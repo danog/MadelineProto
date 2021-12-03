@@ -86,7 +86,7 @@ class Logger extends SettingsAbstract
         $this->type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
             ? MadelineProtoLogger::ECHO_LOGGER
             : MadelineProtoLogger::FILE_LOGGER;
-        Magic::classExists(true);
+        Magic::start(true);
         $this->extra = Magic::$script_cwd.'/MadelineProto.log';
     }
 
@@ -117,7 +117,7 @@ class Logger extends SettingsAbstract
      */
     private function init()
     {
-        Magic::classExists(false);
+        Magic::start(false);
         MadelineProtoLogger::constructorFromSettings($this);
     }
     /**

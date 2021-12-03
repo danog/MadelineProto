@@ -103,7 +103,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 150;
+    const V = 151;
     /**
      * Release version.
      *
@@ -580,7 +580,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function __construct_async(SettingsAbstract $settings): \Generator
     {
         // Initialize needed stuffs
-        Magic::classExists();
+        Magic::start();
         // Parse and store settings
         $this->updateSettingsInternal($settings);
         // Actually instantiate needed classes like a boss
@@ -1223,7 +1223,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     private function wakeupAsync(SettingsAbstract $settings): \Generator
     {
         // Setup one-time stuffs
-        Magic::classExists();
+        Magic::start();
         $this->settings->getConnection()->init();
         // Setup logger
         $this->setupLogger();

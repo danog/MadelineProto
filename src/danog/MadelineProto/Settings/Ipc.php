@@ -19,7 +19,7 @@ class Ipc extends SettingsAbstract
 
     public function __construct()
     {
-        Magic::classExists(true);
+        Magic::start(true);
     }
 
     public function mergeArray(array $settings): void

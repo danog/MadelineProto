@@ -56,14 +56,14 @@ class MsgIdHandler64 extends MsgIdHandler
         }
         $maxMessageId = (\time() + $this->session->time_delta + 30) << 32;
         if ($newMessageId > $maxMessageId) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Consider syncing your date.');
+            throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
         }
         if ($aargs['outgoing']) {
             if ($newMessageId % 4) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is not divisible by 4. Consider syncing your date.');
+                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
             }
             if ($newMessageId <= $this->maxOutgoingId) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Consider syncing your date.');
+                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Please sync your date using NTP.');
             }
             $this->maxOutgoingId = $newMessageId;
         } else {
@@ -73,11 +73,11 @@ class MsgIdHandler64 extends MsgIdHandler
             $key = $this->maxIncomingId;
             if ($aargs['container']) {
                 if ($newMessageId >= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', \danog\MadelineProto\Logger::NOTICE);
                 }
             } else {
                 if ($newMessageId <= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', \danog\MadelineProto\Logger::NOTICE);
                 }
             }
             $this->maxIncomingId = $newMessageId;

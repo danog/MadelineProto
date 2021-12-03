@@ -225,7 +225,7 @@ class Connection extends SettingsAbstract
     }
     public function init(): void
     {
-        Magic::classExists(true);
+        Magic::start(true);
 
         if (Magic::$altervista) {
             $this->addProxy(HttpProxy::class, ['address' => 'localhost', 'port' => 80]);

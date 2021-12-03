@@ -98,7 +98,7 @@ use danog\MadelineProto\Tools;
         $session = new SessionPaths($ipcPath);
 
         try {
-            Magic::classExists();
+            Magic::start();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
             $API = new API($ipcPath, (new Ipc)->setSlow(true));

@@ -1110,9 +1110,9 @@ class InternalDoc extends APIFactory
      *
      * @param array $ints IDs
      *
-     * @return int Vector hash
+     * @return string Vector hash
      */
-    public function genVectorHash(array $ints): int
+    public function genVectorHash(array $ints): string
     {
         return \danog\MadelineProto\Tools::genVectorHash($ints);
     }

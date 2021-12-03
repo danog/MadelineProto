@@ -46,7 +46,7 @@ class RPCErrorException extends \Exception
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]) || $code === 500) {
             Tools::callFork((function () use ($method, $code, $error) {
                 $res = \json_decode(
-                    yield 
+                    yield
                         (yield HttpClientBuilder::buildDefault()
                             ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
                         )->getBody()->buffer(),

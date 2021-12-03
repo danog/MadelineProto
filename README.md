@@ -256,7 +256,6 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.createChat.html" name="messages.createChat">Creates a new chat: messages.createChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteChannel.html" name="channels.deleteChannel">Delete a channel/supergroup: channels.deleteChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/folders.deleteFolder.html" name="folders.deleteFolder">Delete a peer folder: folders.deleteFolder</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteUserHistory.html" name="channels.deleteUserHistory">Delete all messages sent by a certain user in a supergroup: channels.deleteUserHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.dropTempAuthKeys.html" name="auth.dropTempAuthKeys">Delete all temporary authorization keys except for the ones specified: auth.dropTempAuthKeys</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.deleteByPhones.html" name="contacts.deleteByPhones">Delete contacts by phone number: contacts.deleteByPhones</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetWallPapers.html" name="account.resetWallPapers">Delete installed wallpapers: account.resetWallPapers</a>
@@ -465,7 +464,6 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.recoverPassword.html" name="auth.recoverPassword">Reset the 2FA password using the recovery code sent using auth.requestPasswordRecovery: auth.recoverPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetNotifySettings.html" name="account.resetNotifySettings">Resets all notification settings from users and groups: account.resetNotifySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resolveUsername.html" name="contacts.resolveUsername">Resolve a @username to get peer info: contacts.resolveUsername</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getStatsURL.html" name="messages.getStatsURL">Returns URL with the chat statistics. Currently this method can be used only for channels: messages.getStatsURL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizationForm.html" name="account.getAuthorizationForm">Returns a Telegram Passport authorization form for sharing data with a service: account.getAuthorizationForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/updates.getState.html" name="updates.getState">Returns a current state of updates: updates.getState</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPapers.html" name="account.getWallPapers">Returns a list of available wallpapers: account.getWallPapers</a>

@@ -34,7 +34,7 @@ class API extends InternalDoc
      */
     public function __construct(Logger $settings)
     {
-        Magic::classExists();
+        Magic::start();
         $this->API = new Lite($settings);
         foreach (\get_class_methods($this->API) as $method) {
             $this->methods[$method] = [$this->API, \strtolower($method)];

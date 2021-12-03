@@ -28,6 +28,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 
 /**
@@ -62,6 +63,11 @@ class ReadLoop extends SignalLoop
                     yield from $connection->reconnect();
                 })());
                 return;
+            } catch (SecurityException $e) {
+                $connection->resetSession();
+                $API->logger->logger("Got security exception in DC {$datacenter}, reconnecting...", Logger::ERROR);
+                yield from $connection->reconnect();
+                throw $e;
             }
             if (\is_int($error)) {
                 //$this->exitedLoop();
@@ -134,9 +140,7 @@ class ReadLoop extends SignalLoop
             $auth_key_id = yield $buffer->bufferRead(8);
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
                 $message_id = yield $buffer->bufferRead(8);
-                //if (!\in_array($message_id, [\1, \0])) {
                 $connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
-                //}
                 $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
                 $message_data = yield $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;

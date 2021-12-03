@@ -25,7 +25,7 @@ use danog\MadelineProto\TON\Lite;
 
 require 'vendor/autoload.php';
 
-Magic::classExists();
+Magic::start();
 Logger::constructorFromSettings(new SettingsLogger);
 $logger = Logger::$default;
 \set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);

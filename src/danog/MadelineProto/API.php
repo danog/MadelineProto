@@ -166,7 +166,7 @@ class API extends InternalDoc
      */
     public function __magic_construct(string $session, $settings = []): void
     {
-        Magic::classExists(true);
+        Magic::start(true);
         $settings = Settings::parseFromLegacy($settings);
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
@@ -242,6 +242,8 @@ class API extends InternalDoc
                 yield $this->API->stopIpcServer();
                 $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
                 yield $this->API->disconnect();
+            } catch (SecurityException $e) {
+                throw $e;
             } catch (\Throwable $e) {
                 $this->logger->logger("Restarting to full instance: error $e");
             }
@@ -268,6 +270,8 @@ class API extends InternalDoc
                         $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
                         yield $API->disconnect();
                         $API->unreference();
+                    } catch (SecurityException $e) {
+                        throw $e;
                     } catch (\Throwable $e) {
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
@@ -423,6 +427,8 @@ class API extends InternalDoc
             try {
                 Tools::wait($this->startAndLoopAsyncInternal($eventHandler, $started));
                 return;
+            } catch (SecurityException $e) {
+                throw $e;
             } catch (\Throwable $e) {
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
@@ -463,6 +469,8 @@ class API extends InternalDoc
                 }
                 Tools::wait(Tools::all($promises));
                 return;
+            } catch (SecurityException $e) {
+                throw $e;
             } catch (\Throwable $e) {
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
@@ -517,6 +525,8 @@ class API extends InternalDoc
                 $started = true;
                 /** @var API $this->API */
                 return yield from $this->API->loop();
+            } catch (SecurityException $e) {
+                throw $e;
             } catch (\Throwable $e) {
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];

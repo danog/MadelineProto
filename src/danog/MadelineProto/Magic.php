@@ -245,10 +245,13 @@ class Magic
      *
      * @return void
      */
-    public static function classExists(bool $light = false): void
+    public static function start(bool $light = false): void
     {
         if (self::$inited || (self::$initedLight && $light)) {
             return;
+        }
+        if (PHP_INT_SIZE < 8) {
+            throw new \danog\MadelineProto\Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.', 0, null, 'MadelineProto', 1);
         }
         if (!self::$initedLight) {
             // Setup error reporting

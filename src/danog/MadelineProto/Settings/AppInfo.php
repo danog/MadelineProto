@@ -71,7 +71,7 @@ class AppInfo extends SettingsAbstract
     }
     public function init(): void
     {
-        Magic::classExists(true);
+        Magic::start(true);
         // Detect language pack
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];

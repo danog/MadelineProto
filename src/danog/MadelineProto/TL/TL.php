@@ -414,11 +414,7 @@ class TL
         switch ($type['type']) {
             case 'int':
                 if (!\is_numeric($object)) {
-                    if (\is_array($object) && $type['name'] === 'hash') {
-                        $object = \danog\MadelineProto\Tools::genVectorHash($object);
-                    } else {
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
-                    }
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
                 return \danog\MadelineProto\Tools::packSignedInt($object);
             case '#':
@@ -435,6 +431,9 @@ class TL
                 }
                 if (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
                     return \substr($object, 1);
+                }
+                if (\is_array($object) && $type['name'] === 'hash') {
+                    return \danog\MadelineProto\Tools::genVectorHash($object);
                 }
                 if (\is_array($object) && \count($object) === 2) {
                     return \pack('l2', ...$object); // For bot API on 32bit

@@ -56,7 +56,7 @@ interface auth
     /**
      * Logs out the user.
      *
-     * @return bool
+     * @return auth.LoggedOut
      */
     public function logOut();
 
@@ -85,7 +85,7 @@ interface auth
      * Logs in a user using a key transmitted from his native data-centre.
      *
      * Parameters:
-     * * `int`   **id**    - User ID
+     * * `long`  **id**    -
      * * `bytes` **bytes** - Authorization key
      *
      * @param array $params Parameters
@@ -204,7 +204,7 @@ interface auth
      * Parameters:
      * * `int`    **api_id**     - Application identifier (see. [App configuration](https://core.telegram.org/myapp))
      * * `string` **api_hash**   - Application identifier hash (see. [App configuration](https://core.telegram.org/myapp))
-     * * `[int]`  **except_ids** - List of already logged-in user IDs, to prevent logging in twice with the same user
+     * * `[long]` **except_ids** - List of already logged-in user IDs, to prevent logging in twice with the same user
      *
      * @param array $params Parameters
      *
@@ -266,7 +266,7 @@ interface account
      * * `string`  **token**       - Device token
      * * `Bool`    **app_sandbox** - If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, a sandbox-certificate will be used during transmission.
      * * `bytes`   **secret**      - For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
-     * * `[int]`   **other_uids**  - List of user identifiers of other users currently using the client
+     * * `[long]`  **other_uids**  - List of user identifiers of other users currently using the client
      *
      * @param array $params Parameters
      *
@@ -280,7 +280,7 @@ interface account
      * Parameters:
      * * `int`    **token_type** - Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
      * * `string` **token**      - Device token
-     * * `[int]`  **other_uids** - List of user identifiers of other users currently using the client
+     * * `[long]` **other_uids** - List of user identifiers of other users currently using the client
      *
      * @param array $params Parameters
      *
@@ -350,7 +350,7 @@ interface account
      * Returns a list of available wallpapers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -655,7 +655,7 @@ interface account
      * Returns a Telegram Passport authorization form for sharing data with a service.
      *
      * Parameters:
-     * * `int`    **bot_id**     - User identifier of the service's bot
+     * * `long`   **bot_id**     -
      * * `string` **scope**      - Telegram Passport element types requested by the service
      * * `string` **public_key** - Service's public key
      *
@@ -669,7 +669,7 @@ interface account
      * Sends a Telegram Passport authorization form, effectively sharing data with the service.
      *
      * Parameters:
-     * * `int`                        **bot_id**       - Bot ID
+     * * `long`                       **bot_id**       -
      * * `string`                     **scope**        - Telegram Passport element types requested by the service
      * * `string`                     **public_key**   - Service's public key
      * * `[SecureValueHash]`          **value_hashes** - Types of values sent and their hashes
@@ -921,10 +921,10 @@ interface account
      * Create a theme.
      *
      * Parameters:
-     * * `string`             **slug**     - Unique theme ID
-     * * `string`             **title**    - Theme name
-     * * `InputDocument`      **document** - Optional: Theme file
-     * * `InputThemeSettings` **settings** - Optional: Theme settings
+     * * `string`               **slug**     - Unique theme ID
+     * * `string`               **title**    - Theme name
+     * * `InputDocument`        **document** - Optional: Theme file
+     * * `[InputThemeSettings]` **settings** - Optional:
      *
      * @param array $params Parameters
      *
@@ -936,12 +936,12 @@ interface account
      * Update theme.
      *
      * Parameters:
-     * * `string`             **format**   - Theme format, a string that identifies the theming engines supported by the client
-     * * `InputTheme`         **theme**    - Theme to update
-     * * `string`             **slug**     - Optional: Unique theme ID
-     * * `string`             **title**    - Optional: Theme name
-     * * `InputDocument`      **document** - Optional: Theme file
-     * * `InputThemeSettings` **settings** - Optional: Theme settings
+     * * `string`               **format**   - Theme format, a string that identifies the theming engines supported by the client
+     * * `InputTheme`           **theme**    - Theme to update
+     * * `string`               **slug**     - Optional: Unique theme ID
+     * * `string`               **title**    - Optional: Theme name
+     * * `InputDocument`        **document** - Optional: Theme file
+     * * `[InputThemeSettings]` **settings** - Optional:
      *
      * @param array $params Parameters
      *
@@ -966,9 +966,10 @@ interface account
      * Install a theme.
      *
      * Parameters:
-     * * `boolean`    **dark**   - Optional: Whether to install the dark version
-     * * `string`     **format** - Optional: Theme format, a string that identifies the theming engines supported by the client
-     * * `InputTheme` **theme**  - Optional: Theme to install
+     * * `boolean`    **dark**       - Optional: Whether to install the dark version
+     * * `InputTheme` **theme**      - Optional: Theme to install
+     * * `string`     **format**     - Optional: Theme format, a string that identifies the theming engines supported by the client
+     * * `BaseTheme`  **base_theme** - Optional:
      *
      * @param array $params Parameters
      *
@@ -995,7 +996,7 @@ interface account
      *
      * Parameters:
      * * `string` **format** - Theme format, a string that identifies the theming engines supported by the client
-     * * `[int]`  **hash**   - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`   **hash**   -
      *
      * @param array $params Parameters
      *
@@ -1081,6 +1082,44 @@ interface account
      * @return bool
      */
     public function declinePasswordReset();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return account.Themes
+     */
+    public function getChatThemes($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int` **authorization_ttl_days** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setAuthorizationTTL($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash**                        -
+     * * `Bool` **encrypted_requests_disabled** - Optional:
+     * * `Bool` **call_requests_disabled**      - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function changeAuthorizationSettings($params);
 }
 
 interface users
@@ -1105,7 +1144,7 @@ interface users
      *
      * @param array $params Parameters
      *
-     * @return UserFull
+     * @return users.UserFull
      */
     public function getFullUser($params);
 
@@ -1131,7 +1170,7 @@ interface contacts
      * Get contact by telegram IDs.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -1150,7 +1189,7 @@ interface contacts
      * Returns the current user's contact list.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -1272,7 +1311,7 @@ interface contacts
      * * `boolean` **channels**       - Optional: Most frequently visited channels
      * * `int`     **offset**         - Offset for [pagination](https://core.telegram.org/api/offsets)
      * * `int`     **limit**          - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * * `[int]`   **hash**           - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`    **hash**           -
      *
      * @param array $params Parameters
      *
@@ -1403,7 +1442,7 @@ interface messages
      * * `int`       **offset_id**      - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `InputPeer` **offset_peer**    - [Offset peer for pagination](https://core.telegram.org/api/offsets)
      * * `int`       **limit**          - Number of list elements to be returned
-     * * `[int]`     **hash**           - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`      **hash**           -
      *
      * @param array $params Parameters
      *
@@ -1422,7 +1461,7 @@ interface messages
      * * `int`       **limit**       - Number of results to return
      * * `int`       **max_id**      - If a positive value was transferred, the method will return only messages with IDs less than **max\_id**
      * * `int`       **min_id**      - If a positive value was transferred, the method will return only messages with IDs more than **min\_id**
-     * * `[int]`     **hash**        - Optional: [Result hash](https://core.telegram.org/api/offsets)
+     * * `long`      **hash**        -
      *
      * @param array $params Parameters
      *
@@ -1446,7 +1485,7 @@ interface messages
      * * `int`            **limit**      - [Number of results to return](https://core.telegram.org/api/offsets)
      * * `int`            **max_id**     - [Maximum message ID to return](https://core.telegram.org/api/offsets)
      * * `int`            **min_id**     - [Minimum message ID to return](https://core.telegram.org/api/offsets)
-     * * `[int]`          **hash**       - Optional: [Hash](https://core.telegram.org/api/offsets)
+     * * `long`           **hash**       -
      *
      * @param array $params Parameters
      *
@@ -1475,6 +1514,8 @@ interface messages
      * * `boolean`   **revoke**     - Optional: Whether to delete the message history for all chat participants
      * * `InputPeer` **peer**       - User or chat, communication history of which will be deleted
      * * `int`       **max_id**     - Maximum ID of message to delete
+     * * `int`       **min_date**   - Optional:
+     * * `int`       **max_date**   - Optional:
      *
      * @param array $params Parameters
      *
@@ -1535,6 +1576,7 @@ interface messages
      * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for sending bot buttons
      * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for sending styled text
      * * `int`             **schedule_date**   - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
+     * * `InputPeer`       **send_as**         - Optional:
      *
      * @param array $params Parameters
      *
@@ -1556,6 +1598,7 @@ interface messages
      * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for bot keyboards
      * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for styled text
      * * `int`             **schedule_date**   - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
+     * * `InputPeer`       **send_as**         - Optional:
      *
      * @param array $params Parameters
      *
@@ -1567,13 +1610,16 @@ interface messages
      * Forwards messages by their IDs.
      *
      * Parameters:
-     * * `boolean`   **silent**        - Optional: Whether to send messages silently (no notification will be triggered on the destination clients)
-     * * `boolean`   **background**    - Optional: Whether to send the message in background
-     * * `boolean`   **with_my_score** - Optional: When forwarding games, whether to include your score in the game
-     * * `InputPeer` **from_peer**     - Source of messages
-     * * `[int]`     **id**            - IDs of messages
-     * * `InputPeer` **to_peer**       - Destination peer
-     * * `int`       **schedule_date** - Optional: Scheduled message date for scheduled messages
+     * * `boolean`   **silent**              - Optional: Whether to send messages silently (no notification will be triggered on the destination clients)
+     * * `boolean`   **background**          - Optional: Whether to send the message in background
+     * * `boolean`   **with_my_score**       - Optional: When forwarding games, whether to include your score in the game
+     * * `boolean`   **drop_author**         - Optional:
+     * * `boolean`   **drop_media_captions** - Optional:
+     * * `InputPeer` **from_peer**           - Source of messages
+     * * `[int]`     **id**                  - IDs of messages
+     * * `InputPeer` **to_peer**             - Destination peer
+     * * `int`       **schedule_date**       - Optional: Scheduled message date for scheduled messages
+     * * `InputPeer` **send_as**             - Optional:
      *
      * @param array $params Parameters
      *
@@ -1601,7 +1647,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return PeerSettings
+     * @return messages.PeerSettings
      */
     public function getPeerSettings($params);
 
@@ -1624,7 +1670,7 @@ interface messages
      * Returns chat basic info on their IDs.
      *
      * Parameters:
-     * * `[int]` **id** - List of chat IDs
+     * * `[long]` **id** - List of chat IDs
      *
      * @param array $params Parameters
      *
@@ -1873,7 +1919,7 @@ interface messages
      *
      * Parameters:
      * * `string` **emoticon** - The emoji
-     * * `[int]`  **hash**     - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`   **hash**     -
      *
      * @param array $params Parameters
      *
@@ -1885,7 +1931,7 @@ interface messages
      * Get all installed stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -1911,9 +1957,11 @@ interface messages
      *
      * Parameters:
      * * `boolean`   **legacy_revoke_permanent** - Optional:
+     * * `boolean`   **request_needed**          - Optional:
      * * `InputPeer` **peer**                    - Chat
      * * `int`       **expire_date**             - Optional:
      * * `int`       **usage_limit**             - Optional:
+     * * `string`    **title**                   - Optional:
      *
      * @param array $params Parameters
      *
@@ -1950,6 +1998,7 @@ interface messages
      *
      * Parameters:
      * * `InputStickerSet` **stickerset** - Stickerset
+     * * `[int]`           **hash**       - Optional:
      *
      * @param array $params Parameters
      *
@@ -2087,7 +2136,7 @@ interface messages
      * Get saved GIFs.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -2155,6 +2204,7 @@ interface messages
      * * `long`      **query_id**        - Query ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * * `string`    **id**              - Result ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * * `int`       **schedule_date**   - Optional: Scheduled message date for scheduled messages
+     * * `InputPeer` **send_as**         - Optional:
      *
      * @param array $params Parameters
      *
@@ -2282,7 +2332,7 @@ interface messages
      * Get featured stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -2307,7 +2357,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **attached** - Optional: Get stickers recently attached to photo or video files
-     * * `[int]`   **hash**     - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`    **hash**     -
      *
      * @param array $params Parameters
      *
@@ -2359,7 +2409,7 @@ interface messages
      * Get installed mask stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -2444,7 +2494,7 @@ interface messages
      *
      * Parameters:
      * * `InputUser` **user_id** - User ID
-     * * `int`       **max_id**  - Maximum ID of chat to return (see [pagination](https://core.telegram.org/api/offsets))
+     * * `long`      **max_id**  -
      * * `int`       **limit**   - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
@@ -2457,7 +2507,7 @@ interface messages
      * Get all chats, channels and supergroups.
      *
      * Parameters:
-     * * `[int]` **except_ids** - Except these chats/channels/supergroups
+     * * `[long]` **except_ids** - Except these chats/channels/supergroups
      *
      * @param array $params Parameters
      *
@@ -2577,7 +2627,7 @@ interface messages
      * Get faved stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long` **hash** -
      *
      * @param array $params Parameters
      *
@@ -2633,7 +2683,7 @@ interface messages
      * Parameters:
      * * `InputPeer` **peer**  - User
      * * `int`       **limit** - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * * `[int]`     **hash**  - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`      **hash**  -
      *
      * @param array $params Parameters
      *
@@ -2652,6 +2702,7 @@ interface messages
      * * `int`                **reply_to_msg_id** - Optional: The message to reply to
      * * `[InputSingleMedia]` **multi_media**     - The medias to send
      * * `int`                **schedule_date**   - Optional: Scheduled message date for scheduled messages
+     * * `InputPeer`          **send_as**         - Optional:
      *
      * @param array $params Parameters
      *
@@ -2678,7 +2729,7 @@ interface messages
      * Parameters:
      * * `boolean` **exclude_featured** - Optional: Exclude featured stickersets from results
      * * `string`  **q**                - Query string
-     * * `[int]`   **hash**             - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`    **hash**             -
      *
      * @param array $params Parameters
      *
@@ -2774,20 +2825,6 @@ interface messages
      * @return ChatOnlines
      */
     public function getOnlines($params);
-
-    /**
-     * Returns URL with the chat statistics. Currently this method can be used only for channels.
-     *
-     * Parameters:
-     * * `boolean`   **dark**   - Optional: Pass true if a URL with the dark theme must be returned
-     * * `InputPeer` **peer**   - Chat identifier
-     * * `string`    **params** - Parameters from `tg://statsrefresh?params=******` link
-     *
-     * @param array $params Parameters
-     *
-     * @return StatsURL
-     */
-    public function getStatsURL($params);
 
     /**
      * Edit the description of a [group/supergroup/channel](https://core.telegram.org/api/channel).
@@ -2925,7 +2962,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`      **hash** -
      *
      * @param array $params Parameters
      *
@@ -3046,9 +3083,9 @@ interface messages
      * Method for fetching previously featured stickers.
      *
      * Parameters:
-     * * `int`   **offset** - Offset
-     * * `int`   **limit**  - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * * `[int]` **hash**   - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `int`  **offset** - Offset
+     * * `int`  **limit**  - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * * `long` **hash**   -
      *
      * @param array $params Parameters
      *
@@ -3068,7 +3105,7 @@ interface messages
      * * `int`       **limit**       - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * * `int`       **max_id**      - If a positive value was transferred, the method will return only messages with ID smaller than max\_id
      * * `int`       **min_id**      - If a positive value was transferred, the method will return only messages with ID bigger than min\_id
-     * * `[int]`     **hash**        - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * * `long`      **hash**        -
      *
      * @param array $params Parameters
      *
@@ -3227,11 +3264,13 @@ interface messages
      *
      *
      * Parameters:
-     * * `boolean`   **revoked**     - Optional:
-     * * `InputPeer` **peer**        -
-     * * `string`    **link**        -
-     * * `int`       **expire_date** - Optional:
-     * * `int`       **usage_limit** - Optional:.
+     * * `boolean`   **revoked**        - Optional:
+     * * `InputPeer` **peer**           -
+     * * `string`    **link**           -
+     * * `int`       **expire_date**    - Optional:
+     * * `int`       **usage_limit**    - Optional:
+     * * `Bool`      **request_needed** - Optional:
+     * * `string`    **title**          - Optional:.
      *
      * @param array $params Parameters
      *
@@ -3281,8 +3320,10 @@ interface messages
      *
      *
      * Parameters:
+     * * `boolean`   **requested**   - Optional:
      * * `InputPeer` **peer**        -
-     * * `string`    **link**        -
+     * * `string`    **link**        - Optional:
+     * * `string`    **q**           - Optional:
      * * `int`       **offset_date** -
      * * `InputUser` **offset_user** -
      * * `int`       **limit**       -.
@@ -3317,6 +3358,116 @@ interface messages
      * @return messages.CheckedHistoryImportPeer
      */
     public function checkHistoryImportPeer($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**     -
+     * * `string`    **emoticon** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function setChatTheme($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `int`       **msg_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return  of long[]
+     */
+    public function getMessageReadParticipants($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer`      **peer**        -
+     * * `MessagesFilter` **filter**      -
+     * * `int`            **offset_id**   -
+     * * `int`            **offset_date** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.SearchResultsCalendar
+     */
+    public function getSearchResultsCalendar($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer`      **peer**      -
+     * * `MessagesFilter` **filter**    -
+     * * `int`            **offset_id** -
+     * * `int`            **limit**     -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.SearchResultsPositions
+     */
+    public function getSearchResultsPositions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **approved** - Optional:
+     * * `InputPeer` **peer**     -
+     * * `InputUser` **user_id**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function hideChatJoinRequest($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **approved** - Optional:
+     * * `InputPeer` **peer**     -
+     * * `string`    **link**     - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function hideAllChatJoinRequests($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**    -
+     * * `Bool`      **enabled** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleNoForwards($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**    -
+     * * `InputPeer` **send_as** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function saveDefaultSendAs($params);
 }
 
 interface updates
@@ -3788,25 +3939,12 @@ interface channels
     public function deleteMessages($params);
 
     /**
-     * Delete all messages sent by a certain user in a [supergroup](https://core.telegram.org/api/channel).
-     *
-     * Parameters:
-     * * `InputChannel` **channel** - [Supergroup](https://core.telegram.org/api/channel)
-     * * `InputUser`    **user_id** - User whose messages should be deleted
-     *
-     * @param array $params Parameters
-     *
-     * @return messages.AffectedHistory
-     */
-    public function deleteUserHistory($params);
-
-    /**
      * Reports some messages from a user in a supergroup as spam; requires administrator rights in the supergroup.
      *
      * Parameters:
-     * * `InputChannel` **channel** - Supergroup
-     * * `InputUser`    **user_id** - ID of the user that sent the spam messages
-     * * `[int]`        **id**      - IDs of spam messages
+     * * `InputChannel` **channel**     - Supergroup
+     * * `InputPeer`    **participant** -
+     * * `[int]`        **id**          - IDs of spam messages
      *
      * @param array $params Parameters
      *
@@ -3835,7 +3973,7 @@ interface channels
      * * `ChannelParticipantsFilter` **filter**  - Which participant types to fetch
      * * `int`                       **offset**  - [Offset](https://core.telegram.org/api/offsets)
      * * `int`                       **limit**   - [Limit](https://core.telegram.org/api/offsets)
-     * * `[int]`                     **hash**    - Optional: [Hash](https://core.telegram.org/api/offsets)
+     * * `long`                      **hash**    -
      *
      * @param array $params Parameters
      *
@@ -4233,6 +4371,55 @@ interface channels
      * @return Updates
      */
     public function convertToGigagroup($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function viewSponsoredMessage($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.SponsoredMessages
+     */
+    public function getSponsoredMessages($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return channels.SendAsPeers
+     */
+    public function getSendAs($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel**     -
+     * * `InputPeer`    **participant** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedHistory
+     */
+    public function deleteParticipantHistory($params);
 }
 
 interface bots
@@ -4705,7 +4892,8 @@ interface phone
      *
      *
      * Parameters:
-     * * `InputGroupCall` **call** -.
+     * * `InputGroupCall` **call**  -
+     * * `int`            **limit** -.
      *
      * @param array $params Parameters
      *
@@ -4746,9 +4934,11 @@ interface phone
      *
      *
      * Parameters:
-     * * `boolean`        **start** - Optional:
-     * * `InputGroupCall` **call**  -
-     * * `string`         **title** - Optional:.
+     * * `boolean`        **start**          - Optional:
+     * * `boolean`        **video**          - Optional:
+     * * `InputGroupCall` **call**           -
+     * * `string`         **title**          - Optional:
+     * * `Bool`           **video_portrait** - Optional:.
      *
      * @param array $params Parameters
      *
@@ -5623,9 +5813,9 @@ class InternalDoc extends APIFactory
      *
      * @param array $ints IDs
      *
-     * @return int Vector hash
+     * @return string Vector hash
      */
-    public function genVectorHash(array $ints): int
+    public function genVectorHash(array $ints): string
     {
         return \danog\MadelineProto\Tools::genVectorHash($ints);
     }

@@ -78,22 +78,16 @@ abstract class Tools extends StrTools
      *
      * @param array $ints IDs
      *
-     * @return int Vector hash
+     * @return string Vector hash
      */
-    public static function genVectorHash(array $ints): int
+    public static function genVectorHash(array $ints): string
     {
-        //sort($ints, SORT_NUMERIC);
-        if (\danog\MadelineProto\Magic::$bigint) {
-            $hash = new \tgseclib\Math\BigInteger(0);
-            foreach ($ints as $int) {
-                $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \tgseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
-            }
-            $hash = self::unpackSignedInt(\strrev(\str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
-        } else {
-            $hash = 0;
-            foreach ($ints as $int) {
-                $hash = ($hash * 20261 & 0x7fffffff) + $int & 0x7fffffff;
-            }
+        $hash = 0;
+        foreach ($ints as $id) {
+            $hash = $hash ^ ($id >> 21);
+            $hash = $hash ^ ($id << 35);
+            $hash = $hash ^ ($id >> 4);
+            $hash = $hash + $id;
         }
         return $hash;
     }

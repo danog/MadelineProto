@@ -23,7 +23,7 @@
         "ext-pthreads": "*"
     },
     "require": {
-        "php": ">=8.0",
+        "php-64bit": ">=8.0",
         "danog/primemodule": "^1",
         "erusev/parsedown": "^1.7",
         "symfony/polyfill-mbstring": "*",
@@ -62,6 +62,7 @@
         "phpdocumentor/reflection-docblock": "^5.2",
         "ext-ctype": "*",
         "danog/phpdoc": "^0.1.7",
+        "phpunit/phpunit": "^9",
         "phabel/phabel": "^1",
         "bamarni/composer-bin-plugin": "^1.4"
     },
@@ -116,7 +117,6 @@
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
         "psalm": "psalm",
         "phpdocMain": "php tools/phpdoc.php",
-        "phpdocInternal": "phpdoc docs/docs/PHPInternal",
         "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml",
         "bin": "echo 'bin not installed'",
