@@ -23,7 +23,7 @@
         "ext-pthreads": "*"
     },
     "require": {
-        "php": ">=8.0",
+        "php": ">=7.0",
         "danog/primemodule": "^1",
         "erusev/parsedown": "^1.7",
         "symfony/polyfill-mbstring": "*",
