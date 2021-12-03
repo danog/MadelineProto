@@ -7,44 +7,32 @@ PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
 
-COMMIT="$(git log -1 --pretty=%H)"
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-#TAG=$(git tag --points-at $COMMIT | grep -v '\.9999')
-COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
-
 [[ "$TAG" == *.9999 ]] && exit 0
 [[ "$TAG" == *.9998 ]] && exit 0
 
-[ "$TAG" != "" ] && IS_RELEASE=y || IS_RELEASE=n
+COMMIT="$(git log -1 --pretty=%H)"
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
 echo "PHP: $php"
 echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"
-echo "Is release: $IS_RELEASE"
-
-skip=n
-[ $PHP_MAJOR_VERSION -eq 8 ] && [ $PHP_MINOR_VERSION -ge 0 ] && {
-    echo
-    #composer update
-    #composer test || {
-    #    cat tests/MadelineProto.log
-    #    exit 1
-    #}
-    #cat tests/MadelineProto.log
-} || {
-    skip=y
-    echo "Skip"
-}
 
 # Clean up
 madelinePath=$PWD
-[ "$IS_RELEASE" == "y" ] && ref="$TAG" || ref="$COMMIT"
+
+sed 's/php-64bit/php/g' -i composer.json
+
+git commit -am 'Temp'
+git tag "$TAG.1"
+
+export TAG="$TAG.1"
 
 php8.0 $(which composer) update
-php8.0 vendor/bin/phabel publish -d "$ref"
+php8.0 vendor/bin/phabel publish -d "$TAG"
 
-git checkout "$ref.9998"
+git checkout "$TAG.9998"
 
 cd ..
 rm -rf phar
@@ -56,7 +44,7 @@ cd phar
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "'$ref'.9998"
+        "danog/madelineproto": "'$TAG'.9998"
     },
     "authors": [
         {
@@ -75,7 +63,6 @@ echo '{
 php $(which composer) update --no-cache
 php $(which composer) dumpautoload --optimize
 rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs
-find vendor/ -type f -exec sed 's/private function __sleep/public function __sleep/g' -i {} +
 cd ..
 
 branch="-$BRANCH"
@@ -170,14 +157,9 @@ input=$PWD
 cd ~/MadelineProtoPhar
 git pull
 
-cp "$input/madeline$php$branch.phar" .
-cp "$input/tools/phar.php" "$input/examples/mtproxyd" .
-echo -n "$COMMIT-$php" > release$php$branch
-
-[ "$IS_RELEASE" == "y" ] && {
-    cp release$php$branch release$php
-    cp madeline$php$branch.phar madeline$php.phar
-}
+cp "$input/madeline$php$branch.phar" "madeline$php.phar"
+cp "$input/tools/phar.php" .
+echo -n "$COMMIT-$php" > release$php
 
 git add -A
 git commit -am "Release $BRANCH - $COMMIT_MESSAGE"
