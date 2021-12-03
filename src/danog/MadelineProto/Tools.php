@@ -89,7 +89,7 @@ abstract class Tools extends StrTools
             $hash = $hash ^ ($id >> 4);
             $hash = $hash + $id;
         }
-        return $hash;
+        return Tools::packSignedLong($hash);
     }
     /**
      * Get random integer.
@@ -223,14 +223,7 @@ abstract class Tools extends StrTools
      */
     public static function packSignedLong(int $value): string
     {
-        if ($value > 9223372036854775807) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
-        }
-        if ($value < -9.223372036854776E+18) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
-        }
-        $res = \danog\MadelineProto\Magic::$bigint ? self::packSignedInt($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
-        return $res;
+        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value);
     }
     /**
      * Convert value to unsigned base256 int.
