@@ -322,13 +322,6 @@ class Magic
         }
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
         self::$bigint = PHP_INT_SIZE < 8;
-        try {
-            \preg_match('/const V = (\\d+);/', @\file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-            if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
-                throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
-            }
-        } catch (\Throwable $e) {
-        }
         if (\class_exists('\\danog\\MadelineProto\\VoIP')) {
             if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION, ['1.5.0'])) {
                 throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
