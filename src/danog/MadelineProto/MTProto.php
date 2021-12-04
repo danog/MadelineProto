@@ -92,7 +92,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var int
      */
     /*
-        const V = 71;
+        const V = 72;
     */
     /**
      * Internal version of MadelineProto.
