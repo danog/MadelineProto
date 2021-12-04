@@ -25,6 +25,7 @@ madelinePath=$PWD
 sed 's/php-64bit/php/g' -i composer.json
 
 git commit -am 'Temp'
+git tag -d "90$TAG" || :
 git tag "90$TAG"
 
 php8.0 $(which composer) update
