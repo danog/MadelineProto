@@ -5,7 +5,7 @@ if (\defined('MADELINE_PHP')) {
 }
 
 if (\class_exists(\Composer\Autoload\ClassLoader::class)) {
-    throw new \Exception('Please require MadelineProto using composer.');
+    throw new \Exception('Composer autoloader detected: madeline.php is incompatible with Composer, please require MadelineProto using composer.');
 }
 
 \define('MADELINE_PHP', __FILE__);
