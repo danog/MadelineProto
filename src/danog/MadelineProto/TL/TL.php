@@ -667,6 +667,10 @@ class TL
                             }
                     }
                 }
+                if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'long') {
+                    $serialized .= \pack('@8');
+                    continue;
+                }
                 if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'int') {
                     $serialized .= \pack('@4');
                     continue;
