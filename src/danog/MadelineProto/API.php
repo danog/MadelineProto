@@ -323,7 +323,7 @@ class API extends InternalDoc
             // Success, IPC client
             $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
             $this->APIFactory();
-            if ($settings) {
+            if (!$settings instanceof SettingsEmpty) {
                 $this->API->updateSettings($settings);
             }
             return true;

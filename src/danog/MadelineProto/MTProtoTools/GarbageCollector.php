@@ -5,7 +5,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
-use ReflectionClass;
 
 final class GarbageCollector
 {
