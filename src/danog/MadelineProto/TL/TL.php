@@ -801,7 +801,7 @@ class TL
                 if (isset($type['idstrlong'])) {
                     return \stream_get_contents($stream, 8);
                 }
-                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? \stream_get_contents($stream, 8) : \danog\MadelineProto\Tools::unpackSignedLong(\stream_get_contents($stream, 8));
+                return isset($type['strlong']) ? \stream_get_contents($stream, 8) : \danog\MadelineProto\Tools::unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
                 return \danog\MadelineProto\Tools::unpackDouble(\stream_get_contents($stream, 8));
             case 'int128':

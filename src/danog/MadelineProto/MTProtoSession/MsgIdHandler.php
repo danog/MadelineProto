@@ -20,6 +20,8 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Connection;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler32;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler64;
 
@@ -52,10 +54,7 @@ abstract class MsgIdHandler
      */
     public static function createInstance(Connection $session): self
     {
-        if (PHP_INT_SIZE === 8) {
-            return new MsgIdHandler64($session);
-        }
-        return new MsgIdHandler32($session);
+        return new MsgIdHandler64($session);
     }
 
     /**
@@ -97,32 +96,11 @@ abstract class MsgIdHandler
      */
     public function cleanup(): void
     {
-        $count = 0;
-        foreach ($this->session->incoming_messages as $key => $message) {
-            if ($message->canGarbageCollect()) {
-                unset($this->session->incoming_messages[$key]);
-                $count++;
-            } else {
-                $this->session->API->logger->logger("Can't garbage collect $message", \danog\MadelineProto\Logger::VERBOSE);
-            }
-        }
-        $total = \count($this->session->incoming_messages);
-        if ($count+$total) {
-            $this->session->API->logger->logger("Garbage collected $count incoming messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
-        }
-
-        $count = 0;
-        foreach ($this->session->outgoing_messages as $key => $message) {
-            if ($message->canGarbageCollect()) {
-                unset($this->session->outgoing_messages[$key]);
-                $count++;
-            } else {
-                $this->session->API->logger->logger("Can't garbage collect $message", \danog\MadelineProto\Logger::VERBOSE);
-            }
-        }
-        $total = \count($this->session->outgoing_messages);
-        if ($count+$total) {
-            $this->session->API->logger->logger("Garbage collected $count outgoing messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
+        $usage = \memory_get_usage();
+        $this->session->cleanupSession();
+        $cleaned = \round(($usage - \memory_get_usage())/1024/1024, 1);
+        if ($cleaned && !Magic::$suspendPeriodicLogging) {
+            $this->session->API->logger->logger("Zend hashmap reallocation done. Cleaned memory: $cleaned Mb", Logger::VERBOSE);
         }
     }
     /**

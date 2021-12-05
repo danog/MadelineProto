@@ -60,30 +60,6 @@ abstract class Extension
     public static function getExtensionFromLocation($location, string $default): string
     {
         return $default;
-        //('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
-        if (!isset($res['type']['_'])) {
-            return $default;
-        }
-        switch ($res['type']['_']) {
-            case 'storage.fileJpeg':
-                return '.jpg';
-            case 'storage.fileGif':
-                return '.gif';
-            case 'storage.filePng':
-                return '.png';
-            case 'storage.filePdf':
-                return '.pdf';
-            case 'storage.fileMp3':
-                return '.mp3';
-            case 'storage.fileMov':
-                return '.mov';
-            case 'storage.fileMp4':
-                return '.mp4';
-            case 'storage.fileWebp':
-                return '.webp';
-            default:
-                return $default;
-        }
     }
     /**
      * Get mime type of file.

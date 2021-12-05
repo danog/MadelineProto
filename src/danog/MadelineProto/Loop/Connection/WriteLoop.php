@@ -337,6 +337,7 @@ class WriteLoop extends ResumableSignalLoop
             }
         } while ($connection->pendingOutgoing && !$skipped);
         if (empty($connection->pendingOutgoing)) {
+            $connection->pendingOutgoing = [];
             $connection->pendingOutgoingKey = 'a';
         }
         return $skipped;

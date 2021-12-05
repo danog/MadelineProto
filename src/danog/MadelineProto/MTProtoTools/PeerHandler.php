@@ -24,6 +24,7 @@ use Amp\Promise;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -49,22 +50,22 @@ trait PeerHandler
      *
      * @param int $id MTProto channel ID
      *
-     * @return float|int
+     * @return int
      */
-    public static function toSupergroup($id)
+    public static function toSupergroup($id): int
     {
-        return -($id + \pow(10, (int) \floor(\log($id, 10) + 3)));
+        return Magic::ZERO_CHANNEL_ID - $id;
     }
     /**
      * Convert bot API channel ID to MTProto channel ID.
      *
      * @param int $id Bot API channel ID
      *
-     * @return float|int
+     * @return int
      */
-    public static function fromSupergroup($id)
+    public static function fromSupergroup($id): int
     {
-        return -$id - \pow(10, (int) \floor(\log(-$id, 10)));
+        return (-$id) + Magic::ZERO_CHANNEL_ID;
     }
     /**
      * Check whether provided bot API ID is a channel.
@@ -75,8 +76,7 @@ trait PeerHandler
      */
     public static function isSupergroup($id): bool
     {
-        $log = \log(-$id, 10);
-        return ($log - \intval($log)) * 1000 < 10;
+        return $id < Magic::ZERO_CHANNEL_ID;
     }
     /**
      * Set support info.
@@ -488,7 +488,7 @@ trait PeerHandler
         }
         if (\is_numeric($id)) {
             if (\is_string($id)) {
-                $id = \danog\MadelineProto\Magic::$bigint ? (float) $id : (int) $id;
+                $id = (int) $id;
             }
             return $id;
         }
@@ -652,15 +652,16 @@ trait PeerHandler
             }
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
-        if (\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $id, $matches)) {
-            if ($matches[1] === '') {
-                $id = $matches[2];
-            } else {
-                $invite = yield from $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $matches[2]]);
+        if ($r = Tools::parseLink($id)) {
+            [$invite, $content] = $r;
+            if ($invite) {
+                $invite = yield from $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
                 if (isset($invite['chat'])) {
                     return yield from $this->getInfo($invite['chat'], $type);
                 }
                 throw new \danog\MadelineProto\Exception('You have not joined this chat');
+            } else {
+                $id = $content;
             }
         }
         $id = \strtolower(\str_replace('@', '', $id));

@@ -151,6 +151,7 @@ trait ResponseHandler
                     break;
             }
         }
+        $this->new_incoming = [];
         if ($this->pendingOutgoing) {
             $this->writer->resume();
         }

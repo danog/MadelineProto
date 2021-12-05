@@ -30,6 +30,7 @@ use function Amp\Promise\wait;
 
 class Magic
 {
+    const ZERO_CHANNEL_ID = -1000000000000;
     /**
      * Static storage.
      *
@@ -42,12 +43,6 @@ class Magic
      * @var boolean
      */
     public static $BIG_ENDIAN = false;
-    /**
-     * Whether this system is 32-bit and requires bigint.
-     *
-     * @var boolean
-     */
-    public static $bigint = true;
     /**
      * Whether this is a TTY console.
      *
@@ -321,7 +316,6 @@ class Magic
             }
         }
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
-        self::$bigint = PHP_INT_SIZE < 8;
         if (\class_exists('\\danog\\MadelineProto\\VoIP')) {
             if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION, ['1.5.0'])) {
                 throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);

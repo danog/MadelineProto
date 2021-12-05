@@ -83,6 +83,7 @@ trait UpdateHandler
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
+        $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
         return $updates;
     }
     private ?Deferred $update_deferred = null;

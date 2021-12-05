@@ -379,19 +379,27 @@ class Connection
      */
     private function methodAbstractions(string &$method, array &$arguments): \Generator
     {
-        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
-            if ($matches[1] === '') {
-                $method = 'channels.joinChannel';
-                $arguments['channel'] = $matches[2];
+        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
+            [$invite, $content] = $r;
+            if ($invite) {
+                $arguments['hash'] = $content;
             } else {
-                $arguments['hash'] = $matches[2];
+                $method = 'channels.joinChannel';
+                $arguments['channel'] = $content;
             }
-        } elseif ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
-            $arguments['hash'] = $matches[1];
-        } elseif ($method === 'channels.joinChannel' && isset($arguments['channel']) && \is_string($arguments['channel']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
-            if ($matches[1] !== '') {
+        } elseif ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
+            [$invite, $content] = $r;
+            if (!$invite) {
+                throw new TL\Exception('This is not an invite link!');
+            }
+            $arguments['hash'] = $content;
+        } elseif ($method === 'channels.joinChannel' && isset($arguments['channel']) && \is_string($arguments['channel']) && $r = Tools::parseLink($arguments['channel'])) {
+            [$invite, $content] = $r;
+            if ($invite) {
                 $method = 'messages.importChatInvite';
-                $arguments['hash'] = $matches[2];
+                $arguments['hash'] = $content;
+            } else {
+                $arguments['channel'] = $content;
             }
         } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'])) {
             $method = 'messages.sendEncrypted';
@@ -450,6 +458,8 @@ class Connection
             if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
                 $arguments['peer'] = 'me';
             }
+        } elseif ($method === 'channels.deleteUserHistory') {
+            $method = 'channels.deleteParticipantHistory';
         }
         if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
             $arguments['queuePromise'] = new Deferred;

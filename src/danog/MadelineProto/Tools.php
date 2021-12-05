@@ -111,15 +111,9 @@ abstract class Tools extends StrTools
             // If a sufficient source of randomness is unavailable, random_bytes() will throw an
             // object that implements the Throwable interface (Exception, TypeError, Error).
             // We don't actually need to do anything here. The string() method should just continue
-            // as normal. Note, however, that if we don't have a sufficient source of randomness for
-            // random_bytes(), most of the other calls here will fail too, so we'll end up using
-            // the PHP implementation.
+            // as normal.
         }
-        if (Magic::$bigint) {
-            $number = self::unpackSignedInt(self::random(4));
-        } else {
-            $number = self::unpackSignedLong(self::random(8));
-        }
+        $number = self::unpackSignedLong(self::random(8));
         return ($number & PHP_INT_MAX) % $modulus;
     }
     /**
@@ -1011,5 +1005,20 @@ abstract class Tools extends StrTools
             $file = Magic::getcwd().DIRECTORY_SEPARATOR.$file;
         }
         return $file;
+    }
+    /**
+     * Parse t.me link.
+     *
+     * @internal
+     *
+     * @param string $link
+     * @return array{0: bool, 1: string}|null
+     */
+    public static function parseLink(string $link): ?array
+    {
+        if (!\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
+            return null;
+        }
+        return [!!$matches[1], $matches[2]];
     }
 }

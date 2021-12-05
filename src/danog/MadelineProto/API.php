@@ -323,6 +323,9 @@ class API extends InternalDoc
             // Success, IPC client
             $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
             $this->APIFactory();
+            if ($settings) {
+                $this->API->updateSettings($settings);
+            }
             return true;
         } elseif ($unserialized) {
             // Success, full session
