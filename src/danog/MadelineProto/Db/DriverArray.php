@@ -154,10 +154,10 @@ abstract class DriverArray implements DbArray
             while (yield $iterator->advance()) {
                 $counter++;
                 if ($counter % 500 === 0 || $counter === $total) {
-                    yield $new->offsetSet(...$iterator->getCurrent());
+                    yield $new->set(...$iterator->getCurrent());
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
                 } else {
-                    $new->offsetSet(...$iterator->getCurrent());
+                    $new->set(...$iterator->getCurrent());
                 }
                 $new->ttlValues = [];
                 $new->cache = [];
@@ -206,9 +206,19 @@ abstract class DriverArray implements DbArray
             unset($this->settings);
         }
     }
-    public function offsetExists($index): bool
+    final public function offsetExists($index): bool
     {
         throw new \RuntimeException('Native isset not support promises. Use isset method');
+    }
+
+    final public function offsetSet(mixed $index, mixed $value): void
+    {
+        $this->set($index, $value);
+    }
+
+    final public function offsetUnset(mixed $index): void
+    {
+        $this->unset($index);
     }
 
     protected static function getClassName($instance): ?string

@@ -93,7 +93,7 @@ class MinDatabase implements TLCallback
             while (yield $iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                    $this->db->offsetUnset($id);
+                    $this->db->unset($id);
                 }
             }
         });

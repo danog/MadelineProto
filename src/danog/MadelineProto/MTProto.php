@@ -528,7 +528,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->session || $this->session instanceof MemoryArray) {
             return $data;
         }
-        yield $this->session->offsetSet('data', $data);
+        yield $this->session->set('data', $data);
         return $this->session;
     }
     /**
@@ -1052,15 +1052,15 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $k++;
                 if ($k % 500 === 0 || $k === $total) {
                     $this->logger("Cleaning up peer database ($k/$total)...");
-                    yield $this->chats->offsetSet($key, $value);
+                    yield $this->chats->set($key, $value);
                 } else {
-                    $this->chats->offsetSet($key, $value);
+                    $this->chats->set($key, $value);
                 }
             }
-            yield $this->chats->offsetSet(0, []);
+            yield $this->chats->set(0, []);
             $this->logger("Cleaned up peer database!");
         } elseif (yield $this->chats->isset(0)) {
-            $this->chats->offsetUnset(0);
+            $this->chats->unset(0);
         }
     }
 
@@ -1095,7 +1095,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         while (yield $iterator->advance()) {
             [$id, $full] = $iterator->getCurrent();
             if (isset($full['full'], $full['last_update'])) {
-                yield $this->full_chats->offsetSet($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
+                yield $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
             }
         }
 

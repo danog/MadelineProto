@@ -118,8 +118,7 @@ class RedisArray extends DriverArray
      *
      * @throws \Throwable
      */
-
-    public function offsetSet($index, $value): Promise
+    public function set(string|int $index, mixed $value): Promise
     {
         if ($this->getCache($index) === $value) {
             return new Success();
@@ -149,13 +148,13 @@ class RedisArray extends DriverArray
      *
      * @return Promise<bool> true if the offset exists, otherwise false
      */
-    public function isset($key): Promise
+    public function isset(string|int $key): Promise
     {
         return $this->db->has($this->rKey($key));
     }
 
 
-    public function offsetGet($offset): Promise
+    public function offsetGet(mixed $offset): Promise
     {
         return call(function () use ($offset) {
             if ($cached = $this->getCache($offset)) {
@@ -172,23 +171,11 @@ class RedisArray extends DriverArray
         });
     }
 
-    /**
-     * Unset value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetunset.php
-     *
-     * @param string $index <p>
-     * The offset to unset.
-     * </p>
-     *
-     * @return Promise
-     * @throws \Throwable
-     */
-    public function offsetUnset($index): Promise
+    public function unset(string|int $key): Promise
     {
-        $this->unsetCache($index);
+        $this->unsetCache($key);
 
-        return $this->db->delete($this->rkey($index));
+        return $this->db->delete($this->rkey($key));
     }
 
     /**
@@ -197,6 +184,7 @@ class RedisArray extends DriverArray
      * @return Promise<array>
      * @throws \Throwable
      */
+    #[\ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return call(function () {

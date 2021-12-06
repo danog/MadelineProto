@@ -166,12 +166,8 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
      */
     public function throw(\Throwable $reason)
     {
-        if (!isset($reason->yieldedFrames)) {
-            if (\method_exists($reason, 'updateTLTrace')) {
-                $reason->updateTLTrace($this->getTrace());
-            } else {
-                $reason->yieldedFrames = $this->getTrace();
-            }
+        if (\method_exists($reason, 'updateTLTrace')) {
+            $reason->updateTLTrace($this->getTrace());
         }
         return $this->generator->throw($reason);
     }
@@ -184,7 +180,7 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
     {
         $this->resolve(new Failure($reason));
     }
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         throw new Exception('Not supported!');
     }
@@ -195,14 +191,15 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
      *
      * @return Promise
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): Promise
     {
         return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;
             return $result[$offset];
         })());
     }
-    public function offsetSet($offset, $value): Promise
+    #[\ReturnTypeWillChange]
+    public function offsetSet(mixed $offset, mixed $value): Promise
     {
         return Tools::call((function () use ($offset, $value): \Generator {
             $result = yield $this;
@@ -212,7 +209,8 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
             return $result[$offset] = $value;
         })());
     }
-    public function offsetUnset($offset): Promise
+    #[\ReturnTypeWillChange]
+    public function offsetUnset(mixed $offset): Promise
     {
         return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;

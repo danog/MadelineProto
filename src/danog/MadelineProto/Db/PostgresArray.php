@@ -126,7 +126,7 @@ class PostgresArray extends SqlArray
      *
      * @throws \Throwable
      */
-    public function offsetSet($index, $value): Promise
+    public function set(string|int $index, mixed $value): Promise
     {
         if ($this->getCache($index) === $value) {
             return new Success();

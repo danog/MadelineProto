@@ -33,7 +33,7 @@ abstract class SqlArray extends DriverArray
     /**
      * Prepare statements.
      *
-     * @param SqlArray::STATEMENT_* $type
+     * @param SqlArray::SQL_* $type
      *
      * @return string
      */
@@ -59,6 +59,7 @@ abstract class SqlArray extends DriverArray
             }
         });
     }
+    #[\ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return call(function () {
@@ -72,14 +73,53 @@ abstract class SqlArray extends DriverArray
         });
     }
 
+    public function offsetGet(mixed $key): Promise
+    {
+        return call(function () use ($key) {
+            if ($cached = $this->getCache($key)) {
+                return $cached;
+            }
+
+            $row = yield $this->execute($this->getSqlQuery(self::SQL_GET), ['index' => $key]);
+
+            if ($value = $this->getValue($row)) {
+                $this->setCache($key, $value);
+            }
+
+            return $value;
+        });
+    }
+
+    public function set(string|int $key, mixed $value): Promise
+    {
+        if ($this->getCache($key) === $value) {
+            return new Success();
+        }
+
+        $this->setCache($key, $value);
+
+        $request = $this->execute(
+            $this->getSqlQuery(self::SQL_SET),
+            [
+                'index' => $key,
+                'value' => \serialize($value),
+            ]
+        );
+
+        //Ensure that cache is synced with latest insert in case of concurrent requests.
+        $request->onResolve(fn () => $this->setCache($key, $value));
+
+        return $request;
+    }
+
     /**
      * Check if key isset.
      *
-     * @param $key
+     * @param mixed $key
      *
      * @return Promise<bool> true if the offset exists, otherwise false
      */
-    public function isset($key): Promise
+    public function isset(string|int $key): Promise
     {
         return call(fn () => null !== yield $this->offsetGet($key));
     }
@@ -94,16 +134,16 @@ abstract class SqlArray extends DriverArray
      * The offset to unset.
      * </p>
      *
-     * @return Promise
+     * @return Promise<array>
      * @throws \Throwable
      */
-    public function offsetUnset($index): Promise
+    public function unset(string|int $key): Promise
     {
-        $this->unsetCache($index);
+        $this->unsetCache($key);
 
         return $this->execute(
             $this->getSqlQuery(self::SQL_UNSET),
-            ['index' => $index]
+            ['index' => $key]
         );
     }
 
@@ -133,57 +173,6 @@ abstract class SqlArray extends DriverArray
         return $this->execute($this->getSqlQuery(self::SQL_CLEAR));
     }
 
-    public function offsetGet($offset): Promise
-    {
-        return call(function () use ($offset) {
-            if ($cached = $this->getCache($offset)) {
-                return $cached;
-            }
-
-            $row = yield $this->execute($this->getSqlQuery(self::SQL_GET), ['index' => $offset]);
-
-            if ($value = $this->getValue($row)) {
-                $this->setCache($offset, $value);
-            }
-
-            return $value;
-        });
-    }
-
-
-    /**
-     * Set value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetset.php
-     *
-     * @param string|int $index <p>
-     * The index to set for.
-     * </p>
-     * @param $value
-     *
-     * @throws \Throwable
-     */
-    public function offsetSet($index, $value): Promise
-    {
-        if ($this->getCache($index) === $value) {
-            return new Success();
-        }
-
-        $this->setCache($index, $value);
-
-        $request = $this->execute(
-            $this->getSqlQuery(self::SQL_SET),
-            [
-                'index' => $index,
-                'value' => \serialize($value),
-            ]
-        );
-
-        //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn () => $this->setCache($index, $value));
-
-        return $request;
-    }
 
     /**
      * Perform async request to db.

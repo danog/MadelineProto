@@ -48,31 +48,45 @@ class MemoryArray extends \ArrayIterator implements DbArray
         });
     }
 
-    public function offsetExists($offset)
+    public function set(string|int $key, mixed $value): Promise
+    {
+        parent::offsetSet($key, $value);
+        return new Success();
+    }
+    public function isset(string|int $key): Promise
+    {
+        return new Success(parent::offsetExists($key));
+    }
+    public function unset(string|int $key): Promise
+    {
+        parent::offsetUnset($key);
+        return new Success();
+    }
+
+
+
+    public function offsetExists(mixed $offset): bool
     {
         throw new \RuntimeException('Native isset not support promises. Use isset method');
     }
 
-    public function isset($key): Promise
-    {
-        return new Success(parent::offsetExists($key));
-    }
-
-    public function offsetGet($offset): Promise
+    public function offsetGet(mixed $offset): Promise
     {
         return new Success(parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
     }
 
-    public function offsetUnset($offset): Promise
+    public function offsetUnset(mixed $offset): void
     {
-        return new Success(parent::offsetUnset($offset));
+        parent::offsetUnset($offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function count(): Promise
     {
         return new Success(parent::count());
     }
 
+    #[\ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return new Success(parent::getArrayCopy());

@@ -10,7 +10,7 @@ use Amp\Promise;
  *
  * @template T as mixed
  */
-interface DbArray extends DbType, \ArrayAccess, \Countable
+interface DbArray extends DbType, \ArrayAccess
 {
     /**
      * Get Array copy.
@@ -29,17 +29,17 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      *
      * @return Promise
      */
-    public function isset($key): Promise;
+    public function isset(string|int $key): Promise;
     /**
-     * Get element.
+     * Unset element.
      *
-     * @param string|int $index
+     * @param string|int $key
      *
-     * @psalm-return Promise<T>
+     * @psalm-return Promise<mixed>
      *
      * @return Promise
      */
-    public function offsetGet($index): Promise;
+    public function unset(string|int $key): Promise;
     /**
      * Set element.
      *
@@ -50,14 +50,50 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      *
      * @return Promise
      */
-    public function offsetSet($index, $value);
+    public function set(string|int $key, mixed $value): Promise;
     /**
+     * Get element.
+     *
+     * @param string|int $index
+     *
+     * @psalm-return Promise<T>
+     *
+     * @return Promise
+     */
+    public function offsetGet(mixed $index): Promise;
+    /**
+     * Set element.
+     *
+     * @param string|int $index
+     * @param mixed      $value
+     *
+     * @psalm-param T $value
+     *
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetSet(mixed $index, mixed $value);
+    /**
+     * @deprecated
+     * @internal
+     * @see DbArray::unset();
+     *
      * Unset element.
      *
      * @param string|int $index Offset
-     * @return Promise
+     * @return void
      */
-    public function offsetUnset($index): Promise;
+    public function offsetUnset(mixed $index): void;
+    /**
+     * @deprecated
+     * @internal
+     * @see DbArray::isset();
+     *
+     * @param mixed $index
+     *
+     * @return bool
+     */
+    public function offsetExists(mixed $index): bool;
     /**
      * Count number of elements.
      *
@@ -76,15 +112,4 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      * @return Iterator<array{0: string|int, 1: T}>
      */
     public function getIterator(): Iterator;
-
-    /**
-     * @deprecated
-     * @internal
-     * @see DbArray::isset();
-     *
-     * @param mixed $index
-     *
-     * @return bool
-     */
-    public function offsetExists($index);
 }

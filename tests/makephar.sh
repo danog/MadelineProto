@@ -113,16 +113,16 @@ rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
-#runTest
-#k
+runTest
+k
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
 cp "madeline$php$branch.phar" "madeline-$php.phar"
 export ACTIONS_PHAR=1
-#reset
-#runTestSimple
-#k
+reset
+runTestSimple
+k
 
 echo "Testing with new version (restart)"
 reset

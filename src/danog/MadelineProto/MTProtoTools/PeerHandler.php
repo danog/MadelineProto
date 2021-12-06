@@ -143,7 +143,7 @@ trait PeerHandler
                             'min' => $user['min'] ?? false,
                         ];
                     }
-                    yield $this->chats->offsetSet($user['id'], $user);
+                    yield $this->chats->set($user['id'], $user);
                     $this->cachePwrChat($user['id'], false, true);
                 }
                 $this->cacheChatUsername($user['id'], $user);
@@ -182,7 +182,7 @@ trait PeerHandler
                             'min' => $chat['min'] ?? false,
                         ];
                     }
-                    yield $this->chats->offsetSet(-$chat['id'], $chat);
+                    yield $this->chats->set(-$chat['id'], $chat);
                     $this->cachePwrChat(-$chat['id'], $this->getSettings()->getPeer()->getFullFetch(), true);
                 }
                 $this->cacheChatUsername(-$chat['id'], $chat);
@@ -228,7 +228,7 @@ trait PeerHandler
                             'min' => $chat['min'] ?? false,
                         ];
                     }
-                    yield $this->chats->offsetSet($bot_api_id, $chat);
+                    yield $this->chats->set($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
                     if ($this->getSettings()->getPeer()->getFullFetch() && $this->getSettings()->getDb()->getEnableFullPeerDb() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->getSettings()->getPeer()->getFullFetch(), true);
@@ -626,7 +626,7 @@ trait PeerHandler
                     return $this->genAll(yield $this->chats[$id], $folder_id, $type);
                 } catch (\danog\MadelineProto\Exception $e) {
                     if ($e->getMessage() === 'This peer is not present in the internal peer database') {
-                        yield $this->chats->offsetUnset($id);/** @uses DbArray::offsetUnset() */
+                        yield $this->chats->unset($id);/** @uses DbArray::offsetUnset() */
                     } else {
                         throw $e;
                     }
@@ -677,7 +677,7 @@ trait PeerHandler
         if ($bot_api_id = yield $this->usernames[$id]) {
             $chat = yield $this->chats[$bot_api_id];
             if (empty($chat['username']) || \strtolower($chat['username']) !== $id) {
-                yield $this->usernames->offsetUnset($id); /** @uses DbArray::offsetUnset() */
+                yield $this->usernames->unset($id); /** @uses DbArray::offsetUnset() */
             }
 
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
