@@ -50,7 +50,7 @@ namespace tgseclib\Math {
         {
             throw new \Exception("Can't serialize legacy class!");
         }
-        public function unserialize(string $data)
+        public function unserialize($data)
         {
             $r = \unserialize($data);
             $this->real = new MathBigInteger($r['hex'], -16);
