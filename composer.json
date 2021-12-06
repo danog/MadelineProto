@@ -51,7 +51,7 @@
         "danog/ipc": "^0.1",
         "amphp/log": "^1.1",
         "danog/loop": "^0.1.0",
-        "danog/tgseclib": "^3",
+        "phpseclib/phpseclib": "^3",
         "amphp/redis": "^1.0",
         "symfony/polyfill-php80": "^1.18",
         "amphp/websocket-client": "^1.0",
@@ -64,11 +64,14 @@
         "danog/phpdoc": "^0.1.7",
         "phpunit/phpunit": "^9",
         "phabel/phabel": "^1",
-        "bamarni/composer-bin-plugin": "^1.4"
+        "bamarni/composer-bin-plugin": "^1.4",
+        "roave/security-advisories": "dev-latest"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
-        "ext-pdo": "Install pdo extension to support database used as cache"
+        "ext-pdo": "Install pdo extension to support database used as cache",
+        "ext-openssl": "Install the openssl extension for faster crypto",
+        "ext-gmp": "Install the gmp extension for faster crypto"
     },
     "authors": [
         {

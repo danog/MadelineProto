@@ -1,10 +1,8 @@
 <?php
 
-namespace danog\MadelineProto\MTProtoTools;
+namespace danog\MadelineProto;
 
 use Amp\Loop;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Magic;
 
 final class GarbageCollector
 {

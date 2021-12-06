@@ -324,7 +324,7 @@ class API extends InternalDoc
             $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
             $this->APIFactory();
             if (!$settings instanceof SettingsEmpty) {
-                $this->API->updateSettings($settings);
+                Tools::callFork($this->API->updateSettings($settings));
             }
             return true;
         } elseif ($unserialized) {

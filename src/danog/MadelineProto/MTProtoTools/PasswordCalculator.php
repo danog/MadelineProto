@@ -22,7 +22,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
-use tgseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Manages SRP password calculation.

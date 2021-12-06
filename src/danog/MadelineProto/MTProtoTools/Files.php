@@ -29,10 +29,10 @@ use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
-use tgseclib\Crypt\AES;
 
 use const danog\Decoder\TYPES;
 use function Amp\File\exists;
@@ -146,10 +146,7 @@ trait Files
             $iv = Tools::random(32);
             $digest = \hash('md5', $key.$iv, true);
             $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
-            $ige = new \tgseclib\Crypt\AES('ige');
-            $ige->setIV($iv);
-            $ige->setKey($key);
-            $ige->enableContinuousBuffer();
+            $ige = IGE::getInstance($key, $iv);
             $seekable = false;
         }
         //$ctx = \hash_init('md5');
@@ -874,10 +871,7 @@ trait Files
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
-            $ige = new AES('ige');
-            $ige->setIV($messageMedia['iv']);
-            $ige->setKey($messageMedia['key']);
-            $ige->enableContinuousBuffer();
+            $ige = IGE::getInstance($messageMedia['key'], $messageMedia['iv']);
             $seekable = false;
         }
         if ($offset === $end) {
@@ -974,7 +968,7 @@ trait Files
      * @param bool     $cdn           Whether this is a CDN file
      * @param string   $datacenter    DC ID
      * @param ?string   $old_dc        Previous DC ID
-     * @param AES      $ige           IGE decryptor instance
+     * @param IGE      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
      * @param array    $offset        Offset
      * @param callable $callable      Chunk callback

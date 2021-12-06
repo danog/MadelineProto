@@ -26,7 +26,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
-use tgseclib\Math\BigInteger;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
@@ -125,7 +124,7 @@ abstract class Tools extends StrTools
      */
     public static function random(int $length): string
     {
-        return $length === 0 ? '' : \tgseclib\Crypt\Random::string($length);
+        return $length === 0 ? '' : \phpseclib3\Crypt\Random::string($length);
     }
     /**
      * Positive modulo
@@ -187,8 +186,7 @@ abstract class Tools extends StrTools
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-        $big = new BigInteger((string) $value, -256);
-        return (string) $big;
+        return (string) self::unpackSignedLong($value);
     }
     /**
      * Convert integer to base256 signed int.

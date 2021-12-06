@@ -17,21 +17,47 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace phpseclib\Math;
+namespace phpseclib\Math {
 
-if (PHP_MAJOR_VERSION < 7 && !(\class_exists(\Phar::class) && \Phar::running() || \defined('TESTING_VERSIONS'))) {
-    throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
-}
-if (\defined('HHVM_VERSION')) {
-    $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
-    foreach ($engines as $engine) {
-        try {
-            \tgseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
-            break;
-        } catch (\Exception $e) {
+    if (PHP_MAJOR_VERSION < 7 && !(\class_exists(\Phar::class) && \Phar::running() || \defined('TESTING_VERSIONS'))) {
+        throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
+    }
+    if (\defined('HHVM_VERSION')) {
+        $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
+        foreach ($engines as $engine) {
+            try {
+                \phpseclib3\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
+                break;
+            } catch (\Exception $e) {
+            }
         }
     }
+
+    class BigIntegor
+    {
+    }
 }
-class BigIntegor
-{
+
+namespace tgseclib\Math {
+
+    use phpseclib3\Math\BigInteger as MathBigInteger;
+    use Serializable;
+
+    class BigInteger implements Serializable
+    {
+        public MathBigInteger $real;
+        public function serialize()
+        {
+            throw new \Exception("Can't serialize legacy class!");
+        }
+        public function unserialize(string $data)
+        {
+            $r = \unserialize($data);
+            $this->real = new MathBigInteger($r['hex'], -16);
+            if (isset($r['precision'])) {
+                // recalculate $this->bitmask
+                $this->real->setPrecision($r['precision']);
+            }
+        }
+    }
 }

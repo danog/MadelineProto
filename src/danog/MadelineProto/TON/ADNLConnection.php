@@ -33,12 +33,12 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use Exception;
-use tgseclib\Crypt\DH;
-use tgseclib\Crypt\EC;
-use tgseclib\Crypt\EC\Curves\Curve25519;
-use tgseclib\Crypt\EC\PrivateKey;
-use tgseclib\Crypt\EC\PublicKey;
-use tgseclib\Math\BigInteger;
+use phpseclib3\Crypt\DH;
+use phpseclib3\Crypt\EC;
+use phpseclib3\Crypt\EC\Curves\Curve25519;
+use phpseclib3\Crypt\EC\PrivateKey;
+use phpseclib3\Crypt\EC\PublicKey;
+use phpseclib3\Math\BigInteger;
 
 class ADNLConnection
 {

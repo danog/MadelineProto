@@ -127,11 +127,11 @@ trait Reliable
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!isset($this->incoming_messages[$msg_id])) {
-                $msg_id = new \tgseclib\Math\BigInteger(\strrev($msg_id), 256);
-                if ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
+                $msg_id = new \phpseclib3\Math\BigInteger(\strrev($msg_id), 256);
+                if ((new \phpseclib3\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $this->logger->logger("Do not know anything about {$msg_id} and it is too big");
                     $cur_info |= 3;
-                } elseif ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
+                } elseif ((new \phpseclib3\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
                     $this->logger->logger("Do not know anything about {$msg_id} and it is too small");
                     $cur_info |= 1;
                 } else {

@@ -15,6 +15,7 @@ If not, see <http://www.gnu.org/licenses/>.
  * Various ways to load MadelineProto.
  */
 
+use danog\MadelineProto\API;
 
 $loader = false;
 if (\getenv('ACTIONS_PHAR')) {
@@ -155,18 +156,16 @@ $MadelineProto->loop(function () use ($MadelineProto) {
      * Secret chat usage
      */
     if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+        if (!\getenv('TEST_SECRET_CHAT')) {
+            throw new Exception('No TEST_SECRET_CHAT environment variable was provided!');
+        }
         /**
          * Request a secret chat.
          */
         $secret_chat_id = yield $MadelineProto->requestSecretChat(\getenv('TEST_SECRET_CHAT'));
-        echo 'Waiting for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
+        echo 'Waiting 10 seconds for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
-        /*
-         * Wait until the other party accepts it
-         */
-        while (yield $MadelineProto->secretChatStatus($secret_chat_id) !== 2) {
-            yield $MadelineProto->getUpdates();
-        }
+        yield $MadelineProto->sleep(10);
 
         /**
          * Send a markdown-formatted text message with expiration after 10 seconds.
@@ -255,6 +254,9 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         }
     }
 
+    if (!\getenv('TEST_USERNAME')) {
+        throw new Exception('No TEST_USERNAME environment variable was provided!');
+    }
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
     $media = [];

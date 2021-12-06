@@ -30,13 +30,13 @@ class RSA
     /**
      * Exponent.
      *
-     * @var \tgseclib\Math\BigInteger
+     * @var \phpseclib3\Math\BigInteger
      */
     public $e;
     /**
      * Modulus.
      *
-     * @var \tgseclib\Math\BigInteger
+     * @var \phpseclib3\Math\BigInteger
      */
     public $n;
     /**
@@ -57,7 +57,7 @@ class RSA
      */
     public function load(TL $TL, string $rsa_key): \Generator
     {
-        $key = \tgseclib\Crypt\RSA::load($rsa_key);
+        $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
         $this->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
@@ -72,6 +72,14 @@ class RSA
     {
         return ['e', 'n', 'fp'];
     }
+    public function __wakeup()
+    {
+        foreach ($this->__sleep() as $bigint) {
+            if ($this->{$bigint} instanceof \tgseclib\Math\BigInteger) {
+                $this->{$bigint} = $this->{$bigint}->real;
+            }
+        }
+    }
     /**
      * Encrypt data.
      *
@@ -81,6 +89,6 @@ class RSA
      */
     public function encrypt($data): string
     {
-        return (new \tgseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
+        return (new \phpseclib3\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

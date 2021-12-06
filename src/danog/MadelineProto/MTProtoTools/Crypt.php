@@ -20,7 +20,10 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Logger;
-use tgseclib\Math\BigInteger;
+use danog\MadelineProto\Magic;
+use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use phpseclib3\Crypt\AES;
+use phpseclib3\Math\BigInteger;
 
 abstract class Crypt
 {
@@ -79,7 +82,7 @@ abstract class Crypt
      */
     public static function ctrEncrypt(string $message, string $key, string $iv): string
     {
-        $cipher = new \tgseclib\Crypt\AES('ctr');
+        $cipher = new AES('ctr');
         $cipher->setKey($key);
         $cipher->setIV($iv);
         return @$cipher->encrypt($message);
@@ -87,38 +90,66 @@ abstract class Crypt
     /**
      * IGE encrypt.
      *
-     * @param string $message Message to encrypt
-     * @param string $key     Key
-     * @param string $iv      IV
+     * @param string $plaintext Message to encrypt
+     * @param string $key       Key
+     * @param string $iv        IV
      *
      * @internal
      *
      * @return string
      */
-    public static function igeEncrypt(string $message, string $key, string $iv): string
+    public static function igeEncrypt(string $plaintext, string $key, string $iv): string
     {
-        $cipher = new \tgseclib\Crypt\AES('ige');
-        $cipher->setKey($key);
-        $cipher->setIV($iv);
-        return @$cipher->encrypt($message);
+        if (Magic::$hasOpenssl) {
+            $iv_part_1 = \substr($iv, 0, 16);
+            $iv_part_2 = \substr($iv, 16);
+            $ciphertext = "";
+            for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
+                $plain = \substr($plaintext, $i, 16);
+
+                $cipher = \openssl_encrypt($plain ^ $iv_part_1, 'aes-256-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $iv_part_2;
+
+                $ciphertext .= $cipher;
+
+                $iv_part_1 = $cipher;
+                $iv_part_2 = $plain;
+            }
+
+            return $ciphertext;
+        }
+        return IGE::getInstance($key, $iv)->encrypt($plaintext);
     }
     /**
-     * CTR decrypt.
+     * IGE decrypt.
      *
-     * @param string $message Message to encrypt
-     * @param string $key     Key
-     * @param string $iv      IV
+     * @param string $ciphertext Message to decrypt
+     * @param string $key        Key
+     * @param string $iv         IV
      *
      * @internal
      *
      * @return string
      */
-    public static function igeDecrypt(string $message, string $key, string $iv): string
+    public static function igeDecrypt(string $ciphertext, string $key, string $iv): string
     {
-        $cipher = new \tgseclib\Crypt\AES('ige');
-        $cipher->setKey($key);
-        $cipher->setIV($iv);
-        return @$cipher->decrypt($message);
+        if (Magic::$hasOpenssl) {
+            $iv_part_1 = \substr($iv, 0, 16);
+            $iv_part_2 = \substr($iv, 16);
+            $plaintext = "";
+            for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
+                $cipher = \substr($ciphertext, $i, 16);
+
+                $plain = \openssl_decrypt($cipher ^ $iv_part_2, 'aes-256-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $iv_part_1;
+
+                $plaintext .= $plain;
+
+                $iv_part_1 = $cipher;
+                $iv_part_2 = $plain;
+            }
+
+            return $plaintext;
+        }
+        return IGE::getInstance($key, $iv)->decrypt($ciphertext);
     }
     /**
      * Check validity of g_a parameters.

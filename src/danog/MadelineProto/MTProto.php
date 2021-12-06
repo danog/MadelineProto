@@ -38,7 +38,6 @@ use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
-use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
@@ -103,7 +102,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 151;
+    const V = 152;
     /**
      * Release version.
      *
@@ -1888,6 +1887,9 @@ class MTProto extends AsyncConstruct implements TLCallback
             Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
             $warning .= "<h2 style='color:red;'>Warning: no report peers are set, please add the following method to your event handler:</h2>";
             $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+        }
+        if (!Magic::$hasOpenssl) {
+            $warning .= "<h2 style='color:red;'>Warning: the openssl extension is not installed, please install it to speed up MadelineProto</h2>";
         }
         return "<html><body><h1>$message</h1>$warning</body></html>";
     }

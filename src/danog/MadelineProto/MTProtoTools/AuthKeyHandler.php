@@ -27,7 +27,7 @@ use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Settings;
 use danog\PrimeModule;
 
-use tgseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Manages the creation of the authorization key.

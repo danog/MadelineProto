@@ -214,7 +214,7 @@ trait ResponseHandler
                     return;
                 case 16:
                 case 17:
-                    $this->time_delta = (int) (new \tgseclib\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \tgseclib\Math\BigInteger(\time()))->toString();
+                    $this->time_delta = (int) (new \phpseclib3\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \phpseclib3\Math\BigInteger(\time()))->toString();
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
