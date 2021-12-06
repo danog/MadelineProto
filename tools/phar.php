@@ -40,14 +40,8 @@ function ___install_madeline()
 
     // Version definition
     $version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-    $versions = [$version];
+    $release = @\file_get_contents(\sprintf($release_template, $version));
 
-    // Checking if defined branch/default branch builds can be downloaded
-    foreach ($versions as $chosen) {
-        if ($release = @\file_get_contents(\sprintf($release_template, $chosen))) {
-            break;
-        }
-    }
     $madeline_phar = "madeline-$version.phar";
     \define('HAD_MADELINE_PHAR', \file_exists($madeline_phar));
 
