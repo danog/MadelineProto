@@ -46,7 +46,7 @@ function ___install_madeline()
     \define('HAD_MADELINE_PHAR', \file_exists($madeline_phar));
 
     if ($release && !\file_exists($madeline_phar) || !\file_exists("$madeline_phar.version") || \file_get_contents("$madeline_phar.version") !== $release) {
-        $phar = \file_get_contents(\sprintf($phar_template, $chosen));
+        $phar = \file_get_contents(\sprintf($phar_template, $release));
 
         if ($phar) {
             $extractVersions = static function ($ext = '') use ($madeline_phar) {
