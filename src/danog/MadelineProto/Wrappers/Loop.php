@@ -51,7 +51,9 @@ trait Loop
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && !$inited) {
             $needs_restart = true;
             try {
-                \set_time_limit(-1);
+                if (\function_exists('set_time_limit')) {
+                    \set_time_limit(-1);
+                }
             } catch (\danog\MadelineProto\Exception $e) {
                 $needs_restart = true;
             }
