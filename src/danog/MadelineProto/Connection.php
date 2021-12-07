@@ -460,6 +460,9 @@ class Connection
             }
         } elseif ($method === 'channels.deleteUserHistory') {
             $method = 'channels.deleteParticipantHistory';
+            if (isset($arguments['user_id'])) {
+                $arguments['participant'] = $arguments['user_id'];
+            }
         }
         if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
             $arguments['queuePromise'] = new Deferred;
