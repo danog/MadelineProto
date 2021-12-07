@@ -154,6 +154,9 @@ git config --global user.name "Github Actions"
 input=$PWD
 
 cd ~/MadelineProtoPhar
+exec {FD}<>404.html
+flock -x $FD
+
 git pull
 
 cp "$input/madeline$php$branch.phar" "madeline$php.phar"
@@ -168,6 +171,8 @@ while :; do
         git rebase origin/master
     }
 done
+
+flock -u $FD
 
 for chat_id in $DESTINATIONS;do
     curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
