@@ -104,6 +104,10 @@ class WriteLoop extends ResumableSignalLoop
                 if ($message->isEncrypted()) {
                     continue;
                 }
+                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                    unset($connection->pendingOutgoing[$k]);
+                    continue;
+                }
                 $skipped_all = false;
                 $API->logger->logger("Sending $message as unencrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message_id = $message->getMsgId() ?? $connection->msgIdHandler->generateMessageId();

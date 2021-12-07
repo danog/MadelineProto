@@ -178,7 +178,7 @@ class OutgoingMessage extends Message
     public function sent(): void
     {
         if ($this->state & self::STATE_REPLIED) {
-            throw new Exception("Trying to resend already replied message $this!");
+            //throw new Exception("Trying to resend already replied message $this!");
         }
         $this->state |= self::STATE_SENT;
         $this->sent = \time();

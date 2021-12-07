@@ -1245,12 +1245,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Connect to all DCs, start internal loops
         yield from $this->connectToAllDcs();
-        $this->startLoops();
         if (yield from $this->fullGetSelf()) {
             $this->authorized = self::LOGGED_IN;
             $this->setupLogger();
+            $this->startLoops();
             yield from $this->getCdnConfig($this->datacenter->curdc);
             yield from $this->initAuthorization();
+        } else {
+            $this->startLoops();
         }
         // onStart event handler
         if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
