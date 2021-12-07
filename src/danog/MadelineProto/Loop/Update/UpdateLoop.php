@@ -24,6 +24,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
 
 /**
@@ -120,6 +121,9 @@ class UpdateLoop extends ResumableSignalLoop
                             return true;
                         }
                         throw $e;
+                    } catch (PTSException $e) {
+                        $API->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
+                        return true;
                     }
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
