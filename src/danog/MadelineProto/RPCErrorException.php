@@ -45,17 +45,20 @@ class RPCErrorException extends \Exception
         $description = self::$descriptions[$error] ?? '';
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]) || $code === 500) {
             Tools::callFork((function () use ($method, $code, $error) {
-                $res = \json_decode(
-                    yield
-                        (yield HttpClientBuilder::buildDefault()
-                            ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
-                        )->getBody()->buffer(),
-                    true
-                );
-                if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
-                    $description = $res['result'];
-                    RPCErrorException::$descriptions[$error] = $description;
-                    RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
+                try {
+                    $res = \json_decode(
+                        yield
+                            (yield HttpClientBuilder::buildDefault()
+                                ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
+                            )->getBody()->buffer(),
+                        true
+                    );
+                    if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
+                        $description = $res['result'];
+                        RPCErrorException::$descriptions[$error] = $description;
+                        RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
+                    }
+                } catch (\Throwable $e) {
                 }
             })());
         }
