@@ -100,7 +100,7 @@ n
 
 k()
 {
-    while :; do pkill -f 'MadelineProto worker .*' -P $$ || break && sleep 1; done
+    while :; do pkill -f "MadelineProto worker $(pwd)/tests/../testing.madeline" || break && sleep 1; done
 }
 
 reset()

@@ -324,7 +324,6 @@ class WriteLoop extends ResumableSignalLoop
             yield $buffer->bufferWrite($message);
             $connection->httpSent();
             $API->logger->logger("Sent encrypted payload to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            $sent = \time();
 
             if ($ackCount) {
                 $connection->ack_queue = \array_slice($connection->ack_queue, $ackCount);
