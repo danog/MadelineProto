@@ -153,10 +153,13 @@ git config --global user.name "Github Actions"
 
 input=$PWD
 
-cd ~/MadelineProtoPhar
-exec {FD}<>404.html
+echo "Locking..."
+touch /tmp/lock
+exec {FD}<>/tmp/lock
 flock -x $FD
+echo "Locked!"
 
+cd ~/MadelineProtoPhar
 git pull
 
 cp "$input/madeline$php$branch.phar" "madeline$php.phar"
@@ -172,7 +175,9 @@ while :; do
     }
 done
 
+echo "Unlocking..."
 flock -u $FD
+echo "Unlocked!"
 
 for chat_id in $DESTINATIONS;do
     curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
