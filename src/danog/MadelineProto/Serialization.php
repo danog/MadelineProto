@@ -141,13 +141,20 @@ abstract class Serialization
         $canContinue = true;
         $ipcSocket = null;
         $unlock = yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1, $cancelFlock->promise(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState) {
-            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFlock));
-            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFlock, &$canContinue, &$lightState) {
+            $cancelFull = static function () use (&$cancelFlock): void {
+                if ($cancelFlock !== null) {
+                    $copy = $cancelFlock;
+                    $cancelFlock = null;
+                    $copy->resolve(true);
+                }
+            };
+            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFull));
+            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState) {
                 if ($res) {
                     $lightState = $res;
                     if (!$res->canStartIpc()) {
                         $canContinue = false;
-                        $cancelFlock->resolve(true);
+                        $cancelFull();
                     }
                 } else {
                     $lightState = false;
@@ -236,14 +243,14 @@ abstract class Serialization
      *
      * @param string    $ipcPath       IPC path
      * @param Promise   $cancelConnect Cancelation token (triggers cancellation of connection)
-     * @param ?Deferred $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
+     * @param ?callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      *
      * @psalm-param Promise<\Throwable|null> $cancelConnect
      *
      * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, array{0: ChannelledSocket|\Throwable|0, 1: null}>
      */
-    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
+    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): \Generator
     {
         for ($x = 0; $x < 60; $x++) {
             Logger::log("MadelineProto is starting, please wait...");
@@ -252,7 +259,7 @@ abstract class Serialization
                 $socket = yield connect($ipcPath);
                 Logger::log("Connected to IPC socket!");
                 if ($cancelFull) {
-                    $cancelFull->resolve(true);
+                    $cancelFull();
                 }
                 return [$socket, null];
             } catch (\Throwable $e) {
