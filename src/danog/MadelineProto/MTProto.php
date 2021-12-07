@@ -84,16 +84,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\Wrappers\TOS;
     use DbPropertiesTrait;
     /**
-     * Old internal version of MadelineProto.
-     *
-     * DO NOT REMOVE THIS COMMENTED OUT CONSTANT
-     *
-     * @var int
-     */
-    /*
-        const V = 72;
-    */
-    /**
      * Internal version of MadelineProto.
      *
      * Increased every time the default settings array or something big changes
@@ -102,7 +92,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 152;
+    const V = 153;
     /**
      * Release version.
      *
