@@ -561,7 +561,7 @@ trait BotAPI
             $new_message = '';
             $arguments['message'] = \trim($this->htmlFixtags($arguments['message']));
             $dom = new \DOMDocument();
-            $dom->loadHTML(\htmlspecialchars_decode($arguments['message']));
+            $dom->loadHTML(\mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
             if (!isset($arguments['entities'])) {
                 $arguments['entities'] = [];
             }
