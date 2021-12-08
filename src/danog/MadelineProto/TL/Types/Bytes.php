@@ -74,7 +74,7 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @return void
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if ($offset === null) {
             $this->bytes .= $value;
@@ -89,7 +89,7 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @return string
      */
-    public function offsetGet($offset): string
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->bytes[$offset];
     }
@@ -100,7 +100,7 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @return void
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->bytes[$offset]);
     }
@@ -111,7 +111,7 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @return boolean
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->bytes[$offset]);
     }

@@ -146,7 +146,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @return void
      */
-    public function offsetSet($name, $value): void
+    public function offsetSet(mixed $name, mixed $value): void
     {
         if ($name === null) {
             $this->button[] = $value;
@@ -161,7 +161,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @return mixed
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name): mixed
     {
         return $this->button[$name];
     }
@@ -172,7 +172,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @return void
      */
-    public function offsetUnset($name): void
+    public function offsetUnset(mixed $name): void
     {
         unset($this->button[$name]);
     }
@@ -183,7 +183,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @return boolean
      */
-    public function offsetExists($name): bool
+    public function offsetExists(mixed $name): bool
     {
         return isset($this->button[$name]);
     }
