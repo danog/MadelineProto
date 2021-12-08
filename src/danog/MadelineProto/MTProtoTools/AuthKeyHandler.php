@@ -20,11 +20,14 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Http\Client\Request;
+use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 use danog\PrimeModule;
 
 use phpseclib3\Math\BigInteger;
@@ -36,6 +39,7 @@ use phpseclib3\Math\BigInteger;
  * https://core.telegram.org/mtproto/samples-auth_key
  *
  * @property Settings $settings Settings
+ * @property DataCenter $datacenter
  */
 trait AuthKeyHandler
 {
@@ -67,6 +71,12 @@ trait AuthKeyHandler
     {
         $connection = $this->datacenter->getAuthConnection($datacenter);
         $cdn = $connection->isCDN();
+        $media = $connection->isMedia();
+        $test = $this->settings->getConnection()->getTestMode();
+        $datacenter_id = \preg_replace('|_.*|', '', $datacenter) + ($this->settings->getConnection()->getTestMode() ? 10000 : 0);
+        if ($media) {
+            $datacenter_id = -$datacenter_id;
+        }
         $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
@@ -101,7 +111,12 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Find our key in the server_public_key_fingerprints vector
                  */
-                foreach ($cdn ? \array_merge($this->cdn_rsa_keys, $this->rsa_keys) : $this->rsa_keys as $curkey) {
+                if ($test) {
+                    $keys = $this->test_rsa_keys;
+                } else {
+                    $keys = $this->rsa_keys;
+                }
+                foreach ($cdn ? \array_merge($this->cdn_rsa_keys, $keys) : $keys as $curkey) {
                     if (\in_array($curkey->fp, $ResPQ['server_public_key_fingerprints'])) {
                         $key = $curkey;
                     }
@@ -162,16 +177,25 @@ trait AuthKeyHandler
                 $p_bytes = $p->toBytes();
                 $q_bytes = $q->toBytes();
                 $new_nonce = \danog\MadelineProto\Tools::random(32);
-                $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp'), 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
+                $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp').'_dc', 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => $datacenter_id];
                 $p_q_inner_data = (yield from $this->TL->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
                  */
-                $sha_digest = \sha1($p_q_inner_data, true);
-                $random_bytes = \danog\MadelineProto\Tools::random(255 - \strlen($p_q_inner_data) - \strlen($sha_digest));
-                $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
-                $encrypted_data = $key->encrypt($to_encrypt);
+                if (\strlen($p_q_inner_data) > 144) {
+                    throw new SecurityException('p_q_inner_data is too long!');
+                }
+                $data_with_padding = $p_q_inner_data.Tools::random(192 - \strlen($p_q_inner_data));
+                $data_pad_reversed = \strrev($data_with_padding);
+                do {
+                    $temp_key = Tools::random(32);
+                    $data_with_hash = $data_pad_reversed.\hash('sha256', $temp_key.$data_with_padding, true);
+                    $aes_encrypted = Crypt::igeEncrypt($data_with_hash, $temp_key, \str_repeat("\0", 32));
+                    $temp_key_xor = $temp_key ^ \hash('sha256', $aes_encrypted, true);
+                    $key_aes_encrypted_bigint = new BigInteger($temp_key_xor.$aes_encrypted, 256);
+                } while ($key_aes_encrypted_bigint->compare($key->n) >= 0);
+                $encrypted_data = $key->encrypt($key_aes_encrypted_bigint);
                 $this->logger->logger('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
                 /*
                  * ***********************************************************************

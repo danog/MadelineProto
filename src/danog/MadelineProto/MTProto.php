@@ -83,6 +83,26 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\Wrappers\Templates;
     use \danog\MadelineProto\Wrappers\TOS;
     use DbPropertiesTrait;
+    private const RSA_KEYS = [
+        "-----BEGIN RSA PUBLIC KEY-----\n".
+        "MIIBCgKCAQEA6LszBcC1LGzyr992NzE0ieY+BSaOW622Aa9Bd4ZHLl+TuFQ4lo4g\n".
+        "5nKaMBwK/BIb9xUfg0Q29/2mgIR6Zr9krM7HjuIcCzFvDtr+L0GQjae9H0pRB2OO\n".
+        "62cECs5HKhT5DZ98K33vmWiLowc621dQuwKWSQKjWf50XYFw42h21P2KXUGyp2y/\n".
+        "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n".
+        "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n".
+        "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n".
+        "-----END RSA PUBLIC KEY-----"
+    ];
+    private const TEST_RSA_KEYS = [
+        "-----BEGIN RSA PUBLIC KEY-----\n".
+        "MIIBCgKCAQEAyMEdY1aR+sCR3ZSJrtztKTKqigvO/vBfqACJLZtS7QMgCGXJ6XIR\n".
+        "yy7mx66W0/sOFa7/1mAZtEoIokDP3ShoqF4fVNb6XeqgQfaUHd8wJpDWHcR2OFwv\n".
+        "plUUI1PLTktZ9uW2WE23b+ixNwJjJGwBDJPQEQFBE+vfmH0JP503wr5INS1poWg/\n".
+        "j25sIWeYPHYeOrFp/eXaqhISP6G+q2IeTaWTXpwZj4LzXq5YOpk4bYEQ6mvRq7D1\n".
+        "aHWfYmlEGepfaYR8Q0YqvvhYtMte3ITnuSJs171+GDqpdKcSwHnd6FudwGO4pcCO\n".
+        "j4WcDuXc2CTHgH8gFTNhp/Y8/SpDOhvn9QIDAQAB\n".
+        "-----END RSA PUBLIC KEY-----"
+    ];
     /**
      * Internal version of MadelineProto.
      *
@@ -92,7 +112,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 153;
+    const V = 154;
     /**
      * Release version.
      *
@@ -278,6 +298,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var array<RSA>
      */
     private $rsa_keys = [];
+    /**
+     * RSA keys.
+     *
+     * @var array<RSA>
+     */
+    private $test_rsa_keys = [];
     /**
      * CDN RSA keys.
      *
@@ -594,9 +620,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Load rsa keys
         $this->rsa_keys = [];
-        foreach ($this->settings->getAuth()->getRsaKeys() as $key) {
-            $key = (yield from (new RSA())->load($this->TL, $key));
+        foreach (self::RSA_KEYS as $key) {
+            $key = yield from RSA::load($this->TL, $key);
             $this->rsa_keys[$key->fp] = $key;
+        }
+        $this->test_rsa_keys = [];
+        foreach (self::TEST_RSA_KEYS as $key) {
+            $key = yield from RSA::load($this->TL, $key);
+            $this->test_rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
         $callbacks = [$this];
@@ -703,6 +734,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
             // Authorization cache
             'rsa_keys',
+            'test_rsa_keys',
             'dh_config',
 
             // Update state
@@ -1707,8 +1739,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             && $this->datacenter->getDataCenterConnection($this->settings->getDefaultDc())->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
             VoIPServerConfig::updateDefault(yield from $this->methodCallAsyncRead('phone.getCallConfig', [], $this->settings->getDefaultDcParams()));
-        } else {
-            $this->logger->logger('Not fetching phone config');
         }
     }
     /**
@@ -1722,7 +1752,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         try {
             foreach ((yield from $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
-                $curkey = (yield from (new RSA())->load($this->TL, $curkey['public_key']));
+                $curkey = yield from RSA::load($this->TL, $curkey['public_key']);
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {

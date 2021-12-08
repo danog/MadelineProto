@@ -175,6 +175,21 @@ class Server extends SignalLoop
         return self::$shutdownDeferred->promise();
     }
     /**
+     * Shutdown
+     *
+     * @return void
+     */
+    final public function shutdown(): void
+    {
+        $this->signal(null);
+        if (self::$shutdownDeferred) {
+            self::$shutdownNow = true;
+            $deferred = self::$shutdownDeferred;
+            self::$shutdownDeferred = null;
+            $deferred->resolve();
+        }
+    }
+    /**
      * Main loop.
      *
      * @return \Generator
@@ -214,13 +229,7 @@ class Server extends SignalLoop
             } catch (\Throwable $e) {
             }
             if ($payload === self::SHUTDOWN) {
-                $this->signal(null);
-                if (self::$shutdownDeferred) {
-                    self::$shutdownNow = true;
-                    $deferred = self::$shutdownDeferred;
-                    self::$shutdownDeferred = null;
-                    $deferred->resolve();
-                }
+                $this->shutdown();
             }
         }
     }

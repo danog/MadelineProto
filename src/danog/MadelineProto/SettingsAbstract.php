@@ -99,4 +99,15 @@ abstract class SettingsAbstract
         $this->changed = false;
         return $this;
     }
+
+    /**
+     * @deprecated
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return void
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+    }
 }

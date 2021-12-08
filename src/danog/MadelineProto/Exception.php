@@ -84,7 +84,15 @@ class Exception extends \Exception
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
         // If error is suppressed with @, don't throw an exception
-        if (\error_reporting() === 0 || \strpos($errstr, 'headers already sent') || \strpos($errstr, 'Creation of dynamic property') !== false || $errfile && (\strpos($errfile, 'vendor/amphp') !== false || \strpos($errfile, 'vendor/league') !== false)) {
+        if (\error_reporting() === 0
+            || \strpos($errstr, 'headers already sent')
+            || \strpos($errstr, 'Creation of dynamic property') !== false
+            || $errfile && (
+                \strpos($errfile, 'vendor/amphp') !== false
+                || \strpos($errfile, 'vendor/league') !== false
+                || \strpos($errfile, 'vendor/phpseclib') !== false
+            )
+        ) {
             return false;
         }
         throw new self($errstr, $errno, null, $errfile, $errline);

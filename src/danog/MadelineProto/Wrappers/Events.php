@@ -40,7 +40,7 @@ trait Events
     /**
      * Event handler instance.
      *
-     * @var EventHandler
+     * @var EventHandler|null
      */
     private $event_handler_instance;
     /**

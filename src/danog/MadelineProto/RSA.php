@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\TL;
+use phpseclib3\Math\BigInteger;
 
 /**
  * RSA class.
@@ -55,13 +56,20 @@ class RSA
      *
      * @psalm-return \Generator<int|mixed, array|mixed, mixed, self>
      */
-    public function load(TL $TL, string $rsa_key): \Generator
+    public static function load(TL $TL, string $rsa_key): \Generator
     {
         $key = \phpseclib3\Crypt\RSA::load($rsa_key);
-        $this->n = Tools::getVar($key, 'modulus');
-        $this->e = Tools::getVar($key, 'exponent');
-        $this->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
-        return $this;
+        $instance = new self;
+        $instance->n = Tools::getVar($key, 'modulus');
+        $instance->e = Tools::getVar($key, 'exponent');
+        $instance->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
+        return $instance;
+    }
+    /**
+     * Private constructor.
+     */
+    private function __construct()
+    {
     }
     /**
      * Sleep function.
@@ -83,12 +91,12 @@ class RSA
     /**
      * Encrypt data.
      *
-     * @param string $data Data to encrypt
+     * @param BigInteger $data Data to encrypt
      *
      * @return string
      */
-    public function encrypt($data): string
+    public function encrypt(BigInteger $data): string
     {
-        return (new \phpseclib3\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
+        return \str_pad($data->powMod($this->e, $this->n)->toBytes(), 256, "\0", STR_PAD_LEFT);
     }
 }
