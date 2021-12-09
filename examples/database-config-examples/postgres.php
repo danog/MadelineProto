@@ -17,7 +17,7 @@ if (\file_exists('vendor/autoload.php')) {
 }
 
 /* 
-    * create default mysql object
+    * create default Postgres object
 */
 $database = new \danog\MadelineProto\Settings\Database\Postgres;
 
@@ -25,10 +25,10 @@ $database = new \danog\MadelineProto\Settings\Database\Postgres;
     config and set auth information
 */
 
-$database->setUri('127.0.0.1:5432');
-$database->setUsername('wsudo');
-$database->setPassword('12345678');
-$database->setDatabase('MyBotsData');
+$database->setUri('127.0.0.1:5432'); // postgres db default connection inforamtion
+$database->setUsername('wsudo');     // postgres db username
+$database->setPassword('12345678');  // postgres db password
+$database->setDatabase('MyBotsData');// which database madeline proto will store datas in that
 
 /* 
     create default settings object

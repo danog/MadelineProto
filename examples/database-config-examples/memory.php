@@ -17,7 +17,7 @@ if (\file_exists('vendor/autoload.php')) {
 }
 
 /* 
-    * create default mysql object
+    * create default Memory object
 */
 $database = new \danog\MadelineProto\Settings\Database\Memory;
 
@@ -25,9 +25,9 @@ $database = new \danog\MadelineProto\Settings\Database\Memory;
     config and set auth information
 */
 
-$database->setCleanup(true);
-$database->setEnableFullPeerDb(false);
-$database->setEnablePeerInfoDb(true);
+$database->setCleanup(true);          // set clean up befor serialize session
+$database->setEnableFullPeerDb(false);// madeline proto could fetch peers full information ??
+$database->setEnablePeerInfoDb(true); // enable peer basic info option
 
 /* 
     create default settings object

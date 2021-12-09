@@ -25,10 +25,10 @@ $database = new \danog\MadelineProto\Settings\Database\Mysql;
     config and set auth information
 */
 
-$database->setUri('127.0.0.1:3306');
-$database->setUsername('Wsudo');
-$database->setPassword('12345678');
-$database->setDatabase('MyBotsData');
+$database->setUri('127.0.0.1:3306'); // local mysql service connection with default port
+$database->setUsername('Wsudo');     // mysql service username
+$database->setPassword('12345678');  // mysql service password
+$database->setDatabase('MyBotsData');// which database madeline proto will store datas in that
 
 /* 
     create default settings object

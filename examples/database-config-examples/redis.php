@@ -17,7 +17,7 @@ if (\file_exists('vendor/autoload.php')) {
 }
 
 /* 
-    * create default mysql object
+    * create default redis object
 */
 $database = new \danog\MadelineProto\Settings\Database\Redis;
 
@@ -25,9 +25,9 @@ $database = new \danog\MadelineProto\Settings\Database\Redis;
     config and set auth information
 */
 
-$database->setUri('127.0.0.1:6379');
-$database->setDatabase(0); // redis database number
-$database->setPassword('wsudo');
+$database->setUri('127.0.0.1:6379');// redis service connection information with default port
+$database->setDatabase(0);          // redis database number
+$database->setPassword('wsudo');    // redis service password
 
 /* 
     create default settings object
