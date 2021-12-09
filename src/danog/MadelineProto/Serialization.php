@@ -324,11 +324,6 @@ abstract class Serialization
                 $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
                 $changed = true;
             }
-            if (\strpos($tounserialize, 'C:24:"tgseclib\\Math\\BigInteger"') !== false) {
-                Logger::log("SUBBING TGSECLIB!");
-                $tounserialize = \str_replace('C:24:"tgseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
-                $changed = true;
-            }
             Logger::log((string) $e, Logger::ERROR);
             if (!$changed) {
                 throw $e;
