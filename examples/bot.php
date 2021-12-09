@@ -19,7 +19,6 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
@@ -142,8 +141,6 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
-$MadelineProto = new API('uwu.madeline', $settings);
-
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-$MadelineProto->startAndLoop(MyEventHandler::class);
+MyEventHandler::startAndLoop('uwu.madeline', $settings);

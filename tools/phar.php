@@ -4,7 +4,7 @@ if (\defined('MADELINE_PHP')) {
     throw new \Exception('Please do not include madeline.php twice!');
 }
 
-if (!defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\ClassLoader::class)) {
+if (!\defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\ClassLoader::class)) {
     throw new \Exception('Composer autoloader detected: madeline.php is incompatible with Composer, please require MadelineProto using composer.');
 }
 

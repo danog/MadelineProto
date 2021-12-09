@@ -20,14 +20,6 @@ class RPC extends SettingsAbstract
     protected int $floodTimeout = 10*60;
 
     /**
-     * Maximum number of messages to be stored in the incoming queue.
-     */
-    protected int $limitIncoming = 100;
-    /**
-     * Maximum number of messages to be stored in the outgoing queue.
-     */
-    protected int $limitOutgoing = 100;
-    /**
      * Maximum number of message IDs to consider when using call queues.
      */
     protected int $limitCallQueue = 100;
@@ -44,12 +36,6 @@ class RPC extends SettingsAbstract
         }
         if (isset($settings['flood_timeout']['wait_if_lt'])) {
             $this->setFloodTimeout($settings['flood_timeout']['wait_if_lt']);
-        }
-        if (isset($settings['msg_array_limit']['incoming'])) {
-            $this->setLimitIncoming($settings['msg_array_limit']['incoming']);
-        }
-        if (isset($settings['msg_array_limit']['outgoing'])) {
-            $this->setLimitOutgoing($settings['msg_array_limit']['outgoing']);
         }
         if (isset($settings['msg_array_limit']['call_queue'])) {
             $this->setLimitCallQueue($settings['msg_array_limit']['call_queue']);
@@ -103,54 +89,6 @@ class RPC extends SettingsAbstract
     public function setFloodTimeout(int $floodTimeout): self
     {
         $this->floodTimeout = $floodTimeout;
-
-        return $this;
-    }
-
-    /**
-     * Get maximum number of messages to be stored in the incoming queue.
-     *
-     * @return int
-     */
-    public function getLimitIncoming(): int
-    {
-        return $this->limitIncoming;
-    }
-
-    /**
-     * Set maximum number of messages to be stored in the incoming queue.
-     *
-     * @param int $limitIncoming Maximum number of messages to be stored in the incoming queue
-     *
-     * @return self
-     */
-    public function setLimitIncoming(int $limitIncoming): self
-    {
-        $this->limitIncoming = $limitIncoming;
-
-        return $this;
-    }
-
-    /**
-     * Get maximum number of messages to be stored in the outgoing queue.
-     *
-     * @return int
-     */
-    public function getLimitOutgoing(): int
-    {
-        return $this->limitOutgoing;
-    }
-
-    /**
-     * Set maximum number of messages to be stored in the outgoing queue.
-     *
-     * @param int $limitOutgoing Maximum number of messages to be stored in the outgoing queue
-     *
-     * @return self
-     */
-    public function setLimitOutgoing(int $limitOutgoing): self
-    {
-        $this->limitOutgoing = $limitOutgoing;
 
         return $this;
     }

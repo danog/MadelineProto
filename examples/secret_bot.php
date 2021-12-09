@@ -20,6 +20,7 @@
  */
 
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\Settings;
 
 /*
  * Various ways to load MadelineProto
@@ -125,16 +126,6 @@ class SecretHandler extends \danog\MadelineProto\EventHandler
     }
 }
 
-if (\file_exists('.env')) {
-    echo 'Loading .env...'.PHP_EOL;
-    $dotenv = Dotenv\Dotenv::create(\getcwd());
-    $dotenv->load();
-}
+$settings = new Settings;
 
-echo 'Loading settings...'.PHP_EOL;
-$settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
-
-$MadelineProto = new \danog\MadelineProto\API('secret.madeline', $settings);
-
-// Reduce boilerplate with new wrapper method
-$MadelineProto->startAndLoop(SecretHandler::class);
+SecretHandler::startAndLoop('secret.madeline', $settings);

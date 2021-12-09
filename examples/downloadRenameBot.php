@@ -29,6 +29,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use League\Uri\Contracts\UriException;
 
@@ -237,26 +238,15 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-$settings = [
-    'logger' => [
-        'logger_level' => 4
-    ],
-    'serialization' => [
-        'serialization_interval' => 30
-    ],
-    'connection_settings' => [
-       'media_socket_count' => [
-           'min' => 20,
-           'max' => 1000,
-       ]
-    ],
-    'upload' => [
-        'allow_automatic_upload' => false // IMPORTANT: for security reasons, upload by URL will still be allowed
-    ],
-];
 
-$MadelineProto = new \danog\MadelineProto\API(($argv[1] ?? 'bot').'.madeline', $settings);
+$settings = new Settings;
+$settings->getConnection()
+    ->setMinMediaSocketCount(20)
+    ->setMaxMediaSocketCount(1000);
+
+// IMPORTANT: for security reasons, upload by URL will still be allowed
+$settings->getFiles()->setAllowAutomaticUpload(true);
 
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-$MadelineProto->startAndLoop(MyEventHandler::class);
+MyEventHandler::startAndLoop(($argv[1] ?? 'bot').'.madeline', $settings);

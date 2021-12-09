@@ -40,6 +40,22 @@ abstract class EventHandler extends InternalDoc
     public function __construct($API) // BC
     {
     }
+
+    /**
+     * Start MadelineProto and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $session Session name
+     * @param SettingsAbstract $settings Settings
+     *
+     * @return void
+     */
+    final public static function startAndLoop(string $session, SettingsAbstract $settings): void
+    {
+        $API = new API($session, $settings);
+        $API->startAndLoop(static::class);
+    }
     /**
      * Internal constructor.
      *

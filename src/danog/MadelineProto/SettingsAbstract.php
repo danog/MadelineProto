@@ -53,7 +53,10 @@ abstract class SettingsAbstract
                         || $other->{$name} !== $this->{$name} // Is equal, but current value is not the default one
                     )
                 )
-                && $other->{$name} !== $this->{$name}
+                && (
+                    !isset($this->{$name})
+                    || $other->{$name} !== $this->{$name}
+                )
             ) {
                 $this->{"set$uc"}($other->{$name});
                 $this->changed = true;

@@ -175,7 +175,7 @@ class Server extends SignalLoop
         return self::$shutdownDeferred->promise();
     }
     /**
-     * Shutdown
+     * Shutdown.
      *
      * @return void
      */

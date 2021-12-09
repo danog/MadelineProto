@@ -1,6 +1,8 @@
 <?php
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 
 /*
@@ -15,9 +17,7 @@ If not, see <http://www.gnu.org/licenses/>.
  */
 
 require 'vendor/autoload.php';
-$param = 1;
-\danog\MadelineProto\Logger::constructor($param);
-$logger = \danog\MadelineProto\Logger::$default;
+$logger = new Logger(new SettingsLogger);
 
 \set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
@@ -34,17 +34,18 @@ if ($argc !== 3) {
 function getTL($layer)
 {
     $layer = __DIR__."/../schemas/TL_telegram_v$layer.tl";
-    $layer = new class($layer) {
-        use TL;
-
+    $layer = new class($layer) extends TL {
         public function __construct($layer)
         {
-            $this->logger = Logger::$default;
-            $this->construct_TL(['telegram' => $layer]);
+            $API = new class {
+            };
+            $API->logger = Logger::$default;
+            parent::__construct($API);
+            $this->init((new TLSchema)->setAPISchema($layer));
         }
     };
 
-    return ['methods' => $layer->methods, 'constructors' => $layer->constructors];
+    return ['methods' => $layer->getMethods(), 'constructors' => $layer->getConstructors()];
 }
 function getUrl($constructor, $type)
 {
@@ -75,7 +76,6 @@ foreach (['methods', 'constructors'] as $type) {
     $res .= "\n\nChanged ".\ucfirst($type)."\n";
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
-        $constructor['id'] = $new[$type]->$finder($name)['id'];
         if ($old[$type]->$finder($name)) {
             $new_args = $constructor['params'];
             $old_args = $old[$type]->$finder($name)['params'];
@@ -112,4 +112,13 @@ foreach (['methods', 'constructors'] as $type) {
     }
 }
 
-echo $res;
+
+$bot = new \danog\MadelineProto\API('layer.madeline');
+$bot->start();
+
+foreach (\explode("\n\n", $res) as $chunk) {
+    if (!$chunk) {
+        continue;
+    }
+    $bot->messages->sendMessage(['peer' => 'danogentili', 'message' => $chunk, 'parse_mode' => 'markdown']);
+}
