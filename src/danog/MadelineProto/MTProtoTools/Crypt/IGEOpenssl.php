@@ -21,6 +21,8 @@ namespace danog\MadelineProto\MTProtoTools\Crypt;
 
 /**
  * Openssl IGE implementation.
+ *
+ * @internal
  */
 final class IGEOpenssl extends IGE
 {

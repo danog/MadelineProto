@@ -5782,11 +5782,11 @@ class InternalDoc extends APIFactory
      *
      * @param int $id Bot API channel ID
      *
-     * @return float|int
+     * @return int
      */
-    public function fromSupergroup($id)
+    public function fromSupergroup($id): int
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return \danog\MadelineProto\MTProto::fromSupergroup($id);
     }
     /**
      * When were full info for this chat last cached.
@@ -7033,11 +7033,11 @@ class InternalDoc extends APIFactory
      *
      * @param int $id MTProto channel ID
      *
-     * @return float|int
+     * @return int
      */
-    public function toSupergroup($id)
+    public function toSupergroup($id): int
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return \danog\MadelineProto\MTProto::toSupergroup($id);
     }
     /**
      * Escape type name.

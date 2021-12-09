@@ -97,7 +97,7 @@ trait Methods
             if (isset($this->tdDescriptions['methods'][$method])) {
                 $desc = \Parsedown::instance()->line(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'])[0], '.'));
                 $dom = new \DOMDocument();
-                $dom->loadHTML(\htmlspecialchars_decode($desc));
+                $dom->loadHTML(\mb_convert_encoding($desc, 'HTML-ENTITIES', 'UTF-8'));
                 $desc = $dom->textContent;
                 $this->human_docs_methods[$this->tdDescriptions['methods'][$method]['description'].': '.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$method.'</a>
 

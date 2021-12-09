@@ -23,6 +23,8 @@ use danog\MadelineProto\Magic;
 
 /**
  * Continuous mode IGE implementation.
+ *
+ * @internal
  */
 abstract class IGE
 {

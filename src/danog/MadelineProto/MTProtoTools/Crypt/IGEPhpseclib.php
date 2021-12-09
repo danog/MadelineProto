@@ -23,6 +23,8 @@ use phpseclib3\Crypt\AES;
 
 /**
  * Phpseclib IGE implementation.
+ *
+ * @internal
  */
 final class IGEPhpseclib extends IGE
 {
