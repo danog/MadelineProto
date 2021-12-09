@@ -108,9 +108,10 @@ abstract class SettingsAbstract
      *
      * @param string $name
      * @param array $arguments
-     * @return void
+     * @return static
      */
     public function __call(string $name, array $arguments): mixed
     {
+        return $this;
     }
 }
