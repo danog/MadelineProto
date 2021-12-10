@@ -219,7 +219,8 @@ class Installer
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        if ($remote_release === $local_release || $remote_release === null) {
+        $madeline_phar = "madeline-$remote_release.phar";
+        if (($remote_release === $local_release && \file_exists($madeline_phar)) || $remote_release === null) {
             return self::load($local_release);
         }
 
@@ -228,7 +229,6 @@ class Installer
             return $this->install();
         }
 
-        $madeline_phar = "madeline-$remote_release.phar";
         if (!\file_exists($madeline_phar)) {
             $phar = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version));
             if (!$phar) {
