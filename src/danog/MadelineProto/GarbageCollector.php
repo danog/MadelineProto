@@ -70,7 +70,7 @@ final class GarbageCollector
                 $latest = yield $client->request($request);
                 Magic::$version_latest = yield $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
-                    Logger::log("An update of MadelineProto is required!", Logger::FATAL_ERROR);
+                    Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
                     self::$cleanupLoop->signal(true);
                     if (Magic::$isIpcWorker) {
                         die;

@@ -105,7 +105,7 @@ k()
 
 reset()
 {
-    sed 's|phar.madelineproto.xyz/madeline|empty.madelineproto.xyz/madeline|g' tools/phar.php > madeline.php
+    sed 's|phar.madelineproto.xyz/madeline|empty.madelineproto.xyz/madeline|g;s/MADELINE_RELEASE_URL/disable//g' tools/phar.php > madeline.php
     cp madeline.php madelineBackup.php
 }
 k
