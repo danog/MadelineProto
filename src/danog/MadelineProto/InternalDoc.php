@@ -6224,6 +6224,19 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, []);
     }
     /**
+     * Get sponsored messages for channel.
+     * This method will return an array of [sponsored message objects](https://docs.madelineproto.xyz/API_docs/constructors/sponsoredMessage.html).
+     *
+     * See [the API documentation](https://core.telegram.org/api/sponsored-messages) for more info on how to handle sponsored messages.
+     *
+     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @return \Amp\Promise
+     */
+    public function getSponsoredMessages($peer, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$peer, $extra]);
+    }
+    /**
      * Get TL serializer.
      *
      * @psalm-return \danog\MadelineProto\TL\TL|\Amp\Promise<\danog\MadelineProto\TL\TL>
@@ -7244,6 +7257,18 @@ class InternalDoc extends APIFactory
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
+    }
+    /**
+     * Mark sponsored message as read.
+     *
+     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
+     *
+     * @return \Amp\Promise Bool
+     */
+    public function viewSponsoredMessage($peer, $message, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$peer, $message, $extra]);
     }
     /**
      * Synchronously wait for a promise|generator.

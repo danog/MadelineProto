@@ -126,13 +126,6 @@ class RedisArray extends DriverArray
 
         $this->setCache($index, $value);
 
-        /*
-        $request = $this->db->setMultiple(
-            [
-                $this->rKey($index) => \serialize($value),
-                $this->tsKey($index) => \time()
-            ]
-        );*/
         $request = $this->db->set($this->rKey($index), \serialize($value));
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.

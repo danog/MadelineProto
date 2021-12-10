@@ -71,6 +71,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
+    use \danog\MadelineProto\Wrappers\Ads;
     use \danog\MadelineProto\Wrappers\Button;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Events;
@@ -354,6 +355,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public $full_chats;
     /**
+     * Sponsored message database.
+     *
+     * @var DbArray
+     */
+    public $sponsoredMessages;
+    /**
      * Latest chat message ID map for update handling.
      *
      * @var array
@@ -526,6 +533,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     protected static array $dbProperties = [
         'chats' => 'array',
         'full_chats' => 'array',
+        'sponsoredMessages' => 'array',
         'channelParticipants' => 'array',
         'usernames' => 'array',
         'session' => [
