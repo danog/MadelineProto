@@ -119,6 +119,7 @@ k
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
 cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
+echo "$COMMIT-$php" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
 runTestSimple
