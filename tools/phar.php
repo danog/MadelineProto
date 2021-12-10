@@ -40,7 +40,14 @@ class Installer
      */
     public function __construct()
     {
-        if (\count(\debug_backtrace(0)) === 1) {
+        if ((PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION < 7) {
+            throw new \Exception('MadelineProto requires at least PHP 7.1 to run');
+        }
+        if (PHP_INT_SIZE < 8) {
+            throw new \Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.');
+        }
+        $backtrace = \debug_backtrace(0);
+        if (\count($backtrace) === 1) {
             if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
                 $arguments = \array_slice($GLOBALS['argv'], 1);
             } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
@@ -54,12 +61,7 @@ class Installer
             } else {
                 die('MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.'.PHP_EOL);
             }
-        }
-        if ((PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION < 7) {
-            throw new \Exception('MadelineProto requires at least PHP 7.1 to run');
-        }
-        if (PHP_INT_SIZE < 8) {
-            throw new \Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.');
+            \define('MADELINE_REAL_ROOT', \dirname($backtrace[0]["file"]));
         }
         $this->version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline-*-{$this->version}.phar");
