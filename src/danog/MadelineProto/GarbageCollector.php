@@ -2,7 +2,10 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use Amp\Loop;
+use danog\Loop\Generic\PeriodicLoop;
 
 final class GarbageCollector
 {
@@ -31,6 +34,13 @@ final class GarbageCollector
      */
     private static int $memoryConsumption = 0;
 
+    /**
+     * Phar cleanup loop.
+     *
+     * @var PeriodicLoop
+     */
+    private static PeriodicLoop $cleanupLoop;
+
     public static function start(): void
     {
         if (self::$lock) {
@@ -49,6 +59,43 @@ final class GarbageCollector
                 }
             }
         });
+
+        if (!\defined('MADELINE_RELEASE_URL')) {
+            return;
+        }
+        $client = HttpClientBuilder::buildDefault();
+        $request = new Request(MADELINE_RELEASE_URL);
+        self::$cleanupLoop = new PeriodicLoop(static function () use ($client, $request): \Generator {
+            try {
+                $latest = yield $client->request($request);
+                Magic::$version_latest = yield $latest->getBody()->buffer();
+                if (Magic::$version !== Magic::$version_latest) {
+                    Logger::log("An update of MadelineProto is required!", Logger::FATAL_ERROR);
+                    self::$cleanupLoop->signal(true);
+                    if (Magic::$isIpcWorker) {
+                        die;
+                    }
+                    return;
+                }
+
+                foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
+                    $base = \basename($path);
+                    if ($base === "madeline-".Magic::$version.".phar") {
+                        continue;
+                    }
+                    $f = \fopen($path, 'c');
+                    if (\flock($f, LOCK_EX|LOCK_NB)) {
+                        \fclose($f);
+                        \unlink($path);
+                    } else {
+                        \fclose($f);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Logger::log("An error occurred in $this: $e", Logger::FATAL_ERROR);
+            }
+        }, "Phar cleanup loop", 60*1000);
+        self::$cleanupLoop->start();
     }
 
     private static function getMemoryConsumption(): int
