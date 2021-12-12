@@ -103,10 +103,12 @@ class SessionPaths
             $file = yield open("$path.temp.php", 'bw+');
             $l = yield $file->write(Serialization::PHP_HEADER);
             $l += yield $file->write(\chr(Serialization::VERSION));
+            $l += yield $file->write(\chr(PHP_MAJOR_VERSION));
+            $l += yield $file->write(\chr(PHP_MINOR_VERSION));
             $l += yield $file->write($object);
             yield $file->close();
 
-            if ($l !== ($need = \strlen(Serialization::PHP_HEADER)+1+\strlen($object))) {
+            if ($l !== ($need = \strlen(Serialization::PHP_HEADER)+3+\strlen($object))) {
                 throw new Exception("Did not write all the data (need $need, wrote $l)");
             }
             yield renameAsync("$path.temp.php", $path);
@@ -132,7 +134,7 @@ class SessionPaths
         if (!yield exists($path)) {
             return null;
         }
-        $headerLen = \strlen(Serialization::PHP_HEADER) + 1;
+        $headerLen = \strlen(Serialization::PHP_HEADER);
 
         Logger::log("Waiting for shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
         $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_SH, 0.1);
@@ -144,7 +146,17 @@ class SessionPaths
             $size = yield stat($path);
             $size = $size['size'] ?? $headerLen;
 
-            yield $file->seek($headerLen); // Skip version for now
+            yield $file->seek($headerLen++);
+            $v = \ord(yield $file->read(1));
+            if ($v === Serialization::VERSION) {
+                $php = yield $file->read(2);
+                $major = \ord($php[0]);
+                $minor = \ord($php[1]);
+                if (\version_compare("$major.$minor", PHP_VERSION) > 0) {
+                    throw new Exception("Cannot deserialize session created on newer PHP $major.$minor, currently using PHP ".PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.', please upgrade to the latest version of PHP!');
+                }
+                $headerLen += 2;
+            }
             $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
             yield $file->close();
         } finally {

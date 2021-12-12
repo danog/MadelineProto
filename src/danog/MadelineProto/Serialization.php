@@ -45,7 +45,7 @@ abstract class Serialization
     /**
      * Serialization version.
      */
-    const VERSION = 1;
+    const VERSION = 2;
 
     /**
      * Unserialize session.
