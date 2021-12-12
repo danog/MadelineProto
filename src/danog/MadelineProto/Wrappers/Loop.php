@@ -89,6 +89,13 @@ trait Loop
             $this->logger->logger("Done webhost init process!");
             Tools::closeConnection($this->getWebMessage("The bot was started!"));
             $inited = true;
+        } elseif (PHP_SAPI === 'cli') {
+            try {
+                if (\function_exists('shell_exec') && \file_exists('/data/data/com.termux/files/usr/bin/termux-wake-lock')) {
+                    \shell_exec('/data/data/com.termux/files/usr/bin/termux-wake-lock');
+                }
+            } catch (\Throwable $e) {
+            }
         }
     }
     /**
