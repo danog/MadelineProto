@@ -1,8 +1,8 @@
 <?php
-use danog\MadelineProto\Settings;
 use danog\MadelineProto\API;
+use danog\MadelineProto\Settings;
 
-/* 
+/*
     * load MadelineProto in Your Project
 */
 
@@ -16,12 +16,12 @@ if (\file_exists('vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-/* 
+/*
     * create default Memory object
 */
 $database = new \danog\MadelineProto\Settings\Database\Memory;
 
-/* 
+/*
     config and set auth information
 */
 
@@ -29,26 +29,26 @@ $database->setCleanup(true);          // set clean up befor serialize session
 $database->setEnableFullPeerDb(false);// madeline proto could fetch peers full information ??
 $database->setEnablePeerInfoDb(true); // enable peer basic info option
 
-/* 
+/*
     create default settings object
 */
 
 $settings = new Settings;
 
-/* 
+/*
     set and merge database settings to main settings
 */
 
 $settings->setDb($database);
 
 
-/* 
+/*
     create madeline proto session
 */
 
-$MadelineProto = new API('madeline.session' , $settings);
+$MadelineProto = new API('madeline.session', $settings);
 
-/* 
+/*
     start madeline proto workers
 */
 $MadelineProto->start();

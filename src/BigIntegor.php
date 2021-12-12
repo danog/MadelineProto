@@ -59,5 +59,12 @@ namespace tgseclib\Math {
                 $this->real->setPrecision($r['precision']);
             }
         }
+        public function __serialize(): array
+        {
+            throw new \Exception("Can't serialize legacy class!");
+        }
+        public function __unserialize(array $data): void
+        {
+        }
     }
 }

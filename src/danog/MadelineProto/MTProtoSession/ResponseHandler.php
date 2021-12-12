@@ -250,9 +250,6 @@ trait ResponseHandler
         }
         $this->gotResponseForOutgoingMessage($request);
 
-        $r = $response['_'] ?? \json_encode($response);
-        $this->logger->logger("Defer sending {$r} to deferred", Logger::ULTRA_VERBOSE);
-
         if ($side = $message->getSideEffects($response)) {
             if ($botAPI) {
                 $deferred = new Deferred;
