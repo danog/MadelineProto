@@ -238,6 +238,7 @@ class Installer
             self::$lock = \fopen($madeline_phar, 'w');
             \flock(self::$lock, LOCK_EX);
             \fwrite(self::$lock, $phar);
+            \fflush(self::$lock);
             unset($phar);
 
             self::reportComposer($local_release, $remote_release);
