@@ -15,7 +15,7 @@ if (!\defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\Cla
 class Installer
 {
     const RELEASE_TEMPLATE = 'https://phar.madelineproto.xyz/release%s?v=new';
-    const PHAR_TEMPLATE = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
+    const PHAR_TEMPLATE = 'https://phar.madelineproto.xyz/madeline%s.phar?v=%s';
 
     /**
      * Phar lock instance.
@@ -209,8 +209,9 @@ class Installer
     public function install()
     {
         $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
-
+        $madeline_phar = "madeline-$remote_release.phar";
         $madeline_version = "madeline-{$this->version}.phar.version";
+
         if (\file_exists($madeline_version)) {
             $local_release = \file_get_contents($madeline_version) ?: null;
         } else {
@@ -219,7 +220,6 @@ class Installer
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        $madeline_phar = "madeline-$remote_release.phar";
         if (($remote_release === $local_release && \file_exists($madeline_phar)) || $remote_release === null) {
             return self::load($local_release);
         }
@@ -230,8 +230,16 @@ class Installer
         }
 
         if (!\file_exists($madeline_phar)) {
-            $phar = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version));
-            if (!$phar) {
+            for ($x = 0; $x < 10; $x++) {
+                $pharTest = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
+                if ($pharTest && strpos($pharTest, $remote_release) !== false) {
+                    unset($pharTest);
+                    $phar = $pharTest;
+                    break;
+                }
+                sleep(1);
+            }
+            if (!isset($phar)) {
                 return self::load($local_release);
             }
 
@@ -239,6 +247,7 @@ class Installer
             \flock(self::$lock, LOCK_EX);
             \fwrite(self::$lock, $phar);
             \fflush(self::$lock);
+            \fseek(self::$lock, 0)
             unset($phar);
 
             self::reportComposer($local_release, $remote_release);
