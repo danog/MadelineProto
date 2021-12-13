@@ -589,6 +589,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function reading(bool $reading, int $x)
     {
+        if (!isset($this->availableConnections[$x])) {
+            return;
+        }
         $this->availableConnections[$x] += $reading ? -$this->decRead : $this->decRead;
     }
     /**
@@ -601,6 +604,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function writing(bool $writing, int $x)
     {
+        if (!isset($this->availableConnections[$x])) {
+            return;
+        }
         $this->availableConnections[$x] += $writing ? -$this->decWrite : $this->decWrite;
     }
     /**
