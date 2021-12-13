@@ -22,9 +22,11 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -415,18 +417,16 @@ trait AuthKeyHandler
                             break;
                     }
                 }
-            } catch (\danog\MadelineProto\SecurityException $e) {
+            } catch (SecurityException|Exception|RPCErrorException $e) {
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-            } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                yield from $connection->reconnect();
             } catch (\Throwable $e) {
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                yield from $connection->reconnect();
             }
         }
         if (!$cdn) {
-            throw new \danog\MadelineProto\SecurityException('Auth Failed');
+            throw new \danog\MadelineProto\SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
         }
     }
     /**
