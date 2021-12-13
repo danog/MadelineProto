@@ -178,6 +178,9 @@ class Installer
             self::$lock = \fopen($phar, 'c');
         }
         \flock(self::$lock, LOCK_SH);
+        \register_shutdown_function(static function () {
+            \flock(self::$lock, LOCK_UN);
+        });
         $result = require_once $phar;
         if (\defined('MADELINE_WORKER_TYPE') && \constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
             require_once "phar://$phar/vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner/entry.php";
@@ -232,12 +235,12 @@ class Installer
         if (!\file_exists($madeline_phar)) {
             for ($x = 0; $x < 10; $x++) {
                 $pharTest = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
-                if ($pharTest && strpos($pharTest, $remote_release) !== false) {
+                if ($pharTest && \strpos($pharTest, $remote_release) !== false) {
                     $phar = $pharTest;
                     unset($pharTest);
                     break;
                 }
-                sleep(1);
+                \sleep(1);
             }
             if (!isset($phar)) {
                 return self::load($local_release);
