@@ -316,6 +316,7 @@ trait UpdateHandler
                     $controller = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING);
                     $controller->setCall($update['phone_call']);
                     $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
+                    $controller->storage['video'] = $update['phone_call']['video'] ?? false;
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
@@ -334,7 +335,7 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? [], [], $update['phone_call']['need_debug'] ?? false);
+                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
