@@ -77,7 +77,6 @@ trait AuthKeyHandler
         if ($media) {
             $datacenter_id = -$datacenter_id;
         }
-        $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
                 $this->logger->logger("Requesting pq...", \danog\MadelineProto\Logger::VERBOSE);
@@ -85,7 +84,7 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Make pq request, DH exchange initiation.
                  *
-                 * @method req_pq
+                 * @method req_pq_multi
                  *
                  * @param [
                  *         int128         $nonce                             : The value of nonce is selected randomly by the client (random number) and identifies the client within this communication
@@ -99,7 +98,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = \danog\MadelineProto\Tools::random(16);
-                $ResPQ = yield from $connection->methodCallAsyncRead($req_pq, ['nonce' => $nonce]);
+                $ResPQ = yield from $connection->methodCallAsyncRead('req_pq_multi', ['nonce' => $nonce]);
                 /*
                  * ***********************************************************************
                  * Check if the client's nonce and the server's nonce are the same
@@ -420,7 +419,6 @@ trait AuthKeyHandler
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                $req_pq = $req_pq === 'req_pq_multi' ? 'req_pq' : 'req_pq_multi';
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\Throwable $e) {
