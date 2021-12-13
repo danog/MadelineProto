@@ -335,7 +335,6 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    // just test comment
                     return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
             }
         }
