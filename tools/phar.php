@@ -178,14 +178,21 @@ class Installer
             self::$lock = \fopen($phar, 'c');
         }
         \flock(self::$lock, LOCK_SH);
-        \register_shutdown_function(static function () {
-            \flock(self::$lock, LOCK_UN);
-        });
         $result = require_once $phar;
         if (\defined('MADELINE_WORKER_TYPE') && \constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
             require_once "phar://$phar/vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner/entry.php";
         }
         return $result;
+    }
+
+    /**
+     * Unlock phar.
+     *
+     * @return void
+     */
+    public static function unlock()
+    {
+        \flock(self::$lock, LOCK_UN);
     }
 
     /**
