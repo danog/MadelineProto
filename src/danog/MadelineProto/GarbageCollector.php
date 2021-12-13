@@ -65,7 +65,7 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(static function () use ($client, $request): \Generator {
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): \Generator {
             try {
                 $latest = yield $client->request($request);
                 Magic::$version_latest = yield $latest->getBody()->buffer();
@@ -92,7 +92,7 @@ final class GarbageCollector
                     }
                 }
             } catch (\Throwable $e) {
-                Logger::log("An error occurred in $this: $e", Logger::FATAL_ERROR);
+                Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
         }, "Phar cleanup loop", 60*1000);
         self::$cleanupLoop->start();
