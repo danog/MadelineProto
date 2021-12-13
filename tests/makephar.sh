@@ -113,6 +113,7 @@ rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
+cp tools/phar.php madeline.php
 runTest
 k
 
