@@ -247,7 +247,7 @@ class Installer
             \flock(self::$lock, LOCK_EX);
             \fwrite(self::$lock, $phar);
             \fflush(self::$lock);
-            \fseek(self::$lock, 0)
+            \fseek(self::$lock, 0);
             unset($phar);
 
             self::reportComposer($local_release, $remote_release);
