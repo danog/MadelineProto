@@ -233,8 +233,8 @@ class Installer
             for ($x = 0; $x < 10; $x++) {
                 $pharTest = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
                 if ($pharTest && strpos($pharTest, $remote_release) !== false) {
-                    unset($pharTest);
                     $phar = $pharTest;
+                    unset($pharTest);
                     break;
                 }
                 sleep(1);
