@@ -326,11 +326,6 @@ trait ResponseHandler
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
                         $this->logger->logger($response['error_message'], Logger::FATAL_ERROR);
-                        foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                            $socket->setTempAuthKey(null);
-                            $socket->setPermAuthKey(null);
-                            $socket->resetSession();
-                        }
                         if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
                             $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
@@ -340,13 +335,7 @@ trait ResponseHandler
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                         }
-                        $this->API->resetSession();
-                        $this->gotResponseForOutgoingMessage($request);
-                        Tools::callFork((function () use ($request, $response): \Generator {
-                            yield from $this->API->initAuthorization();
-                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
-                        })());
-                        return null;
+                        throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
@@ -363,10 +352,6 @@ trait ResponseHandler
                         $this->logger->logger("Auth key not registered in DC {$this->datacenter} with RPC error ${response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
                         if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
                             $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
-                            foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                $socket->setTempAuthKey(null);
-                                $socket->setPermAuthKey(null);
-                            }
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
                             $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
                             $this->logger->logger('To continue, manual verification is required.', Logger::FATAL_ERROR);
@@ -374,13 +359,7 @@ trait ResponseHandler
                             $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
-                            $this->API->resetSession();
-                            $this->gotResponseForOutgoingMessage($request);
-                            Tools::callFork((function () use ($request, &$response): \Generator {
-                                yield from $this->API->initAuthorization();
-                                $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
-                            })());
-                            return null;
+                            throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
                         Tools::callFork((function () use ($request): \Generator {
                             yield from $this->API->initAuthorization();
