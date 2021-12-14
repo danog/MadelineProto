@@ -43,7 +43,8 @@ cd phar
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "90'$TAG'.9998"
+        "danog/madelineproto": "90'$TAG'.9998",
+        "amphp/process": "dev-master#0ddcb301dc9ac2691533af06a60aff541c0efb02 as 1.1.0"
     },
     "authors": [
         {
