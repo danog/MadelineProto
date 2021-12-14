@@ -64,7 +64,7 @@ class Installer
             \define('MADELINE_REAL_ROOT', \dirname($backtrace[0]["file"]));
         }
         $this->version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-        \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline-*-{$this->version}.phar");
+        \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
         \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
@@ -175,7 +175,7 @@ class Installer
         }
         $phar = "madeline-$release.phar";
         if (!self::$lock) {
-            self::$lock = \fopen($phar, 'c');
+            self::$lock = \fopen("$phar.lock", 'c');
         }
         \flock(self::$lock, LOCK_SH);
         $result = require_once $phar;
@@ -207,7 +207,7 @@ class Installer
         if ($this->lockInstaller) {
             return true;
         }
-        $this->lockInstaller = \fopen($version, 'c');
+        $this->lockInstaller = \fopen($version, 'w');
         return \flock($this->lockInstaller, LOCK_EX|LOCK_NB);
     }
 
@@ -253,16 +253,15 @@ class Installer
                 return self::load($local_release);
             }
 
-            self::$lock = \fopen($madeline_phar, 'w');
+            self::$lock = \fopen("$madeline_phar.lock", 'w');
             \flock(self::$lock, LOCK_EX);
-            \fwrite(self::$lock, $phar);
-            \fflush(self::$lock);
-            \fseek(self::$lock, 0);
+            \file_put_contents($madeline_phar, $phar);
             unset($phar);
 
             self::reportComposer($local_release, $remote_release);
         }
-        \file_put_contents($madeline_version, $remote_release);
+        \fwrite($this->lockInstaller, $remote_release);
+        \fflush($this->lockInstaller);
         return self::load($remote_release);
     }
 }

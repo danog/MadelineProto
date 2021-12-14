@@ -83,10 +83,11 @@ final class GarbageCollector
                     if ($base === "madeline-".Magic::$version.".phar") {
                         continue;
                     }
-                    $f = \fopen($path, 'c');
+                    $f = \fopen("$path.lock", 'c');
                     if (\flock($f, LOCK_EX|LOCK_NB)) {
                         \fclose($f);
                         \unlink($path);
+                        \unlink("$path.lock");
                     } else {
                         \fclose($f);
                     }

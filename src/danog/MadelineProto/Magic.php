@@ -439,7 +439,7 @@ class Magic
         }
         MTProto::serializeAll();
         Loop::stop();
-        if (class_exists(Installer::class)) {
+        if (\class_exists(Installer::class)) {
             Installer::unlock();
         }
         die($code);
