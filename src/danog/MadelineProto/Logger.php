@@ -252,7 +252,7 @@ class Logger
         $maxSize = $settings->getMaxSize();
 
         if ($this->mode === self::FILE_LOGGER) {
-            if (!\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
+            if (!$this->optional || !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
                 $this->optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
             }
             if (!\str_ends_with($this->optional, '.log')) {
