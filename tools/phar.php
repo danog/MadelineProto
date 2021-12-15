@@ -63,7 +63,7 @@ class Installer
             }
             \define('MADELINE_REAL_ROOT', \dirname($backtrace[0]["file"]));
         }
-        $this->version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+        $this->version = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
         \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }

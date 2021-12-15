@@ -333,7 +333,7 @@ class Magic
             self::$revision = 'Revision: '.self::$version;
             self::$version_latest = null;
             try {
-                $php = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+                $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
                 self::$version_latest = @\file_get_contents("https://phar.madelineproto.xyz/release$php");
             } catch (\Throwable $e) {
             }
