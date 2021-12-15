@@ -128,7 +128,8 @@ trait FilesLogic
                     yield $stream->seek($offset);
                 }
             }
-            return yield $stream->write($payload);
+            yield $stream->write($payload);
+            return \strlen($payload);
         };
         return yield from $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
     }

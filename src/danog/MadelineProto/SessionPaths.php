@@ -25,6 +25,7 @@ use danog\MadelineProto\Ipc\IpcState;
 
 use function Amp\File\exists;
 use function Amp\File\openFile;
+use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
 
@@ -97,19 +98,17 @@ class SessionPaths
         try {
             Logger::log("Got exclusive lock of $path.lock...");
 
-            $object = \serialize($object);
+            $object = Serialization::PHP_HEADER
+                .\chr(Serialization::VERSION)
+                .\chr(PHP_MAJOR_VERSION)
+                .\chr(PHP_MINOR_VERSION)
+                .\serialize($object);
 
-            $file = yield openFile("$path.temp.php", 'bw+');
-            $l = yield $file->write(Serialization::PHP_HEADER);
-            $l += yield $file->write(\chr(Serialization::VERSION));
-            $l += yield $file->write(\chr(PHP_MAJOR_VERSION));
-            $l += yield $file->write(\chr(PHP_MINOR_VERSION));
-            $l += yield $file->write($object);
-            yield $file->close();
+            yield put(
+                "$path.temp.php",
+                $object
+            );
 
-            if ($l !== ($need = \strlen(Serialization::PHP_HEADER)+3+\strlen($object))) {
-                throw new Exception("Did not write all the data (need $need, wrote $l)");
-            }
             yield renameAsync("$path.temp.php", $path);
         } finally {
             $unlock();
