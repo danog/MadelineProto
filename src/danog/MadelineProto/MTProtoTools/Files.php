@@ -21,7 +21,6 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Deferred;
 use Amp\File\BlockingFile;
-use Amp\File\StatCache as StatCacheAsync;
 use Amp\Http\Client\Request;
 use Amp\Http\Status;
 use Amp\Promise;
@@ -36,9 +35,9 @@ use danog\MadelineProto\Tools;
 
 use const danog\Decoder\TYPES;
 use function Amp\File\exists;
-use function Amp\File\open;
-use function Amp\File\stat as statAsync;
-
+use function Amp\File\getSize;
+use function Amp\File\openFile;
+use function Amp\File\touch as touchAsync;
 use function Amp\Promise\all;
 
 /**
@@ -804,22 +803,21 @@ trait Files
         }
         $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
         if (!yield exists($file)) {
-            yield \touch($file);
+            yield touchAsync($file);
         }
         $file = \realpath($file);
         $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
-        StatCacheAsync::clear($file);
-        $size = (yield statAsync($file))['size'];
-        $stream = yield open($file, 'cb');
+        $size = yield getSize($file);
+        $stream = yield openFile($file, 'cb');
         $this->logger->logger('Waiting for lock of file to download...');
-        $unlock = yield Tools::flock($file, LOCK_EX);
+        $unlock = yield Tools::flock("$file.lock", LOCK_EX);
         $this->logger->logger('Got lock of file to download');
         try {
             yield from $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
         } finally {
             $unlock();
+            \unlink("$file.lock");
             yield $stream->close();
-            StatCacheAsync::clear($file);
         }
         return $file;
     }

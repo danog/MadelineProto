@@ -20,7 +20,6 @@
 namespace danog\MadelineProto;
 
 use Amp\Dns\Resolver;
-use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
 use Amp\Loop;
 use Amp\Promise;
@@ -47,8 +46,8 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use Psr\Log\LoggerInterface;
 
-use function Amp\File\exists;
-use function Amp\File\size;
+use function Amp\File\getSize;
+use function Amp\File\touch as touchAsync;
 
 /**
  * Manages all of the mtproto stuff.
@@ -1967,10 +1966,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         $file = null;
         if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
             && $path = $this->settings->getLogger()->getExtra()) {
-            StatCache::clear($path);
-            if (!yield exists($path)) {
-                $message = "!!! WARNING !!!\nThe logfile does not exist, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
-            } elseif (!yield size($path)) {
+            yield touchAsync($path);
+            if (!yield getSize($path)) {
                 $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
             } else {
                 $file = yield from $this->methodCallAsyncRead(

@@ -40,7 +40,7 @@
         "amphp/socket": "^1",
         "amphp/dns": "^1",
         "amphp/byte-stream": "^1",
-        "amphp/file": "^1",
+        "amphp/file": "^2",
         "amphp/mysql": "^2",
         "amphp/postgres": "^1.2",
         "danog/dns-over-https": "^0.2",

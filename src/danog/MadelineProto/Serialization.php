@@ -30,7 +30,7 @@ use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 use function Amp\File\exists;
-use function Amp\File\get;
+use function Amp\File\read;
 use function Amp\Ipc\connect;
 
 /**
@@ -286,7 +286,7 @@ abstract class Serialization
      */
     private static function legacyUnserialize(string $session): \Generator
     {
-        $tounserialize = yield get($session);
+        $tounserialize = yield read($session);
 
         try {
             $unserialized = \unserialize($tounserialize);

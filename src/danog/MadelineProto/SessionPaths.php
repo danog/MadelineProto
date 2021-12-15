@@ -19,13 +19,12 @@
 
 namespace danog\MadelineProto;
 
-use Amp\File\StatCache;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Ipc\IpcState;
 
 use function Amp\File\exists;
-use function Amp\File\open;
+use function Amp\File\openFile;
 use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
 
@@ -100,7 +99,7 @@ class SessionPaths
 
             $object = \serialize($object);
 
-            $file = yield open("$path.temp.php", 'bw+');
+            $file = yield openFile("$path.temp.php", 'bw+');
             $l = yield $file->write(Serialization::PHP_HEADER);
             $l += yield $file->write(\chr(Serialization::VERSION));
             $l += yield $file->write(\chr(PHP_MAJOR_VERSION));
@@ -130,7 +129,6 @@ class SessionPaths
     {
         $path = $path ?: $this->sessionPath;
 
-        StatCache::clear($path);
         if (!yield exists($path)) {
             return null;
         }
@@ -142,7 +140,7 @@ class SessionPaths
         try {
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
-            $file = yield open($path, 'rb');
+            $file = yield openFile($path, 'rb');
             $size = yield stat($path);
             $size = $size['size'] ?? $headerLen;
 

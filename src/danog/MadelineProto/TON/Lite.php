@@ -24,7 +24,8 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
-use function Amp\File\get;
+
+use function Amp\File\read;
 
 /**
  * TON API.
@@ -85,7 +86,7 @@ class Lite
      */
     public function connect(string $config): \Generator
     {
-        $config = \json_decode(yield get($config), true);
+        $config = \json_decode(yield read($config), true);
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];

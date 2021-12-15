@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Failure;
-use Amp\File\StatCache;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
@@ -31,7 +30,7 @@ use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 use function Amp\delay;
 use function Amp\File\exists;
-use function Amp\File\get;
+use function Amp\File\touch as touchAsync;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
 use function Amp\Promise\first;
@@ -607,8 +606,7 @@ abstract class Tools extends StrTools
         $polling *= 1000;
         $polling = (int) $polling;
         if (!yield exists($file)) {
-            yield \touch($file);
-            StatCache::clear($file);
+            yield touchAsync($file);
         }
         $operation |= LOCK_NB;
         $res = \fopen($file, 'c');
@@ -958,8 +956,7 @@ abstract class Tools extends StrTools
     public static function &getVar($obj, string $var)
     {
         return \Closure::bind(
-            function &() use ($var)
-            {
+            function &() use ($var) {
                 return $this->{$var};
             },
             $obj,

@@ -21,7 +21,7 @@ use danog\MadelineProto\Stream\Ogg\Ogg;
 use danog\MadelineProto\VoIP\Endpoint;
 use SplQueue;
 
-use function Amp\File\open;
+use function Amp\File\openFile;
 
 if (\extension_loaded('php-libtgvoip')) {
     return;
@@ -467,7 +467,7 @@ class VoIP
     private function openFile(string $file): \Generator
     {
         $ctx = new ConnectionContext;
-        $ctx->addStream(FileBufferedStream::class, yield open($file, 'r'));
+        $ctx->addStream(FileBufferedStream::class, yield openFile($file, 'r'));
         $stream = yield from $ctx->getStream();
         $ogg = yield from Ogg::init($stream, 60000);
         $it = $ogg->getEmitter()->iterate();

@@ -22,7 +22,7 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
 
-use function Amp\File\open;
+use function Amp\File\openFile;
 
 final class APIWrapper
 {
@@ -212,7 +212,7 @@ final class APIWrapper
 
 
             // Truncate legacy session
-            yield (yield open($this->session->getLegacySessionPath(), 'w'))->close();
+            yield (yield openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
             if (!Magic::$suspendPeriodicLogging) {
                 Logger::log('Saved session!');
