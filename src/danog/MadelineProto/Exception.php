@@ -83,6 +83,7 @@ class Exception extends \Exception
      */
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
+        $errfile = \str_replace('phabel.transpiler'.PHP_MAJOR_VERSION.PHP_MINOR_VERSION, '', $errfile ?? '');
         // If error is suppressed with @, don't throw an exception
         if (\error_reporting() === 0
             || \strpos($errstr, 'headers already sent')
