@@ -88,9 +88,9 @@ class Exception extends \Exception
             || \strpos($errstr, 'headers already sent')
             || \strpos($errstr, 'Creation of dynamic property') !== false
             || $errfile && (
-                \strpos($errfile, 'vendor/amphp') !== false
-                || \strpos($errfile, 'vendor/league') !== false
-                || \strpos($errfile, 'vendor/phpseclib') !== false
+                \strpos($errfile, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
+                || \strpos($errfile, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
+                || \strpos($errfile, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR) !== false
             )
         ) {
             return false;
