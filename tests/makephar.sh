@@ -44,7 +44,7 @@ echo '{
     "name": "danog/madelineprotophar",
     "require": {
         "danog/madelineproto": "90'$TAG'.9998",
-        "amphp/process": "dev-master#0ddcb301dc9ac2691533af06a60aff541c0efb02 as 1.1.0"
+        "amphp/process": "dev-patch-1 as 1.1.0"
     },
     "authors": [
         {
@@ -57,6 +57,10 @@ echo '{
             "type": "path",
             "url": "'$madelinePath'",
             "options":{"symlink": false}
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danog/process"
         }
     ]
 }' > composer.json
