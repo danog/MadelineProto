@@ -60,7 +60,7 @@ echo '{
         },
         {
             "type": "vcs",
-            "url": "https://github.com/danog/process"
+            "url": "git@github.com:danog/process.git"
         }
     ]
 }' > composer.json
