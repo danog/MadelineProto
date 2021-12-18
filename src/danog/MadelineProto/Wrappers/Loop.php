@@ -138,6 +138,7 @@ trait Loop
             if (!$this->updateHandler) {
                 yield $this->waitUpdate();
                 if (!$this->updateHandler) {
+                    $this->logger->logger('Exiting update loop, no handler!', \danog\MadelineProto\Logger::NOTICE);
                     continue;
                 }
             }
@@ -153,7 +154,9 @@ trait Loop
                 $updates = [];
             }
             yield $this->waitUpdate();
+            $this->logger->logger('Resuming update loop!', \danog\MadelineProto\Logger::VERBOSE);
         } while (!$this->stopLoop);
+        $this->logger->logger('Exiting update loop!', \danog\MadelineProto\Logger::NOTICE);
         $this->stopLoop = false;
         if (isset($repeat)) {
             AmpLoop::cancel($repeat);
