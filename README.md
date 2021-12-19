@@ -209,7 +209,7 @@ You can find examples for nearly every MadelineProto function in
     * [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getFullInfo.html)
     * [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getInfo.html)
     * [Get info about the currently logged-in user](https://docs.madelineproto.xyz/getSelf.html)
-    * [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
+    * [Upload or download files up to 2 GB](https://docs.madelineproto.xyz/docs/FILES.html)
     * [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
     * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.acceptLoginToken.html" name="auth.acceptLoginToken">Accept QR code login token, logging in the app that generated it: auth.acceptLoginToken</a>
