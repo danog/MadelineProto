@@ -143,11 +143,11 @@ abstract class DriverArray implements DbArray
     protected static function migrateDataToDb(self $new, $old): \Generator
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
-            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
-
             if (!$old instanceof DbArray) {
                 $old = yield MemoryArray::getInstance('', $old, new Memory);
             }
+            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
+
             $counter = 0;
             $total = yield $old->count();
             $iterator = $old->getIterator();
