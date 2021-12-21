@@ -177,10 +177,10 @@ trait Constructors
             $description = isset($this->TL->getDescriptions()['constructors'][$constructor]) ? $this->TL->getDescriptions()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
             $symFile = \str_replace('.', '_', $constructor.$layer);
             $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/{$symFile}.html" : '';
-            $description = \rtrim(\explode("\n", $description)[0], ':');
+            $description = \str_replace('"', "'", Tools::toString(\rtrim(\explode("\n", $description)[0], ':')));
             $header = '---
-title: '.$constructor.'
-description: '.$description.'
+title: "'.$constructor.'"
+description: "'.$description.'"
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
 # Constructor: '.StrTools::markdownEscape($constructor.$layer).'  

@@ -26,15 +26,6 @@ function __destructure($list, $value): array
     return $res;
 }
 
-trait MyCallableMaker
-{
-    use \Amp\CallableMaker {
-        callableFromInstanceMethod as public;
-        callableFromStaticMethod as public;
-    }
-}
-
-
 $ampFilePolyfill = 'namespace Amp\\File {';
 foreach ([
     'open' => 'openFile',

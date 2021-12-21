@@ -20,6 +20,7 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\TON\API as TONAPI;
 use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
 use danog\MadelineProto\TON\Lite;
+use danog\MadelineProto\Tools;
 
 \chdir($d=__DIR__.'/..');
 
@@ -159,9 +160,9 @@ foreach ($orderedfiles as $key => $filename) {
     }
     \preg_match('|^# (.*)|', $lines[0], $matches);
     $title = $matches[1];
-    $description = $lines[2];
+    $description = \str_replace('"', "'", Tools::toString($lines[2]));
 
-    \array_unshift($lines, '---', 'title: '.$title, 'description: '.$description, 'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png', '---');
+    \array_unshift($lines, '---', 'title: "'.$title.'"', 'description: "'.$description.'"', 'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png', '---');
 
     if (isset($orderedfiles[$key + 1])) {
         $nextfile = 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key + 1], '.md').'.html';
