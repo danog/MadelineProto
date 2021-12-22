@@ -104,7 +104,7 @@ class UpdateLoop extends ResumableSignalLoop
                     try {
                         $difference = yield from $API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
                     } catch (RPCErrorException $e) {
-                        if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID'])) {
+                        if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'])) {
                             $feeder->signal(true);
                             unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
                             $API->getChannelStates()->remove($this->channelId);
