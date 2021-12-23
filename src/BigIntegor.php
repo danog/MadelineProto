@@ -48,7 +48,7 @@ namespace tgseclib\Math {
         public MathBigInteger $real;
         public function serialize()
         {
-            throw new \Exception("Can't serialize legacy class!");
+            //throw new \Exception("Can't serialize legacy class!");
         }
         public function unserialize($data)
         {
@@ -61,7 +61,7 @@ namespace tgseclib\Math {
         }
         public function __serialize(): array
         {
-            throw new \Exception("Can't serialize legacy class!");
+            //throw new \Exception("Can't serialize legacy class!");
         }
         public function __unserialize(array $data): void
         {
