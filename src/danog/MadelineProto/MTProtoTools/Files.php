@@ -20,7 +20,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Deferred;
-use Amp\File\BlockingFile;
+use Amp\File\Driver\BlockingFile;
 use Amp\Http\Client\Request;
 use Amp\Http\Status;
 use Amp\Promise;

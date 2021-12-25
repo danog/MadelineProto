@@ -8,9 +8,9 @@ use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceInputStream;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
-use Amp\File\BlockingFile;
+use Amp\File\Driver\BlockingFile;
 
-use Amp\File\Handle;
+use Amp\File\File;
 use Amp\Http\Client\Request;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
@@ -295,7 +295,7 @@ trait FilesLogic
             }
         }
         $created = false;
-        if ($stream instanceof Handle) {
+        if ($stream instanceof File) {
             $callable = static function (int $offset, int $size) use ($stream, $seekable): \Generator {
                 if ($seekable) {
                     while ($stream->tell() !== $offset) {
