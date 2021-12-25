@@ -130,8 +130,6 @@ class Settings extends SettingsAbstract
     }
     /**
      * Constructor.
-     *
-     * @internal
      */
     public function __construct()
     {
