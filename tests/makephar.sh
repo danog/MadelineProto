@@ -30,14 +30,10 @@ k()
 k
 rm -f madeline.phar testing.madeline*
 
-git commit -am 'Temp'
-git tag -d "90$TAG" || :
-git tag "90$TAG"
-
 php8.0 $(which composer) update
-php8.0 vendor/bin/phabel publish -d "90$TAG"
+php8.0 vendor/bin/phabel publish -d "$TAG"
 
-git checkout "90$TAG.9998"
+git checkout "$TAG.9998"
 
 cd ..
 rm -rf phar
@@ -49,7 +45,7 @@ cd phar
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "90'$TAG'.9998"
+        "danog/madelineproto": "'$TAG'.9998"
     },
     "authors": [
         {
