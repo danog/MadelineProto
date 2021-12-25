@@ -22,7 +22,13 @@ echo "Latest tag: $TAG"
 # Clean up
 madelinePath=$PWD
 
-sed 's/php-64bit/php/g' -i composer.json
+k()
+{
+    while :; do pkill -f "MadelineProto worker $(pwd)/tests/../testing.madeline" || break && sleep 1; done
+}
+
+k
+rm -f madeline.phar testing.madeline*
 
 git commit -am 'Temp'
 git tag -d "90$TAG" || :
@@ -96,11 +102,6 @@ n
         sleep 10
         exit 1
     }
-}
-
-k()
-{
-    while :; do pkill -f "MadelineProto worker $(pwd)/tests/../testing.madeline" || break && sleep 1; done
 }
 
 reset()
