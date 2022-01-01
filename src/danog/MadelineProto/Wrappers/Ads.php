@@ -41,7 +41,7 @@ trait Ads
     {
         $peer = (yield from $this->getInfo($peer))['bot_api_id'];
         $cache = yield $this->sponsoredMessages[$peer];
-        if ($cache && $cache[0] < \time()) {
+        if ($cache && $cache[0] > \time()) {
             return $cache[1];
         }
         $result = (yield from $this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]))['messages'];
