@@ -95,23 +95,23 @@ You can find examples for nearly every MadelineProto function in
   * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
 * [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html)
-  * [\danog\MadelineProto\Settings\AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
-  * [\danog\MadelineProto\Settings\Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
-  * [\danog\MadelineProto\Settings\Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
-  * [\danog\MadelineProto\Settings\Files: File management settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Files.html)
-  * [\danog\MadelineProto\Settings\Logger: Logger settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Logger.html)
-  * [\danog\MadelineProto\Settings\Peer: Peer database settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Peer.html)
-  * [\danog\MadelineProto\Settings\Pwr: PWRTelegram settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Pwr.html)
-  * [\danog\MadelineProto\Settings\RPC: RPC settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html)
-  * [\danog\MadelineProto\Settings\SecretChats: Secret chat settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/SecretChats.html)
-  * [\danog\MadelineProto\Settings\Serialization: Serialization settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Serialization.html)
-  * [\danog\MadelineProto\Settings\TLSchema: TL schema settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/TLSchema.html)
-  * [\danog\MadelineProto\Settings\Templates: Web and CLI template settings for login.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Templates.html)
-  * [\danog\MadelineProto\Settings\VoIP: VoIP settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/VoIP.html)
-  * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
-  * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
-  * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
-  * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
+  * [AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
+  * [Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
+  * [Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
+  * [Files: File management settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Files.html)
+  * [Logger: Logger settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Logger.html)
+  * [Peer: Peer database settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Peer.html)
+  * [Pwr: PWRTelegram settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Pwr.html)
+  * [RPC: RPC settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html)
+  * [SecretChats: Secret chat settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/SecretChats.html)
+  * [Serialization: Serialization settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Serialization.html)
+  * [TLSchema: TL schema settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/TLSchema.html)
+  * [Templates: Web and CLI template settings for login.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Templates.html)
+  * [VoIP: VoIP settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/VoIP.html)
+  * [Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
+  * [Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
+  * [Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
+  * [Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
 * [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html)
 * [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html)
   * [List of exception types](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#list-of-exception-types)
@@ -525,40 +525,6 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendVote.html" name="messages.sendVote">Vote in a poll: messages.sendVote</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateDeviceLocked.html" name="account.updateDeviceLocked">When client-side passcode lock feature is enabled, will not show message texts in incoming PUSH notifications: account.updateDeviceLocked</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContactSignUpNotification.html" name="account.getContactSignUpNotification">Whether the user will receive notifications when contacts sign up: account.getContactSignUpNotification</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.bindTempAuthKey.html" name="auth.bindTempAuthKey">You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info: auth.bindTempAuthKey</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDhConfig.html" name="messages.getDhConfig">You cannot use this method directly, instead use $MadelineProto->getDhConfig();: messages.getDhConfig</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.acceptEncryption.html" name="messages.acceptEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.acceptEncryption</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.discardEncryption.html" name="messages.discardEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.discardEncryption</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestEncryption.html" name="messages.requestEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.requestEncryption</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/updates.getChannelDifference.html" name="updates.getChannelDifference">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates: updates.getChannelDifference</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/updates.getDifference.html" name="updates.getDifference">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates: updates.getDifference</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/updates.getState.html" name="updates.getState">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates: updates.getState</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.acceptCall.html" name="phone.acceptCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.acceptCall</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.confirmCall.html" name="phone.confirmCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.confirmCall</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.discardCall.html" name="phone.discardCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.discardCall</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.requestCall.html" name="phone.requestCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.requestCall</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportAuthorization.html" name="auth.exportAuthorization">You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.exportAuthorization</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importAuthorization.html" name="auth.importAuthorization">You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.importAuthorization</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importBotAuthorization.html" name="auth.importBotAuthorization">You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info): auth.importBotAuthorization</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.checkPassword.html" name="auth.checkPassword">You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info): auth.checkPassword</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.signIn.html" name="auth.signIn">You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info): auth.signIn</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.signUp.html" name="auth.signUp">You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info): auth.signUp</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getFullChannel.html" name="channels.getFullChannel">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): channels.getFullChannel</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFullChat.html" name="messages.getFullChat">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): messages.getFullChat</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getFullUser.html" name="users.getFullUser">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): users.getFullUser</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.logOut.html" name="auth.logOut">You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info): auth.logOut</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html" name="auth.sendCode">You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info): auth.sendCode</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resolveUsername.html" name="contacts.resolveUsername">You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): contacts.resolveUsername</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.getCdnFile.html" name="upload.getCdnFile">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.getCdnFile</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.getCdnFileHashes.html" name="upload.getCdnFileHashes">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.getCdnFileHashes</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.getFile.html" name="upload.getFile">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.getFile</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.getFileHashes.html" name="upload.getFileHashes">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.getFileHashes</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.reuploadCdnFile.html" name="upload.reuploadCdnFile">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.reuploadCdnFile</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.saveBigFilePart.html" name="upload.saveBigFilePart">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.saveBigFilePart</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html" name="upload.saveFilePart">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.saveFilePart</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.receivedQueue.html" name="messages.receivedQueue">You cannot use this method directly: messages.receivedQueue</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getPasswordSettings.html" name="account.getPasswordSettings">You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.getPasswordSettings</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updatePasswordSettings.html" name="account.updatePasswordSettings">You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.updatePasswordSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.unpinAllMessages.html" name="messages.unpinAllMessages">Unpin all pinned messages: messages.unpinAllMessages</a>
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
   * [Files](https://docs.madelineproto.xyz/docs/FILES.html)

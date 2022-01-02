@@ -159,7 +159,7 @@ foreach ($orderedfiles as $key => $filename) {
         '---',
         'title: "'.$title.'"',
         'description: "'.$description.'"',
-        'nav_order: '.($key+1),
+        'nav_order: '.($key+4),
         'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png',
         '---'
     );
@@ -194,6 +194,9 @@ foreach ($orderedfiles as $key => $filename) {
                 $spaces .= '  ';
                 \preg_match_all('|\* (.*)|', \file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
                 foreach ($smatches[1] as $key => $match) {
+                    if (\str_contains($match, 'You cannot use this method directly')) {
+                        continue;
+                    }
                     $match = \str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
                     $index .= "$spaces* ".$match."\n";
                 }
@@ -215,6 +218,7 @@ $readme = \implode('## ', $readme);
 \file_put_contents('docs/docs/index.md', '---
 title: MadelineProto documentation
 description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
+nav_order: 1
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 '.$readme);

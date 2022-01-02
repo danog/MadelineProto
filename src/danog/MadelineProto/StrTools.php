@@ -20,6 +20,8 @@
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\Conversion\Extension;
+use DOMDocument;
+use Parsedown;
 
 /**
  * Some tools.
@@ -86,5 +88,26 @@ abstract class StrTools extends Extension
     public static function methodEscape(string $method): string
     {
         return \str_replace('.', '->', $method);
+    }
+    /**
+     * Strip markdown tags.
+     *
+     * @internal
+     *
+     * @param string $markdown
+     * @return string
+     */
+    public static function toString(string $markdown): string
+    {
+        if ($markdown === '') {
+            return $markdown;
+        }
+        $html = (new Parsedown($markdown))->text($markdown);
+        $document = new DOMDocument('', 'utf-8');
+        @$document->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        if (!$document->getElementsByTagName('body')[0]) {
+            return '';
+        }
+        return $document->getElementsByTagName('body')[0]->childNodes[0]->textContent;
     }
 }
