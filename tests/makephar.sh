@@ -59,7 +59,12 @@ echo '{
             "url": "'$madelinePath'",
             "options":{"symlink": false}
         }
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "phabel/phabel": true
+        }
+    }
 }' > composer.json
 php $(which composer) update --no-cache
 php $(which composer) dumpautoload --optimize

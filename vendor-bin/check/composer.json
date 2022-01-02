@@ -5,5 +5,10 @@
         "phpunit/phpunit": "^9",
         "amphp/php-cs-fixer-config": "dev-master",
         "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     }
 }
