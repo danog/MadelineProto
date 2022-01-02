@@ -275,6 +275,12 @@ class Magic
                 self::$can_getcwd = true;
             } catch (\Throwable $e) {
             }
+            try {
+                if (\function_exists('set_time_limit')) {
+                    \set_time_limit(-1);
+                }
+            } catch (\Throwable $e) {
+            }
             // Define signal handlers
             if (\defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
