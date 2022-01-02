@@ -84,7 +84,7 @@ class DocsBuilder
     public function mkDocs(): void
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
-        \file_put_contents($this->index, $this->template('index', $this->settings['title'], $this->settings['description']));
+        \file_put_contents($this->index, $this->template('index', $this->settings['description']));
 
         $this->mkMethods();
         $this->mkConstructors();

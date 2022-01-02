@@ -959,8 +959,7 @@ abstract class Tools extends StrTools
     public static function &getVar($obj, string $var)
     {
         return \Closure::bind(
-            function &() use ($var)
-            {
+            function &() use ($var) {
                 return $this->{$var};
             },
             $obj,

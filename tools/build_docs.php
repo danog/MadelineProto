@@ -44,14 +44,6 @@ layerUpgrade($layer);
 $logger->logger("Initing docs (layer $layer)...", Logger::NOTICE);
 $docs = [
     [
-        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.tl", 'telegram' => '', 'secret' => ''],
-        'title'       => 'MadelineProto API documentation (mtproto)',
-        'description' => 'MadelineProto API documentation (mtproto)',
-        'output_dir'  => "$d/docs/docs/MTProto_docs",
-        'template'    => "$d/docs/template",
-        'readme'      => false,
-    ],
-    [
         'tl_schema'   => ['mtproto' => '', 'telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
@@ -65,7 +57,7 @@ $docs = \array_merge($docs, initDocs($schemas));
 $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
-    $docs[1],
+    $docs[0],
     \dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
     [
         'API' => API::class,
@@ -162,7 +154,15 @@ foreach ($orderedfiles as $key => $filename) {
     $title = $matches[1];
     $description = \str_replace('"', "'", Tools::toString($lines[2]));
 
-    \array_unshift($lines, '---', 'title: "'.$title.'"', 'description: "'.$description.'"', 'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png', '---');
+    \array_unshift(
+        $lines,
+        '---',
+        'title: "'.$title.'"',
+        'description: "'.$description.'"',
+        'nav_order: '.($key+1),
+        'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png',
+        '---'
+    );
 
     if (isset($orderedfiles[$key + 1])) {
         $nextfile = 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key + 1], '.md').'.html';
