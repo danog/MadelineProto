@@ -21,6 +21,9 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
+    public function unreference(): void
+    {
+    }
     /**
      * Get instance.
      *

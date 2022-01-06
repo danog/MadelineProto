@@ -124,6 +124,8 @@ class DataCenter
      */
     private Rfc6455Connector $webSocketConnector;
 
+    private bool $unreferenced = false;
+
     public function __sleep()
     {
         return ['sockets', 'curdc', 'dclist', 'settings'];
@@ -664,5 +666,22 @@ class DataCenter
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
         return $all ? \array_keys((array) $this->dclist[$test][$ipv6]) : \array_keys((array) $this->sockets);
+    }
+
+    /**
+     * Cleanup all properties to allow garbage collection.
+     *
+     * @return void
+     */
+    public function unreference(): void
+    {
+        if ($this->unreferenced) {
+            return;
+        }
+        foreach ($this->sockets as $datacenter) {
+            $datacenter->setExtra($this->API);
+            $datacenter->disconnect();
+        }
+        $this->unreferenced = true;
     }
 }

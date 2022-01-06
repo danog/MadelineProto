@@ -130,7 +130,7 @@ abstract class Serialization
                 Magic::shutdown(1);
             }*/
             Logger::log("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
-            $warningId = Loop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
+            $warningId = Loop::repeat(5000, static fn () => Logger::log('Still waiting for exclusive session lock...'));
             Loop::unreference($warningId);
         });
         Loop::unreference($warningId);

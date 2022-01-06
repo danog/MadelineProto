@@ -38,7 +38,7 @@ class CleanupLoop extends ResumableSignalLoop
     public function loop(): \Generator
     {
         $connection = $this->connection;
-        while (!yield $this->waitSignal($this->pause(1000))) {
+        while (!yield $this->waitSignal($this->pause(10000))) {
             if (isset($connection->msgIdHandler)) {
                 $connection->msgIdHandler->cleanup();
             }

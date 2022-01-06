@@ -166,13 +166,6 @@ abstract class DriverArray implements DbArray
             Logger::log('Converting database done.', Logger::ERROR);
         }
     }
-
-
-    public function __destruct()
-    {
-        $this->stopCacheCleanupLoop();
-    }
-
     /**
      * Get the value of table.
      *

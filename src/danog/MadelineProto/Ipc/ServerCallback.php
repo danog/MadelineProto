@@ -76,6 +76,14 @@ class ServerCallback extends Server
         return $socket->send($id);
     }
 
+    public function shutdown(): void
+    {
+        parent::shutdown();
+        foreach ($this->watcherList as $id => $watcher) {
+            Loop::cancel($watcher);
+            unset($this->watcherList[$id], $this->socketList[$id]);
+        }
+    }
 
     /**
      * Unwrap value.

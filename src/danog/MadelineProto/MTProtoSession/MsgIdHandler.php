@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoSession;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
-use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler32;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler64;
 
 /**
@@ -111,8 +110,6 @@ abstract class MsgIdHandler
      */
     public static function toString(string $messageId): string
     {
-        return PHP_INT_SIZE === 8
-            ? MsgIdHandler64::toStringInternal($messageId)
-            : MsgIdHandler32::toStringInternal($messageId);
+        return MsgIdHandler64::toStringInternal($messageId);
     }
 }

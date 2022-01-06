@@ -20,11 +20,12 @@
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Doc\MethodDoc;
 
 /**
  * Event handler.
  */
-abstract class EventHandler extends InternalDoc
+abstract class EventHandler extends MethodDoc
 {
     use DbPropertiesTrait {
         DbPropertiesTrait::initDb as private internalInitDb;
@@ -37,8 +38,22 @@ abstract class EventHandler extends InternalDoc
      * API instance.
      */
     protected MTProto $API;
+    /**
+     * @deprecated Please don't override the constructor.
+     * @internal Please don't override the constructor.
+     */
     public function __construct($API) // BC
     {
+    }
+
+    /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
     }
 
     /**
@@ -61,17 +76,13 @@ abstract class EventHandler extends InternalDoc
      *
      * @internal
      *
-     * @param APIWrapper $MadelineProto MadelineProto instance
+     * @param APIWrapper $MadelineProto MadelineProto wrapper
      *
      * @return void
      */
-    public function initInternal(APIWrapper $MadelineProto): void
+    final public function initInternal(APIWrapper $MadelineProto): void
     {
-        self::link($this, $MadelineProto->getFactory());
-        $this->API =& $MadelineProto->getAPI();
-        foreach ($this->API->getMethodNamespaces() as $namespace) {
-            $this->{$namespace} = $this->exportNamespace($namespace);
-        }
+        $this->initProxyNamespaces($MadelineProto);
     }
     /**
      * Start method handler.
@@ -80,13 +91,13 @@ abstract class EventHandler extends InternalDoc
      *
      * @return \Generator
      */
-    public function startInternal(): \Generator
+    final public function startInternal(): \Generator
     {
         if ($this->startedInternal) {
             return;
         }
         if (isset(static::$dbProperties)) {
-            yield from $this->internalInitDb($this->API);
+            yield from $this->internalInitDb($this->wrapper->getApi());
         }
         if (\method_exists($this, 'onStart')) {
             yield $this->onStart();
@@ -101,15 +112,5 @@ abstract class EventHandler extends InternalDoc
     public function getReportPeers()
     {
         return [];
-    }
-
-    /**
-     * Get API instance.
-     *
-     * @return MTProto
-     */
-    public function getAPI(): MTProto
-    {
-        return $this->API;
     }
 }

@@ -42,6 +42,6 @@ trait APILoop
     public function __construct(InternalDoc $API)
     {
         $this->API = $API;
-        $this->setLogger($API instanceof EventHandler ? $API->getAPI()->getLogger() : $API->logger);
+        $this->setLogger($API instanceof EventHandler ? $API->getLogger() : $API->logger);
     }
 }

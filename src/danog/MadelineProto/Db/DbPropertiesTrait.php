@@ -50,6 +50,16 @@ trait DbPropertiesTrait
         }
     }
 
+    public function deinitDb()
+    {
+        foreach (static::$dbProperties as $property => $_) {
+            if (isset($this->{$property}) && $this->{$property} instanceof DbArray) {
+                $this->{$property}->unreference();
+                unset($this->{$property});
+            }
+        }
+    }
+
     private static function getSessionId(MTProto $madelineProto): string
     {
         $result = $madelineProto->getSelf()['id'] ?? null;

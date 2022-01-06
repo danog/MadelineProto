@@ -19,6 +19,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use Amp\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
@@ -143,4 +144,4 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-MyEventHandler::startAndLoop('uwu.madeline', $settings);
+MyEventHandler::startAndLoop('bot.madeline', $settings);

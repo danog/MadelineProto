@@ -19,7 +19,6 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Settings;
 
 /*
@@ -37,11 +36,6 @@ if (\file_exists(__DIR__.'/../vendor/autoload.php')) {
 class SecretHandler extends \danog\MadelineProto\EventHandler
 {
     private $sent = [-440592694 => true];
-    public function __construct(?APIWrapper $API)
-    {
-        parent::__construct($API);
-        $this->sent = [];
-    }
     /**
      * @var int|string Username or ID of bot admin
      */

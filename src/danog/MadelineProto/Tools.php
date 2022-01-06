@@ -1018,4 +1018,70 @@ abstract class Tools extends StrTools
         }
         return [!!$matches[1], $matches[2]];
     }
+
+
+    /**
+     * Get fully resolved method list for object, including snake_case and camelCase variants.
+     *
+     * @param object       $value Value
+     * @param class-string $class Custom class name
+     *
+     * @internal
+     *
+     * @return array<callable>
+     */
+    public static function getInternalMethodList(object $value, string $class = null): array
+    {
+        return \array_map(fn ($method) => [$value, $method], self::getInternalMethodListClass($class ?? \get_class($value)));
+    }
+    /**
+     * Get fully resolved method list for object, including snake_case and camelCase variants.
+     *
+     * @param class-string $class Class name
+     *
+     * @internal
+     *
+     * @return array
+     */
+    private static function getInternalMethodListClass(string $class): array
+    {
+        static $cache = [];
+        if (isset($cache[$class])) {
+            return $cache[$class];
+        }
+        $methods = \get_class_methods($class);
+        foreach ($methods as $method) {
+            if ($method == 'methodCallAsyncRead') {
+                unset($methods[\array_search('methodCall', $methods)]);
+            } elseif (\stripos($method, 'async') !== false) {
+                if (\strpos($method, '_async') !== false) {
+                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
+                } else {
+                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
+                }
+            }
+        }
+        $finalMethods = [];
+        foreach ($methods as $method) {
+            $actual_method = $method;
+            if ($method == 'methodCallAsyncRead') {
+                $method = 'methodCall';
+            } elseif (\stripos($method, 'async') !== false) {
+                if (\strpos($method, '_async') !== false) {
+                    $method = \str_ireplace('_async', '', $method);
+                } else {
+                    $method = \str_ireplace('async', '', $method);
+                }
+            }
+            $finalMethods[\strtolower($method)] = $actual_method;
+            if (\strpos($method, '_') !== false) {
+                $finalMethods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
+            } else {
+                $finalMethods[\strtolower(StrTools::toSnakeCase($method))] = $actual_method;
+            }
+        }
+
+        $cache[$class] = $finalMethods;
+        return $finalMethods;
+    }
 }

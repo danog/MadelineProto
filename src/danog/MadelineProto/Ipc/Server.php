@@ -179,7 +179,7 @@ class Server extends SignalLoop
      *
      * @return void
      */
-    final public function shutdown(): void
+    public function shutdown(): void
     {
         $this->signal(null);
         if (self::$shutdownDeferred) {
@@ -187,6 +187,9 @@ class Server extends SignalLoop
             $deferred = self::$shutdownDeferred;
             self::$shutdownDeferred = null;
             $deferred->resolve();
+        }
+        if (isset($this->callback)) {
+            $this->callback->shutdown();
         }
     }
     /**

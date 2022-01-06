@@ -40,6 +40,8 @@ class AsyncConstruct
     /**
      * Blockingly init.
      *
+     * @internal
+     *
      * @return void
      */
     public function init(): void
@@ -51,6 +53,8 @@ class AsyncConstruct
     }
     /**
      * Asynchronously init.
+     *
+     * @internal
      *
      * @return \Generator
      */
@@ -64,6 +68,8 @@ class AsyncConstruct
     /**
      * Check if we've already inited.
      *
+     * @internal
+     *
      * @return boolean
      */
     public function inited(): bool
@@ -72,6 +78,8 @@ class AsyncConstruct
     }
     /**
      * Mark instance as (de)inited forcefully.
+     *
+     * @internal
      *
      * @param boolean $inited Whether to mark the instance as inited or deinited
      *

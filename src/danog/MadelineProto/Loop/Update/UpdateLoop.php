@@ -237,4 +237,12 @@ class UpdateLoop extends ResumableSignalLoop
             "getUpdate loop channel {$this->channelId}" :
             'getUpdate loop generic';
     }
+
+    public function __debugInfo()
+    {
+        return [
+            'update loop' => $this->__toString(),
+            'has API?' => !!$this->API
+        ];
+    }
 }

@@ -25,8 +25,6 @@ if (\function_exists('memprof_enable')) {
 }
 
 use Amp\Http\Server\HttpServer;
-use danog\MadelineProto\API;
-use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -82,18 +80,9 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
      * @var array
      */
     private $states = [];
-    /**
-     * Constructor.
-     *
-     * @param ?API $API API
-     */
-    public function __construct(?APIWrapper $API)
-    {
-        $this->UPLOAD = \class_exists(HttpServer::class);
-        parent::__construct($API);
-    }
     public function onStart()
     {
+        $this->UPLOAD = \class_exists(HttpServer::class);
         $this->adminId = yield $this->getInfo(self::ADMIN)['bot_api_id'];
     }
     /**

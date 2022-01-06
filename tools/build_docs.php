@@ -12,14 +12,10 @@
  */
 
 use danog\MadelineProto\API;
-use danog\MadelineProto\APIFactory;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
-use danog\MadelineProto\TON\API as TONAPI;
-use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
-use danog\MadelineProto\TON\Lite;
 use danog\MadelineProto\Tools;
 
 \chdir($d=__DIR__.'/..');
@@ -58,36 +54,12 @@ $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
     $docs[0],
-    \dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
-    [
-        'API' => API::class,
-        'APIFactory' => APIFactory::class,
-        'MTProto' => MTProto::class
-    ],
-    'danog\\MadelineProto'
+    \dirname(__FILE__).'/../src/',
+    API::class,
+    MTProto::class,
+    'danog\\MadelineProto\\Doc'
 );
-$doc->mkAnnotations();
-
-$doc = new \danog\MadelineProto\AnnotationsBuilder(
-    $logger,
-    [
-        'tl_schema' => [
-            'telegram' => "$d/schemas/TON/lite_api.tl",
-            'mtproto' => "$d/schemas/TON/ton_api.tl",
-            //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
-        ]
-    ],
-    \dirname(__FILE__).'/../src/danog/MadelineProto/TON/InternalDoc.php',
-    [
-        'API' => TONAPI::class,
-        'APIFactory' => TONAPIFactory::class,
-        'MTProto' => Lite::class
-    ],
-    'danog\\MadelineProto\\TON'
-);
-$doc->mkAnnotations();
-
-
+$doc->run();
 
 $logger->logger('Creating docs...', Logger::NOTICE);
 foreach ($docs as $settings) {
@@ -118,7 +90,6 @@ $order = [
     'DIALOGS',
     'INLINE_BUTTONS',
     'SECRET_CHATS',
-    'LUA',
     'PROXY',
     'ASYNC',
     'USING_METHODS',
@@ -166,7 +137,6 @@ foreach ($orderedfiles as $key => $filename) {
 
     if (isset($orderedfiles[$key + 1])) {
         $nextfile = 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key + 1], '.md').'.html';
-        $prevfile = $key === 0 ? 'https://docs.madelineproto.xyz' : 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key - 1], '.md').'.html';
         $lines[\count($lines)] = "\n<a href=\"$nextfile\">Next section</a>";
     } else {
         $lines[\count($lines)] = "\n<a href=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\">Next section</a>";

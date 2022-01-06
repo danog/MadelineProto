@@ -3,6 +3,7 @@
 use danog\MadelineProto\AbstractAPIFactory;
 use danog\MadelineProto\AnnotationsBuilder;
 use danog\MadelineProto\APIFactory;
+use danog\MadelineProto\APIProxy;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Bug74586Exception;
@@ -10,10 +11,11 @@ use danog\MadelineProto\Connection;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Doc\MethodDoc;
+use danog\MadelineProto\Doc\NamespaceDoc;
 use danog\MadelineProto\DocsBuilder;
 use danog\MadelineProto\DoHConnector;
 use danog\MadelineProto\GarbageCollector;
-use danog\MadelineProto\InternalDoc;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LightState;
 use danog\MadelineProto\Magic;
@@ -45,6 +47,7 @@ require 'vendor/autoload.php';
 $ignore = [ // Disallow list
     AnnotationsBuilder::class,
     APIFactory::class,
+    APIProxy::class,
     APIWrapper::class,
     AbstractAPIFactory::class,
     Bug74586Exception::class,
@@ -54,7 +57,8 @@ $ignore = [ // Disallow list
     DataCenterConnection::class,
     DoHConnector::class,
     DocsBuilder::class,
-    InternalDoc::class,
+    MethodDoc::class,
+    NamespaceDoc::class,
     Lang::class,
     LightState::class,
     Magic::class,

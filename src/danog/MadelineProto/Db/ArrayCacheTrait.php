@@ -68,7 +68,7 @@ trait ArrayCacheTrait
             Closure::fromCallable([$this, 'cleanupCache']),
         );
     }
-    protected function stopCacheCleanupLoop(): void
+    public function unreference(): void
     {
         if ($this->cacheCleanupId) {
             Loop::cancel($this->cacheCleanupId);

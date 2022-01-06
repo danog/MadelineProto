@@ -559,11 +559,14 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * CALLED ONLY ON SHUTDOWN.
      *
+     * @internal
+     *
      * @return void
      */
     public static function serializeAll(): void
     {
         static $done = false;
+        $done = $done || !self::$references;
         if ($done) {
             return;
         }
@@ -579,7 +582,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Constructor function.
      *
      * @param Settings|SettingsEmpty $settings Settings
-     * @param ?APIWrapper            $wrapper  API wrapper
+     * @param ?APIWrapper            $wrapper    API wrapper
      *
      * @return void
      */
@@ -612,7 +615,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             try {
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->session);
+                $this->ipcServer->setIpcPath($this->wrapper->getSession());
             } catch (\Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
@@ -956,7 +959,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             try {
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->session);
+                $this->ipcServer->setIpcPath($this->wrapper->getSession());
             } catch (\Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
@@ -1003,7 +1006,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->checkTosLoop = null;
         }
         if ($this->ipcServer) {
-            $this->ipcServer->signal(null);
+            $this->ipcServer->shutdown();
             $this->ipcServer = null;
         }
     }
@@ -1192,7 +1195,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Post-deserialization initialization function.
      *
      * @param Settings|SettingsEmpty $settings New settings
-     * @param APIWrapper             $wrapper  API wrapper
+     * @param APIWrapper               $wrapper  API wrapper
      *
      * @internal
      *
@@ -1325,6 +1328,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function unreference(): void
     {
+        $this->init();
         if (!isset($this->logger)) {
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
@@ -1335,6 +1339,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->stopLoops();
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
+            unset($this->seqUpdater);
         }
         if (isset($this->channels_state)) {
             $channelIds = [];
@@ -1350,13 +1355,14 @@ class MTProto extends AsyncConstruct implements TLCallback
                     $this->updaters[$channelId]->signal(true);
                 }
             }
+            $this->feeders = [];
+            $this->updaters = [];
         }
         if (isset($this->datacenter)) {
-            foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
-                $datacenter->setExtra($this);
-                $datacenter->disconnect();
-            }
+            $this->datacenter->unreference();
         }
+        $this->deinitDb();
+        $this->event_handler_instance?->deinitDb();
         $this->logger->logger("Unreferenced instance");
     }
     /**
@@ -1366,7 +1372,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         $this->logger('Shutting down MadelineProto (MTProto)');
         $this->unreference();
-        $this->logger("Successfully destroyed MadelineProto");
+        $this->logger("Successfully destroyed MadelineProto (MTProto)");
     }
     /**
      * Restart IPC server instance.

@@ -13,6 +13,12 @@ use Amp\Promise;
 interface DbArray extends DbType, \ArrayAccess
 {
     /**
+     * Unreference instance to allow destruction.
+     *
+     * @return void
+     */
+    public function unreference(): void;
+    /**
      * Get Array copy.
      *
      * @psalm-return Promise<array<string|int, T>>
