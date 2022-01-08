@@ -100,20 +100,20 @@ class DocsBuilder
         \danog\MadelineProto\Logger::log('Generating types documentation...', \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->types as $otype => $keys) {
             $type = StrTools::typeEscape($otype);
-            $index .= '['.StrTools::markdownEscape($type).']('.$type.'.md)<a name="'.$type.'"></a>  
+            $index .= '['.StrTools::markdownEscape($type).'](/API_docs/types/'.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
                 $predicate = $data['predicate'].(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
                 $md_predicate =  StrTools::markdownEscape($predicate);
-                $constructors .= "[$md_predicate](../constructors/$predicate.md)  \n\n";
+                $constructors .= "[$md_predicate](/API_docs/constructors/$predicate.md)  \n\n";
             }
             $methods = '';
             foreach ($keys['methods'] as $data) {
                 $name = $data['method'];
                 $md_name = \str_replace(['.', '_'], ['->', '\\_'], $name);
-                $methods .= "[\$MadelineProto->$md_name](../methods/$name.md)  \n\n";
+                $methods .= "[\$MadelineProto->$md_name](/API_docs/methods/$name.md)  \n\n";
             }
             $symFile = \str_replace('.', '_', $type);
             $redir = $symFile !== $type ? "\nredirect_from: /API_docs/types/{$symFile}.html" : '';

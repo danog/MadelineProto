@@ -72,11 +72,11 @@ trait Constructors
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
                 }
                 $params .= "'".$param['name']."' => ";
-                $param[$type_or_subtype] = '['.Tools::markdownEscape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $param[$type_or_subtype] = '['.Tools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             $md_constructor = StrTools::markdownEscape($constructor.$layer);
-            $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
+            $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](/API_docs/constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
             $table = empty($data['params']) ? '' : '### Attributes:
@@ -147,7 +147,7 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
                 if (!isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptions()['constructors'][$constructor]['description'])) {
@@ -185,7 +185,7 @@ nav_exclude: true
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
 # Constructor: '.StrTools::markdownEscape($constructor.$layer).'  
-[Back to constructors index](index.md)
+[Back to constructors index](/API_docs/constructors/index.md)
 
 
 
@@ -197,7 +197,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
             if (isset($this->TL->getDescriptions()['constructors'][$constructor])) {
                 $header .= $this->TL->getDescriptions()['constructors'][$constructor]['description'].PHP_EOL.PHP_EOL;
             }
-            $type = '### Type: ['.StrTools::markdownEscape($php_type).'](../types/'.$php_type.'.md)
+            $type = '### Type: ['.StrTools::markdownEscape($php_type).'](/API_docs/types/'.$php_type.'.md)
 
 
 ';
