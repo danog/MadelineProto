@@ -899,7 +899,7 @@ class MethodDoc extends NamespaceDoc
      * @return \Amp\Promise Info object
      *
      * @template TConstructor
-     * @psalm-param $id array{_: TConstructor}|mixed
+     * @psalm-param array{_: TConstructor}|mixed $id
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
