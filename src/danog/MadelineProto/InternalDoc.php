@@ -3468,6 +3468,86 @@ interface messages
      * @return bool
      */
     public function saveDefaultSendAs($params);
+
+    /**
+     * Send reaction to message.
+     *
+     * Parameters:
+     * * `InputPeer` **peer**     - Peer
+     * * `int`       **msg_id**   - Message ID to react to
+     * * `string`    **reaction** - Optional: Reaction (a UTF8 emoji)
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function sendReaction($params);
+
+    /**
+     * Get message reactions.
+     *
+     * Parameters:
+     * * `InputPeer` **peer** - Peer
+     * * `[int]`     **id**   - Message IDs
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function getMessagesReactions($params);
+
+    /**
+     * Get full message reaction list.
+     *
+     * Parameters:
+     * * `InputPeer` **peer**     - Peer
+     * * `int`       **id**       - Message ID
+     * * `string`    **reaction** - Optional: Get only reactions of this type (UTF8 emoji)
+     * * `string`    **offset**   - Optional: Offset (typically taken from the `next_offset` field of the returned [MessageReactionsList](https://docs.madelineproto.xyz/API_docs/types/MessageReactionsList.html))
+     * * `int`       **limit**    - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.MessageReactionsList
+     */
+    public function getMessageReactionsList($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**                -
+     * * `[string]`  **available_reactions** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function setChatAvailableReactions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `[int]` **hash** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AvailableReactions
+     */
+    public function getAvailableReactions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **reaction** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setDefaultReaction($params);
 }
 
 interface updates
