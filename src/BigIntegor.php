@@ -61,10 +61,11 @@ namespace tgseclib\Math {
         }
         public function __serialize(): array
         {
-            //throw new \Exception("Can't serialize legacy class!");
+            return ['real' => $this->real];
         }
         public function __unserialize(array $data): void
         {
+            $this->real = $data['real'];
         }
     }
 }
