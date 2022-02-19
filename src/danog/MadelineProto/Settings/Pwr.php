@@ -12,7 +12,7 @@ class Pwr extends SettingsAbstract
     /**
      * Whether to try resolving usernames using PWRTelegram DB.
      */
-    protected bool $requests = true;
+    protected bool $requests = false;
     /**
      * DB token.
      */
@@ -20,7 +20,7 @@ class Pwr extends SettingsAbstract
 
     public function mergeArray(array $settings): void
     {
-        $this->requests = $settings['pwr']['requests'] ?? true;
+        $this->requests = $settings['pwr']['requests'] ?? false;
         $this->dbToken = $settings['pwr']['db_token'] ?? '';
     }
 
