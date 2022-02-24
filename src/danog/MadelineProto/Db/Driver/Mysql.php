@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
+use danog\MadelineProto\Db\Driver;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
@@ -14,41 +15,33 @@ use function Amp\Mysql\Pool;
  *
  * @internal
  */
-class Mysql
+class Mysql extends Driver
 {
-    /** @var Pool[] */
-    private static array $connections = [];
-
     /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $db
-     *
-     * @param int $maxConnections
-     * @param int $idleTimeout
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator<Pool>
+     * @return \Generator<array{0: Pool, 1: callable(string): string}>
      */
-    public static function getConnection(DatabaseMysql $settings): \Generator
+    protected static function getConnectionInternal(DatabaseMysql $settings): \Generator
     {
-        $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
-                ->withUser($settings->getUsername())
-                ->withPassword($settings->getPassword())
-                ->withDatabase($settings->getDatabase());
+        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+            ->withUser($settings->getUsername())
+            ->withPassword($settings->getPassword())
+            ->withDatabase($settings->getDatabase());
 
-            yield from static::createDb($config);
-            static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
-        }
+        $host = $config->getHost();
+        $port = $config->getPort();
 
-        return static::$connections[$dbKey];
+        yield from self::createDb($config);
+        return [
+            new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
+            [
+                new \PDO(
+                    "mysql:host={$host};port={$port};charset=UTF8",
+                    $settings->getUsername(),
+                    $settings->getPassword()
+                ),
+                'escape'
+            ]
+        ];
     }
 
     /**

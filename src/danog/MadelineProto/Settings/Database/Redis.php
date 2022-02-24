@@ -42,7 +42,7 @@ class Redis extends DatabaseAbstract
      *
      * @return self
      */
-    public function setDatabase($database): self
+    public function setDatabase(int $database): self
     {
         $this->database = $database;
 

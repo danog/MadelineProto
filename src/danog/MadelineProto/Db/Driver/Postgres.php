@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Postgres\ConnectionConfig;
 use Amp\Postgres\Pool;
+use danog\MadelineProto\Db\Driver;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
@@ -14,11 +15,8 @@ use function Amp\Postgres\Pool;
  *
  * @internal
  */
-class Postgres
+class Postgres extends Driver
 {
-    /** @var Pool[] */
-    private static array $connections = [];
-
     /**
      * @param string $host
      * @param int $port
@@ -33,22 +31,29 @@ class Postgres
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      *
-     * @return \Generator<Pool>
+     * @return \Generator<array{0: Pool, 1: callable(string): string}>
      */
-    public static function getConnection(DatabasePostgres $settings): \Generator
+    protected static function getConnectionInternal(DatabasePostgres $settings): \Generator
     {
-        $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
                 ->withUser($settings->getUsername())
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
-
-            yield from static::createDb($config);
-            static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
-        }
-
-        return static::$connections[$dbKey];
+        $host = $config->getHost();
+        $port = $config->getPort();
+        
+        yield from self::createDb($config);
+        return [
+            new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
+            [
+                new \PDO(
+                    "pgsql:host={$host};port={$port}",
+                    $settings->getUsername(),
+                    $settings->getPassword()
+                ),
+                'escape'
+            ]
+        ];
     }
 
     /**

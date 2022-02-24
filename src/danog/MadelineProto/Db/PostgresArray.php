@@ -78,16 +78,8 @@ class PostgresArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
-        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
-        $host = $config->getHost();
-        $port = $config->getPort();
-        $this->pdo = new \PDO(
-            "pgsql:host={$host};port={$port}",
-            $settings->getUsername(),
-            $settings->getPassword()
-        );
         if (!isset($this->db)) {
-            $this->db = yield from Postgres::getConnection($settings);
+            [$this->db, $this->escape] = yield from Postgres::getConnection($settings);
         }
     }
 

@@ -6,21 +6,28 @@ use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\CommandResult;
+use Amp\Sql\Link;
 use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
 use Amp\Success;
+use danog\MadelineProto\Db\Driver\Sqlite;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Tools;
+use Vajexal\AmpSQLite\SQLiteConnection;
 
 use function Amp\call;
+use function Amp\delay;
 
 /**
  * Generic SQL database backend.
  */
 abstract class SqlArray extends DriverArray
 {
-    protected Pool $db;
-    //Pdo driver used for value quoting, to prevent sql injections.
-    protected \PDO $pdo;
+    protected Link $db;
+    /**
+     * @var (callable(string): string)
+     */
+    protected $escape;
 
     protected const SQL_GET = 0;
     protected const SQL_SET = 1;
@@ -218,13 +225,19 @@ abstract class SqlArray extends DriverArray
 
         try {
             foreach ($params as $key => $value) {
-                $value = $this->pdo->quote($value);
+                $value = ($this->escape)($value);
                 $sql = \str_replace(":$key", $value, $sql);
             }
 
             $request = yield $this->db->query($sql);
         } catch (\Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
+            if ($this instanceof SqliteArray && in_array($e->getMessage(), ['The process stopped responding, potentially due to a fatal error or calling exit', 'Process unexpectedly exited'], true)) {
+                yield from Sqlite::clearConnection($this->dbSettings);
+                unset($this->db);
+                yield from $this->initConnection($this->dbSettings);
+                return yield from $this->executeRaw($sql, $params);
+            }
             return [];
         }
 

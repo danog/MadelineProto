@@ -56,7 +56,9 @@
         "symfony/polyfill-php80": "^1.18",
         "amphp/websocket-client": "^1.0",
         "psr/http-factory": "^1.0",
-        "psr/log": "^1"
+        "psr/log": "^1",
+        "vajexal/amp-sqlite": "^0.1.0",
+        "amphp/sync": "^1.4"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^5.2",
@@ -70,6 +72,7 @@
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
+        "ext-primemodule": "Install the primemodule FFI extension to make phone calls (https://prime.madelineproto.xyz)",
         "ext-pdo": "Install pdo extension to support database used as cache",
         "ext-openssl": "Install the openssl extension for faster crypto",
         "ext-gmp": "Install the gmp extension for faster crypto"

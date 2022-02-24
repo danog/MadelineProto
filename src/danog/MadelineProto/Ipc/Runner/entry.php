@@ -34,6 +34,7 @@ use danog\MadelineProto\Tools;
     \define('MADELINE_ENTRY', 1);
     if (!\defined('MADELINE_WORKER_TYPE')) {
         if (\count(\debug_backtrace(0)) !== 1) {
+            die;
             // We're not being included directly
             return;
         }

@@ -122,6 +122,7 @@ PhpDocBuilder::fromNamespace()
     ->addIndexFrontMatter('title', 'MadelineProto API')
     ->addIndexFrontMatter('description', 'MadelineProto PHP API reference')
     ->addIndexFrontMatter('has_children', 'true')
+    ->addIndexFrontMatter('has_toc', 'false')
     ->addIndexFrontMatter('nav_order', '2')
     ->addFrontMatter('parent', 'MadelineProto API')
     ->run();

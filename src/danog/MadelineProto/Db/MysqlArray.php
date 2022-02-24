@@ -9,6 +9,8 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
+use function Amp\Sync\synchronized;
+
 /**
  * MySQL database backend.
  */
@@ -93,16 +95,8 @@ class MysqlArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
-        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
-        $host = $config->getHost();
-        $port = $config->getPort();
-        $this->pdo = new \PDO(
-            "mysql:host={$host};port={$port};charset=UTF8",
-            $settings->getUsername(),
-            $settings->getPassword()
-        );
         if (!isset($this->db)) {
-            $this->db = yield from Mysql::getConnection($settings);
+            [$this->db, $this->escape] = yield from Mysql::getConnection($settings);
         }
     }
 

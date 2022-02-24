@@ -8,6 +8,7 @@ use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
+use danog\MadelineProto\Settings\Database\Sqlite;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
@@ -57,6 +58,9 @@ abstract class DbPropertiesFactory
                 break;
             case $dbSettings instanceof Redis:
                 $class .= '\\Redis';
+                break;
+            case $dbSettings instanceof Sqlite:
+                $class .= '\\Sqlite';
                 break;
             default:
                 throw new \InvalidArgumentException("Unknown dbType: ".\get_class($dbSettings));

@@ -5,6 +5,7 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;
+use danog\MadelineProto\Db\Driver;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
 /**
@@ -12,11 +13,8 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  *
  * @internal
  */
-class Redis
+class Redis extends Driver
 {
-    /** @var RedisRedis[] */
-    private static array $connections = [];
-
     /**
      * @param string $host
      * @param int $port
@@ -34,18 +32,14 @@ class Redis
      *
      * @psalm-return \Generator<int, \Amp\Promise<void>, mixed, RedisRedis>
      */
-    public static function getConnection(DatabaseRedis $settings): \Generator
+    protected static function getConnectionInternal(DatabaseRedis $settings): \Generator
     {
-        $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = Config::fromUri($settings->getUri())
-                ->withPassword($settings->getPassword())
-                ->withDatabase($settings->getDatabase());
+        $config = Config::fromUri($settings->getUri())
+            ->withPassword($settings->getPassword())
+            ->withDatabase($settings->getDatabase());
 
-            static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
-            yield static::$connections[$dbKey]->ping();
-        }
-
-        return static::$connections[$dbKey];
+        $connection = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
+        yield $connection->ping();
+        return $connection;
     }
 }

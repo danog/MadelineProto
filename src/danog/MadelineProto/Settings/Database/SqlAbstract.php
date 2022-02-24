@@ -114,7 +114,7 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @return self
      */
-    public function setDatabase($database): self
+    public function setDatabase(string $database): self
     {
         $this->database = $database;
 
