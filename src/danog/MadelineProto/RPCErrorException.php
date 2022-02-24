@@ -43,7 +43,7 @@ class RPCErrorException extends \Exception
         }
         $error = \preg_replace('/\\d+$/', "X", $error);
         $description = self::$descriptions[$error] ?? '';
-        if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]) || $code === 500) {
+        if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error])) {
             Tools::callFork((function () use ($method, $code, $error) {
                 try {
                     $res = \json_decode(
@@ -108,10 +108,10 @@ class RPCErrorException extends \Exception
                 if (isset($level['function']) && $level['function'] === 'methodCall') {
                     $this->line = $level['line'];
                     $this->file = $level['file'];
-                    $additional = $level['args'];
                 }
             }
         }
+        $this->getLocalization();
         /*
         if (\in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
             return;
