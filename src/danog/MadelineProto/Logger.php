@@ -285,6 +285,7 @@ class Logger
                     static function () use ($maxSize, $optional, &$stdout) {
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
+                            \copy($optional, $optional.'.old');
                             \ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize");
                         }
