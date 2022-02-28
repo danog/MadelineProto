@@ -842,7 +842,7 @@ abstract class Tools extends StrTools
             "\x3f\x00";
         static $footer = "\xff\xd9";
         $header[164] = $stripped[1];
-        $header[165] = $stripped[2];
+        $header[166] = $stripped[2];
         return $header.\substr($stripped, 3).$footer;
     }
     /**
