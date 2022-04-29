@@ -4,6 +4,7 @@ jobs:
   run:
     runs-on: Linux
     strategy:
+      max-parallel: 1
       matrix:
         php:
           - '8.1'
