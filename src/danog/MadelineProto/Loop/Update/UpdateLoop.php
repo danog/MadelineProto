@@ -214,7 +214,7 @@ class UpdateLoop extends ResumableSignalLoop
             }
             $API->logger->logger("Finished resuming feeders in {$this}, signaling updates", Logger::ULTRA_VERBOSE);
             $API->signalUpdate();
-            $API->logger->logger("Finished signaling updates in {$this}, pausing", Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Finished signaling updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
             $first = false;
             if (yield $this->waitSignal($this->pause($timeout * 1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");

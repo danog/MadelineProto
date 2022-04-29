@@ -131,5 +131,11 @@
         "phabel": {
             "revision": 0
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "phabel/phabel": true
+        }
     }
 }
