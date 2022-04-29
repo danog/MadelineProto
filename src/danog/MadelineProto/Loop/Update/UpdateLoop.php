@@ -78,7 +78,7 @@ class UpdateLoop extends ResumableSignalLoop
             }
         }
         $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        $timeout = 30 * 1000;
+        $timeout = 1;
         $first = true;
         while (true) {
             while (!$API->hasAllAuth()) {
@@ -128,7 +128,7 @@ class UpdateLoop extends ResumableSignalLoop
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }
-                    $timeout = \min(10*1000, $timeout);
+                    $timeout = \min(10, $timeout);
                     $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
