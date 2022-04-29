@@ -86,7 +86,7 @@ class Connection extends SettingsAbstract
     /**
      * Ping interval.
      */
-    protected int $pingInterval = 10;
+    protected int $pingInterval = 60;
 
     /**
      * Whether to retry connection.

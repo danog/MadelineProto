@@ -54,7 +54,7 @@ class PingLoop extends ResumableSignalLoop
             if (\time() - $connection->getLastChunk() >= $timeout && $shared->hasTempAuthKey()) {
                 $API->logger->logger("Ping DC {$datacenter}");
                 try {
-                    yield from $connection->methodCallAsyncRead('ping', ['ping_id' => \random_bytes(8)]);
+                    yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeout + 15]);
                 } catch (\Throwable $e) {
                     $API->logger->logger("Error while pinging DC {$datacenter}");
                     $API->logger->logger((string) $e);
