@@ -1,7 +1,8 @@
 name: build
 on:
   release:
-    types: [released]
+    types: [published]
+
 jobs:
   run:
     runs-on: Linux
@@ -38,5 +39,6 @@ jobs:
           DESTINATIONS: ${{ secrets.DESTINATIONS }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
           PHP_VERSION: ${{ matrix.php }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tests/makephar.sh
