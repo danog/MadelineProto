@@ -102,7 +102,8 @@ n
 
 reset()
 {
-    sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g;s|MADELINE_RELEASE_URL|disable|g' tools/phar.php > madeline.php
+    wget https://github.com/danog/MadelineProtoPhar/raw/92053cd92c0154438105b64f7c62c3b834057939/phar.php -O madeline.php
+    sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g;s|MADELINE_RELEASE_URL|disable|g' -i madeline.php
     cp madeline.php madelineBackup.php
 }
 k
@@ -110,7 +111,7 @@ rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
-cp tools/phar.php madeline.php
+wget https://github.com/danog/MadelineProtoPhar/raw/92053cd92c0154438105b64f7c62c3b834057939/phar.php -O madeline.php
 runTest
 k
 
