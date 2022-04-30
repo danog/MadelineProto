@@ -153,6 +153,10 @@ git config --global user.name "Github Actions"
 
 input=$PWD
 
+cd "$madelinePath"
+
+gh release upload "$TAG" ""$input/madeline$php$branch.phar""
+
 echo "Locking..."
 touch /tmp/lock
 exec {FD}<>/tmp/lock
@@ -162,7 +166,6 @@ echo "Locked!"
 cd ~/MadelineProtoPhar
 git pull
 
-cp "$input/madeline$php$branch.phar" "madeline$php.phar"
 cp "$input/tools/phar.php" .
 echo -n "$COMMIT-$php" > release$php
 

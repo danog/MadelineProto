@@ -1,5 +1,7 @@
 name: build
-on: [create]
+on:
+  release:
+    types: [released]
 jobs:
   run:
     runs-on: Linux
