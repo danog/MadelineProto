@@ -155,7 +155,9 @@ input=$PWD
 
 cd "$madelinePath"
 
-gh release upload "$TAG" ""$input/madeline$php$branch.phar""
+cp "$input/madeline$php$branch.phar" "madeline$php.phar"
+gh release upload "$TAG" "madeline$php.phar"
+rm "madeline$php.phar"
 
 echo "Locking..."
 touch /tmp/lock
