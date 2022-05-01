@@ -37,8 +37,8 @@ trait Methods
         $new = ['result' => []];
         foreach ($errors['result'] as $code => $suberrors) {
             foreach ($suberrors as $method => $suberrors) {
-                if (!isset($new['result'][$method])) {
-                    $new['result'][$method] = [];
+                if (!isset($new[$method])) {
+                    $new[$method] = [];
                 }
                 foreach ($suberrors as $error) {
                     $new['result'][$method][] = [$error, $code];
@@ -81,7 +81,7 @@ trait Methods
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
-                $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             if (!isset($this->tdDescriptions['methods'][$method])) {
@@ -90,8 +90,8 @@ trait Methods
                     $this->tdDescriptions['methods'][$method]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method];
                 }
             }
-            $md_method = '['.$phpMethod.']('.$method.'.md)';
-            $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.StrTools::markdownEscape($type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
+            $md_method = '['.$phpMethod.'](/API_docs/methods/'.$method.'.md)';
+            $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.StrTools::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
             if (isset($this->tdDescriptions['methods'][$method])) {
@@ -170,9 +170,9 @@ trait Methods
                     }
                 }
                 if (isset($this->tdDescriptions['methods'][$method])) {
-                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -192,7 +192,7 @@ trait Methods
                 }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
-                    $table .= '|parse\\_mode| [string](../types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
+                    $table .= '|parse\\_mode| [string](/API_docs/types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
 ';
                     $params .= "'parse_mode' => 'string', ";
                     $lua_params .= "parseMode='string', ";
@@ -212,7 +212,7 @@ trait Methods
             $table .= '
 
 ';
-            $return = '### Return type: ['.StrTools::markdownEscape($type).'](../types/'.$php_type.'.md)
+            $return = '### Return type: ['.StrTools::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)
 
 ';
             $bot = !\in_array($method, $bots);

@@ -17,9 +17,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
-use danog\MadelineProto\TON\API as TONAPI;
-use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
-use danog\MadelineProto\TON\Lite;
 use danog\MadelineProto\Tools;
 
 \chdir($d=__DIR__.'/..');
@@ -44,14 +41,6 @@ layerUpgrade($layer);
 $logger->logger("Initing docs (layer $layer)...", Logger::NOTICE);
 $docs = [
     [
-        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.tl", 'telegram' => '', 'secret' => ''],
-        'title'       => 'MadelineProto API documentation (mtproto)',
-        'description' => 'MadelineProto API documentation (mtproto)',
-        'output_dir'  => "$d/docs/docs/MTProto_docs",
-        'template'    => "$d/docs/template",
-        'readme'      => false,
-    ],
-    [
         'tl_schema'   => ['mtproto' => '', 'telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
@@ -65,7 +54,7 @@ $docs = \array_merge($docs, initDocs($schemas));
 $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
-    $docs[1],
+    $docs[0],
     \dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
     [
         'API' => API::class,
@@ -75,27 +64,6 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
     'danog\\MadelineProto'
 );
 $doc->mkAnnotations();
-
-$doc = new \danog\MadelineProto\AnnotationsBuilder(
-    $logger,
-    [
-        'tl_schema' => [
-            'telegram' => "$d/schemas/TON/lite_api.tl",
-            'mtproto' => "$d/schemas/TON/ton_api.tl",
-            //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
-        ]
-    ],
-    \dirname(__FILE__).'/../src/danog/MadelineProto/TON/InternalDoc.php',
-    [
-        'API' => TONAPI::class,
-        'APIFactory' => TONAPIFactory::class,
-        'MTProto' => Lite::class
-    ],
-    'danog\\MadelineProto\\TON'
-);
-$doc->mkAnnotations();
-
-
 
 $logger->logger('Creating docs...', Logger::NOTICE);
 foreach ($docs as $settings) {
@@ -161,11 +129,18 @@ foreach ($orderedfiles as $key => $filename) {
     $title = $matches[1];
     $description = \str_replace('"', "'", Tools::toString($lines[2]));
 
-    \array_unshift($lines, '---', 'title: "'.$title.'"', 'description: "'.$description.'"', 'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png', '---');
+    \array_unshift(
+        $lines,
+        '---',
+        'title: "'.$title.'"',
+        'description: "'.$description.'"',
+        'nav_order: '.($key+4),
+        'image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png',
+        '---'
+    );
 
     if (isset($orderedfiles[$key + 1])) {
         $nextfile = 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key + 1], '.md').'.html';
-        $prevfile = $key === 0 ? 'https://docs.madelineproto.xyz' : 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key - 1], '.md').'.html';
         $lines[\count($lines)] = "\n<a href=\"$nextfile\">Next section</a>";
     } else {
         $lines[\count($lines)] = "\n<a href=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\">Next section</a>";
@@ -193,6 +168,9 @@ foreach ($orderedfiles as $key => $filename) {
                 $spaces .= '  ';
                 \preg_match_all('|\* (.*)|', \file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
                 foreach ($smatches[1] as $key => $match) {
+                    if (\str_contains($match, 'You cannot use this method directly')) {
+                        continue;
+                    }
                     $match = \str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
                     $index .= "$spaces* ".$match."\n";
                 }
@@ -214,6 +192,12 @@ $readme = \implode('## ', $readme);
 \file_put_contents('docs/docs/index.md', '---
 title: MadelineProto
 description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
+nav_order: 1
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 '.$readme);
+
+
+include 'phpdoc.php';
+
+\passthru('find -name \'*.md\' -exec sed \'s/\\.md/.html/g\' -i {} +');

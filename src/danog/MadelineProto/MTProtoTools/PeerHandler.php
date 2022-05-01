@@ -530,7 +530,7 @@ trait PeerHandler
      * @return \Generator Info object
      *
      * @template TConstructor
-     * @psalm-param $id array{_: TConstructor}|mixed
+     * @psalm-param array{_: TConstructor}|mixed $id
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
@@ -710,8 +710,8 @@ trait PeerHandler
     }
     /**
      * @template TConstructor
-     * @psalm-param $constructor array{_: TConstructor}
-     * @psalm-param $type        bool|null
+     * @psalm-param array{_: TConstructor} $constructor
+     * @psalm-param bool|null $type
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *

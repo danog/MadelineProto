@@ -122,7 +122,7 @@ class PostgresArray extends SqlArray
      * @param string|int $index <p>
      * The index to set for.
      * </p>
-     * @param $value
+     * @param mixed $value
      *
      * @throws \Throwable
      */

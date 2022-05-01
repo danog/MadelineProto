@@ -703,7 +703,6 @@ class TL
                         $arguments[$current_argument['name']] = [];
                         break;
                     default:
-                        var_dump($arguments, $tl);
                         throw new Exception("Missing required parameter ".$current_argument['name']);
                 }
             }

@@ -21,7 +21,7 @@ trait NullCacheTrait
      * Save item in cache.
      *
      * @param string $key
-     * @param $value
+     * @param mixed $value
      */
     protected function setCache(string $key, $value): void
     {

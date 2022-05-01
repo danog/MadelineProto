@@ -114,7 +114,7 @@ class RedisArray extends DriverArray
      * @param string $index <p>
      * The index to set for.
      * </p>
-     * @param $value
+     * @param mixed $value
      *
      * @throws \Throwable
      */
@@ -137,7 +137,7 @@ class RedisArray extends DriverArray
     /**
      * Check if key isset.
      *
-     * @param $key
+     * @param mixed $key
      *
      * @return Promise<bool> true if the offset exists, otherwise false
      */

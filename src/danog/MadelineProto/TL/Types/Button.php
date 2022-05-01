@@ -141,8 +141,8 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Set button info.
      *
-     * @param $name  Offset
-     * @param mixed  $value Value
+     * @param mixed $name  Offset
+     * @param mixed $value Value
      *
      * @return void
      */
@@ -157,7 +157,7 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Get button info.
      *
-     * @param $name Field name
+     * @param mixed $name Field name
      *
      * @return mixed
      */
@@ -168,7 +168,7 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Unset button info.
      *
-     * @param $name Offset
+     * @param mixed $name Offset
      *
      * @return void
      */
@@ -179,7 +179,7 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Check if button field exists.
      *
-     * @param $name Offset
+     * @param mixed $name Offset
      *
      * @return boolean
      */

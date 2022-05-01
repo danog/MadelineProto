@@ -10,10 +10,11 @@ use danog\MadelineProto\Connection;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Doc\MethodDoc;
+use danog\MadelineProto\Doc\NamespaceDoc;
 use danog\MadelineProto\DocsBuilder;
 use danog\MadelineProto\DoHConnector;
 use danog\MadelineProto\GarbageCollector;
-use danog\MadelineProto\InternalDoc;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LightState;
 use danog\MadelineProto\Magic;
@@ -54,7 +55,8 @@ $ignore = [ // Disallow list
     DataCenterConnection::class,
     DoHConnector::class,
     DocsBuilder::class,
-    InternalDoc::class,
+    MethodDoc::class,
+    NamespaceDoc::class,
     Lang::class,
     LightState::class,
     Magic::class,
@@ -115,4 +117,10 @@ PhpDocBuilder::fromNamespace()
     ->setFilter($filter)
     ->setOutput(__DIR__.'/../docs/docs/PHP/')
     ->setImage("https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png")
+    ->addIndexFrontMatter('title', 'MadelineProto API')
+    ->addIndexFrontMatter('description', 'MadelineProto PHP API reference')
+    ->addIndexFrontMatter('has_children', 'true')
+    ->addIndexFrontMatter('has_toc', 'false')
+    ->addIndexFrontMatter('nav_order', '2')
+    ->addFrontMatter('parent', 'MadelineProto API')
     ->run();

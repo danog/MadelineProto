@@ -24,7 +24,7 @@ abstract class DbPropertiesFactory
      * @param DatabaseAbstract $dbSettings
      * @param string $table
      * @param self::TYPE_*|array $propertyType
-     * @param $value
+     * @param mixed $value
      * @param DriverArray|null $value
      *
      * @return Promise<DbType>

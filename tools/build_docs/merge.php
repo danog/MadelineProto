@@ -23,6 +23,6 @@ function mergeExtracted(): void
         }
     }
     foreach (\json_decode(\file_get_contents('docs/template/disallow.json'), true) as $key => $value) {
-        Lang::$lang['en'][$key] = $value;
+        Lang::$lang['en']["method_$key"] = $value;
     }
 }

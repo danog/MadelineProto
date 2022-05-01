@@ -25,8 +25,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
-use DOMDocument;
-use Parsedown;
 
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
@@ -1020,26 +1018,5 @@ abstract class Tools extends StrTools
             return null;
         }
         return [!!$matches[1], $matches[2]];
-    }
-    /**
-     * Strip markdown tags.
-     *
-     * @internal
-     *
-     * @param string $markdown
-     * @return string
-     */
-    public static function toString(string $markdown): string
-    {
-        if ($markdown === '') {
-            return $markdown;
-        }
-        $html = (new Parsedown($markdown))->text($markdown);
-        $document = new DOMDocument('', 'utf-8');
-        @$document->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-        if (!$document->getElementsByTagName('body')[0]) {
-            return '';
-        }
-        return $document->getElementsByTagName('body')[0]->childNodes[0]->textContent;
     }
 }
