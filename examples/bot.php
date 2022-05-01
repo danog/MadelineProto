@@ -76,6 +76,14 @@ class MyEventHandler extends EventHandler
         return [self::ADMIN];
     }
     /**
+     * Initialization logic.
+     */
+    public function onStart()
+    {
+        $this->logger("The bot was started!");
+        var_dump(yield $this->getFullInfo('madelineproto'));
+    }
+    /**
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update

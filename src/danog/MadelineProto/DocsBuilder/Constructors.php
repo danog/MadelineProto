@@ -55,7 +55,7 @@ trait Constructors
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
@@ -104,7 +104,7 @@ trait Constructors
             $hasreplymarkup = false;
             $hasentities = false;
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {

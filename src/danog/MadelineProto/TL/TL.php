@@ -614,31 +614,29 @@ class TL
     {
         $serialized = '';
         $arguments = (yield from $this->API->botAPIToMTProto($arguments));
-        $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
+                $arguments[$cur_flag['flag']] ??= 0;
                 switch ($cur_flag['type']) {
                     case 'true':
-                    case 'false':
-                        $flags = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] ? $flags | $cur_flag['pow'] : $flags & ~$cur_flag['pow'];
+                        $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
                         unset($arguments[$cur_flag['name']]);
                         break;
                     case 'Bool':
-                        $arguments[$cur_flag['name']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] && ($flags & $cur_flag['pow']) != 0;
-                        if (($flags & $cur_flag['pow']) === 0) {
+                        $arguments[$cur_flag['name']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] && ($arguments[$cur_flag['flag']] & $cur_flag['pow']) != 0;
+                        if (($arguments[$cur_flag['flag']] & $cur_flag['pow']) === 0) {
                             unset($arguments[$cur_flag['name']]);
                         }
                         break;
                     default:
-                        $flags = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null ? $flags | $cur_flag['pow'] : $flags & ~$cur_flag['pow'];
+                        $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
                         break;
                 }
             }
         }
-        $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if (isset($current_argument['pow']) && (\in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if (isset($current_argument['pow']) && ($current_argument['type'] === 'true' || ($arguments[$current_argument['flag']] & $current_argument['pow']) === 0)) {
                     //$this->API->logger->logger('Skipping '.$current_argument['name'].' of type '.$current_argument['type');
                     continue;
                 }
@@ -675,6 +673,10 @@ class TL
                     $serialized .= \pack('@4');
                     continue;
                 }
+                if ($current_argument['name'] === 'flags' && $current_argument['type'] === 'int') {
+                    $serialized .= \pack('@4');
+                    continue;
+                }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
                     $serialized .= (yield from $this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
                     continue;
@@ -701,6 +703,7 @@ class TL
                         $arguments[$current_argument['name']] = [];
                         break;
                     default:
+                        var_dump($arguments, $tl);
                         throw new Exception("Missing required parameter ".$current_argument['name']);
                 }
             }
@@ -931,17 +934,16 @@ class TL
             if (isset($arg['pow'])) {
                 switch ($arg['type']) {
                     case 'true':
-                    case 'false':
-                        $x[$arg['name']] = ($x['flags'] & $arg['pow']) !== 0;
+                        $x[$arg['name']] = ($x[$arg['flag']] & $arg['pow']) !== 0;
                         continue 2;
                     case 'Bool':
-                        if (($x['flags'] & $arg['pow']) === 0) {
+                        if (($x[$arg['flag']] & $arg['pow']) === 0) {
                             $x[$arg['name']] = false;
                             continue 2;
                         }
                     // no break
                     default:
-                        if (($x['flags'] & $arg['pow']) === 0) {
+                        if (($x[$arg['flag']] & $arg['pow']) === 0) {
                             continue 2;
                         }
                 }
@@ -975,10 +977,6 @@ class TL
                 }
                 unset($x[$arg['name']]);
             }
-        }
-        if (isset($x['flags'])) {
-            // I don't think we need this anymore
-            unset($x['flags']);
         }
         if ($x['_'] === 'dataJSON') {
             return \json_decode($x['data'], true);

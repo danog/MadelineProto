@@ -24,7 +24,8 @@ trait TLParams
     public function parseParams($key, $mtproto = false): void
     {
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
-            if (\preg_match('/(\\w*)\\.(\\d*)\\?(.*)/', $param['type'], $matches)) {
+            if (\preg_match('/([^.]+)\\.(\\d+)\\?(.+)/', $param['type'], $matches)) {
+                $param['flag'] = $matches[1];
                 $param['pow'] = \pow(2, $matches[2]);
                 $param['type'] = $matches[3];
             }

@@ -126,7 +126,6 @@ $order = [
     'DIALOGS',
     'INLINE_BUTTONS',
     'SECRET_CHATS',
-    'LUA',
     'PROXY',
     'ASYNC',
     'USING_METHODS',
@@ -213,7 +212,7 @@ $readme = \implode('## ', $readme);
 
 \file_put_contents('README.md', $readme);
 \file_put_contents('docs/docs/index.md', '---
-title: MadelineProto documentation
+title: MadelineProto
 description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---

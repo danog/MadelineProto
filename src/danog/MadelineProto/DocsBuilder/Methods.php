@@ -32,13 +32,13 @@ trait Methods
         }
         static $errors;
         if (!$errors) {
-            $errors = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/v1.json'), true);
+            $errors = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
         }
         $new = ['result' => []];
         foreach ($errors['result'] as $code => $suberrors) {
             foreach ($suberrors as $method => $suberrors) {
-                if (!isset($new[$method])) {
-                    $new[$method] = [];
+                if (!isset($new['result'][$method])) {
+                    $new['result'][$method] = [];
                 }
                 foreach ($suberrors as $error) {
                     $new['result'][$method][] = [$error, $code];
@@ -68,7 +68,7 @@ trait Methods
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
@@ -123,7 +123,7 @@ trait Methods
             $hasreplymarkup = false;
             $hasmessage = false;
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {

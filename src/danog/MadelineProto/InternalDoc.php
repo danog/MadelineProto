@@ -1120,6 +1120,45 @@ interface account
      * @return bool
      */
     public function changeAuthorizationSettings($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return account.SavedRingtones
+     */
+    public function getSavedRingtones($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputDocument` **id**     -
+     * * `Bool`          **unsave** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return account.SavedRingtone
+     */
+    public function saveRingtone($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputFile` **file**      -
+     * * `string`    **file_name** -
+     * * `string`    **mime_type** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Document
+     */
+    public function uploadRingtone($params);
 }
 
 interface users
@@ -1416,6 +1455,18 @@ interface contacts
      * @return Updates
      */
     public function blockFromReplies($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **phone** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return contacts.ResolvedPeer
+     */
+    public function resolvePhone($params);
 }
 
 interface messages
@@ -1570,6 +1621,7 @@ interface messages
      * * `boolean`         **silent**          - Optional: Send this message silently (no notifications for the receivers)
      * * `boolean`         **background**      - Optional: Send this message as background message
      * * `boolean`         **clear_draft**     - Optional: Clear the draft field
+     * * `boolean`         **noforwards**      - Optional:
      * * `InputPeer`       **peer**            - The destination where the message will be sent
      * * `int`             **reply_to_msg_id** - Optional: The message ID to which this message will reply to
      * * `string`          **message**         - The message
@@ -1591,6 +1643,7 @@ interface messages
      * * `boolean`         **silent**          - Optional: Send message silently (no notification should be triggered)
      * * `boolean`         **background**      - Optional: Send message in background
      * * `boolean`         **clear_draft**     - Optional: Clear the draft
+     * * `boolean`         **noforwards**      - Optional:
      * * `InputPeer`       **peer**            - Destination
      * * `int`             **reply_to_msg_id** - Optional: Message ID to which this message should reply to
      * * `InputMedia`      **media**           - Attached media
@@ -1615,6 +1668,7 @@ interface messages
      * * `boolean`   **with_my_score**       - Optional: When forwarding games, whether to include your score in the game
      * * `boolean`   **drop_author**         - Optional:
      * * `boolean`   **drop_media_captions** - Optional:
+     * * `boolean`   **noforwards**          - Optional:
      * * `InputPeer` **from_peer**           - Source of messages
      * * `[int]`     **id**                  - IDs of messages
      * * `InputPeer` **to_peer**             - Destination peer
@@ -2698,6 +2752,7 @@ interface messages
      * * `boolean`            **silent**          - Optional: Whether to send the album silently (no notification triggered)
      * * `boolean`            **background**      - Optional: Send in background?
      * * `boolean`            **clear_draft**     - Optional: Whether to clear [drafts](https://core.telegram.org/api/drafts)
+     * * `boolean`            **noforwards**      - Optional:
      * * `InputPeer`          **peer**            - The destination chat
      * * `int`                **reply_to_msg_id** - Optional: The message to reply to
      * * `[InputSingleMedia]` **multi_media**     - The medias to send
@@ -3473,6 +3528,7 @@ interface messages
      * Send reaction to message.
      *
      * Parameters:
+     * * `boolean`   **big**      - Optional:
      * * `InputPeer` **peer**     - Peer
      * * `int`       **msg_id**   - Message ID to react to
      * * `string`    **reaction** - Optional: Reaction (a UTF8 emoji)
@@ -3548,6 +3604,178 @@ interface messages
      * @return bool
      */
     public function setDefaultReaction($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**      - Optional:
+     * * `int`       **msg_id**    - Optional:
+     * * `string`    **text**      - Optional:
+     * * `string`    **from_lang** - Optional:
+     * * `string`    **to_lang**   -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.TranslatedText
+     */
+    public function translateText($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**       -
+     * * `int`       **offset_id**  -
+     * * `int`       **add_offset** -
+     * * `int`       **limit**      -
+     * * `int`       **max_id**     -
+     * * `int`       **min_id**     -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getUnreadReactions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedHistory
+     */
+    public function readReactions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string`         **q**      -
+     * * `MessagesFilter` **filter** -
+     * * `int`            **limit**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function searchSentMedia($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return AttachMenuBots
+     */
+    public function getAttachMenuBots($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser` **bot** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return AttachMenuBotsBot
+     */
+    public function getAttachMenuBot($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser` **bot**     -
+     * * `Bool`      **enabled** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function toggleBotInAttachMenu($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **from_bot_menu**   - Optional:
+     * * `boolean`   **silent**          - Optional:
+     * * `InputPeer` **peer**            -
+     * * `InputUser` **bot**             -
+     * * `string`    **url**             - Optional:
+     * * `string`    **start_param**     - Optional:
+     * * `DataJSON`  **theme_params**    - Optional:
+     * * `int`       **reply_to_msg_id** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return WebViewResult
+     */
+    public function requestWebView($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **silent**          - Optional:
+     * * `InputPeer` **peer**            -
+     * * `InputUser` **bot**             -
+     * * `long`      **query_id**        -
+     * * `int`       **reply_to_msg_id** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function prolongWebView($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser` **bot**          -
+     * * `string`    **url**          -
+     * * `DataJSON`  **theme_params** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return SimpleWebViewResult
+     */
+    public function requestSimpleWebView($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string`               **bot_query_id** -
+     * * `InputBotInlineResult` **result**       -.
+     *
+     * @param array $params Parameters
+     *
+     * @return WebViewMessageSent
+     */
+    public function sendWebViewResultMessage($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser` **bot**         -
+     * * `string`    **button_text** -
+     * * `string`    **data**        -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function sendWebViewData($params);
 }
 
 interface updates
@@ -4335,12 +4563,13 @@ interface channels
      * Delete the history of a [supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - [Supergroup](https://core.telegram.org/api/channel) whose history must be deleted
-     * * `int`          **max_id**  - ID of message **up to which** the history must be deleted
+     * * `boolean`      **for_everyone** - Optional:
+     * * `InputChannel` **channel**      - [Supergroup](https://core.telegram.org/api/channel) whose history must be deleted
+     * * `int`          **max_id**       - ID of message **up to which** the history must be deleted
      *
      * @param array $params Parameters
      *
-     * @return bool
+     * @return Updates
      */
     public function deleteHistory($params);
 
@@ -4569,6 +4798,55 @@ interface bots
      * @return  of BotCommand[]
      */
     public function getBotCommands($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser`     **user_id** -
+     * * `BotMenuButton` **button**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setBotMenuButton($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser` **user_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return BotMenuButton
+     */
+    public function getBotMenuButton($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `ChatAdminRights` **admin_rights** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setBotBroadcastDefaultAdminRights($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `ChatAdminRights` **admin_rights** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setBotGroupDefaultAdminRights($params);
 }
 
 interface payments
@@ -4674,6 +4952,7 @@ interface stickers
      * Parameters:
      * * `boolean`               **masks**      - Optional: Whether this is a mask stickerset
      * * `boolean`               **animated**   - Optional: Whether this is an animated stickerset
+     * * `boolean`               **videos**     - Optional:
      * * `InputUser`             **user_id**    - Stickerset owner
      * * `string`                **title**      - Stickerset name, `1-64` chars
      * * `string`                **short_name** - Sticker set name. Can contain only English letters, digits and underscores. Must end with *"*by*<bot username="">"</bot>* (*<bot_username></bot_username>* is case insensitive); 1-64 characters
@@ -4889,6 +5168,7 @@ interface phone
      *
      *
      * Parameters:
+     * * `boolean`   **rtmp_stream**   - Optional:
      * * `InputPeer` **peer**          -
      * * `string`    **title**         - Optional:
      * * `int`       **schedule_date** - Optional:.
@@ -5145,6 +5425,31 @@ interface phone
      * @return Updates
      */
     public function leaveGroupCallPresentation($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.GroupCallStreamChannels
+     */
+    public function getGroupCallStreamChannels($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `Bool`      **revoke** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.GroupCallStreamRtmpUrl
+     */
+    public function getGroupCallStreamRtmpUrl($params);
 }
 
 interface langpack

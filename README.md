@@ -69,7 +69,7 @@ You can find examples for nearly every MadelineProto function in
 * [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html)
 * [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
   * [Getting permission to use the telegram API](https://docs.madelineproto.xyz/docs/LOGIN.html#getting-permission-to-use-the-telegram-api)
-  * [Automatic](https://docs.madelineproto.xyz/docs/LOGIN.html#automatic-now-fully-async)
+  * [Automatic](https://docs.madelineproto.xyz/docs/LOGIN.html#automatic)
   * [Manual (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-user)
     * [API ID](https://docs.madelineproto.xyz/docs/LOGIN.html#api-id)
   * [Manual (bot)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-bot)
@@ -88,30 +88,29 @@ You can find examples for nearly every MadelineProto function in
     * [Built-in database driver](https://docs.madelineproto.xyz/docs/UPDATES.html#built-in-database-driver)
   * [Async Event driven multi-account](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven-multiaccount)
   * [Noop (default)](https://docs.madelineproto.xyz/docs/UPDATES.html#noop)
-  * [Fetch all updates from the beginning](https://docs.madelineproto.xyz/docs/UPDATES.html#fetch-all-updates-from-the-beginning)
 * [Database](https://docs.madelineproto.xyz/docs/DATABASE.html)
   * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
   * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
   * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
 * [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html)
-  * [\danog\MadelineProto\Settings\AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
-  * [\danog\MadelineProto\Settings\Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
-  * [\danog\MadelineProto\Settings\Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
-  * [\danog\MadelineProto\Settings\Files: File management settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Files.html)
-  * [\danog\MadelineProto\Settings\Logger: Logger settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Logger.html)
-  * [\danog\MadelineProto\Settings\Peer: Peer database settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Peer.html)
-  * [\danog\MadelineProto\Settings\Pwr: PWRTelegram settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Pwr.html)
-  * [\danog\MadelineProto\Settings\RPC: RPC settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html)
-  * [\danog\MadelineProto\Settings\SecretChats: Secret chat settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/SecretChats.html)
-  * [\danog\MadelineProto\Settings\Serialization: Serialization settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Serialization.html)
-  * [\danog\MadelineProto\Settings\TLSchema: TL schema settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/TLSchema.html)
-  * [\danog\MadelineProto\Settings\Templates: Web and CLI template settings for login.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Templates.html)
-  * [\danog\MadelineProto\Settings\VoIP: VoIP settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/VoIP.html)
-  * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
-  * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
-  * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
-  * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
+  * [AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
+  * [Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
+  * [Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
+  * [Files: File management settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Files.html)
+  * [Logger: Logger settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Logger.html)
+  * [Peer: Peer database settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Peer.html)
+  * [Pwr: PWRTelegram settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Pwr.html)
+  * [RPC: RPC settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html)
+  * [SecretChats: Secret chat settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/SecretChats.html)
+  * [Serialization: Serialization settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Serialization.html)
+  * [TLSchema: TL schema settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/TLSchema.html)
+  * [Templates: Web and CLI template settings for login.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Templates.html)
+  * [VoIP: VoIP settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/VoIP.html)
+  * [Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
+  * [Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
+  * [Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
+  * [Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
 * [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html)
 * [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html)
   * [List of exception types](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#list-of-exception-types)
@@ -151,20 +150,19 @@ You can find examples for nearly every MadelineProto function in
     * [Download to browser](https://docs.madelineproto.xyz/docs/FILES.html#download-to-browser)
   * [Getting progress](https://docs.madelineproto.xyz/docs/FILES.html#getting-progress)
 * [Getting info about chats](https://docs.madelineproto.xyz/docs/CHAT_INFO.html)
-  * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getPwrChat-now-fully-async)
-  * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getFullInfo-now-fully-async)
-  * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getInfo-now-fully-async)
-  * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getId-now-fully-async)
+  * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getPwrChat)
+  * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getFullInfo)
+  * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getInfo)
+  * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getId)
 * [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html)
-  * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs-now-fully-async)
-  * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs-now-fully-async)
+  * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs)
+  * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs)
 * [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html)
 * [Secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
-  * [Requesting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#requesting-secret-chats-now-fully-async)
-  * [Accepting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#accepting-secret-chats-now-fully-async)
-  * [Checking secret chat status](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#checking-secret-chat-status-now-fully-async)
-  * [Sending secret messages](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#sending-secret-messages-now-fully-async)
-* [Lua binding](https://docs.madelineproto.xyz/docs/LUA.html)
+  * [Requesting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#requesting-secret-chats)
+  * [Accepting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#accepting-secret-chats)
+  * [Checking secret chat status](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#checking-secret-chat-status)
+  * [Sending secret messages](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#sending-secret-messages)
 * [Using a proxy](https://docs.madelineproto.xyz/docs/PROXY.html)
   * [How to set a proxy](https://docs.madelineproto.xyz/docs/PROXY.html#how-to-set-a-proxy)
   * [Multiple proxies with automatic switch](https://docs.madelineproto.xyz/docs/PROXY.html#multiple-proxies-with-automatic-switch)
@@ -326,6 +324,7 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFavedStickers.html" name="messages.getFavedStickers">Get faved stickers: messages.getFavedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFeaturedStickers.html" name="messages.getFeaturedStickers">Get featured stickers: messages.getFeaturedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getFullChannel.html" name="channels.getFullChannel">Get full info about a channel: channels.getFullChannel</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessageReactionsList.html" name="messages.getMessageReactionsList">Get full message reaction list: messages.getMessageReactionsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getGlobalPrivacySettings.html" name="account.getGlobalPrivacySettings">Get global privacy settings: account.getGlobalPrivacySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineGameHighScores.html" name="messages.getInlineGameHighScores">Get highscores of a game sent using an inline bot: messages.getInlineGameHighScores</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getGameHighScores.html" name="messages.getGameHighScores">Get highscores of a game: messages.getGameHighScores</a>
@@ -350,6 +349,7 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizations.html" name="account.getAuthorizations">Get logged-in sessions: account.getAuthorizations</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAutoDownloadSettings.html" name="account.getAutoDownloadSettings">Get media autodownload settings: account.getAutoDownloadSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSplitRanges.html" name="messages.getSplitRanges">Get message ranges for saving the user's chat history: messages.getSplitRanges</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessagesReactions.html" name="messages.getMessagesReactions">Get message reactions: messages.getMessagesReactions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getReplies.html" name="messages.getReplies">Get messages in a reply thread: messages.getReplies</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestUrlAuth.html" name="messages.requestUrlAuth">Get more info about a Seamless Telegram Login authorization request, for more info click here »: messages.requestUrlAuth</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getTopPeers.html" name="contacts.getTopPeers">Get most used peers: contacts.getTopPeers</a>
@@ -506,6 +506,7 @@ You can find examples for nearly every MadelineProto function in
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.sendPaymentForm.html" name="payments.sendPaymentForm">Send compiled payment form: payments.sendPaymentForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.sendConfirmPhoneCode.html" name="account.sendConfirmPhoneCode">Send confirmation code to cancel account deletion, for more info click here »: account.sendConfirmPhoneCode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.saveCallDebug.html" name="phone.saveCallDebug">Send phone call debug data to server: phone.saveCallDebug</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendReaction.html" name="messages.sendReaction">Send reaction to message: messages.sendReaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendScheduledMessages.html" name="messages.sendScheduledMessages">Send scheduled messages right away: messages.sendScheduledMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html" name="auth.sendCode">Send the verification code for login: auth.sendCode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.sendVerifyEmailCode.html" name="account.sendVerifyEmailCode">Send the verification email code for telegram passport: account.sendVerifyEmailCode</a>
