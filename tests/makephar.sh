@@ -7,9 +7,6 @@ PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
 
-[[ "$TAG" == *.9999 ]] && exit 0
-[[ "$TAG" == *.9998 ]] && exit 0
-
 COMMIT="$(git log -1 --pretty=%H)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
@@ -104,7 +101,7 @@ n
 
 reset()
 {
-    wget https://github.com/danog/MadelineProtoPhar/raw/92053cd92c0154438105b64f7c62c3b834057939/phar.php -O madeline.php
+    cp tools/phar.php madeline.php
     sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g;s|MADELINE_RELEASE_URL|disable|g' -i madeline.php
     cp madeline.php madelineBackup.php
 }
@@ -113,7 +110,7 @@ rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
-wget https://github.com/danog/MadelineProtoPhar/raw/92053cd92c0154438105b64f7c62c3b834057939/phar.php -O madeline.php
+cp tools/phar.php madeline.php
 runTest
 k
 
@@ -144,16 +141,6 @@ k
 echo "Checking syntax of madeline.php"
 php -l ./tools/phar.php
 
-if [ "$SSH_KEY" != "" ]; then
-    eval "$(ssh-agent -s)"
-    echo -e "$SSH_KEY" > madeline_rsa
-    chmod 600 madeline_rsa
-    ssh-add madeline_rsa
-fi
-
-git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-git config --global user.name "Github Actions"
-
 input=$PWD
 
 cd "$madelinePath"
@@ -161,37 +148,3 @@ cd "$madelinePath"
 cp "$input/madeline$php$branch.phar" "madeline$php.phar"
 gh release upload "$TAG" "madeline$php.phar"
 rm "madeline$php.phar"
-
-echo "Locking..."
-touch /tmp/lock
-exec {FD}<>/tmp/lock
-flock -x $FD
-echo "Locked!"
-
-cd ~/MadelineProtoPhar
-git pull
-
-cp "$input/tools/phar.php" .
-echo -n "$COMMIT-$php" > release$php
-
-git add -A
-git commit -am "Release $BRANCH - $COMMIT_MESSAGE"
-while :; do
-    git push origin master && break || {
-        git fetch
-        git rebase origin/master
-    }
-done
-
-echo "Unlocking..."
-flock -u $FD
-echo "Unlocked!"
-
-for chat_id in $DESTINATIONS;do
-    curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
-<a href=\"https://github.com/danog/MadelineProto/commit/$COMMIT\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
-        
-$COMMIT_MESSAGE" -F parse_mode=HTML -F chat_id="$chat_id"
-done
-
-k
