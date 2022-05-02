@@ -1,7 +1,7 @@
 name: build
 on:
   release:
-    types: [created]
+    types: [prereleased]
 
 jobs:
   run:
