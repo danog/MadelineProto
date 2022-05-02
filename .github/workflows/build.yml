@@ -58,5 +58,6 @@ jobs:
       - name: Deploy
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tests/deploy.sh

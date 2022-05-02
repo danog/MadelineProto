@@ -9,8 +9,7 @@ echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"
 
-# Clean up
-madelinePath=$PWD
+gh release edit --prerelease=false "$TAG"
 
 if [ "$SSH_KEY" != "" ]; then
     eval "$(ssh-agent -s)"
