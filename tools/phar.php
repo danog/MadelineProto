@@ -15,7 +15,7 @@ if (!\defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\Cla
 class Installer
 {
     const RELEASE_TEMPLATE = 'https://phar.madelineproto.xyz/release%s?v=new';
-    const PHAR_TEMPLATE = 'https://phar.madelineproto.xyz/madeline%s.phar?v=%s';
+    const PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline%s.phar?v=%s';
 
     /**
      * Phar lock instance.
