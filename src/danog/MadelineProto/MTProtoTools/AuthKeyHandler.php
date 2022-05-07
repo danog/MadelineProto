@@ -139,10 +139,7 @@ trait AuthKeyHandler
                 $pq = Tools::unpackSignedLong(\strrev($pq_bytes));
                 foreach ([
                     'native_single_cpp',
-                    'python_single_alt',
-                    'python_single',
                     'native_single',
-                    'wolfram'
                 ] as $method) {
                     $this->logger->logger("Factorizing with $method (please wait, might take a while)");
                     if ($method !== 'native_single_cpp') {
