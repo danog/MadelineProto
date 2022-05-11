@@ -27,6 +27,7 @@ class DocsBuilder
 {
     const DEFAULT_TEMPLATES = [
         'User' => ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'],
+        'ReplyMarkup' => ['ReplyMarkup'],
         'InputFile' => ['InputFile', 'InputEncryptedFile'],
         'InputEncryptedChat' => ['InputEncryptedChat'],
         'PhoneCall' => ['PhoneCall'],

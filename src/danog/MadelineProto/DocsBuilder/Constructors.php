@@ -203,13 +203,13 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
 ';
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example = $this->template('constructor-example', \str_replace('.', '_', $constructor.$layer), $params, $lua_params);
                 if ($hasreplymarkup) {
-                    $example .= $this->template('reply_markup');
+                    $example = $this->template('reply_markup');
                 }
                 if ($hasentities) {
-                    $example .= $this->template('parse_mode');
+                    $example = $this->template('parse_mode');
                 }
+                $example .= $this->template('constructor-example', \str_replace('.', '_', $constructor.$layer), $params, $lua_params);
             }
             \file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
