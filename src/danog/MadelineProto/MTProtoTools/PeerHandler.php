@@ -640,7 +640,7 @@ trait PeerHandler
                     $this->logger->logger($e);
                 }
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    yield from $this->resolveUsername('@'.$dbres['result']);
+                    yield from $this->resolveUsername($dbres['result']);
                     return yield from $this->getInfo($id, $type, false);
                 }
             }
