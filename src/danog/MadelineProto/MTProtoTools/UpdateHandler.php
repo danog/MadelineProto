@@ -292,7 +292,7 @@ trait UpdateHandler
         }
         if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink']) && $this->getSettings()->getDb()->getEnableFullPeerDb()) {
             if ($update['_'] === 'updateUserName') {
-                $update = yield from $this->resolveUsername($update['username'])['peer'];
+                $update = (yield from $this->resolveUsername($update['username']))['peer'];
             }
             $id = $this->getId($update);
             $chat = yield $this->full_chats[$id];
