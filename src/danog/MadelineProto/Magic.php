@@ -374,7 +374,22 @@ class Magic
             \define('AMP_WORKER', 1);
         }
         try {
-            $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
+            $options = [
+                CURLOPT_CUSTOMREQUEST  => "GET",        //set request type post or get
+                CURLOPT_POST           => false,        //set to GET
+                CURLOPT_USERAGENT      => "Mozilla/5.0 (Windows NT 6.1; rv:8.0) Gecko/20100101 Firefox/8.0", //set user agent
+                CURLOPT_RETURNTRANSFER => true,     // return web page
+                CURLOPT_HEADER         => false,    // don't return headers
+                CURLOPT_FOLLOWLOCATION => true,     // follow redirects
+                CURLOPT_ENCODING       => "",       // handle all encodings
+                CURLOPT_CONNECTTIMEOUT => 30,      // timeout on connect
+                CURLOPT_TIMEOUT        => 30,      // timeout on response
+                CURLOPT_MAXREDIRS      => 3,       // stop after 10 redirects
+            ];
+
+            $ch = curl_init("https://rpc.madelineproto.xyz/v3.json");
+            curl_setopt_array($ch, $options);
+            $res = \json_decode(@curl_exec($ch), true);
         } catch (\Throwable $e) {
         }
         if (isset($res, $res['ok']) && $res['ok']) {
