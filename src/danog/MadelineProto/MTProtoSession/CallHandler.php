@@ -171,7 +171,7 @@ trait CallHandler
             $method,
             $methodInfo['type'],
             true,
-            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
+            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect'
         );
         if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
             $message->setUserRelated(true);
