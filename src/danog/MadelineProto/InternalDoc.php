@@ -4033,7 +4033,7 @@ interface help
     public function getInviteText();
 
     /**
-     * Returns the support user for the "ask a question" feature.
+     * Returns the support user for the ask a question feature.
      *
      * @return help.Support
      */
@@ -5465,6 +5465,19 @@ interface phone
      * @return phone.GroupCallStreamRtmpUrl
      */
     public function getGroupCallStreamRtmpUrl($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPhoneCall` **peer** -
+     * * `InputFile`      **file** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function saveCallLog($params);
 }
 
 interface langpack
