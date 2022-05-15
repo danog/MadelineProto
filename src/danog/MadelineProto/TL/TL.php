@@ -702,6 +702,10 @@ class TL
                     case 'vector':
                         $arguments[$current_argument['name']] = [];
                         break;
+                    case 'DataJSON':
+                    case '%DataJSON':
+                        $arguments[$current_argument['name']] = null;
+                        break;
                     default:
                         throw new Exception("Missing required parameter ".$current_argument['name']);
                 }
