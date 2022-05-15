@@ -103,7 +103,7 @@ trait Templates
                 }
                 $title = \htmlentities(Lang::$current_lang['apiChooseManualAutoWeb']);
                 $title .= "<br>";
-                $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id');
+                $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
                 $title .= "<b>$message</b>";
 
                 $automatically = \htmlentities(Lang::$current_lang['apiChooseAutomaticallyWeb']);

@@ -50,7 +50,7 @@ trait Start
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
             $prepare = Lang::$current_lang['apiChooseManualAuto'].PHP_EOL;
-            $prepare .= \sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id');
+            $prepare .= \sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
             $prepare .= PHP_EOL;
             yield $stdout->write($prepare);
             if (\strpos(yield Tools::readLine(Lang::$current_lang['apiChoosePrompt']), 'm') !== false) {
