@@ -70,11 +70,6 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
         try {
             $yielded = $this->generator->current();
             while (!$yielded instanceof Promise) {
-                if ($yielded instanceof \YieldReturnValue) {
-                    $this->resolve($yielded->getReturn());
-                    $this->generator->next();
-                    return;
-                }
                 if (!$this->generator->valid()) {
                     if (PHP_MAJOR_VERSION >= 7) {
                         $this->resolve($this->generator->getReturn());
@@ -117,12 +112,6 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
                         $yielded = $this->generator->send($this->value);
                     }
                     while (!$yielded instanceof Promise) {
-                        if ($yielded instanceof \YieldReturnValue) {
-                            $this->resolve($yielded->getReturn());
-                            $this->onResolve = null;
-                            $this->generator->next();
-                            return;
-                        }
                         if (!$this->generator->valid()) {
                             if (PHP_MAJOR_VERSION >= 7) {
                                 $this->resolve($this->generator->getReturn());

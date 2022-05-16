@@ -364,7 +364,7 @@ class Logger
             self::$printed = true;
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
             $this->logger('MadelineProto');
-            $this->logger('Copyright (C) 2016-'.date('Y').' Daniil Gentili');
+            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
