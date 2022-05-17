@@ -6898,7 +6898,7 @@ class InternalDoc extends APIFactory
      */
     public function mbStrSplit(string $text, int $length): array
     {
-        return \danog\MadelineProto\MTProto::mbStrSplit($text, $length);
+        return \danog\MadelineProto\StrTools::mbStrSplit($text, $length);
     }
     /**
      * Get Telegram UTF-8 length of string.
@@ -6922,7 +6922,7 @@ class InternalDoc extends APIFactory
      */
     public function mbSubstr(string $text, int $offset, $length = null): string
     {
-        return \danog\MadelineProto\MTProto::mbSubstr($text, $offset, $length);
+        return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
     }
     /**
      * Call method and wait asynchronously for response.
