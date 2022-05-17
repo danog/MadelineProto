@@ -87,7 +87,6 @@
         },
         "files": [
             "src/BigIntegor.php",
-            "src/YieldReturnValue.php",
             "src/polyfill.php"
         ]
     },
