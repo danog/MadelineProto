@@ -4033,7 +4033,7 @@ interface help
     public function getInviteText();
 
     /**
-     * Returns the support user for the ask a question feature.
+     * Returns the support user for the "ask a question" feature.
      *
      * @return help.Support
      */
@@ -6909,7 +6909,7 @@ class InternalDoc extends APIFactory
      */
     public function mbStrlen(string $text)
     {
-        return $this->__call(__FUNCTION__, [$text]);
+        return \danog\MadelineProto\StrTools::mbStrlen($text);
     }
     /**
      * Telegram UTF-8 multibyte substring.
