@@ -1,0 +1,16 @@
+pipeline:
+  deploy:
+    image: 192.168.69.1:5000/php-ci:latest
+    when:
+      branch: stable
+      event: tag
+    secrets:
+      - GITHUB_TOKEN
+      - DEPLOY_KEY
+    environment:
+      - TAG=${CI_COMMIT_TAG}
+    commands:
+      - tests/deploy.sh
+
+depends_on:
+  - build

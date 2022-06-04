@@ -11,9 +11,9 @@ echo "Latest tag: $TAG"
 
 gh release edit --prerelease=false "$TAG"
 
-if [ "$SSH_KEY" != "" ]; then
+if [ "$DEPLOY_KEY" != "" ]; then
     eval "$(ssh-agent -s)"
-    echo -e "$SSH_KEY" > madeline_rsa
+    echo -e "$DEPLOY_KEY" > madeline_rsa
     chmod 600 madeline_rsa
     ssh-add madeline_rsa
 fi
@@ -23,8 +23,9 @@ git config --global user.name "Github Actions"
 
 input=$PWD
 
-cd ~/MadelineProtoPhar
-git pull
+cd /tmp
+git clone git@github.com:danog/MadelineProtoPhar.git
+cd MadelineProtoPhar
 
 cp "$input/tools/phar.php" .
 for php in 71 72 73 74 80 81; do

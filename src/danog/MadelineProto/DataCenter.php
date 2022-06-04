@@ -235,7 +235,8 @@ class DataCenter
         }
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
             $configProvider = new class implements ConfigLoader {
-                private function loadConfigGenerator(): \Generator {
+                private function loadConfigGenerator(): \Generator
+                {
                     $loader = \stripos(PHP_OS, "win") === 0 ? new WindowsConfigLoader() : new UnixConfigLoader();
                     try {
                         return yield $loader->loadConfig();
@@ -248,7 +249,8 @@ class DataCenter
                         ]);
                     }
                 }
-                public function loadConfig(): Promise {
+                public function loadConfig(): Promise
+                {
                     return Tools::call($this->loadConfigGenerator());
                 }
             };
