@@ -9,6 +9,8 @@ matrix:
 
 clone:
   git:
+    when:
+      event: tag
     image: woodpeckerci/plugin-git
     settings:
       depth: 1

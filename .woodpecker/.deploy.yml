@@ -2,6 +2,8 @@
 clone:
   git:
     image: woodpeckerci/plugin-git
+    when:
+      event: tag
     settings:
       depth: 1
       lfs: false
