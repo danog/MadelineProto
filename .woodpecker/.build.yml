@@ -19,7 +19,6 @@ pipeline:
   build:
     image: 192.168.69.1:5000/php-ci:latest
     when:
-      branch: stable
       event: tag
     secrets:
       - GITHUB_TOKEN
