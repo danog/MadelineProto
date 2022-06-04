@@ -19,8 +19,12 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Dns\Config;
+use Amp\Dns\ConfigLoader;
 use Amp\Dns\Resolver;
 use Amp\Dns\Rfc1035StubResolver;
+use Amp\Dns\UnixConfigLoader;
+use Amp\Dns\WindowsConfigLoader;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
@@ -32,6 +36,7 @@ use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsConnector;
 use Amp\Websocket\Client\Handshake;
@@ -229,19 +234,38 @@ class DataCenter
             }
         }
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
+            $configProvider = new class implements ConfigLoader {
+                private function loadConfigGenerator(): \Generator {
+                    $loader = \stripos(PHP_OS, "win") === 0 ? new WindowsConfigLoader() : new UnixConfigLoader();
+                    try {
+                        return yield $loader->loadConfig();
+                    } catch (\Throwable) {
+                        return new Config([
+                            '1.1.1.1',
+                            '1.0.0.1',
+                            '[2606:4700:4700::1111]',
+                            '[2606:4700:4700::1001]',
+                        ]);
+                    }
+                }
+                public function loadConfig(): Promise {
+                    return Tools::call($this->loadConfigGenerator());
+                }
+            };
+
             $this->CookieJar = $jar ?? new InMemoryCookieJar();
             $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this))))->build();
             $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, true))))->build();
             $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
             $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
             $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
-                ? new Rfc1035StubResolver()
+                ? new Rfc1035StubResolver(null, $configProvider)
                 : new Rfc8484StubResolver($DoHConfig);
             $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
-                ? new Rfc1035StubResolver()
+                ? new Rfc1035StubResolver(null, $configProvider)
                 : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
-            $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
+            $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver(null, $configProvider));
             $this->webSocketConnector = new Rfc6455Connector($this->HTTPClient);
         }
         $this->settings->applyChanges();
