@@ -8,6 +8,7 @@ clone:
       depth: 1
       lfs: false
       recursive: false
+      tags: true
 
 pipeline:
   deploy:
