@@ -364,9 +364,15 @@ class DataCenter
         }
         $combos[] = $default;
         if ($this->settings->getRetry()) {
-            if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'] || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
+            $only = $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'] ?? false;
+            if ($only || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
-                $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
+                $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
+                if ($only) {
+                    \array_unshift($combos, $combo);
+                } else {
+                    $combos []= $combo;
+                }
             }
             $proxyCombos = [];
             foreach ($this->settings->getProxies() as $proxy => $extras) {

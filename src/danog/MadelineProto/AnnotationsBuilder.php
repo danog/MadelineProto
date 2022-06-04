@@ -291,6 +291,9 @@ class AnnotationsBuilder
             if ($method->getDeclaringClass()->getName() == Tools::class) {
                 $async = false;
             }
+            if ($method->getDeclaringClass()->getName() == StrTools::class) {
+                $async = false;
+            }
             $finalParamList = $hasVariadic ? "Tools::arr({$paramList})" : "[{$paramList}]";
             $ret = $type && \in_array($type->getName(), ['self', 'void']) ? '' : 'return';
             $doc .= "\n{\n";

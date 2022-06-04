@@ -22,8 +22,8 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\Tools;
 
 use const danog\Decoder\TYPES_IDS;
 

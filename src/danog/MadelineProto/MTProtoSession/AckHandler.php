@@ -97,7 +97,7 @@ trait AckHandler
                 && $message->getSent() + $timeout < \time()
                 && $message->isUnencrypted() === $unencrypted
                 && $message->getConstructor() !== 'msgs_state_req') {
-                if ($pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
+                if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
                 }
                 return true;
@@ -127,7 +127,7 @@ trait AckHandler
                 && $message->getSent() + $timeout < \time()
                 && $message->isUnencrypted() === $unencrypted
             ) {
-                if ($pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
+                if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
                 }
                 if ($message->getConstructor() === 'msgs_state_req') {

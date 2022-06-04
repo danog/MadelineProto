@@ -1821,11 +1821,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
-            if (isset($dc['static'])) {
-                //$id .= $dc['static'] ? '_static' : '';
+            if ($dc['static']) {
+                continue;
             }
-            if (isset($dc['cdn'])) {
-                $id .= $dc['cdn'] ? '_cdn' : '';
+            if ($dc['cdn']) {
+                $id .= '_cdn';
             }
             $id .= $dc['media_only'] ? '_media' : '';
             $ipv6 = $dc['ipv6'] ? 'ipv6' : 'ipv4';

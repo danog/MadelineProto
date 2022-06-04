@@ -132,14 +132,14 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $this->API->logger->logger("Can't garbage collect $message, not handled yet!", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", \danog\MadelineProto\Logger::VERBOSE);
                 $incoming[$key] = $message;
             }
         }
         $this->incoming_messages = $incoming;
         $total = \count($this->incoming_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count incoming messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
         }
 
         $count = 0;
@@ -150,7 +150,7 @@ trait Session
             } else {
                 $ago = \time() - $message->getSent();
                 if ($ago > 2) {
-                    $this->API->logger->logger("Can't garbage collect $message sent $ago seconds ago, no response has been received or it wasn't yet handled!", \danog\MadelineProto\Logger::VERBOSE);
+                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter} sent $ago seconds ago, no response has been received or it wasn't yet handled!", \danog\MadelineProto\Logger::VERBOSE);
                 }
                 $outgoing[$key] = $message;
             }
@@ -158,7 +158,7 @@ trait Session
         $this->outgoing_messages = $outgoing;
         $total = \count($this->outgoing_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count outgoing messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
         }
     }
     /**

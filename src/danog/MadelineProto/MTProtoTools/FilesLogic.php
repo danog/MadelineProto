@@ -16,6 +16,8 @@ use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
 use Amp\Producer;
+use Amp\Sync\LocalMutex;
+use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Client;
@@ -122,13 +124,20 @@ trait FilesLogic
             } catch (StreamException $e) {
             }
         }
-        $callable = static function (string $payload, int $offset) use ($stream, $seekable): \Generator {
-            if ($seekable) {
-                while ($stream->tell() !== $offset) {
-                    yield $stream->seek($offset);
+        $lock = new LocalMutex;
+        $callable = static function (string $payload, int $offset) use ($stream, $seekable, $lock): \Generator {
+            /** @var Lock */
+            $l = yield $lock->acquire();
+            try {
+                if ($seekable) {
+                    while ($stream->tell() !== $offset) {
+                        yield $stream->seek($offset);
+                    }
                 }
+                yield $stream->write($payload);
+            } finally {
+                $l->release();
             }
-            yield $stream->write($payload);
             return \strlen($payload);
         };
         return yield from $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
@@ -296,13 +305,20 @@ trait FilesLogic
         }
         $created = false;
         if ($stream instanceof File) {
-            $callable = static function (int $offset, int $size) use ($stream, $seekable): \Generator {
-                if ($seekable) {
-                    while ($stream->tell() !== $offset) {
-                        yield $stream->seek($offset);
+            $lock = new LocalMutex;
+            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock): \Generator {
+                /** @var Lock */
+                $l = yield $lock->acquire();
+                try {
+                    if ($seekable) {
+                        while ($stream->tell() !== $offset) {
+                            yield $stream->seek($offset);
+                        }
                     }
+                    return yield $stream->read($size);
+                } finally {
+                    $l->release();
                 }
-                return yield $stream->read($size);
             };
         } else {
             if (!$stream instanceof BufferedRawStream) {

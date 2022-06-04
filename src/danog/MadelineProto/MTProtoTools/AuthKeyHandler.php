@@ -139,11 +139,13 @@ trait AuthKeyHandler
                 $pq = Tools::unpackSignedLong(\strrev($pq_bytes));
                 foreach ([
                     'native_single_cpp',
+                    'python_single_alt',
+                    'python_single',
                     'native_single',
                 ] as $method) {
                     $this->logger->logger("Factorizing with $method (please wait, might take a while)");
                     if ($method !== 'native_single_cpp') {
-                        $this->logger->logger("Install https://prime.madelineproto.xyz to speed this up!");
+                        $this->logger->logger("Install https://prime.madelineproto.xyz and the FFI extension to speed this up!");
                     }
 
                     $p = 0;
