@@ -3,6 +3,9 @@
 # Configure
 export PATH="$HOME/.local/php/$PHP_VERSION:$PATH"
 
+echo "$TAG" | grep -q '\.9999' && exit 0 || true
+echo "$TAG" | grep -q '\.9998' && exit 0 || true
+
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION

@@ -275,7 +275,6 @@ class Logger
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            Snitch::logFile($this->optional);
             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
                 $optional = &$this->optional;
