@@ -1,3 +1,12 @@
+
+clone:
+  git:
+    image: woodpeckerci/plugin-git
+    settings:
+      depth: 1
+      lfs: false
+      recursive: false
+
 pipeline:
   deploy:
     image: 192.168.69.1:5000/php-ci:latest

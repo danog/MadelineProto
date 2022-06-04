@@ -7,6 +7,14 @@ matrix:
     - "7.2"
     - "7.1"
 
+clone:
+  git:
+    image: woodpeckerci/plugin-git
+    settings:
+      depth: 1
+      lfs: false
+      recursive: false
+
 pipeline:
   build:
     image: 192.168.69.1:5000/php-ci:latest
