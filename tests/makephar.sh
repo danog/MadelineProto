@@ -11,6 +11,9 @@ COMMIT="$(git log -1 --pretty=%H)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
+git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git config --global user.name "Github Actions"
+
 echo "PHP: $php"
 echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
