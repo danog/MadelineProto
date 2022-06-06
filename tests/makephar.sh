@@ -119,6 +119,8 @@ reset()
 k
 rm -f madeline.phar testing.madeline*
 
+tail -F MadelineProto.log &
+
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
