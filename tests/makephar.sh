@@ -71,7 +71,7 @@ echo '{
         }
     }
 }' > composer.json
-php $(which composer) update --no-cache
+php $(which composer) update -vvv --no-cache
 php $(which composer) dumpautoload --optimize
 rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 cd ..
