@@ -17,10 +17,10 @@ git remote add hub https://github.com/danog/MadelineProto
 gh release edit --prerelease=false "$TAG"
 
 if [ "$DEPLOY_KEY" != "" ]; then
-    eval "$(ssh-agent -s)"
-    echo -e "$DEPLOY_KEY" > madeline_rsa
-    chmod 600 madeline_rsa
-    ssh-add madeline_rsa
+    mkdir -p $HOME/.ssh
+    ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
+    echo "$DEPLOY_KEY" > $HOME/.ssh/id_rsa
+    chmod 0600 $HOME/.ssh/id_rsa
 fi
 
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
