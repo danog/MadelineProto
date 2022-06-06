@@ -1,9 +1,8 @@
-
 clone:
   git:
-    image: woodpeckerci/plugin-git
     when:
       event: tag
+    image: woodpeckerci/plugin-git
     settings:
       depth: 1
       lfs: false
@@ -11,22 +10,20 @@ clone:
       tags: true
 
 pipeline:
-  deploy:
+  build:
+    group: build
     image: 192.168.69.1:5000/php-ci:latest
     when:
       event: tag
     secrets:
       - GITHUB_TOKEN
-      - DEPLOY_KEY
+      - API_ID
+      - API_HASH
+      - BOT_TOKEN
+      - DEST
     environment:
+      - PHP_VERSION=8.0
       - TAG=${CI_COMMIT_TAG}
     commands:
-      - tests/deploy.sh
+      - tests/makephar.sh
 
-depends_on:
-  - build-71
-  - build-72
-  - build-73
-  - build-74
-  - build-80
-  - build-81
