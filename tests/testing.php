@@ -119,7 +119,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Try making a phone call
      */
-    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to make a call? (y/n): ') ?? '', 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to make a call? (y/n): ')) ?? '', 'y') !== false) {
         $controller = yield $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
         while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
             yield $MadelineProto->sleep(1);
@@ -133,7 +133,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Try receiving a phone call
      */
-    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): ') ?? '', 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): ')) ?? '', 'y') !== false) {
         $howmany = yield $MadelineProto->readline('How many calls would you like me to handle? ');
         $offset = 0;
         while ($howmany > 0) {
@@ -155,7 +155,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Secret chat usage
      */
-    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): ') ?? '', 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): ')) ?? '', 'y') !== false) {
         if (!\getenv('TEST_SECRET_CHAT')) {
             throw new Exception('No TEST_SECRET_CHAT environment variable was provided!');
         }
