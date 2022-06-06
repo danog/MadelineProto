@@ -1,3 +1,12 @@
+matrix:
+  php:
+    - "8.1"
+    - "8.0"
+    - "7.4"
+    - "7.3"
+    - "7.2"
+    - "7.1"
+
 clone:
   git:
     when:
@@ -22,7 +31,7 @@ pipeline:
       - BOT_TOKEN
       - DEST
     environment:
-      - PHP_VERSION=7.2
+      - PHP_VERSION=${php}
       - TAG=${CI_COMMIT_TAG}
     commands:
       - tests/makephar.sh

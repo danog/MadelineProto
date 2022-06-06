@@ -24,9 +24,4 @@ pipeline:
       - tests/deploy.sh
 
 depends_on:
-  - build-71
-  - build-72
-  - build-73
-  - build-74
-  - build-80
-  - build-81
+  - build
