@@ -159,5 +159,6 @@ input=$PWD
 cd "$madelinePath"
 
 cp "$input/madeline$php$branch.phar" "madeline$php.phar"
+git remote add hub https://github.com/danog/MadelineProto
 gh release upload "$TAG" "madeline$php.phar"
 rm "madeline$php.phar"

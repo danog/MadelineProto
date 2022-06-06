@@ -12,6 +12,8 @@ echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"
 
+git remote add hub https://github.com/danog/MadelineProto
+
 gh release edit --prerelease=false "$TAG"
 
 if [ "$DEPLOY_KEY" != "" ]; then
