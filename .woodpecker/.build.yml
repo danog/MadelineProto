@@ -1,3 +1,6 @@
+labels:
+  madeline: "y"
+
 matrix:
   php:
     - "8.1"
