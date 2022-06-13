@@ -33,6 +33,15 @@ trait BotAPI
     {
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
+    private function fetchChild(\DOMNode $node): ?\DOMNode {
+        if (
+            !$node->hasChildNodes() ||
+            $node->firstChild instanceof \DOMText
+        ) {
+            return null;
+        }
+        return $node->firstChild;
+    }
     /**
      * @return ((bool|mixed|string)[][]|string)[][]
      *
@@ -490,9 +499,15 @@ trait BotAPI
             if (!isset($arguments['entities'])) {
                 $arguments['entities'] = [];
             }
+            $body = $dom->getElementsByTagName('body')->item(0);
             $offset = 0;
-            foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
+            for ($node = $body; ; ) {
+                $child = yield $this->fetchChild($node);
+                if ($child === null) {
+                    break;
+                }
                 yield from $this->parseNode($node, $arguments['entities'], $new_message, $offset);
+                $node = $child;
             }
             if (isset($arguments['entities']['buttons'])) {
                 $arguments['reply_markup'] = $this->buildRows($arguments['entities']['buttons']);
