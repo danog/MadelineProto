@@ -19,18 +19,23 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Http\Client\Request;
 use Amp\Promise;
 use danog\Decoder\FileId;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\MadelineProto\Db\DbArray;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\Db\DbArray;
 use const danog\Decoder\PROFILE_PHOTO;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
+use const danog\Decoder\PROFILE_PHOTO;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 
 /**
@@ -649,7 +654,7 @@ trait PeerHandler
                     $this->logger->logger($e);
                 }
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    yield from $this->resolveUsername('@'.$dbres['result']);
+                    yield from $this->resolveUsername($dbres['result']);
                     return yield from $this->getInfo($id, $type, false);
                 }
             }
