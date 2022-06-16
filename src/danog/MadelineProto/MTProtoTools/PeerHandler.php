@@ -19,19 +19,19 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Http\Client\Request;
 use Amp\Promise;
 use danog\Decoder\FileId;
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
-use danog\MadelineProto\Db\DbArray;
+use Amp\Http\Client\Request;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tools;
+use danog\MadelineProto\Db\DbArray;
+use const danog\Decoder\PROFILE_PHOTO;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
-use const danog\Decoder\PROFILE_PHOTO;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 
 /**
  * Manages peers.
@@ -474,6 +474,9 @@ trait PeerHandler
             }
         }
         if (\is_string($id)) {
+            if(\is_string($id) and \preg_match('/^[0-9]+./',$id)) {
+                $id = \preg_replace('/([^\d])/','',$id);
+            }
             if (\strpos($id, '#') !== false) {
                 if (\preg_match('/^channel#(\\d*)/', $id, $matches)) {
                     return $this->toSupergroup($matches[1]);
@@ -530,7 +533,7 @@ trait PeerHandler
      * @return \Generator Info object
      *
      * @template TConstructor
-     * @psalm-param array{_: TConstructor}|mixed $id
+     * @psalm-param $id array{_: TConstructor}|mixed
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
@@ -553,6 +556,9 @@ trait PeerHandler
      */
     public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL, $recursive = true): \Generator
     {
+        if(\is_string($id) and \preg_match('/^[0-9]+./',$id)) {
+            $id = \preg_replace('/([^\d])/','',$id);
+        }
         if (\is_array($id)) {
             switch ($id['_']) {
                 case 'updateEncryption':
@@ -567,6 +573,9 @@ trait PeerHandler
                 case 'encryptedMessage':
                 case 'encryptedMessageService':
                     $id = $id['chat_id'];
+                    if(\is_string($id) and \preg_match('/^[0-9]+./',$id)) {
+                        $id = \preg_replace('/([^\d])/','',$id);
+                    }
                     if (!isset($this->secret_chats[$id])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
                     }
@@ -640,7 +649,7 @@ trait PeerHandler
                     $this->logger->logger($e);
                 }
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    yield from $this->resolveUsername($dbres['result']);
+                    yield from $this->resolveUsername('@'.$dbres['result']);
                     return yield from $this->getInfo($id, $type, false);
                 }
             }
@@ -710,8 +719,8 @@ trait PeerHandler
     }
     /**
      * @template TConstructor
-     * @psalm-param array{_: TConstructor} $constructor
-     * @psalm-param bool|null $type
+     * @psalm-param $constructor array{_: TConstructor}
+     * @psalm-param $type        bool|null
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
@@ -1231,6 +1240,9 @@ trait PeerHandler
      */
     public function resolveUsername(string $username): \Generator
     {
+        if(\preg_match('/^[0-9]+./',$username)) {
+            $username = \preg_replace('/([^\d])/','',$username);
+        }
         $username = \str_replace('@', '', $username);
         if (!$username) {
             return false;
