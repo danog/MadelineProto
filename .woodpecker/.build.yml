@@ -25,7 +25,9 @@ pipeline:
     group: build
     image: 192.168.69.1:5000/php-ci:latest
     when:
-      event: tag
+      event:
+        - tag
+        - push
     secrets:
       - GITHUB_TOKEN
       - API_ID
