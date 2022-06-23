@@ -47,6 +47,7 @@ services:
       - MARIADB_DATABASE=MadelineProto
       - MARIADB_USER=MadelineProto
       - MARIADB_PASSWORD=test
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
 
   postgres:
     image: postgres
