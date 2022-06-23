@@ -10,7 +10,9 @@ matrix:
 clone:
   git:
     when:
-      event: tag
+      event:
+        - tag
+        - push
     image: woodpeckerci/plugin-git
     settings:
       depth: 1
@@ -36,3 +38,20 @@ pipeline:
     commands:
       - tests/makephar.sh
 
+services:
+  mariadb:
+    image: mariadb
+    environment:
+      - MARIADB_DATABASE=MadelineProto
+      - MARIADB_USER=MadelineProto
+      - MARIADB_PASSWORD=test
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=MadelineProto
+      - POSTGRES_USER=MadelineProto
+      - POSTGRES_PASSWORD=test
+
+  redis:
+    image: redis

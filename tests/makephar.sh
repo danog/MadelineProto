@@ -6,6 +6,10 @@ export PATH="$HOME/.local/php/$PHP_VERSION:$PATH"
 echo "$TAG" | grep -q '\.9999' && exit 0 || true
 echo "$TAG" | grep -q '\.9998' && exit 0 || true
 
+if [ "$TAG" == "" ]; then
+    export TAG=7777
+fi
+
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
@@ -94,7 +98,6 @@ runTestSimple()
 }
 runTest()
 {
-    [ "$1" != "" ] && p="$1" || p=php
     echo "m
 $API_ID
 $API_HASH
@@ -158,7 +161,9 @@ input=$PWD
 
 cd "$madelinePath"
 
-cp "$input/madeline$php$branch.phar" "madeline$php.phar"
-git remote add hub https://github.com/danog/MadelineProto
-gh release upload "$TAG" "madeline$php.phar"
-rm "madeline$php.phar"
+if [ "$TAG" != "7777" ]; then
+    cp "$input/madeline$php$branch.phar" "madeline$php.phar"
+    git remote add hub https://github.com/danog/MadelineProto
+    gh release upload "$TAG" "madeline$php.phar"
+    rm "madeline$php.phar"
+fi
