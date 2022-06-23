@@ -6,10 +6,6 @@ export PATH="$HOME/.local/php/$PHP_VERSION:$PATH"
 echo "$TAG" | grep -q '\.9999' && exit 0 || true
 echo "$TAG" | grep -q '\.9998' && exit 0 || true
 
-if [ "$TAG" == "" ]; then
-    export TAG=7777
-fi
-
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
@@ -20,6 +16,11 @@ COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"
+
+if [ "$TAG" == "" ]; then
+    export TAG=7777
+    git tag "$TAG"
+fi
 
 echo "PHP: $php"
 echo "Branch: $BRANCH"
