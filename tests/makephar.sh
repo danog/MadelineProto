@@ -88,13 +88,23 @@ export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
 export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
+db()
+{
+    php tests/db.php $1
+}
+cycledb()
+{
+    db memory
+    db mysql
+    db postgres
+    db redis
+    db memory
+}
+
 runTestSimple()
 {
-    tests/testing.php || {
-        cat MadelineProto.log
-        sleep 10
-        exit 1
-    }
+    tests/testing.php
+    cycledb
 }
 runTest()
 {
@@ -106,11 +116,8 @@ $BOT_TOKEN
 n
 n
 n
-" | $p tests/testing.php || {
-        cat MadelineProto.log
-        sleep 10
-        exit 1
-    }
+" | $p tests/testing.php
+    cycledb
 }
 
 reset()
@@ -128,6 +135,7 @@ echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
 runTest
+db mysql
 k
 
 echo "Testing with new version (upgrade)..."
