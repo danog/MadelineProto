@@ -256,7 +256,7 @@ trait FilesLogic
             $fileName = \basename($file);
         }
         $size = yield getSize($file);
-        if ($size > 512 * 1024 * 4000) {
+        if ($size > 512 * 1024 * 8000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         $stream = yield openFile($file, 'rb');

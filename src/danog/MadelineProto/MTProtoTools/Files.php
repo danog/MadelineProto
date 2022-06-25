@@ -70,7 +70,7 @@ trait Files
         /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
         $request->setTransferTimeout(10 * 1000 * 3600);
-        $request->setBodySizeLimit(512 * 1024 * 4000);
+        $request->setBodySizeLimit(512 * 1024 * 8000);
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         if (200 !== ($status = $response->getStatus())) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
@@ -878,7 +878,7 @@ trait Files
         }
         $params = [];
         $start_at = $offset % $part_size;
-        $probable_end = $end !== -1 ? $end : 512 * 1024 * 4000;
+        $probable_end = $end !== -1 ? $end : 512 * 1024 * 8000;
         $breakOut = false;
         for ($x = $offset - $start_at; $x < $probable_end; $x += $part_size) {
             $end_at = $part_size;
