@@ -9,7 +9,6 @@ use Amp\Sql\CommandResult;
 use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
 use Amp\Success;
-use danog\MadelineProto\Logger;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -61,17 +60,19 @@ abstract class SqlArray extends DriverArray
         return $this;
     }
     /**
-     * Deserialize retrieved value
+     * Deserialize retrieved value.
      */
-    protected function getValue(string $value): mixed {
-        return unserialize($value);
+    protected function getValue(string $value): mixed
+    {
+        return \unserialize($value);
     }
 
     /**
-     * Serialize retrieved value
+     * Serialize retrieved value.
      */
-    protected function setValue(mixed $value): string {
-        return serialize($value);
+    protected function setValue(mixed $value): string
+    {
+        return \serialize($value);
     }
 
 

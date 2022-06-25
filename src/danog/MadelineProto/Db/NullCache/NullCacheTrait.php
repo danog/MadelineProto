@@ -9,9 +9,11 @@ namespace danog\MadelineProto\Db\NullCache;
  */
 trait NullCacheTrait
 {
-    protected function setCacheTtl(int $ttl): void {
+    protected function setCacheTtl(int $ttl): void
+    {
     }
-    protected function hasCache(string $key): bool {
+    protected function hasCache(string $key): bool
+    {
         return false;
     }
     /**
@@ -41,8 +43,8 @@ trait NullCacheTrait
     {
     }
 
-    protected function clearCache(): void {
-
+    protected function clearCache(): void
+    {
     }
 
     protected function startCacheCleanupLoop(): void

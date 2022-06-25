@@ -741,7 +741,7 @@ interface account
      * * `boolean` **message_megagroups** - Optional: Whether to export messages in [supergroups](https://core.telegram.org/api/channel#supergroups)
      * * `boolean` **message_channels**   - Optional: Whether to export messages in [channels](https://core.telegram.org/api/channel#channels)
      * * `boolean` **files**              - Optional: Whether to export files
-     * * `int`     **file_max_size**      - Optional: Maximum size of files to export
+     * * `long`    **file_max_size**      - Optional:
      *
      * @param array $params Parameters
      *
@@ -2175,7 +2175,7 @@ interface messages
      *
      * Parameters:
      * * `bytes`  **sha256**    - SHA256 of file
-     * * `int`    **size**      - Size of the file in bytes
+     * * `long`   **size**      -
      * * `string` **mime_type** - Mime type
      *
      * @param array $params Parameters
@@ -3719,7 +3719,8 @@ interface messages
      * * `string`    **url**             - Optional:
      * * `string`    **start_param**     - Optional:
      * * `DataJSON`  **theme_params**    - Optional:
-     * * `int`       **reply_to_msg_id** - Optional:.
+     * * `int`       **reply_to_msg_id** - Optional:
+     * * `InputPeer` **send_as**         - Optional:.
      *
      * @param array $params Parameters
      *
@@ -3735,7 +3736,8 @@ interface messages
      * * `InputPeer` **peer**            -
      * * `InputUser` **bot**             -
      * * `long`      **query_id**        -
-     * * `int`       **reply_to_msg_id** - Optional:.
+     * * `int`       **reply_to_msg_id** - Optional:
+     * * `InputPeer` **send_as**         - Optional:.
      *
      * @param array $params Parameters
      *
@@ -3783,6 +3785,34 @@ interface messages
      * @return Updates
      */
     public function sendWebViewData($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `int`       **msg_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.TranscribedAudio
+     */
+    public function transcribeAudio($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**             -
+     * * `int`       **msg_id**           -
+     * * `long`      **transcription_id** -
+     * * `Bool`      **good**             -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function rateTranscribedAudio($params);
 }
 
 interface updates
@@ -3905,7 +3935,7 @@ interface upload
      * * `boolean`           **precise**       - Optional: Disable some checks on limit and offset values, useful for example to stream videos by keyframes
      * * `boolean`           **cdn_supported** - Optional: Whether the current client supports [CDN downloads](https://core.telegram.org/cdn)
      * * `InputFileLocation` **location**      - File location
-     * * `int`               **offset**        - Number of bytes to be skipped
+     * * `long`              **offset**        -
      * * `int`               **limit**         - Number of bytes to be returned
      *
      * @param array $params Parameters
@@ -3948,7 +3978,7 @@ interface upload
      *
      * Parameters:
      * * `bytes` **file_token** - File token
-     * * `int`   **offset**     - Offset of chunk to download
+     * * `long`  **offset**     -
      * * `int`   **limit**      - Length of chunk to download
      *
      * @param array $params Parameters
@@ -3975,7 +4005,7 @@ interface upload
      *
      * Parameters:
      * * `bytes` **file_token** - File
-     * * `int`   **offset**     - Offset from which to start getting hashes
+     * * `long`  **offset**     -
      *
      * @param array $params Parameters
      *
@@ -3988,7 +4018,7 @@ interface upload
      *
      * Parameters:
      * * `InputFileLocation` **location** - File
-     * * `int`               **offset**   - Offset from which to get file hashes
+     * * `long`              **offset**   -
      *
      * @param array $params Parameters
      *
@@ -4223,6 +4253,13 @@ interface help
      * @return help.CountriesList
      */
     public function getCountriesList($params);
+
+    /**
+     *
+     *
+     * @return help.PremiumPromo
+     */
+    public function getPremiumPromo();
 }
 
 interface channels
@@ -4736,6 +4773,32 @@ interface channels
      * @return messages.AffectedHistory
      */
     public function deleteParticipantHistory($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel** -
+     * * `Bool`         **enabled** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleJoinToSend($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel** -
+     * * `Bool`         **enabled** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleJoinRequest($params);
 }
 
 interface bots
@@ -4862,9 +4925,8 @@ interface payments
      * Get a payment form.
      *
      * Parameters:
-     * * `InputPeer` **peer**         - The peer where the payment form was sent
-     * * `int`       **msg_id**       - Message ID of payment form
-     * * `DataJSON`  **theme_params** - Optional: A JSON object with the following keys, containing color theme information (integers, RGB24) to pass to the payment provider, to apply in eventual verification pages: <br>`bg_color` \- Background color <br>`text_color` \- Text color <br>`hint_color` \- Hint text color <br>`link_color` \- Link color <br>`button_color` \- Button color <br>`button_text_color` \- Button text color
+     * * `InputInvoice` **invoice**      -
+     * * `DataJSON`     **theme_params** - Optional: A JSON object with the following keys, containing color theme information (integers, RGB24) to pass to the payment provider, to apply in eventual verification pages: <br>`bg_color` \- Background color <br>`text_color` \- Text color <br>`hint_color` \- Hint text color <br>`link_color` \- Link color <br>`button_color` \- Button color <br>`button_text_color` \- Button text color
      *
      * @param array $params Parameters
      *
@@ -4889,10 +4951,9 @@ interface payments
      * Submit requested order information for validation.
      *
      * Parameters:
-     * * `boolean`              **save**   - Optional: Save order information to re-use it for future orders
-     * * `InputPeer`            **peer**   - Peer where the payment form was sent
-     * * `int`                  **msg_id** - Message ID of payment form
-     * * `PaymentRequestedInfo` **info**   - Requested order information
+     * * `boolean`              **save**    - Optional: Save order information to re-use it for future orders
+     * * `InputInvoice`         **invoice** -
+     * * `PaymentRequestedInfo` **info**    - Requested order information
      *
      * @param array $params Parameters
      *
@@ -4905,8 +4966,7 @@ interface payments
      *
      * Parameters:
      * * `long`                    **form_id**            - Form ID
-     * * `InputPeer`               **peer**               - The peer where the payment form was sent
-     * * `int`                     **msg_id**             - Message ID of form
+     * * `InputInvoice`            **invoice**            -
      * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](https://docs.madelineproto.xyz/API_docs/constructors/payments.validatedRequestedInfo.html)
      * * `string`                  **shipping_option_id** - Optional: Chosen shipping option ID
      * * `InputPaymentCredentials` **credentials**        - Payment credentials
@@ -4949,6 +5009,77 @@ interface payments
      * @return payments.BankCardData
      */
     public function getBankCardData($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputMedia` **invoice_media** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return payments.ExportedInvoice
+     */
+    public function exportInvoice($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean` **restore**        - Optional:
+     * * `string`  **transaction_id** -
+     * * `bytes`   **receipt**        -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function assignAppStoreTransaction($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **purchase_token** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function assignPlayMarketTransaction($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `bytes` **receipt** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function restorePlayMarketReceipt($params);
+
+    /**
+     *
+     *
+     * @return bool
+     */
+    public function canPurchasePremium();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputUser`  **user_id**               -
+     * * `string`     **recurring_init_charge** -
+     * * `InputMedia` **invoice_media**         -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function requestRecurringPayment($params);
 }
 
 interface stickers

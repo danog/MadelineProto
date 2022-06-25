@@ -2,11 +2,8 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Postgres\ByteA;
 use Amp\Postgres\ConnectionConfig;
 use Amp\Promise;
-use Amp\Success;
-use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -95,12 +92,12 @@ class PostgresArray extends SqlArray
 
     protected function getValue(string $value): mixed
     {
-        return unserialize(hex2bin($value));
+        return \unserialize(\hex2bin($value));
     }
 
     protected function setValue(mixed $value): string
     {
-        return bin2hex(serialize($value));
+        return \bin2hex(\serialize($value));
     }
 
     /**
@@ -130,7 +127,7 @@ class PostgresArray extends SqlArray
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
         yield $this->db->query(/** @lang PostgreSQL */ "
-            ALTER TABLE $from RENAME TO $to;
+            ALTER TABLE \"$from\" RENAME TO \"$to\";
         ");
     }
 }

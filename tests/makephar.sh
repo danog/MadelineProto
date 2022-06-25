@@ -105,7 +105,6 @@ cycledb()
 runTestSimple()
 {
     tests/testing.php
-    cycledb
 }
 runTest()
 {
@@ -118,7 +117,6 @@ n
 n
 n
 " | $p tests/testing.php
-    #cycledb
 }
 
 reset()
@@ -146,6 +144,7 @@ echo -n "$COMMIT-$php" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
 runTestSimple
+cycledb
 k
 
 echo "Testing with new version (restart)"

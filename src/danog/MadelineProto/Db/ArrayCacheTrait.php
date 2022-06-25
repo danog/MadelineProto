@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Loop;
-use Closure;
 use danog\MadelineProto\Logger;
 
 /**
@@ -27,7 +26,8 @@ trait ArrayCacheTrait
      */
     private ?string $cacheCleanupId = null;
 
-    protected function setCacheTtl(int $ttl): void {
+    protected function setCacheTtl(int $ttl): void
+    {
         $this->cacheTtl = $ttl;
     }
 
@@ -79,7 +79,8 @@ trait ArrayCacheTrait
         }
     }
 
-    protected function clearCache(): void {
+    protected function clearCache(): void
+    {
         $this->cache = [];
         $this->ttl = [];
     }

@@ -138,7 +138,7 @@ abstract class DriverArray implements DbArray
         if ($old instanceof SqlArray && $old->getTable()) {
             if (
                 $old->getTable() !== $new->getTable() &&
-                !str_starts_with($new->getTable(), 'tmp')
+                !\str_starts_with($new->getTable(), 'tmp')
             ) {
                 yield from $new->renameTable($old->getTable(), $new->getTable());
             } else {

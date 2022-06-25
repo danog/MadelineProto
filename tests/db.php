@@ -31,4 +31,4 @@ $map = [
 
 $MadelineProto->updateSettings($map[$argv[1]]);
 
-var_dump($MadelineProto->getFullInfo('danogentili'));
+\var_dump($MadelineProto->getFullInfo('danogentili'));
