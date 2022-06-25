@@ -118,7 +118,7 @@ n
 n
 n
 " | $p tests/testing.php
-    cycledb
+    #cycledb
 }
 
 reset()

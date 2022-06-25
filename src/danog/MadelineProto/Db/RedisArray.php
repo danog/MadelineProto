@@ -120,7 +120,7 @@ class RedisArray extends DriverArray
      */
     public function set(string|int $index, mixed $value): Promise
     {
-        if ($this->getCache($index) === $value) {
+        if ($this->hasCache($index) && $this->getCache($index) === $value) {
             return new Success();
         }
 
@@ -134,29 +134,17 @@ class RedisArray extends DriverArray
         return $request;
     }
 
-    /**
-     * Check if key isset.
-     *
-     * @param mixed $key
-     *
-     * @return Promise<bool> true if the offset exists, otherwise false
-     */
-    public function isset(string|int $key): Promise
-    {
-        return $this->db->has($this->rKey($key));
-    }
-
-
     public function offsetGet(mixed $offset): Promise
     {
+        $offset = (string) $offset;
         return call(function () use ($offset) {
-            if ($cached = $this->getCache($offset)) {
-                return $cached;
+            if ($this->hasCache($offset)) {
+                return $this->getCache($offset);
             }
 
             $value = yield $this->db->get($this->rKey($offset));
 
-            if ($value = \unserialize($value)) {
+            if ($value !== null && $value = \unserialize($value)) {
                 $this->setCache($offset, $value);
             }
 
@@ -233,6 +221,7 @@ class RedisArray extends DriverArray
      */
     public function clear(): Promise
     {
+        $this->clearCache();
         return call(function () {
             $request = $this->db->scan($this->itKey());
 

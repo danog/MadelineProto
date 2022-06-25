@@ -14,29 +14,32 @@ trait ArrayCacheTrait
     /**
      * @var array<mixed>
      */
-    protected array $cache = [];
+    private array $cache = [];
     /**
      * @var array<int>
      */
-    protected array $ttlValues = [];
+    private array $ttl = [];
 
-    /**
-     * TTL interval.
-     */
-    protected int $ttl = 5 * 60;
+    private int $cacheTtl = 5 * 60;
 
     /**
      * Cache cleanup watcher ID.
      */
     private ?string $cacheCleanupId = null;
 
-    protected function getCache(string $key, $default = null)
+    protected function setCacheTtl(int $ttl): void {
+        $this->cacheTtl = $ttl;
+    }
+
+    protected function getCache(string $key)
     {
-        if (!isset($this->ttlValues[$key])) {
-            return $default;
-        }
-        $this->ttlValues[$key] = \time() + $this->ttl;
+        $this->ttl[$key] = \time() + $this->cacheTtl;
         return $this->cache[$key];
+    }
+
+    protected function hasCache(string $key): bool
+    {
+        return isset($this->ttl[$key]);
     }
 
     /**
@@ -48,7 +51,7 @@ trait ArrayCacheTrait
     protected function setCache(string $key, $value): void
     {
         $this->cache[$key] = $value;
-        $this->ttlValues[$key] = \time() + $this->ttl;
+        $this->ttl[$key] = \time() + $this->cacheTtl;
     }
 
     /**
@@ -58,14 +61,14 @@ trait ArrayCacheTrait
      */
     protected function unsetCache(string $key): void
     {
-        unset($this->cache[$key], $this->ttlValues[$key]);
+        unset($this->cache[$key], $this->ttl[$key]);
     }
 
     protected function startCacheCleanupLoop(): void
     {
         $this->cacheCleanupId = Loop::repeat(
-            \max(1000, ($this->ttl * 1000) / 5),
-            Closure::fromCallable([$this, 'cleanupCache']),
+            \max(1000, ($this->cacheTtl * 1000) / 5),
+            fn () => $this->cleanupCache(),
         );
     }
     protected function stopCacheCleanupLoop(): void
@@ -76,19 +79,30 @@ trait ArrayCacheTrait
         }
     }
 
+    protected function clearCache(): void {
+        $this->cache = [];
+        $this->ttl = [];
+    }
+
     /**
      * Remove all keys from cache.
      */
-    protected function cleanupCache(): void
+    private function cleanupCache(): void
     {
+        $newValues = [];
+        $newTtl = [];
         $now = \time();
         $oldCount = 0;
-        foreach ($this->ttlValues as $cacheKey => $ttl) {
+        foreach ($this->ttl as $key => $ttl) {
             if ($ttl < $now) {
-                $this->unsetCache($cacheKey);
                 $oldCount++;
+            } else {
+                $newTtl[$key] = $this->ttl[$key];
+                $newValues[$key] = $this->cache[$key];
             }
         }
+        $this->ttl = $newTtl;
+        $this->cache = $newValues;
 
         Logger::log(
             \sprintf(

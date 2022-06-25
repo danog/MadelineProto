@@ -9,12 +9,17 @@ namespace danog\MadelineProto\Db\NullCache;
  */
 trait NullCacheTrait
 {
+    protected function setCacheTtl(int $ttl): void {
+    }
+    protected function hasCache(string $key): bool {
+        return false;
+    }
     /**
-     * @return void
+     * @return null
      */
-    protected function getCache(string $key, $default = null)
+    protected function getCache(string $key)
     {
-        return $default;
+        throw new \RuntimeException('Not implemented!');
     }
 
     /**
@@ -34,6 +39,10 @@ trait NullCacheTrait
      */
     protected function unsetCache(string $key): void
     {
+    }
+
+    protected function clearCache(): void {
+
     }
 
     protected function startCacheCleanupLoop(): void

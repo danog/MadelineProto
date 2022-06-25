@@ -26,6 +26,7 @@ class MysqlArray extends SqlArray
      */
     public function initStartup(): \Generator
     {
+        $this->setTable($this->table);
         yield from $this->initConnection($this->dbSettings);
     }
 
@@ -67,23 +68,6 @@ class MysqlArray extends SqlArray
         throw new Exception("An invalid statement type $type was provided!");
     }
 
-
-    /**
-     * Get value from row.
-     *
-     * @param array $row
-     * @return null|mixed
-     */
-    protected function getValue(array $row)
-    {
-        if ($row) {
-            if (!empty($row[0]['value'])) {
-                $row = \reset($row);
-            }
-            return \unserialize($row['value']);
-        }
-        return null;
-    }
 
     /**
      * Initialize connection.

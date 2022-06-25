@@ -74,6 +74,20 @@ abstract class DriverArray implements DbArray
     }
 
     /**
+     * Check if key isset.
+     *
+     * @param mixed $key
+     *
+     * @return Promise<bool> true if the offset exists, otherwise false
+     */
+    public function isset(string|int $key): Promise
+    {
+        return call(function () use ($key) {
+            return null !== yield $this->offsetGet($key);
+        });
+    }
+
+    /**
      * @param string $table
      * @param DbArray|array|null $previous
      * @param DatabaseAbstract $settings
@@ -89,7 +103,7 @@ abstract class DriverArray implements DbArray
 
         /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->dbSettings = $settings;
-        $instance->ttl = $settings->getCacheTtl();
+        $instance->setCacheTtl($settings->getCacheTtl());
 
         $instance->startCacheCleanupLoop();
 
@@ -124,7 +138,7 @@ abstract class DriverArray implements DbArray
         if ($old instanceof SqlArray && $old->getTable()) {
             if (
                 $old->getTable() !== $new->getTable() &&
-                \mb_strpos($new->getTable(), 'tmp') !== 0
+                !str_starts_with($new->getTable(), 'tmp')
             ) {
                 yield from $new->renameTable($old->getTable(), $new->getTable());
             } else {
@@ -159,8 +173,7 @@ abstract class DriverArray implements DbArray
                 } else {
                     $new->set(...$iterator->getCurrent());
                 }
-                $new->ttlValues = [];
-                $new->cache = [];
+                $new->clearCache();
             }
             yield $old->clear();
             Logger::log('Converting database done.', Logger::ERROR);

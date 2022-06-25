@@ -57,7 +57,7 @@
         "amphp/websocket-client": "^1.0",
         "psr/http-factory": "^1.0",
         "psr/log": "^1",
-        "webmozart/assert": "^1.10"
+        "webmozart/assert": "^1.11"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^5.2",

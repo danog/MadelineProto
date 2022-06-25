@@ -270,7 +270,7 @@ trait PeerHandler
     public function peerIsset($id): \Generator
     {
         try {
-            return (yield $this->chats[yield from $this->getInfo($id, MTProto::INFO_TYPE_ID)]) !== null;
+            return yield $this->chats->isset(yield from $this->getInfo($id, MTProto::INFO_TYPE_ID));
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {

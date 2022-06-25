@@ -131,3 +131,5 @@ madeline*phar.version
 e.php
 
 .phpdoc_cache
+
+tests/db-local.php

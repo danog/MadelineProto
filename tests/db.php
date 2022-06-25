@@ -22,12 +22,13 @@ use danog\MadelineProto\Settings\Database\Redis;
 
 $MadelineProto = new \danog\MadelineProto\API(__DIR__.'/../testing.madeline');
 
-$MadelineProto->updateSettings(match ($argv[1]) {
+$map = [
     'memory' => new Memory,
     'mysql' => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProto')->setPassword('test'),
     'postgres' => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProto')->setPassword('test'),
-    'redis' => (new Redis)->setUri('tcp://redis'),
-});
+    'redis' => (new Redis)->setUri('redis://redis'),
+];
 
-$MadelineProto->contacts->resolveUsername(username: 'danogentili');
-$MadelineProto->getFullInfo('danogentili');
+$MadelineProto->updateSettings($map[$argv[1]]);
+
+var_dump($MadelineProto->getFullInfo('danogentili'));

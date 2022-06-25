@@ -10,6 +10,8 @@ use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
 use Amp\Success;
 use danog\MadelineProto\Logger;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 use function Amp\call;
 
@@ -29,6 +31,10 @@ abstract class SqlArray extends DriverArray
     protected const SQL_ITERATE = 4;
     protected const SQL_CLEAR = 5;
 
+    /**
+     * @var array<self::SQL_*, string>
+     */
+    private array $queries = [];
 
     /**
      * Prepare statements.
@@ -39,26 +45,51 @@ abstract class SqlArray extends DriverArray
      */
     abstract protected function getSqlQuery(int $type): string;
 
+    public function setTable(string $table): DriverArray
+    {
+        $this->table = $table;
+
+        $this->queries = [
+            self::SQL_GET => $this->getSqlQuery(self::SQL_GET),
+            self::SQL_SET => $this->getSqlQuery(self::SQL_SET),
+            self::SQL_UNSET => $this->getSqlQuery(self::SQL_UNSET),
+            self::SQL_COUNT => $this->getSqlQuery(self::SQL_COUNT),
+            self::SQL_ITERATE => $this->getSqlQuery(self::SQL_ITERATE),
+            self::SQL_CLEAR => $this->getSqlQuery(self::SQL_CLEAR),
+        ];
+
+        return $this;
+    }
     /**
-     * Get value from row.
-     *
-     * @param array $row
-     * @return null|mixed
+     * Deserialize retrieved value
      */
-    abstract protected function getValue(array $row);
+    protected function getValue(string $value): mixed {
+        return unserialize($value);
+    }
+
+    /**
+     * Serialize retrieved value
+     */
+    protected function setValue(mixed $value): string {
+        return serialize($value);
+    }
 
 
+    /**
+     * @return Iterator<array{0: string, 1: mixed}>
+     */
     public function getIterator(): Iterator
     {
         return new Producer(function (callable $emit) {
-            $request = yield from $this->executeRaw($this->getSqlQuery(self::SQL_ITERATE));
+            $request = yield $this->execute($this->queries[self::SQL_ITERATE]);
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
-                yield $emit([$row['key'], $this->getValue($row)]);
+                yield $emit([$row['key'], $this->getValue($row['value'])]);
             }
         });
     }
+
     #[\ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
@@ -75,14 +106,19 @@ abstract class SqlArray extends DriverArray
 
     public function offsetGet(mixed $key): Promise
     {
+        $key = (string) $key;
+        if ($this->hasCache($key)) {
+            return new Success($this->getCache($key));
+        }
+
         return call(function () use ($key) {
-            if ($cached = $this->getCache($key)) {
-                return $cached;
+            $row = yield $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
+            if (!yield $row->advance()) {
+                return null;
             }
+            $row = $row->getCurrent();
 
-            $row = yield $this->execute($this->getSqlQuery(self::SQL_GET), ['index' => $key]);
-
-            if ($value = $this->getValue($row)) {
+            if ($value = $this->getValue($row['value'])) {
                 $this->setCache($key, $value);
             }
 
@@ -92,36 +128,31 @@ abstract class SqlArray extends DriverArray
 
     public function set(string|int $key, mixed $value): Promise
     {
-        if ($this->getCache($key) === $value) {
+        $key = (string) $key;
+        if ($this->hasCache($key) && $this->getCache($key) === $value) {
             return new Success();
         }
 
         $this->setCache($key, $value);
 
         $request = $this->execute(
-            $this->getSqlQuery(self::SQL_SET),
+            $this->queries[self::SQL_SET],
             [
                 'index' => $key,
-                'value' => \serialize($value),
+                'value' => $this->setValue($value),
             ]
         );
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn () => $this->setCache($key, $value));
+        $request->onResolve(function (?Throwable $err, ?CommandResult $result) use ($key, $value) {
+            if ($err) {
+                throw $err;
+            }
+            Assert::greaterThanEq($result->getAffectedRowCount(), 1);
+            $this->setCache($key, $value);
+        });
 
         return $request;
-    }
-
-    /**
-     * Check if key isset.
-     *
-     * @param mixed $key
-     *
-     * @return Promise<bool> true if the offset exists, otherwise false
-     */
-    public function isset(string|int $key): Promise
-    {
-        return call(fn () => null !== yield $this->offsetGet($key));
     }
 
 
@@ -139,10 +170,11 @@ abstract class SqlArray extends DriverArray
      */
     public function unset(string|int $key): Promise
     {
+        $key = (string) $key;
         $this->unsetCache($key);
 
         return $this->execute(
-            $this->getSqlQuery(self::SQL_UNSET),
+            $this->queries[self::SQL_UNSET],
             ['index' => $key]
         );
     }
@@ -158,19 +190,22 @@ abstract class SqlArray extends DriverArray
     public function count(): Promise
     {
         return call(function () {
-            $row = yield $this->execute($this->getSqlQuery(self::SQL_COUNT));
-            return $row[0]['count'] ?? 0;
+            /** @var ResultSet */
+            $row = yield $this->execute($this->queries[self::SQL_COUNT]);
+            Assert::true(yield $row->advance());
+            return $row->getCurrent()['count'];
         });
     }
 
     /**
      * Clear all elements.
      *
-     * @return Promise
+     * @return Promise<CommandResult>
      */
     public function clear(): Promise
     {
-        return $this->execute($this->getSqlQuery(self::SQL_CLEAR));
+        $this->clearCache();
+        return $this->execute($this->queries[self::SQL_CLEAR]);
     }
 
 
@@ -182,52 +217,23 @@ abstract class SqlArray extends DriverArray
      *
      * @psalm-param self::STATEMENT_* $stmt
      *
-     * @return Promise<array>
+     * @return Promise<CommandResult|ResultSet>
      * @throws \Throwable
      */
     protected function execute(string $sql, array $params = []): Promise
     {
-        return call(function () use ($sql, $params) {
-            $request = yield from $this->executeRaw($sql, $params);
-            $result = [];
-            if ($request instanceof ResultSet) {
-                while (yield $request->advance()) {
-                    $result[] = $request->getCurrent();
-                }
-            }
-            return $result;
-        });
-    }
-
-    /**
-     * Return raw query result.
-     *
-     * @param string $sql
-     * @param array $params
-     *
-     * @return \Generator<CommandResult|ResultSet>
-     */
-    protected function executeRaw(string $sql, array $params = []): \Generator
-    {
         if (
-            !empty($params['index'])
+            isset($params['index'])
             && !\mb_check_encoding($params['index'], 'UTF-8')
         ) {
             $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
         }
 
-        try {
-            foreach ($params as $key => $value) {
-                $value = $this->pdo->quote($value);
-                $sql = \str_replace(":$key", $value, $sql);
-            }
-
-            $request = yield $this->db->query($sql);
-        } catch (\Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
-            return [];
+        foreach ($params as $key => $value) {
+            $value = $this->pdo->quote($value);
+            $sql = \str_replace(":$key", $value, $sql);
         }
 
-        return $request;
+        return $this->db->query($sql);
     }
 }
