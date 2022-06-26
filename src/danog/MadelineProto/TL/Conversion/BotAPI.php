@@ -29,10 +29,7 @@ use const danog\Decoder\TYPES_IDS;
 
 trait BotAPI
 {
-    private function htmlEntityDecode(string $stuff): string
-    {
-        return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
-    }
+
     /**
      * @return ((bool|mixed|string)[][]|string)[][]
      *
@@ -355,109 +352,6 @@ trait BotAPI
         }
         return $arguments;
     }
-    private function parseNode($node, &$entities, &$new_message, &$offset): \Generator
-    {
-        switch ($node->nodeName) {
-            case 'br':
-                $new_message .= "\n";
-                $offset++;
-                break;
-            case 's':
-            case 'strike':
-            case 'del':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityStrike', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'u':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityUnderline', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'blockquote':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityBlockquote', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'b':
-            case 'strong':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityBold', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'i':
-            case 'em':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityItalic', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'code':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $entities[] = ['_' => 'messageEntityCode', 'offset' => $offset, 'length' => $length];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'pre':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $language = $node->getAttribute('language');
-                if ($language === null) {
-                    $language = '';
-                }
-                $entities[] = ['_' => 'messageEntityPre', 'offset' => $offset, 'length' => $length, 'language' => $language];
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            case 'p':
-                foreach ($node->childNodes as $node) {
-                    yield from $this->parseNode($node, $entities, $new_message, $offset);
-                }
-                break;
-            case 'a':
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $href = $node->getAttribute('href');
-                if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\\?id=(.*)|', $href, $matches)) {
-                    $mention = yield from $this->getInfo($matches[1]);
-                    if (!isset($mention['InputUser'])) {
-                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
-                    }
-                    $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => $offset, 'length' => $length, 'user_id' => $mention['InputUser']];
-                } elseif (\preg_match('|buttonurl:(.*)|', $href)) {
-                    if (!isset($entities['buttons'])) {
-                        $entities['buttons'] = [];
-                    }
-                    if (\strpos(\substr($href, -4), '|:new|') !== false) {
-                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => \str_replace(['buttonurl:', ':new'], '', $href), 'new' => true];
-                    } else {
-                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => \str_replace('buttonurl:', '', $href)];
-                    }
-                    break;
-                } else {
-                    $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => $offset, 'length' => $length, 'url' => $href];
-                }
-                $new_message .= $text;
-                $offset += $length;
-                break;
-            default:
-                $text = $this->htmlEntityDecode($node->textContent);
-                $length = StrTools::mbStrlen($text);
-                $new_message .= $text;
-                $offset += $length;
-                break;
-        }
-    }
     /**
      * Convert markdown and HTML messages.
      *
@@ -479,28 +373,29 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
-            $arguments['parse_mode'] = 'HTML';
+            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']),'markdown');
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
-            $new_message = '';
-            $arguments['message'] = \trim($this->htmlFixtags($arguments['message']));
-            $dom = new \DOMDocument();
-            $dom->loadHTML(\mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
-            if (!isset($arguments['entities'])) {
-                $arguments['entities'] = [];
-            }
-            $offset = 0;
-            foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
-                yield from $this->parseNode($node, $arguments['entities'], $new_message, $offset);
-            }
+            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']),'html');
+
+            /**
+             * deprecated future or you can fix it in future
+             * @deprecated
+             */
+            /*
             if (isset($arguments['entities']['buttons'])) {
                 $arguments['reply_markup'] = $this->buildRows($arguments['entities']['buttons']);
                 unset($arguments['entities']['buttons']);
-            }
-            unset($arguments['parse_mode']);
-            $arguments['message'] = $new_message;
+            } */
+            
         }
+        /**
+         * this is new future added! but for use must scape some special chars ...
+         */
+        if(\stripos($arguments['parse_mode'], 'combined') !== false){
+            [$arguments['message'],$arguments['entities']] = yield $this->parseText(\trim($arguments['message']),'markdownhtml');
+        }
+        unset($arguments['parse_mode']);
         return $arguments;
     }
     /**
@@ -629,41 +524,6 @@ trait BotAPI
             $delimOffset++;
         }
         return $finalArray;
-    }
-    private function htmlFixtags($text): string
-    {
-        $diff = 0;
-        \preg_match_all('#(.*?)(<(\\bu\\b|\\bs\\b|\\ba\\b|\\bb\\b|\\bstrong\\b|\\bblockquote\\b|\\bstrike\\b|\\bdel\\b|\\bem\\b|i|\\bcode\\b|\\bpre\\b)[^>]*>)(.*?)([<]\\s*/\\s*\\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
-        if ($matches) {
-            foreach ($matches as $match) {
-                if (\trim($match[1][0]) != '') {
-                    $mod = \htmlentities($match[1][0]);
-                    $temp = \substr($text, 0, $match[1][1] + $diff);
-                    $temp .= $mod;
-                    $temp .= \substr($text, $match[1][1] + $diff + \strlen($match[1][0]));
-                    $diff += \strlen($mod) - \strlen($match[1][0]);
-                    $text = $temp;
-                }
-                $mod = \htmlentities($match[4][0]);
-                $temp = \substr($text, 0, $match[4][1] + $diff);
-                $temp .= $mod;
-                $temp .= \substr($text, $match[4][1] + $diff + \strlen($match[4][0]));
-                $diff += \strlen($mod) - \strlen($match[4][0]);
-                $text = $temp;
-            }
-            $diff = 0;
-            \preg_match_all('#<a\\s*href=("|\')(.+?)("|\')\\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
-            foreach ($matches[2] as $match) {
-                $mod = \htmlentities($match[0]);
-                $temp = \substr($text, 0, $match[1] + $diff);
-                $temp .= $mod;
-                $temp .= \substr($text, $match[1] + $diff + \strlen($match[0]));
-                $diff += \strlen($mod) - \strlen($match[0]);
-                $text = $temp;
-            }
-            return $text;
-        }
-        return \htmlentities($text);
     }
     /**
      * @return ((array|string)[][]|string)[]
