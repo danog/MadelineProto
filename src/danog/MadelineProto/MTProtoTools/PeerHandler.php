@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Http\Client\Request;
 use Amp\Promise;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
@@ -820,7 +819,8 @@ trait PeerHandler
      * @param mixed $id
      * @return \Generator
      */
-    public function refreshPeerCache($id): \Generator {
+    public function refreshPeerCache($id): \Generator
+    {
         $id = yield from $this->getInfo($id)['bot_api_id'];
         if ($id < 0) {
             yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
@@ -834,7 +834,8 @@ trait PeerHandler
      * @param mixed $id
      * @return \Generator
      */
-    public function refreshFullPeerCache($id): \Generator {
+    public function refreshFullPeerCache($id): \Generator
+    {
         yield $this->full_chats->unset(yield $this->getInfo($id)['bot_api_id']);
         yield from $this->getFullInfo($id);
     }

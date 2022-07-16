@@ -42,7 +42,8 @@ trait InternalLoop
         $this->setLogger($API->getLogger());
     }
 
-    private function waitForAuthOrSignal(bool $waitAfter = true): \Generator {
+    private function waitForAuthOrSignal(bool $waitAfter = true): \Generator
+    {
         $API = $this->API;
         while (!$API->hasAllAuth()) {
             $waitAfter = false;

@@ -1844,7 +1844,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get info about the logged-in user, cached.
-     * 
+     *
      * Use fullGetSelf to bypass the cache.
      *
      * @return array|false

@@ -6751,11 +6751,14 @@ class InternalDoc extends APIFactory
     /**
      * Get info about the logged-in user, cached.
      *
-     * @return array|bool
+     * Use fullGetSelf to bypass the cache.
+     *
+     * @psalm-return array|false|\Amp\Promise<array|false>
+     * @return mixed
      */
-    public function getSelf(array $extra = [])
+    public function getSelf()
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Return current settings.
@@ -6951,6 +6954,13 @@ class InternalDoc extends APIFactory
      * @return mixed
      */
     public function isIpcWorker()
+    {
+        return $this->__call(__FUNCTION__, []);
+    }
+    /**
+     * Returns whether the current user is a premium user, cached.
+     */
+    public function isPremium()
     {
         return $this->__call(__FUNCTION__, []);
     }
@@ -7218,6 +7228,26 @@ class InternalDoc extends APIFactory
     public function readLine(string $prompt = '')
     {
         return \danog\MadelineProto\Tools::readLine($prompt);
+    }
+    /**
+     * Refresh full peer cache for a certain peer.
+     *
+     * @param mixed $id
+     * @return \Amp\Promise
+     */
+    public function refreshFullPeerCache($id, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$id, $extra]);
+    }
+    /**
+     * Refresh peer cache for a certain peer.
+     *
+     * @param mixed $id
+     * @return \Amp\Promise
+     */
+    public function refreshPeerCache($id, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Rekey secret chat.
