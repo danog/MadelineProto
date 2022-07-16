@@ -628,8 +628,6 @@ trait AuthKeyHandler
                 if ($this->getSettings()->getAuth()->getPfs()) {
                     if (!$cdn) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        //$authorized = $socket->authorized;
-                        //$socket->authorized = false;
                         $socket->setTempAuthKey(null);
                         $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id));
                         yield from $this->bindTempAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id);

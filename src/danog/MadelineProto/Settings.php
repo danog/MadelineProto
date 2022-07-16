@@ -14,7 +14,6 @@ use danog\MadelineProto\Settings\Files;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Settings\Logger;
 use danog\MadelineProto\Settings\Peer;
-use danog\MadelineProto\Settings\Pwr;
 use danog\MadelineProto\Settings\RPC;
 use danog\MadelineProto\Settings\SecretChats;
 use danog\MadelineProto\Settings\Serialization;
@@ -55,10 +54,6 @@ class Settings extends SettingsAbstract
      * Peer database settings.
      */
     protected Peer $peer;
-    /**
-     * PWRTelegram settings.
-     */
-    protected Pwr $pwr;
     /**
      * RPC settings.
      */
@@ -139,7 +134,6 @@ class Settings extends SettingsAbstract
         $this->files = new Files;
         $this->logger = new Logger;
         $this->peer = new Peer;
-        $this->pwr = new Pwr;
         $this->rpc = new RPC;
         $this->secretChats = new SecretChats;
         $this->serialization = new Serialization;
@@ -172,7 +166,6 @@ class Settings extends SettingsAbstract
         $this->files->mergeArray($settings);
         $this->logger->mergeArray($settings);
         $this->peer->mergeArray($settings);
-        $this->pwr->mergeArray($settings);
         $this->rpc->mergeArray($settings);
         $this->secretChats->mergeArray($settings);
         $this->serialization->mergeArray($settings);
@@ -219,8 +212,6 @@ class Settings extends SettingsAbstract
                 $this->logger->merge($settings);
             } elseif ($settings instanceof Peer) {
                 $this->peer->merge($settings);
-            } elseif ($settings instanceof Pwr) {
-                $this->pwr->merge($settings);
             } elseif ($settings instanceof RPC) {
                 $this->rpc->merge($settings);
             } elseif ($settings instanceof SecretChats) {
@@ -250,7 +241,6 @@ class Settings extends SettingsAbstract
         $this->files->merge($settings->files);
         $this->logger->merge($settings->logger);
         $this->peer->merge($settings->peer);
-        $this->pwr->merge($settings->pwr);
         $this->rpc->merge($settings->rpc);
         $this->secretChats->merge($settings->secretChats);
         $this->serialization->merge($settings->serialization);
@@ -438,30 +428,6 @@ class Settings extends SettingsAbstract
     public function setPeer(Peer $peer): self
     {
         $this->peer = $peer;
-
-        return $this;
-    }
-
-    /**
-     * Get PWRTelegram settings.
-     *
-     * @return Pwr
-     */
-    public function getPwr(): Pwr
-    {
-        return $this->pwr;
-    }
-
-    /**
-     * Set PWRTelegram settings.
-     *
-     * @param Pwr $pwr PWRTelegram settings.
-     *
-     * @return self
-     */
-    public function setPwr(Pwr $pwr): self
-    {
-        $this->pwr = $pwr;
 
         return $this;
     }

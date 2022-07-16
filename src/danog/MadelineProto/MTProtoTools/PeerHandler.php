@@ -102,6 +102,9 @@ trait PeerHandler
      */
     public function addUser(array $user): \Generator
     {
+        if ($user['id'] === ($this->authorization['user']['id'] ?? null)) {
+            $this->authorization['user'] = $user;
+        }
         $existingChat = yield $this->chats[$user['id']];
         if ($existingChat) {
             $this->cacheChatUsername($user['id'], $user);
@@ -632,18 +635,6 @@ trait PeerHandler
                     }
                 }
             }
-            if ($this->settings->getPwr()->getRequests() && $recursive) {
-                $dbres = [];
-                try {
-                    $dbres = \json_decode(yield from $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
-                } catch (\Throwable $e) {
-                    $this->logger->logger($e);
-                }
-                if (isset($dbres['ok']) && $dbres['ok']) {
-                    yield from $this->resolveUsername($dbres['result']);
-                    return yield from $this->getInfo($id, $type, false);
-                }
-            }
             if ($tried_simple && isset($this->caching_possible_username[$id])) {
                 $this->logger->logger("No access hash with {$id}, trying to fetch by username...");
                 $user = $this->caching_possible_username[$id];
@@ -822,6 +813,30 @@ trait PeerHandler
             $res['InputFolderPeer'] = ['_' => 'inputFolderPeer', 'peer' => $res['InputPeer'], 'folder_id' => $folder_id];
         }
         return $res;
+    }
+    /**
+     * Refresh peer cache for a certain peer.
+     *
+     * @param mixed $id
+     * @return \Generator
+     */
+    public function refreshPeerCache($id): \Generator {
+        $id = yield from $this->getInfo($id)['bot_api_id'];
+        if ($id < 0) {
+            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
+        } else {
+            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll(yield $this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
+        }
+    }
+    /**
+     * Refresh full peer cache for a certain peer.
+     *
+     * @param mixed $id
+     * @return \Generator
+     */
+    public function refreshFullPeerCache($id): \Generator {
+        yield $this->full_chats->unset(yield $this->getInfo($id)['bot_api_id']);
+        yield from $this->getFullInfo($id);
     }
     /**
      * When were full info for this chat last cached.
@@ -1015,9 +1030,6 @@ trait PeerHandler
         if (!$fullfetch) {
             unset($res['participants']);
         }
-        if ($fullfetch || $send) {
-            $this->storeDb($res);
-        }
         if (isset($res['photo'])) {
             $photo = [];
             foreach ([
@@ -1187,40 +1199,6 @@ trait PeerHandler
     private function getParticipantsHash($channel, $filter, $q, $offset, $limit): \Generator
     {
         return (yield $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)])['hash'] ?? 0;
-    }
-    private function storeDb($res, $force = false): \Generator
-    {
-        if (!$this->settings->getPwr()->getDbToken() || $this->settings->getConnection()->getTestMode()) {
-            return;
-        }
-        if (!empty($res)) {
-            if (isset($res['participants'])) {
-                unset($res['participants']);
-            }
-            $this->qres[] = $res;
-        }
-        if ($this->last_stored > \time() && !$force) {
-            //$this->logger->logger("========== WILL SERIALIZE IN ".($this->last_stored - time())." =============");
-            return false;
-        }
-        if (empty($this->qres)) {
-            return false;
-        }
-        try {
-            $payload = \json_encode($this->qres);
-            //$path = '/tmp/ids'.hash('sha256', $payload);
-            //file_put_contents($path, $payload);
-            $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
-            $request = new Request('https://id.pwrtelegram.xyz/db'.$this->settings->getPwr()->getDbToken().'/addnewmadeline?d=pls&from='.$id, 'POST');
-            $request->setHeader('content-type', 'application/json');
-            $request->setBody($payload);
-            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
-            $this->logger->logger("============ {$result} =============", \danog\MadelineProto\Logger::VERBOSE);
-            $this->qres = [];
-            $this->last_stored = \time() + 10;
-        } catch (\danog\MadelineProto\Exception $e) {
-            $this->logger->logger('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
-        }
     }
     /**
      * Resolve username (use getInfo instead).

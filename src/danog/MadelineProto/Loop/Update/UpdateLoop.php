@@ -71,21 +71,15 @@ class UpdateLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
-        while (!$API->hasAllAuth()) {
-            if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting {$this} due to signal");
-                return;
-            }
+        if (yield from $this->waitForAuthOrSignal()) {
+            return;
         }
         $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = 10;
         $first = true;
         while (true) {
-            while (!$API->hasAllAuth()) {
-                if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting {$this} due to signal");
-                    return;
-                }
+            if (yield from $this->waitForAuthOrSignal(false)) {
+                return;
             }
             $result = [];
             $toPts = $this->toPts;

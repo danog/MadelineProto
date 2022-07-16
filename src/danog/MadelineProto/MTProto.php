@@ -1844,12 +1844,21 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get info about the logged-in user, cached.
+     * 
+     * Use fullGetSelf to bypass the cache.
      *
-     * @return array|bool
+     * @return array|false
      */
-    public function getSelf()
+    public function getSelf(): array|false
     {
         return $this->authorization['user'] ?? false;
+    }
+    /**
+     * Returns whether the current user is a premium user, cached.
+     */
+    public function isPremium(): bool
+    {
+        return $this->getSelf()['premium'];
     }
     /**
      * Get info about the logged-in user, not cached.

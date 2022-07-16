@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto\Loop;
 
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 
 trait InternalLoop
@@ -39,5 +40,25 @@ trait InternalLoop
     {
         $this->API = $API;
         $this->setLogger($API->getLogger());
+    }
+
+    private function waitForAuthOrSignal(bool $waitAfter = true): \Generator {
+        $API = $this->API;
+        while (!$API->hasAllAuth()) {
+            $waitAfter = false;
+            $API->logger->logger("Waiting for auth in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
+            if (yield $this->waitSignal($this->pause())) {
+                $API->logger->logger("Exiting in {$this} while waiting for auth (init)!", Logger::LEVEL_ULTRA_VERBOSE);
+                return true;
+            }
+        }
+        if (!$waitAfter) {
+            return false;
+        }
+        if (yield $this->waitSignal($this->pause())) {
+            $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
+            return true;
+        }
+        return false;
     }
 }

@@ -56,7 +56,7 @@
         "symfony/polyfill-php80": "^1.18",
         "amphp/websocket-client": "^1.0",
         "psr/http-factory": "^1.0",
-        "psr/log": "^1",
+        "psr/log": "^1|^2|^3",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
