@@ -67,6 +67,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\SecretChats\ResponseHandler;
     use \danog\MadelineProto\SecretChats\SeqNoHandler;
     use \danog\MadelineProto\TL\Conversion\BotAPI;
+    use \danog\MadelineProto\TL\Conversion\Entities;
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
@@ -112,7 +113,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 157;
+    const V = 158;
     /**
      * Release version.
      *
