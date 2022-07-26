@@ -139,6 +139,7 @@ php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT
 cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
 echo -n "$COMMIT-$php" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
+reset
 
 cp tools/phar.php madeline.php
 runTest
