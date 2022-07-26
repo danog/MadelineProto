@@ -257,6 +257,8 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     if (!\getenv('TEST_USERNAME')) {
         throw new Exception('No TEST_USERNAME environment variable was provided!');
     }
+    yield $MadelineProto->refreshPeerCache(getenv('TEST_USERNAME'));
+    yield $MadelineProto->refreshFullPeerCache(getenv('TEST_USERNAME'));
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
     $media = [];
@@ -292,11 +294,6 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($media as $type => $inputMedia) {
-            $MadelineProto->logger("Sending multi $type");
-            yield $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
-                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-            ]]);
             $MadelineProto->logger("Sending $type");
             yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
             $MadelineProto->logger("Uploading $type");
@@ -306,7 +303,14 @@ $MadelineProto->loop(function () use ($MadelineProto) {
             $MadelineProto->logger("Re-sending $type");
             $inputMedia['file'] = $media;
             yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
-            $MadelineProto->logger("Done $type");
+            if ($type === 'sticker' || $type === 'voice') {
+                continue;
+            }
+            $MadelineProto->logger("Sending multi $type");
+            yield $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
+                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+            ]]);
         }
     }
 

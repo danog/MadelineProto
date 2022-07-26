@@ -413,6 +413,15 @@ class Connection
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
+        } elseif ($method === 'messages.sendMultiMedia') {
+            foreach ($arguments['multi_media'] as &$singleMedia) {
+                if ($singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
+                    || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
+                ) {
+                    $singleMedia['media'] = yield from $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
+                }
+            }
+            $this->logger->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
