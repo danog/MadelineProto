@@ -141,7 +141,6 @@ echo -n "$COMMIT-$php" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
 
-cp tools/phar.php madeline.php
 runTest
 db mysql
 k
