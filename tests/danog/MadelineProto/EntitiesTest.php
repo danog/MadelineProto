@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\StrTools;
 use PHPUnit\Framework\TestCase;
 
 class EntitiesTest extends TestCase
@@ -47,6 +48,23 @@ class EntitiesTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         self::$MadelineProto = null;
+    }
+    public function testMb()
+    {
+        $this->assertEquals(1, StrTools::mbStrlen('t'));
+        $this->assertEquals(1, StrTools::mbStrlen('я'));
+        $this->assertEquals(2, StrTools::mbStrlen('👍'));
+        $this->assertEquals(4, StrTools::mbStrlen('🇺🇦'));
+
+        $this->assertEquals('st', StrTools::mbSubstr('test', 2));
+        $this->assertEquals('aя', StrTools::mbSubstr('aяaя', 2));
+        $this->assertEquals('a👍', StrTools::mbSubstr('a👍a👍', 3));
+        $this->assertEquals('🇺🇦', StrTools::mbSubstr('🇺🇦🇺🇦', 4));
+
+        $this->assertEquals(['te', 'st'], StrTools::mbStrSplit('test', 2));
+        $this->assertEquals(['aя', 'aя'], StrTools::mbStrSplit('aяaя', 2));
+        $this->assertEquals(['a👍', 'a👍'], StrTools::mbStrSplit('a👍a👍', 3));
+        $this->assertEquals(['🇺🇦', '🇺🇦'], StrTools::mbStrSplit('🇺🇦🇺🇦', 4));
     }
     /**
      * @dataProvider provideEntities
