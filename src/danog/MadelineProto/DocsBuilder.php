@@ -138,7 +138,7 @@ class DocsBuilder
                 $constructors,
                 $methods
             );
-            \file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
+            \file_put_contents('types/'.$type.'.md', $header);
         }
         \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
         \file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);

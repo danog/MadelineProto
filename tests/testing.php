@@ -257,8 +257,8 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     if (!\getenv('TEST_USERNAME')) {
         throw new Exception('No TEST_USERNAME environment variable was provided!');
     }
-    yield $MadelineProto->refreshPeerCache(getenv('TEST_USERNAME'));
-    yield $MadelineProto->refreshFullPeerCache(getenv('TEST_USERNAME'));
+    yield $MadelineProto->refreshPeerCache(\getenv('TEST_USERNAME'));
+    yield $MadelineProto->refreshFullPeerCache(\getenv('TEST_USERNAME'));
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
     $media = [];
