@@ -58,34 +58,15 @@ abstract class StrTools extends Extension
      */
     public static function mbSubstr(string $text, int $offset, $length = null): string
     {
-        $mb_text_length = self::mbStrlen($text);
-        if ($offset < 0) {
-            $offset = $mb_text_length + $offset;
-        }
-        if ($length < 0) {
-            $length = $mb_text_length - $offset + $length;
-        } elseif ($length === null) {
-            $length = $mb_text_length - $offset;
-        }
-        $new_text = '';
-        $current_offset = 0;
-        $current_length = 0;
-        $text_length = \strlen($text);
-        for ($x = 0; $x < $text_length; $x++) {
-            $char = \ord($text[$x]);
-            if (($char & 0xc0) != 0x80) {
-                $current_offset += 1 + ($char >= 0xf0);
-                if ($current_offset > $offset) {
-                    $current_length += 1 + ($char >= 0xf0);
-                }
-            }
-            if ($current_offset > $offset) {
-                if ($current_length <= $length) {
-                    $new_text .= $text[$x];
-                }
-            }
-        }
-        return $new_text;
+        return mb_convert_encoding(
+            substr(
+                mb_convert_encoding($text, 'UTF-16'), 
+                $offset<<1,
+                $length === null ? null : ($length<<1)
+            ),
+            'UTF-8',
+            'UTF-16'
+        );
     }
     /**
      * Telegram UTF-8 multibyte split.
@@ -93,15 +74,13 @@ abstract class StrTools extends Extension
      * @param string  $text   Text
      * @param integer $length Length
      *
-     * @return array
+     * @return array<string>
      */
     public static function mbStrSplit(string $text, int $length): array
     {
-        // Todo: refactor
-        $tlength = \mb_strlen($text, 'UTF-8');
         $result = [];
-        for ($x = 0; $x < $tlength; $x += $length) {
-            $result[] = \mb_substr($text, $x, $length, 'UTF-8');
+        foreach (str_split(mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
+            $result []= mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
         }
         return $result;
     }
