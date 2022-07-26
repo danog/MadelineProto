@@ -125,26 +125,23 @@ reset()
     sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g;s|MADELINE_RELEASE_URL|disable|g' -i madeline.php
     cp madeline.php madelineBackup.php
 }
-
 k
 rm -f madeline.phar testing.madeline*
 
 tail -F MadelineProto.log &
-export ACTIONS_FORCE_PREVIOUS=1
 
 echo "Testing with previous version..."
+export ACTIONS_FORCE_PREVIOUS=1
+cp tools/phar.php madeline.php
+runTest
+db mysql
+k
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
 cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
 echo -n "$COMMIT-$php" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
-reset
-
-runTest
-db mysql
-k
-
 reset
 runTestSimple
 cycledb
