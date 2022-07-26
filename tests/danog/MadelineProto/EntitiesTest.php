@@ -2,8 +2,6 @@
 
 namespace danog\MadelineProto\Test;
 
-use CURLFile;
-use danog\Decoder\FileId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +53,7 @@ class EntitiesTest extends TestCase
      */
     public function testEntities(string $mode, string $html, string $bare, array $entities)
     {
-        $result = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: $html, parse_mode: $mode);
+        $result = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
         $result = self::$MadelineProto->MTProtoToBotAPI($result);
         $this->assertEquals($bare, $result['text']);
         $this->assertEquals($entities, $result['entities']);
@@ -83,6 +81,30 @@ class EntitiesTest extends TestCase
                     [
                         'offset' => 4,
                         'length' => 4,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'html',
+                'test<b>test </b>',
+                'testtest',
+                [
+                    [
+                        'offset' => 4,
+                        'length' => 4,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'html',
+                'test<b> test</b>',
+                'test test',
+                [
+                    [
+                        'offset' => 4,
+                        'length' => 5,
                         'type' => 'bold'
                     ]
                 ]
