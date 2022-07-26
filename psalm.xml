@@ -12,6 +12,7 @@
             <directory name="vendor" />
             <file name="src/danog/MadelineProto/InternalDoc.php" />
             <file name="src/danog/MadelineProto/TON/InternalDoc.php" />
+            <file name="src/danog/MadelineProto/Lua.php" />
         </ignoreFiles>
     </projectFiles>
 </psalm>

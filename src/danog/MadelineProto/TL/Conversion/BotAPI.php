@@ -373,13 +373,13 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']),'markdown');
+            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']), 'markdown');
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
-            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']),'html');
+            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']), 'html');
 
             /**
-             * deprecated future or you can fix it in future
+             * deprecated future or you can fix it in future.
              * @deprecated
              */
             /*
@@ -387,13 +387,12 @@ trait BotAPI
                 $arguments['reply_markup'] = $this->buildRows($arguments['entities']['buttons']);
                 unset($arguments['entities']['buttons']);
             } */
-            
         }
         /**
          * this is new future added! but for use must scape some special chars ...
          */
-        if(\stripos($arguments['parse_mode'], 'combined') !== false){
-            [$arguments['message'],$arguments['entities']] = yield $this->parseText(\trim($arguments['message']),'markdownhtml');
+        if (\stripos($arguments['parse_mode'], 'combined') !== false) {
+            [$arguments['message'],$arguments['entities']] = yield $this->parseText(\trim($arguments['message']), 'markdownhtml');
         }
         unset($arguments['parse_mode']);
         return $arguments;

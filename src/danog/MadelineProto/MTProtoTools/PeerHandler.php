@@ -816,7 +816,7 @@ trait PeerHandler
     /**
      * Refresh peer cache for a certain peer.
      *
-     * @param mixed $id
+     * @param mixed $id The peer to refresh
      * @return \Generator
      */
     public function refreshPeerCache($id): \Generator
@@ -831,7 +831,7 @@ trait PeerHandler
     /**
      * Refresh full peer cache for a certain peer.
      *
-     * @param mixed $id
+     * @param mixed $id The peer to refresh
      * @return \Generator
      */
     public function refreshFullPeerCache($id): \Generator

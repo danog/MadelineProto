@@ -170,6 +170,14 @@ trait Constructors
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
+                if ($param['name'] === 'entities' && $ptype === 'InputSingleMedia') {
+                    $hasentities = true;
+                    $table .= '|parse\\_mode| [string](/API_docs/types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
+';
+                    $params .= "parse_mode: 'string', ";
+                    $lua_params .= "parseMode='string', ";
+                    $pwr_params = "parseMode - string\n";
+                }
             }
             $params = "['_' => '".$constructor."'".$params.']';
             $lua_params = "{_='".$constructor."'".$lua_params.'}';

@@ -283,11 +283,20 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
 
-    foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
+    $peers = \json_decode(\getenv('TEST_DESTINATION_GROUPS'), true);
+    if (!$peers) {
+        die("No TEST_DESTINATION_GROUPS array was provided!");
+    }
+    foreach ($peers as $peer) {
         $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($media as $type => $inputMedia) {
+            $MadelineProto->logger("Sending multi $type");
+            yield $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
+                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+            ]]);
             $MadelineProto->logger("Sending $type");
             yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
             $MadelineProto->logger("Uploading $type");

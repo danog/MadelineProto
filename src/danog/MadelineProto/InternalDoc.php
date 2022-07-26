@@ -7232,7 +7232,7 @@ class InternalDoc extends APIFactory
     /**
      * Refresh full peer cache for a certain peer.
      *
-     * @param mixed $id
+     * @param mixed $id The peer to refresh
      * @return \Amp\Promise
      */
     public function refreshFullPeerCache($id, array $extra = [])
@@ -7242,7 +7242,7 @@ class InternalDoc extends APIFactory
     /**
      * Refresh peer cache for a certain peer.
      *
-     * @param mixed $id
+     * @param mixed $id The peer to refresh
      * @return \Amp\Promise
      */
     public function refreshPeerCache($id, array $extra = [])

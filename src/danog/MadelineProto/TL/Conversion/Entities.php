@@ -2,8 +2,6 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
-use danog\MadelineProto\API;
-
 const BOLD = 0;
 const ITALIC = 1;
 const UNDERLINE = 2;
@@ -44,37 +42,37 @@ trait Entities
     /**
      * br2nl
      * Checks if provided $separator is valid.
-     * 
+     *
      * @param string $string
-     * 
+     *
      * @param mixed $separator
-     * 
+     *
      * @return string|array|null
      */
     private function br2nl(
         string $string,
         mixed $separator = PHP_EOL
     ): string|array|null {
-        $separator = in_array($separator, [
+        $separator = \in_array($separator, [
             "\n",
             "\r",
             "\r\n",
             "\n\r",
-            chr(30),
-            chr(155),
+            \chr(30),
+            \chr(155),
             PHP_EOL,
         ])
             ? $separator
             : PHP_EOL; // Checks if provided $separator is valid.
-        return preg_replace("/\<br(\s*)?\/?\>/i", $separator, $string);
+        return \preg_replace("/\<br(\s*)?\/?\>/i", $separator, $string);
     }
 
-    /** 
+    /**
      * getEntityName
-     * get entity name by it codes
-     * 
+     * get entity name by it codes.
+     *
      * @param int $code
-     * 
+     *
      * @return string|bool
      */
     private function getEntityName(int $code): string|bool
@@ -110,12 +108,12 @@ trait Entities
         return false;
     }
 
-    /** 
+    /**
      * getEntityCode
-     * get entity name by it name
-     * 
+     * get entity name by it name.
+     *
      * @param string $name
-     * 
+     *
      * @return int|bool
      */
     private function getEntityCode(string $name): int|bool
@@ -151,12 +149,12 @@ trait Entities
         return false;
     }
 
-    /** 
+    /**
      * getEntityNameFromTag
-     * get entity name by it tag
-     * 
+     * get entity name by it tag.
+     *
      * @param string $tag
-     * 
+     *
      * @return int|bool
      */
     private function getEntityNameFromTag(string $tag): int|bool
@@ -204,15 +202,15 @@ trait Entities
 
     /**
      * setText
-     * set text string and offset
-     * 
+     * set text string and offset.
+     *
      * @param string $text
-     * 
+     *
      * @return void
      */
     private function setText(string $text)
     {
-        $text = htmlspecialchars_decode($text);
+        $text = \htmlspecialchars_decode($text);
         $l = $this->strlen($text);
         $this->text .= $text;
         $this->offset = $this->offset + $l;
@@ -220,51 +218,51 @@ trait Entities
 
     /**
      * decode
-     * decode text from UTF-8 to UTF-16LE to easily parse it tags
-     * 
+     * decode text from UTF-8 to UTF-16LE to easily parse it tags.
+     *
      * @param string $str
-     * 
+     *
      * @return array|string|false
      */
     private function decode(string $str): array|string|false
     {
-        return mb_convert_encoding($str, "UTF-8", "UTF-16LE");
+        return \mb_convert_encoding($str, "UTF-8", "UTF-16LE");
     }
 
     /**
-     * encode
-     * 
-     * encode parsed text from UTF-16LE to UTF-8 
+     * encode.
+     *
+     * encode parsed text from UTF-16LE to UTF-8
      * @param string $str
-     * 
+     *
      * @return array|string|false
      */
     private function encode(string $str): array|string|false
     {
-        return mb_convert_encoding($str, "UTF-16LE", "UTF-8");
+        return \mb_convert_encoding($str, "UTF-16LE", "UTF-8");
     }
 
     /**
-     * strlen
-     * 
+     * strlen.
+     *
      * @param string $str
-     * 
+     *
      * @return int|float
      */
     private function strlen(string $str): int|float
     {
-        return strlen($this->encode($str)) / 2;
+        return \strlen($this->encode($str)) / 2;
     }
 
-    /** 
-     * substr
-     * 
+    /**
+     * substr.
+     *
      * @param string $string
-     * 
+     *
      * @param int $offset
-     * 
+     *
      * @param null|int $length
-     * 
+     *
      * @return array|string|false
      */
     private function substr(
@@ -272,15 +270,15 @@ trait Entities
         int $offset,
         ?int $length = null
     ): array|string|false {
-        return $this->decode(substr($string, $offset * 2, $length * 2));
+        return $this->decode(\substr($string, $offset * 2, $length * 2));
     }
 
     /**
      * setOffset
-     * setOffset for text
-     * 
+     * setOffset for text.
+     *
      * @param string $start
-     * 
+     *
      * @return void
      */
     private function setOffset(string $start, mixed $end = "</a>"): void
@@ -291,16 +289,16 @@ trait Entities
 
     /**
      * setEntitie
-     * setEntitie for text and parse special tags to entities
-     * 
+     * setEntitie for text and parse special tags to entities.
+     *
      * @param int $type
-     * 
+     *
      * @param array $array
-     * 
+     *
      * @param string $intag
-     * 
+     *
      * @param int &$i
-     * 
+     *
      * @return array|null|bool
      */
     private function setEntitie(
@@ -313,7 +311,7 @@ trait Entities
         if ($type == ATAG) {
             if (isset($array["href"])) {
                 if (
-                    preg_match(
+                    \preg_match(
                         '/^(?:tg:\/\/user\?id=|mention:)(.*)$/isu',
                         $array["href"],
                         $matches
@@ -321,7 +319,7 @@ trait Entities
                 ) {
                     $userId = $matches[1];
 
-                    if (!is_numeric($userId)) {
+                    if (!\is_numeric($userId)) {
                         try {
                             $userId ??= $this->api->getInfo($matches[1])['id'];
                         } catch (\Throwable $e) {
@@ -342,7 +340,7 @@ trait Entities
             if (
                 $intag === "pre" &&
                 ((isset($array["class"]) &&
-                    preg_match(
+                    \preg_match(
                         '/^language\-(.*?)$/',
                         $array["class"],
                         $matches
@@ -357,7 +355,7 @@ trait Entities
             return $result;
         } elseif ($type == SPANTAG) {
             if (isset($array["class"])) {
-                $array["class"] = strtolower($array["class"]);
+                $array["class"] = \strtolower($array["class"]);
                 switch ($array["class"]) {
                     case "bold":
                         $result["_"] = $this->getEntityName(BOLD);
@@ -403,20 +401,20 @@ trait Entities
 
     /**
      * checkEntity
-     * checkEntity in text and identify it
-     * 
+     * checkEntity in text and identify it.
+     *
      * @param object|array $entity
-     * 
+     *
      * @param mixed &$type
-     * 
+     *
      * @return array
      */
     private function checkEntity(object|array $entity, &$type): array
     {
-        if (is_object($entity)) {
+        if (\is_object($entity)) {
             $entity = (array) $entity;
         }
-        if (is_array($entity)) {
+        if (\is_array($entity)) {
             if (!isset($entity["offset"])) {
                 throw new Exception('Can\'t find field "offset"');
             }
@@ -426,19 +424,19 @@ trait Entities
             if (!isset($entity["_"])) {
                 throw new Exception('Can\'t find field "type"');
             }
-            if (is_array($entity["_"]) || is_object($entity["_"])) {
+            if (\is_array($entity["_"]) || \is_object($entity["_"])) {
                 throw new Exception('Field "type" must be of type String');
             }
             if (
-                is_array($entity["offset"]) ||
-                is_object($entity["offset"]) ||
+                \is_array($entity["offset"]) ||
+                \is_object($entity["offset"]) ||
                 (string) (int) $entity["offset"] !== (string) $entity["offset"]
             ) {
                 throw new Exception('Field "offset" must be of type Integer');
             }
             if (
-                is_array($entity["length"]) ||
-                is_object($entity["length"]) ||
+                \is_array($entity["length"]) ||
+                \is_object($entity["length"]) ||
                 (string) (int) $entity["length"] !== (string) $entity["length"]
             ) {
                 throw new Exception('Field "length" must be of type Integer');
@@ -447,21 +445,20 @@ trait Entities
             $this->length = (int) $entity["length"];
             $type = $this->getEntityCode($entity["_"]);
             return $entity;
-        } else {
-            throw new Exception("expected an Object");
         }
+        throw new Exception("expected an Object");
     }
 
     /**
      * entitiesToHtml
-     * Covert entities to html tags
-     * 
+     * Covert entities to html tags.
+     *
      * @param string $text
      *
      * @param array|object $entities
-     * 
+     *
      * @param bool $specialchars
-     * 
+     *
      * @return string
      */
     public function entitiesToHtml(
@@ -511,8 +508,8 @@ trait Entities
             if (!isset($this->setOffset[$key])) {
                 $this->setOffset[$key] = [];
             }
-            $this->setOffset[$key] = array_merge(
-                array_reverse($this->setOffset2[$key]),
+            $this->setOffset[$key] = \array_merge(
+                \array_reverse($this->setOffset2[$key]),
                 $this->setOffset[$key]
             );
         }
@@ -527,15 +524,15 @@ trait Entities
             '/\\<\\000/',
             '/\\>\\000/',
         ];
-        for ($offset = 0; $offset < strlen($utf16) / 2; $offset++) {
-            $t = substr($utf16, $offset * 2, 2);
+        for ($offset = 0; $offset < \strlen($utf16) / 2; $offset++) {
+            $t = \substr($utf16, $offset * 2, 2);
             if (isset($this->setOffset[$offset])) {
                 foreach ($this->setOffset[$offset] as $tt) {
                     $htmlext .= $this->encode($tt);
                 }
                 unset($this->setOffset[$offset]);
             }
-            $htmlext .= $specialchars ? preg_replace($deltag2, $deltag, $t) : $t;
+            $htmlext .= $specialchars ? \preg_replace($deltag2, $deltag, $t) : $t;
         }
         foreach ($this->setOffset as $off) {
             foreach ($off as $tt) {
@@ -547,14 +544,14 @@ trait Entities
 
     /**
      * entitiesToMarkdownV1
-     * Covert entities to html tags v1 (Telegram version)
-     * 
+     * Covert entities to html tags v1 (Telegram version).
+     *
      * @param string $text
-     * 
-     * @param object|array $entities 
-     * 
+     *
+     * @param object|array $entities
+     *
      * @param bool $slashmarkdown
-     * 
+     *
      * @return string
      */
 
@@ -595,8 +592,8 @@ trait Entities
             if (!isset($this->setOffset[$key])) {
                 $this->setOffset[$key] = [];
             }
-            $this->setOffset[$key] = array_merge(
-                array_reverse($this->setOffset2[$key]),
+            $this->setOffset[$key] = \array_merge(
+                \array_reverse($this->setOffset2[$key]),
                 $this->setOffset[$key]
             );
         }
@@ -613,15 +610,15 @@ trait Entities
             '/`\\000/',
             '/\\[\\000/',
         ];
-        for ($offset = 0; $offset < strlen($utf16) / 2; $offset++) {
-            $t = substr($utf16, $offset * 2, 2);
+        for ($offset = 0; $offset < \strlen($utf16) / 2; $offset++) {
+            $t = \substr($utf16, $offset * 2, 2);
             if (isset($this->setOffset[$offset])) {
                 foreach ($this->setOffset[$offset] as $tt) {
                     $htmlext .= $this->encode($tt);
                 }
                 unset($this->setOffset[$offset]);
             }
-            $htmlext .= $slashmarkdown ? preg_replace($deltag2, $deltag, $t) : $t;
+            $htmlext .= $slashmarkdown ? \preg_replace($deltag2, $deltag, $t) : $t;
         }
         foreach ($this->setOffset as $off) {
             foreach ($off as $tt) {
@@ -633,14 +630,14 @@ trait Entities
 
     /**
      * entitiesToMarkdown
-     * convert given entities to markdown
-     * 
+     * convert given entities to markdown.
+     *
      * @param string $text
      *
      * @param object|array $entities
-     * 
+     *
      * @param bool $slashmarkdown
-     * 
+     *
      * @return string
      */
     public function entitiesToMarkdown(
@@ -686,8 +683,8 @@ trait Entities
             if (!isset($this->setOffset[$key])) {
                 $this->setOffset[$key] = [];
             }
-            $this->setOffset[$key] = array_merge(
-                array_reverse($this->setOffset2[$key]),
+            $this->setOffset[$key] = \array_merge(
+                \array_reverse($this->setOffset2[$key]),
                 $this->setOffset[$key]
             );
         }
@@ -733,15 +730,15 @@ trait Entities
             '/\\.\\000/',
             '/\\!\\000/',
         ];
-        for ($offset = 0; $offset < strlen($utf16) / 2; $offset++) {
-            $t = substr($utf16, $offset * 2, 2);
+        for ($offset = 0; $offset < \strlen($utf16) / 2; $offset++) {
+            $t = \substr($utf16, $offset * 2, 2);
             if (isset($this->setOffset[$offset])) {
                 foreach ($this->setOffset[$offset] as $tt) {
                     $htmlext .= $this->encode($tt);
                 }
                 unset($this->setOffset[$offset]);
             }
-            $htmlext .= $slashmarkdown ? preg_replace($deltag2, $deltag, $t) : $t;
+            $htmlext .= $slashmarkdown ? \preg_replace($deltag2, $deltag, $t) : $t;
         }
         foreach ($this->setOffset as $off) {
             foreach ($off as $tt) {
@@ -753,12 +750,12 @@ trait Entities
 
     /**
      * markdownV1ToHtml
-     * convert markdownv1 to html
-     * 
+     * convert markdownv1 to html.
+     *
      * @param string $str
-     * 
+     *
      * @param bool $specialchars
-     * 
+     *
      * @return string
      */
     public function markdownV1ToHtml(string $str, bool $specialchars = true): string
@@ -766,28 +763,28 @@ trait Entities
         if ($specialchars) {
             $str = $this->htmlSpecialChars($str);
         }
-        $len = mb_strlen($str);
+        $len = \mb_strlen($str);
         $backslash = ["_", "*", "`", "["];
         $marks = [];
         $marksi = -1;
 
         $i = 0;
         $is = function ($string) use (&$i, &$str) {
-            return mb_substr($str, $i, mb_strlen($string)) == $string;
+            return \mb_substr($str, $i, \mb_strlen($string)) == $string;
         };
         $find = function ($str, $find, &$i) use ($backslash) {
-            $findlen = mb_strlen($find);
+            $findlen = \mb_strlen($find);
             $newstr = "";
-            for ($i = 0; $i < mb_strlen($str); $i++) {
-                $curchar = mb_substr($str, $i, 1);
+            for ($i = 0; $i < \mb_strlen($str); $i++) {
+                $curchar = \mb_substr($str, $i, 1);
 
                 if (
                     $curchar == "\\" &&
-                    in_array(mb_substr($str, $i + 1, 1), $backslash)
+                    \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
-                    $newstr .= mb_substr($str, $i + 1, 1);
+                    $newstr .= \mb_substr($str, $i + 1, 1);
                     $i++;
-                } elseif (mb_substr($str, $i, $findlen) == $find) {
+                } elseif (\mb_substr($str, $i, $findlen) == $find) {
                     return $newstr;
                 } else {
                     $newstr .= $curchar;
@@ -799,7 +796,7 @@ trait Entities
         $htmli = 0;
         $setstr = function ($starttag) use (&$html, &$htmli) {
             $html .= $starttag;
-            $htmli += mb_strlen($starttag);
+            $htmli += \mb_strlen($starttag);
         };
         $i = 0;
         $setmark = function ($mark, &$currentmarki = 0, $fakemark = false) use (
@@ -816,12 +813,11 @@ trait Entities
                     $i,
                 ];
                 return true;
-            } else {
-                $currentmarki = $marks[$marksi][1];
-                unset($marks[$marksi]);
-                $marksi--;
-                return false;
             }
+            $currentmarki = $marks[$marksi][1];
+            unset($marks[$marksi]);
+            $marksi--;
+            return false;
         };
         $currentmarki = 0;
         $setstr2 = function ($endtag, $starttaglen) use (
@@ -834,16 +830,16 @@ trait Entities
                 $setstr($endtag);
             } else {
                 $htmli -= $starttaglen;
-                $html = mb_substr($html, 0, $htmli);
+                $html = \mb_substr($html, 0, $htmli);
             }
         };
         for ($i = 0; $i < $len; $i++) {
-            $curchar = mb_substr($str, $i, 1);
+            $curchar = \mb_substr($str, $i, 1);
             if (
                 $curchar == "\\" &&
-                in_array(mb_substr($str, $i + 1, 1), $backslash)
+                \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
-                $setstr(mb_substr($str, $i + 1, 1));
+                $setstr(\mb_substr($str, $i + 1, 1));
                 $i++;
             } elseif ($curchar == "*") {
                 if ($setmark("*", $currentmarki)) {
@@ -861,47 +857,47 @@ trait Entities
                 $setmark("[", $currentmarki, "]");
             } elseif ($curchar == "]") {
                 if (!$setmark("]", $currentmarki, false) && $is("](")) {
-                    $txt = mb_substr(
+                    $txt = \mb_substr(
                         $html,
                         $currentmarki,
                         $htmli - $currentmarki
                     );
                     if ($txt !== "") {
                         $i++;
-                        $strfind = $find(mb_substr($str, $i + 1), ")", $pos);
+                        $strfind = $find(\mb_substr($str, $i + 1), ")", $pos);
                         if ($strfind !== false) {
                             $i += $pos + 1;
                             $html =
-                                mb_substr($html, 0, $currentmarki) .
+                                \mb_substr($html, 0, $currentmarki) .
                                 '<a href="' .
                                 $strfind .
                                 '">' .
                                 $txt .
                                 "</a>";
-                            $htmli = mb_strlen($html);
+                            $htmli = \mb_strlen($html);
                         }
                     }
                 }
             } elseif ($curchar == "`") {
                 if ($is("```")) {
                     $i += 2;
-                    $strfind = $find(mb_substr($str, $i + 1), "```", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), "```", $pos);
                     if ($strfind !== false) {
                         $i += $pos + 3;
                         if ($strfind !== "") {
                             $lang = "";
-                            $ex = explode("\n", $f, 2);
+                            $ex = \explode("\n", $f, 2);
                             if (isset($ex[1])) {
-                                $exx = explode(" ", $ex[0], 2);
+                                $exx = \explode(" ", $ex[0], 2);
                                 if (isset($exx[1])) {
                                     $ex[1] = " " . $exx[1];
                                 }
-                                $lang = trim($exx[0]);
+                                $lang = \trim($exx[0]);
                                 $strfind = $ex[1];
                             }
 
                             if ($lang) {
-                                $strfind = trim($f);
+                                $strfind = \trim($f);
                                 if ($strfind !== "") {
                                     $setstr(
                                         '<pre><code class="language-' .
@@ -921,7 +917,7 @@ trait Entities
                         );
                     }
                 } else {
-                    $strfind = $find(mb_substr($str, $i + 1), "`", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), "`", $pos);
                     if ($strfind !== false) {
                         if ($strfind !== "") {
                             $setstr("<code>" . $strfind . "</code>");
@@ -934,7 +930,7 @@ trait Entities
                         );
                     }
                 }
-            } elseif (in_array($curchar, $backslash)) {
+            } elseif (\in_array($curchar, $backslash)) {
                 throw new Exception(
                     "Character '$curchar' is reserved and must be escaped with the preceding '\'"
                 );
@@ -959,13 +955,13 @@ trait Entities
     }
 
     /**
-     * markdownToHtml 
-     * convert html tags to markdown format
-     * 
+     * markdownToHtml
+     * convert html tags to markdown format.
+     *
      * @param string $str
-     * 
+     *
      * @param bool $specialchars
-     * 
+     *
      * @return string
      */
     public function markdownToHtml(string $str, bool $specialchars = true): string
@@ -973,7 +969,7 @@ trait Entities
         if ($specialchars) {
             $str = $this->htmlSpecialChars($str);
         }
-        $len = mb_strlen($str);
+        $len = \mb_strlen($str);
         $backslash = [
             "_",
             "*",
@@ -999,21 +995,21 @@ trait Entities
 
         $i = 0;
         $is = function ($string) use (&$i, &$str) {
-            return mb_substr($str, $i, mb_strlen($string)) == $string;
+            return \mb_substr($str, $i, \mb_strlen($string)) == $string;
         };
         $find = function ($str, $find, &$i) use ($backslash) {
-            $findlen = mb_strlen($find);
+            $findlen = \mb_strlen($find);
             $newstr = "";
-            for ($i = 0; $i < mb_strlen($str); $i++) {
-                $curchar = mb_substr($str, $i, 1);
+            for ($i = 0; $i < \mb_strlen($str); $i++) {
+                $curchar = \mb_substr($str, $i, 1);
 
                 if (
                     $curchar == "\\" &&
-                    in_array(mb_substr($str, $i + 1, 1), $backslash)
+                    \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
-                    $newstr .= mb_substr($str, $i + 1, 1);
+                    $newstr .= \mb_substr($str, $i + 1, 1);
                     $i++;
-                } elseif (mb_substr($str, $i, $findlen) == $find) {
+                } elseif (\mb_substr($str, $i, $findlen) == $find) {
                     return $newstr;
                 } else {
                     $newstr .= $curchar;
@@ -1025,7 +1021,7 @@ trait Entities
         $htmli = 0;
         $setstr = function ($starttag) use (&$html, &$htmli) {
             $html .= $starttag;
-            $htmli += mb_strlen($starttag);
+            $htmli += \mb_strlen($starttag);
         };
         $i = 0;
         $setmark = function ($mark, &$currentmarki = 0, $fakemark = false) use (
@@ -1042,12 +1038,11 @@ trait Entities
                     $i,
                 ];
                 return true;
-            } else {
-                $currentmarki = $marks[$marksi][1];
-                unset($marks[$marksi]);
-                $marksi--;
-                return false;
             }
+            $currentmarki = $marks[$marksi][1];
+            unset($marks[$marksi]);
+            $marksi--;
+            return false;
         };
         $currentmarki = 0;
         $setstr2 = function ($endtag, $starttaglen) use (
@@ -1060,16 +1055,16 @@ trait Entities
                 $setstr($endtag);
             } else {
                 $htmli -= $starttaglen;
-                $html = mb_substr($html, 0, $htmli);
+                $html = \mb_substr($html, 0, $htmli);
             }
         };
         for ($i = 0; $i < $len; $i++) {
-            $curchar = mb_substr($str, $i, 1);
+            $curchar = \mb_substr($str, $i, 1);
             if (
                 $curchar == "\\" &&
-                in_array(mb_substr($str, $i + 1, 1), $backslash)
+                \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
-                $setstr(mb_substr($str, $i + 1, 1));
+                $setstr(\mb_substr($str, $i + 1, 1));
                 $i++;
             } elseif ($curchar == "*") {
                 $tag = "i";
@@ -1119,47 +1114,47 @@ trait Entities
                 $setmark("[", $currentmarki, "]");
             } elseif ($curchar == "]") {
                 if (!$setmark("]", $currentmarki, false) && $is("](")) {
-                    $txt = mb_substr(
+                    $txt = \mb_substr(
                         $html,
                         $currentmarki,
                         $htmli - $currentmarki
                     );
                     if ($txt !== "") {
                         $i++;
-                        $strfind = $find(mb_substr($str, $i + 1), ")", $pos);
+                        $strfind = $find(\mb_substr($str, $i + 1), ")", $pos);
                         if ($strfind !== false) {
                             $i += $pos + 1;
                             $html =
-                                mb_substr($html, 0, $currentmarki) .
+                                \mb_substr($html, 0, $currentmarki) .
                                 '<a href="' .
                                 $strfind .
                                 '">' .
                                 $txt .
                                 "</a>";
-                            $htmli = mb_strlen($html);
+                            $htmli = \mb_strlen($html);
                         }
                     }
                 }
             } elseif ($curchar == "`") {
                 if ($is("```")) {
                     $i += 2;
-                    $strfind = $find(mb_substr($str, $i + 1), "```", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), "```", $pos);
                     if ($strfind !== false) {
                         $i += $pos + 3;
                         if ($strfind !== "") {
                             $lang = "";
-                            $ex = explode("\n", $f, 2);
+                            $ex = \explode("\n", $f, 2);
                             if (isset($ex[1])) {
-                                $exx = explode(" ", $ex[0], 2);
+                                $exx = \explode(" ", $ex[0], 2);
                                 if (isset($exx[1])) {
                                     $ex[1] = " " . $exx[1];
                                 }
-                                $lang = trim($exx[0]);
+                                $lang = \trim($exx[0]);
                                 $strfind = $ex[1];
                             }
 
                             if ($lang) {
-                                $strfind = trim($f);
+                                $strfind = \trim($f);
                                 if ($strfind !== "") {
                                     $setstr(
                                         '<pre><code class="language-' .
@@ -1179,7 +1174,7 @@ trait Entities
                         );
                     }
                 } else {
-                    $strfind = $find(mb_substr($str, $i + 1), "`", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), "`", $pos);
                     if ($strfind !== false) {
                         if ($strfind !== "") {
                             $setstr("<code>" . $strfind . "</code>");
@@ -1192,7 +1187,7 @@ trait Entities
                         );
                     }
                 }
-            } elseif (in_array($curchar, $backslash)) {
+            } elseif (\in_array($curchar, $backslash)) {
                 throw new Exception(
                     "Character '$curchar' is reserved and must be escaped with the preceding '\'"
                 );
@@ -1221,12 +1216,12 @@ trait Entities
     }
 
     /**
-     * elementReader
-     * 
+     * elementReader.
+     *
      * @param mixed $element
-     * 
+     *
      * @param bool $tag
-     * 
+     *
      * @return void
      */
     private function elementReader($element, $tag = false): void
@@ -1265,7 +1260,7 @@ trait Entities
         if ($entitie) {
             $entitie["length"] = $this->offset - $entitie["offset"];
             if ($entitie["length"] > 0) {
-                $this->entities[$ident] = array_merge(
+                $this->entities[$ident] = \array_merge(
                     $entitie,
                     $this->entities[$ident]
                 );
@@ -1276,12 +1271,12 @@ trait Entities
     }
     /**
      * htmlToEntities
-     * convert html tags to entities
-     * 
+     * convert html tags to entities.
+     *
      * @param string $text
-     * 
+     *
      * @param mixed &$entities
-     * 
+     *
      * @return string
      */
     public function htmlToEntities(string $text, &$entities): string
@@ -1292,13 +1287,13 @@ trait Entities
         $this->offset = 0;
         $this->text = "";
         $dom = new \DOMDocument();
-        $internalErrors = libxml_use_internal_errors(true);
-        $dom->loadxml("<body>" . str_replace(['&amp;', '&#039;', '&quot;', '&'], ['&', '\'', "\"", '&amp;'], $text) . "</body>");
-        $ar = libxml_get_errors();
+        $internalErrors = \libxml_use_internal_errors(true);
+        $dom->loadxml("<body>" . \str_replace(['&amp;', '&#039;', '&quot;', '&'], ['&', '\'', "\"", '&amp;'], $text) . "</body>");
+        $ar = \libxml_get_errors();
         if (!empty($ar)) {
-            libxml_clear_errors();
+            \libxml_clear_errors();
             foreach ($ar as $er) {
-                $er->message = preg_replace(
+                $er->message = \preg_replace(
                     [
                         "/: and body/",
                         "/and body(.+)/isu",
@@ -1307,23 +1302,23 @@ trait Entities
                     [": ", ""],
                     $er->message
                 );
-                if (in_array($er->code, [76, 40, 801, 73, 800])) {
+                if (\in_array($er->code, [76, 40, 801, 73, 800])) {
                     if (
                         $er->code == 801 &&
                         $this->getEntityNameFromTag(
-                            explode(" ", $er->message, 3)[1]
+                            \explode(" ", $er->message, 3)[1]
                         ) !== false
                     ) {
                         continue;
                     }
-                    libxml_use_internal_errors($internalErrors);
+                    \libxml_use_internal_errors($internalErrors);
                     throw new Exception(
                         $er->message . " in line " . $er->line . PHP_EOL
                     );
                 }
             }
         }
-        libxml_use_internal_errors($internalErrors);
+        \libxml_use_internal_errors($internalErrors);
         $this->elementReader($dom->getElementsByTagName("body")[0]);
         $entities = $this->entities;
         return $this->text;
@@ -1331,12 +1326,12 @@ trait Entities
 
     /**
      * markdownToEntities
-     * convert markdown format to entities
-     * 
+     * convert markdown format to entities.
+     *
      * @param string $text
-     * 
+     *
      * @param mixed &$entities
-     * 
+     *
      * @return string
      */
     public function markdownToEntities(string $text, &$entities): string
@@ -1348,13 +1343,13 @@ trait Entities
     }
 
     /**
-     * markdownV1ToEntities 
-     * convert markdownV1 to entities
-     * 
+     * markdownV1ToEntities
+     * convert markdownV1 to entities.
+     *
      * @param string $text
-     * 
+     *
      * @param mixed &$entities
-     * 
+     *
      * @return string
      */
     public function markdownV1ToEntities(string $text, &$entities): string
@@ -1367,12 +1362,12 @@ trait Entities
 
     /**
      * markdownhtmlToEntities
-     * convert mixed format(with markdown and html) to entities
-     * 
+     * convert mixed format(with markdown and html) to entities.
+     *
      * @param string $text
-     * 
+     *
      * @param mixed &$entities
-     * 
+     *
      * @return string
      */
     public function markdownhtmlToEntities(string $text, &$entities): string
@@ -1383,16 +1378,16 @@ trait Entities
         );
     }
 
-     /**
-     * markdownV1htmlToEntities
-     * convert mixed format(with markdownv1 and html) to entities
-     * 
-     * @param string $text
-     * 
-     * @param mixed &$entities
-     * 
-     * @return string
-     */
+    /**
+    * markdownV1htmlToEntities
+    * convert mixed format(with markdownv1 and html) to entities.
+    *
+    * @param string $text
+    *
+    * @param mixed &$entities
+    *
+    * @return string
+    */
     public function markdownV1htmlToEntities(string $text, &$entities): string
     {
         return $this->htmlToEntities(
@@ -1400,15 +1395,15 @@ trait Entities
             $entities
         );
     }
-    
+
     /**
      * htmlToMarkdown
-     * convert html tags to markdown format
-     * 
+     * convert html tags to markdown format.
+     *
      * @param string $str
-     * 
+     *
      * @param bool $slashmarkdown
-     * 
+     *
      * @return string
      */
     public function htmlToMarkdown(string $str, bool $slashmarkdown = true): string
@@ -1419,12 +1414,12 @@ trait Entities
 
     /**
      * htmlToMarkdownv1
-     * convert html tags to markdownv1 format
-     * 
+     * convert html tags to markdownv1 format.
+     *
      * @param string $str
-     * 
+     *
      * @param bool $slashmarkdown
-     * 
+     *
      * @return string
      */
     public function htmlToMarkdownv1(string $str, bool $slashmarkdown = true): string
@@ -1434,30 +1429,30 @@ trait Entities
     }
 
     /**
-     * htmlSpecialChars
-     * 
+     * htmlSpecialChars.
+     *
      * @param string $str
-     * 
+     *
      * @return string
      */
     private function htmlSpecialChars(string $str): string
     {
-        return str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
+        return \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
     }
 
     /**
      * parseText (main function)
-     * function return formated text with entities or tags or format it to markdown & markdownv1
-     * 
+     * function return formated text with entities or tags or format it to markdown & markdownv1.
+     *
      * @param string $text
-     * 
+     *
      * @param string $mode
-     * 
+     *
      * @return string|array
      */
     public function parseText(string $text, string $mode = "html"): string|array
     {
-        $mode = strtolower($mode);
+        $mode = \strtolower($mode);
         $entities = [];
 
         $text = match ($mode) {
