@@ -294,6 +294,13 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($media as $type => $inputMedia) {
+            if ($type !== 'sticker' && $type !== 'voice') {
+                $MadelineProto->logger("Sending multi $type");
+                yield $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
+                    ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+                    ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+                ]]);
+            }
             $MadelineProto->logger("Sending $type");
             yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
             $MadelineProto->logger("Uploading $type");
@@ -303,14 +310,6 @@ $MadelineProto->loop(function () use ($MadelineProto) {
             $MadelineProto->logger("Re-sending $type");
             $inputMedia['file'] = $media;
             yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
-            if ($type === 'sticker' || $type === 'voice') {
-                continue;
-            }
-            $MadelineProto->logger("Sending multi $type");
-            yield $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
-                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-                ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-            ]]);
         }
     }
 
