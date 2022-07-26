@@ -58,9 +58,9 @@ abstract class StrTools extends Extension
      */
     public static function mbSubstr(string $text, int $offset, $length = null): string
     {
-        return mb_convert_encoding(
-            substr(
-                mb_convert_encoding($text, 'UTF-16'), 
+        return \mb_convert_encoding(
+            \substr(
+                \mb_convert_encoding($text, 'UTF-16'),
                 $offset<<1,
                 $length === null ? null : ($length<<1)
             ),
@@ -79,8 +79,8 @@ abstract class StrTools extends Extension
     public static function mbStrSplit(string $text, int $length): array
     {
         $result = [];
-        foreach (str_split(mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
-            $result []= mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+        foreach (\str_split(\mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
+            $result []= \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
         }
         return $result;
     }

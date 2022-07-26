@@ -871,7 +871,7 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-                $full = yield from $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['InputUser']]);
+                $full = (yield from $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['InputUser']]))['full_user'];
                 break;
             case 'chat':
                 $full = (yield from $this->methodCallAsyncRead('messages.getFullChat', $partial))['full_chat'];

@@ -24,7 +24,7 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
-use danog\MadelineProto\MTProtoTools\PeerHandler;
+use danog\MadelineProto\API;
 
 use const danog\Decoder\ANIMATION;
 use const danog\Decoder\AUDIO;
@@ -102,7 +102,7 @@ trait BotAPIFiles
                 if ($photoSize->getDialogId() < 0) {
                     $res['Chat'] = [
                         '_' => $photoSize->getDialogId() < -1000000000000 ? 'channel' : 'chat',
-                        'id' => $photoSize->getDialogId() < -1000000000000 ? PeerHandler::fromSupergroup($photoSize->getDialogId()) : -$photoSize->getDialogId(),
+                        'id' => $photoSize->getDialogId() < -1000000000000 ? API::fromSupergroup($photoSize->getDialogId()) : -$photoSize->getDialogId(),
                         'access_hash' => $photoSize->getDialogAccessHash(),
                         'photo' => [
                             '_' => 'chatPhoto',

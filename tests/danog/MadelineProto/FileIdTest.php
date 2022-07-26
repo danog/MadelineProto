@@ -105,7 +105,8 @@ class FileIdTest extends TestCase
     public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
-        self::$MadelineProto->downloadToFile($fileIdStr, '/dev/null');
+        self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
+        \unlink("/tmp/$fileIdStr");
         $this->assertTrue(true);
     }
     /**
@@ -237,7 +238,7 @@ class FileIdTest extends TestCase
     }
     public function provideChats(): array
     {
-        return [\getenv('DEST'), '@MadelineProto', -559184257];
+        return [\getenv('DEST'), '@MadelineProto'];
     }
     public function provideUrls(): array
     {

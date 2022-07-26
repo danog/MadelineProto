@@ -226,7 +226,11 @@ class AnnotationsBuilder
             }
             $name = StrTools::toCamelCase($name);
             $name = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
-            $doc = 'public function ';
+            $doc = 'public ';
+            if ($static) {
+                $doc .= 'static ';
+            }
+            $doc .= 'function ';
             $doc .= $name;
             $doc .= '(';
             $paramList = '';
