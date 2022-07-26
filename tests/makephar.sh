@@ -39,6 +39,7 @@ k
 rm -f madeline.phar testing.madeline*
 
 php8.0 $(which composer) update
+php8.0 vendor/bin/phpunit
 php8.0 vendor/bin/phabel publish -d "$TAG"
 
 rm -rf vendor*
