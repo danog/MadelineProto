@@ -1,5 +1,9 @@
 <?php
 
+if (PHP_OS_FAMILY === 'Windows') {
+    echo PHP_EOL.'========='.PHP_EOL.'WARNING: MadelineProto does not support Windows, please use Linux or another UNIX system (WSL on Windows, Mac OS, BSD, etc).'.PHP_EOL.'========='.PHP_EOL.PHP_EOL;
+}
+
 // Polyfill for some PHP 5 functions
 function callMe($allable, ...$args)
 {
