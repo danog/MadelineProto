@@ -22,6 +22,9 @@ abstract class MadelineTestCase extends TestCase
      */
     public static function setUpBeforeClass(): void
     {
+        if (self::$MadelineProto !== null) {
+            return;
+        }
         self::$MadelineProto = new API(
             'testing.madeline',
             [
