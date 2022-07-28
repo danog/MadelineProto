@@ -836,7 +836,7 @@ trait PeerHandler
      */
     public function refreshFullPeerCache($id): \Generator
     {
-        yield $this->full_chats->unset((yield from $this->getInfo($id))['bot_api_id']);
+        yield $this->full_chats->unset((yield from $this->getFullInfo($id))['bot_api_id']);
         yield from $this->getFullInfo($id);
     }
     /**
