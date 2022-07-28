@@ -23,6 +23,7 @@ final class DOMEntities
     public function __construct(string $html)
     {
         $dom = new \DOMDocument();
+        $html = \preg_replace("/\<br(\s*)?\/?\>/i", "\n", $html);
         $dom->loadxml("<body>" . \str_replace(['&amp;', '&#039;', '&quot;', '&'], ['&', '\'', "\"", '&amp;'], \trim($html)) . "</body>");
         $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
     }
