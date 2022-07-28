@@ -50,6 +50,30 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
+                '<b>test</b><br>test',
+                "test\ntest",
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'html',
+                '<b>test</b><br/>test',
+                "test\ntest",
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'html',
                 '🇺🇦<b>🇺🇦</b>',
                 '🇺🇦🇺🇦',
                 [
