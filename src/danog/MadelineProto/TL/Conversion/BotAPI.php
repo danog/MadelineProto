@@ -29,7 +29,10 @@ use const danog\Decoder\TYPES_IDS;
 
 trait BotAPI
 {
-
+    private function htmlEntityDecode(string $stuff): string
+    {
+        return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
+    }
     /**
      * @return ((bool|mixed|string)[][]|string)[][]
      *
@@ -206,6 +209,18 @@ trait BotAPI
                 unset($data['_']);
                 $data['type'] = 'bold';
                 return $data;
+            case 'messageEntityStrike':
+                unset($data['_']);
+                $data['type'] = 'strikethrough';
+                return $data;
+            case 'messageEntitySpoiler':
+                unset($data['_']);
+                $data['type'] = 'spoiler';
+                return $data;
+            case 'messageEntityUnderline':
+                unset($data['_']);
+                $data['type'] = 'underline';
+                return $data;
             case 'messageEntityItalic':
                 unset($data['_']);
                 $data['type'] = 'italic';
@@ -334,9 +349,9 @@ trait BotAPI
      *
      * @param array $arguments Arguments
      *
-     * @return \Generator<array>
+     * @return array
      */
-    public function botAPIToMTProto(array $arguments): \Generator
+    public function botAPIToMTProto(array $arguments): array
     {
         foreach (self::BOTAPI_PARAMS_CONVERSION as $bot => $mtproto) {
             if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
@@ -348,7 +363,7 @@ trait BotAPI
             $arguments['reply_markup'] = $this->parseReplyMarkup($arguments['reply_markup']);
         }
         if (isset($arguments['parse_mode'])) {
-            $arguments = (yield from $this->parseMode($arguments));
+            $arguments = $this->parseMode($arguments);
         }
         return $arguments;
     }
@@ -361,7 +376,7 @@ trait BotAPI
      *
      * @return \Generator<array>
      */
-    public function parseMode(array $arguments): \Generator
+    public function parseMode(array $arguments)
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -373,28 +388,18 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']), 'markdown');
+            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
+            $arguments['parse_mode'] = 'HTML';
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
-            [$arguments['message'],$arguments['entities']] = $this->parseText(($arguments['message']), 'html');
-
-            /**
-             * deprecated future or you can fix it in future.
-             * @deprecated
-             */
-            /*
-            if (isset($arguments['entities']['buttons'])) {
-                $arguments['reply_markup'] = $this->buildRows($arguments['entities']['buttons']);
-                unset($arguments['entities']['buttons']);
-            } */
+            $entities = new DOMEntities($arguments['message']);
+            $arguments['message'] = $entities->message;
+            $arguments['entities'] = $entities->entities;
+            if ($entities->buttons) {
+                $arguments['reply_markup'] = $this->buildRows($entities->buttons);
+            }
+            unset($arguments['parse_mode']);
         }
-        /**
-         * this is new future added! but for use must scape some special chars ...
-         */
-        if (\stripos($arguments['parse_mode'], 'combined') !== false) {
-            [$arguments['message'],$arguments['entities']] = yield $this->parseText(\trim($arguments['message']), 'markdownhtml');
-        }
-        unset($arguments['parse_mode']);
         return $arguments;
     }
     /**
@@ -403,12 +408,10 @@ trait BotAPI
      * @param array $args Arguments
      *
      * @internal
-     *
-     * @return \Generator
      */
-    public function splitToChunks($args): \Generator
+    public function splitToChunks($args): array
     {
-        $args = (yield from $this->parseMode($args));
+        $args = $this->parseMode($args);
         if (!isset($args['entities'])) {
             $args['entities'] = [];
         }

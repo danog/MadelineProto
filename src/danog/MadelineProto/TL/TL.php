@@ -613,7 +613,7 @@ class TL
     private function serializeParams(array $tl, $arguments, $ctx, int $layer, $promise): \Generator
     {
         $serialized = '';
-        $arguments = (yield from $this->API->botAPIToMTProto($arguments));
+        $arguments = $this->API->botAPIToMTProto($arguments);
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
                 $arguments[$cur_flag['flag']] ??= 0;

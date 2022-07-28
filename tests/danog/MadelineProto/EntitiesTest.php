@@ -2,53 +2,10 @@
 
 namespace danog\MadelineProto\Test;
 
-use danog\MadelineProto\API;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
-use PHPUnit\Framework\TestCase;
 
-class EntitiesTest extends TestCase
+class EntitiesTest extends MadelineTestCase
 {
-    /**
-     * MadelineProto instance.
-     *
-     * @var API
-     */
-    protected static $MadelineProto;
-
-    /**
-     * Setup MadelineProto instance.
-     *
-     * @return void
-     */
-    public static function setUpBeforeClass(): void
-    {
-        self::$MadelineProto = new API(
-            'testing.madeline',
-            [
-                'app_info' => [
-                    'api_id' => \getenv('API_ID'),
-                    'api_hash' => \getenv('API_HASH'),
-                ],
-                'logger' => [
-                    'logger' => Logger::FILE_LOGGER,
-                    'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE
-                ]
-            ]
-        );
-        self::$MadelineProto->botLogin(\getenv('BOT_TOKEN'));
-    }
-
-    /**
-     * Teardown.
-     *
-     * @return void
-     */
-    public static function tearDownAfterClass(): void
-    {
-        self::$MadelineProto = null;
-    }
     public function testMb()
     {
         $this->assertEquals(1, StrTools::mbStrlen('t'));
@@ -106,7 +63,19 @@ class EntitiesTest extends TestCase
             [
                 'html',
                 'test<b>test </b>',
-                'testtest',
+                'testtest ',
+                [
+                    [
+                        'offset' => 4,
+                        'length' => 4,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'html',
+                'test<b>test </b>test',
+                'testtest test',
                 [
                     [
                         'offset' => 4,
@@ -125,6 +94,90 @@ class EntitiesTest extends TestCase
                         'length' => 5,
                         'type' => 'bold'
                     ]
+                ]
+            ],
+            [
+                'markdown',
+                'test** test**',
+                'test test',
+                [
+                    [
+                        'offset' => 4,
+                        'length' => 5,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'markdown',
+                'test **bold *bold and italic* bold**',
+                'test bold bold and italic bold',
+                [
+                    [
+                        'offset' => 5,
+                        'length' => 25,
+                        'type' => 'bold'
+                    ],
+                    [
+                        'offset' => 10,
+                        'length' => 15,
+                        'type' => 'italic'
+                    ]
+                ]
+            ],
+            [
+                'html',
+                '<b>&\'"</b>',
+                '&\'"',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 3,
+                        'type' => 'bold'
+                    ]
+                ]
+            ],
+            [
+                'markdown',
+                'test *italic* **bold** <u>underlined</u> ~~strikethrough~~ <pre language="test">pre</pre> <code>code</code> <spoiler>spoiler</spoiler>',
+                'test italic bold underlined strikethrough pre code spoiler',
+                [
+                    [
+                        'offset' => 5,
+                        'length' => 6,
+                        'type' => 'italic'
+                    ],
+                    [
+                        'offset' => 12,
+                        'length' => 4,
+                        'type' => 'bold'
+                    ],
+                    [
+                        'offset' => 17,
+                        'length' => 10,
+                        'type' => 'underline'
+                    ],
+                    [
+                        'offset' => 28,
+                        'length' => 13,
+                        'type' => 'strikethrough'
+                    ],
+                    [
+                        'offset' => 42,
+                        'length' => 3,
+                        'type' => 'pre',
+                        'language' => 'test'
+                    ],
+                    [
+                        'offset' => 46,
+                        'length' => 4,
+                        'type' => 'code'
+                    ],
+                    [
+                        'offset' => 51,
+                        'length' => 7,
+                        'type' => 'spoiler'
+                    ],
                 ]
             ],
         ];

@@ -93,7 +93,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "danog\\MadelineProto\\Test\\": "tests/danog/"
+            "danog\\MadelineProto\\Test\\": "tests/danog/MadelineProto"
         },
         "files": [
             "tools/build_docs/schemas.php",

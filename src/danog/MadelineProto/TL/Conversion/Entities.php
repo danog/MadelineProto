@@ -2,18 +2,6 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
-const BOLD = 0;
-const ITALIC = 1;
-const UNDERLINE = 2;
-const STRIKE = 3;
-const SPOILER = 4;
-const TEXTURL = 5;
-const TEXTMENTION = 6;
-const CODE = 7;
-const PRE = 8;
-const SPANTAG = 11;
-const ATAG = 12;
-
 /**
  * Entities module.
  *
@@ -31,247 +19,10 @@ const ATAG = 12;
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-trait Entities
+final class Entities
 {
-    private $entities = null;
-    private $entitiesid = 0;
-    private $offset = 0;
-    private $length = 0;
-    private $text = "";
-
-    /**
-     * br2nl
-     * Checks if provided $separator is valid.
-     *
-     * @param string $string
-     *
-     * @param mixed $separator
-     *
-     * @return string|array|null
-     */
-    private function br2nl(
-        string $string,
-        mixed $separator = PHP_EOL
-    ): string|array|null {
-        $separator = \in_array($separator, [
-            "\n",
-            "\r",
-            "\r\n",
-            "\n\r",
-            \chr(30),
-            \chr(155),
-            PHP_EOL,
-        ])
-            ? $separator
-            : PHP_EOL; // Checks if provided $separator is valid.
-        return \preg_replace("/\<br(\s*)?\/?\>/i", $separator, $string);
-    }
-
-    /**
-     * getEntityName
-     * get entity name by it codes.
-     *
-     * @param int $code
-     *
-     * @return string|bool
-     */
-    private function getEntityName(int $code): string|bool
-    {
-        switch ($code) {
-            case BOLD:
-                return "messageEntityBold";
-
-            case ITALIC:
-                return "messageEntityItalic";
-
-            case UNDERLINE:
-                return "messageEntityUnderline";
-
-            case STRIKE:
-                return "messageEntityStrike";
-
-            case SPOILER:
-                return "messageEntitySpoiler";
-
-            case TEXTURL:
-                return "messageEntityTextUrl";
-
-            case TEXTMENTION:
-                return "messageEntityMentionName";
-
-            case CODE:
-                return "messageEntityCode";
-
-            case PRE:
-                return "messageEntityPre";
-        }
-        return false;
-    }
-
-    /**
-     * getEntityCode
-     * get entity name by it name.
-     *
-     * @param string $name
-     *
-     * @return int|bool
-     */
-    private function getEntityCode(string $name): int|bool
-    {
-        switch ($name) {
-            case $this->getEntityName(BOLD):
-                return BOLD;
-
-            case $this->getEntityName(ITALIC):
-                return ITALIC;
-
-            case $this->getEntityName(UNDERLINE):
-                return UNDERLINE;
-
-            case $this->getEntityName(STRIKE):
-                return STRIKE;
-
-            case $this->getEntityName(SPOILER):
-                return SPOILER;
-
-            case $this->getEntityName(TEXTURL):
-                return TEXTURL;
-
-            case $this->getEntityName(TEXTMENTION):
-                return TEXTMENTION;
-
-            case $this->getEntityName(CODE):
-                return CODE;
-
-            case $this->getEntityName(PRE):
-                return PRE;
-        }
-        return false;
-    }
-
-    /**
-     * getEntityNameFromTag
-     * get entity name by it tag.
-     *
-     * @param string $tag
-     *
-     * @return int|bool
-     */
-    private function getEntityNameFromTag(string $tag): int|bool
-    {
-        switch ($tag) {
-            case "b":
-            case "strong":
-            case "bold":
-                return BOLD;
-
-            case "i":
-            case "em":
-            case "italic":
-                return ITALIC;
-
-            case "ins":
-            case "u":
-            case "underline":
-                return UNDERLINE;
-
-            case "s":
-            case "del":
-            case "strike":
-            case "strikethrough":
-                return STRIKE;
-
-            case "spoiler":
-            case "tg-spoiler":
-                return SPOILER;
-
-            case "span":
-                return SPANTAG;
-
-            case "a":
-                return ATAG;
-
-            case "code":
-                return CODE;
-
-            case "pre":
-                return PRE;
-        }
-        return false;
-    }
-
-    /**
-     * setText
-     * set text string and offset.
-     *
-     * @param string $text
-     *
-     * @return void
-     */
-    private function setText(string $text)
-    {
-        $text = \htmlspecialchars_decode($text);
-        $l = $this->strlen($text);
-        $this->text .= $text;
-        $this->offset = $this->offset + $l;
-    }
-
-    /**
-     * decode
-     * decode text from UTF-8 to UTF-16LE to easily parse it tags.
-     *
-     * @param string $str
-     *
-     * @return array|string|false
-     */
-    private function decode(string $str): array|string|false
-    {
-        return \mb_convert_encoding($str, "UTF-8", "UTF-16LE");
-    }
-
-    /**
-     * encode.
-     *
-     * encode parsed text from UTF-16LE to UTF-8
-     * @param string $str
-     *
-     * @return array|string|false
-     */
-    private function encode(string $str): array|string|false
-    {
-        return \mb_convert_encoding($str, "UTF-16LE", "UTF-8");
-    }
-
-    /**
-     * strlen.
-     *
-     * @param string $str
-     *
-     * @return int|float
-     */
-    private function strlen(string $str): int|float
-    {
-        return \strlen($this->encode($str)) / 2;
-    }
-
-    /**
-     * substr.
-     *
-     * @param string $string
-     *
-     * @param int $offset
-     *
-     * @param null|int $length
-     *
-     * @return array|string|false
-     */
-    private function substr(
-        string $string,
-        int $offset,
-        ?int $length = null
-    ): array|string|false {
-        return $this->decode(\substr($string, $offset * 2, $length * 2));
-    }
+    private array $entities = [];
+    private int $offset = 0;
 
     /**
      * setOffset
@@ -1214,226 +965,81 @@ trait Entities
         }
         return $html;
     }
-
-    /**
-     * elementReader.
-     *
-     * @param mixed $element
-     *
-     * @param bool $tag
-     *
-     * @return void
-     */
-    private function elementReader($element, $tag = false): void
-    {
-        $obj = ["tag" => $element->tagName];
-        foreach ($element->attributes as $attribute) {
-            $obj[$attribute->name] = $attribute->value;
-        }
-        $entitie = false;
-        $entitie_name = $this->getEntityNameFromTag($obj["tag"]);
-        if ($entitie_name !== false) {
-            $entitie = $this->setEntitie($entitie_name, $obj, $tag);
-            if ($entitie) {
-                $this->entities[$this->entitiesid] = [];
-                $ident = $this->entitiesid;
-                $this->entitiesid++;
-            }
-        } else {
-            if ($tag !== false) {
-                throw new Exception(
-                    "Tag " .
-                        $element->tagName .
-                        ' invalid
- in line ' .
-                        $element->getLineNo()
-                );
-            }
-        }
-        foreach ($element->childNodes as $subElement) {
-            if ($subElement->nodeType == XML_TEXT_NODE) {
-                $this->setText($subElement->wholeText);
-            } else {
-                $this->elementReader($subElement, $obj["tag"]);
-            }
-        }
-        if ($entitie) {
-            $entitie["length"] = $this->offset - $entitie["offset"];
-            if ($entitie["length"] > 0) {
-                $this->entities[$ident] = \array_merge(
-                    $entitie,
-                    $this->entities[$ident]
-                );
-            } else {
-                unset($this->entities[$ident]);
-            }
-        }
-    }
     /**
      * htmlToEntities
      * convert html tags to entities.
-     *
-     * @param string $text
-     *
-     * @param mixed &$entities
-     *
-     * @return string
      */
-    public function htmlToEntities(string $text, &$entities): string
+    public function htmlToEntities(string $text): DOMEntities
     {
-        $text = $this->br2nl($text);
-        $this->entities = [];
-        $this->entitiesid = 0;
-        $this->offset = 0;
-        $this->text = "";
-        $dom = new \DOMDocument();
-        $internalErrors = \libxml_use_internal_errors(true);
-        $dom->loadxml("<body>" . \str_replace(['&amp;', '&#039;', '&quot;', '&'], ['&', '\'', "\"", '&amp;'], $text) . "</body>");
-        $ar = \libxml_get_errors();
-        if (!empty($ar)) {
-            \libxml_clear_errors();
-            foreach ($ar as $er) {
-                $er->message = \preg_replace(
-                    [
-                        "/: and body/",
-                        "/and body(.+)/isu",
-                        "/body line (.*?) and /",
-                    ],
-                    [": ", ""],
-                    $er->message
-                );
-                if (\in_array($er->code, [76, 40, 801, 73, 800])) {
-                    if (
-                        $er->code == 801 &&
-                        $this->getEntityNameFromTag(
-                            \explode(" ", $er->message, 3)[1]
-                        ) !== false
-                    ) {
-                        continue;
-                    }
-                    \libxml_use_internal_errors($internalErrors);
-                    throw new Exception(
-                        $er->message . " in line " . $er->line . PHP_EOL
-                    );
-                }
-            }
-        }
-        \libxml_use_internal_errors($internalErrors);
-        $this->elementReader($dom->getElementsByTagName("body")[0]);
-        $entities = $this->entities;
-        return $this->text;
+        return new DOMEntities($text);
     }
 
     /**
      * markdownToEntities
      * convert markdown format to entities.
-     *
-     * @param string $text
-     *
-     * @param mixed &$entities
-     *
-     * @return string
      */
-    public function markdownToEntities(string $text, &$entities): string
+    public function markdownToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownToHtml($text),
-            $entities
+            $this->markdownToHtml($text)
         );
     }
 
     /**
      * markdownV1ToEntities
      * convert markdownV1 to entities.
-     *
-     * @param string $text
-     *
-     * @param mixed &$entities
-     *
-     * @return string
      */
-    public function markdownV1ToEntities(string $text, &$entities): string
+    public function markdownV1ToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownV1ToHtml($text),
-            $entities
+            $this->markdownV1ToHtml($text)
         );
     }
 
     /**
      * markdownhtmlToEntities
      * convert mixed format(with markdown and html) to entities.
-     *
-     * @param string $text
-     *
-     * @param mixed &$entities
-     *
-     * @return string
      */
-    public function markdownhtmlToEntities(string $text, &$entities): string
+    public function markdownhtmlToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownToHtml($text, false),
-            $entities
+            $this->markdownToHtml($text, false)
         );
     }
 
     /**
     * markdownV1htmlToEntities
     * convert mixed format(with markdownv1 and html) to entities.
-    *
-    * @param string $text
-    *
-    * @param mixed &$entities
-    *
-    * @return string
     */
-    public function markdownV1htmlToEntities(string $text, &$entities): string
+    public function markdownV1htmlToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
             $this->markdownV1ToHtml($text, false),
-            $entities
         );
     }
 
     /**
      * htmlToMarkdown
      * convert html tags to markdown format.
-     *
-     * @param string $str
-     *
-     * @param bool $slashmarkdown
-     *
-     * @return string
      */
     public function htmlToMarkdown(string $str, bool $slashmarkdown = true): string
     {
-        $str = $this->htmlToEntities($str, $entities);
-        return $this->entitiesToMarkdown($str, $entities, $slashmarkdown);
+        $entities = $this->htmlToEntities($str);
+        return $this->entitiesToMarkdown($entities->message, $entities->entities, $slashmarkdown);
     }
 
     /**
      * htmlToMarkdownv1
      * convert html tags to markdownv1 format.
-     *
-     * @param string $str
-     *
-     * @param bool $slashmarkdown
-     *
-     * @return string
      */
     public function htmlToMarkdownv1(string $str, bool $slashmarkdown = true): string
     {
-        $str = $this->htmlToEntities($str, $entities);
-        return $this->entitiesToMarkdownV1($str, $entities, $slashmarkdown);
+        $entities = $this->htmlToEntities($str);
+        return $this->entitiesToMarkdownV1($entities->message, $entities->entities, $slashmarkdown);
     }
 
     /**
      * htmlSpecialChars.
-     *
-     * @param string $str
-     *
-     * @return string
      */
     private function htmlSpecialChars(string $str): string
     {
@@ -1444,26 +1050,20 @@ trait Entities
      * parseText (main function)
      * function return formated text with entities or tags or format it to markdown & markdownv1.
      *
-     * @param string $text
+     * @param non-empty-string $text
+     * @param "html"|"markdown"|"markdownv1"|"markdownv2"|"markdownhtml"|"markdownv2html"|"markdownv1html" $mode
      *
-     * @param string $mode
-     *
-     * @return string|array
+     * @return DOMEntities
      */
-    public function parseText(string $text, string $mode = "html"): string|array
+    public function parseText(string $text, string $mode = "html"): DOMEntities
     {
-        $mode = \strtolower($mode);
-        $entities = [];
-
-        $text = match ($mode) {
-            'html' => $this->htmlToEntities($text, $entities),
-            'markdown', 'markdownv2' => $this->markdownToEntities($text, $entities),
-            'markdownv1' => $this->markdownV1ToEntities($text, $entities),
-            'markdownhtml', 'markdownv2html' => $this->markdownhtmlToEntities($text, $entities),
-            'markdownv1html' => $this->markdownV1htmlToEntities($text, $entities),
+        return match ($mode) {
+            'html' => $this->htmlToEntities($text),
+            'markdown', 'markdownv2' => $this->markdownToEntities($text),
+            'markdownv1' => $this->markdownV1ToEntities($text),
+            'markdownhtml', 'markdownv2html' => $this->markdownhtmlToEntities($text),
+            'markdownv1html' => $this->markdownV1htmlToEntities($text),
             default => throw new Exception("unsupported mode")
         };
-
-        return [$text, $entities];
     }
 }
