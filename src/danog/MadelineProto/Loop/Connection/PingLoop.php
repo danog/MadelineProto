@@ -49,7 +49,7 @@ class PingLoop extends ResumableSignalLoop
                 $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
-                    return true;
+                    return;
                 }
             }
             $API->logger->logger("Ping DC {$datacenter}");
@@ -61,7 +61,7 @@ class PingLoop extends ResumableSignalLoop
             }
             if (yield $this->waitSignal($this->pause($timeoutMs))) {
                 $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
-                return true;
+                return;
             }
         }
     }

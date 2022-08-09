@@ -548,7 +548,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function serializeSession(object $data): \Generator
     {
-        if (!$this->session || $this->session instanceof MemoryArray) {
+        if (!isset($this->session) || !$this->session || $this->session instanceof MemoryArray) {
             return $data;
         }
         yield $this->session->set('data', $data);
