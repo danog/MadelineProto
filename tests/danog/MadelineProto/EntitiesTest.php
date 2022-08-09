@@ -36,7 +36,7 @@ class EntitiesTest extends MadelineTestCase
     public function provideEntities(): array
     {
         $this->setUpBeforeClass();
-        $mention = self::$MadelineProto->getPwrChat(getenv('TEST_USERNAME'));
+        $mention = self::$MadelineProto->getPwrChat(\getenv('TEST_USERNAME'));
         return [
             [
                 'html',
@@ -165,7 +165,7 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                '<a href="mention:'.getenv('TEST_USERNAME').'">mention1</a> <a href="tg://user?id='.getenv('TEST_USERNAME').'">mention2</a>',
+                '<a href="mention:'.\getenv('TEST_USERNAME').'">mention1</a> <a href="tg://user?id='.\getenv('TEST_USERNAME').'">mention2</a>',
                 'mention1 mention2',
                 [
                     [

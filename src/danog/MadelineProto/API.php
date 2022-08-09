@@ -430,6 +430,9 @@ class API extends InternalDoc
             } catch (SecurityException $e) {
                 throw $e;
             } catch (\Throwable $e) {
+                if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
+                    throw $e;
+                }
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;

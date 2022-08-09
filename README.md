@@ -72,7 +72,7 @@ The following open source projects were created using MadelineProto: you can dir
 * [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/examples/pipesbot.php) - Creating inline bots and using other inline bots via a userbot!
 * [`bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/bot.php) - Examples for sending normal messages, downloading any media!
 
-Want to add your own open-source project to this list? [Click here!](https://github.com/danog/MadelineProto/edit/stable/README.md)
+Want to add your own open-source project to this list? [Click here!](https://docs.madelineproto.xyz/FOSS.html)
 
 ## Documentation
 

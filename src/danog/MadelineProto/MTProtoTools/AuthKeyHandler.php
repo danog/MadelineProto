@@ -79,6 +79,7 @@ trait AuthKeyHandler
         if ($media) {
             $datacenter_id = -$datacenter_id;
         }
+
         for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
                 $this->logger->logger("Requesting pq...", \danog\MadelineProto\Logger::VERBOSE);
@@ -417,10 +418,10 @@ trait AuthKeyHandler
                     }
                 }
             } catch (SecurityException|Exception|RPCErrorException $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger("An exception occurred while generating the authorization key in DC $datacenter: ".$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
                 yield from $connection->reconnect();
             } catch (\Throwable $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger("An exception occurred while generating the authorization key in DC $datacenter: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
                 yield from $connection->reconnect();
             }
         }

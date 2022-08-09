@@ -5934,11 +5934,12 @@ class InternalDoc extends APIFactory
      *
      * @param array $arguments Arguments
      *
-     * @return \Amp\Promise<array>
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function botAPIToMTProto(array $arguments, array $extra = [])
+    public function botAPIToMTProto(array $arguments)
     {
-        return $this->__call(__FUNCTION__, [$arguments, $extra]);
+        return $this->__call(__FUNCTION__, [$arguments]);
     }
     /**
      * Login as bot.
