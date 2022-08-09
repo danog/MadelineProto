@@ -128,8 +128,10 @@ ponyScripts
 uwu
 madeline*phar
 madeline*phar.version
+madeline*phar.lock
 e.php
 
 .phpdoc_cache
 
 tests/db-local.php
+a.php

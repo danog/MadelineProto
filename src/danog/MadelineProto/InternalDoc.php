@@ -423,7 +423,8 @@ interface account
      * Delete the user's account from the telegram servers. Can be used, for example, to delete the account of a user that provided the login code, but forgot the [2FA password and no recovery method is configured](https://core.telegram.org/api/srp).
      *
      * Parameters:
-     * * `string` **reason** - Why is the account being deleted, can be empty
+     * * `string`                **reason**   - Why is the account being deleted, can be empty
+     * * `InputCheckPasswordSRP` **password** - Optional:
      *
      * @param array $params Parameters
      *
@@ -2161,8 +2162,9 @@ interface messages
      * Reorder installed stickersets.
      *
      * Parameters:
-     * * `boolean` **masks** - Optional: Reorder mask stickersets
-     * * `[long]`  **order** - New stickerset order by stickerset IDs
+     * * `boolean` **masks**  - Optional: Reorder mask stickersets
+     * * `boolean` **emojis** - Optional:
+     * * `[long]`  **order**  - New stickerset order by stickerset IDs
      *
      * @param array $params Parameters
      *
@@ -2448,6 +2450,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **masks**     - Optional: Get mask stickers
+     * * `boolean` **emojis**    - Optional:
      * * `long`    **offset_id** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `int`     **limit**     - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
@@ -3813,6 +3816,42 @@ interface messages
      * @return bool
      */
     public function rateTranscribedAudio($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `[long]` **document_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return  of Document[]
+     */
+    public function getCustomEmojiDocuments($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AllStickers
+     */
+    public function getEmojiStickers($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.FeaturedStickers
+     */
+    public function getFeaturedEmojiStickers($params);
 }
 
 interface updates
@@ -5026,9 +5065,8 @@ interface payments
      *
      *
      * Parameters:
-     * * `boolean` **restore**        - Optional:
-     * * `string`  **transaction_id** -
-     * * `bytes`   **receipt**        -.
+     * * `bytes`                    **receipt** -
+     * * `InputStorePaymentPurpose` **purpose** -.
      *
      * @param array $params Parameters
      *
@@ -5040,7 +5078,8 @@ interface payments
      *
      *
      * Parameters:
-     * * `string` **purchase_token** -.
+     * * `DataJSON`                 **receipt** -
+     * * `InputStorePaymentPurpose` **purpose** -.
      *
      * @param array $params Parameters
      *
@@ -5052,20 +5091,13 @@ interface payments
      *
      *
      * Parameters:
-     * * `bytes` **receipt** -.
+     * * `InputStorePaymentPurpose` **purpose** -.
      *
      * @param array $params Parameters
      *
-     * @return Updates
-     */
-    public function restorePlayMarketReceipt($params);
-
-    /**
-     *
-     *
      * @return bool
      */
-    public function canPurchasePremium();
+    public function canPurchasePremium($params);
 
     /**
      *
