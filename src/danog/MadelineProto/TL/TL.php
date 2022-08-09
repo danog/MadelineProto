@@ -685,7 +685,7 @@ class TL
                     $serialized .= \pack('@4');
                     continue;
                 }
-                if (\in_array($current_argument['type'], ['bytes', 'string'])) {
+                if (\in_array($current_argument['type'], ['bytes', 'string', 'int'])) {
                     $serialized .= \pack('@4');
                     continue;
                 }
