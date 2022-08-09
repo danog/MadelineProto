@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Logger;
 
 /**
  * Ping loop.
@@ -42,23 +43,25 @@ class PingLoop extends ResumableSignalLoop
         $shared = $this->datacenterConnection;
         $timeout = $shared->getSettings()->getPingInterval();
         $timeoutMs = $timeout * 1000;
+        $timeoutDisconnect = $timeout+15;
         while (true) {
             while (!$shared->hasTempAuthKey()) {
+                $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
-                    return;
+                    $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
+                    return true;
                 }
+            }
+            $API->logger->logger("Ping DC {$datacenter}");
+            try {
+                yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
+            } catch (\Throwable $e) {
+                $API->logger->logger("Error while pinging DC {$datacenter}");
+                $API->logger->logger((string) $e);
             }
             if (yield $this->waitSignal($this->pause($timeoutMs))) {
-                return;
-            }
-            if (\time() - $connection->getLastChunk() >= $timeout && $shared->hasTempAuthKey()) {
-                $API->logger->logger("Ping DC {$datacenter}");
-                try {
-                    yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeout + 15]);
-                } catch (\Throwable $e) {
-                    $API->logger->logger("Error while pinging DC {$datacenter}");
-                    $API->logger->logger((string) $e);
-                }
+                $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
+                return true;
             }
         }
     }

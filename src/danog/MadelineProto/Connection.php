@@ -368,6 +368,14 @@ class Connection
         if ($this->pinger) {
             $this->pinger->start();
         }
+
+        /*if (!isset($this->r)) {
+            $this->r = true;
+            Tools::callFork((function () {
+                yield Tools::sleep(3);
+                yield from $this->reconnect();
+            })());
+        }*/
     }
     /**
      * Apply method abstractions.
