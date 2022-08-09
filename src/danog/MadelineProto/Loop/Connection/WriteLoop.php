@@ -216,7 +216,7 @@ class WriteLoop extends ResumableSignalLoop
                     'body' => $message->getSerializedBody(),
                     'seqno' => $message->getSeqNo() ?? $connection->generateOutSeqNo($message->isContentRelated())
                 ];
-                if ($message->isMethod() && $constructor !== 'http_wait') {
+                if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect') {
                     if (!$shared->getTempAuthKey()->isInited() && $constructor !== 'auth.bindTempAuthKey' && !$inited) {
                         $inited = true;
                         $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $constructor), \danog\MadelineProto\Logger::NOTICE);
