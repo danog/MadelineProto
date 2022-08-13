@@ -31,6 +31,7 @@ use danog\MadelineProto\MTProto\OutgoingMessage;
  */
 trait Session
 {
+    use AuthKeyHandler;
     use AckHandler;
     use ResponseHandler;
     use SeqNoHandler;

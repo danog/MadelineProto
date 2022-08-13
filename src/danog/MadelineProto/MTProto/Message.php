@@ -26,7 +26,7 @@ namespace danog\MadelineProto\MTProto;
  */
 abstract class Message
 {
-    protected const NOT_CONTENT_RELATED = [
+    public const NOT_CONTENT_RELATED = [
         //'rpc_result' => true,
         //'rpc_error' => true,
         'rpc_drop_answer' => true,

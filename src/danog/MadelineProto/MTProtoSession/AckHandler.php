@@ -130,7 +130,7 @@ trait AckHandler
                 if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
                 }
-                if ($message->getConstructor() === 'msgs_state_req') {
+                if ($message->getConstructor() === 'msgs_state_req' || $message->getConstructor() === 'ping_delay_disconnect') {
                     unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     continue;
                 }

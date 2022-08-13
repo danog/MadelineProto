@@ -22,11 +22,14 @@ namespace danog\MadelineProto;
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
+use Amp\Sync\LocalMutex;
+use Amp\Sync\Lock;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
@@ -149,6 +152,156 @@ class DataCenterConnection implements JsonSerializable
     public function shouldReconnect(): bool
     {
         return $this->needsReconnect;
+    }
+    private ?LocalMutex $initingAuth = null;
+    /**
+     * Init auth keys for single DC.
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function initAuthorization(): \Generator
+    {
+        $logger = $this->API->logger;
+        $this->initingAuth ??= new LocalMutex;
+        $lock = yield $this->initingAuth->acquire();
+        try {
+            $logger->logger("Initing auth for DC {$this->datacenter}", Logger::NOTICE);
+            yield from $this->waitGetConnection();
+            $connection = $this->getAuthConnection();
+            $this->createSession();
+            $cdn = $this->isCDN();
+            $media = $this->isMedia();
+            if (!$this->hasTempAuthKey() || !$this->hasPermAuthKey() || !$this->isBound()) {
+                if (!$this->hasPermAuthKey() && !$cdn && !$media) {
+                    $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
+                    $this->setPermAuthKey(yield from $connection->createAuthKey(false));
+                    //$this->authorized(false);
+                }
+                if ($media) {
+                    $this->link(\intval($this->datacenter));
+                    if ($this->hasTempAuthKey()) {
+                        return;
+                    }
+                }
+                if ($this->API->settings->getAuth()->getPfs()) {
+                    if (!$cdn) {
+                        $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
+                        $this->setTempAuthKey(null);
+                        $this->setTempAuthKey(yield from $connection->createAuthKey(true));
+                        yield from $this->bindTempAuthKey();
+                        yield from $connection->methodCallAsyncRead('help.getConfig', []);
+                        yield from $this->syncAuthorization();
+                    } elseif (!$this->hasTempAuthKey()) {
+                        $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
+                        $this->setTempAuthKey(yield from $connection->createAuthKey(true));
+                    }
+                } else {
+                    if (!$cdn) {
+                        $this->bind(false);
+                        yield from $connection->methodCallAsyncRead('help.getConfig', []);
+                        yield from $this->syncAuthorization();
+                    } elseif (!$this->hasTempAuthKey()) {
+                        $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
+                        $this->setTempAuthKey(yield from $connection->createAuthKey(true));
+                    }
+                }
+            } elseif (!$cdn) {
+                yield from $this->syncAuthorization();
+            }
+        } finally {
+            $lock->release();
+        }
+    }
+    /**
+     * Bind temporary and permanent auth keys.
+     *
+     * @param integer $expires_in Date of expiry for binding
+     *
+     * @internal
+     *
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, array|mixed, mixed, true>
+     */
+    public function bindTempAuthKey(): \Generator
+    {
+        $connection = $this->getAuthConnection();
+        $logger = $this->API->logger;
+        $expires_in = $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn();
+        for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
+            try {
+                $logger->logger('Binding authorization keys...', \danog\MadelineProto\Logger::VERBOSE);
+                $nonce = \danog\MadelineProto\Tools::random(8);
+                $expires_at = \time() + $expires_in;
+                $temp_auth_key_id = $this->getTempAuthKey()->getID();
+                $perm_auth_key_id = $this->getPermAuthKey()->getID();
+                $temp_session_id = $connection->session_id;
+                $message_data = (yield from $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner', 'nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner'));
+                $message_id = $connection->msgIdHandler->generateMessageId();
+                $seq_no = 0;
+                $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
+                $message_key = \substr(\sha1($encrypted_data, true), -16);
+                $padding = \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($encrypted_data), 16));
+                list($aes_key, $aes_iv) = Crypt::oldAesCalculate($message_key, $this->getPermAuthKey()->getAuthKey());
+                $encrypted_message = $this->getPermAuthKey()->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                $res = yield from $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
+                if ($res === true) {
+                    $logger->logger("Bound temporary and permanent authorization keys, DC {$this->datacenter}", \danog\MadelineProto\Logger::NOTICE);
+                    $this->bind();
+                    $this->flush();
+                    return true;
+                }
+            } catch (\danog\MadelineProto\SecurityException $e) {
+                $logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+            } catch (\danog\MadelineProto\Exception $e) {
+                $logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                $logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+            }
+        }
+        throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
+    }
+    /**
+     * Sync authorization data between DCs.
+     *
+     * @return \Generator
+     */
+    private function syncAuthorization(): \Generator
+    {
+        $socket = $this->getAuthConnection();
+        $logger = $this->API->logger;
+        if ($this->API->authorized === MTProto::LOGGED_IN && !$this->isAuthorized()) {
+            foreach ($this->API->datacenter->getDataCenterConnections() as $authorized_dc_id => $authorized_socket) {
+                if ($this->API->authorized_dc !== -1 && $authorized_dc_id !== $this->API->authorized_dc) {
+                    continue;
+                }
+                if ($authorized_socket->hasTempAuthKey() 
+                    && $authorized_socket->hasPermAuthKey() 
+                    && $authorized_socket->isAuthorized() 
+                    && $this->API->authorized === MTProto::LOGGED_IN 
+                    && !$this->isAuthorized() 
+                    && !$authorized_socket->isCDN()
+                ) {
+                    try {
+                        $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
+                        $exported_authorization = yield from $this->API->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $this->datacenter)], ['datacenter' => $authorized_dc_id]);
+                        $authorization = yield from $socket->methodCallAsyncRead('auth.importAuthorization', $exported_authorization);
+                        $this->authorized(true);
+                        break;
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        $logger->logger('Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter.': '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        $logger->logger('Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter.': '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                        if ($e->rpc === 'DC_ID_INVALID') {
+                            break;
+                        }
+                    }
+                    // Turns out this DC isn't authorized after all
+                }
+            }
+        }
     }
     /**
      * Get auth key.
@@ -428,7 +581,9 @@ class DataCenterConnection implements JsonSerializable
         $backup = $this->connections[$id]->backupSession();
         $list = '';
         foreach ($backup as $k => $message) {
-            if ($message->getConstructor() === 'msgs_state_req' || $message->isUnencrypted()) {
+            if ($message->getConstructor() === 'msgs_state_req'
+                || $message->getConstructor() === 'ping_delay_disconnect'
+                || $message->isUnencrypted()) {
                 unset($backup[$k]);
                 continue;
             }

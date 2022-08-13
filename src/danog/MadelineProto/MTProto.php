@@ -250,7 +250,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public $hook_url = false;
     /**
-     * Settings array.
+     * Settings object.
      *
      * @var Settings
      */
@@ -553,6 +553,20 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         yield $this->session->set('data', $data);
         return $this->session;
+    }
+
+    /**
+     * @internal
+     * @return array<RSA>
+     */
+    public function getRsaKeys(bool $test, bool $cdn): array{
+        if ($cdn) {
+            return $this->cdn_rsa_keys;
+        }
+        if ($test) {
+            return $this->test_rsa_keys;
+        }
+        return $this->rsa_keys;
     }
     /**
      * Serialize all instances.
@@ -1796,6 +1810,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->config;
     }
     /**
+     * @internal
+     */
+    public function addConfig(array $config): void {
+        $this->config = $config;
+    }
+    /**
      * Parse cached config.
      *
      * @return \Generator
@@ -2057,7 +2077,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         return \array_merge(
             \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'addChat']]),
             \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]),
-            ['help.support' => [[$this, 'addSupport']]]
+            ['help.support' => [[$this, 'addSupport']]],
+            ['config' => [[$this, 'addConfig']]]
         );
     }
     /**
