@@ -559,7 +559,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @internal
      * @return array<RSA>
      */
-    public function getRsaKeys(bool $test, bool $cdn): array{
+    public function getRsaKeys(bool $test, bool $cdn): array
+    {
         if ($cdn) {
             return $this->cdn_rsa_keys;
         }
@@ -1812,7 +1813,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * @internal
      */
-    public function addConfig(array $config): void {
+    public function addConfig(array $config): void
+    {
         $this->config = $config;
     }
     /**

@@ -23,7 +23,6 @@ use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use Amp\Sync\LocalMutex;
-use Amp\Sync\Lock;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\OutgoingMessage;
@@ -277,11 +276,11 @@ class DataCenterConnection implements JsonSerializable
                 if ($this->API->authorized_dc !== -1 && $authorized_dc_id !== $this->API->authorized_dc) {
                     continue;
                 }
-                if ($authorized_socket->hasTempAuthKey() 
-                    && $authorized_socket->hasPermAuthKey() 
-                    && $authorized_socket->isAuthorized() 
-                    && $this->API->authorized === MTProto::LOGGED_IN 
-                    && !$this->isAuthorized() 
+                if ($authorized_socket->hasTempAuthKey()
+                    && $authorized_socket->hasPermAuthKey()
+                    && $authorized_socket->isAuthorized()
+                    && $this->API->authorized === MTProto::LOGGED_IN
+                    && !$this->isAuthorized()
                     && !$authorized_socket->isCDN()
                 ) {
                     try {

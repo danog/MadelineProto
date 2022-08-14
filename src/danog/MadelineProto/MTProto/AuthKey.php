@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProto;
 
 use JsonSerializable;
+use Webmozart\Assert\Assert;
 
 /**
  * MTProto auth key.
@@ -29,19 +30,19 @@ abstract class AuthKey implements JsonSerializable
     /**
      * Auth key.
      *
-     * @var string
+     * @var ?string
      */
     protected $authKey;
     /**
      * Auth key ID.
      *
-     * @var string
+     * @var ?string
      */
     protected $id;
     /**
      * Server salt.
      *
-     * @var string
+     * @var ?string
      */
     protected $serverSalt;
     /**
@@ -80,7 +81,7 @@ abstract class AuthKey implements JsonSerializable
      */
     public function hasAuthKey(): bool
     {
-        return $this->authKey !== null;
+        return $this->authKey !== null && $this->serverSalt !== null;
     }
     /**
      * Get auth key.
@@ -89,6 +90,7 @@ abstract class AuthKey implements JsonSerializable
      */
     public function getAuthKey(): string
     {
+        Assert::notNull($this->authKey);
         return $this->authKey;
     }
     /**
@@ -98,6 +100,7 @@ abstract class AuthKey implements JsonSerializable
      */
     public function getID(): string
     {
+        Assert::notNull($this->id);
         return $this->id;
     }
     /**
@@ -118,6 +121,7 @@ abstract class AuthKey implements JsonSerializable
      */
     public function getServerSalt(): string
     {
+        Assert::notNull($this->serverSalt);
         return $this->serverSalt;
     }
     /**

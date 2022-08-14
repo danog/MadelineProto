@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Closure;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Tools;
 use tgseclib\Math\BigInteger;
@@ -13,12 +12,12 @@ use tgseclib\Math\BigInteger;
 trait AuthKeyHandler
 {
     /**
-     * Whether another initAuthorization is pending
+     * Whether another initAuthorization is pending.
      *
      * @var boolean
      */
     private $pending_auth = false;
-    
+
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
@@ -58,8 +57,8 @@ trait AuthKeyHandler
                     $first = \array_shift($main)();
                     yield from $first;
                 }
-                yield Tools::all(array_map(fn ($cb) => $cb(), $main));
-                yield Tools::all(array_map(fn ($cb) => $cb(), $media));
+                yield Tools::all(\array_map(fn ($cb) => $cb(), $main));
+                yield Tools::all(\array_map(fn ($cb) => $cb(), $media));
             } while ($this->pending_auth);
         } finally {
             $this->logger("Done initing authorization!");

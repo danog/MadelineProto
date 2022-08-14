@@ -1,6 +1,6 @@
 {
     "require": {
-        "vimeo/psalm": "dev-master",
+        "vimeo/psalm": "^4",
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^9",
         "amphp/php-cs-fixer-config": "dev-master",
