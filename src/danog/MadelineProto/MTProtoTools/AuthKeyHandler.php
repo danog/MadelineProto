@@ -4,7 +4,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Tools;
-use tgseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 /**
  * @property DataCenter $datacenter
