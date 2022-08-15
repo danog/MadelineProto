@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
@@ -11,13 +12,7 @@ use phpseclib3\Math\BigInteger;
  */
 trait AuthKeyHandler
 {
-    /**
-     * Whether another initAuthorization is pending.
-     *
-     * @var boolean
-     */
-    private $pending_auth = false;
-
+    private ?LocalMutex $auth_mutex = null;
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
@@ -27,43 +22,35 @@ trait AuthKeyHandler
      */
     public function initAuthorization(): \Generator
     {
-        if ($this->initing_authorization) {
-            if ($this->pending_auth) {
-                $this->logger("Pending auth check, not queueing further auth check");
-                return;
-            }
-            $this->logger("Queueing further auth check");
-            $this->pending_auth = true;
-            return;
-        }
+        $this->auth_mutex ??= new LocalMutex;
+        $lock = yield $this->auth_mutex->acquire();
         $this->logger("Initing authorization...");
         $this->initing_authorization = true;
         try {
-            do {
-                $this->pending_auth = false;
-                $main = [];
-                $media = [];
-                foreach ($this->datacenter->getDataCenterConnections() as $socket) {
-                    if (!$socket->hasCtx()) {
-                        continue;
-                    }
-                    if ($socket->isMedia()) {
-                        $media []= [$socket, 'initAuthorization'];
-                    } else {
-                        $main []= [$socket, 'initAuthorization'];
-                    }
+            $main = [];
+            $media = [];
+            foreach ($this->datacenter->getDataCenterConnections() as $socket) {
+                if (!$socket->hasCtx()) {
+                    continue;
                 }
-                if ($main) {
-                    $first = \array_shift($main)();
-                    yield from $first;
+                if ($socket->isMedia()) {
+                    $media []= [$socket, 'initAuthorization'];
+                } else {
+                    $main []= [$socket, 'initAuthorization'];
                 }
-                yield Tools::all(\array_map(fn ($cb) => $cb(), $main));
-                yield Tools::all(\array_map(fn ($cb) => $cb(), $media));
-            } while ($this->pending_auth);
+            }
+            if ($main) {
+                $first = \array_shift($main)();
+                yield from $first;
+            }
+            yield Tools::all(\array_map(fn ($cb) => $cb(), $main));
+            yield Tools::all(\array_map(fn ($cb) => $cb(), $media));
         } finally {
+            $lock->release();
             $this->logger("Done initing authorization!");
             $this->initing_authorization = false;
         }
+        $this->startUpdateSystem(true);
     }
     /**
      * Get diffie-hellman configuration.

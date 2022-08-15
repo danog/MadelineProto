@@ -1541,10 +1541,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function hasAllAuth(): bool
     {
         if ($this->isInitingAuthorization()) {
+            $this->logger("Initing auth");
             return false;
         }
-        foreach ($this->datacenter->getDataCenterConnections() as $dc) {
+        foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
             if ((!$dc->isAuthorized() || !$dc->hasTempAuthKey()) && !$dc->isCDN()) {
+                $this->logger("Initing auth $id");
                 return false;
             }
         }
@@ -1702,7 +1704,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->secretFeeders[$id])) {
                 $this->secretFeeders[$id] = new SecretFeedLoop($this, $id);
             }
-            if ($this->secretFeeders[$id]->start() && isset($this->secretFeeders[$id])) {
+            $this->secretFeeders[$id]->start();
+            if (isset($this->secretFeeders[$id])) {
                 $this->secretFeeders[$id]->resume();
             }
         }
@@ -1722,17 +1725,18 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
             }
-            if ($this->feeders[$channelId]->start() && isset($this->feeders[$channelId])) {
+            $this->feeders[$channelId]->start();
+            if (isset($this->feeders[$channelId])) {
                 $this->feeders[$channelId]->resume();
             }
-            if ($this->updaters[$channelId]->start() && isset($this->updaters[$channelId])) {
+            $this->updaters[$channelId]->start();
+            if (isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId]->resume();
             }
         }
         $this->flushAll();
-        if ($this->seqUpdater->start()) {
-            $this->seqUpdater->resume();
-        }
+        $this->seqUpdater->start();
+        $this->seqUpdater->resume();
     }
     /**
      * Flush all datacenter connections.

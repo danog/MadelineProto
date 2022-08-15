@@ -212,6 +212,9 @@ class DataCenterConnection implements JsonSerializable
         } finally {
             $lock->release();
         }
+        if ($this->hasTempAuthKey()) {
+            $connection->pingHttpWaiter();
+        }
     }
     /**
      * Bind temporary and permanent auth keys.
