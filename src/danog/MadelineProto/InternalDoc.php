@@ -5098,20 +5098,6 @@ interface payments
      * @return bool
      */
     public function canPurchasePremium($params);
-
-    /**
-     *
-     *
-     * Parameters:
-     * * `InputUser`  **user_id**               -
-     * * `string`     **recurring_init_charge** -
-     * * `InputMedia` **invoice_media**         -.
-     *
-     * @param array $params Parameters
-     *
-     * @return Updates
-     */
-    public function requestRecurringPayment($params);
 }
 
 interface stickers
@@ -6315,6 +6301,24 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\MTProto::extractBotAPIFile($info);
     }
     /**
+     * Extract an update message constructor from an Updates constructor.
+     *
+     * @psalm-return \Amp\Promise<array>
+     */
+    public function extractMessageUpdate(array $updates, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$updates, $extra]);
+    }
+    /**
+     * Extract Update constructors from an Updates constructor.
+     *
+     * @psalm-return \Amp\Promise<array<array>>
+     */
+    public function extractUpdates(array $updates, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$updates, $extra]);
+    }
+    /**
      * Get contents of remote file asynchronously.
      *
      * @param string $url URL
@@ -6489,6 +6493,15 @@ class InternalDoc extends APIFactory
      * @return int|string
      */
     public function getDataCenterId(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Get diffie-hellman configuration.
+     *
+     * @return \Amp\Promise<array>
+     */
+    public function getDhConfig(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }

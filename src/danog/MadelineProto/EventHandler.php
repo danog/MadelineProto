@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 
 /**
@@ -33,6 +34,7 @@ abstract class EventHandler extends InternalDoc
      * Whether the event handler was started.
      */
     private bool $startedInternal = false;
+    private ?LocalMutex $startMutex = null;
     /**
      * API instance.
      */
@@ -82,16 +84,22 @@ abstract class EventHandler extends InternalDoc
      */
     public function startInternal(): \Generator
     {
-        if ($this->startedInternal) {
-            return;
+        $this->startMutex ??= new LocalMutex;
+        $lock = yield $this->startMutex->acquire();
+        try {
+            if ($this->startedInternal) {
+                return;
+            }
+            if (isset(static::$dbProperties)) {
+                yield from $this->internalInitDb($this->API);
+            }
+            if (\method_exists($this, 'onStart')) {
+                yield $this->onStart();
+            }
+            $this->startedInternal = true;
+        } finally {
+            $lock->release();
         }
-        if (isset(static::$dbProperties)) {
-            yield from $this->internalInitDb($this->API);
-        }
-        if (\method_exists($this, 'onStart')) {
-            yield $this->onStart();
-        }
-        $this->startedInternal = true;
     }
     /**
      * Get peers where to send error reports.

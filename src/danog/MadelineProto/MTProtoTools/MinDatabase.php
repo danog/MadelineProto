@@ -84,8 +84,7 @@ class MinDatabase implements TLCallback
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             yield $this->db->clear();
         }
-        if ($this->clean || 0 === yield $this->db->count()) {
-            $this->clean = true;
+        if ($this->clean) {
             return;
         }
         \Amp\Loop::defer(function () {
@@ -96,6 +95,7 @@ class MinDatabase implements TLCallback
                     $this->db->unset($id);
                 }
             }
+            $this->clean = true;
         });
     }
     public function getMethodCallbacks(): array

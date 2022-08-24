@@ -569,6 +569,8 @@ trait Files
             // Updates
             case 'updateNewMessage':
             case 'updateNewChannelMessage':
+            case 'updateEditMessage':
+            case 'updateEditChannelMessage':
                 $messageMedia = $messageMedia['message'];
             // no break
             case 'message':

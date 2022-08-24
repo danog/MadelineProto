@@ -310,7 +310,6 @@ class Logger
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-                \error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $this->logger('Could not enable PHP logging');
             }

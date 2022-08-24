@@ -23,6 +23,7 @@ use Amp\Promise;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 
 /**
@@ -613,7 +614,7 @@ class TL
     private function serializeParams(array $tl, $arguments, $ctx, int $layer, $promise): \Generator
     {
         $serialized = '';
-        $arguments = $this->API->botAPIToMTProto($arguments);
+        $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
                 $arguments[$cur_flag['flag']] ??= 0;

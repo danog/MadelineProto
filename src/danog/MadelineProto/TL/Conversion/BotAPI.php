@@ -123,27 +123,18 @@ trait BotAPI
         }
         $res = null;
         switch ($data['_']) {
-            case 'updateShortSentMessage':
-                $newd['message_id'] = $data['id'];
-                $newd['date'] = $data['date'];
-                $newd['text'] = $data['request']['body']['message'];
-                if ($data['out']) {
-                    $newd['from'] = (yield from $this->getPwrChat($this->authorization['user']));
-                }
-                $newd['chat'] = yield from $this->getPwrChat($data['request']['body']['peer']);
-                if (isset($data['entities'])) {
-                    $newd['entities'] = yield from $this->MTProtoToBotAPI($data['entities']);
-                }
-                if (isset($data['media'])) {
-                    $newd += yield from $this->MTProtoToBotAPI($data['media']);
-                }
-                return $newd;
             case 'updates':
-                $data = \array_values(\array_filter($data['updates'], fn (array $update) => $update['_'] !== 'updateMessageID'))[0];
+            case 'updatesCombined':
+            case 'updateShort':
+            case 'updateShortSentMessage':
+            case 'updateShortMessage':
+            case 'updateShortChatMessage':
+                $data = yield from $this->extractMessageUpdate($data);
                 // no break
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
-                return yield from $this->MTProtoToBotAPI($data['message']);
+                $data = $data['message'];
+                // no break
             case 'message':
                 $newd['message_id'] = $data['id'];
                 $newd['date'] = $data['date'];

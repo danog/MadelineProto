@@ -34,8 +34,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\StreamInterface;
-use danog\MadelineProto\Stream\Transport\WssStream;
-use danog\MadelineProto\Stream\Transport\WsStream;
 
 /**
  * Connection class.

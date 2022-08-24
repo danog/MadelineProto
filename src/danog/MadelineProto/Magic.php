@@ -256,7 +256,6 @@ class Magic
                     \error_reporting(E_ALL);
                     \ini_set('log_errors', 1);
                     \ini_set('error_log', Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-                    \error_log('Enabled PHP logging');
                 } catch (\Throwable $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
