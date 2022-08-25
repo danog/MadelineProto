@@ -30,6 +30,7 @@ use danog\MadelineProto\RPCErrorException;
 
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 
 /**
@@ -199,6 +200,15 @@ trait UpdateHandler
         return $data;
     }
     /**
+     * Extract a message constructor from an Updates constructor.
+     *
+     * @psalm-return \Generator<mixed, mixed, mixed, array>
+     */
+    public function extractMessage(array $updates): \Generator
+    {
+        return (yield from $this->extractMessageUpdate($updates))['message'];
+    }
+    /**
      * Extract an update message constructor from an Updates constructor.
      *
      * @psalm-return \Generator<mixed, mixed, mixed, array>
@@ -234,11 +244,11 @@ trait UpdateHandler
                 return [$updates['update']];
             case 'updateShortSentMessage':
                 $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-                $updates['message'] = $updates['request']['body']['message'];
-                unset($updates['request']);
             // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
+                $updates = \array_merge($updates['request']['body'], $updates);
+                unset($updates['request']);
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
@@ -253,9 +263,20 @@ trait UpdateHandler
     }
     private function populateMessageFlags(array &$message): void
     {
+        $new = ['_' => 'message'];
         foreach ($this->TL->getConstructors()->findByPredicate('message')['params'] as $param) {
-            if ($param['type'] === 'true') {
-                $message[$param['name']] ??= false;
+            if (isset($message[$param['name']]) && $param['name'] !== 'flags') {
+                $new[$param['name']] = $message[$param['name']];
+            } elseif ($param['type'] === 'true') {
+                $new[$param['name']] = false;
+            }
+        }
+        $message = $new;
+        if (isset($message['reply_markup']['rows'])) {
+            foreach ($message['reply_markup']['rows'] as $key => $row) {
+                foreach ($row['buttons'] as $bkey => $button) {
+                    $message['reply_markup']['rows'][$key]['buttons'][$bkey] = new Button($this, $message, $button);
+                }
             }
         }
     }
@@ -302,11 +323,11 @@ trait UpdateHandler
                     break;
                 }
                 $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-                $updates['message'] = $updates['request']['body']['message'];
-                unset($updates['request']);
             // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
+                $updates = \array_merge($updates['request']['body'], $updates);
+                unset($updates['request']);
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!((yield from $this->peerIsset($from_id)) || !((yield from $this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !((yield from $this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !((yield from $this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {

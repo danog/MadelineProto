@@ -234,14 +234,14 @@ trait ResponseHandler
         $botAPI = $request->getBotAPI();
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $body = $request->getBodyOrEmpty();
-            $trimmed = [];
-            if (isset($body['peer'])) {
+            $trimmed = $body;
+            if (isset($trimmed['peer'])) {
                 try {
                     $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
                 } catch (\Throwable $e) {
                 }
             }
-            if (isset($body['message'])) {
+            if (isset($trimmed['message'])) {
                 $trimmed['message'] = (string) $body['message'];
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];

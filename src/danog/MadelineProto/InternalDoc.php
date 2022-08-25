@@ -6302,6 +6302,15 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\MTProto::extractBotAPIFile($info);
     }
     /**
+     * Extract a message constructor from an Updates constructor.
+     *
+     * @psalm-return \Amp\Promise<array>
+     */
+    public function extractMessage(array $updates, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$updates, $extra]);
+    }
+    /**
      * Extract an update message constructor from an Updates constructor.
      *
      * @psalm-return \Amp\Promise<array>
