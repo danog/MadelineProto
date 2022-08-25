@@ -42,15 +42,19 @@ trait FilesLogic
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string $messageMedia File to download
-     * @param callable     $cb           Status callback (can also use FileCallback)
+     * @param ?callable     $cb           Status callback (can also use FileCallback)
+     * @param ?int $size Size of file to download, required for bot API file IDs.
      *
      * @return \Generator
      */
-    public function downloadToBrowser($messageMedia, callable $cb = null): \Generator
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null): \Generator
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
             $messageMedia = yield $messageMedia->getFile();
+        }
+        if (\is_string($messageMedia) && $size === null) {
+            throw new \danog\MadelineProto\Exception('downloadToBrowser only supports bot file IDs if the file size is also specified in the third parameter of the method.');
         }
 
         $headers = [];
@@ -59,6 +63,7 @@ trait FilesLogic
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
+        $messageMedia['size'] ??= $size;
         $result = ResponseInfo::parseHeaders(
             $_SERVER['REQUEST_METHOD'],
             $headers,

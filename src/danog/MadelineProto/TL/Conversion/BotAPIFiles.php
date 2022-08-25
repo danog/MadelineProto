@@ -244,7 +244,7 @@ trait BotAPIFiles
             'access_hash' => $fileId->getAccessHash(),
             'file_reference' => $fileId->getFileReference(),
             'dc_id' => $fileId->getDcId(),
-            'mime_type' => '',
+            'mime_type' => 'application/octet-stream',
             'attributes' => $attribute ? [$attribute] : []
         ];
         $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];

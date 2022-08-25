@@ -172,7 +172,7 @@ trait Methods
                 if (isset($this->tdDescriptions['methods'][$method])) {
                     $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -207,6 +207,9 @@ trait Methods
             $header = $this->template('Method', $method, $description, $redir, StrTools::markdownEscape($method));
             if ($this->td) {
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
+            }
+            if (\in_array($method, ['messages.getHistory', 'messages.getMessages', 'channels.getMessages'])) {
+                $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, please use the [event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
             }
             $header .= isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '

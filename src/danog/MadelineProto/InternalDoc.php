@@ -6162,13 +6162,14 @@ class InternalDoc extends APIFactory
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string $messageMedia File to download
-     * @param callable     $cb           Status callback (can also use FileCallback)
+     * @param ?callable     $cb           Status callback (can also use FileCallback)
+     * @param ?int $size Size of file to download, required for bot API file IDs.
      *
      * @return \Amp\Promise
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, array $extra = [])
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $extra]);
     }
     /**
      * Download file to callable.
