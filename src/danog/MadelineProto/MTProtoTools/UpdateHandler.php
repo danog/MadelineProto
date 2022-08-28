@@ -247,7 +247,7 @@ trait UpdateHandler
             // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = \array_merge($updates['request']['body'], $updates);
+                $updates = \array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
@@ -326,7 +326,7 @@ trait UpdateHandler
             // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = \array_merge($updates['request']['body'], $updates);
+                $updates = \array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
