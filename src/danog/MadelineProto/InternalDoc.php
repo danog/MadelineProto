@@ -6164,12 +6164,14 @@ class InternalDoc extends APIFactory
      * @param array|string $messageMedia File to download
      * @param ?callable     $cb           Status callback (can also use FileCallback)
      * @param ?int $size Size of file to download, required for bot API file IDs.
+     * @param ?string $mime MIME type of file to download, required for bot API file IDs.
+     * @param ?string $name Name of file to download, required for bot API file IDs.
      *
      * @return \Amp\Promise
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, array $extra = [])
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $name, $mime, $extra]);
     }
     /**
      * Download file to callable.
@@ -6231,14 +6233,17 @@ class InternalDoc extends APIFactory
      * @param array|string  $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
+     * @param ?int          $size         Size of file to download, required for bot API file IDs.
+     * @param ?string       $name         Name of file to download, required for bot API file IDs.
+     * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
      *
      * @return \Amp\Promise Returned response
      *
      * @psalm-return \Amp\Promise<\Amp\Http\Server\Response>
      */
-    public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, array $extra = [])
+    public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $size, $mime, $name, $extra]);
     }
     /**
      * Download file to stream.
