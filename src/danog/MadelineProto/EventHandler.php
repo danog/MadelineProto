@@ -59,6 +59,23 @@ abstract class EventHandler extends InternalDoc
         $API->startAndLoop(static::class);
     }
     /**
+     * Start MadelineProto as a bot and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $session Session name
+     * @param string $token Bot token
+     * @param SettingsAbstract $settings Settings
+     *
+     * @return void
+     */
+    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
+    {
+        $API = new API($session, $settings);
+        $API->botLogin($token);
+        $API->startAndLoop(static::class);
+    }
+    /**
      * Internal constructor.
      *
      * @internal

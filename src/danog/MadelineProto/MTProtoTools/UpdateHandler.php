@@ -275,7 +275,7 @@ trait UpdateHandler
         if (isset($message['reply_markup']['rows'])) {
             foreach ($message['reply_markup']['rows'] as $key => $row) {
                 foreach ($row['buttons'] as $bkey => $button) {
-                    $message['reply_markup']['rows'][$key]['buttons'][$bkey] = new Button($this, $message, $button);
+                    $message['reply_markup']['rows'][$key]['buttons'][$bkey] = $button instanceof Button ? $button : new Button($this, $message, $button);
                 }
             }
         }
