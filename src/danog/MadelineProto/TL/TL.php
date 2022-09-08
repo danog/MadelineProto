@@ -1021,6 +1021,7 @@ class TL
                 }
             }
         }
+        unset($x['flags'], $x['flags2']);
         return $x;
     }
 }

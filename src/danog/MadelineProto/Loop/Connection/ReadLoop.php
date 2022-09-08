@@ -154,7 +154,13 @@ class ReadLoop extends SignalLoop
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
                 $message_key = yield $buffer->bufferRead(16);
                 list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
-                $decrypted_data = Crypt::igeDecrypt(yield $buffer->bufferRead($payload_length - 24), $aes_key, $aes_iv);
+                $payload_length -= 24;
+                $left = $payload_length & 15;
+                $payload_length -= $left;
+                $decrypted_data = Crypt::igeDecrypt(yield $buffer->bufferRead($payload_length), $aes_key, $aes_iv);
+                if ($left) {
+                    yield $buffer->bufferRead($left);
+                }
                 if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
                 }

@@ -102,9 +102,9 @@ class ReferenceDatabase implements TLCallback
         yield from $this->initDb($this->API);
 
         //Clear table on each start to fix fatals with invalid references
-        Loop::defer(fn () =>yield $this->db->clear());
+        //Loop::defer(fn () =>yield $this->db->clear());
         //Clear table every day
-        Loop::repeat(24*1000*3600, fn () =>yield $this->db->clear());
+        //Loop::repeat(24*1000*3600, fn () =>yield $this->db->clear());
     }
     public function getMethodCallbacks(): array
     {

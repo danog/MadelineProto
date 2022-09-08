@@ -60,17 +60,38 @@ decryptedMessage#36b091de flags:# random_id:long ttl:int message:string media:fl
 decryptedMessageMediaPhoto#f1fa8d78 thumb:bytes thumb_w:int thumb_h:int w:int h:int size:int key:bytes iv:bytes caption:string = DecryptedMessageMedia;
 decryptedMessageMediaVideo#970c8c0e thumb:bytes thumb_w:int thumb_h:int duration:int mime_type:string w:int h:int size:int key:bytes iv:bytes caption:string = DecryptedMessageMedia;
 decryptedMessageMediaDocument#7afe8ae2 thumb:bytes thumb_w:int thumb_h:int mime_type:string size:int key:bytes iv:bytes attributes:Vector<DocumentAttribute> caption:string = DecryptedMessageMedia;
-
-===46===
-decryptedMessageMediaVenue#8a0df56f lat:double long:double title:string address:string provider:string venue_id:string = DecryptedMessageMedia;
+documentAttributeSticker#3a556302 alt:string stickerset:InputStickerSet = DocumentAttribute;
 documentAttributeAudio#ded218e0 duration:int title:string performer:string = DocumentAttribute;
+messageEntityUnknown#bb92ba95 offset:int length:int = MessageEntity;
+messageEntityMention#fa04579d offset:int length:int = MessageEntity;
+messageEntityHashtag#6f635b0d offset:int length:int = MessageEntity;
+messageEntityBotCommand#6cef8ac7 offset:int length:int = MessageEntity;
+messageEntityUrl#6ed02538 offset:int length:int = MessageEntity;
+messageEntityEmail#64e475c2 offset:int length:int = MessageEntity;
+messageEntityBold#bd610bc9 offset:int length:int = MessageEntity;
+messageEntityItalic#826f8b60 offset:int length:int = MessageEntity;
+messageEntityCode#28a20571 offset:int length:int = MessageEntity;
+messageEntityPre#73924be0 offset:int length:int language:string = MessageEntity;
+messageEntityTextUrl#76a6d327 offset:int length:int url:string = MessageEntity;
+inputStickerSetShortName#861cc8a0 short_name:string = InputStickerSet;
+inputStickerSetEmpty#ffb62b95 = InputStickerSet;
+decryptedMessageMediaVenue#8a0df56f lat:double long:double title:string address:string provider:string venue_id:string = DecryptedMessageMedia;
 decryptedMessageMediaWebPage#e50511d8 url:string = DecryptedMessageMedia;
 
-===55===
-documentAttributeSticker#3a556302 alt:string stickerset:InputStickerSet = DocumentAttribute;
+===46===
+documentAttributeAudio#9852f9c6 flags:# voice:flags.10?true duration:int title:flags.0?string performer:flags.1?string waveform:flags.2?bytes = DocumentAttribute;
 
 ===66===
 documentAttributeVideo#ef02ce6 flags:# round_message:flags.0?true duration:int w:int h:int = DocumentAttribute;
+sendMessageRecordRoundAction#88f27fbc = SendMessageAction;
+sendMessageUploadRoundAction#bb718624 = SendMessageAction;
 
 ===73===
-decryptedMessage#91cc4674 flags:# random_id:long ttl:int message:string media:flags.9?DecryptedMessageMedia entities:flags.7?Vector<MessageEntity> via_bot_name:flags.11?string reply_to_random_id:flags.3?long grouped_id:flags.17?long = DecryptedMessage;
+decryptedMessage#91cc4674 flags:# no_webpage:flags.1?true silent:flags.5?true random_id:long ttl:int message:string media:flags.9?DecryptedMessageMedia entities:flags.7?Vector<MessageEntity> via_bot_name:flags.11?string reply_to_random_id:flags.3?long grouped_id:flags.17?long = DecryptedMessage;
+
+===143===
+decryptedMessageMediaDocument#8e4c064c thumb:bytes thumb_w:int thumb_h:int mime_type:string size:long key:bytes iv:bytes attributes:Vector<DocumentAttribute> caption:string = DecryptedMessageMedia;
+
+===144===
+messageEntitySpoiler#32ca960f offset:int length:int = MessageEntity;
+messageEntityCustomEmoji#c8cf05f8 offset:int length:int document_id:long = MessageEntity;

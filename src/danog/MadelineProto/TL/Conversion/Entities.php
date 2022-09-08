@@ -12,8 +12,8 @@ namespace danog\MadelineProto\TL\Conversion;
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2022 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
@@ -21,7 +21,6 @@ namespace danog\MadelineProto\TL\Conversion;
 
 final class Entities
 {
-    private array $entities = [];
     private int $offset = 0;
 
     /**
@@ -36,118 +35,6 @@ final class Entities
     {
         $this->setOffset[$this->offset][] = $start;
         $this->setOffset2[$this->offset + $this->length][] = $end;
-    }
-
-    /**
-     * setEntitie
-     * setEntitie for text and parse special tags to entities.
-     *
-     * @param int $type
-     *
-     * @param array $array
-     *
-     * @param string $intag
-     *
-     * @param int &$i
-     *
-     * @return array|null|bool
-     */
-    private function setEntitie(
-        int $type,
-        array $array = [],
-        string $intag = "",
-        &$i = 0
-    ): array|null|bool {
-        $result = ["_" => "", "offset" => $this->offset, "length" => 0];
-        if ($type == ATAG) {
-            if (isset($array["href"])) {
-                if (
-                    \preg_match(
-                        '/^(?:tg:\/\/user\?id=|mention:)(.*)$/isu',
-                        $array["href"],
-                        $matches
-                    )
-                ) {
-                    $userId = $matches[1];
-
-                    if (!\is_numeric($userId)) {
-                        try {
-                            $userId ??= $this->api->getInfo($matches[1])['id'];
-                        } catch (\Throwable $e) {
-                        }
-                    }
-
-                    $result["_"] = $this->getEntityName(TEXTMENTION);
-                    $result["user_id"] = $userId;
-                } else {
-                    $result["_"] = $this->getEntityName(TEXTURL);
-                    $result["url"] = $array["href"];
-                }
-            } else {
-                return null;
-            }
-        } elseif ($type == CODE) {
-            $result["_"] = $this->getEntityName(CODE);
-            if (
-                $intag === "pre" &&
-                ((isset($array["class"]) &&
-                    \preg_match(
-                        '/^language\-(.*?)$/',
-                        $array["class"],
-                        $matches
-                    )) ||
-                    isset($array["language"]))
-            ) {
-                $result["_"] = $this->getEntityName(PRE);
-                $this->entities[$this->entitiesid - 1]["language"] =
-                    $matches[1];
-                return null;
-            }
-            return $result;
-        } elseif ($type == SPANTAG) {
-            if (isset($array["class"])) {
-                $array["class"] = \strtolower($array["class"]);
-                switch ($array["class"]) {
-                    case "bold":
-                        $result["_"] = $this->getEntityName(BOLD);
-                        break;
-
-                    case "italic":
-                        $result["_"] = $this->getEntityName(ITALIC);
-                        break;
-
-                    case "underline":
-                        $result["_"] = $this->getEntityName(UNDERLINE);
-                        break;
-
-                    case "strikethrough":
-                    case "strike":
-                        $result["_"] = $this->getEntityName(STRIKE);
-                        break;
-
-                    case "spoiler":
-                    case "tg-spoiler":
-                        $result["_"] = $this->getEntityName(SPOILER);
-                        break;
-
-                    case "code":
-                        $result["_"] = $this->getEntityName(CODE);
-                        break;
-
-                    case "pre":
-                        $result["_"] = $this->getEntityName(PRE);
-                        break;
-
-                    default:
-                        return false;
-                }
-            } else {
-                return null;
-            }
-        } else {
-            $result["_"] = $this->getEntityName($type);
-        }
-        return $result;
     }
 
     /**
@@ -502,18 +389,10 @@ final class Entities
     /**
      * markdownV1ToHtml
      * convert markdownv1 to html.
-     *
-     * @param string $str
-     *
-     * @param bool $specialchars
-     *
-     * @return string
      */
-    public function markdownV1ToHtml(string $str, bool $specialchars = true): string
+    public function markdownV1ToHtml(string $str): string
     {
-        if ($specialchars) {
-            $str = $this->htmlSpecialChars($str);
-        }
+        $str = \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
         $len = \mb_strlen($str);
         $backslash = ["_", "*", "`", "["];
         $marks = [];
@@ -708,18 +587,10 @@ final class Entities
     /**
      * markdownToHtml
      * convert html tags to markdown format.
-     *
-     * @param string $str
-     *
-     * @param bool $specialchars
-     *
-     * @return string
      */
-    public function markdownToHtml(string $str, bool $specialchars = true): string
+    public function markdownToHtml(string $str): string
     {
-        if ($specialchars) {
-            $str = $this->htmlSpecialChars($str);
-        }
+        $str = \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
         $len = \mb_strlen($str);
         $backslash = [
             "_",
@@ -1036,14 +907,6 @@ final class Entities
     {
         $entities = $this->htmlToEntities($str);
         return $this->entitiesToMarkdownV1($entities->message, $entities->entities, $slashmarkdown);
-    }
-
-    /**
-     * htmlSpecialChars.
-     */
-    private function htmlSpecialChars(string $str): string
-    {
-        return \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
     }
 
     /**
