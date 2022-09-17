@@ -80,10 +80,13 @@ final class DOMEntities
     private function handleA(DOMNode $node): array
     {
         $href = $node->getAttribute('href');
-        if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\\?id=(.*)|', $href, $matches)) {
+        if (\preg_match('|mention:(.+)|', $href, $matches) || \preg_match('|tg://user\\?id=(.+)|', $href, $matches)) {
             return ['_' => 'inputMessageEntityMentionName', 'user_id' => $matches[1]];
         }
-        if (\preg_match('|buttonurl:(.*)|', $href)) {
+        if (\preg_match('|emoji:(\d+)|', $href, $matches)) {
+            return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int)$matches[1]];
+        }
+        if (\preg_match('|buttonurl:(.+)|', $href)) {
             if (\strpos(\substr($href, -4), '|:new|') !== false) {
                 $this->buttons[] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => \str_replace(['buttonurl:', ':new'], '', $href), 'new' => true];
             } else {
