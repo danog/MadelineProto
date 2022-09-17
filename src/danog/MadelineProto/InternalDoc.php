@@ -43,9 +43,10 @@ interface auth
      * You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **phone_number**    - Phone number in the international format
-     * * `string` **phone_code_hash** - SMS-message ID, obtained from [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
-     * * `string` **phone_code**      - Valid numerical code from the SMS-message
+     * * `string`            **phone_number**       - Phone number in the international format
+     * * `string`            **phone_code_hash**    - SMS-message ID, obtained from [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
+     * * `string`            **phone_code**         - Optional: Valid numerical code from the SMS-message
+     * * `EmailVerification` **email_verification** - Optional:
      *
      * @param array $params Parameters
      *
@@ -711,7 +712,8 @@ interface account
      * Send the verification email code for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string` **email** - The email where to send the code
+     * * `EmailVerifyPurpose` **purpose** -
+     * * `string`             **email**   - The email where to send the code
      *
      * @param array $params Parameters
      *
@@ -723,12 +725,12 @@ interface account
      * Verify an email address for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string` **email** - The email to verify
-     * * `string` **code**  - The verification code that was received
+     * * `EmailVerifyPurpose` **purpose**      -
+     * * `EmailVerification`  **verification** -
      *
      * @param array $params Parameters
      *
-     * @return bool
+     * @return account.EmailVerified
      */
     public function verifyEmail($params);
 
@@ -1158,6 +1160,49 @@ interface account
      * @return Document
      */
     public function uploadRingtone($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `EmojiStatus` **emoji_status** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function updateEmojiStatus($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return account.EmojiStatuses
+     */
+    public function getDefaultEmojiStatuses($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `long` **hash** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return account.EmojiStatuses
+     */
+    public function getRecentEmojiStatuses($params);
+
+    /**
+     *
+     *
+     * @return bool
+     */
+    public function clearRecentEmojiStatuses();
 }
 
 interface users
@@ -1616,18 +1661,19 @@ interface messages
      * Sends a message to a chat.
      *
      * Parameters:
-     * * `boolean`         **no_webpage**      - Optional: Set this flag to disable generation of the webpage preview
-     * * `boolean`         **silent**          - Optional: Send this message silently (no notifications for the receivers)
-     * * `boolean`         **background**      - Optional: Send this message as background message
-     * * `boolean`         **clear_draft**     - Optional: Clear the draft field
-     * * `boolean`         **noforwards**      - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
-     * * `InputPeer`       **peer**            - The destination where the message will be sent
-     * * `int`             **reply_to_msg_id** - Optional: The message ID to which this message will reply to
-     * * `string`          **message**         - The message
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for sending bot buttons
-     * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for sending styled text
-     * * `int`             **schedule_date**   - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
-     * * `InputPeer`       **send_as**         - Optional: Send this message as the specified peer
+     * * `boolean`         **no_webpage**               - Optional: Set this flag to disable generation of the webpage preview
+     * * `boolean`         **silent**                   - Optional: Send this message silently (no notifications for the receivers)
+     * * `boolean`         **background**               - Optional: Send this message as background message
+     * * `boolean`         **clear_draft**              - Optional: Clear the draft field
+     * * `boolean`         **noforwards**               - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * * `boolean`         **update_stickersets_order** - Optional:
+     * * `InputPeer`       **peer**                     - The destination where the message will be sent
+     * * `int`             **reply_to_msg_id**          - Optional: The message ID to which this message will reply to
+     * * `string`          **message**                  - The message
+     * * `ReplyMarkup`     **reply_markup**             - Optional: Reply markup for sending bot buttons
+     * * `[MessageEntity]` **entities**                 - Optional: Message [entities](https://core.telegram.org/api/entities) for sending styled text
+     * * `int`             **schedule_date**            - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
+     * * `InputPeer`       **send_as**                  - Optional: Send this message as the specified peer
      *
      * @param array $params Parameters
      *
@@ -1639,18 +1685,19 @@ interface messages
      * Send a media.
      *
      * Parameters:
-     * * `boolean`         **silent**          - Optional: Send message silently (no notification should be triggered)
-     * * `boolean`         **background**      - Optional: Send message in background
-     * * `boolean`         **clear_draft**     - Optional: Clear the draft
-     * * `boolean`         **noforwards**      - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
-     * * `InputPeer`       **peer**            - Destination
-     * * `int`             **reply_to_msg_id** - Optional: Message ID to which this message should reply to
-     * * `InputMedia`      **media**           - Attached media
-     * * `string`          **message**         - Caption
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for bot keyboards
-     * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for styled text
-     * * `int`             **schedule_date**   - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
-     * * `InputPeer`       **send_as**         - Optional: Send this message as the specified peer
+     * * `boolean`         **silent**                   - Optional: Send message silently (no notification should be triggered)
+     * * `boolean`         **background**               - Optional: Send message in background
+     * * `boolean`         **clear_draft**              - Optional: Clear the draft
+     * * `boolean`         **noforwards**               - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * * `boolean`         **update_stickersets_order** - Optional:
+     * * `InputPeer`       **peer**                     - Destination
+     * * `int`             **reply_to_msg_id**          - Optional: Message ID to which this message should reply to
+     * * `InputMedia`      **media**                    - Attached media
+     * * `string`          **message**                  - Caption
+     * * `ReplyMarkup`     **reply_markup**             - Optional: Reply markup for bot keyboards
+     * * `[MessageEntity]` **entities**                 - Optional: Message [entities](https://core.telegram.org/api/entities) for styled text
+     * * `int`             **schedule_date**            - Optional: Scheduled message date for [scheduled messages](https://core.telegram.org/api/scheduled-messages)
+     * * `InputPeer`       **send_as**                  - Optional: Send this message as the specified peer
      *
      * @param array $params Parameters
      *
@@ -2750,15 +2797,16 @@ interface messages
      * Send an [album or grouped media](https://core.telegram.org/api/files#albums-grouped-media).
      *
      * Parameters:
-     * * `boolean`            **silent**          - Optional: Whether to send the album silently (no notification triggered)
-     * * `boolean`            **background**      - Optional: Send in background?
-     * * `boolean`            **clear_draft**     - Optional: Whether to clear [drafts](https://core.telegram.org/api/drafts)
-     * * `boolean`            **noforwards**      - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
-     * * `InputPeer`          **peer**            - The destination chat
-     * * `int`                **reply_to_msg_id** - Optional: The message to reply to
-     * * `[InputSingleMedia]` **multi_media**     - The medias to send
-     * * `int`                **schedule_date**   - Optional: Scheduled message date for scheduled messages
-     * * `InputPeer`          **send_as**         - Optional: Send this message as the specified peer
+     * * `boolean`            **silent**                   - Optional: Whether to send the album silently (no notification triggered)
+     * * `boolean`            **background**               - Optional: Send in background?
+     * * `boolean`            **clear_draft**              - Optional: Whether to clear [drafts](https://core.telegram.org/api/drafts)
+     * * `boolean`            **noforwards**               - Optional: Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * * `boolean`            **update_stickersets_order** - Optional:
+     * * `InputPeer`          **peer**                     - The destination chat
+     * * `int`                **reply_to_msg_id**          - Optional: The message to reply to
+     * * `[InputSingleMedia]` **multi_media**              - The medias to send
+     * * `int`                **schedule_date**            - Optional: Scheduled message date for scheduled messages
+     * * `InputPeer`          **send_as**                  - Optional: Send this message as the specified peer
      *
      * @param array $params Parameters
      *
@@ -3537,10 +3585,11 @@ interface messages
      * React to message.
      *
      * Parameters:
-     * * `boolean`   **big**      - Optional: Whether a bigger and longer reaction should be shown
-     * * `InputPeer` **peer**     - Peer
-     * * `int`       **msg_id**   - Message ID to react to
-     * * `string`    **reaction** - Optional: Reaction (a UTF8 emoji)
+     * * `boolean`    **big**           - Optional: Whether a bigger and longer reaction should be shown
+     * * `boolean`    **add_to_recent** - Optional:
+     * * `InputPeer`  **peer**          - Peer
+     * * `int`        **msg_id**        - Message ID to react to
+     * * `[Reaction]` **reaction**      - Optional:
      *
      * @param array $params Parameters
      *
@@ -3567,7 +3616,7 @@ interface messages
      * Parameters:
      * * `InputPeer` **peer**     - Peer
      * * `int`       **id**       - Message ID
-     * * `string`    **reaction** - Optional: Get only reactions of this type (UTF8 emoji)
+     * * `Reaction`  **reaction** - Optional:
      * * `string`    **offset**   - Optional: Offset (typically taken from the `next_offset` field of the returned [messages.MessageReactionsList](https://docs.madelineproto.xyz/API_docs/types/messages.MessageReactionsList.html))
      * * `int`       **limit**    - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
@@ -3581,8 +3630,8 @@ interface messages
      * Change the set of [message reactions »](https://core.telegram.org/api/reactions) that can be used in a certain group, supergroup or channel.
      *
      * Parameters:
-     * * `InputPeer` **peer**                - Group where to apply changes
-     * * `[string]`  **available_reactions** - Allowed reaction emojis
+     * * `InputPeer`     **peer**                - Group where to apply changes
+     * * `ChatReactions` **available_reactions** -
      *
      * @param array $params Parameters
      *
@@ -3606,7 +3655,7 @@ interface messages
      * Change default emoji reaction to use in the quick reaction menu: the value is synced across devices and can be fetched using [help.getAppConfig, `reactions_default` field](https://core.telegram.org/api/config#client-configuration).
      *
      * Parameters:
-     * * `string` **reaction** - New emoji reaction
+     * * `Reaction` **reaction** -
      *
      * @param array $params Parameters
      *
@@ -3722,6 +3771,7 @@ interface messages
      * * `string`    **url**             - Optional:
      * * `string`    **start_param**     - Optional:
      * * `DataJSON`  **theme_params**    - Optional:
+     * * `string`    **platform**        -
      * * `int`       **reply_to_msg_id** - Optional:
      * * `InputPeer` **send_as**         - Optional:.
      *
@@ -3754,7 +3804,8 @@ interface messages
      * Parameters:
      * * `InputUser` **bot**          -
      * * `string`    **url**          -
-     * * `DataJSON`  **theme_params** - Optional:.
+     * * `DataJSON`  **theme_params** - Optional:
+     * * `string`    **platform**     -.
      *
      * @param array $params Parameters
      *
@@ -3852,6 +3903,66 @@ interface messages
      * @return messages.FeaturedStickers
      */
     public function getFeaturedEmojiStickers($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**          -
+     * * `int`       **id**            -
+     * * `InputPeer` **reaction_peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function reportReaction($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int`  **limit** -
+     * * `long` **hash**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Reactions
+     */
+    public function getTopReactions($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int`  **limit** -
+     * * `long` **hash**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Reactions
+     */
+    public function getRecentReactions($params);
+
+    /**
+     *
+     *
+     * @return bool
+     */
+    public function clearRecentReactions();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -
+     * * `[int]`     **id**   -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function getExtendedMedia($params);
 }
 
 interface updates
