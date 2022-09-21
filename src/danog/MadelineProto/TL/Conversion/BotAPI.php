@@ -385,7 +385,7 @@ trait BotAPI
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
             $entities = new DOMEntities($arguments['message']);
             $arguments['message'] = $entities->message;
-            $arguments['entities'] = $entities->entities;
+            $arguments['entities'] = array_merge($arguments['entities'] ?? [], $entities->entities);
             if ($entities->buttons) {
                 $arguments['reply_markup'] = $this->buildRows($entities->buttons);
             }
