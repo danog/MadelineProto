@@ -111,8 +111,6 @@ abstract class MsgIdHandler
      */
     public static function toString(string $messageId): string
     {
-        return PHP_INT_SIZE === 8
-            ? MsgIdHandler64::toStringInternal($messageId)
-            : MsgIdHandler32::toStringInternal($messageId);
+        return MsgIdHandler64::toStringInternal($messageId);
     }
 }

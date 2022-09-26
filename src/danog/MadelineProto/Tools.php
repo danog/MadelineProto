@@ -1014,9 +1014,14 @@ abstract class Tools extends StrTools
      */
     public static function parseLink(string $link): ?array
     {
-        if (!\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
-            return null;
+        if (\preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
+            if ($link !== 'www') {
+                return [false, $matches[1]];
+            }
         }
-        return [!!$matches[1], $matches[2]];
+        if (\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
+            return [!!$matches[1], $matches[2]];
+        }
+        return null;
     }
 }
