@@ -171,7 +171,7 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
     }
     public function offsetExists(mixed $offset): bool
     {
-        throw new Exception('Not supported!');
+        throw new Exception('isset is not supported, please yield the entire Coroutine first!');
     }
     /**
      * Get data at an array offset asynchronously.
