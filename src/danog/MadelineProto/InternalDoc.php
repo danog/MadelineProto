@@ -196,7 +196,7 @@ interface auth
 
     /**
      * Generate a login token, for [login via QR code](https://core.telegram.org/api/qr-login).
-     * The generated login token should be encoded using base64url, then shown as a `tg://login?token=base64encodedtoken` URL in the QR code.
+     * The generated login token should be encoded using base64url, then shown as a `tg://login?token=base64encodedtoken` [deep link »](https://core.telegram.org/api/links#qr-code-login-links) in the QR code.
      *
      * For more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
@@ -346,7 +346,7 @@ interface account
     public function updateStatus($params);
 
     /**
-     * Returns a list of available wallpapers.
+     * Returns a list of available [wallpapers](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
      * * `long` **hash** - [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
@@ -421,11 +421,13 @@ interface account
     public function setPrivacy($params);
 
     /**
-     * Delete the user's account from the telegram servers. Can be used, for example, to delete the account of a user that provided the login code, but forgot the [2FA password and no recovery method is configured](https://core.telegram.org/api/srp).
+     * Delete the user's account from the telegram servers.
+     *
+     * Can also be used to delete the account of a user that provided the login code, but forgot the 2FA password and no recovery method is configured, see [here »](https://core.telegram.org/api/srp#password-recovery) for more info on password recovery, and [here »](https://core.telegram.org/api/account-deletion) for more info on account deletion.
      *
      * Parameters:
      * * `string`                **reason**   - Why is the account being deleted, can be empty
-     * * `InputCheckPasswordSRP` **password** - Optional:
+     * * `InputCheckPasswordSRP` **password** - Optional: [2FA password](https://core.telegram.org/api/srp): this field can be omitted even for accounts with 2FA enabled: in this case account account deletion will be delayed by 7 days [as specified in the docs »](https://core.telegram.org/api/account-deletion)
      *
      * @param array $params Parameters
      *
@@ -709,11 +711,11 @@ interface account
     public function verifyPhone($params);
 
     /**
-     * Send the verification email code for telegram [passport](https://core.telegram.org/passport).
+     * Send an email verification code.
      *
      * Parameters:
      * * `EmailVerifyPurpose` **purpose** -
-     * * `string`             **email**   - The email where to send the code
+     * * `string`             **email**   - The email where to send the code.
      *
      * @param array $params Parameters
      *
@@ -722,7 +724,7 @@ interface account
     public function sendVerifyEmailCode($params);
 
     /**
-     * Verify an email address for telegram [passport](https://core.telegram.org/passport).
+     * Verify an email address.
      *
      * Parameters:
      * * `EmailVerifyPurpose` **purpose**      -
@@ -744,7 +746,7 @@ interface account
      * * `boolean` **message_megagroups** - Optional: Whether to export messages in [supergroups](https://core.telegram.org/api/channel#supergroups)
      * * `boolean` **message_channels**   - Optional: Whether to export messages in [channels](https://core.telegram.org/api/channel#channels)
      * * `boolean` **files**              - Optional: Whether to export files
-     * * `long`    **file_max_size**      - Optional:
+     * * `long`    **file_max_size**      - Optional: Maximum size of files to export
      *
      * @param array $params Parameters
      *
@@ -823,10 +825,10 @@ interface account
     public function getNotifyExceptions($params);
 
     /**
-     * Get info about a certain wallpaper.
+     * Get info about a certain [wallpaper](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
-     * * `InputWallPaper` **wallpaper** - The wallpaper to get info about
+     * * `InputWallPaper` **wallpaper** - The [wallpaper](https://core.telegram.org/api/wallpapers) to get info about
      *
      * @param array $params Parameters
      *
@@ -835,7 +837,7 @@ interface account
     public function getWallPaper($params);
 
     /**
-     * Create and upload a new wallpaper.
+     * Create and upload a new [wallpaper](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
      * * `InputFile`         **file**      - The JPG/PNG wallpaper
@@ -849,10 +851,10 @@ interface account
     public function uploadWallPaper($params);
 
     /**
-     * Install/uninstall wallpaper.
+     * Install/uninstall [wallpaper](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
-     * * `InputWallPaper`    **wallpaper** - Wallpaper to save
+     * * `InputWallPaper`    **wallpaper** - [Wallpaper](https://core.telegram.org/api/wallpapers) to install or uninstall
      * * `Bool`              **unsave**    - Uninstall wallpaper?
      * * `WallPaperSettings` **settings**  - Wallpaper settings
      *
@@ -863,11 +865,11 @@ interface account
     public function saveWallPaper($params);
 
     /**
-     * Install wallpaper.
+     * Install [wallpaper](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
-     * * `InputWallPaper`    **wallpaper** - Wallpaper to install
-     * * `WallPaperSettings` **settings**  - Wallpaper settings
+     * * `InputWallPaper`    **wallpaper** - [Wallpaper](https://core.telegram.org/api/wallpapers) to install
+     * * `WallPaperSettings` **settings**  - [Wallpaper](https://core.telegram.org/api/wallpapers) settings
      *
      * @param array $params Parameters
      *
@@ -876,7 +878,7 @@ interface account
     public function installWallPaper($params);
 
     /**
-     * Delete installed wallpapers.
+     * Delete all installed [wallpapers](https://core.telegram.org/api/wallpapers), reverting to the default wallpaper set.
      *
      * @return bool
      */
@@ -907,7 +909,7 @@ interface account
      * Upload theme.
      *
      * Parameters:
-     * * `InputFile` **file**      - Theme file uploaded as described in [files »](https://core.telegram.org/api/files)
+     * * `InputFile` **file**      - [Previously uploaded](https://core.telegram.org/api/themes#uploading-theme-files) theme file with platform-specific colors for UI components, can be left unset when creating themes that only modify the wallpaper or accent colors.
      * * `InputFile` **thumb**     - Optional: Thumbnail
      * * `string`    **file_name** - File name
      * * `string`    **mime_type** - MIME type, must be `application/x-tgtheme-{format}`, where `format` depends on the client
@@ -922,10 +924,10 @@ interface account
      * Create a theme.
      *
      * Parameters:
-     * * `string`               **slug**     - Unique theme ID
+     * * `string`               **slug**     - Unique theme ID used to generate [theme deep links](https://core.telegram.org/api/links#theme-links), can be empty to autogenerate a random ID.
      * * `string`               **title**    - Theme name
      * * `InputDocument`        **document** - Optional: Theme file
-     * * `[InputThemeSettings]` **settings** - Optional: Theme settings
+     * * `[InputThemeSettings]` **settings** - Optional: Theme settings, multiple values can be provided for the different base themes (day/night mode, etc).
      *
      * @param array $params Parameters
      *
@@ -984,7 +986,7 @@ interface account
      * Parameters:
      * * `string`     **format**      - Theme format, a string that identifies the theming engines supported by the client
      * * `InputTheme` **theme**       - Theme
-     * * `long`       **document_id** - Document ID
+     * * `long`       **document_id** - Deprecated: should always be `0`
      *
      * @param array $params Parameters
      *
@@ -1025,10 +1027,10 @@ interface account
     public function getContentSettings();
 
     /**
-     * Get info about multiple wallpapers.
+     * Get info about multiple [wallpapers](https://core.telegram.org/api/wallpapers).
      *
      * Parameters:
-     * * `[InputWallPaper]` **wallpapers** - Wallpapers to fetch info about
+     * * `[InputWallPaper]` **wallpapers** - [Wallpapers](https://core.telegram.org/api/wallpapers) to fetch info about
      *
      * @param array $params Parameters
      *
@@ -1123,10 +1125,10 @@ interface account
     public function changeAuthorizationSettings($params);
 
     /**
-     *
+     * Fetch saved notification sounds.
      *
      * Parameters:
-     * * `long` **hash** -.
+     * * `long` **hash** - [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1135,11 +1137,14 @@ interface account
     public function getSavedRingtones($params);
 
     /**
+     * Save or remove saved notification sound.
      *
+     * If the notification sound is already in MP3 format, [account.savedRingtone](https://docs.madelineproto.xyz/API_docs/constructors/account.savedRingtone.html) will be returned.
+     * Otherwise, it will be automatically converted and a [account.savedRingtoneConverted](https://docs.madelineproto.xyz/API_docs/constructors/account.savedRingtoneConverted.html) will be returned, containing a new [document](https://docs.madelineproto.xyz/API_docs/constructors/document.html) object that should be used to refer to the ringtone from now on (ie when deleting it using the `unsave` parameter, or when downloading it).
      *
      * Parameters:
-     * * `InputDocument` **id**     -
-     * * `Bool`          **unsave** -.
+     * * `InputDocument` **id**     - Notification sound uploaded using [account.uploadRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.uploadRingtone.html)
+     * * `Bool`          **unsave** - Whether to add or delete the notification sound
      *
      * @param array $params Parameters
      *
@@ -1148,12 +1153,12 @@ interface account
     public function saveRingtone($params);
 
     /**
-     *
+     * Upload notification sound, use [account.saveRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.saveRingtone.html) to convert it and add it to the list of saved notification sounds.
      *
      * Parameters:
-     * * `InputFile` **file**      -
-     * * `string`    **file_name** -
-     * * `string`    **mime_type** -.
+     * * `InputFile` **file**      - Notification sound
+     * * `string`    **file_name** - File name
+     * * `string`    **mime_type** - MIME type of file
      *
      * @param array $params Parameters
      *
@@ -1504,7 +1509,7 @@ interface contacts
      * Resolve a phone number to get user info, if their privacy settings allow it.
      *
      * Parameters:
-     * * `string` **phone** - Phone number in international format, possibly obtained from a `t.me/+number` or `tg://resolve?phone=number` URI.
+     * * `string` **phone** - Phone number in international format, possibly obtained from a [phone number deep link](https://core.telegram.org/api/links#phone-number-links).
      *
      * @param array $params Parameters
      *
@@ -1546,7 +1551,7 @@ interface messages
     public function getDialogs($params);
 
     /**
-     * Gets back the conversation history with one interlocutor / within a chat.
+     * Returns the conversation history with one interlocutor / within a chat.
      *
      * Parameters:
      * * `InputPeer` **peer**        - Target peer
@@ -1565,7 +1570,7 @@ interface messages
     public function getHistory($params);
 
     /**
-     * Gets back found messages.
+     * Returns found messages.
      *
      * Parameters:
      * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) constructor for global search
@@ -1649,7 +1654,7 @@ interface messages
      * Parameters:
      * * `InputPeer`         **peer**       - Target user or group
      * * `int`               **top_msg_id** - Optional: [Thread ID](https://core.telegram.org/api/threads)
-     * * `SendMessageAction` **action**     - Type of action<br>Parameter added in [Layer 17](https://core.telegram.org/api/layers#layer-17).
+     * * `SendMessageAction` **action**     - Type of action
      *
      * @param array $params Parameters
      *
@@ -2073,7 +2078,7 @@ interface messages
      * Check the validity of a chat invite link and get basic info about it.
      *
      * Parameters:
-     * * `string` **hash** - Invite hash in `t.me/joinchat/hash` or `t.me/+hash`
+     * * `string` **hash** - Invite hash from [chat invite deep link »](https://core.telegram.org/api/links#chat-invite-links).
      *
      * @param array $params Parameters
      *
@@ -2085,7 +2090,7 @@ interface messages
      * Import a chat invite and join a private chat/supergroup/channel.
      *
      * Parameters:
-     * * `string` **hash** - `hash` from `t.me/joinchat/hash`
+     * * `string` **hash** - `hash` from a [chat invite deep link](https://core.telegram.org/api/links#chat-invite-links)
      *
      * @param array $params Parameters
      *
@@ -2132,12 +2137,12 @@ interface messages
     public function uninstallStickerSet($params);
 
     /**
-     * Start a conversation with a bot using a [deep linking parameter](https://core.telegram.org/bots#deep-linking).
+     * Start a conversation with a bot using a [deep linking parameter](https://core.telegram.org/api/links#bot-links).
      *
      * Parameters:
      * * `InputUser` **bot**         - The bot
      * * `InputPeer` **peer**        - The chat where to start the bot, can be the bot's private chat or a group
-     * * `string`    **start_param** - [Deep linking parameter](https://core.telegram.org/bots#deep-linking)
+     * * `string`    **start_param** - [Deep linking parameter](https://core.telegram.org/api/links#bot-links)
      *
      * @param array $params Parameters
      *
@@ -2210,7 +2215,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **masks**  - Optional: Reorder mask stickersets
-     * * `boolean` **emojis** - Optional:
+     * * `boolean` **emojis** - Optional: Reorder [custom emoji stickersets](https://core.telegram.org/api/custom-emoji)
      * * `[long]`  **order**  - New stickerset order by stickerset IDs
      *
      * @param array $params Parameters
@@ -2224,7 +2229,7 @@ interface messages
      *
      * Parameters:
      * * `bytes`  **sha256**    - SHA256 of file
-     * * `long`   **size**      -
+     * * `long`   **size**      - Size of the file in bytes
      * * `string` **mime_type** - Mime type
      *
      * @param array $params Parameters
@@ -2423,7 +2428,8 @@ interface messages
     public function saveDraft($params);
 
     /**
-     * Save get all message [drafts](https://core.telegram.org/api/drafts).
+     * Return all message [drafts](https://core.telegram.org/api/drafts).
+     * Returns all the latest [updateDraftMessage](https://docs.madelineproto.xyz/API_docs/constructors/updateDraftMessage.html) updates related to all chats with drafts.
      *
      * @return Updates
      */
@@ -2496,8 +2502,8 @@ interface messages
      * Get all archived stickers.
      *
      * Parameters:
-     * * `boolean` **masks**     - Optional: Get mask stickers
-     * * `boolean` **emojis**    - Optional:
+     * * `boolean` **masks**     - Optional: Get [mask stickers](https://core.telegram.org/api/stickers#mask-stickers)
+     * * `boolean` **emojis**    - Optional: Get [custom emoji stickers](https://core.telegram.org/api/custom-emoji)
      * * `long`    **offset_id** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `int`     **limit**     - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
@@ -2703,7 +2709,7 @@ interface messages
      * Upload a file and associate it to a chat (without actually sending it to the chat).
      *
      * Parameters:
-     * * `InputPeer`  **peer**  - The chat, can be an [inputPeerEmpty](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) for bots
+     * * `InputPeer`  **peer**  - The chat, can be [inputPeerEmpty](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) for bots and [inputPeerSelf](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerSelf.html) for users.
      * * `InputMedia` **media** - File uploaded in chunks as described in [files »](https://core.telegram.org/api/files)
      *
      * @param array $params Parameters
@@ -2804,7 +2810,7 @@ interface messages
      * * `boolean`            **update_stickersets_order** - Optional:
      * * `InputPeer`          **peer**                     - The destination chat
      * * `int`                **reply_to_msg_id**          - Optional: The message to reply to
-     * * `[InputSingleMedia]` **multi_media**              - The medias to send
+     * * `[InputSingleMedia]` **multi_media**              - The medias to send: note that they must be separately uploaded using [messages.uploadMedia](https://docs.madelineproto.xyz/API_docs/methods/messages.uploadMedia.html) first, using raw `inputMediaUploaded*` constructors is not supported.
      * * `int`                **schedule_date**            - Optional: Scheduled message date for scheduled messages
      * * `InputPeer`          **send_as**                  - Optional: Send this message as the specified peer
      *
@@ -3480,7 +3486,7 @@ interface messages
     public function setChatTheme($params);
 
     /**
-     * Get which users read a specific message: only available for groups and supergroups with less than `chat_read_mark_size_threshold` members, read receipts will be stored for `chat_read_mark_expire_period` seconds after the message was sent, see [client configuration for more info »](https://core.telegram.org/api/config#client-configuration).
+     * Get which users read a specific message: only available for groups and supergroups with less than [`chat_read_mark_size_threshold` members](https://core.telegram.org/api/config#chat-read-mark-size-threshold), read receipts will be stored for [`chat_read_mark_expire_period` seconds after the message was sent](https://core.telegram.org/api/config#chat-read-mark-expire-period), see [client configuration for more info »](https://core.telegram.org/api/config#client-configuration).
      *
      * Parameters:
      * * `InputPeer` **peer**   - Dialog
@@ -3652,7 +3658,7 @@ interface messages
     public function getAvailableReactions($params);
 
     /**
-     * Change default emoji reaction to use in the quick reaction menu: the value is synced across devices and can be fetched using [help.getAppConfig, `reactions_default` field](https://core.telegram.org/api/config#client-configuration).
+     * Change default emoji reaction to use in the quick reaction menu: the value is synced across devices and can be fetched using [help.getConfig, `reactions_default` field](https://docs.madelineproto.xyz/API_docs/methods/help.getConfig.html).
      *
      * Parameters:
      * * `Reaction` **reaction** -
@@ -3724,10 +3730,10 @@ interface messages
     public function searchSentMedia($params);
 
     /**
-     *
+     * Returns installed attachment menu [bot web apps »](https://core.telegram.org/api/bots/attach).
      *
      * Parameters:
-     * * `long` **hash** -.
+     * * `long` **hash** - [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -3736,10 +3742,10 @@ interface messages
     public function getAttachMenuBots($params);
 
     /**
-     *
+     * Returns attachment menu entry for a [bot web app that can be launched from the attachment menu »](https://core.telegram.org/api/bots/attach).
      *
      * Parameters:
-     * * `InputUser` **bot** -.
+     * * `InputUser` **bot** - Bot ID
      *
      * @param array $params Parameters
      *
@@ -3748,11 +3754,11 @@ interface messages
     public function getAttachMenuBot($params);
 
     /**
-     *
+     * Enable or disable [web bot attachment menu »](https://core.telegram.org/api/bots/attach).
      *
      * Parameters:
-     * * `InputUser` **bot**     -
-     * * `Bool`      **enabled** -.
+     * * `InputUser` **bot**     - Bot ID
+     * * `Bool`      **enabled** - Toggle
      *
      * @param array $params Parameters
      *
@@ -3761,19 +3767,21 @@ interface messages
     public function toggleBotInAttachMenu($params);
 
     /**
+     * Open a [bot web app](https://core.telegram.org/bots/webapps), sending over user information after user confirmation.
      *
+     * After calling this method, until the user closes the webview, [messages.prolongWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.prolongWebView.html) must be called every 60 seconds.
      *
      * Parameters:
-     * * `boolean`   **from_bot_menu**   - Optional:
-     * * `boolean`   **silent**          - Optional:
-     * * `InputPeer` **peer**            -
-     * * `InputUser` **bot**             -
-     * * `string`    **url**             - Optional:
-     * * `string`    **start_param**     - Optional:
-     * * `DataJSON`  **theme_params**    - Optional:
+     * * `boolean`   **from_bot_menu**   - Optional: Whether the webview was opened by clicking on the bot's [menu button »](https://core.telegram.org/api/bots/menu).
+     * * `boolean`   **silent**          - Optional: Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent silently (no notifications for the receivers).
+     * * `InputPeer` **peer**            - Dialog where the web app is being opened, and where the resulting message will be sent (see the [docs for more info »](https://core.telegram.org/api/bots/webapps)).
+     * * `InputUser` **bot**             - Bot that owns the [web app](https://core.telegram.org/api/bots/webapps)
+     * * `string`    **url**             - Optional: [Web app URL](https://core.telegram.org/api/bots/webapps)
+     * * `string`    **start_param**     - Optional: If the web app was opened from the attachment menu using a [attachment menu deep link](https://core.telegram.org/api/links#bot-attachment-menu-links), `start_param` should contain the `data` from the `startattach` parameter.
+     * * `DataJSON`  **theme_params**    - Optional: Theme parameters for the web app
      * * `string`    **platform**        -
-     * * `int`       **reply_to_msg_id** - Optional:
-     * * `InputPeer` **send_as**         - Optional:.
+     * * `int`       **reply_to_msg_id** - Optional: Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent in reply to this message ID.
+     * * `InputPeer` **send_as**         - Optional: Open the web app as the specified peer, sending the resulting the message as the specified peer.
      *
      * @param array $params Parameters
      *
@@ -3782,15 +3790,15 @@ interface messages
     public function requestWebView($params);
 
     /**
-     *
+     * Indicate to the server (from the user side) that the user is still using a web app.
      *
      * Parameters:
-     * * `boolean`   **silent**          - Optional:
-     * * `InputPeer` **peer**            -
-     * * `InputUser` **bot**             -
-     * * `long`      **query_id**        -
-     * * `int`       **reply_to_msg_id** - Optional:
-     * * `InputPeer` **send_as**         - Optional:.
+     * * `boolean`   **silent**          - Optional: Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent silently (no notifications for the receivers).
+     * * `InputPeer` **peer**            - Dialog where the web app was opened.
+     * * `InputUser` **bot**             - Bot that owns the [web app](https://core.telegram.org/api/bots/webapps)
+     * * `long`      **query_id**        - Web app interaction ID obtained from [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html)
+     * * `int`       **reply_to_msg_id** - Optional: Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent in reply to this message ID.
+     * * `InputPeer` **send_as**         - Optional: Open the web app as the specified peer
      *
      * @param array $params Parameters
      *
@@ -3799,13 +3807,13 @@ interface messages
     public function prolongWebView($params);
 
     /**
-     *
+     * Open a [bot web app](https://core.telegram.org/api/bots/webapps).
      *
      * Parameters:
-     * * `InputUser` **bot**          -
-     * * `string`    **url**          -
-     * * `DataJSON`  **theme_params** - Optional:
-     * * `string`    **platform**     -.
+     * * `InputUser` **bot**          - Bot that owns the webapp
+     * * `string`    **url**          - Web app URL
+     * * `DataJSON`  **theme_params** - Optional: Theme parameters
+     * * `string`    **platform**     -
      *
      * @param array $params Parameters
      *
@@ -3814,11 +3822,11 @@ interface messages
     public function requestSimpleWebView($params);
 
     /**
-     *
+     * Terminate webview interaction started with [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html), sending the specified message to the chat on behalf of the user.
      *
      * Parameters:
-     * * `string`               **bot_query_id** -
-     * * `InputBotInlineResult` **result**       -.
+     * * `string`               **bot_query_id** - Webview interaction ID obtained from [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html)
+     * * `InputBotInlineResult` **result**       - Message to send
      *
      * @param array $params Parameters
      *
@@ -3827,12 +3835,12 @@ interface messages
     public function sendWebViewResultMessage($params);
 
     /**
-     *
+     * Used by the user to relay data from an opened [reply keyboard bot web app](https://core.telegram.org/api/bots/webapps) to the bot that owns it.
      *
      * Parameters:
-     * * `InputUser` **bot**         -
-     * * `string`    **button_text** -
-     * * `string`    **data**        -.
+     * * `InputUser` **bot**         - Bot that owns the web app
+     * * `string`    **button_text** - Text of the [keyboardButtonSimpleWebView](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonSimpleWebView.html) that was pressed to open the web app.
+     * * `string`    **data**        - Data to relay to the bot, obtained from a [`web_app_data_send` JS event](https://core.telegram.org/api/web-events#web-app-data-send).
      *
      * @param array $params Parameters
      *
@@ -3841,11 +3849,11 @@ interface messages
     public function sendWebViewData($params);
 
     /**
-     *
+     * [Transcribe voice message](https://core.telegram.org/api/transcribe).
      *
      * Parameters:
-     * * `InputPeer` **peer**   -
-     * * `int`       **msg_id** -.
+     * * `InputPeer` **peer**   - Peer ID where the voice message was sent
+     * * `int`       **msg_id** - Voice message ID
      *
      * @param array $params Parameters
      *
@@ -3854,13 +3862,13 @@ interface messages
     public function transcribeAudio($params);
 
     /**
-     *
+     * Rate [transcribed voice message](https://core.telegram.org/api/transcribe).
      *
      * Parameters:
-     * * `InputPeer` **peer**             -
-     * * `int`       **msg_id**           -
-     * * `long`      **transcription_id** -
-     * * `Bool`      **good**             -.
+     * * `InputPeer` **peer**             - Peer where the voice message was sent
+     * * `int`       **msg_id**           - Message ID
+     * * `long`      **transcription_id** - Transcription ID
+     * * `Bool`      **good**             - Whether the transcription was correct
      *
      * @param array $params Parameters
      *
@@ -3869,10 +3877,12 @@ interface messages
     public function rateTranscribedAudio($params);
 
     /**
+     * Fetch [custom emoji stickers »](https://core.telegram.org/api/custom-emoji).
      *
+     * Returns a list of [documents](https://docs.madelineproto.xyz/API_docs/constructors/document.html) with the animated custom emoji in TGS format, and a [documentAttributeCustomEmoji](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeCustomEmoji.html) attribute with the original emoji and info about the emoji stickerset this custom emoji belongs to.
      *
      * Parameters:
-     * * `[long]` **document_id** -.
+     * * `[long]` **document_id** - [Custom emoji](https://core.telegram.org/api/custom-emoji) IDs from a [messageEntityCustomEmoji](https://docs.madelineproto.xyz/API_docs/constructors/messageEntityCustomEmoji.html).
      *
      * @param array $params Parameters
      *
@@ -3881,10 +3891,10 @@ interface messages
     public function getCustomEmojiDocuments($params);
 
     /**
-     *
+     * Gets the list of currently installed [custom emoji stickersets](https://core.telegram.org/api/custom-emoji).
      *
      * Parameters:
-     * * `long` **hash** -.
+     * * `long` **hash** - [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -3893,10 +3903,10 @@ interface messages
     public function getEmojiStickers($params);
 
     /**
-     *
+     * Gets featured custom emoji stickersets.
      *
      * Parameters:
-     * * `long` **hash** -.
+     * * `long` **hash** - [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -4035,7 +4045,7 @@ interface photos
     public function uploadProfilePhoto($params);
 
     /**
-     * Deletes profile photos.
+     * Deletes profile photos. The method returns a list of successfully deleted photo IDs.
      *
      * Parameters:
      * * `[InputPhoto]` **id** - Input photos to delete
@@ -4085,7 +4095,7 @@ interface upload
      * * `boolean`           **precise**       - Optional: Disable some checks on limit and offset values, useful for example to stream videos by keyframes
      * * `boolean`           **cdn_supported** - Optional: Whether the current client supports [CDN downloads](https://core.telegram.org/cdn)
      * * `InputFileLocation` **location**      - File location
-     * * `long`              **offset**        -
+     * * `long`              **offset**        - Number of bytes to be skipped
      * * `int`               **limit**         - Number of bytes to be returned
      *
      * @param array $params Parameters
@@ -4110,7 +4120,9 @@ interface upload
     public function saveBigFilePart($params);
 
     /**
-     * Returns content of an HTTP file or a part, by proxying the request through telegram.
+     * Returns content of a web file, by proxying the request through telegram, see the [webfile docs for more info](https://core.telegram.org/api/files#downloading-webfiles).
+     *
+     * **Note**: the query must be sent to the DC specified in the `webfile_dc_id` [MTProto configuration field](https://core.telegram.org/api/config#mtproto-configuration).
      *
      * Parameters:
      * * `InputWebFileLocation` **location** - The file to download
@@ -4128,7 +4140,7 @@ interface upload
      *
      * Parameters:
      * * `bytes` **file_token** - File token
-     * * `long`  **offset**     -
+     * * `long`  **offset**     - Offset of chunk to download
      * * `int`   **limit**      - Length of chunk to download
      *
      * @param array $params Parameters
@@ -4155,7 +4167,7 @@ interface upload
      *
      * Parameters:
      * * `bytes` **file_token** - File
-     * * `long`  **offset**     -
+     * * `long`  **offset**     - Offset from which to start getting hashes
      *
      * @param array $params Parameters
      *
@@ -4168,7 +4180,7 @@ interface upload
      *
      * Parameters:
      * * `InputFileLocation` **location** - File
-     * * `long`              **offset**   -
+     * * `long`              **offset**   - Offset from which to get file hashes
      *
      * @param array $params Parameters
      *
@@ -4255,8 +4267,11 @@ interface help
     /**
      * Get recently used `t.me` links.
      *
+     * When installing official applications from "Download Telegram" buttons present in [t.me](https://t.me) pages, a referral parameter is passed to applications after installation.
+     * If, after downloading the application, the user creates a new account (instead of logging into an existing one), the referral parameter should be imported using this method, which returns the [t.me](https://t.me) pages the user recently opened, before installing Telegram.
+     *
      * Parameters:
-     * * `string` **referer** - Referer
+     * * `string` **referer** - Referrer
      *
      * @param array $params Parameters
      *
@@ -4284,10 +4299,10 @@ interface help
     public function acceptTermsOfService($params);
 
     /**
-     * Get info about a `t.me` link.
+     * Get info about an unsupported deep link, see [here for more info »](https://core.telegram.org/api/links#unsupported-links).
      *
      * Parameters:
-     * * `string` **path** - Path in `t.me/path`
+     * * `string` **path** - Path component of a `tg:` link
      *
      * @param array $params Parameters
      *
@@ -4405,7 +4420,7 @@ interface help
     public function getCountriesList($params);
 
     /**
-     *
+     * Get Telegram Premium promotion information.
      *
      * @return help.PremiumPromo
      */
@@ -4757,7 +4772,7 @@ interface channels
      * Delete the history of a [supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `boolean`      **for_everyone** - Optional:
+     * * `boolean`      **for_everyone** - Optional: Whether the history should be deleted for everyone
      * * `InputChannel` **channel**      - [Supergroup](https://core.telegram.org/api/channel) whose history must be deleted
      * * `int`          **max_id**       - ID of message **up to which** the history must be deleted
      *
@@ -4925,11 +4940,11 @@ interface channels
     public function deleteParticipantHistory($params);
 
     /**
-     *
+     * Set whether all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
      *
      * Parameters:
-     * * `InputChannel` **channel** -
-     * * `Bool`         **enabled** -.
+     * * `InputChannel` **channel** - Discussion group
+     * * `Bool`         **enabled** - Toggle
      *
      * @param array $params Parameters
      *
@@ -4938,11 +4953,11 @@ interface channels
     public function toggleJoinToSend($params);
 
     /**
-     *
+     * Set whether all users should [request admin approval to join the group »](https://core.telegram.org/api/invites#join-requests).
      *
      * Parameters:
-     * * `InputChannel` **channel** -
-     * * `Bool`         **enabled** -.
+     * * `InputChannel` **channel** - Group
+     * * `Bool`         **enabled** - Toggle
      *
      * @param array $params Parameters
      *
@@ -5020,11 +5035,11 @@ interface bots
     public function getBotCommands($params);
 
     /**
-     *
+     * Sets the [menu button action »](https://core.telegram.org/api/bots/menu) for a given user or for all users.
      *
      * Parameters:
-     * * `InputUser`     **user_id** -
-     * * `BotMenuButton` **button**  -.
+     * * `InputUser`     **user_id** - User ID
+     * * `BotMenuButton` **button**  - Bot menu button action
      *
      * @param array $params Parameters
      *
@@ -5033,10 +5048,10 @@ interface bots
     public function setBotMenuButton($params);
 
     /**
-     *
+     * Gets the menu button action for a given user or for all users, previously set using [bots.setBotMenuButton](https://docs.madelineproto.xyz/API_docs/methods/bots.setBotMenuButton.html); users can see this information in the [botInfo](https://docs.madelineproto.xyz/API_docs/constructors/botInfo.html) constructor.
      *
      * Parameters:
-     * * `InputUser` **user_id** -.
+     * * `InputUser` **user_id** - User ID or empty for the default menu button.
      *
      * @param array $params Parameters
      *
@@ -5045,10 +5060,10 @@ interface bots
     public function getBotMenuButton($params);
 
     /**
-     *
+     * Set the default [suggested admin rights](https://core.telegram.org/api/rights#suggested-bot-rights) for bots being added as admins to channels, see [here for more info on how to handle them »](https://core.telegram.org/api/rights#suggested-bot-rights).
      *
      * Parameters:
-     * * `ChatAdminRights` **admin_rights** -.
+     * * `ChatAdminRights` **admin_rights** - Admin rights
      *
      * @param array $params Parameters
      *
@@ -5057,10 +5072,10 @@ interface bots
     public function setBotBroadcastDefaultAdminRights($params);
 
     /**
-     *
+     * Set the default [suggested admin rights](https://core.telegram.org/api/rights#suggested-bot-rights) for bots being added as admins to groups, see [here for more info on how to handle them »](https://core.telegram.org/api/rights#suggested-bot-rights).
      *
      * Parameters:
-     * * `ChatAdminRights` **admin_rights** -.
+     * * `ChatAdminRights` **admin_rights** - Admin rights
      *
      * @param array $params Parameters
      *
@@ -5075,7 +5090,7 @@ interface payments
      * Get a payment form.
      *
      * Parameters:
-     * * `InputInvoice` **invoice**      -
+     * * `InputInvoice` **invoice**      - Invoice
      * * `DataJSON`     **theme_params** - Optional: A JSON object with the following keys, containing color theme information (integers, RGB24) to pass to the payment provider, to apply in eventual verification pages: <br>`bg_color` \- Background color <br>`text_color` \- Text color <br>`hint_color` \- Hint text color <br>`link_color` \- Link color <br>`button_color` \- Button color <br>`button_text_color` \- Button text color
      *
      * @param array $params Parameters
@@ -5102,7 +5117,7 @@ interface payments
      *
      * Parameters:
      * * `boolean`              **save**    - Optional: Save order information to re-use it for future orders
-     * * `InputInvoice`         **invoice** -
+     * * `InputInvoice`         **invoice** - Invoice
      * * `PaymentRequestedInfo` **info**    - Requested order information
      *
      * @param array $params Parameters
@@ -5116,7 +5131,7 @@ interface payments
      *
      * Parameters:
      * * `long`                    **form_id**            - Form ID
-     * * `InputInvoice`            **invoice**            -
+     * * `InputInvoice`            **invoice**            - Invoice
      * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](https://docs.madelineproto.xyz/API_docs/constructors/payments.validatedRequestedInfo.html)
      * * `string`                  **shipping_option_id** - Optional: Chosen shipping option ID
      * * `InputPaymentCredentials` **credentials**        - Payment credentials
@@ -5161,10 +5176,10 @@ interface payments
     public function getBankCardData($params);
 
     /**
-     *
+     * Generate an [invoice deep link](https://core.telegram.org/api/links#invoice-links).
      *
      * Parameters:
-     * * `InputMedia` **invoice_media** -.
+     * * `InputMedia` **invoice_media** - Invoice
      *
      * @param array $params Parameters
      *
@@ -5173,11 +5188,11 @@ interface payments
     public function exportInvoice($params);
 
     /**
-     *
+     * Informs server about a purchase made through the App Store: for official applications only.
      *
      * Parameters:
-     * * `bytes`                    **receipt** -
-     * * `InputStorePaymentPurpose` **purpose** -.
+     * * `bytes`                    **receipt** - Receipt
+     * * `InputStorePaymentPurpose` **purpose** - Payment purpose
      *
      * @param array $params Parameters
      *
@@ -5186,11 +5201,11 @@ interface payments
     public function assignAppStoreTransaction($params);
 
     /**
-     *
+     * Informs server about a purchase made through the Play Store: for official applications only.
      *
      * Parameters:
-     * * `DataJSON`                 **receipt** -
-     * * `InputStorePaymentPurpose` **purpose** -.
+     * * `DataJSON`                 **receipt** - Receipt
+     * * `InputStorePaymentPurpose` **purpose** - Payment purpose
      *
      * @param array $params Parameters
      *
@@ -5199,10 +5214,10 @@ interface payments
     public function assignPlayMarketTransaction($params);
 
     /**
-     *
+     * Checks whether Telegram Premium purchase is possible. Must be called before in-store Premium purchase, official apps only.
      *
      * Parameters:
-     * * `InputStorePaymentPurpose` **purpose** -.
+     * * `InputStorePaymentPurpose` **purpose** - Payment purpose
      *
      * @param array $params Parameters
      *
@@ -5222,7 +5237,7 @@ interface stickers
      * * `boolean`               **videos**     - Optional: Whether this is a video stickerset
      * * `InputUser`             **user_id**    - Stickerset owner
      * * `string`                **title**      - Stickerset name, `1-64` chars
-     * * `string`                **short_name** - Sticker set name. Can contain only English letters, digits and underscores. Must end with *"*by*<bot username="">"</bot>* (*<bot_username></bot_username>* is case insensitive); 1-64 characters
+     * * `string`                **short_name** - Short name of sticker set, to be used in [sticker deep links »](https://core.telegram.org/api/links#stickerset-links). Can contain only english letters, digits and underscores. Must begin with a letter, can't contain consecutive underscores and, **if called by a bot**, must end in `"_by_<bot_username>"`. `<bot_username>` is case insensitive. 1-64 characters.
      * * `InputDocument`         **thumb**      - Optional: Thumbnail
      * * `[InputStickerSetItem]` **stickers**   - Stickers
      * * `string`                **software**   - Optional: Used when [importing stickers using the sticker import SDKs](https://core.telegram.org/import-stickers), specifies the name of the software that created the stickers
@@ -5391,7 +5406,7 @@ interface phone
     public function discardCall($params);
 
     /**
-     * Rate a call.
+     * Rate a call, returns info about the rating message sent to the official VoIP bot.
      *
      * Parameters:
      * * `boolean`        **user_initiative** - Optional: Whether the user decided on their own initiative to rate the call
@@ -5454,7 +5469,7 @@ interface phone
      * * `boolean`        **video_stopped** - Optional: If set, the user's video will be disabled by default upon joining.
      * * `InputGroupCall` **call**          - The group call
      * * `InputPeer`      **join_as**       - Join the group call, presenting yourself as the specified user/channel
-     * * `string`         **invite_hash**   - Optional: The invitation hash from the invite link: `https://t.me/username?voicechat=hash`
+     * * `string`         **invite_hash**   - Optional: The invitation hash from the [invite link »](https://core.telegram.org/api/links#voice-chatvideo-chatlivestream-links), if provided allows speaking in a livestream or muted group chat.
      * * `DataJSON`       **params**        - WebRTC parameters
      *
      * @param array $params Parameters
@@ -5546,6 +5561,7 @@ interface phone
 
     /**
      * Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.
+     * Returns an intersection of the source IDs specified in `sources`, and the source IDs currently being forwarded by the SFU.
      *
      * Parameters:
      * * `InputGroupCall` **call**    - Group call
@@ -5624,10 +5640,10 @@ interface phone
     public function getGroupCallJoinAs($params);
 
     /**
-     * Get an invite link for a group call or livestream.
+     * Get an [invite link](https://core.telegram.org/api/links#voice-chatvideo-chatlivestream-links) for a group call or livestream.
      *
      * Parameters:
-     * * `boolean`        **can_self_unmute** - Optional: For livestreams, if set, users that join using this link will be able to speak without explicitly requesting permission by (for example by raising their hand).
+     * * `boolean`        **can_self_unmute** - Optional: For livestreams or muted group chats, if set, users that join using this link will be able to speak without explicitly requesting permission by (for example by raising their hand).
      * * `InputGroupCall` **call**            - The group call
      *
      * @param array $params Parameters
@@ -5727,11 +5743,11 @@ interface phone
     public function getGroupCallStreamRtmpUrl($params);
 
     /**
-     *
+     * Save phone call debug information.
      *
      * Parameters:
-     * * `InputPhoneCall` **peer** -
-     * * `InputFile`      **file** -.
+     * * `InputPhoneCall` **peer** - Phone call
+     * * `InputFile`      **file** - Logs
      *
      * @param array $params Parameters
      *
@@ -5746,7 +5762,7 @@ interface langpack
      * Get localization pack strings.
      *
      * Parameters:
-     * * `string` **lang_pack** - Language pack name
+     * * `string` **lang_pack** - Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
      * * `string` **lang_code** - Language code
      *
      * @param array $params Parameters
@@ -5759,7 +5775,7 @@ interface langpack
      * Get strings from a language pack.
      *
      * Parameters:
-     * * `string`   **lang_pack** - Language pack name
+     * * `string`   **lang_pack** - Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
      * * `string`   **lang_code** - Language code
      * * `[string]` **keys**      - Strings to get
      *
@@ -5799,7 +5815,7 @@ interface langpack
      * Get information about a language in a localization pack.
      *
      * Parameters:
-     * * `string` **lang_pack** - Language pack name
+     * * `string` **lang_pack** - Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
      * * `string` **lang_code** - Language code
      *
      * @param array $params Parameters
@@ -6136,6 +6152,8 @@ class InternalDoc extends APIFactory
     }
     /**
      * Check for terms of service update.
+     *
+     * Will throw a \danog\MadelineProto\Exception if a new TOS is available.
      *
      * @return \Amp\Promise
      */
