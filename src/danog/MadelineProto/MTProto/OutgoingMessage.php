@@ -519,6 +519,16 @@ class OutgoingMessage extends Message
     }
 
     /**
+     * Get promise.
+     *
+     * @return Promise
+     */
+    public function getPromise(): Promise
+    {
+        return $this->promise->promise();
+    }
+
+    /**
      * Reset sent time to trigger resending.
      *
      * @return self

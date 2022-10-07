@@ -961,9 +961,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->phoneConfigLoop) {
             $this->phoneConfigLoop = new PeriodicLoopInternal($this, [$this, 'getPhoneConfig'], 'phone config', 24 * 3600 * 1000);
         }
-        if (!$this->checkTosLoop) {
-            $this->checkTosLoop = new PeriodicLoopInternal($this, [$this, 'checkTos'], 'TOS', 24 * 3600 * 1000);
-        }
         if (!$this->configLoop) {
             $this->configLoop = new PeriodicLoopInternal($this, [$this, 'getConfig'], 'config', 24 * 3600 * 1000);
         }
@@ -980,7 +977,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
-        $this->checkTosLoop->start();
         try {
             $this->ipcServer->start();
         } catch (\Throwable $e) {
@@ -1012,10 +1008,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->configLoop) {
             $this->configLoop->signal(true);
             $this->configLoop = null;
-        }
-        if ($this->checkTosLoop) {
-            $this->checkTosLoop->signal(true);
-            $this->checkTosLoop = null;
         }
         if ($this->ipcServer) {
             $this->ipcServer->signal(null);

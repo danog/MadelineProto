@@ -84,7 +84,7 @@ final class DOMEntities
             return ['_' => 'inputMessageEntityMentionName', 'user_id' => $matches[1]];
         }
         if (\preg_match('|^emoji:(\d+)$|', $href, $matches)) {
-            return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int)$matches[1]];
+            return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $matches[1]];
         }
         if (\preg_match('|^buttonurl:(.+)|', $href)) {
             if (\strpos(\substr($href, -4), '|:new|') !== false) {

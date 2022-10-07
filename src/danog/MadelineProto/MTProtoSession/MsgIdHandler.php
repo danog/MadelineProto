@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoSession;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
-use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler32;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler64;
 
 /**

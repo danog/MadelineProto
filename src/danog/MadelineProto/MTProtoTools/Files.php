@@ -552,9 +552,6 @@ trait Files
             }
             if (isset($messageMedia['file_id'])) {
                 $res = yield from $this->getDownloadInfo($messageMedia['file_id']);
-                $res['size'] = $messageMedia['file_size'] ?? 0;
-                $res['mime'] = $messageMedia['mime_type'] ?? 'application/octet-stream';
-
                 $pathinfo = \pathinfo($messageMedia['file_name']);
                 if (isset($pathinfo['extension'])) {
                     $res['ext'] = '.'.$pathinfo['extension'];

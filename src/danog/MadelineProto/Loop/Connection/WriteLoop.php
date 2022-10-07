@@ -155,7 +155,6 @@ class WriteLoop extends ResumableSignalLoop
             $total_length = 0;
             $count = 0;
             $skipped = false;
-            $inited = false;
 
             $has_seq = false;
 
@@ -216,26 +215,30 @@ class WriteLoop extends ResumableSignalLoop
                     'body' => $message->getSerializedBody(),
                     'seqno' => $message->getSeqNo() ?? $connection->generateOutSeqNo($message->isContentRelated())
                 ];
-                if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect') {
-                    if (!$shared->getTempAuthKey()->isInited() && $constructor !== 'auth.bindTempAuthKey' && !$inited) {
-                        $inited = true;
-                        $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $constructor), \danog\MadelineProto\Logger::NOTICE);
-                        $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings->getSchema()->getLayer(), 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings->getAppInfo()->getApiId(), 'api_hash' => $API->settings->getAppInfo()->getApiHash(), 'device_model' => !$connection->isCDN() ? $API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $API->settings->getAppInfo()->getLangPack(), 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
-                    } else {
-                        if ($message->hasQueue()) {
-                            $queueId = $message->getQueueId();
-                            if (!isset($connection->call_queue[$queueId])) {
-                                $connection->call_queue[$queueId] = [];
-                            }
-                            $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$queueId], 'query' => $MTmessage['body']]));
-                            $connection->call_queue[$queueId][$message_id] = $message_id;
-                            if (\count($connection->call_queue[$queueId]) > $API->settings->getRpc()->getLimitCallQueue()) {
-                                \reset($connection->call_queue[$queueId]);
-                                $key = \key($connection->call_queue[$queueId]);
-                                unset($connection->call_queue[$queueId][$key]);
-                            }
+                if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
+                    if (!$shared->getTempAuthKey()->isInited()) {
+                        if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
+                            $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $constructor), \danog\MadelineProto\Logger::NOTICE);
+                            $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings->getSchema()->getLayer(), 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings->getAppInfo()->getApiId(), 'api_hash' => $API->settings->getAppInfo()->getApiHash(), 'device_model' => !$connection->isCDN() ? $API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $API->settings->getAppInfo()->getLangPack(), 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
+                        } else {
+                            $API->logger->logger("Skipping $message due to uninited connection in DC $datacenter");
+                            $skipped = true;
+                            continue;
                         }
-                        // TODO
+                    } elseif ($message->hasQueue()) {
+                        $queueId = $message->getQueueId();
+                        if (!isset($connection->call_queue[$queueId])) {
+                            $connection->call_queue[$queueId] = [];
+                        }
+                        $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$queueId], 'query' => $MTmessage['body']]));
+                        $connection->call_queue[$queueId][$message_id] = $message_id;
+                        if (\count($connection->call_queue[$queueId]) > $API->settings->getRpc()->getLimitCallQueue()) {
+                            \reset($connection->call_queue[$queueId]);
+                            $key = \key($connection->call_queue[$queueId]);
+                            unset($connection->call_queue[$queueId][$key]);
+                        }
+                    }
+                    // TODO
                         /*
                         if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
                             if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
@@ -244,7 +247,6 @@ class WriteLoop extends ResumableSignalLoop
                             }
                             unset($gzipped);
                         }*/
-                    }
                 }
                 $body_length = \strlen($MTmessage['body']);
                 $actual_length = $body_length + 32;

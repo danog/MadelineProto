@@ -172,11 +172,11 @@ class DataCenterConnection implements JsonSerializable
             $this->createSession();
             $cdn = $this->isCDN();
             $media = $this->isMedia();
+            $pfs = $this->API->settings->getAuth()->getPfs();
             if (!$this->hasTempAuthKey() || !$this->hasPermAuthKey() || !$this->isBound()) {
                 if (!$this->hasPermAuthKey() && !$cdn && !$media) {
                     $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
                     $this->setPermAuthKey(yield from $connection->createAuthKey(false));
-                    //$this->authorized(false);
                 }
                 if ($media) {
                     $this->link(\intval($this->datacenter));
@@ -184,7 +184,7 @@ class DataCenterConnection implements JsonSerializable
                         return;
                     }
                 }
-                if ($this->API->settings->getAuth()->getPfs()) {
+                if ($pfs) {
                     if (!$cdn) {
                         $logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), \danog\MadelineProto\Logger::NOTICE);
                         $this->setTempAuthKey(null);
@@ -206,6 +206,7 @@ class DataCenterConnection implements JsonSerializable
                         $this->setTempAuthKey(yield from $connection->createAuthKey(true));
                     }
                 }
+                $this->flush();
             } elseif (!$cdn) {
                 yield from $this->syncAuthorization();
             }
@@ -252,7 +253,6 @@ class DataCenterConnection implements JsonSerializable
                 if ($res === true) {
                     $logger->logger("Bound temporary and permanent authorization keys, DC {$this->datacenter}", \danog\MadelineProto\Logger::NOTICE);
                     $this->bind();
-                    $this->flush();
                     return true;
                 }
             } catch (\danog\MadelineProto\SecurityException $e) {
@@ -488,6 +488,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function flush(): void
     {
+        $this->API->logger->logger("Flushing pending messages, DC {$this->datacenter}", \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->connections as $socket) {
             $socket->flush();
         }
