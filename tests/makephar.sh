@@ -42,11 +42,11 @@ php8.0 $(which composer) update
 #php8.0 vendor/bin/phpunit
 php8.0 vendor/bin/phabel publish -d "$TAG"
 
-[ $php -eq 81 ] && SUBTAG=9999 || SUBTAG=9998
+[ $php -eq 81 ] && COMPOSER_TAG="$TAG" || COMPOSER_TAG="$TAG.9998"
 
 rm -rf vendor*
 git reset --hard
-git checkout "$TAG.$SUBTAG"
+git checkout "$COMPOSER_TAG"
 
 cd ..
 rm -rf phar
@@ -58,7 +58,7 @@ cd phar
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "'$TAG'.'$SUBTAG'"
+        "danog/madelineproto": "'$COMPOSER_TAG'"
     },
     "authors": [
         {
