@@ -135,3 +135,7 @@ e.php
 
 tests/db-local.php
 a.php
+/*.php
+app_test.json
+app.json
+config.json
