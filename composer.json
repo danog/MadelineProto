@@ -105,6 +105,7 @@
         "build": [
             "@docs",
             "@phpdoc",
+            "@docs-fix",
             "@cs-fix",
             "@psalm"
         ],
@@ -123,6 +124,7 @@
         "psalm": "psalm",
         "phpdocMain": "php tools/phpdoc.php",
         "docs": "php tools/build_docs.php",
+        "docs-fix": "tools/fix_docs.sh",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],

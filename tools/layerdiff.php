@@ -68,7 +68,7 @@ foreach (['methods', 'constructors'] as $type) {
         $name = $constructor[$key];
         if (!$old[$type]->$finder($name)) {
             $name = getUrl($name, $type);
-            $res .= "Added $name\n";
+            $res .= "- $name\n";
         }
     }
 
@@ -107,7 +107,7 @@ foreach (['methods', 'constructors'] as $type) {
     foreach ($old[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$new[$type]->$finder($name)) {
-            $res .= "Removed $name\n";
+            $res .= "- $name\n";
         }
     }
 }

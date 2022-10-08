@@ -199,5 +199,3 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 
 include 'phpdoc.php';
-
-\passthru('find -name \'*.md\' -exec sed \'s/\\.md/.html/g\' -i {} +');
