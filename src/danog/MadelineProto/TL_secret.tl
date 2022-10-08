@@ -89,6 +89,11 @@ sendMessageUploadRoundAction#bb718624 = SendMessageAction;
 ===73===
 decryptedMessage#91cc4674 flags:# no_webpage:flags.1?true silent:flags.5?true random_id:long ttl:int message:string media:flags.9?DecryptedMessageMedia entities:flags.7?Vector<MessageEntity> via_bot_name:flags.11?string reply_to_random_id:flags.3?long grouped_id:flags.17?long = DecryptedMessage;
 
+===101===
+messageEntityUnderline#9c4e7e8b offset:int length:int = MessageEntity;
+messageEntityStrike#bf0693d4 offset:int length:int = MessageEntity;
+messageEntityBlockquote#20df5d0 offset:int length:int = MessageEntity;
+
 ===143===
 decryptedMessageMediaDocument#8e4c064c thumb:bytes thumb_w:int thumb_h:int mime_type:string size:long key:bytes iv:bytes attributes:Vector<DocumentAttribute> caption:string = DecryptedMessageMedia;
 
