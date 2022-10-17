@@ -46,12 +46,12 @@ if (!$me['bot']) {
     $MadelineProto->channels->joinChannel(channel: '@MadelineProto');
 
     try {
-        $MadelineProto->messages->importChatInvite(hash: 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg');
+        $MadelineProto->messages->importChatInvite(hash: 'https://t.me/+Por5orOjwgccnt2w');
     } catch (\danog\MadelineProto\RPCErrorException $e) {
         $MadelineProto->logger($e);
     }
 
-    $MadelineProto->messages->sendMessage(peer: 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', message: 'Testing MadelineProto!');
+    $MadelineProto->messages->sendMessage(peer: 'https://t.me/+Por5orOjwgccnt2w', message: 'Testing MadelineProto!');
 }
 $MadelineProto->echo('OK, done!');
 ```
