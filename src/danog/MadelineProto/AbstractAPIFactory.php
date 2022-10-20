@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Ipc\Client;
+use InvalidArgumentException;
 
 abstract class AbstractAPIFactory extends AsyncConstruct
 {
@@ -192,6 +193,9 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
+            if (isset($arguments[0])) {
+                throw new InvalidArgumentException("Parameter names must be provided!");
+            }
             return yield from $this->mainAPI->API->methodCallAsyncRead($name, $args, $aargs);
         }
         if ($lower_name === 'seteventhandler'
