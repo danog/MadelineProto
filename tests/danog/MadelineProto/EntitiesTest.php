@@ -153,12 +153,12 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                '<b>&\'"</b>',
-                '&\'"',
+                '<b>\'"</b>',
+                '\'"',
                 [
                     [
                         'offset' => 0,
-                        'length' => 3,
+                        'length' => 2,
                         'type' => 'bold'
                     ]
                 ]
@@ -180,6 +180,18 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'text_mention',
                         'user' => $mention
                     ]
+                ]
+            ],
+            [
+                'markdown',
+                '_a b c &lt;b&gt; &amp; &quot; &#039;_',
+                'a b c <b> & " \'',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 15,
+                        'type' => 'italic',
+                    ],
                 ]
             ],
             [

@@ -24,7 +24,7 @@ final class DOMEntities
     {
         $dom = new \DOMDocument();
         $html = \preg_replace("/\<br(\s*)?\/?\>/i", "\n", $html);
-        $dom->loadxml("<body>" . \str_replace(['&amp;', '&#039;', '&quot;', '&gt;', '&lt;', '&'], ['&', '\'', "\"", '>', '<', '&amp;'], \trim($html)) . "</body>");
+        $dom->loadxml("<body>" . \trim($html) . "</body>");
         $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
     }
     /**

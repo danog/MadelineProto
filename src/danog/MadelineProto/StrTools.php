@@ -158,7 +158,7 @@ abstract class StrTools extends Extension
         if ($markdown === '') {
             return $markdown;
         }
-        $html = (new Parsedown($markdown))->text($markdown);
+        $html = Parsedown::instance()->text($markdown);
         $document = new DOMDocument('', 'utf-8');
         @$document->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         if (!$document->getElementsByTagName('body')[0]) {
