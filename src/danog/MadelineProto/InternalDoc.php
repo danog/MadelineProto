@@ -2810,7 +2810,7 @@ interface messages
      * * `boolean`            **update_stickersets_order** - Optional:
      * * `InputPeer`          **peer**                     - The destination chat
      * * `int`                **reply_to_msg_id**          - Optional: The message to reply to
-     * * `[InputSingleMedia]` **multi_media**              - The medias to send: note that they must be separately uploaded using [messages.uploadMedia](https://docs.madelineproto.xyz/API_docs/methods/messages.uploadMedia.html) first, using raw `inputMediaUploaded*` constructors is not supported.
+     * * `[InputSingleMedia]` **multi_media**              - The medias to send
      * * `int`                **schedule_date**            - Optional: Scheduled message date for scheduled messages
      * * `InputPeer`          **send_as**                  - Optional: Send this message as the specified peer
      *
