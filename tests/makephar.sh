@@ -40,9 +40,8 @@ rm -f madeline.phar testing.madeline*
 
 php8.0 $(which composer) update
 #php8.0 vendor/bin/phpunit
-php8.0 vendor/bin/phabel publish -d "$TAG"
 
-[ $php -eq 81 ] && COMPOSER_TAG="$TAG" || COMPOSER_TAG="$TAG.9998"
+COMPOSER_TAG="$TAG"
 
 rm -rf vendor*
 git reset --hard
@@ -72,16 +71,11 @@ echo '{
             "url": "'$madelinePath'",
             "options": {"symlink": false}
         }
-    ],
-    "config": {
-        "allow-plugins": {
-            "phabel/phabel": true
-        }
-    }
+    ]
 }' > composer.json
 php $(which composer) update -vvv --no-cache
 php $(which composer) dumpautoload --optimize
-rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
+rm -rf vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 cd ..
 
 branch="-$BRANCH"
