@@ -64,7 +64,6 @@
         "ext-ctype": "*",
         "danog/phpdoc": "^0.1.7",
         "phpunit/phpunit": "^9",
-        "phabel/phabel": "^1",
         "bamarni/composer-bin-plugin": "1.5.0",
         "roave/security-advisories": "dev-latest",
         "symfony/yaml": "^6.0"
