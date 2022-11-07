@@ -115,7 +115,6 @@ big
 .vscode/*
 .vscode
 custom.md
-phpunit.xml
 .php_cs.cache
 coverage
 tempConv
