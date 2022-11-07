@@ -22,6 +22,11 @@ if [ "$TAG" == "" ]; then
     git tag "$TAG"
 fi
 
+export TEST_SECRET_CHAT=test
+export TEST_USERNAME=danogentili
+export TEST_DESTINATION_GROUPS='["@danogentili"]'
+export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
+
 echo "PHP: $php"
 echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
@@ -38,8 +43,8 @@ k()
 k
 rm -f madeline.phar testing.madeline*
 
-php8.0 $(which composer) update
-#php8.0 vendor/bin/phpunit
+composer update
+vendor/bin/phpunit
 
 COMPOSER_TAG="$TAG"
 
@@ -80,11 +85,6 @@ cd ..
 
 branch="-$BRANCH"
 cd $madelinePath
-
-export TEST_SECRET_CHAT=test
-export TEST_USERNAME=danogentili
-export TEST_DESTINATION_GROUPS='["@danogentili"]'
-export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
 db()
 {
