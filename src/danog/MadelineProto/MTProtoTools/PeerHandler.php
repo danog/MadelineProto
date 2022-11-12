@@ -381,6 +381,7 @@ trait PeerHandler
                     return $id['user_id'];
                 case 'inputChannelFromMessage':
                 case 'inputPeerChannelFromMessage':
+                case 'updateChannelParticipant':
                     return $this->toSupergroup($id['channel_id']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
