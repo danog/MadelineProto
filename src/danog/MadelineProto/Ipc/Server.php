@@ -269,11 +269,11 @@ class Server extends SignalLoop
         try {
             yield $socket->send([$id, $result]);
         } catch (\Throwable $e) {
-            $this->API->logger("Got error while trying to send result of ${payload[0]}: $e", Logger::ERROR);
+            $this->API->logger("Got error while trying to send result of {$payload[0]}: $e", Logger::ERROR);
             try {
                 yield $socket->send([$id, new ExitFailure($e)]);
             } catch (\Throwable $e) {
-                $this->API->logger("Got error while trying to send error of error of ${payload[0]}: $e", Logger::ERROR);
+                $this->API->logger("Got error while trying to send error of error of {$payload[0]}: $e", Logger::ERROR);
             }
         }
     }

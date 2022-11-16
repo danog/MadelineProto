@@ -102,7 +102,7 @@ final class WebRunner extends RunnerAbstract
 
         $uri = self::$runPath.'?'.$params;
 
-        $payload = "GET $uri HTTP/1.1\r\nHost: ${_SERVER['SERVER_NAME']}\r\n\r\n";
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
 
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
