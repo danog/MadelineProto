@@ -8,7 +8,7 @@ clone:
       event:
         - tag
         - push
-    image: woodpeckerci/plugin-git
+    image: woodpeckerci/plugin-git:v1.6.0
     settings:
       depth: 1
       lfs: false
