@@ -1,6 +1,14 @@
 <?php
 
-$config = new Amp\CodeStyle\Config();
+$config = new class extends Amp\CodeStyle\Config {
+    public function getRules(): array
+    {
+        return array_merge(parent::getRules(), [
+            'void_return' => true,
+        ]);
+    }
+};
+
 $config->getFinder()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')

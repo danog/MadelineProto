@@ -27,7 +27,7 @@ class Exception extends \Exception
     use \danog\MadelineProto\TL\PrettyException;
     public function __toString()
     {
-        $result = \get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }

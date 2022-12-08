@@ -51,7 +51,6 @@ class ServerCallback extends Server
      *
      * @param SessionPaths $session Session
      *
-     * @return void
      */
     public function setIpcPath(SessionPaths $session): void
     {
@@ -69,19 +68,16 @@ class ServerCallback extends Server
         $id = $this->id++;
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
         $this->socketList[$id] = $socket;
-        $this->watcherList[$id] = Loop::delay(30*1000, function () use ($id) {
+        $this->watcherList[$id] = Loop::delay(30*1000, function () use ($id): void {
             unset($this->watcherList[$id], $this->socketList[$id]);
         });
 
         return $socket->send($id);
     }
 
-
     /**
      * Unwrap value.
      *
-     * @param Wrapper $wrapper
-     * @return mixed
      */
     protected function unwrap(Wrapper $wrapper)
     {

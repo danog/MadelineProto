@@ -26,11 +26,11 @@ use danog\MadelineProto\Logger;
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 }
@@ -58,7 +58,6 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      *
-     * @return \Generator
      */
     public function onUpdateNewChannelMessage(array $update): \Generator
     {
@@ -69,14 +68,13 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      *
-     * @return \Generator
      */
     public function onUpdateNewMessage(array $update): \Generator
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
-        $res = \json_encode($update, JSON_PRETTY_PRINT);
+        $res = json_encode($update, JSON_PRETTY_PRINT);
 
         yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {

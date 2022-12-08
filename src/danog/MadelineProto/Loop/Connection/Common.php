@@ -39,7 +39,6 @@ trait Common
     /**
      * DC ID.
      *
-     * @var string
      */
     protected string $datacenter;
     /**

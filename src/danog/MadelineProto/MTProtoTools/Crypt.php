@@ -36,7 +36,6 @@ abstract class Crypt
      *
      * @internal
      *
-     * @return array
      */
     public static function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
@@ -56,7 +55,6 @@ abstract class Crypt
      *
      * @internal
      *
-     * @return array
      */
     public static function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
@@ -78,7 +76,6 @@ abstract class Crypt
      *
      * @internal
      *
-     * @return string
      */
     public static function ctrEncrypt(string $message, string $key, string $iv): string
     {
@@ -96,7 +93,6 @@ abstract class Crypt
      *
      * @internal
      *
-     * @return string
      */
     public static function igeEncrypt(string $plaintext, string $key, string $iv): string
     {
@@ -128,7 +124,6 @@ abstract class Crypt
      *
      * @internal
      *
-     * @return string
      */
     public static function igeDecrypt(string $ciphertext, string $key, string $iv): string
     {
@@ -154,12 +149,9 @@ abstract class Crypt
     /**
      * Check validity of g_a parameters.
      *
-     * @param BigInteger $g_a
-     * @param BigInteger $p
      *
      * @internal
      *
-     * @return bool
      */
     public static function checkG(BigInteger $g_a, BigInteger $p): bool
     {
@@ -181,8 +173,6 @@ abstract class Crypt
     /**
      * Check validity of p and g parameters.
      *
-     * @param BigInteger $p
-     * @param BigInteger $g
      *
      * @internal
      *

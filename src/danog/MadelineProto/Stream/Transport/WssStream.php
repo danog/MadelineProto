@@ -33,7 +33,6 @@ class WssStream extends WsStream
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {

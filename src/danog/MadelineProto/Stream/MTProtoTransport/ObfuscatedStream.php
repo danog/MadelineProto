@@ -39,7 +39,6 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -76,7 +75,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      *
      * @return void
      */
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
             if (\strlen($extra['secret']) > 17) {

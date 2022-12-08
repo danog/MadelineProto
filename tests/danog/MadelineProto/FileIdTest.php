@@ -12,7 +12,6 @@ class FileIdTest extends MadelineTestCase
      *
      * @param string $fileId File ID
      *
-     * @return string
      */
     public static function stripFileReference(string $fileId): string
     {
@@ -23,7 +22,6 @@ class FileIdTest extends MadelineTestCase
      *
      * @param string $fileId File ID
      *
-     * @return string
      */
     public static function stripForChat(string $fileId): string
     {
@@ -41,7 +39,7 @@ class FileIdTest extends MadelineTestCase
      *
      * @return void
      */
-    public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, $message = '')
+    public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, $message = ''): void
     {
         $fileIdAstr = self::stripFileReference($fileIdAstr);
         $fileIdBstr = self::stripFileReference($fileIdBstr);
@@ -52,13 +50,12 @@ class FileIdTest extends MadelineTestCase
     }
 
     /**
-     * @param string $fileId File ID
      * @param string $type   Expected type
      * @param string $type   Original type
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
+    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
@@ -66,13 +63,12 @@ class FileIdTest extends MadelineTestCase
         $this->assertTrue(true);
     }
     /**
-     * @param string $fileId File ID
      * @param string $type   Expected type
      * @param string $type   Original type
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
+    public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to resend and then reconvert $fileIdStr");
         if ($type === 'profile_photo') {

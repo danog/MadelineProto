@@ -22,11 +22,11 @@
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     /**
      * @psalm-suppress MissingFile
@@ -44,11 +44,11 @@ $MadelineProto->loop(static function () use ($MadelineProto) {
     $threads = 5;
     $step = 20;
     $totalMessages = 0;
-    $start = \microtime(true);
+    $start = microtime(true);
     while (true) {
         $promises = [];
         for ($i = 0; $i < $threads; $i++) {
-            $promises[] = $MadelineProto->messages->getMessages(['id' => \range($lastMessageId+1, $lastMessageId+$step)]);
+            $promises[] = $MadelineProto->messages->getMessages(['id' => range($lastMessageId+1, $lastMessageId+$step)]);
             $lastMessageId +=$step;
         }
         $results = yield \Amp\Promise\all($promises);
@@ -62,6 +62,6 @@ $MadelineProto->loop(static function () use ($MadelineProto) {
             }
         }
     };
-    $time = \microtime(true)-$start;
+    $time = microtime(true)-$start;
     yield $MadelineProto->echo("\nTime: {$time}\n");
 });

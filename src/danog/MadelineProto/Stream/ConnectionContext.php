@@ -118,9 +118,7 @@ class ConnectionContext
     /**
      * Set the socket context.
      *
-     * @param ConnectContext $socketContext
      *
-     * @return self
      */
     public function setSocketContext(ConnectContext $socketContext): self
     {
@@ -130,7 +128,6 @@ class ConnectionContext
     /**
      * Get the socket context.
      *
-     * @return ConnectContext
      */
     public function getSocketContext(): ConnectContext
     {
@@ -141,7 +138,6 @@ class ConnectionContext
      *
      * @param string|UriInterface $uri
      *
-     * @return self
      */
     public function setUri($uri): self
     {
@@ -151,7 +147,6 @@ class ConnectionContext
     /**
      * Get the URI as a string.
      *
-     * @return string
      */
     public function getStringUri(): string
     {
@@ -160,7 +155,6 @@ class ConnectionContext
     /**
      * Get the URI.
      *
-     * @return UriInterface
      */
     public function getUri(): UriInterface
     {
@@ -171,7 +165,6 @@ class ConnectionContext
      *
      * @param CancellationToken $cancellationToken
      *
-     * @return self
      */
     public function setCancellationToken($cancellationToken): self
     {
@@ -190,7 +183,6 @@ class ConnectionContext
     /**
      * Return a clone of the current connection context.
      *
-     * @return self
      */
     public function getCtx(): self
     {
@@ -199,9 +191,7 @@ class ConnectionContext
     /**
      * Set the test boolean.
      *
-     * @param bool $test
      *
-     * @return self
      */
     public function setTest(bool $test): self
     {
@@ -211,7 +201,6 @@ class ConnectionContext
     /**
      * Whether this is a test connection.
      *
-     * @return bool
      */
     public function isTest(): bool
     {
@@ -220,7 +209,6 @@ class ConnectionContext
     /**
      * Whether this is a media connection.
      *
-     * @return bool
      */
     public function isMedia(): bool
     {
@@ -229,7 +217,6 @@ class ConnectionContext
     /**
      * Whether this is a CDN connection.
      *
-     * @return bool
      */
     public function isCDN(): bool
     {
@@ -238,7 +225,6 @@ class ConnectionContext
     /**
      * Whether this connection context will only be used by the DNS client.
      *
-     * @return bool
      */
     public function isDns(): bool
     {
@@ -248,7 +234,6 @@ class ConnectionContext
      * Whether this connection context will only be used by the DNS client.
      *
      * @param boolean $isDns
-     * @return self
      */
     public function setIsDns(bool $isDns): self
     {
@@ -258,9 +243,7 @@ class ConnectionContext
     /**
      * Set the secure boolean.
      *
-     * @param bool $secure
      *
-     * @return self
      */
     public function secure(bool $secure): self
     {
@@ -270,7 +253,6 @@ class ConnectionContext
     /**
      * Whether to use TLS with socket connections.
      *
-     * @return bool
      */
     public function isSecure(): bool
     {
@@ -281,7 +263,6 @@ class ConnectionContext
      *
      * @param string|int $dc
      *
-     * @return self
      */
     public function setDc($dc): self
     {
@@ -322,9 +303,7 @@ class ConnectionContext
     /**
      * Whether to use ipv6.
      *
-     * @param bool $ipv6
      *
-     * @return self
      */
     public function setIpv6(bool $ipv6): self
     {
@@ -334,7 +313,6 @@ class ConnectionContext
     /**
      * Whether to use ipv6.
      *
-     * @return bool
      */
     public function getIpv6(): bool
     {
@@ -343,12 +321,9 @@ class ConnectionContext
     /**
      * Add a stream to the stream chain.
      *
-     * @param string $streamName
-     * @param mixed  $extra
      *
      * @psalm-param class-string $streamName
      *
-     * @return self
      */
     public function addStream(string $streamName, $extra = null): self
     {
@@ -363,7 +338,7 @@ class ConnectionContext
      *
      * @return void
      */
-    public function setReadCallback(callable $callable)
+    public function setReadCallback(callable $callable): void
     {
         $this->readCallback = $callable;
     }
@@ -379,7 +354,6 @@ class ConnectionContext
     /**
      * Get read callback.
      *
-     * @return callable
      */
     public function getReadCallback(): callable
     {
@@ -388,7 +362,6 @@ class ConnectionContext
     /**
      * Get the current stream name from the stream chain.
      *
-     * @return string
      */
     public function getStreamName(): string
     {
@@ -444,7 +417,6 @@ class ConnectionContext
     /**
      * Get a description "name" of the context.
      *
-     * @return string
      */
     public function getName(): string
     {

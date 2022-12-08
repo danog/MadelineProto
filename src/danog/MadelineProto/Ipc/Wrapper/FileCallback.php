@@ -9,7 +9,6 @@ class FileCallback extends Obj implements FileCallbackInterface
     /**
      * Get file.
      *
-     * @return mixed
      */
     public function getFile()
     {
@@ -24,7 +23,6 @@ class FileCallback extends Obj implements FileCallbackInterface
      *
      * @psalm-suppress MethodSignatureMismatch
      *
-     * @return mixed
      */
     public function __invoke($percent, $speed, $time)
     {

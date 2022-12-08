@@ -59,7 +59,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      *
-     * @return Promise
      */
     public function read(): Promise
     {
@@ -70,7 +69,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function write(string $data): Promise
     {
@@ -84,7 +82,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             if ($this->stream) {
@@ -104,7 +102,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
      */
     public function getSocket(): Socket
     {
@@ -113,7 +110,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      */
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->stream = $extra;
     }

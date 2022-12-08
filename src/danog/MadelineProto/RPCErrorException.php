@@ -79,7 +79,6 @@ class RPCErrorException extends \Exception
     /**
      * Get localized error name.
      *
-     * @return string
      */
     public function getLocalization(): string
     {
@@ -89,8 +88,6 @@ class RPCErrorException extends \Exception
     /**
      * Set localized error name.
      *
-     * @param string $localization
-     * @return void
      */
     public function setLocalization(string $localization): void
     {

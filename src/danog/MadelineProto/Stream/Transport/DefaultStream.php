@@ -81,7 +81,6 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      *
-     * @return Promise
      */
     public function read(): Promise
     {
@@ -92,7 +91,6 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function write(string $data): Promise
     {
@@ -106,7 +104,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             if ($this->stream) {
@@ -122,20 +120,19 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @return void
      */
-    public function close()
+    public function close(): void
     {
         $this->disconnect();
     }
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {
         return $this->stream;
     }
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->connector = $extra;
     }

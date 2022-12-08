@@ -68,7 +68,6 @@ class Ogg
      * @param BufferedStreamInterface $stream        The stream
      * @param int                     $frameDuration Required frame duration, microseconds
      *
-     * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, self>
      */
     public static function init(BufferedStreamInterface $stream, int $frameDuration): \Generator
@@ -102,7 +101,6 @@ class Ogg
     /**
      * Read OPUS length.
      *
-     * @param string $content
      * @param integer $offset
      * @return integer
      */
@@ -117,8 +115,6 @@ class Ogg
     /**
      * OPUS state machine.
      *
-     * @param string $content
-     * @return \Generator
      */
     private function opusStateMachine(string $content): \Generator
     {
@@ -237,7 +233,6 @@ class Ogg
     /**
      * Read frames.
      *
-     * @return \Generator
      */
     public function read(): \Generator
     {
@@ -332,7 +327,6 @@ class Ogg
     /**
      * Get OPUS packet emitter.
      *
-     * @return Emitter
      */
     public function getEmitter(): Emitter
     {

@@ -26,8 +26,6 @@ class Conversion
      * Prepare API instance.
      *
      * @param array<int, string> $authorization Authorization info
-     * @param int $main_dc_id
-     * @param string $session
      * @param SettingsAbstract|array $settings
      *
      * @return \Generator<mixed, mixed, mixed, API>
@@ -393,11 +391,11 @@ class Conversion
                     switch (Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)))) {
                         case 2:
                         case 3:
-                        self::tdesktop_read_bytearray($main);
-                        \stream_get_contents($main, 4);
-                        self::tdesktop_read_bytearray($main);
-                        self::tdesktop_read_bytearray($main);
-                        break;
+                            self::tdesktop_read_bytearray($main);
+                            \stream_get_contents($main, 4);
+                            self::tdesktop_read_bytearray($main);
+                            self::tdesktop_read_bytearray($main);
+                            break;
                     }
                     break;
                 case self::dbiConnectionType:

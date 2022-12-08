@@ -52,7 +52,6 @@ class RSA
      * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, array|mixed, mixed, self>
      */
@@ -74,13 +73,12 @@ class RSA
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
         return ['e', 'n', 'fp'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         foreach ($this->__sleep() as $bigint) {
             if ($this->{$bigint} instanceof \tgseclib\Math\BigInteger) {
@@ -93,7 +91,6 @@ class RSA
      *
      * @param BigInteger $data Data to encrypt
      *
-     * @return string
      */
     public function encrypt(BigInteger $data): string
     {

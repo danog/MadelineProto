@@ -48,7 +48,6 @@ trait ResponseHandler
             $message = $this->new_incoming[$current_msg_id];
             unset($this->new_incoming[$current_msg_id]);
 
-
             $this->logger->logger($message->log($this->datacenter), Logger::ULTRA_VERBOSE);
 
             $type = $message->getType();
@@ -168,7 +167,6 @@ trait ResponseHandler
      * @param IncomingMessage $message   Incoming message
      * @param string          $requestId Request ID
      *
-     * @return void
      */
     private function handleResponse(IncomingMessage $message, $requestId = null): void
     {

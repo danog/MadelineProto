@@ -192,7 +192,7 @@ class Connection extends SettingsAbstract
                     break;
                 case 'obfuscated2':
                     $this->setObfuscated(true);
-                // no break
+                    // no break
                 case 'intermediate_padded':
                 case 'tcp_intermediate_padded':
                     $protocol = IntermediatePaddedStream::class;
@@ -219,7 +219,7 @@ class Connection extends SettingsAbstract
     {
         $this->init();
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->init();
     }
@@ -237,7 +237,6 @@ class Connection extends SettingsAbstract
     /**
      * Get protocol identifier.
      *
-     * @return string
      */
     public function getProtocol(): string
     {
@@ -296,7 +295,6 @@ class Connection extends SettingsAbstract
      *
      * @param class-string<MTProtoBufferInterface> $protocol Protocol identifier
      *
-     * @return self
      */
     public function setProtocol(string $protocol): self
     {
@@ -311,7 +309,6 @@ class Connection extends SettingsAbstract
     /**
      * Get whether to use ipv6.
      *
-     * @return bool
      */
     public function getIpv6(): bool
     {
@@ -323,7 +320,6 @@ class Connection extends SettingsAbstract
      *
      * @param bool $ipv6 Whether to use ipv6
      *
-     * @return self
      */
     public function setIpv6(bool $ipv6): self
     {
@@ -335,7 +331,6 @@ class Connection extends SettingsAbstract
     /**
      * Get subdomains of web.telegram.org for https protocol.
      *
-     * @return array
      */
     public function getSslSubdomains(): array
     {
@@ -347,7 +342,6 @@ class Connection extends SettingsAbstract
      *
      * @param array $sslSubdomains Subdomains of web.telegram.org for https protocol.
      *
-     * @return self
      */
     public function setSslSubdomains(array $sslSubdomains): self
     {
@@ -359,7 +353,6 @@ class Connection extends SettingsAbstract
     /**
      * Get minimum media socket count.
      *
-     * @return int
      */
     public function getMinMediaSocketCount(): int
     {
@@ -371,7 +364,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $minMediaSocketCount Minimum media socket count.
      *
-     * @return self
      */
     public function setMinMediaSocketCount(int $minMediaSocketCount): self
     {
@@ -383,7 +375,6 @@ class Connection extends SettingsAbstract
     /**
      * Get maximum media socket count.
      *
-     * @return int
      */
     public function getMaxMediaSocketCount(): int
     {
@@ -395,7 +386,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $maxMediaSocketCount Maximum media socket count.
      *
-     * @return self
      */
     public function setMaxMediaSocketCount(int $maxMediaSocketCount): self
     {
@@ -407,7 +397,6 @@ class Connection extends SettingsAbstract
     /**
      * Get robin period (seconds).
      *
-     * @return int
      */
     public function getRobinPeriod(): int
     {
@@ -419,7 +408,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $robinPeriod Robin period (seconds).
      *
-     * @return self
      */
     public function setRobinPeriod(int $robinPeriod): self
     {
@@ -431,7 +419,6 @@ class Connection extends SettingsAbstract
     /**
      * Get default DC ID.
      *
-     * @return int
      */
     public function getDefaultDc(): int
     {
@@ -440,7 +427,6 @@ class Connection extends SettingsAbstract
     /**
      * Get default DC params.
      *
-     * @return array
      */
     public function getDefaultDcParams(): array
     {
@@ -452,7 +438,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $defaultDc Default DC ID.
      *
-     * @return self
      */
     public function setDefaultDc(int $defaultDc): self
     {
@@ -465,7 +450,6 @@ class Connection extends SettingsAbstract
     /**
      * Get proxy identifiers.
      *
-     * @return array
      * @psalm-return array<class-string<StreamInterface>, array>
      */
     public function getProxies(): array
@@ -483,7 +467,6 @@ class Connection extends SettingsAbstract
      * @param class-string<StreamInterface> $proxy Proxy identifier
      * @param array                         $extra Extra
      *
-     * @return self
      */
     public function addProxy(string $proxy, array $extra = []): self
     {
@@ -503,7 +486,6 @@ class Connection extends SettingsAbstract
      *
      * @param array $proxies Proxies
      *
-     * @return self
      */
     public function setProxy(array $proxies): self
     {
@@ -513,7 +495,6 @@ class Connection extends SettingsAbstract
     /**
      * Clear proxies.
      *
-     * @return self
      */
     public function clearProxies(): self
     {
@@ -525,10 +506,7 @@ class Connection extends SettingsAbstract
     /**
      * Remove specific proxy pair.
      *
-     * @param string $proxy
-     * @param array $extra
      *
-     * @return self
      */
     public function removeProxy(string $proxy, array $extra): self
     {
@@ -547,7 +525,6 @@ class Connection extends SettingsAbstract
     /**
      * Get whether to use the obfuscated protocol: useful to bypass ISP blocks.
      *
-     * @return bool
      */
     public function getObfuscated(): bool
     {
@@ -559,7 +536,6 @@ class Connection extends SettingsAbstract
      *
      * @param bool $obfuscated Whether to use the obfuscated protocol.
      *
-     * @return self
      */
     public function setObfuscated(bool $obfuscated): self
     {
@@ -571,7 +547,6 @@ class Connection extends SettingsAbstract
     /**
      * Get whether we're in test mode.
      *
-     * @return bool
      */
     public function getTestMode(): bool
     {
@@ -583,7 +558,6 @@ class Connection extends SettingsAbstract
      *
      * @param bool $testMode Whether we're in test mode.
      *
-     * @return self
      */
     public function setTestMode(bool $testMode): self
     {
@@ -612,7 +586,6 @@ class Connection extends SettingsAbstract
      *
      * @param class-string<RawStreamInterface> $transport Transport identifier.
      *
-     * @return self
      */
     public function setTransport(string $transport): self
     {
@@ -627,7 +600,6 @@ class Connection extends SettingsAbstract
     /**
      * Get whether to retry connection.
      *
-     * @return bool
      */
     public function getRetry(): bool
     {
@@ -639,7 +611,6 @@ class Connection extends SettingsAbstract
      *
      * @param bool $retry Whether to retry connection.
      *
-     * @return self
      */
     public function setRetry(bool $retry): self
     {
@@ -651,7 +622,6 @@ class Connection extends SettingsAbstract
     /**
      * Get connection timeout.
      *
-     * @return int
      */
     public function getTimeout(): int
     {
@@ -663,7 +633,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $timeout Connection timeout.
      *
-     * @return self
      */
     public function setTimeout(int $timeout): self
     {
@@ -675,7 +644,6 @@ class Connection extends SettingsAbstract
     /**
      * Get ping interval.
      *
-     * @return int
      */
     public function getPingInterval(): int
     {
@@ -687,7 +655,6 @@ class Connection extends SettingsAbstract
      *
      * @param int $pingInterval Ping interval
      *
-     * @return self
      */
     public function setPingInterval(int $pingInterval): self
     {
@@ -699,7 +666,6 @@ class Connection extends SettingsAbstract
     /**
      * Get whether to use DNS over HTTPS.
      *
-     * @return bool
      */
     public function getUseDoH(): bool
     {
@@ -711,7 +677,6 @@ class Connection extends SettingsAbstract
      *
      * @param bool $useDoH Whether to use DNS over HTTPS
      *
-     * @return self
      */
     public function setUseDoH(bool $useDoH): self
     {
@@ -735,7 +700,6 @@ class Connection extends SettingsAbstract
      *
      * @param ?string $bindTo Bind on specific address and port.
      *
-     * @return self
      */
     public function setBindTo(?string $bindTo): self
     {

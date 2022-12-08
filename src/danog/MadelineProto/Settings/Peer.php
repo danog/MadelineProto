@@ -37,7 +37,6 @@ class Peer extends SettingsAbstract
     /**
      * Get cache time for full peer information (seconds).
      *
-     * @return int
      */
     public function getFullInfoCacheTime(): int
     {
@@ -49,7 +48,6 @@ class Peer extends SettingsAbstract
      *
      * @param int $fullInfoCacheTime Cache time for full peer information (seconds).
      *
-     * @return self
      */
     public function setFullInfoCacheTime(int $fullInfoCacheTime): self
     {
@@ -61,7 +59,6 @@ class Peer extends SettingsAbstract
     /**
      * Get should madeline fetch the full member list of every group it meets?
      *
-     * @return bool
      */
     public function getFullFetch(): bool
     {
@@ -73,7 +70,6 @@ class Peer extends SettingsAbstract
      *
      * @param bool $fullFetch Should madeline fetch the full member list of every group it meets?
      *
-     * @return self
      */
     public function setFullFetch(bool $fullFetch): self
     {
@@ -85,7 +81,6 @@ class Peer extends SettingsAbstract
     /**
      * Get whether to cache all peers on startup for userbots.
      *
-     * @return bool
      */
     public function getCacheAllPeersOnStartup(): bool
     {
@@ -97,7 +92,6 @@ class Peer extends SettingsAbstract
      *
      * @param bool $cacheAllPeersOnStartup Whether to cache all peers on startup for userbots.
      *
-     * @return self
      */
     public function setCacheAllPeersOnStartup(bool $cacheAllPeersOnStartup): self
     {

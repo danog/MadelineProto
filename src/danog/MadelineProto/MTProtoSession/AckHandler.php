@@ -50,9 +50,7 @@ trait AckHandler
     /**
      * We have gotten a response for an outgoing message.
      *
-     * @param OutgoingMessage $message Message
      *
-     * @return void
      */
     public function gotResponseForOutgoingMessage(OutgoingMessage $outgoingMessage): void
     {
@@ -68,7 +66,6 @@ trait AckHandler
      *
      * @param IncomingMessage $message Message
      *
-     * @return void
      */
     public function ackIncomingMessage(IncomingMessage $message): void
     {
@@ -108,7 +105,6 @@ trait AckHandler
     /**
      * Get all pending calls (also clear pending state requests).
      *
-     * @return array
      */
     public function getPendingCalls(): array
     {

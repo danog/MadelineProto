@@ -45,7 +45,7 @@ class Snitch
     /**
      * Wakeup function.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (\defined('HAD_MADELINE_PHAR')) {
             $this->hadInstalled []= \HAD_MADELINE_PHAR;
@@ -61,7 +61,6 @@ class Snitch
     /**
      * Die.
      *
-     * @return void
      */
     private function die(): void
     {

@@ -34,7 +34,6 @@ interface StreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator;
     /**
@@ -42,7 +41,7 @@ interface StreamInterface
      *
      * @return void
      */
-    public function disconnect();
+    public function disconnect(): void;
     /**
      * Get underlying AMPHP socket resource.
      *

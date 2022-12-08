@@ -50,7 +50,6 @@ trait AuthKeyHandler
     /**
      * Create authorization key.
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<mixed, mixed|string, mixed, ($temp is false ? \danog\MadelineProto\MTProto\PermAuthKey : \danog\MadelineProto\MTProto\TempAuthKey)|null>
      */
@@ -414,7 +413,6 @@ trait AuthKeyHandler
      *
      * @param string|integer $what Number to factorize
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise<string>, mixed, false|int|string>
      */

@@ -54,7 +54,6 @@ trait Events
      *
      * @param class-string<EventHandler> $eventHandler
      *
-     * @return void
      */
     private function initEventHandler(string $eventHandler): void
     {
@@ -70,7 +69,6 @@ trait Events
      *
      * @param class-string<EventHandler> $eventHandler Event handler
      *
-     * @return \Generator
      */
     public function setEventHandler(string $eventHandler): \Generator
     {
@@ -108,7 +106,6 @@ trait Events
      *
      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
      *
-     * @return void
      */
     public function unsetEventHandler(bool $disableUpdateHandling = false): void
     {
@@ -120,7 +117,6 @@ trait Events
     /**
      * Get event handler.
      *
-     * @return EventHandler
      */
     public function getEventHandler(): EventHandler
     {

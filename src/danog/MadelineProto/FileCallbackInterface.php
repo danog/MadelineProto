@@ -27,7 +27,6 @@ interface FileCallbackInterface
     /**
      * Get file.
      *
-     * @return mixed
      */
     public function getFile();
     /**
@@ -37,7 +36,6 @@ interface FileCallbackInterface
      * @param float $speed   Speed in mbps
      * @param float $time    Time
      *
-     * @return mixed
      */
     public function __invoke($percent, $speed, $time);
 }

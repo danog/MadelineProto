@@ -24,35 +24,34 @@ class PostgresArray extends SqlArray
      *
      * @param SqlArray::STATEMENT_* $type
      *
-     * @return string
      */
     protected function getSqlQuery(int $type): string
     {
         switch ($type) {
-        case SqlArray::SQL_GET:
-            return "SELECT value FROM \"{$this->table}\" WHERE key = :index";
-        case SqlArray::SQL_SET:
-            return "
+            case SqlArray::SQL_GET:
+                return "SELECT value FROM \"{$this->table}\" WHERE key = :index";
+            case SqlArray::SQL_SET:
+                return "
                 INSERT INTO \"{$this->table}\"
                 (key,value)
                 VALUES (:index, :value)
                 ON CONFLICT (key) DO UPDATE SET value = :value
             ";
-        case SqlArray::SQL_UNSET:
-            return "
+            case SqlArray::SQL_UNSET:
+                return "
                 DELETE FROM \"{$this->table}\"
                 WHERE key = :index
             ";
-        case SqlArray::SQL_COUNT:
-            return "
+            case SqlArray::SQL_COUNT:
+                return "
                 SELECT count(key) as count FROM \"{$this->table}\"
             ";
-        case SqlArray::SQL_ITERATE:
-            return "
+            case SqlArray::SQL_ITERATE:
+                return "
                 SELECT key, value FROM \"{$this->table}\"
             ";
-        case SqlArray::SQL_CLEAR:
-            return "
+            case SqlArray::SQL_CLEAR:
+                return "
                 DELETE FROM \"{$this->table}\"
             ";
         }
@@ -62,7 +61,6 @@ class PostgresArray extends SqlArray
     /**
      * Initialize on startup.
      *
-     * @return \Generator
      */
     public function initStartup(): \Generator
     {
@@ -73,7 +71,6 @@ class PostgresArray extends SqlArray
      * Initialize connection.
      *
      * @param DatabasePostgres $settings
-     * @return \Generator
      */
     public function initConnection($settings): \Generator
     {
@@ -103,7 +100,6 @@ class PostgresArray extends SqlArray
     /**
      * Create table for property.
      *
-     * @return \Generator
      *
      * @throws \Throwable
      *

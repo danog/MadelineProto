@@ -24,8 +24,6 @@ class MemoryArray extends \ArrayIterator implements DbArray
     /**
      * Get instance.
      *
-     * @param string $table
-     * @param mixed  $previous
      * @param Memory $settings
      * @return Promise<self>
      */
@@ -62,8 +60,6 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::offsetUnset($key);
         return new Success();
     }
-
-
 
     public function offsetExists(mixed $offset): bool
     {

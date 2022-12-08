@@ -40,7 +40,6 @@ abstract class SqlArray extends DriverArray
      *
      * @param SqlArray::SQL_* $type
      *
-     * @return string
      */
     abstract protected function getSqlQuery(int $type): string;
 
@@ -74,7 +73,6 @@ abstract class SqlArray extends DriverArray
     {
         return \serialize($value);
     }
-
 
     /**
      * @return Iterator<array{0: string, 1: mixed}>
@@ -145,7 +143,7 @@ abstract class SqlArray extends DriverArray
         );
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(function (?Throwable $err, ?CommandResult $result) use ($key, $value) {
+        $request->onResolve(function (?Throwable $err, ?CommandResult $result) use ($key, $value): void {
             if ($err) {
                 throw $err;
             }
@@ -156,15 +154,11 @@ abstract class SqlArray extends DriverArray
         return $request;
     }
 
-
     /**
      * Unset value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
      *
-     * @param string|int $index <p>
-     * The offset to unset.
-     * </p>
      *
      * @return Promise<array>
      * @throws \Throwable
@@ -209,12 +203,9 @@ abstract class SqlArray extends DriverArray
         return $this->execute($this->queries[self::SQL_CLEAR]);
     }
 
-
     /**
      * Perform async request to db.
      *
-     * @param string $sql
-     * @param array $params
      *
      * @psalm-param self::STATEMENT_* $stmt
      *

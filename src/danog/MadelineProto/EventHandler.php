@@ -51,7 +51,6 @@ abstract class EventHandler extends InternalDoc
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
      *
-     * @return void
      */
     final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
@@ -67,7 +66,6 @@ abstract class EventHandler extends InternalDoc
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
      *
-     * @return void
      */
     final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
     {
@@ -82,7 +80,6 @@ abstract class EventHandler extends InternalDoc
      *
      * @param APIWrapper $MadelineProto MadelineProto instance
      *
-     * @return void
      */
     public function initInternal(APIWrapper $MadelineProto): void
     {
@@ -97,7 +94,6 @@ abstract class EventHandler extends InternalDoc
      *
      * @internal
      *
-     * @return \Generator
      */
     public function startInternal(): \Generator
     {
@@ -131,7 +127,6 @@ abstract class EventHandler extends InternalDoc
     /**
      * Get API instance.
      *
-     * @return MTProto
      */
     public function getAPI(): MTProto
     {

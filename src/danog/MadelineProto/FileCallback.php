@@ -27,7 +27,6 @@ class FileCallback implements FileCallbackInterface
     /**
      * File to download/upload.
      *
-     * @var mixed
      */
     private $file;
     /**
@@ -50,7 +49,6 @@ class FileCallback implements FileCallbackInterface
     /**
      * Get file.
      *
-     * @return mixed
      */
     public function getFile()
     {
@@ -63,7 +61,6 @@ class FileCallback implements FileCallbackInterface
      * @param int $speed   Speed in mbps
      * @param int $time    Time
      *
-     * @return mixed
      */
     public function __invoke($percent, $speed, $time)
     {

@@ -83,7 +83,6 @@ class ReferenceDatabase implements TLCallback
     /**
      * List of properties stored in database (memory or external).
      * @see DbPropertiesFactory
-     * @var array
      */
     protected static array $dbProperties = [
         'db' => 'array',
@@ -434,7 +433,7 @@ class ReferenceDatabase implements TLCallback
                     }
                     yield from $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
                     break;
-                // Peer + photo ID
+                    // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
                     $fullChat = yield $this->API->full_chats[$origin['peer']];
                     if (isset($fullChat['last_update'])) {
@@ -443,7 +442,7 @@ class ReferenceDatabase implements TLCallback
                     }
                     $this->API->getFullInfo($origin['peer']);
                     break;
-                // Peer (default photo ID)
+                    // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
                     yield from $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;

@@ -27,7 +27,6 @@ trait TD
      * @param array $params Params
      * @param array $key    Key
      *
-     * @return array
      */
     public function tdcliToTd(&$params, $key = null): array
     {
@@ -90,7 +89,6 @@ trait TD
      *
      * @param mixed $params Params
      *
-     * @return \Generator
      */
     public function MTProtoToTdcli($params): \Generator
     {
@@ -101,7 +99,6 @@ trait TD
      *
      * @param mixed $params Params
      *
-     * @return \Generator
      */
     public function MTProtoToTd(&$params): \Generator
     {
@@ -188,7 +185,6 @@ trait TD
      *
      * @param mixed $params Parameters
      *
-     * @return mixed
      */
     public function tdToTdcli($params)
     {

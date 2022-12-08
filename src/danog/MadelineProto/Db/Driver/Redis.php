@@ -18,19 +18,11 @@ class Redis
     private static array $connections = [];
 
     /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $db
-     * @param int $maxConnections
-     * @param int $idleTimeout
      *
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise<void>, mixed, RedisRedis>
      */

@@ -73,7 +73,7 @@ class UpdatesState
     /**
      * Wakeup function.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         /** @psalm-suppress DocblockTypeContradiction */
         if ($this->channelId === false) {
@@ -83,7 +83,6 @@ class UpdatesState
     /**
      * Is this state relative to a channel?
      *
-     * @return bool
      */
     public function isChannel(): bool
     {
@@ -92,7 +91,6 @@ class UpdatesState
     /**
      * Get the channel ID.
      *
-     * @return int
      */
     public function getChannel(): int
     {
@@ -103,7 +101,6 @@ class UpdatesState
      *
      * @param bool|null $set Update the currently busy flag
      *
-     * @return bool
      */
     public function syncLoading(bool $set = null): bool
     {
@@ -117,7 +114,6 @@ class UpdatesState
      *
      * @param array $init Parameters to update
      *
-     * @return self
      */
     public function update(array $init): self
     {

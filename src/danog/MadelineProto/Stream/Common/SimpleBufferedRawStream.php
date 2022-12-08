@@ -35,7 +35,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      *
      * @param int $length Amount of data to read
      *
-     * @return \Generator
      */
     public function bufferReadGenerator(int $length): \Generator
     {
@@ -59,7 +58,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -68,7 +66,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     /**
      * Get class name.
      *
-     * @return string
      */
     public static function getName(): string
     {

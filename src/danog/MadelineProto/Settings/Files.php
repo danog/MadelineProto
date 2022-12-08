@@ -46,7 +46,6 @@ class Files extends SettingsAbstract
     /**
      * Get allow automatic upload of files from file paths present in constructors?
      *
-     * @return bool
      */
     public function getAllowAutomaticUpload(): bool
     {
@@ -58,7 +57,6 @@ class Files extends SettingsAbstract
      *
      * @param bool $allowAutomaticUpload Allow automatic upload of files from file paths present in constructors?
      *
-     * @return self
      */
     public function setAllowAutomaticUpload(bool $allowAutomaticUpload): self
     {
@@ -70,7 +68,6 @@ class Files extends SettingsAbstract
     /**
      * Get upload parallel chunk count.
      *
-     * @return int
      */
     public function getUploadParallelChunks(): int
     {
@@ -82,7 +79,6 @@ class Files extends SettingsAbstract
      *
      * @param int $uploadParallelChunks Upload parallel chunk count
      *
-     * @return self
      */
     public function setUploadParallelChunks(int $uploadParallelChunks): self
     {
@@ -94,7 +90,6 @@ class Files extends SettingsAbstract
     /**
      * Get download parallel chunk count.
      *
-     * @return int
      */
     public function getDownloadParallelChunks(): int
     {
@@ -106,7 +101,6 @@ class Files extends SettingsAbstract
      *
      * @param int $downloadParallelChunks Download parallel chunk count
      *
-     * @return self
      */
     public function setDownloadParallelChunks(int $downloadParallelChunks): self
     {
@@ -118,7 +112,6 @@ class Files extends SettingsAbstract
     /**
      * Get whether to report undownloadable media to TSF.
      *
-     * @return bool
      */
     public function getReportBrokenMedia(): bool
     {
@@ -130,7 +123,6 @@ class Files extends SettingsAbstract
      *
      * @param bool $reportBrokenMedia Whether to report undownloadable media to TSF
      *
-     * @return self
      */
     public function setReportBrokenMedia(bool $reportBrokenMedia): self
     {

@@ -28,7 +28,6 @@ abstract class Extension
      * @param string $extension File extension
      * @param string $default   Default mime type
      *
-     * @return string
      */
     public static function getMimeFromExtension(string $extension, string $default): string
     {
@@ -43,7 +42,6 @@ abstract class Extension
      *
      * @param string $mime MIME type
      *
-     * @return string
      */
     public static function getExtensionFromMime(string $mime): string
     {
@@ -55,7 +53,6 @@ abstract class Extension
      * @param mixed  $location File location
      * @param string $default  Default extension
      *
-     * @return string
      */
     public static function getExtensionFromLocation($location, string $default): string
     {
@@ -66,7 +63,6 @@ abstract class Extension
      *
      * @param string $file File
      *
-     * @return string
      */
     public static function getMimeFromFile(string $file): string
     {
@@ -78,7 +74,6 @@ abstract class Extension
      *
      * @param string $buffer Buffer
      *
-     * @return string
      */
     public static function getMimeFromBuffer(string $buffer): string
     {

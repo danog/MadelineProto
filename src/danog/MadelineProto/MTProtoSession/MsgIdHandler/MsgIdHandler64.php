@@ -45,7 +45,6 @@ class MsgIdHandler64 extends MsgIdHandler
      * @param string $newMessageId New message ID
      * @param array  $aargs        Params
      *
-     * @return void
      */
     public function checkMessageId($newMessageId, array $aargs): void
     {
@@ -86,7 +85,6 @@ class MsgIdHandler64 extends MsgIdHandler
     /**
      * Generate message ID.
      *
-     * @return string
      */
     public function generateMessageId(): string
     {
@@ -102,7 +100,6 @@ class MsgIdHandler64 extends MsgIdHandler
      *
      * @param boolean $incoming Incoming or outgoing message ID
      *
-     * @return mixed
      */
     public function getMaxId(bool $incoming)
     {
@@ -112,8 +109,6 @@ class MsgIdHandler64 extends MsgIdHandler
     /**
      * Get readable representation of message ID.
      *
-     * @param string $messageId
-     * @return string
      */
     protected static function toStringInternal(string $messageId): string
     {

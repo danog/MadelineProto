@@ -43,7 +43,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -63,7 +62,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
@@ -76,7 +74,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
@@ -87,7 +84,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {
@@ -96,7 +92,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {

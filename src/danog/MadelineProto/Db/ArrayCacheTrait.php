@@ -45,8 +45,6 @@ trait ArrayCacheTrait
     /**
      * Save item in cache.
      *
-     * @param string $key
-     * @param mixed $value
      */
     protected function setCache(string $key, $value): void
     {
@@ -57,7 +55,6 @@ trait ArrayCacheTrait
     /**
      * Remove key from cache.
      *
-     * @param string $key
      */
     protected function unsetCache(string $key): void
     {

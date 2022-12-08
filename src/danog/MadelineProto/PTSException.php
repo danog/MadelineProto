@@ -27,7 +27,7 @@ class PTSException extends \Exception
     use TL\PrettyException;
     public function __toString()
     {
-        return \get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        return static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
     }
     public function __construct($message, $file = '')
     {

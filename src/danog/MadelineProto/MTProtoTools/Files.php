@@ -32,8 +32,6 @@ use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
-
-use const danog\Decoder\TYPES;
 use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -57,7 +55,6 @@ trait Files
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\Http\Client\Response>|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
      */
@@ -107,7 +104,6 @@ trait Files
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise|\Amp\Promise<array>, mixed, array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
      */
@@ -232,7 +228,6 @@ trait Files
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, mixed>
      */
@@ -309,7 +304,6 @@ trait Files
              * @param integer $offset Offset
              * @param integer $size   Chunk size
              *
-             * @return Promise
              */
             public function read(int $offset, int $size): Promise
             {
@@ -322,7 +316,6 @@ trait Files
              * @param string  $data   Data
              * @param integer $offset Offset
              *
-             * @return Promise
              */
             public function write(string $data, int $offset): Promise
             {
@@ -335,7 +328,6 @@ trait Files
              *
              * @param mixed ...$params Params to be passed to cb
              *
-             * @return void
              */
             public function callback(...$params): void
             {
@@ -476,7 +468,7 @@ trait Files
             case 'updateEditMessage':
             case 'updateEditChannelMessage':
                 $constructor = $constructor['message'];
-            // no break
+                // no break
             case 'message':
                 $constructor = $constructor['media'];
         }
@@ -491,7 +483,6 @@ trait Files
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
      *
-     * @param mixed $messageMedia File ID
      *
      * @return \Generator<array>
      */
@@ -569,13 +560,13 @@ trait Files
             case 'updateEditMessage':
             case 'updateEditChannelMessage':
                 $messageMedia = $messageMedia['message'];
-            // no break
+                // no break
             case 'message':
                 return yield from $this->getDownloadInfo($messageMedia['media']);
             case 'updateNewEncryptedMessage':
                 $messageMedia = $messageMedia['message'];
-            // Secret media
-            // no break
+                // Secret media
+                // no break
             case 'encryptedMessage':
                 if ($messageMedia['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
                     return yield from $this->getDownloadInfo($messageMedia['decrypted_message']['media']);
@@ -629,10 +620,10 @@ trait Files
                     $res['name'] = Tools::unpackSignedLongString($messageMedia['file']['access_hash']);
                 }
                 return $res;
-            // Wallpapers
+                // Wallpapers
             case 'wallPaper':
                 return $this->getDownloadInfo($messageMedia['document']);
-            // Photos
+                // Photos
             case 'photo':
             case 'messageMediaPhoto':
                 if ($messageMedia['_'] == 'photo') {
@@ -719,11 +710,11 @@ trait Files
                     $res['size'] = \end($messageMedia['sizes']);
                 }
                 return $res;
-            // Documents
+                // Documents
             case 'decryptedMessageMediaExternalDocument':
             case 'document':
                 $messageMedia = ['_' => 'messageMediaDocument', 'ttl_seconds' => 0, 'document' => $messageMedia];
-            // no break
+                // no break
             case 'messageMediaDocument':
                 $res['MessageMedia'] = $messageMedia;
                 foreach ($messageMedia['document']['attributes'] as $attribute) {
@@ -770,7 +761,6 @@ trait Files
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
      */
@@ -834,7 +824,6 @@ trait Files
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, true>
      */
@@ -921,7 +910,7 @@ trait Files
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
                 $previous_promise = Tools::call($this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
-                $previous_promise->onResolve(static function ($e, $res) use (&$size) {
+                $previous_promise->onResolve(static function ($e, $res) use (&$size): void {
                     if ($res) {
                         $size += $res;
                     }
@@ -972,7 +961,6 @@ trait Files
      * @param boolean  $seekable      Whether the download file is seekable
      * @param boolean  $postpone      Whether to postpone method call
      *
-     * @return \Generator
      */
     private function downloadPart(&$messageMedia, bool &$cdn, &$datacenter, &$old_dc, &$ige, $cb, array $offset, $callable, bool $seekable, bool $postpone = false): \Generator
     {

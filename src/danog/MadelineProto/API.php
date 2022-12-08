@@ -107,7 +107,6 @@ class API extends InternalDoc
     /**
      * Storage for externally set properties to be serialized.
      *
-     * @var array
      */
     protected array $storage = [];
 
@@ -162,7 +161,6 @@ class API extends InternalDoc
      * @param string         $session  Session name
      * @param array|Settings $settings Settings
      *
-     * @return void
      */
     public function __magic_construct(string $session, $settings = []): void
     {
@@ -186,7 +184,6 @@ class API extends InternalDoc
      *
      * @param Settings|SettingsEmpty|SettingsIpc $settings Settings
      *
-     * @return \Generator
      */
     private function internalInitAPI(SettingsAbstract $settings): \Generator
     {
@@ -223,7 +220,6 @@ class API extends InternalDoc
     /**
      * Reconnect to full instance.
      *
-     * @return \Generator
      */
     protected function reconnectFull(): \Generator
     {
@@ -290,7 +286,6 @@ class API extends InternalDoc
      * @param SettingsAbstract $settings Settings
      * @param bool $forceFull Whether to force full initialization
      *
-     * @return \Generator
      */
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): \Generator
     {
@@ -355,7 +350,6 @@ class API extends InternalDoc
     /**
      * Wakeup function.
      *
-     * @return void
      */
     public function __wakeup(): void
     {
@@ -393,7 +387,6 @@ class API extends InternalDoc
     /**
      * Init API wrapper.
      *
-     * @return void
      */
     private function APIFactory(): void
     {
@@ -409,7 +402,6 @@ class API extends InternalDoc
         }
     }
 
-
     /**
      * Start MadelineProto and the event handler (enables async).
      *
@@ -417,7 +409,6 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      *
-     * @return void
      */
     public function startAndLoop(string $eventHandler): void
     {
@@ -452,7 +443,6 @@ class API extends InternalDoc
      * @param API[]           $instances    Instances of madeline
      * @param string[]|string $eventHandler Event handler(s)
      *
-     * @return void
      */
     public static function startAndLoopMulti(array $instances, $eventHandler): void
     {
@@ -495,7 +485,6 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      *
-     * @return \Generator
      */
     public function startAndLoopAsync(string $eventHandler): \Generator
     {
@@ -510,7 +499,6 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      *
-     * @return \Generator
      */
     private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): \Generator
     {
@@ -551,7 +539,6 @@ class API extends InternalDoc
      *
      * @internal
      *
-     * @return mixed
      */
     public function &__get(string $name)
     {
@@ -571,7 +558,6 @@ class API extends InternalDoc
      *
      * @internal
      *
-     * @return mixed
      */
     public function __set(string $name, $value)
     {
@@ -593,7 +579,6 @@ class API extends InternalDoc
      *
      * @param string $name Attribute name
      *
-     * @return void
      */
     public function __unset(string $name): void
     {

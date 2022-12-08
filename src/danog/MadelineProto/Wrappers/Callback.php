@@ -29,7 +29,6 @@ trait Callback
      *
      * @param callable $callback Callback
      *
-     * @return void
      */
     public function setCallback($callback): void
     {

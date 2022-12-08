@@ -36,7 +36,6 @@ trait Start
      *
      * @param Settings $settings Settings
      *
-     * @return \Generator
      */
     private function APIStart(Settings $settings): \Generator
     {

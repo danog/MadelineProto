@@ -28,14 +28,12 @@ class RedisArray extends DriverArray
     /**
      * Initialize on startup.
      *
-     * @return \Generator
      */
     public function initStartup(): \Generator
     {
         return $this->initConnection($this->dbSettings);
     }
     /**
-     * @return Generator
      *
      * @psalm-return Generator<int, Success<null>, mixed, void>
      */
@@ -66,7 +64,6 @@ class RedisArray extends DriverArray
      * Initialize connection.
      *
      * @param DatabaseRedis $settings
-     * @return \Generator
      */
     public function initConnection($settings): \Generator
     {
@@ -75,12 +72,9 @@ class RedisArray extends DriverArray
         }
     }
 
-
     /**
      * Get redis key name.
      *
-     * @param string $key
-     * @return string
      */
     private function rKey(string $key): string
     {
@@ -89,8 +83,6 @@ class RedisArray extends DriverArray
     /**
      * Get redis ts name.
      *
-     * @param string $key
-     * @return string
      */
     private function tsKey(string $key): string
     {
@@ -100,7 +92,6 @@ class RedisArray extends DriverArray
     /**
      * Get iterator key.
      *
-     * @return string
      */
     private function itKey(): string
     {
@@ -114,7 +105,6 @@ class RedisArray extends DriverArray
      * @param string $index <p>
      * The index to set for.
      * </p>
-     * @param mixed $value
      *
      * @throws \Throwable
      */
@@ -217,7 +207,6 @@ class RedisArray extends DriverArray
     /**
      * Clear all elements.
      *
-     * @return Promise
      */
     public function clear(): Promise
     {

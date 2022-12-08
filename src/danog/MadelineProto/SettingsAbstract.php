@@ -20,7 +20,6 @@ abstract class SettingsAbstract
      *
      * @internal
      *
-     * @return void
      */
     public function mergeArray(array $settings): void
     {
@@ -29,11 +28,9 @@ abstract class SettingsAbstract
     /**
      * Merge with other settings instance.
      *
-     * @param self $other
      *
      * @internal
      *
-     * @return void
      */
     public function merge(self $other): void
     {
@@ -68,7 +65,6 @@ abstract class SettingsAbstract
      *
      * @param array $properties Properties
      *
-     * @return array
      */
     protected static function toCamel(array $properties): array
     {
@@ -106,8 +102,6 @@ abstract class SettingsAbstract
     /**
      * @deprecated
      *
-     * @param string $name
-     * @param array $arguments
      * @return static
      */
     public function __call(string $name, array $arguments): mixed

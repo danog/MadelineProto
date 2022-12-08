@@ -48,7 +48,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -147,7 +146,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -158,7 +156,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
      */
     public function getReadBuffer(&$length): Promise
     {
@@ -186,14 +183,13 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @return void
      */
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->extra = $extra;
     }
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {
@@ -202,7 +198,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {

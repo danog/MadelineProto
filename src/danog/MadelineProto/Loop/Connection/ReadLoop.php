@@ -42,7 +42,6 @@ class ReadLoop extends SignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -221,7 +220,6 @@ class ReadLoop extends SignalLoop
     /**
      * Get loop name.
      *
-     * @return string
      */
     public function __toString(): string
     {

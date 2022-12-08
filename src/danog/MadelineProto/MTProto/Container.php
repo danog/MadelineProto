@@ -35,7 +35,6 @@ class Container extends OutgoingMessage
     /**
      * Constructor.
      *
-     * @param array $ids
      */
     public function __construct(array $ids)
     {
@@ -45,7 +44,6 @@ class Container extends OutgoingMessage
     /**
      * Get message IDs.
      *
-     * @return array
      */
     public function getIds(): array
     {

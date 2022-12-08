@@ -40,7 +40,6 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return mixed
      */
     public function acceptCallFrom($instance, $user)
     {
@@ -67,7 +66,6 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return mixed
      */
     public function discardCallFrom($instance, $call, $reason, $rating = [], $need_debug = true)
     {
@@ -87,7 +85,6 @@ trait AuthKeyHandler
      *
      * @param mixed $user User
      *
-     * @return \Generator
      */
     public function requestCall($user): \Generator
     {
@@ -119,7 +116,6 @@ trait AuthKeyHandler
      *
      * @param array $call Call
      *
-     * @return \Generator
      */
     public function acceptCall(array $call): \Generator
     {
@@ -159,7 +155,6 @@ trait AuthKeyHandler
      *
      * @param array $params Params
      *
-     * @return \Generator
      */
     public function confirmCall(array $params): \Generator
     {
@@ -208,7 +203,6 @@ trait AuthKeyHandler
      *
      * @param array $params Params
      *
-     * @return \Generator
      */
     public function completeCall(array $params): \Generator
     {
@@ -264,7 +258,6 @@ trait AuthKeyHandler
      *
      * @param int $call Call ID
      *
-     * @return array
      */
     public function getCall($call): array
     {
@@ -277,11 +270,9 @@ trait AuthKeyHandler
      * Discard call.
      *
      * @param array   $call       Call
-     * @param array $reason
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      *
-     * @return \Generator
      */
     public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): \Generator
     {
@@ -316,11 +307,10 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return void
      */
     public function checkCalls(): void
     {
-        \array_walk($this->calls, function ($controller, $id) {
+        \array_walk($this->calls, function ($controller, $id): void {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $this->logger("Discarding ended call...");
                 $controller->discard();

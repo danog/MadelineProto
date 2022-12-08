@@ -18,22 +18,22 @@ If not, see <http://www.gnu.org/licenses/>.
 use danog\MadelineProto\API;
 
 $loader = false;
-if (\getenv('ACTIONS_PHAR')) {
+if (getenv('ACTIONS_PHAR')) {
     $loader = include 'madeline.php';
-    \copy('madelineBackup.php', 'madeline.php');
-} elseif (!\file_exists(__DIR__.'/../vendor/autoload.php') || \getenv('ACTIONS_FORCE_PREVIOUS')) {
+    copy('madelineBackup.php', 'madeline.php');
+} elseif (!file_exists(__DIR__.'/../vendor/autoload.php') || getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
     require_once 'vendor/autoload.php';
 }
-\define('MADELINEPROTO_TEST', 'testing');
+define('MADELINEPROTO_TEST', 'testing');
 if ($loader) {
     foreach ($loader->getClassMap() as $class => $file) {
-        if (\in_array($class, [
+        if (in_array($class, [
             'Amp\\Sync\\Internal\\MutexStorage',
             'Amp\\Sync\\Internal\\SemaphoreStorage',
             'Amp\\Parallel\\Sync\\Internal\\ParcelStorage',
@@ -57,7 +57,7 @@ if ($loader) {
         ])) {
             continue;
         }
-        if (\str_starts_with($class, 'PhabelVendor\\Symfony\\Component\\Console') || \str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || \str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
+        if (str_starts_with($class, 'PhabelVendor\\Symfony\\Component\\Console') || str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || str_ends_with($class, 'Test') || class_exists($class) || interface_exists($class)) {
             continue;
         }
         require_once($file);
@@ -67,17 +67,17 @@ if ($loader) {
 /*
  * Load .env for settings
  */
-if (\file_exists('.env') && \class_exists(Dotenv\Dotenv::class)) {
+if (file_exists('.env') && class_exists(Dotenv\Dotenv::class)) {
     echo 'Loading .env...'.PHP_EOL;
-    $dotenv = Dotenv\Dotenv::create(\getcwd());
+    $dotenv = Dotenv\Dotenv::create(getcwd());
     $dotenv->load();
-    if (\getenv('TEST_SECRET_CHAT') == '') {
+    if (getenv('TEST_SECRET_CHAT') == '') {
         echo('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
         die(1);
     }
 }
 echo 'Loading settings...'.PHP_EOL;
-$settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
+$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 /*
  * Load MadelineProto
@@ -112,15 +112,15 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /**
      * A small example message to use for tests.
      */
-    $message = \getenv('GITHUB_SHA') == '' ?
+    $message = getenv('GITHUB_SHA') == '' ?
         'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' :
-        ('Github actions tests in progress: commit '.\getenv('GITHUB_SHA').', job '.\getenv('GITHUB_JOB').', PHP version: '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION);
+        ('Github actions tests in progress: commit '.getenv('GITHUB_SHA').', job '.getenv('GITHUB_JOB').', PHP version: '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION);
 
     /*
      * Try making a phone call
      */
-    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to make a call? (y/n): ')) ?? '', 'y') !== false) {
-        $controller = yield $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+    if (!getenv('GITHUB_SHA') && stripos((yield $MadelineProto->readline('Do you want to make a call? (y/n): ')) ?? '', 'y') !== false) {
+        $controller = yield $MadelineProto->requestCall(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
         while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
             yield $MadelineProto->sleep(1);
         }
@@ -133,7 +133,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Try receiving a phone call
      */
-    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): ')) ?? '', 'y') !== false) {
+    if (!getenv('GITHUB_SHA') && stripos((yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): ')) ?? '', 'y') !== false) {
         $howmany = yield $MadelineProto->readline('How many calls would you like me to handle? ');
         $offset = 0;
         while ($howmany > 0) {
@@ -142,12 +142,12 @@ $MadelineProto->loop(function () use ($MadelineProto) {
                 $MadelineProto->logger($update);
                 $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
                 switch ($update['update']['_']) {
-                case 'updatePhoneCall':
-                    if (\is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-                        $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
-                        $howmany--;
-                    }
-            }
+                    case 'updatePhoneCall':
+                        if (is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+                            $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+                            $howmany--;
+                        }
+                }
             }
         }
     }
@@ -155,15 +155,15 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Secret chat usage
      */
-    if (!\getenv('GITHUB_SHA') && \stripos((yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): ')) ?? '', 'y') !== false) {
-        if (!\getenv('TEST_SECRET_CHAT')) {
+    if (!getenv('GITHUB_SHA') && stripos((yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): ')) ?? '', 'y') !== false) {
+        if (!getenv('TEST_SECRET_CHAT')) {
             throw new Exception('No TEST_SECRET_CHAT environment variable was provided!');
         }
         /**
          * Request a secret chat.
          */
-        $secret_chat_id = yield $MadelineProto->requestSecretChat(\getenv('TEST_SECRET_CHAT'));
-        echo 'Waiting 10 seconds for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
+        $secret_chat_id = yield $MadelineProto->requestSecretChat(getenv('TEST_SECRET_CHAT'));
+        echo 'Waiting 10 seconds for '.getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
         yield $MadelineProto->sleep(10);
 
@@ -197,13 +197,13 @@ $MadelineProto->loop(function () use ($MadelineProto) {
                 'message' => '', // No text message, only media
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
+                    'thumb' => file_get_contents(__DIR__.'/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
                     'thumb_w' => 90,
                     'thumb_h' => 90,
-                    'mime_type' => \mime_content_type(__DIR__.'/faust.jpg'), // The file's mime type
+                    'mime_type' => mime_content_type(__DIR__.'/faust.jpg'), // The file's mime type
                     'caption' => 'This file was uploaded using @MadelineProto', // The caption
                     'file_name' => 'faust.jpg', // The file's name
-                    'size' => \filesize(__DIR__.'/faust.jpg'), // The file's size
+                    'size' => filesize(__DIR__.'/faust.jpg'), // The file's size
                     'attributes' => [
                         ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
                     ],
@@ -221,11 +221,11 @@ $MadelineProto->loop(function () use ($MadelineProto) {
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaPhoto',
-                    'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'),
+                    'thumb' => file_get_contents(__DIR__.'/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'caption' => 'This file was uploaded using @MadelineProto',
-                    'size' => \filesize(__DIR__.'/faust.jpg'),
+                    'size' => filesize(__DIR__.'/faust.jpg'),
                     'w' => 1280,
                     'h' => 914,
                 ],
@@ -233,20 +233,20 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         ];
 
         // GIF, secret chat
-        $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => \filesize(__DIR__.'/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
+        $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type(__DIR__.'/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => filesize(__DIR__.'/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
 
         // Sticker, secret chat
-        $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => \filesize(__DIR__.'/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
+        $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type(__DIR__.'/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => filesize(__DIR__.'/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
 
         // Document, secret chat
-        $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => \filesize(__DIR__.'/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
+        $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => filesize(__DIR__.'/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
         // Video, secret chat
-        $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => \filesize(__DIR__.'/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
+        $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type(__DIR__.'/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => filesize(__DIR__.'/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
 
         // audio, secret chat
-        $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
-        $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
         foreach ($secret_media as $type => $smessage) {
             $MadelineProto->logger("Encrypting and uploading $type...");
@@ -254,12 +254,12 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         }
     }
 
-    if (!\getenv('TEST_USERNAME')) {
+    if (!getenv('TEST_USERNAME')) {
         throw new Exception('No TEST_USERNAME environment variable was provided!');
     }
     /*yield $MadelineProto->refreshPeerCache(\getenv('TEST_USERNAME'));
     yield $MadelineProto->refreshFullPeerCache(\getenv('TEST_USERNAME'));*/
-    $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+    $mention = yield $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
     $media = [];
 
@@ -282,15 +282,15 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
     $message = 'yay '.\PHP_VERSION_ID;
-    $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+    $mention = yield $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
 
-    $peers = \json_decode(\getenv('TEST_DESTINATION_GROUPS'), true);
+    $peers = json_decode(getenv('TEST_DESTINATION_GROUPS'), true);
     if (!$peers) {
         die("No TEST_DESTINATION_GROUPS array was provided!");
     }
     foreach ($peers as $peer) {
-        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
+        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($media as $type => $inputMedia) {
@@ -313,8 +313,8 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         }
     }
 
-    foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
+    foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
+        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
     }
 });

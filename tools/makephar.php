@@ -16,10 +16,10 @@ if (!isset($argv[3])) {
     die(1);
 }
 
-@\unlink($argv[2]);
+@unlink($argv[2]);
 
 $p = new Phar(__DIR__.'/../'.$argv[2], 0, $argv[2]);
-$p->buildFromDirectory(\realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.tl|\.json|\.dat|\.h)$/i');
+$p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.tl|\.json|\.dat|\.h)$/i');
 $p->addFromString('vendor/danog/madelineproto/.git/refs/heads/master', $argv[3]);
 $p->addFromString('.git/refs/heads/master', $argv[3]);
 

@@ -100,9 +100,7 @@ class TL
     /**
      * Get constructors.
      *
-     * @param bool $td
      *
-     * @return TLConstructors
      */
     public function getConstructors(bool $td = false): TLConstructors
     {
@@ -111,9 +109,7 @@ class TL
     /**
      * Get methods.
      *
-     * @param bool $td
      *
-     * @return TLMethods
      */
     public function getMethods(bool $td = false): TLMethods
     {
@@ -122,7 +118,6 @@ class TL
     /**
      * Get TL descriptions.
      *
-     * @return array
      */
     public function &getDescriptions(): array
     {
@@ -136,7 +131,7 @@ class TL
      *
      * @return void
      */
-    public function init(TLSchema $files, array $objects = [])
+    public function init(TLSchema $files, array $objects = []): void
     {
         $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->updateCallbacks($objects);
@@ -331,7 +326,6 @@ class TL
     /**
      * Get TL namespaces.
      *
-     * @return array
      */
     public function getMethodNamespaces(): array
     {
@@ -345,7 +339,6 @@ class TL
     /**
      * Get namespaced methods (method => namespace).
      *
-     * @return array
      */
     public function getMethodsNamespaced(): array
     {
@@ -358,7 +351,7 @@ class TL
      *
      * @return void
      */
-    public function updateCallbacks(array $objects)
+    public function updateCallbacks(array $objects): void
     {
         $this->callbacks = [];
         foreach ($objects as $object) {
@@ -385,7 +378,6 @@ class TL
      *
      * @param string $id Constructor ID
      *
-     * @return bool
      */
     private function deserializeBool(string $id): bool
     {
@@ -403,7 +395,6 @@ class TL
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, array|mixed, mixed, false|mixed|null|string>
      */
@@ -587,7 +578,6 @@ class TL
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|Promise<string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
@@ -607,7 +597,6 @@ class TL
      * @param string  $ctx       Context
      * @param integer $layer     Layer
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
@@ -715,7 +704,7 @@ class TL
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => \json_encode($arguments[$current_argument['name']])];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'])) {
-                \array_walk($arguments[$current_argument['name']], function (&$arg) {
+                \array_walk($arguments[$current_argument['name']], function (&$arg): void {
                     $arg = ['_' => 'dataJSON', 'data' => \json_encode($arg)];
                 });
             }
@@ -743,7 +732,6 @@ class TL
      * @param resource|string $stream Stream
      * @param array           $type   Type identifier
      *
-     * @return int
      */
     public function getLength($stream, $type = ['type' => '']): int
     {
@@ -765,7 +753,6 @@ class TL
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
      *
-     * @return array
      * @psalm-return array{0: mixed, 1: \Amp\Promise[]}
      */
     public function deserialize($stream, $type = ['type' => '']): array
@@ -785,7 +772,6 @@ class TL
      * @param Promise[]       &$promises Promise array
      * @param array           $type      Type identifier
      *
-     * @return mixed
      */
     private function deserializeInternal($stream, array &$promises, array $type)
     {
@@ -870,7 +856,7 @@ class TL
                     default:
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
-            // no break
+                // no break
             case 'vector':
                 $count = \unpack('V', \stream_get_contents($stream, 4))[1];
                 $result = [];
@@ -945,7 +931,7 @@ class TL
                             $x[$arg['name']] = false;
                             continue 2;
                         }
-                    // no break
+                        // no break
                     default:
                         if (($x[$arg['flag']] & $arg['pow']) === 0) {
                             continue 2;

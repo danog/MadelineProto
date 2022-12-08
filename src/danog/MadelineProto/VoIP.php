@@ -109,7 +109,6 @@ class VoIP
 
     const CODEC_OPUS = 'SUPO';
 
-
     private $TLID_DECRYPTED_AUDIO_BLOCK;
     private $TLID_SIMPLE_AUDIO_BLOCK;
     private $TLID_REFLECTOR_SELF_INFO;
@@ -141,7 +140,6 @@ class VoIP
 
     private PermAuthKey $authKey;
     private int $peerVersion = 0;
-
 
     /**
      * @var Endpoint[]
@@ -190,7 +188,7 @@ class VoIP
     /**
      * Wakeup function.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if ($this->voip_state === self::STATE_ESTABLISHED) {
             $this->voip_state = self::STATE_CREATED;
@@ -202,7 +200,6 @@ class VoIP
      *
      * @param boolean $creator
      * @param integer $otherID
-     * @param MTProto $MadelineProto
      * @param integer $callState
      */
     public function __construct(bool $creator, int $otherID, MTProto $MadelineProto, int $callState)
@@ -231,7 +228,6 @@ class VoIP
     /**
      * Get debug string.
      *
-     * @return string
      */
     public function getDebugString(): string
     {
@@ -241,8 +237,6 @@ class VoIP
     /**
      * Set call constructor.
      *
-     * @param array $callID
-     * @return void
      */
     public function setCall(array $callID): void
     {
@@ -257,8 +251,6 @@ class VoIP
     /**
      * Set emojis.
      *
-     * @param array $visualization
-     * @return void
      */
     public function setVisualization(array $visualization): void
     {
@@ -268,7 +260,6 @@ class VoIP
     /**
      * Get emojis.
      *
-     * @return array
      */
     public function getVisualization(): array
     {
@@ -319,7 +310,7 @@ class VoIP
         }
         $this->callState = self::CALL_STATE_ACCEPTED;
 
-        Tools::call($this->MadelineProto->acceptCall($this->callID))->onResolve(function ($e, $res) {
+        Tools::call($this->MadelineProto->acceptCall($this->callID))->onResolve(function ($e, $res): void {
             if ($e || !$res) {
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }
@@ -337,7 +328,7 @@ class VoIP
             return $this;
         }
         $this->voip_state = self::STATE_WAIT_INIT;
-        $this->timeoutWatcher = Loop::repeat(10000, function () {
+        $this->timeoutWatcher = Loop::repeat(10000, function (): void {
             if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }
@@ -401,8 +392,6 @@ class VoIP
     /**
      * Start write loop.
      *
-     * @param Endpoint $socket
-     * @return \Generator
      */
     private function startWriteLoop(Endpoint $socket): \Generator
     {
@@ -461,8 +450,6 @@ class VoIP
     /**
      * Open OGG file for reading.
      *
-     * @param string $file
-     * @return \Generator
      */
     private function openFile(string $file): \Generator
     {
@@ -477,8 +464,6 @@ class VoIP
     /**
      * Play file.
      *
-     * @param string $file
-     * @return self
      */
     public function play(string $file): self
     {
@@ -490,8 +475,6 @@ class VoIP
     /**
      * Play file.
      *
-     * @param string $file
-     * @return self
      */
     public function then(string $file): self
     {
@@ -503,8 +486,6 @@ class VoIP
     /**
      * Files to play on hold.
      *
-     * @param array $files
-     * @return self
      */
     public function playOnHold(array $files): self
     {
@@ -516,8 +497,6 @@ class VoIP
     /**
      * Set output file.
      *
-     * @param string $file
-     * @return self
      */
     public function setOutputFile(string $file): self
     {
@@ -529,7 +508,6 @@ class VoIP
     /**
      * Unset output file.
      *
-     * @return self
      */
     public function unsetOutputFile(): self
     {
@@ -538,12 +516,9 @@ class VoIP
         return $this;
     }
 
-
     /**
      * Set MadelineProto instance.
      *
-     * @param MTProto $MadelineProto
-     * @return void
      */
     public function setMadeline(MTProto $MadelineProto): void
     {
@@ -553,7 +528,6 @@ class VoIP
     /**
      * Get call protocol.
      *
-     * @return array
      */
     public function getProtocol(): array
     {
@@ -563,7 +537,6 @@ class VoIP
     /**
      * Get ID of other user.
      *
-     * @return int
      */
     public function getOtherID(): int
     {
@@ -593,7 +566,6 @@ class VoIP
     /**
      * Parse config.
      *
-     * @return void
      */
     public function parseConfig(): void
     {
@@ -602,7 +574,6 @@ class VoIP
     /**
      * Get call state.
      *
-     * @return int
      */
     public function getCallState(): int
     {
@@ -612,7 +583,6 @@ class VoIP
     /**
      * Get library version.
      *
-     * @return string
      */
     public function getVersion(): string
     {
@@ -632,7 +602,6 @@ class VoIP
     /**
      * Get last error.
      *
-     * @return string
      */
     public function getLastError(): string
     {
@@ -642,7 +611,6 @@ class VoIP
     /**
      * Get debug log.
      *
-     * @return string
      */
     public function getDebugLog(): string
     {
@@ -660,7 +628,6 @@ class VoIP
     /**
      * Get the value of creator.
      *
-     * @return bool
      */
     public function isCreator(): bool
     {
@@ -670,7 +637,6 @@ class VoIP
     /**
      * Get the value of authKey.
      *
-     * @return PermAuthKey
      */
     public function getAuthKey(): PermAuthKey
     {
@@ -680,7 +646,6 @@ class VoIP
     /**
      * Get the value of peerVersion.
      *
-     * @return int
      */
     public function getPeerVersion(): int
     {

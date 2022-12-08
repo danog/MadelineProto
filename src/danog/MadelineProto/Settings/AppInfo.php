@@ -65,7 +65,7 @@ class AppInfo extends SettingsAbstract
         }
         $this->init();
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->init();
     }
@@ -108,7 +108,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get API ID.
      *
-     * @return int
      */
     public function getApiId(): int
     {
@@ -123,7 +122,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param int $apiId API ID.
      *
-     * @return self
      */
     public function setApiId(int $apiId): self
     {
@@ -155,7 +153,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get API hash.
      *
-     * @return string
      */
     public function getApiHash(): string
     {
@@ -170,7 +167,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $apiHash API hash.
      *
-     * @return self
      */
     public function setApiHash(string $apiHash): self
     {
@@ -182,7 +178,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get device model.
      *
-     * @return string
      */
     public function getDeviceModel(): string
     {
@@ -194,7 +189,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $deviceModel Device model.
      *
-     * @return self
      */
     public function setDeviceModel(string $deviceModel): self
     {
@@ -206,7 +200,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get system version.
      *
-     * @return string
      */
     public function getSystemVersion(): string
     {
@@ -218,7 +211,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $systemVersion System version.
      *
-     * @return self
      */
     public function setSystemVersion(string $systemVersion): self
     {
@@ -230,7 +222,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get app version.
      *
-     * @return string
      */
     public function getAppVersion(): string
     {
@@ -242,7 +233,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $appVersion App version.
      *
-     * @return self
      */
     public function setAppVersion(string $appVersion): self
     {
@@ -254,7 +244,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get language code.
      *
-     * @return string
      */
     public function getLangCode(): string
     {
@@ -266,7 +255,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $langCode Language code.
      *
-     * @return self
      */
     public function setLangCode(string $langCode): self
     {
@@ -281,7 +269,6 @@ class AppInfo extends SettingsAbstract
     /**
      * Get language pack.
      *
-     * @return string
      */
     public function getLangPack(): string
     {
@@ -293,7 +280,6 @@ class AppInfo extends SettingsAbstract
      *
      * @param string $langPack Language pack.
      *
-     * @return self
      */
     public function setLangPack(string $langPack): self
     {

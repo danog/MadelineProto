@@ -35,7 +35,6 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -44,7 +43,6 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {

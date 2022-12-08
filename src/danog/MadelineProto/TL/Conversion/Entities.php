@@ -27,9 +27,7 @@ final class Entities
      * setOffset
      * setOffset for text.
      *
-     * @param string $start
      *
-     * @return void
      */
     private function setOffset(string $start, mixed $end = "</a>"): void
     {
@@ -41,11 +39,8 @@ final class Entities
      * checkEntity
      * checkEntity in text and identify it.
      *
-     * @param object|array $entity
      *
-     * @param mixed &$type
      *
-     * @return array
      */
     private function checkEntity(object|array $entity, &$type): array
     {
@@ -91,13 +86,9 @@ final class Entities
      * entitiesToHtml
      * Covert entities to html tags.
      *
-     * @param string $text
      *
-     * @param array|object $entities
      *
-     * @param bool $specialchars
      *
-     * @return string
      */
     public function entitiesToHtml(
         string $text,
@@ -184,13 +175,9 @@ final class Entities
      * entitiesToMarkdownV1
      * Covert entities to html tags v1 (Telegram version).
      *
-     * @param string $text
      *
-     * @param object|array $entities
      *
-     * @param bool $slashmarkdown
      *
-     * @return string
      */
 
     public function entitiesToMarkdownV1(
@@ -270,13 +257,9 @@ final class Entities
      * entitiesToMarkdown
      * convert given entities to markdown.
      *
-     * @param string $text
      *
-     * @param object|array $entities
      *
-     * @param bool $slashmarkdown
      *
-     * @return string
      */
     public function entitiesToMarkdown(
         string $text,
@@ -424,7 +407,7 @@ final class Entities
         };
         $html = "";
         $htmli = 0;
-        $setstr = function ($starttag) use (&$html, &$htmli) {
+        $setstr = function ($starttag) use (&$html, &$htmli): void {
             $html .= $starttag;
             $htmli += \mb_strlen($starttag);
         };
@@ -455,7 +438,7 @@ final class Entities
             &$html,
             &$htmli,
             &$currentmarki
-        ) {
+        ): void {
             if ($htmli - $currentmarki > $starttaglen) {
                 $setstr($endtag);
             } else {
@@ -641,7 +624,7 @@ final class Entities
         };
         $html = "";
         $htmli = 0;
-        $setstr = function ($starttag) use (&$html, &$htmli) {
+        $setstr = function ($starttag) use (&$html, &$htmli): void {
             $html .= $starttag;
             $htmli += \mb_strlen($starttag);
         };
@@ -672,7 +655,7 @@ final class Entities
             &$html,
             &$htmli,
             &$currentmarki
-        ) {
+        ): void {
             if ($htmli - $currentmarki > $starttaglen) {
                 $setstr($endtag);
             } else {
@@ -916,7 +899,6 @@ final class Entities
      * @param non-empty-string $text
      * @param "html"|"markdown"|"markdownv1"|"markdownv2"|"markdownhtml"|"markdownv2html"|"markdownv1html" $mode
      *
-     * @return DOMEntities
      */
     public function parseText(string $text, string $mode = "html"): DOMEntities
     {

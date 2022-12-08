@@ -1,7 +1,5 @@
 # MadelineProto, a PHP MTProto telegram client
 
-[![phabel.io - PHP transpiler](https://phabel.io/badge)](https://phabel.io)
-
 Created by <a href="https://daniil.it" target="_blank" rel="noopener">Daniil Gentili</a>
 
 `#StandWithUkraine 🇺🇦`
@@ -374,7 +372,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getGameHighScores.html" name="messages.getGameHighScores">Get highscores of a game: messages.getGameHighScores</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getInactiveChannels.html" name="channels.getInactiveChannels">Get inactive channels and supergroups: channels.getInactiveChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamChannels.html" name="phone.getGroupCallStreamChannels">Get info about RTMP streams in a group call or livestream.  : phone.getGroupCallStreamChannels</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getChannels.html" name="channels.getChannels">Get info about channels/supergroups: channels.getChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipant.html" name="channels.getParticipant">Get info about a channel/supergroup participant: channels.getParticipant</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPaper.html" name="account.getWallPaper">Get info about a certain wallpaper: account.getWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getExportedChatInvite.html" name="messages.getExportedChatInvite">Get info about a chat invite: messages.getExportedChatInvite</a>
@@ -532,7 +529,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPapers.html" name="account.getWallPapers">Returns a list of available wallpapers: account.getWallPapers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiURL.html" name="messages.getEmojiURL">Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new emoji replacements. The URL will be valid for 30 seconds after generation: messages.getEmojiURL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAttachMenuBot.html" name="messages.getAttachMenuBot">Returns attachment menu entry for a bot web app that can be launched from the attachment menu »: messages.getAttachMenuBot</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getUsers.html" name="users.getUsers">Returns basic user info according to their identifiers: users.getUsers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getChats.html" name="messages.getChats">Returns chat basic info on their IDs: messages.getChats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.getWebFile.html" name="upload.getWebFile">Returns content of a web file, by proxying the request through telegram, see the webfile docs for more info: upload.getWebFile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getConfig.html" name="help.getConfig">Returns current configuration, including data center configuration: help.getConfig</a>

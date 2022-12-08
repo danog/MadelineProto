@@ -28,7 +28,6 @@ class Wrapper extends ClientAbstract
     /**
      * Payload data.
      *
-     * @var mixed
      */
     private $data;
     /**
@@ -55,9 +54,7 @@ class Wrapper extends ClientAbstract
      * Constructor.
      *
      * @param mixed        $data Payload data
-     * @param SessionPaths $ipc  IPC URI
      *
-     * @return \Generator
      * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, Wrapper>
      */
     public static function create(&$data, SessionPaths $session, Logger $logger): \Generator
@@ -80,7 +77,6 @@ class Wrapper extends ClientAbstract
     /**
      * Serialization function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -94,7 +90,6 @@ class Wrapper extends ClientAbstract
      *
      * @param-out int $callback Callback ID
      *
-     * @return void
      */
     public function wrap(&$callback, bool $wrapObjects = true): void
     {
@@ -125,8 +120,6 @@ class Wrapper extends ClientAbstract
     /**
      * Get copy of data.
      *
-     * @param mixed $data
-     * @return mixed
      */
     private static function copy($data)
     {
@@ -135,7 +128,6 @@ class Wrapper extends ClientAbstract
     /**
      * Receiver loop.
      *
-     * @return \Generator
      */
     private function receiverLoop(): \Generator
     {
@@ -156,7 +148,6 @@ class Wrapper extends ClientAbstract
      * @param integer          $id      Request ID
      * @param array            $payload Payload
      *
-     * @return \Generator
      */
     private function clientRequest(int $id, $payload): \Generator
     {
@@ -183,7 +174,6 @@ class Wrapper extends ClientAbstract
      *
      * @internal
      *
-     * @return int
      */
     public function getRemoteId(): int
     {
@@ -197,7 +187,6 @@ class Wrapper extends ClientAbstract
      *
      * @internal
      *
-     * @return mixed
      */
     public function unwrap(ChannelledSocket $server)
     {

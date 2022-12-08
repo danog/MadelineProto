@@ -24,7 +24,6 @@ trait Noop
     /**
      * Set NOOP update handler, ignoring all updates.
      *
-     * @return void
      */
     public function setNoop(): void
     {
@@ -37,7 +36,6 @@ trait Noop
      *
      * @internal
      *
-     * @return void
      */
     public static function noop(): void
     {

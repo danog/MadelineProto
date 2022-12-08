@@ -22,8 +22,6 @@ class Obj
     /**
      * Constructor.
      *
-     * @param Wrapper $wrapper
-     * @param array $methods
      */
     public function __construct(Wrapper $wrapper, array $methods)
     {
@@ -33,8 +31,6 @@ class Obj
     /**
      * Call method.
      *
-     * @param string $name
-     * @param array $arguments
      *
      * @return \Generator<mixed, mixed, mixed, mixed>
      */

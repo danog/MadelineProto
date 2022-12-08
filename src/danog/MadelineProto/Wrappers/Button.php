@@ -32,9 +32,6 @@ trait Button
      *
      * @internal
      *
-     * @param bool $donotwait
-     * @param string $method
-     * @param array $parameters
      *
      * @return Promise|true
      */

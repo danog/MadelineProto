@@ -22,70 +22,69 @@ namespace danog\MadelineProto;
 if (\class_exists(VoIPServerConfig::class)) {
     return;
 }
+/**
+ * Manages storage of VoIP server config.
+ */
+class VoIPServerConfig
+{
     /**
-     * Manages storage of VoIP server config.
+     * The configuration.
+     *
+     * @var array
      */
-    class VoIPServerConfig
+    private static $_config = [];
+    /**
+     * The default configuration.
+     *
+     * @var array
+     */
+    private static $_configDefault = [];
+    /**
+     * Update shared call settings.
+     *
+     * @param array $config The settings
+     *
+     * @return void
+     */
+    public static function update(array $config): void
     {
-        /**
-         * The configuration.
-         *
-         * @var array
-         */
-        private static $_config = [];
-        /**
-         * The default configuration.
-         *
-         * @var array
-         */
-        private static $_configDefault = [];
-        /**
-         * Update shared call settings.
-         *
-         * @param array $config The settings
-         *
-         * @return void
-         */
-        public static function update(array $config)
-        {
-            self::$_config = $config;
-        }
-        /**
-         * Get shared call settings.
-         *
-         * @return array The settings
-         */
-        public static function get(): array
-        {
-            return self::$_config;
-        }
-        /**
-         * Update default shared call settings.
-         *
-         * @param array $configDefault The settings
-         *
-         * @return void
-         */
-        public static function updateDefault(array $configDefault)
-        {
-            self::$_configDefault = $configDefault;
-        }
-        /**
-         * Get default shared call settings.
-         *
-         * @return array The settings
-         */
-        public static function getDefault(): array
-        {
-            return self::$_configDefault;
-        }
-        /**
-         * Get final settings.
-         *
-         * @return array
-         */
-        public static function getFinal(): array
-        {
-            return \array_merge(self::$_configDefault, self::$_config);
-        }
+        self::$_config = $config;
     }
+    /**
+     * Get shared call settings.
+     *
+     * @return array The settings
+     */
+    public static function get(): array
+    {
+        return self::$_config;
+    }
+    /**
+     * Update default shared call settings.
+     *
+     * @param array $configDefault The settings
+     *
+     * @return void
+     */
+    public static function updateDefault(array $configDefault): void
+    {
+        self::$_configDefault = $configDefault;
+    }
+    /**
+     * Get default shared call settings.
+     *
+     * @return array The settings
+     */
+    public static function getDefault(): array
+    {
+        return self::$_configDefault;
+    }
+    /**
+     * Get final settings.
+     *
+     */
+    public static function getFinal(): array
+    {
+        return \array_merge(self::$_configDefault, self::$_config);
+    }
+}

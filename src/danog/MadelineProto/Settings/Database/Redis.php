@@ -28,7 +28,6 @@ class Redis extends DatabaseAbstract
     /**
      * Get database number.
      *
-     * @return int
      */
     public function getDatabase(): int
     {
@@ -40,7 +39,6 @@ class Redis extends DatabaseAbstract
      *
      * @param int $database Database number.
      *
-     * @return self
      */
     public function setDatabase($database): self
     {
@@ -52,7 +50,6 @@ class Redis extends DatabaseAbstract
     /**
      * Get database URI.
      *
-     * @return string
      */
     public function getUri(): string
     {
@@ -64,7 +61,6 @@ class Redis extends DatabaseAbstract
      *
      * @param string $uri Database URI.
      *
-     * @return self
      */
     public function setUri(string $uri): self
     {

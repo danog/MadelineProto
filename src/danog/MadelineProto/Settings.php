@@ -90,7 +90,6 @@ class Settings extends SettingsAbstract
      *
      * @param SettingsAbstract|array $settings Settings
      *
-     * @return SettingsAbstract
      */
     public static function parseFromLegacy($settings): SettingsAbstract
     {
@@ -111,7 +110,6 @@ class Settings extends SettingsAbstract
      *
      * @param SettingsAbstract|array $settings Settings
      *
-     * @return Settings
      */
     public static function parseFromLegacyFull($settings): Settings
     {
@@ -143,7 +141,7 @@ class Settings extends SettingsAbstract
         $this->ipc = new IPc;
         $this->voip = new VoIP;
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (!isset($this->voip)) {
             $this->voip = new VoIP;
@@ -156,7 +154,6 @@ class Settings extends SettingsAbstract
      *
      * @internal
      *
-     * @return void
      */
     public function mergeArray(array $settings): void
     {
@@ -195,7 +192,6 @@ class Settings extends SettingsAbstract
      *
      * @param SettingsAbstract $settings Settings
      *
-     * @return void
      */
     public function merge(SettingsAbstract $settings): void
     {
@@ -268,7 +264,6 @@ class Settings extends SettingsAbstract
     /**
      * Get default DC params.
      *
-     * @return array
      */
     public function getDefaultDcParams(): array
     {
@@ -280,7 +275,6 @@ class Settings extends SettingsAbstract
      *
      * @param int $dc DC ID
      *
-     * @return self
      */
     public function setDefaultDc(int $dc): self
     {
@@ -291,7 +285,6 @@ class Settings extends SettingsAbstract
     /**
      * Get app information.
      *
-     * @return AppInfo
      */
     public function getAppInfo(): AppInfo
     {
@@ -303,7 +296,6 @@ class Settings extends SettingsAbstract
      *
      * @param AppInfo $appInfo App information.
      *
-     * @return self
      */
     public function setAppInfo(AppInfo $appInfo): self
     {
@@ -315,7 +307,6 @@ class Settings extends SettingsAbstract
     /**
      * Get cryptography settings.
      *
-     * @return Auth
      */
     public function getAuth(): Auth
     {
@@ -327,7 +318,6 @@ class Settings extends SettingsAbstract
      *
      * @param Auth $auth Cryptography settings.
      *
-     * @return self
      */
     public function setAuth(Auth $auth): self
     {
@@ -339,7 +329,6 @@ class Settings extends SettingsAbstract
     /**
      * Get connection settings.
      *
-     * @return Connection
      */
     public function getConnection(): Connection
     {
@@ -351,7 +340,6 @@ class Settings extends SettingsAbstract
      *
      * @param Connection $connection Connection settings.
      *
-     * @return self
      */
     public function setConnection(Connection $connection): self
     {
@@ -363,7 +351,6 @@ class Settings extends SettingsAbstract
     /**
      * Get file management settings.
      *
-     * @return Files
      */
     public function getFiles(): Files
     {
@@ -375,7 +362,6 @@ class Settings extends SettingsAbstract
      *
      * @param Files $files File management settings.
      *
-     * @return self
      */
     public function setFiles(Files $files): self
     {
@@ -387,7 +373,6 @@ class Settings extends SettingsAbstract
     /**
      * Get logger settings.
      *
-     * @return Logger
      */
     public function getLogger(): Logger
     {
@@ -399,7 +384,6 @@ class Settings extends SettingsAbstract
      *
      * @param Logger $logger Logger settings.
      *
-     * @return self
      */
     public function setLogger(Logger $logger): self
     {
@@ -411,7 +395,6 @@ class Settings extends SettingsAbstract
     /**
      * Get peer database settings.
      *
-     * @return Peer
      */
     public function getPeer(): Peer
     {
@@ -423,7 +406,6 @@ class Settings extends SettingsAbstract
      *
      * @param Peer $peer Peer database settings.
      *
-     * @return self
      */
     public function setPeer(Peer $peer): self
     {
@@ -435,7 +417,6 @@ class Settings extends SettingsAbstract
     /**
      * Get RPC settings.
      *
-     * @return RPC
      */
     public function getRpc(): RPC
     {
@@ -447,7 +428,6 @@ class Settings extends SettingsAbstract
      *
      * @param RPC $rpc RPC settings.
      *
-     * @return self
      */
     public function setRpc(RPC $rpc): self
     {
@@ -459,7 +439,6 @@ class Settings extends SettingsAbstract
     /**
      * Get secret chat settings.
      *
-     * @return SecretChats
      */
     public function getSecretChats(): SecretChats
     {
@@ -471,7 +450,6 @@ class Settings extends SettingsAbstract
      *
      * @param SecretChats $secretChats Secret chat settings.
      *
-     * @return self
      */
     public function setSecretChats(SecretChats $secretChats): self
     {
@@ -483,7 +461,6 @@ class Settings extends SettingsAbstract
     /**
      * Get serialization settings.
      *
-     * @return Serialization
      */
     public function getSerialization(): Serialization
     {
@@ -495,7 +472,6 @@ class Settings extends SettingsAbstract
      *
      * @param Serialization $serialization Serialization settings.
      *
-     * @return self
      */
     public function setSerialization(Serialization $serialization): self
     {
@@ -507,7 +483,6 @@ class Settings extends SettingsAbstract
     /**
      * Get TL schema settings.
      *
-     * @return TLSchema
      */
     public function getSchema(): TLSchema
     {
@@ -519,7 +494,6 @@ class Settings extends SettingsAbstract
      *
      * @param TLSchema $schema TL schema settings.
      *
-     * @return self
      */
     public function setSchema(TLSchema $schema): self
     {
@@ -531,7 +505,6 @@ class Settings extends SettingsAbstract
     /**
      * Get database settings.
      *
-     * @return DatabaseAbstract
      */
     public function getDb(): DatabaseAbstract
     {
@@ -543,7 +516,6 @@ class Settings extends SettingsAbstract
      *
      * @param DatabaseAbstract $db DatabaseAbstract settings.
      *
-     * @return self
      */
     public function setDb(DatabaseAbstract $db): self
     {
@@ -555,7 +527,6 @@ class Settings extends SettingsAbstract
     /**
      * Get IPC server settings.
      *
-     * @return Ipc
      */
     public function getIpc(): Ipc
     {
@@ -567,7 +538,6 @@ class Settings extends SettingsAbstract
      *
      * @param Ipc $ipc IPC server settings.
      *
-     * @return self
      */
     public function setIpc(Ipc $ipc): self
     {
@@ -589,7 +559,6 @@ class Settings extends SettingsAbstract
     /**
      * Get template settings.
      *
-     * @return Templates
      */
     public function getTemplates(): Templates
     {
@@ -601,7 +570,6 @@ class Settings extends SettingsAbstract
      *
      * @param Templates $templates Template settings
      *
-     * @return self
      */
     public function setTemplates(Templates $templates): self
     {
@@ -613,7 +581,6 @@ class Settings extends SettingsAbstract
     /**
      * Get voIP settings.
      *
-     * @return VoIP
      */
     public function getVoip(): VoIP
     {
@@ -625,7 +592,6 @@ class Settings extends SettingsAbstract
      *
      * @param VoIP $voip VoIP settings.
      *
-     * @return self
      */
     public function setVoip(VoIP $voip): self
     {

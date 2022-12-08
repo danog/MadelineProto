@@ -31,7 +31,6 @@ trait Templates
      *
      * @param string $message Error message
      *
-     * @return \Generator
      */
     private function webEcho(string $message = ''): \Generator
     {
@@ -90,7 +89,6 @@ trait Templates
      * @param string $message Message
      * @param string $form    Form contents
      *
-     * @return string
      */
     private function webEchoTemplate(string $message, string $form): string
     {
@@ -99,7 +97,6 @@ trait Templates
     /**
      * Get web template.
      *
-     * @return string
      */
     public function getWebTemplate(): string
     {
@@ -110,7 +107,6 @@ trait Templates
      *
      * @param string $template Template
      *
-     * @return void
      */
     public function setWebTemplate(string $template): void
     {

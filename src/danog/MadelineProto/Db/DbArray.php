@@ -17,38 +17,30 @@ interface DbArray extends DbType, \ArrayAccess
      *
      * @psalm-return Promise<array<string|int, T>>
      *
-     * @return Promise
      */
     public function getArrayCopy(): Promise;
     /**
      * Check if element is set.
      *
-     * @param string|int $key
      *
      * @psalm-return Promise<bool>
      *
-     * @return Promise
      */
     public function isset(string|int $key): Promise;
     /**
      * Unset element.
      *
-     * @param string|int $key
      *
      * @psalm-return Promise<mixed>
      *
-     * @return Promise
      */
     public function unset(string|int $key): Promise;
     /**
      * Set element.
      *
-     * @param string|int $index
-     * @param mixed      $value
      *
      * @psalm-param T $value
      *
-     * @return Promise
      */
     public function set(string|int $key, mixed $value): Promise;
     /**
@@ -58,14 +50,12 @@ interface DbArray extends DbType, \ArrayAccess
      *
      * @psalm-return Promise<T>
      *
-     * @return Promise
      */
     public function offsetGet(mixed $index): Promise;
     /**
      * Set element.
      *
      * @param string|int $index
-     * @param mixed      $value
      *
      * @psalm-param T $value
      *
@@ -81,7 +71,6 @@ interface DbArray extends DbType, \ArrayAccess
      * Unset element.
      *
      * @param string|int $index Offset
-     * @return void
      */
     public function offsetUnset(mixed $index): void;
     /**
@@ -89,9 +78,7 @@ interface DbArray extends DbType, \ArrayAccess
      * @internal
      * @see DbArray::isset();
      *
-     * @param mixed $index
      *
-     * @return bool
      */
     public function offsetExists(mixed $index): bool;
     /**
@@ -103,7 +90,6 @@ interface DbArray extends DbType, \ArrayAccess
     /**
      * Clear all elements.
      *
-     * @return Promise
      */
     public function clear(): Promise;
     /**

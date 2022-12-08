@@ -6,12 +6,11 @@ use danog\MadelineProto\Settings;
     * load MadelineProto in Your Project
 */
 
-
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 }
@@ -40,7 +39,6 @@ $settings = new Settings;
 */
 
 $settings->setDb($database);
-
 
 /*
     create madeline proto session

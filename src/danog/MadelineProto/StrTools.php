@@ -54,7 +54,6 @@ abstract class StrTools extends Extension
      * @param integer $offset Offset
      * @param ?int    $length Length
      *
-     * @return string
      */
     public static function mbSubstr(string $text, int $offset, $length = null): string
     {
@@ -89,7 +88,6 @@ abstract class StrTools extends Extension
      *
      * @param string $input String
      *
-     * @return string
      */
     public static function toCamelCase(string $input): string
     {
@@ -100,7 +98,6 @@ abstract class StrTools extends Extension
      *
      * @param string $input String
      *
-     * @return string
      */
     public static function toSnakeCase(string $input): string
     {
@@ -116,7 +113,6 @@ abstract class StrTools extends Extension
      *
      * @param string $hwat String to escape
      *
-     * @return string
      */
     public static function markdownEscape(string $hwat): string
     {
@@ -127,7 +123,6 @@ abstract class StrTools extends Extension
      *
      * @param string $type String to escape
      *
-     * @return string
      */
     public static function typeEscape(string $type): string
     {
@@ -139,7 +134,6 @@ abstract class StrTools extends Extension
      *
      * @param string $method Method name
      *
-     * @return string
      */
     public static function methodEscape(string $method): string
     {
@@ -150,8 +144,6 @@ abstract class StrTools extends Extension
      *
      * @internal
      *
-     * @param string $markdown
-     * @return string
      */
     public static function toString(string $markdown): string
     {

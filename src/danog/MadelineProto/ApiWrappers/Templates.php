@@ -38,7 +38,6 @@ trait Templates
      * @param string $message Message
      * @param string $form    Form
      *
-     * @return string
      */
     private function webAPIEchoTemplate(string $message, string $form): string
     {
@@ -47,7 +46,6 @@ trait Templates
     /**
      * Get web API login HTML template string.
      *
-     * @return string
      */
     public function getWebAPITemplate(): string
     {
@@ -56,7 +54,6 @@ trait Templates
     /**
      * Set web API login HTML template string.
      *
-     * @return void
      */
     public function setWebAPITemplate(string $template): void
     {
@@ -67,7 +64,6 @@ trait Templates
      *
      * @param string $message Message to echo
      *
-     * @return Promise
      */
     private function webAPIEcho(string $message = ''): Promise
     {

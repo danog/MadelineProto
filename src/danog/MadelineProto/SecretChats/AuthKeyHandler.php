@@ -48,7 +48,6 @@ trait AuthKeyHandler
      *
      * @param array $params Secret chat ID
      *
-     * @return \Generator
      */
     public function acceptSecretChat($params): \Generator
     {
@@ -106,7 +105,6 @@ trait AuthKeyHandler
      *
      * @param mixed $user User to start secret chat with
      *
-     * @return \Generator
      */
     public function requestSecretChat($user): \Generator
     {
@@ -133,7 +131,6 @@ trait AuthKeyHandler
      *
      * @param array $params Secret chat
      *
-     * @return \Generator
      */
     private function completeSecretChat(array $params): \Generator
     {
@@ -177,7 +174,6 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat to rekey
      *
-     * @return \Generator
      */
     public function rekey(int $chat): \Generator
     {
@@ -204,7 +200,6 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      *
-     * @return \Generator
      */
     private function acceptRekey(int $chat, array $params): \Generator
     {
@@ -243,7 +238,6 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      *
-     * @return \Generator
      */
     private function commitRekey(int $chat, array $params): \Generator
     {
@@ -278,7 +272,6 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      *
-     * @return \Generator
      */
     private function completeRekey(int $chat, array $params): \Generator
     {
@@ -322,7 +315,6 @@ trait AuthKeyHandler
      *
      * @param array|int $chat Secret chat ID
      *
-     * @return array
      */
     public function getSecretChat($chat): array
     {
@@ -344,7 +336,6 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat ID
      *
-     * @return \Generator
      */
     public function discardSecretChat(int $chat): \Generator
     {

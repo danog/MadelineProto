@@ -52,7 +52,6 @@ class OutgoingMessage extends Message
     /**
      * State of message.
      *
-     * @var int
      * @psalm-var self::STATE_*
      */
     private int $state = self::STATE_PENDING;
@@ -77,7 +76,6 @@ class OutgoingMessage extends Message
      * Send deferred.
      */
     private ?Deferred $sendPromise = null;
-
 
     /**
      * Whether this is an unencrypted message.
@@ -161,7 +159,6 @@ class OutgoingMessage extends Message
     /**
      * Signal that we're trying to send the message.
      *
-     * @return void
      */
     public function trySend(): void
     {
@@ -173,7 +170,6 @@ class OutgoingMessage extends Message
     /**
      * Signal that the message was sent.
      *
-     * @return void
      */
     public function sent(): void
     {
@@ -192,7 +188,6 @@ class OutgoingMessage extends Message
      * Set reply to message.
      *
      * @param Promise|mixed $result
-     * @return void
      */
     public function reply($result): void
     {
@@ -213,7 +208,6 @@ class OutgoingMessage extends Message
     /**
      * ACK message.
      *
-     * @return void
      */
     public function ack(): void
     {
@@ -222,7 +216,6 @@ class OutgoingMessage extends Message
     /**
      * Get state of message.
      *
-     * @return int
      * @psalm-return self::STATE_*
      */
     public function getState(): int
@@ -230,11 +223,9 @@ class OutgoingMessage extends Message
         return $this->state;
     }
 
-
     /**
      * Get message body.
      *
-     * @return \Generator
      */
     public function getBody(): \Generator
     {
@@ -244,7 +235,6 @@ class OutgoingMessage extends Message
     /**
      * Get message body or empty array.
      *
-     * @return array
      */
     public function getBodyOrEmpty(): array
     {
@@ -282,7 +272,6 @@ class OutgoingMessage extends Message
     /**
      * Get number of times this message was sent.
      *
-     * @return int
      */
     public function getTries(): int
     {
@@ -292,7 +281,6 @@ class OutgoingMessage extends Message
     /**
      * Get constructor name.
      *
-     * @return string
      */
     public function getConstructor(): string
     {
@@ -302,7 +290,6 @@ class OutgoingMessage extends Message
     /**
      * Get constructor type.
      *
-     * @return string
      */
     public function getType(): string
     {
@@ -312,7 +299,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether this is a method.
      *
-     * @return bool
      */
     public function isMethod(): bool
     {
@@ -322,7 +308,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether this is an unencrypted message.
      *
-     * @return bool
      */
     public function isUnencrypted(): bool
     {
@@ -331,7 +316,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether this is an encrypted message.
      *
-     * @return bool
      */
     public function isEncrypted(): bool
     {
@@ -341,7 +325,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether this message is related to a user, as in getting a successful reply means we have auth.
      *
-     * @return bool
      */
     public function isUserRelated(): bool
     {
@@ -351,7 +334,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether we should refresh references upon serialization of this message.
      *
-     * @return bool
      */
     public function shouldRefreshReferences(): bool
     {
@@ -370,7 +352,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether we have a queue ID.
      *
-     * @return bool
      */
     public function hasQueue(): bool
     {
@@ -382,7 +363,6 @@ class OutgoingMessage extends Message
      *
      * @param string $serializedBody Serialized body.
      *
-     * @return self
      */
     public function setSerializedBody(string $serializedBody): self
     {
@@ -396,7 +376,6 @@ class OutgoingMessage extends Message
      *
      * @param bool $userRelated Whether this message is related to a user, as in getting a successful reply means we have auth.
      *
-     * @return self
      */
     public function setUserRelated(bool $userRelated): self
     {
@@ -410,7 +389,6 @@ class OutgoingMessage extends Message
      *
      * @param bool $refreshReferences Whether we should refresh references upon serialization of this message.
      *
-     * @return self
      */
     public function setRefreshReferences(bool $refreshReferences): self
     {
@@ -424,7 +402,6 @@ class OutgoingMessage extends Message
      *
      * @param ?string $queueId Queue ID.
      *
-     * @return self
      */
     public function setQueueId(?string $queueId): self
     {
@@ -436,7 +413,6 @@ class OutgoingMessage extends Message
     /**
      * Get when was this message sent.
      *
-     * @return int
      */
     public function getSent(): int
     {
@@ -486,7 +462,6 @@ class OutgoingMessage extends Message
      *
      * @param Deferred $promise Resolution deferred.
      *
-     * @return self
      */
     public function setPromise(Deferred $promise): self
     {
@@ -498,7 +473,6 @@ class OutgoingMessage extends Message
     /**
      * Wait for message to be sent.
      *
-     * @return Promise
      */
     public function getSendPromise(): Promise
     {
@@ -511,7 +485,6 @@ class OutgoingMessage extends Message
     /**
      * Check if we have a promise.
      *
-     * @return bool
      */
     public function hasPromise(): bool
     {
@@ -521,7 +494,6 @@ class OutgoingMessage extends Message
     /**
      * Get promise.
      *
-     * @return Promise
      */
     public function getPromise(): Promise
     {
@@ -531,7 +503,6 @@ class OutgoingMessage extends Message
     /**
      * Reset sent time to trigger resending.
      *
-     * @return self
      */
     public function resetSent(): self
     {
@@ -543,7 +514,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether we should try converting the result to a bot API object.
      *
-     * @return bool
      */
     public function getBotAPI(): bool
     {
@@ -555,7 +525,6 @@ class OutgoingMessage extends Message
      *
      * @param bool $botAPI Whether we should try converting the result to a bot API object
      *
-     * @return self
      */
     public function setBotAPI(bool $botAPI): self
     {
@@ -567,7 +536,6 @@ class OutgoingMessage extends Message
     /**
      * Get whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
      *
-     * @return bool
      */
     public function isFileRelated(): bool
     {
@@ -579,7 +547,6 @@ class OutgoingMessage extends Message
      *
      * @param bool $fileRelated Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
      *
-     * @return self
      */
     public function setFileRelated(bool $fileRelated): self
     {
@@ -603,7 +570,6 @@ class OutgoingMessage extends Message
      *
      * @param ?int $floodWaitLimit Custom flood wait limit for this bot
      *
-     * @return self
      */
     public function setFloodWaitLimit(?int $floodWaitLimit): self
     {
@@ -617,7 +583,6 @@ class OutgoingMessage extends Message
      *
      * @param int $sent When was this message sent.
      *
-     * @return self
      */
     public function setSent(int $sent): self
     {

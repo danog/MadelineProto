@@ -43,7 +43,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -63,7 +62,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
@@ -77,7 +75,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
@@ -88,7 +85,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {
@@ -97,7 +93,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {

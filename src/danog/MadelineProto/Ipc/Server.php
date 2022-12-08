@@ -78,7 +78,6 @@ class Server extends SignalLoop
      *
      * @param SessionPaths $session Session
      *
-     * @return void
      */
     public function setIpcPath(SessionPaths $session): void
     {
@@ -96,7 +95,6 @@ class Server extends SignalLoop
      *
      * @param SessionPaths $session   Session path
      *
-     * @return Promise
      */
     public static function startMe(SessionPaths $session): Promise
     {
@@ -124,12 +122,8 @@ class Server extends SignalLoop
     /**
      * Monitor session.
      *
-     * @param SessionPaths  $session
-     * @param int           $id
-     * @param bool          $started
      * @param Promise<bool> $cancelConnect
      *
-     * @return \Generator
      */
     private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): \Generator
     {
@@ -164,7 +158,6 @@ class Server extends SignalLoop
     /**
      * Wait for shutdown.
      *
-     * @return Promise
      */
     public static function waitShutdown(): Promise
     {
@@ -177,7 +170,6 @@ class Server extends SignalLoop
     /**
      * Shutdown.
      *
-     * @return void
      */
     final public function shutdown(): void
     {
@@ -192,7 +184,6 @@ class Server extends SignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -239,7 +230,6 @@ class Server extends SignalLoop
      * @param ChannelledSocket                   $socket  Socket
      * @param array{0: string, 1: array|Wrapper} $payload Payload
      *
-     * @return \Generator
      */
     private function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
     {
@@ -280,7 +270,6 @@ class Server extends SignalLoop
     /**
      * Get the name of the loop.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -292,7 +281,6 @@ class Server extends SignalLoop
      *
      * @param Ipc $settings IPC settings
      *
-     * @return self
      */
     public function setSettings(Ipc $settings): self
     {

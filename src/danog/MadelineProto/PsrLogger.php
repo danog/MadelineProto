@@ -27,7 +27,6 @@ class PsrLogger extends AbstractLogger
     /**
      * Constructor.
      *
-     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
@@ -36,11 +35,9 @@ class PsrLogger extends AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed   $level
      * @param string  $message
      * @param mixed[] $context
      *
-     * @return void
      *
      * @throws \Psr\Log\InvalidArgumentException
      */

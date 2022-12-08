@@ -33,7 +33,6 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
      * @psalm-return Promise<BufferInterface>
      */
     public function getReadBuffer(&$length): Promise;
@@ -42,7 +41,6 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      *
-     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise;
     /**
@@ -50,13 +48,11 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * Is supposed to return __CLASS__
      *
-     * @return string
      */
     public static function getName(): string;
     /**
      * Get underlying stream resource.
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface;
 }

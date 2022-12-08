@@ -43,7 +43,6 @@ class WriteLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -239,14 +238,14 @@ class WriteLoop extends ResumableSignalLoop
                         }
                     }
                     // TODO
-                        /*
-                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
-                            if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
-                                $MTmessage['body'] = yield $API->getTL()->serializeObject(['type' => ''], ['_' => 'gzip_packed', 'packed_data' => $gzipped], 'gzipped data');
-                                $API->logger->logger('Using GZIP compression for ' . $constructor . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                            }
-                            unset($gzipped);
-                        }*/
+                    /*
+                    if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
+                        if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
+                            $MTmessage['body'] = yield $API->getTL()->serializeObject(['type' => ''], ['_' => 'gzip_packed', 'packed_data' => $gzipped], 'gzipped data');
+                            $API->logger->logger('Using GZIP compression for ' . $constructor . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        }
+                        unset($gzipped);
+                    }*/
                 }
                 $body_length = \strlen($MTmessage['body']);
                 $actual_length = $body_length + 32;
@@ -350,7 +349,6 @@ class WriteLoop extends ResumableSignalLoop
     /**
      * Get loop name.
      *
-     * @return string
      */
     public function __toString(): string
     {

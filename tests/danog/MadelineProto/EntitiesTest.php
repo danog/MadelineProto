@@ -6,7 +6,7 @@ use danog\MadelineProto\StrTools;
 
 class EntitiesTest extends MadelineTestCase
 {
-    public function testMb()
+    public function testMb(): void
     {
         $this->assertEquals(1, StrTools::mbStrlen('t'));
         $this->assertEquals(1, StrTools::mbStrlen('я'));
@@ -26,7 +26,7 @@ class EntitiesTest extends MadelineTestCase
     /**
      * @dataProvider provideEntities
      */
-    public function testEntities(string $mode, string $html, string $bare, array $entities)
+    public function testEntities(string $mode, string $html, string $bare, array $entities): void
     {
         $result = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
         $result = self::$MadelineProto->MTProtoToBotAPI($result);

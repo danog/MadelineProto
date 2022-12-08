@@ -50,7 +50,6 @@ class Exception extends \Exception
      *
      * @param string $extensionName Extension name
      *
-     * @return self
      */
     public static function extension(string $extensionName): self
     {
@@ -97,7 +96,6 @@ class Exception extends \Exception
      *
      * Error handler
      *
-     * @return void
      */
     public static function exceptionHandler($exception): void
     {

@@ -60,7 +60,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise<mixed|null>, mixed, list<array{update_id: mixed, update: mixed}>|mixed>
      */
@@ -95,7 +94,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return Promise
      */
     public function waitUpdate(): Promise
     {
@@ -107,7 +105,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return void
      */
     public function signalUpdate(): void
     {
@@ -150,7 +147,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
      * @psalm-return <mixed, mixed, mixed, UpdatesState>
      */
     public function loadUpdateState(): \Generator
@@ -191,7 +187,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function getUpdatesState(): \Generator
     {
@@ -244,7 +239,7 @@ trait UpdateHandler
                 return [$updates['update']];
             case 'updateShortSentMessage':
                 $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-            // no break
+                // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $updates = \array_merge($updates['request']['body'] ?? [], $updates);
@@ -286,7 +281,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function handleUpdates($updates, $actual_updates = null): \Generator
     {
@@ -323,7 +317,7 @@ trait UpdateHandler
                     break;
                 }
                 $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-            // no break
+                // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $updates = \array_merge($updates['request']['body'] ?? [], $updates);
@@ -365,7 +359,6 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function saveUpdate(array $update): \Generator
     {

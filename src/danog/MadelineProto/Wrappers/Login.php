@@ -35,7 +35,6 @@ trait Login
     /**
      * Log out currently logged in user.
      *
-     * @return \Generator
      */
     public function logout(): \Generator
     {
@@ -50,7 +49,6 @@ trait Login
      *
      * @param string $token Bot token
      *
-     * @return \Generator
      */
     public function botLogin(string $token): \Generator
     {
@@ -84,7 +82,6 @@ trait Login
      * @param string  $number   Phone number
      * @param integer $sms_type SMS type
      *
-     * @return \Generator
      */
     public function phoneLogin($number, $sms_type = 5): \Generator
     {
@@ -118,7 +115,6 @@ trait Login
      *
      * @param string $code Login code
      *
-     * @return \Generator
      */
     public function completePhoneLogin($code): \Generator
     {
@@ -169,7 +165,6 @@ trait Login
      * @param array<int, string> $authorization Authorization info
      * @param int $mainDcID Main DC ID
      *
-     * @return \Generator
      */
     public function importAuthorization(array $authorization, int $mainDcID): \Generator
     {
@@ -211,7 +206,6 @@ trait Login
     /**
      * Export authorization.
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<mixed, array|bool, mixed, array{0: int|string, 1: string}>
      */
@@ -230,7 +224,6 @@ trait Login
      * @param string $first_name First name
      * @param string $last_name  Last name
      *
-     * @return \Generator
      */
     public function completeSignup(string $first_name, string $last_name = ''): \Generator
     {
@@ -253,7 +246,6 @@ trait Login
      *
      * @param string $password Password
      *
-     * @return \Generator
      */
     public function complete2faLogin(string $password): \Generator
     {
@@ -280,7 +272,6 @@ trait Login
      *
      * @param array $params The params
      *
-     * @return \Generator
      */
     public function update2fa(array $params): \Generator
     {

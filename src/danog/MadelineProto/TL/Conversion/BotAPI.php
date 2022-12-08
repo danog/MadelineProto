@@ -340,7 +340,6 @@ trait BotAPI
      *
      * @param array $arguments Arguments
      *
-     * @return array
      */
     public function botAPIToMTProto(array $arguments): array
     {

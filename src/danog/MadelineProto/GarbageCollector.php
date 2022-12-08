@@ -12,32 +12,27 @@ final class GarbageCollector
     /**
      * Ensure only one instance of GarbageCollector
      * 		when multiple instances of MadelineProto running.
-     * @var bool
      */
     public static bool $lock = false;
 
     /**
      * How often will check memory.
-     * @var int
      */
     public static int $checkIntervalMs = 1000;
 
     /**
      * Next cleanup will be triggered when memory consumption will increase by this amount.
-     * @var int
      */
     public static int $memoryDiffMb = 1;
 
     /**
      * Memory consumption after last cleanup.
-     * @var int
      */
     private static int $memoryConsumption = 0;
 
     /**
      * Phar cleanup loop.
      *
-     * @var PeriodicLoop
      */
     private static PeriodicLoop $cleanupLoop;
 
@@ -48,7 +43,7 @@ final class GarbageCollector
         }
         self::$lock = true;
 
-        Loop::repeat(self::$checkIntervalMs, static function () {
+        Loop::repeat(self::$checkIntervalMs, static function (): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 \gc_collect_cycles();

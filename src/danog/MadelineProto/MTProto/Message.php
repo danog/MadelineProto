@@ -76,7 +76,6 @@ abstract class Message
     /**
      * Get whether constructor is content related.
      *
-     * @return bool
      */
     public function isContentRelated(): bool
     {
@@ -86,7 +85,6 @@ abstract class Message
     /**
      * Get my message ID.
      *
-     * @return mixed
      */
     public function getMsgId()
     {
@@ -98,7 +96,6 @@ abstract class Message
      *
      * @param mixed $msgId My message ID
      *
-     * @return self
      */
     public function setMsgId($msgId): self
     {
@@ -130,7 +127,6 @@ abstract class Message
     /**
      * Has sequence number.
      *
-     * @return bool
      */
     public function hasSeqNo(): bool
     {
@@ -142,7 +138,6 @@ abstract class Message
      *
      * @param ?int $seqNo Sequence number
      *
-     * @return self
      */
     public function setSeqNo(?int $seqNo): self
     {

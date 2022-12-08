@@ -30,8 +30,6 @@ trait Reliable
     /**
      * Called when receiving a new_msg_detailed_info.
      *
-     * @param array $content
-     * @return void
      */
     public function onNewMsgDetailedInfo(array $content): void
     {
@@ -44,8 +42,6 @@ trait Reliable
     /**
      * Called when receiving a msg_detailed_info.
      *
-     * @param array $content
-     * @return void
      */
     public function onMsgDetailedInfo(array $content): void
     {
@@ -56,9 +52,7 @@ trait Reliable
     /**
      * Called when receiving a msg_resend_req.
      *
-     * @param array  $content
      * @param string $current_msg_id
-     * @return void
      */
     public function onMsgResendReq(array $content, $current_msg_id): void
     {
@@ -79,9 +73,7 @@ trait Reliable
     /**
      * Called when receiving a msg_resend_ans_req.
      *
-     * @param array  $content
      * @param string $current_msg_id
-     * @return void
      */
     public function onMsgResendAnsReq(array $content, $current_msg_id): void
     {
@@ -91,8 +83,6 @@ trait Reliable
     /**
      * Called when receiving a msgs_all_info.
      *
-     * @param array  $content
-     * @return void
      */
     public function onMsgsAllInfo(array $content): void
     {
@@ -118,7 +108,6 @@ trait Reliable
      * @param array      $msg_ids    Message IDs to send info about
      * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
      *
-     * @return void
      */
     public function sendMsgsStateInfo(array $msg_ids, $req_msg_id): void
     {

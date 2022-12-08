@@ -65,7 +65,6 @@ abstract class ClientAbstract
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      *
-     * @return void
      */
     public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
     {
@@ -77,7 +76,6 @@ abstract class ClientAbstract
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     protected function loopInternal(): \Generator
     {
@@ -132,7 +130,6 @@ abstract class ClientAbstract
     /**
      * Disconnect cleanly from main instance.
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, Promise, mixed, void>
      */
@@ -150,7 +147,6 @@ abstract class ClientAbstract
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
      *
-     * @return \Generator
      */
     public function __call($function, $arguments): \Generator
     {

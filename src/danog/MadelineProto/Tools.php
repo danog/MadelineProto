@@ -37,7 +37,6 @@ use function Amp\Promise\any;
 use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function Amp\Promise\timeout;
-use function Amp\Promise\timeoutWithDefault;
 use function Amp\Promise\wait;
 
 /**
@@ -58,7 +57,6 @@ abstract class Tools extends StrTools
      *
      * @internal
      *
-     * @return array
      */
     public static function convertJsonTL(array $input): array
     {
@@ -95,7 +93,6 @@ abstract class Tools extends StrTools
      *
      * @param integer $modulus Modulus
      *
-     * @return int
      */
     public static function randomInt(int $modulus = 0): int
     {
@@ -173,7 +170,6 @@ abstract class Tools extends StrTools
      *
      * @param string|int|array $value base256 long
      *
-     * @return string
      */
     public static function unpackSignedLongString($value): string
     {
@@ -193,7 +189,6 @@ abstract class Tools extends StrTools
      *
      * @param integer $value Value to convert
      *
-     * @return string
      */
     public static function packSignedInt(int $value): string
     {
@@ -211,7 +206,6 @@ abstract class Tools extends StrTools
      *
      * @param int $value Value to convert
      *
-     * @return string
      */
     public static function packSignedLong(int $value): string
     {
@@ -222,7 +216,6 @@ abstract class Tools extends StrTools
      *
      * @param int $value Value
      *
-     * @return string
      */
     public static function packUnsignedInt(int $value): string
     {
@@ -239,7 +232,6 @@ abstract class Tools extends StrTools
      *
      * @param float $value Value to convert
      *
-     * @return string
      */
     public static function packDouble(float $value): string
     {
@@ -254,7 +246,6 @@ abstract class Tools extends StrTools
      *
      * @param string $value Value to unpack
      *
-     * @return float
      */
     public static function unpackDouble(string $value): float
     {
@@ -269,7 +260,6 @@ abstract class Tools extends StrTools
      * @param \Generator|Promise $promise      The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
      *
-     * @return mixed
      */
     public static function wait($promise, $ignoreSignal = false)
     {
@@ -284,8 +274,8 @@ abstract class Tools extends StrTools
         do {
             try {
                 //Logger::log("Starting event loop...");
-                Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
-                    $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
+                Loop::run(function () use (&$resolved, &$value, &$exception, $promise): void {
+                    $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception): void {
                         Loop::stop();
                         $resolved = true;
                         $exception = $e;
@@ -309,7 +299,6 @@ abstract class Tools extends StrTools
      *
      * @param array<\Generator|Promise> $promises Promises
      *
-     * @return Promise
      */
     public static function all(array $promises): Promise
     {
@@ -324,7 +313,6 @@ abstract class Tools extends StrTools
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
      */
     public static function any(array $promises): Promise
     {
@@ -340,7 +328,6 @@ abstract class Tools extends StrTools
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
      */
     public static function some(array $promises): Promise
     {
@@ -355,7 +342,6 @@ abstract class Tools extends StrTools
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
      */
     public static function first(array $promises): Promise
     {
@@ -371,7 +357,6 @@ abstract class Tools extends StrTools
      * @param \Generator|Promise $promise
      * @param integer $timeout
      *
-     * @return Promise
      */
     public static function timeout($promise, int $timeout): Promise
     {
@@ -379,14 +364,14 @@ abstract class Tools extends StrTools
 
         $deferred = new Deferred;
 
-        $watcher = Loop::delay($timeout, static function () use (&$deferred) {
+        $watcher = Loop::delay($timeout, static function () use (&$deferred): void {
             $temp = $deferred; // prevent double resolve
             $deferred = null;
             $temp->fail(new TimeoutException);
         });
         //Loop::unreference($watcher);
 
-        $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
+        $promise->onResolve(function () use (&$deferred, $promise, $watcher): void {
             if ($deferred !== null) {
                 Loop::cancel($watcher);
                 $deferred->resolve($promise);
@@ -408,7 +393,6 @@ abstract class Tools extends StrTools
      *
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     * @param mixed             $default
      *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
@@ -423,14 +407,14 @@ abstract class Tools extends StrTools
 
         $deferred = new Deferred;
 
-        $watcher = Loop::delay($timeout, static function () use (&$deferred, $default) {
+        $watcher = Loop::delay($timeout, static function () use (&$deferred, $default): void {
             $temp = $deferred; // prevent double resolve
             $deferred = null;
             $temp->resolve($default);
         });
         //Loop::unreference($watcher);
 
-        $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
+        $promise->onResolve(function () use (&$deferred, $promise, $watcher): void {
             if ($deferred !== null) {
                 Loop::cancel($watcher);
                 $deferred->resolve($promise);
@@ -447,7 +431,6 @@ abstract class Tools extends StrTools
      * @template TReturn
      * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      *
-     * @return Promise
      * @psalm-return Promise<TReturn>
      */
     public static function call($promise): Promise
@@ -479,7 +462,7 @@ abstract class Tools extends StrTools
             $promise = new Coroutine($promise);
         }
         if ($promise instanceof Promise) {
-            $promise->onResolve(function ($e, $res) use ($file) {
+            $promise->onResolve(function ($e, $res) use ($file): void {
                 if ($e) {
                     if (isset($this)) {
                         $this->rethrow($e, $file);
@@ -496,7 +479,6 @@ abstract class Tools extends StrTools
      *
      * @param \Generator|Promise $promise Promise to resolve
      *
-     * @return void
      */
     public static function callForkDefer($promise): void
     {
@@ -510,7 +492,6 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return void
      */
     public static function rethrow(\Throwable $e, $file = ''): void
     {
@@ -542,13 +523,12 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return Promise
      */
     public static function after($a, $b): Promise
     {
         $a = self::call($a);
         $deferred = new Deferred();
-        $a->onResolve(static function ($e, $res) use ($b, $deferred) {
+        $a->onResolve(static function ($e, $res) use ($b, $deferred): void {
             if ($e) {
                 if (isset($this)) {
                     $this->rethrow($e);
@@ -558,7 +538,7 @@ abstract class Tools extends StrTools
                 return;
             }
             $b = self::call($b);
-            $b->onResolve(function ($e, $res) use ($deferred) {
+            $b->onResolve(function ($e, $res) use ($deferred): void {
                 if ($e) {
                     if (isset($this)) {
                         $this->rethrow($e);
@@ -599,7 +579,6 @@ abstract class Tools extends StrTools
      *
      * @internal Generator function
      *
-     * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, ?callable>
      */
     public static function flockGenerator(string $file, int $operation, float $polling, ?Promise $token = null, $failureCb = null): \Generator
@@ -627,7 +606,7 @@ abstract class Tools extends StrTools
                 }
             }
         } while (!$result);
-        return static function () use (&$res) {
+        return static function () use (&$res): void {
             if ($res) {
                 \flock($res, LOCK_UN);
                 \fclose($res);
@@ -640,7 +619,6 @@ abstract class Tools extends StrTools
      *
      * @param int|float $time Number of seconds to sleep for
      *
-     * @return Promise
      */
     public static function sleep($time): Promise
     {
@@ -664,7 +642,6 @@ abstract class Tools extends StrTools
      *
      * @internal Generator function
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, Promise|Promise<null|string>, mixed, mixed|null>
      */
@@ -693,7 +670,6 @@ abstract class Tools extends StrTools
      *
      * @param string $string Message to echo
      *
-     * @return Promise
      */
     public static function echo(string $string): Promise
     {
@@ -715,7 +691,6 @@ abstract class Tools extends StrTools
      *
      * @param mixed ...$params Params
      *
-     * @return array
      */
     public static function arr(...$params): array
     {
@@ -726,7 +701,6 @@ abstract class Tools extends StrTools
      *
      * @param string $data Data to decode
      *
-     * @return string
      */
     public static function base64urlDecode(string $data): string
     {
@@ -737,7 +711,6 @@ abstract class Tools extends StrTools
      *
      * @param string $data Data to encode
      *
-     * @return string
      */
     public static function base64urlEncode(string $data): string
     {
@@ -748,7 +721,6 @@ abstract class Tools extends StrTools
      *
      * @param string $string Data to decode
      *
-     * @return string
      */
     public static function rleDecode(string $string): string
     {
@@ -772,7 +744,6 @@ abstract class Tools extends StrTools
      *
      * @param string $string Data to encode
      *
-     * @return string
      */
     public static function rleEncode(string $string): string
     {
@@ -852,7 +823,7 @@ abstract class Tools extends StrTools
      *
      * @return void
      */
-    public static function closeConnection($message)
+    public static function closeConnection($message): void
     {
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
@@ -866,7 +837,7 @@ abstract class Tools extends StrTools
         \flush();
         $GLOBALS['exited'] = true;
         if (\function_exists('fastcgi_finish_request')) {
-            \fastcgi_finish_request();
+            fastcgi_finish_request();
         }
     }
     /**
@@ -874,8 +845,6 @@ abstract class Tools extends StrTools
      *
      * @internal
      *
-     * @param array $sizes
-     * @return array
      */
     public static function maxSize(array $sizes): array
     {
@@ -907,7 +876,6 @@ abstract class Tools extends StrTools
      *
      * @param array $what Array
      *
-     * @return mixed
      */
     public static function end(array $what)
     {
@@ -930,7 +898,6 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return bool
      * @access public
      */
     public static function hasVar($obj, string $var): bool
@@ -951,14 +918,12 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return mixed
      * @access public
      */
     public static function &getVar($obj, string $var)
     {
         return \Closure::bind(
-            function &() use ($var)
-            {
+            function &() use ($var) {
                 return $this->{$var};
             },
             $obj,
@@ -974,14 +939,13 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return void
      *
      * @access public
      */
     public static function setVar($obj, string $var, &$val): void
     {
         \Closure::bind(
-            function () use ($var, &$val) {
+            function () use ($var, &$val): void {
                 $this->{$var} =& $val;
             },
             $obj,
@@ -995,7 +959,6 @@ abstract class Tools extends StrTools
      *
      * @internal
      *
-     * @return string
      */
     public static function absolute(string $file): string
     {
@@ -1009,7 +972,6 @@ abstract class Tools extends StrTools
      *
      * @internal
      *
-     * @param string $link
      * @return array{0: bool, 1: string}|null
      */
     public static function parseLink(string $link): ?array

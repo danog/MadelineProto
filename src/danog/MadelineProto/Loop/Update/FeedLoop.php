@@ -74,7 +74,6 @@ class FeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {

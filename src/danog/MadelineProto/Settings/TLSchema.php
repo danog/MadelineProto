@@ -12,11 +12,11 @@ class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 146;
+    protected int $layer = 150;
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__ . '/../TL_telegram_v146.tl';
+    protected string $APISchema = __DIR__ . '/../TL_telegram_v150.tl';
     /**
      * MTProto schema path.
      */
@@ -54,7 +54,7 @@ class TLSchema extends SettingsAbstract
     /**
      * Upgrade scheme autonomously.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         // Scheme was upgraded or path has changed
         if (!\file_exists($this->APISchema)) {
@@ -78,7 +78,6 @@ class TLSchema extends SettingsAbstract
     /**
      * Signal that scheme was re-parsed.
      *
-     * @return void
      */
     public function upgrade(): void
     {
@@ -87,7 +86,6 @@ class TLSchema extends SettingsAbstract
     /**
      * Get TL layer version.
      *
-     * @return int
      */
     public function getLayer(): int
     {
@@ -99,7 +97,6 @@ class TLSchema extends SettingsAbstract
      *
      * @param int $layer TL layer version.
      *
-     * @return self
      */
     public function setLayer(int $layer): self
     {
@@ -111,7 +108,6 @@ class TLSchema extends SettingsAbstract
     /**
      * Get MTProto schema path.
      *
-     * @return string
      */
     public function getMTProtoSchema(): string
     {
@@ -123,7 +119,6 @@ class TLSchema extends SettingsAbstract
      *
      * @param string $MTProtoSchema MTProto schema path.
      *
-     * @return self
      */
     public function setMTProtoSchema(string $MTProtoSchema): self
     {
@@ -135,7 +130,6 @@ class TLSchema extends SettingsAbstract
     /**
      * Get API schema path.
      *
-     * @return string
      */
     public function getAPISchema(): string
     {
@@ -147,7 +141,6 @@ class TLSchema extends SettingsAbstract
      *
      * @param string $APISchema API schema path.
      *
-     * @return self
      */
     public function setAPISchema(string $APISchema): self
     {
@@ -156,11 +149,9 @@ class TLSchema extends SettingsAbstract
         return $this;
     }
 
-
     /**
      * Get secret schema path.
      *
-     * @return string
      */
     public function getSecretSchema(): string
     {
@@ -172,7 +163,6 @@ class TLSchema extends SettingsAbstract
      *
      * @param string $secretSchema Secret schema path.
      *
-     * @return self
      */
     public function setSecretSchema(string $secretSchema): self
     {
@@ -184,7 +174,6 @@ class TLSchema extends SettingsAbstract
     /**
      * Get the value of other.
      *
-     * @return array
      */
     public function getOther(): array
     {
@@ -194,9 +183,7 @@ class TLSchema extends SettingsAbstract
     /**
      * Set the value of other.
      *
-     * @param array $other
      *
-     * @return self
      */
     public function setOther(array $other): self
     {

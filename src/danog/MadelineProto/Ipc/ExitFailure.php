@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
+use TypeError;
 
 use function Amp\Parallel\Sync\flattenThrowableBacktrace;
 
@@ -52,7 +53,12 @@ final class ExitFailure
     {
         $previous = $this->previous ? $this->previous->getException() : null;
 
-        $exception = new $this->type($this->message, $this->code, $previous);
+        try {
+            $exception = new $this->type($this->message, $this->code, $previous);
+        } catch (TypeError) {
+            $exception = new \RuntimeException($this->message, $this->code, $previous);
+        }
+
         if ($this->tlTrace) {
             $exception->setTLTrace($this->tlTrace);
         }

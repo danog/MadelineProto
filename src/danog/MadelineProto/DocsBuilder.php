@@ -164,7 +164,6 @@ class DocsBuilder
      * @param string   $name      Template name
      * @param string   ...$params Params
      *
-     * @return string
      */
     protected function template(string $name, string ...$params): string
     {

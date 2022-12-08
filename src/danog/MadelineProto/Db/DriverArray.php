@@ -27,14 +27,12 @@ abstract class DriverArray implements DbArray
     /**
      * Initialize on startup.
      *
-     * @return \Generator
      */
     abstract public function initStartup(): \Generator;
 
     /**
      * Create table for property.
      *
-     * @return \Generator
      *
      * @throws \Throwable
      */
@@ -43,16 +41,12 @@ abstract class DriverArray implements DbArray
     /**
      * Rename table.
      *
-     * @param string $from
-     * @param string $to
-     * @return \Generator
      */
     abstract protected function renameTable(string $from, string $to): \Generator;
 
     /**
      * Get the value of table.
      *
-     * @return string
      */
     public function getTable(): string
     {
@@ -62,9 +56,7 @@ abstract class DriverArray implements DbArray
     /**
      * Set the value of table.
      *
-     * @param string $table
      *
-     * @return self
      */
     public function setTable(string $table): self
     {
@@ -88,11 +80,9 @@ abstract class DriverArray implements DbArray
     }
 
     /**
-     * @param string $table
      * @param DbArray|array|null $previous
      * @param DatabaseAbstract $settings
      *
-     * @return Promise
      *
      * @psalm-return Promise<static>
      */
@@ -131,7 +121,6 @@ abstract class DriverArray implements DbArray
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
      *
-     * @return \Generator
      */
     protected static function renameTmpTable(self $new, $old): \Generator
     {
@@ -148,10 +137,8 @@ abstract class DriverArray implements DbArray
     }
 
     /**
-     * @param self $new
      * @param DbArray|array|null $old
      *
-     * @return \Generator
      * @throws \Throwable
      */
     protected static function migrateDataToDb(self $new, $old): \Generator
@@ -180,7 +167,6 @@ abstract class DriverArray implements DbArray
         }
     }
 
-
     public function __destruct()
     {
         $this->stopCacheCleanupLoop();
@@ -189,7 +175,6 @@ abstract class DriverArray implements DbArray
     /**
      * Get the value of table.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -199,14 +184,13 @@ abstract class DriverArray implements DbArray
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
         return ['table', 'dbSettings'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (isset($this->settings) && \is_array($this->settings)) {
             $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();

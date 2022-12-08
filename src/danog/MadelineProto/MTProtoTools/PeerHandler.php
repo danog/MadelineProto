@@ -49,7 +49,6 @@ trait PeerHandler
      *
      * @param int $id MTProto channel ID
      *
-     * @return int
      */
     public static function toSupergroup($id): int
     {
@@ -60,7 +59,6 @@ trait PeerHandler
      *
      * @param int $id Bot API channel ID
      *
-     * @return int
      */
     public static function fromSupergroup($id): int
     {
@@ -84,7 +82,6 @@ trait PeerHandler
      *
      * @internal
      *
-     * @return void
      */
     public function addSupport(array $support): void
     {
@@ -96,7 +93,6 @@ trait PeerHandler
      *
      * @param array $user User info
      *
-     * @return \Generator
      * @throws \danog\MadelineProto\Exception
      */
     public function addUser(array $user): \Generator
@@ -163,7 +159,6 @@ trait PeerHandler
      *
      * @internal
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise|null, mixed, void>
      */
@@ -265,7 +260,6 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, bool>
      */
@@ -316,7 +310,6 @@ trait PeerHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function fwdPeerIsset(array $fwd): \Generator
     {
@@ -364,7 +357,7 @@ trait PeerHandler
                 case 'updateDialogUnreadMark':
                 case 'updateNotifySettings':
                     $id = $id['peer'];
-                // no break
+                    // no break
                 case 'updateDraftMessage':
                 case 'inputDialogPeer':
                 case 'dialogPeer':
@@ -437,7 +430,7 @@ trait PeerHandler
                     return $this->toSupergroup($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
-                // no break
+                    // no break
                 case 'updateChatUserTyping':
                 case 'updateChatParticipantAdd':
                 case 'updateChatParticipantDelete':
@@ -503,7 +496,6 @@ trait PeerHandler
      * @internal
      *
      * @param mixed $id Peer
-     * @return \Generator
      */
     public function getInputPeer($id): \Generator
     {
@@ -515,7 +507,6 @@ trait PeerHandler
      * @internal
      *
      * @param mixed $id Peer
-     * @return \Generator
      */
     public function getInputConstructor($id): \Generator
     {
@@ -566,7 +557,7 @@ trait PeerHandler
                     return $this->getSecretChat($id['chat_id']);
                 case 'updateNewEncryptedMessage':
                     $id = $id['message'];
-                // no break
+                    // no break
                 case 'encryptedMessage':
                 case 'encryptedMessageService':
                     $id = $id['chat_id'];
@@ -818,7 +809,6 @@ trait PeerHandler
      * Refresh peer cache for a certain peer.
      *
      * @param mixed $id The peer to refresh
-     * @return \Generator
      */
     public function refreshPeerCache($id): \Generator
     {
@@ -833,7 +823,6 @@ trait PeerHandler
      * Refresh full peer cache for a certain peer.
      *
      * @param mixed $id The peer to refresh
-     * @return \Generator
      */
     public function refreshFullPeerCache($id): \Generator
     {
@@ -1171,11 +1160,8 @@ trait PeerHandler
      * Key for participatns cache.
      *
      * @param integer $channelId
-     * @param string $filter
-     * @param string $q
      * @param integer $offset
      * @param integer $limit
-     * @return string
      */
     private function participantsKey(int $channelId, string $filter, string $q, int $offset, int $limit): string
     {
@@ -1207,7 +1193,6 @@ trait PeerHandler
      *
      * @param string $username Username
      *
-     * @return \Generator
      */
     public function resolveUsername(string $username): \Generator
     {

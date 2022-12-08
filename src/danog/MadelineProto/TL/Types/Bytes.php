@@ -42,7 +42,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -51,7 +50,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     /**
      * Cast bytes to string.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -60,7 +58,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     /**
      * Obtain values for JSON-encoding.
      *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -72,7 +69,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      * @param integer|null $offset Offset
      * @param string       $value  Char
      *
-     * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -98,7 +94,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @param integer $offset Offset
      *
-     * @return void
      */
     public function offsetUnset(mixed $offset): void
     {

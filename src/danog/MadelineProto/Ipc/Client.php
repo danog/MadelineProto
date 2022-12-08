@@ -44,8 +44,6 @@ class Client extends ClientAbstract
     /**
      * Returns an instance of a client by session name.
      *
-     * @param string $session
-     * @return Client
      */
     public static function giveInstanceBySession(string $session): Client
     {
@@ -64,7 +62,6 @@ class Client extends ClientAbstract
     /**
      * Constructor function.
      *
-     * @param ChannelledSocket $socket  IPC client socket
      * @param SessionPaths     $session Session paths
      * @param Logger           $logger  Logger
      * @param bool             $async   Whether the wrapper API is async
@@ -83,7 +80,6 @@ class Client extends ClientAbstract
      *
      * @param callable $callback Async callable to run
      *
-     * @return \Generator
      */
     public function loop(callable $callback): \Generator
     {
@@ -92,7 +88,6 @@ class Client extends ClientAbstract
     /**
      * Unreference.
      *
-     * @return void
      */
     public function unreference(): void
     {
@@ -143,7 +138,6 @@ class Client extends ClientAbstract
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      */
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
@@ -170,7 +164,6 @@ class Client extends ClientAbstract
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
@@ -193,7 +186,6 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
@@ -306,7 +298,6 @@ class Client extends ClientAbstract
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
@@ -328,7 +319,6 @@ class Client extends ClientAbstract
      *
      * @param mixed ...$params Params
      *
-     * @return void
      */
     public function setEventHandler(...$params): void
     {
@@ -339,7 +329,6 @@ class Client extends ClientAbstract
      *
      * @param mixed ...$params Params
      *
-     * @return void
      */
     public function getEventHandler(...$params): void
     {

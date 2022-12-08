@@ -38,7 +38,6 @@ class MyTelegramOrgWrapper
     /**
      * Phone number.
      *
-     * @var string
      */
     private string $number = '';
     /**
@@ -72,7 +71,6 @@ class MyTelegramOrgWrapper
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -96,7 +94,6 @@ class MyTelegramOrgWrapper
     /**
      * Wakeup function.
      *
-     * @return void
      */
     public function __wakeup(): void
     {
@@ -130,7 +127,6 @@ class MyTelegramOrgWrapper
      *
      * @param string $number Phone number
      *
-     * @return \Generator
      */
     public function login(string $number): \Generator
     {
@@ -151,7 +147,6 @@ class MyTelegramOrgWrapper
      *
      * @param string $password Password
      *
-     * @return \Generator
      */
     public function completeLogin(string $password): \Generator
     {
@@ -185,7 +180,6 @@ class MyTelegramOrgWrapper
     /**
      * Check if an app was already created.
      *
-     * @return \Generator
      */
     public function hasApp(): \Generator
     {
@@ -210,7 +204,6 @@ class MyTelegramOrgWrapper
     /**
      * Get the currently created app.
      *
-     * @return \Generator
      */
     public function getApp(): \Generator
     {
@@ -238,7 +231,6 @@ class MyTelegramOrgWrapper
      *
      * @param array $settings App parameters
      *
-     * @return \Generator
      */
     public function createApp(array $settings): \Generator
     {
@@ -282,7 +274,6 @@ class MyTelegramOrgWrapper
      *
      * @param string $httpType Origin
      *
-     * @return array
      */
     private function getHeaders(string $httpType): array
     {
@@ -330,7 +321,6 @@ class MyTelegramOrgWrapper
      *
      * @param boolean $async Async
      *
-     * @return void
      */
     public function async(bool $async): void
     {
@@ -341,7 +331,6 @@ class MyTelegramOrgWrapper
      *
      * @param callable $callable Callable
      *
-     * @return mixed
      */
     public function loop(callable $callable)
     {
@@ -353,7 +342,6 @@ class MyTelegramOrgWrapper
      * @param string $name      Function name
      * @param array  $arguments Arguments
      *
-     * @return mixed
      */
     public function __call(string $name, array $arguments)
     {

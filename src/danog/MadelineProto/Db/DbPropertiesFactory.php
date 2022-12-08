@@ -21,10 +21,7 @@ abstract class DbPropertiesFactory
      */
     const TYPE_ARRAY = 'array';
     /**
-     * @param DatabaseAbstract $dbSettings
-     * @param string $table
      * @param self::TYPE_*|array $propertyType
-     * @param mixed $value
      * @param DriverArray|null $value
      *
      * @return Promise<DbType>
@@ -60,7 +57,6 @@ abstract class DbPropertiesFactory
                 break;
             default:
                 throw new \InvalidArgumentException("Unknown dbType: ".\get_class($dbSettings));
-
         }
 
         /** @var DbType $class */

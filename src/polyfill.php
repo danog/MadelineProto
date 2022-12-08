@@ -21,10 +21,10 @@ function __destructure($list, $value): array
 {
     $res = [];
     foreach ($list as $key) {
-        if (\is_string($key)) {
+        if (is_string($key)) {
             $res[] = $value[$key];
         } else {
-            $res = \array_merge($res, __destructure($key, $value[$key]));
+            $res = array_merge($res, __destructure($key, $value[$key]));
         }
     }
     return $res;

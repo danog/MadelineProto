@@ -35,7 +35,6 @@ final class IpcState
     /**
      * Get startup time.
      *
-     * @return float
      */
     public function getStartupTime(): float
     {
@@ -45,7 +44,6 @@ final class IpcState
     /**
      * Get startup ID.
      *
-     * @return int
      */
     public function getStartupId(): int
     {

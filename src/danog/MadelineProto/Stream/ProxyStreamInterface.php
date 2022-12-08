@@ -33,5 +33,5 @@ interface ProxyStreamInterface
      *
      * @return void
      */
-    public function setExtra($extra);
+    public function setExtra($extra): void;
 }

@@ -100,7 +100,6 @@ trait Session
     /**
      * Reset MTProto session.
      *
-     * @return void
      */
     public function resetSession(): void
     {
@@ -123,7 +122,6 @@ trait Session
     /**
      * Cleanup incoming and outgoing messages.
      *
-     * @return void
      */
     public function cleanupSession(): void
     {
@@ -165,7 +163,6 @@ trait Session
     /**
      * Create MTProto session if needed.
      *
-     * @return void
      */
     public function createSession(): void
     {

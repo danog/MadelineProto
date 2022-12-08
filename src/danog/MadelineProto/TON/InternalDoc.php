@@ -954,7 +954,6 @@ class InternalDoc extends APIFactory
      *
      * @param mixed ...$params Params
      *
-     * @return array
      */
     public function arr(...$params): array
     {
@@ -965,7 +964,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $data Data to decode
      *
-     * @return string
      */
     public function base64urlDecode(string $data): string
     {
@@ -976,7 +974,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $data Data to encode
      *
-     * @return string
      */
     public function base64urlEncode(string $data): string
     {
@@ -1028,7 +1025,6 @@ class InternalDoc extends APIFactory
      *
      * @param \Generator|Promise $promise Promise to resolve
      *
-     * @return void
      */
     public function callForkDefer($promise): void
     {
@@ -1072,7 +1068,6 @@ class InternalDoc extends APIFactory
      *
      * @param array $what Array
      *
-     * @return mixed
      */
     public function end(array $what)
     {
@@ -1122,7 +1117,6 @@ class InternalDoc extends APIFactory
      * @param mixed  $location File location
      * @param string $default  Default extension
      *
-     * @return string
      */
     public function getExtensionFromLocation($location, string $default): string
     {
@@ -1133,7 +1127,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $mime MIME type
      *
-     * @return string
      */
     public function getExtensionFromMime(string $mime): string
     {
@@ -1143,7 +1136,6 @@ class InternalDoc extends APIFactory
      * Get TL method namespaces.
      *
      * @psalm-return array|\Amp\Promise<array>
-     * @return mixed
      */
     public function getMethodNamespaces()
     {
@@ -1154,7 +1146,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $buffer Buffer
      *
-     * @return string
      */
     public function getMimeFromBuffer(string $buffer): string
     {
@@ -1166,7 +1157,6 @@ class InternalDoc extends APIFactory
      * @param string $extension File extension
      * @param string $default   Default mime type
      *
-     * @return string
      */
     public function getMimeFromExtension(string $extension, string $default): string
     {
@@ -1177,7 +1167,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $file File
      *
-     * @return string
      */
     public function getMimeFromFile(string $file): string
     {
@@ -1191,7 +1180,6 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return mixed
      * @access public
      */
     public function getVar($obj, string $var)
@@ -1206,7 +1194,6 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return bool
      * @access public
      */
     public function hasVar($obj, string $var): bool
@@ -1252,9 +1239,8 @@ class InternalDoc extends APIFactory
      * @param string $file  File where the message originated
      *
      * @psalm-return void|\Amp\Promise<void>
-     * @return mixed
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '')
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
         $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
@@ -1274,7 +1260,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $hwat String to escape
      *
-     * @return string
      */
     public function markdownEscape(string $hwat): string
     {
@@ -1299,7 +1284,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $method Method name
      *
-     * @return string
      */
     public function methodEscape(string $method): string
     {
@@ -1310,7 +1294,6 @@ class InternalDoc extends APIFactory
      *
      * @param float $value Value to convert
      *
-     * @return string
      */
     public function packDouble(float $value): string
     {
@@ -1321,7 +1304,6 @@ class InternalDoc extends APIFactory
      *
      * @param integer $value Value to convert
      *
-     * @return string
      */
     public function packSignedInt(int $value): string
     {
@@ -1332,7 +1314,6 @@ class InternalDoc extends APIFactory
      *
      * @param int $value Value to convert
      *
-     * @return string
      */
     public function packSignedLong(int $value): string
     {
@@ -1343,7 +1324,6 @@ class InternalDoc extends APIFactory
      *
      * @param int $value Value
      *
-     * @return string
      */
     public function packUnsignedInt(int $value): string
     {
@@ -1378,7 +1358,6 @@ class InternalDoc extends APIFactory
      *
      * @param integer $modulus Modulus
      *
-     * @return int
      */
     public function randomInt(int $modulus = 0): int
     {
@@ -1403,7 +1382,6 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return void
      */
     public function rethrow(\Throwable $e, $file = ''): void
     {
@@ -1414,7 +1392,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Data to decode
      *
-     * @return string
      */
     public function rleDecode(string $string): string
     {
@@ -1425,7 +1402,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Data to encode
      *
-     * @return string
      */
     public function rleEncode(string $string): string
     {
@@ -1440,7 +1416,6 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return void
      *
      * @access public
      */
@@ -1496,7 +1471,6 @@ class InternalDoc extends APIFactory
      *
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     * @param mixed             $default
      *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
@@ -1514,7 +1488,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $input String
      *
-     * @return string
      */
     public function toCamelCase(string $input): string
     {
@@ -1525,7 +1498,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $input String
      *
-     * @return string
      */
     public function toSnakeCase(string $input): string
     {
@@ -1536,7 +1508,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $type String to escape
      *
-     * @return string
      */
     public function typeEscape(string $type): string
     {
@@ -1547,7 +1518,6 @@ class InternalDoc extends APIFactory
      *
      * @param string $value Value to unpack
      *
-     * @return float
      */
     public function unpackDouble(string $value): float
     {
@@ -1580,7 +1550,6 @@ class InternalDoc extends APIFactory
      *
      * @param string|int|array $value base256 long
      *
-     * @return string
      */
     public function unpackSignedLongString($value): string
     {
@@ -1592,7 +1561,6 @@ class InternalDoc extends APIFactory
      * @param \Generator|Promise $promise      The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
      *
-     * @return mixed
      */
     public function wait($promise, $ignoreSignal = false)
     {

@@ -33,7 +33,6 @@ class HttpWaitLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -74,7 +73,6 @@ class HttpWaitLoop extends ResumableSignalLoop
     /**
      * Loop name.
      *
-     * @return string
      */
     public function __toString(): string
     {

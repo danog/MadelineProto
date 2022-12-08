@@ -20,7 +20,6 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
@@ -65,7 +64,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -84,7 +82,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             $this->stream->close();
@@ -115,7 +113,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function write(string $data): \Amp\Promise
     {
@@ -124,13 +121,12 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         if ($extra instanceof Connector) {
             $this->connector = $extra;

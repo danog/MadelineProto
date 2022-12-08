@@ -100,7 +100,6 @@ class IncomingMessage extends Message
     /**
      * Get deserialized response content.
      *
-     * @return array
      */
     public function getContent(): array
     {
@@ -110,7 +109,6 @@ class IncomingMessage extends Message
     /**
      * Get was present in container.
      *
-     * @return bool
      */
     public function isFromContainer(): bool
     {
@@ -122,7 +120,6 @@ class IncomingMessage extends Message
      *
      * @param int|string $dc DC ID
      *
-     * @return string
      */
     public function log($dc): string
     {
@@ -135,7 +132,6 @@ class IncomingMessage extends Message
     /**
      * Get message type.
      *
-     * @return string
      */
     public function getType(): string
     {
@@ -145,7 +141,6 @@ class IncomingMessage extends Message
     /**
      * Get message type.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -155,7 +150,6 @@ class IncomingMessage extends Message
     /**
      * We have acked this message.
      *
-     * @return void
      */
     public function ack(): void
     {
@@ -164,7 +158,6 @@ class IncomingMessage extends Message
     /**
      * Read this message, clearing its contents.
      *
-     * @return array
      */
     public function read(): array
     {
@@ -187,7 +180,6 @@ class IncomingMessage extends Message
     /**
      * Get ID of message to which this message replies.
      *
-     * @return string
      */
     public function getRequestId(): string
     {
@@ -196,7 +188,6 @@ class IncomingMessage extends Message
     /**
      * Get state.
      *
-     * @return int
      */
     public function getState(): int
     {
@@ -208,7 +199,6 @@ class IncomingMessage extends Message
      *
      * @param Promise[] $sideEffects DB side effects to be resolved before using the content
      *
-     * @return self
      */
     public function setSideEffects(array $sideEffects): self
     {
@@ -239,7 +229,7 @@ class IncomingMessage extends Message
 
         foreach ($this->sideEffects as $promise) {
             $promise = Tools::call($promise);
-            $promise->onResolve(function ($exception, $value) use (&$deferred, &$pending, $return) {
+            $promise->onResolve(function ($exception, $value) use (&$deferred, &$pending, $return): void {
                 if ($pending === 0) {
                     return;
                 }
@@ -260,11 +250,9 @@ class IncomingMessage extends Message
         return $result;
     }
 
-
     /**
      * Get receive date.
      *
-     * @return int
      */
     public function getReceived(): int
     {

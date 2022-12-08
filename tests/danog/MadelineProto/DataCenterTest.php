@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 final class DataCenterTest extends TestCase
 {
-
     /**
      * DC list.
      */
@@ -78,7 +77,6 @@ final class DataCenterTest extends TestCase
      *
      * @dataProvider protocolProvider
      *
-     * @return void
      */
     public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
@@ -108,9 +106,8 @@ final class DataCenterTest extends TestCase
              * Constructor.
              *
              * @param Settings $settings Logger settings
-             * @param ?DataCenter $datacenter Datacenter
              */
-            public function initTests(Settings $settings, ?DataCenter &$dataCenter)
+            public function initTests(Settings $settings, ?DataCenter &$dataCenter): void
             {
                 $this->logger = Logger::constructorFromSettings($settings->getLogger());
                 $this->settings = $settings;
@@ -119,7 +116,6 @@ final class DataCenterTest extends TestCase
             /**
              * Get logger.
              *
-             * @return Logger
              */
             public function getLogger(): Logger
             {
@@ -129,7 +125,6 @@ final class DataCenterTest extends TestCase
             /**
              * Get settings.
              *
-             * @return Settings
              */
             public function getSettings(): Settings
             {

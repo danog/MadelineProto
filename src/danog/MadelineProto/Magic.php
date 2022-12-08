@@ -233,7 +233,6 @@ class Magic
      *
      * @param bool $light Use lightweight initialization routine
      *
-     * @return void
      */
     public static function start(bool $light = false): void
     {
@@ -286,11 +285,11 @@ class Magic
                 try {
                     \pcntl_signal(SIGINT, fn () => null);
                     \pcntl_signal(SIGINT, SIG_DFL);
-                    Loop::unreference(Loop::onSignal(SIGINT, static function () {
+                    Loop::unreference(Loop::onSignal(SIGINT, static function (): void {
                         Logger::log('Got sigint', Logger::FATAL_ERROR);
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
-                    Loop::unreference(Loop::onSignal(SIGTERM, static function () {
+                    Loop::unreference(Loop::onSignal(SIGTERM, static function (): void {
                         Logger::log('Got sigterm', Logger::FATAL_ERROR);
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
@@ -415,7 +414,6 @@ class Magic
     /**
      * Get current working directory.
      *
-     * @return string
      */
     public static function getcwd(): string
     {
@@ -428,7 +426,7 @@ class Magic
      *
      * @return void
      */
-    public static function shutdown(int $code = 0)
+    public static function shutdown(int $code = 0): void
     {
         self::$signaled = true;
         if (\defined('STDIN')) {
@@ -469,7 +467,6 @@ class Magic
      *
      * @param bool $ipv6 Whether we can use ipv6.
      *
-     * @return void
      */
     public static function setIpv6(bool $ipv6): void
     {

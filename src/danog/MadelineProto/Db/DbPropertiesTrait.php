@@ -23,9 +23,7 @@ trait DbPropertiesTrait
      *
      * @internal
      *
-     * @param MTProto $MadelineProto
      * @param boolean $reset
-     * @return \Generator
      */
     public function initDb(MTProto $MadelineProto, bool $reset = false): \Generator
     {

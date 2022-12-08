@@ -43,9 +43,6 @@ abstract class IGE
     /**
      * Instantiate appropriate handler.
      *
-     * @param string $key
-     * @param string $iv
-     * @return IGE
      */
     public static function getInstance(string $key, string $iv): IGE
     {

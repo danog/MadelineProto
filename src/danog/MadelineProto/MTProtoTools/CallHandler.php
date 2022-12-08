@@ -37,7 +37,6 @@ trait CallHandler
      *
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
-     * @return mixed
      */
     public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
@@ -54,7 +53,6 @@ trait CallHandler
      *
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
-     * @return \Generator
      */
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
@@ -69,7 +67,6 @@ trait CallHandler
      *
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
-     * @return \Generator
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {

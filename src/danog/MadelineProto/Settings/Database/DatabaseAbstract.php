@@ -34,7 +34,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get DB key.
      *
-     * @return string
      */
     public function getKey(): string
     {
@@ -47,7 +46,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get for how long to keep records in memory after last read, for cached backends.
      *
-     * @return int
      */
     public function getCacheTtl(): int
     {
@@ -65,7 +63,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      *
      * @param int|string $cacheTtl For how long to keep records in memory after last read, for cached backends.
      *
-     * @return self
      */
     public function setCacheTtl($cacheTtl): self
     {
@@ -77,7 +74,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get password.
      *
-     * @return string
      */
     public function getPassword(): string
     {
@@ -89,7 +85,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      *
      * @param string $password Password.
      *
-     * @return self
      */
     public function setPassword(string $password): self
     {
@@ -107,7 +102,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get database URI.
      *
-     * @return string
      */
     abstract public function getUri(): string;
 
@@ -115,14 +109,11 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Set database name/ID.
      *
      * @param int|string $database
-     * @return self
      */
     abstract public function setDatabase($database): self;
     /**
      * Set database URI.
      *
-     * @param string $uri
-     * @return self
      */
     abstract public function setUri(string $uri): self;
 }

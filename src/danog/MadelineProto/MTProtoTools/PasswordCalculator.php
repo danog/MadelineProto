@@ -88,7 +88,6 @@ class PasswordCalculator
      *
      * @param array $object 2FA configuration object obtained using account.getPassword
      *
-     * @return void
      */
     public function addInfo(array $object): void
     {

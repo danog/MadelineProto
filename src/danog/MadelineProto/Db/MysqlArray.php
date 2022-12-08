@@ -22,7 +22,6 @@ class MysqlArray extends SqlArray
     /**
      * Initialize on startup.
      *
-     * @return \Generator
      */
     public function initStartup(): \Generator
     {
@@ -35,7 +34,6 @@ class MysqlArray extends SqlArray
      *
      * @param SqlArray::STATEMENT_* $type
      *
-     * @return string
      */
     protected function getSqlQuery(int $type): string
     {
@@ -68,12 +66,10 @@ class MysqlArray extends SqlArray
         throw new Exception("An invalid statement type $type was provided!");
     }
 
-
     /**
      * Initialize connection.
      *
      * @param DatabaseMysql $settings
-     * @return \Generator
      */
     public function initConnection($settings): \Generator
     {
@@ -93,7 +89,6 @@ class MysqlArray extends SqlArray
     /**
      * Create table for property.
      *
-     * @return \Generator
      *
      * @throws \Throwable
      *

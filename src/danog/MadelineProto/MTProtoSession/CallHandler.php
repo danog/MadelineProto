@@ -36,7 +36,6 @@ trait CallHandler
      * @param string $watcherId Watcher ID for defer
      * @param array  $args      Args
      *
-     * @return void
      */
     public function methodRecall(string $watcherId, array $args): void
     {
@@ -58,7 +57,7 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
-                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message) {
+                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message): void {
                         Tools::callFork($r->sendMessage($message, false));
                     });
                 } else {
@@ -92,7 +91,6 @@ trait CallHandler
      *
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
-     * @return \Generator
      */
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
@@ -115,7 +113,6 @@ trait CallHandler
      *
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
-     * @return \Generator
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
@@ -203,7 +200,6 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return \Generator
      */
     public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {

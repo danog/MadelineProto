@@ -45,11 +45,10 @@ trait PrettyException
     /**
      * Update TL trace.
      *
-     * @param array $trace
      *
      * @return void
      */
-    public function updateTLTrace(array $trace)
+    public function updateTLTrace(array $trace): void
     {
         if (!$this->updated) {
             $this->updated = true;
@@ -59,7 +58,6 @@ trait PrettyException
     /**
      * Get TL trace.
      *
-     * @return string
      */
     public function getTLTrace(): string
     {
@@ -70,7 +68,6 @@ trait PrettyException
      *
      * @param string $tlTrace TL trace
      *
-     * @return void
      */
     public function setTLTrace(string $tlTrace): void
     {
@@ -84,7 +81,7 @@ trait PrettyException
      *
      * @return void
      */
-    public function prettifyTL(string $init = '', array $trace = null)
+    public function prettifyTL(string $init = '', array $trace = null): void
     {
         $this->method = $init;
         $previous_trace = $this->tlTrace;

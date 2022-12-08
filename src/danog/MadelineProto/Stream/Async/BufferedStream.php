@@ -35,7 +35,6 @@ trait BufferedStream
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
      */
     public function getReadBuffer(&$length): Promise
     {
@@ -47,7 +46,6 @@ trait BufferedStream
      * @param int    $length Total length of data that is going to be piped in the buffer
      * @param string $append Data to append after entire buffer is written
      *
-     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {

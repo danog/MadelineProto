@@ -56,7 +56,6 @@ class SecretFeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -92,8 +91,6 @@ class SecretFeedLoop extends ResumableSignalLoop
     /**
      * Feed incoming update to loop.
      *
-     * @param array $update
-     * @return void
      */
     public function feed(array $update): void
     {

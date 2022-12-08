@@ -69,7 +69,7 @@ abstract class AuthKey implements JsonSerializable
      *
      * @return void
      */
-    public function setAuthKey(string $authKey)
+    public function setAuthKey(string $authKey): void
     {
         $this->authKey = $authKey;
         $this->id = \substr(\sha1($authKey, true), -8);
@@ -86,7 +86,6 @@ abstract class AuthKey implements JsonSerializable
     /**
      * Get auth key.
      *
-     * @return string
      */
     public function getAuthKey(): string
     {
@@ -96,7 +95,6 @@ abstract class AuthKey implements JsonSerializable
     /**
      * Get auth key ID.
      *
-     * @return string
      */
     public function getID(): string
     {
@@ -110,14 +108,13 @@ abstract class AuthKey implements JsonSerializable
      *
      * @return void
      */
-    public function setServerSalt(string $salt)
+    public function setServerSalt(string $salt): void
     {
         $this->serverSalt = $salt;
     }
     /**
      * Get server salt.
      *
-     * @return string
      */
     public function getServerSalt(): string
     {
@@ -146,5 +143,5 @@ abstract class AuthKey implements JsonSerializable
      *
      * @return void
      */
-    abstract public function authorized(bool $authorized);
+    abstract public function authorized(bool $authorized): void;
 }

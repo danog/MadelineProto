@@ -74,7 +74,6 @@ class ADNLConnection
      *
      * @param array $endpoint Endpoint
      *
-     * @return \Generator
      */
     public function connect(array $endpoint): \Generator
     {
@@ -146,7 +145,6 @@ class ADNLConnection
      *
      * @param string $payload Payload to send
      *
-     * @return \Generator
      */
     public function query(string $payload): \Generator
     {

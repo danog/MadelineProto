@@ -36,7 +36,6 @@ trait Start
     /**
      * Log in to telegram (via CLI or web).
      *
-     * @return \Generator
      */
     public function start(): \Generator
     {

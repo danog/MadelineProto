@@ -40,7 +40,7 @@ class Lua
     {
         return ['MadelineProto', 'script'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (!\class_exists(\Lua::class)) {
             throw Exception::extension('lua');
@@ -156,7 +156,7 @@ class Lua
     }
     public static function convertObjects(&$data): void
     {
-        \array_walk_recursive($data, function (&$value, $key) {
+        \array_walk_recursive($data, function (&$value, $key): void {
             if (\is_object($value) && !$value instanceof \phpseclib3\Math\BigInteger) {
                 $newval = [];
                 foreach (\get_class_methods($value) as $name) {

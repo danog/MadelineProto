@@ -105,7 +105,6 @@ abstract class Serialization
      *
      * @internal
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<void, mixed, mixed, array{0: ChannelledSocket|APIWrapper|\Throwable|null|0, 1: callable|null}>
      */
@@ -123,7 +122,7 @@ abstract class Serialization
         }
 
         //Logger::log('Waiting for exclusive session lock...');
-        $warningId = Loop::delay(1000, static function () use (&$warningId) {
+        $warningId = Loop::delay(1000, static function () use (&$warningId): void {
             Logger::log("It seems like the session is busy.");
             /*if (\defined(\MADELINE_WORKER::class)) {
                 Logger::log("Exiting since we're in a worker");
@@ -140,7 +139,7 @@ abstract class Serialization
         $cancelIpc = new Deferred;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1, $cancelFlock->promise(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState) {
+        $unlock = yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1, $cancelFlock->promise(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
             $cancelFull = static function () use (&$cancelFlock): void {
                 if ($cancelFlock !== null) {
                     $copy = $cancelFlock;
@@ -149,7 +148,7 @@ abstract class Serialization
                 }
             };
             $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFull));
-            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState) {
+            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
                 if ($res) {
                     $lightState = $res;
                     if (!$res->canStartIpc()) {
@@ -196,7 +195,7 @@ abstract class Serialization
             }
         }
 
-        $tempId = Shutdown::addCallback($unlock = static function () use ($unlock) {
+        $tempId = Shutdown::addCallback($unlock = static function () use ($unlock): void {
             Logger::log("Unlocking exclusive session lock!");
             $unlock();
             Logger::log("Unlocked exclusive session lock!");
@@ -247,7 +246,6 @@ abstract class Serialization
      *
      * @psalm-param Promise<\Throwable|null> $cancelConnect
      *
-     * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, array{0: ChannelledSocket|\Throwable|0, 1: null}>
      */
     public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): \Generator
@@ -281,8 +279,6 @@ abstract class Serialization
     /**
      * Deserialize legacy session.
      *
-     * @param string $session
-     * @return \Generator
      */
     private static function legacyUnserialize(string $session): \Generator
     {

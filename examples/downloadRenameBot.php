@@ -19,9 +19,8 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-
-if (\function_exists('memprof_enable')) {
-    \memprof_enable();
+if (function_exists('memprof_enable')) {
+    memprof_enable();
 }
 
 use Amp\Http\Server\HttpServer;
@@ -36,11 +35,11 @@ use League\Uri\Contracts\UriException;
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 }
@@ -89,7 +88,7 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
      */
     public function __construct(?APIWrapper $API)
     {
-        $this->UPLOAD = \class_exists(HttpServer::class);
+        $this->UPLOAD = class_exists(HttpServer::class);
         parent::__construct($API);
     }
     public function onStart()
@@ -112,7 +111,6 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
      *
      * @param array $update Update
      *
-     * @return \Generator
      */
     public function onUpdateNewMessage(array $update): \Generator
     {
@@ -137,10 +135,10 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if ($update['message']['message'] === '/report' && $peerId === $this->adminId) {
-                \memprof_dump_callgrind($stm = \fopen("php://memory", "w"));
-                \fseek($stm, 0);
+                memprof_dump_callgrind($stm = fopen("php://memory", "w"));
+                fseek($stm, 0);
                 yield $this->messages->sendMedia(['peer' => $peerId, 'media' => ['_' => 'inputMediaUploadedDocument', 'file' => $stm, 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'callgrind.out']]]]);
-                \fclose($stm);
+                fclose($stm);
                 return;
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
@@ -148,7 +146,7 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                     unset($this->states[$peerId]);
                     $update = Files::extractBotAPIFile(yield $this->MTProtoToBotAPI($update));
                     $file = [$update['file_size'], $update['mime_type']];
-                    \var_dump($update['file_id'].'.'.Tools::base64urlEncode(\json_encode($file))."/".$update['file_name']);
+                    var_dump($update['file_id'].'.'.Tools::base64urlEncode(json_encode($file))."/".$update['file_name']);
                     return;
                 }
                 yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
@@ -161,19 +159,19 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                 $url = $this->states[$peerId];
                 unset($this->states[$peerId]);
             } else {
-                $url = \explode(' ', $update['message']['message'], 2);
-                $name = \trim($url[1] ?? \basename($update['message']['message']));
-                $url = \trim($url[0]);
+                $url = explode(' ', $update['message']['message'], 2);
+                $name = trim($url[1] ?? basename($update['message']['message']));
+                $url = trim($url[0]);
                 if (!$url) {
                     return;
                 }
-                if (\stripos($url, 'http') !== 0) {
+                if (stripos($url, 'http') !== 0) {
                     $url = "http://$url";
                 }
             }
             $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId]);
             if (!isset($id['id'])) {
-                $this->report(\json_encode($id));
+                $this->report(json_encode($id));
                 foreach ($id['updates'] as $updat) {
                     if (isset($updat['id'])) {
                         $id = $updat['id'];
@@ -190,7 +188,7 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                     $this->logger("Upload progress: $progress%");
 
                     static $prev = 0;
-                    $now = \time();
+                    $now = time();
                     if ($now - $prev < 10 && $progress < 100) {
                         return;
                     }
@@ -217,18 +215,18 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                 ]
             );
 
-            if (\in_array($peer['type'], ['channel', 'supergroup'])) {
+            if (in_array($peer['type'], ['channel', 'supergroup'])) {
                 yield $this->channels->deleteMessages(['channel' => $peerId, 'id' => [$id]]);
             } else {
                 yield $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
             }
         } catch (\Throwable $e) {
-            if (\strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && \strpos($e->getMessage(), 'URI') === false) {
+            if (strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && strpos($e->getMessage(), 'URI') === false) {
                 $this->report((string) $e);
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
             if ($e instanceof RPCErrorException && $e->rpc === 'FILE_PARTS_INVALID') {
-                $this->report(\json_encode($url));
+                $this->report(json_encode($url));
             }
             try {
                 yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);

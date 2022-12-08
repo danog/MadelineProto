@@ -43,7 +43,6 @@ trait Loop
     /**
      * Initialize self-restart hack.
      *
-     * @return void
      */
     public function initSelfRestart(): void
     {
@@ -64,7 +63,7 @@ trait Loop
             if ($needs_restart) {
                 $this->logger->logger("Adding restart callback!");
                 $logger = $this->logger;
-                $id = Shutdown::addCallback(static function () use (&$logger) {
+                $id = Shutdown::addCallback(static function () use (&$logger): void {
                     $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];
                     $uri = $_SERVER['REQUEST_URI'];
@@ -103,7 +102,6 @@ trait Loop
      *
      * @param callable|null $callback Async callable to run
      *
-     * @return \Generator
      */
     public function loop($callback = null): \Generator
     {
@@ -167,7 +165,7 @@ trait Loop
      *
      * @return void
      */
-    public function stop()
+    public function stop(): void
     {
         \danog\MadelineProto\Shutdown::removeCallback('restarter');
         $this->restart();
@@ -177,7 +175,7 @@ trait Loop
      *
      * @return void
      */
-    public function restart()
+    public function restart(): void
     {
         $this->stopLoop = true;
         $this->signalUpdate();
@@ -185,7 +183,6 @@ trait Loop
     /**
      * Start MadelineProto's update handling loop in background.
      *
-     * @return Promise
      */
     public function loopFork(): Promise
     {

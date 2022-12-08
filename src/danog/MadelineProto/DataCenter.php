@@ -133,7 +133,7 @@ class DataCenter
     {
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (\is_array($this->settings)) {
             $settings = new ConnectionSettings;
@@ -163,7 +163,7 @@ class DataCenter
      *
      * @return void
      */
-    public function setDataCenterConnections(array $saved)
+    public function setDataCenterConnections(array $saved): void
     {
         foreach ($saved as $id => $data) {
             $connection = $this->sockets[$id] = new DataCenterConnection();
@@ -203,7 +203,7 @@ class DataCenter
      *
      * @return void
      */
-    public function __magic_construct($API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null)
+    public function __magic_construct($API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null): void
     {
         $this->API = $API;
         $changed = [];
@@ -277,7 +277,6 @@ class DataCenter
      *
      * @param array $endpoints Endpoints
      *
-     * @return void
      */
     public function setVoIPEndpoints(array $endpoints): void
     {
@@ -466,8 +465,6 @@ class DataCenter
                         continue;
                     }
 
-
-
                     // This is only for MTProto connections
                     if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                         continue;
@@ -550,7 +547,6 @@ class DataCenter
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Http\Client\HttpClient
      */
     public function getHTTPClient(): HttpClient
     {
@@ -559,7 +555,6 @@ class DataCenter
     /**
      * Get async HTTP client cookies.
      *
-     * @return \Amp\Http\Client\Cookie\CookieJar
      */
     public function getCookieJar(): CookieJar
     {
@@ -568,7 +563,6 @@ class DataCenter
     /**
      * Get DNS over HTTPS async DNS client.
      *
-     * @return \Amp\Dns\Resolver
      */
     public function getDNSClient(): Resolver
     {
@@ -577,7 +571,6 @@ class DataCenter
     /**
      * Get non-proxied DNS over HTTPS async DNS client.
      *
-     * @return \Amp\Dns\Resolver
      */
     public function getNonProxiedDNSClient(): Resolver
     {
@@ -588,7 +581,6 @@ class DataCenter
      *
      * @param string $url URL to fetch
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise<string>, mixed, string>
      */
@@ -601,7 +593,6 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return Connection
      */
     public function getAuthConnection(string $dc): Connection
     {
@@ -612,7 +603,6 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return Connection
      */
     public function getConnection(string $dc): Connection
     {
@@ -623,7 +613,6 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<int, \Amp\Promise, mixed, Connection>
      */
@@ -636,7 +625,6 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return DataCenterConnection
      */
     public function getDataCenterConnection(string $dc): DataCenterConnection
     {
@@ -689,7 +677,6 @@ class DataCenter
      *
      * @param boolean $all Whether to get all possible DC IDs, or only connected ones
      *
-     * @return array
      */
     public function getDcs($all = true): array
     {

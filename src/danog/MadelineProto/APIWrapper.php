@@ -41,14 +41,12 @@ final class APIWrapper
     /**
      * Getting API ID flag.
      *
-     * @var bool
      */
     private bool $gettingApiId = false;
 
     /**
      * Web API template.
      *
-     * @var string
      */
     private string $webApiTemplate = '';
 
@@ -85,7 +83,6 @@ final class APIWrapper
     /**
      * AbstractAPIFactory instance.
      *
-     * @var AbstractAPIFactory
      */
     private AbstractAPIFactory $factory;
 
@@ -111,7 +108,6 @@ final class APIWrapper
      * @param API|APIWrapper $a Instance to which link
      * @param API|APIWrapper $b Instance from which link
      *
-     * @return void
      */
     public static function link($a, $b): void
     {
@@ -124,7 +120,6 @@ final class APIWrapper
     /**
      * Property list.
      *
-     * @return array
      */
     public static function properties(): array
     {
@@ -134,7 +129,6 @@ final class APIWrapper
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -164,7 +158,6 @@ final class APIWrapper
     /**
      * Get API factory.
      *
-     * @return AbstractAPIFactory
      */
     public function getFactory(): AbstractAPIFactory
     {
@@ -176,7 +169,6 @@ final class APIWrapper
      *
      * @internal
      *
-     * @return string
      */
     public function getIpcPath(): string
     {
@@ -210,7 +202,6 @@ final class APIWrapper
                 yield from $this->session->storeLightState($this->API);
             }
 
-
             // Truncate legacy session
             yield (yield openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
@@ -224,7 +215,6 @@ final class APIWrapper
     /**
      * Get session path.
      *
-     * @return SessionPaths
      */
     public function getSession(): SessionPaths
     {

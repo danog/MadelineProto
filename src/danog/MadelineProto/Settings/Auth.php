@@ -46,7 +46,6 @@ class Auth extends SettingsAbstract
     /**
      * Get validity period of the binding of temporary and permanent keys.
      *
-     * @return int
      */
     public function getDefaultTempAuthKeyExpiresIn(): int
     {
@@ -58,7 +57,6 @@ class Auth extends SettingsAbstract
      *
      * @param int $defaultTempAuthKeyExpiresIn Validity period of the binding of temporary and permanent keys.
      *
-     * @return self
      */
     public function setDefaultTempAuthKeyExpiresIn(int $defaultTempAuthKeyExpiresIn): self
     {
@@ -70,7 +68,6 @@ class Auth extends SettingsAbstract
     /**
      * Get whether to use PFS.
      *
-     * @return bool
      */
     public function getPfs(): bool
     {
@@ -82,7 +79,6 @@ class Auth extends SettingsAbstract
      *
      * @param bool $pfs Whether to use PFS
      *
-     * @return self
      */
     public function setPfs(bool $pfs): self
     {
@@ -94,7 +90,6 @@ class Auth extends SettingsAbstract
     /**
      * Get max tries for generating auth key.
      *
-     * @return int
      */
     public function getMaxAuthTries(): int
     {
@@ -106,7 +101,6 @@ class Auth extends SettingsAbstract
      *
      * @param int $maxAuthTries Max tries for generating auth key
      *
-     * @return self
      */
     public function setMaxAuthTries(int $maxAuthTries): self
     {

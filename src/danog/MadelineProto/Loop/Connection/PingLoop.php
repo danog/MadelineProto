@@ -33,7 +33,6 @@ class PingLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -68,7 +67,6 @@ class PingLoop extends ResumableSignalLoop
     /**
      * Get loop name.
      *
-     * @return string
      */
     public function __toString(): string
     {

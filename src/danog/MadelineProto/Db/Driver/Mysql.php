@@ -20,14 +20,7 @@ class Mysql
     private static array $connections = [];
 
     /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $db
      *
-     * @param int $maxConnections
-     * @param int $idleTimeout
      *
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
@@ -52,13 +45,11 @@ class Mysql
     }
 
     /**
-     * @param ConnectionConfig $config
      *
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      *
-     * @return \Generator
      */
     private static function createDb(ConnectionConfig $config): \Generator
     {

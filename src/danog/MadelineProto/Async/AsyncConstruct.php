@@ -40,7 +40,6 @@ class AsyncConstruct
     /**
      * Blockingly init.
      *
-     * @return void
      */
     public function init(): void
     {
@@ -52,7 +51,6 @@ class AsyncConstruct
     /**
      * Asynchronously init.
      *
-     * @return \Generator
      */
     public function initAsynchronously(): \Generator
     {
@@ -75,7 +73,6 @@ class AsyncConstruct
      *
      * @param boolean $inited Whether to mark the instance as inited or deinited
      *
-     * @return void
      */
     public function forceInit(bool $inited): void
     {
@@ -88,7 +85,6 @@ class AsyncConstruct
      *
      * @internal
      *
-     * @return void
      */
     public function setInitPromise($promise): void
     {

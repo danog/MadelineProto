@@ -27,51 +27,51 @@ use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 
 (static function (): void {
-    if (\defined('MADELINE_ENTRY')) {
+    if (defined('MADELINE_ENTRY')) {
         // Already called
         return;
     }
-    \define('MADELINE_ENTRY', 1);
-    if (!\defined('MADELINE_WORKER_TYPE')) {
-        if (\count(\debug_backtrace(0)) !== 1) {
+    define('MADELINE_ENTRY', 1);
+    if (!defined('MADELINE_WORKER_TYPE')) {
+        if (count(debug_backtrace(0)) !== 1) {
             // We're not being included directly
             return;
         }
         $arguments = [];
         if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
-            $arguments = \array_slice($GLOBALS['argv'], 1);
+            $arguments = array_slice($GLOBALS['argv'], 1);
         } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
             $arguments = $_GET['argv'];
         }
-        if (\count($arguments) < 2) {
-            \trigger_error("Not enough arguments!", E_USER_ERROR);
+        if (count($arguments) < 2) {
+            trigger_error("Not enough arguments!", E_USER_ERROR);
             exit(1);
         }
-        \define('MADELINE_WORKER_TYPE', \array_shift($arguments));
-        \define('MADELINE_WORKER_ARGS', $arguments);
+        define('MADELINE_WORKER_TYPE', array_shift($arguments));
+        define('MADELINE_WORKER_ARGS', $arguments);
     }
 
-    if (\defined('SIGHUP')) {
+    if (defined('SIGHUP')) {
         try {
-            \pcntl_signal(SIGHUP, fn () => null);
+            pcntl_signal(SIGHUP, fn () => null);
         } catch (\Throwable $e) {
         }
     }
-    if (!\class_exists(API::class)) {
+    if (!class_exists(API::class)) {
         $paths = [
-            \dirname(__DIR__, 7)."/autoload.php",
-            \dirname(__DIR__, 5)."/vendor/autoload.php",
+            dirname(__DIR__, 7)."/autoload.php",
+            dirname(__DIR__, 5)."/vendor/autoload.php",
         ];
 
         foreach ($paths as $path) {
-            if (\file_exists($path)) {
+            if (file_exists($path)) {
                 $autoloadPath = $path;
                 break;
             }
         }
 
         if (!isset($autoloadPath)) {
-            \trigger_error("Could not locate autoload.php in any of the following files: ".\implode(", ", $paths), E_USER_ERROR);
+            trigger_error("Could not locate autoload.php in any of the following files: ".implode(", ", $paths), E_USER_ERROR);
             exit(1);
         }
 
@@ -79,20 +79,20 @@ use danog\MadelineProto\Tools;
     }
     if (\MADELINE_WORKER_TYPE === 'madeline-ipc') {
         $ipcPath = \MADELINE_WORKER_ARGS[0];
-        if (!\file_exists($ipcPath)) {
-            \trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
+        if (!file_exists($ipcPath)) {
+            trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
             exit(1);
         }
-        if (\function_exists('cli_set_process_title')) {
-            @\cli_set_process_title("MadelineProto worker $ipcPath");
+        if (function_exists('cli_set_process_title')) {
+            @cli_set_process_title("MadelineProto worker $ipcPath");
         }
-        if (\function_exists('posix_setsid')) {
-            @\posix_setsid();
+        if (function_exists('posix_setsid')) {
+            @posix_setsid();
         }
         if (isset($_GET['cwd'])) {
-            @\chdir($_GET['cwd']);
+            @chdir($_GET['cwd']);
         }
-        \define('MADELINE_WORKER', 1);
+        define('MADELINE_WORKER', 1);
 
         $runnerId = \MADELINE_WORKER_ARGS[1];
         $session = new SessionPaths($ipcPath);

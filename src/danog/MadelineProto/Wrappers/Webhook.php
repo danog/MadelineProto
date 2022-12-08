@@ -35,7 +35,6 @@ trait Webhook
      * @param string $hook_url Webhook URL
      * @param string $pem_path PEM path for self-signed certificate
      *
-     * @return void
      */
     public function setWebhook(string $hook_url, string $pem_path = ''): void
     {
@@ -49,7 +48,6 @@ trait Webhook
      *
      * @param array $update Update
      *
-     * @return void
      */
     private function pwrWebhook(array $update): void
     {

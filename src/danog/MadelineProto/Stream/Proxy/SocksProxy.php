@@ -49,7 +49,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -154,7 +153,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -165,7 +163,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
      */
     public function getReadBuffer(&$length): Promise
     {
@@ -186,14 +183,13 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @return void
      */
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->extra = $extra;
     }
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -202,7 +198,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * {@inheritdoc}
      *
-     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {

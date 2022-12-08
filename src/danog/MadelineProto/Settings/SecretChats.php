@@ -39,7 +39,6 @@ class SecretChats extends SettingsAbstract
      *
      * @param bool|array<int> $accept Boolean or array of IDs
      *
-     * @return self
      */
     public function setAccept($accept): self
     {

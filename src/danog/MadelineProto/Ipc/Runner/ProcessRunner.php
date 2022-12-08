@@ -86,7 +86,7 @@ final class ProcessRunner extends RunnerAbstract
 
         $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
         $handle = $runner->start($command, null, $envVars);
-        $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred) {
+        $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
             if ($e) {
                 Logger::log("Got exception while starting process worker: $e");
                 $resDeferred->resolve($e);
@@ -95,7 +95,7 @@ final class ProcessRunner extends RunnerAbstract
             Tools::callFork(self::readUnref($handle->stdout));
             Tools::callFork(self::readUnref($handle->stderr));
 
-            $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) use ($runner, $handle, $resDeferred) {
+            $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
                 $runner->destroy($handle);
                 if ($e) {
                     Logger::log("Got exception from process worker: $e");
@@ -111,8 +111,6 @@ final class ProcessRunner extends RunnerAbstract
     /**
      * Unreference and read data from fd, logging results.
      *
-     * @param ProcessInputStream $stream
-     * @return \Generator
      */
     private static function readUnref(ProcessInputStream $stream): \Generator
     {
@@ -154,7 +152,6 @@ final class ProcessRunner extends RunnerAbstract
     /**
      * Format PHP options.
      *
-     * @param array $options
      * @return list<string>
      */
     private static function formatOptions(array $options): array

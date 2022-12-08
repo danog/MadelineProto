@@ -18,7 +18,6 @@
  */
 
 namespace phpseclib\Math {
-
     if (PHP_MAJOR_VERSION < 7 && !(\class_exists(\Phar::class) && \Phar::running() || \defined('TESTING_VERSIONS'))) {
         throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
     }
@@ -39,18 +38,17 @@ namespace phpseclib\Math {
 }
 
 namespace tgseclib\Math {
-
     use phpseclib3\Math\BigInteger as MathBigInteger;
     use Serializable;
 
     class BigInteger implements Serializable
     {
         public MathBigInteger $real;
-        public function serialize()
+        public function serialize(): void
         {
             //throw new \Exception("Can't serialize legacy class!");
         }
-        public function unserialize($data)
+        public function unserialize($data): void
         {
             $r = \unserialize($data);
             $this->real = new MathBigInteger($r['hex'], -16);

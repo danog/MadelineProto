@@ -18,7 +18,6 @@ abstract class MadelineTestCase extends TestCase
     /**
      * Setup MadelineProto instance.
      *
-     * @return void
      */
     public static function setUpBeforeClass(): void
     {
@@ -45,7 +44,6 @@ abstract class MadelineTestCase extends TestCase
     /**
      * Teardown.
      *
-     * @return void
      */
     public static function tearDownAfterClass(): void
     {

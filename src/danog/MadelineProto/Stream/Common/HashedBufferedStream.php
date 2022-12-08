@@ -50,7 +50,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return void
      */
-    public function startReadHash()
+    public function startReadHash(): void
     {
         $this->read_hash = \hash_init($this->hash_name);
     }
@@ -61,14 +61,13 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return void
      */
-    public function checkReadHash(int $after)
+    public function checkReadHash(int $after): void
     {
         $this->read_check_after = $after;
     }
     /**
      * Stop read hashing and get final hash.
      *
-     * @return string
      */
     public function getReadHash(): string
     {
@@ -84,7 +83,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Check if we are read hashing.
      *
-     * @return bool
      */
     public function hasReadHash(): bool
     {
@@ -95,7 +93,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return void
      */
-    public function startWriteHash()
+    public function startWriteHash(): void
     {
         $this->write_hash = \hash_init($this->hash_name);
     }
@@ -106,14 +104,13 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return void
      */
-    public function checkWriteHash(int $after)
+    public function checkWriteHash(int $after): void
     {
         $this->write_check_after = $after;
     }
     /**
      * Stop write hashing and get final hash.
      *
-     * @return string
      */
     public function getWriteHash(): string
     {
@@ -129,7 +126,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Check if we are write hashing.
      *
-     * @return bool
      */
     public function hasWriteHash(): bool
     {
@@ -170,7 +166,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return void
      */
-    public function setExtra($hash)
+    public function setExtra($hash): void
     {
         $rev = \strpos($hash, '_rev');
         $this->rev = false;
@@ -185,7 +181,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -211,7 +206,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
@@ -226,7 +220,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
@@ -279,7 +272,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket
     {
@@ -288,7 +280,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {

@@ -82,7 +82,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Sleep function.
      *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -93,7 +92,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param boolean $donotwait Whether to wait for the result of the method
      *
-     * @return mixed
      */
     public function click(bool $donotwait = true)
     {
@@ -121,7 +119,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Get debug info.
      *
-     * @return array
      */
     public function __debugInfo(): array
     {
@@ -132,7 +129,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Serialize button.
      *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -144,7 +140,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * @param mixed $name  Offset
      * @param mixed $value Value
      *
-     * @return void
      */
     public function offsetSet(mixed $name, mixed $value): void
     {
@@ -159,7 +154,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param mixed $name Field name
      *
-     * @return mixed
      */
     public function offsetGet(mixed $name): mixed
     {
@@ -170,7 +164,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param mixed $name Offset
      *
-     * @return void
      */
     public function offsetUnset(mixed $name): void
     {

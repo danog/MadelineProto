@@ -33,7 +33,6 @@ interface WriteBufferInterface
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function bufferWrite(string $data): Promise;
 }

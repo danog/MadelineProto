@@ -43,9 +43,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Connect.
      *
-     * @param ConnectionContext $ctx
-     * @param string $header
-     * @return \Generator
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
@@ -56,7 +53,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async chunked read.
      *
-     * @return Promise
      */
     public function read(): Promise
     {
@@ -70,7 +66,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function write(string $data): Promise
     {
@@ -82,9 +77,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async write.
      *
-     * @param string $data Data to write
      *
-     * @return Promise
      */
     public function end(string $finalData = ''): Promise
     {
@@ -98,7 +91,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         if ($this->stream) {
             $this->stream = null;
@@ -109,7 +102,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
      */
     public function getReadBuffer(&$length): Promise
     {
@@ -123,7 +115,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      *
-     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -138,7 +129,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Amount of data to read
      *
-     * @return Promise
      */
     public function bufferRead(int $length): Promise
     {
@@ -149,7 +139,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      *
-     * @return Promise
      */
     public function bufferWrite(string $data): Promise
     {
@@ -172,14 +161,13 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      * @param File $extra
      * @return void
      */
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->stream = $extra;
     }
     /**
      * {@inheritDoc}
      *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -195,7 +183,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Get class name.
      *
-     * @return string
      */
     public static function getName(): string
     {

@@ -20,6 +20,7 @@ git config --global user.name "Github Actions"
 if [ "$TAG" == "" ]; then
     export TAG=7777
     git tag "$TAG"
+    git checkout "$TAG"
 fi
 
 export TEST_SECRET_CHAT=test

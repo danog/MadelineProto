@@ -124,7 +124,6 @@ class ResponseInfo
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
      *
-     * @return self
      */
     public static function parseHeaders(string $method, array $headers, array $messageMedia): self
     {
@@ -133,7 +132,6 @@ class ResponseInfo
     /**
      * Get explanation for HTTP code.
      *
-     * @return string
      */
     public function getCodeExplanation(): string
     {

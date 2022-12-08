@@ -54,7 +54,6 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Constructor.
      *
-     * @param MTProto $API
      * @param integer $channelId
      */
     public function __construct(MTProto $API, int $channelId)
@@ -65,7 +64,6 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Main loop.
      *
-     * @return \Generator
      */
     public function loop(): \Generator
     {
@@ -223,7 +221,6 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Get loop name.
      *
-     * @return string
      */
     public function __toString(): string
     {

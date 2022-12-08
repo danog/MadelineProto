@@ -19,14 +19,14 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Tools;
 
-\chdir($d=__DIR__.'/..');
+chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
 Magic::start();
 Logger::constructorFromSettings(new SettingsLogger);
 $logger = Logger::$default;
-\set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 $logger->logger('Merging constructor localization...', Logger::NOTICE);
 mergeExtracted();
@@ -49,13 +49,13 @@ $docs = [
         'readme'      => false,
     ],
 ];
-$docs = \array_merge($docs, initDocs($schemas));
+$docs = array_merge($docs, initDocs($schemas));
 
 $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
     $docs[0],
-    \dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
+    dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
     [
         'API' => API::class,
         'APIFactory' => APIFactory::class,
@@ -71,7 +71,7 @@ foreach ($docs as $settings) {
     $doc->mkDocs();
 }
 
-\chdir(__DIR__.'/..');
+chdir(__DIR__.'/..');
 
 $logger->logger('Fixing readme...', Logger::NOTICE);
 $orderedfiles = [];
@@ -101,35 +101,35 @@ $order = [
     'TEMPLATES',
 ];
 $index = '';
-$files = \glob('docs/docs/docs/*md');
+$files = glob('docs/docs/docs/*md');
 foreach ($files as $file) {
-    $base = \basename($file, '.md');
+    $base = basename($file, '.md');
     if ($base === 'UPDATES_INTERNAL') {
         continue;
     }
-    $key = \array_search($base, $order);
+    $key = array_search($base, $order);
     if ($key !== false) {
         $orderedfiles[$key] = $file;
     }
 }
-\ksort($orderedfiles);
+ksort($orderedfiles);
 foreach ($orderedfiles as $key => $filename) {
-    $lines = \explode("\n", \file_get_contents($filename));
-    while (\end($lines) === '' || \strpos(\end($lines), 'Next')) {
-        unset($lines[\count($lines) - 1]);
+    $lines = explode("\n", file_get_contents($filename));
+    while (end($lines) === '' || strpos(end($lines), 'Next')) {
+        unset($lines[count($lines) - 1]);
     }
     if ($lines[0] === '---') {
-        \array_shift($lines);
+        array_shift($lines);
         while ($lines[0] !== '---') {
-            \array_shift($lines);
+            array_shift($lines);
         }
-        \array_shift($lines);
+        array_shift($lines);
     }
-    \preg_match('|^# (.*)|', $lines[0], $matches);
+    preg_match('|^# (.*)|', $lines[0], $matches);
     $title = $matches[1];
-    $description = \str_replace('"', "'", Tools::toString($lines[2]));
+    $description = str_replace('"', "'", Tools::toString($lines[2]));
 
-    \array_unshift(
+    array_unshift(
         $lines,
         '---',
         'title: "'.$title.'"',
@@ -140,38 +140,38 @@ foreach ($orderedfiles as $key => $filename) {
     );
 
     if (isset($orderedfiles[$key + 1])) {
-        $nextfile = 'https://docs.madelineproto.xyz/docs/'.\basename($orderedfiles[$key + 1], '.md').'.html';
-        $lines[\count($lines)] = "\n<a href=\"$nextfile\">Next section</a>";
+        $nextfile = 'https://docs.madelineproto.xyz/docs/'.basename($orderedfiles[$key + 1], '.md').'.html';
+        $lines[count($lines)] = "\n<a href=\"$nextfile\">Next section</a>";
     } else {
-        $lines[\count($lines)] = "\n<a href=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\">Next section</a>";
+        $lines[count($lines)] = "\n<a href=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\">Next section</a>";
     }
-    \file_put_contents($filename, \implode("\n", $lines));
+    file_put_contents($filename, implode("\n", $lines));
 
-    $file = \file_get_contents($filename);
+    $file = file_get_contents($filename);
 
-    \preg_match_all('|( *)\* \[(.*)\]\((.*)\)|', $file, $matches);
-    $file = 'https://docs.madelineproto.xyz/docs/'.\basename($filename, '.md').'.html';
+    preg_match_all('|( *)\* \[(.*)\]\((.*)\)|', $file, $matches);
+    $file = 'https://docs.madelineproto.xyz/docs/'.basename($filename, '.md').'.html';
     $index .= "* [$title]($file)\n";
-    if (\basename($filename) !== 'FEATURES.md') {
+    if (basename($filename) !== 'FEATURES.md') {
         foreach ($matches[1] as $key => $match) {
             $spaces = "  $match";
             $name = $matches[2][$key];
             if ($matches[3][$key][0] === '#') {
                 $url = $file.$matches[3][$key];
-            } elseif (\substr($matches[3][$key], 0, 3) === '../') {
-                $url = 'https://docs.madelineproto.xyz/'.\str_replace('.md', '.html', \substr($matches[3][$key], 3));
+            } elseif (substr($matches[3][$key], 0, 3) === '../') {
+                $url = 'https://docs.madelineproto.xyz/'.str_replace('.md', '.html', substr($matches[3][$key], 3));
             } else {
                 $url = $matches[3][$key];
             }
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {
                 $spaces .= '  ';
-                \preg_match_all('|\* (.*)|', \file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
+                preg_match_all('|\* (.*)|', file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
                 foreach ($smatches[1] as $key => $match) {
-                    if (\str_contains($match, 'You cannot use this method directly')) {
+                    if (str_contains($match, 'You cannot use this method directly')) {
                         continue;
                     }
-                    $match = \str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
+                    $match = str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
                     $index .= "$spaces* ".$match."\n";
                 }
             }
@@ -180,22 +180,21 @@ foreach ($orderedfiles as $key => $filename) {
 }
 
 $logger->logger('Fixing readme...', Logger::NOTICE);
-$readme = \explode('## ', \file_get_contents('README.md'));
+$readme = explode('## ', file_get_contents('README.md'));
 foreach ($readme as &$section) {
-    if (\explode("\n", $section)[0] === 'Documentation') {
+    if (explode("\n", $section)[0] === 'Documentation') {
         $section = "Documentation\n\n".$index."\n";
     }
 }
-$readme = \implode('## ', $readme);
+$readme = implode('## ', $readme);
 
-\file_put_contents('README.md', $readme);
-\file_put_contents('docs/docs/index.md', '---
+file_put_contents('README.md', $readme);
+file_put_contents('docs/docs/index.md', '---
 title: MadelineProto
 description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
 nav_order: 1
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 '.$readme);
-
 
 include 'phpdoc.php';

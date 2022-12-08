@@ -43,7 +43,6 @@ trait MessageHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function encryptSecretMessage(int $chat_id, array $message, Deferred $queuePromise): \Generator
     {
@@ -92,8 +91,6 @@ trait MessageHandler
      *
      * @internal
      *
-     * @param array $message
-     * @return \Generator
      */
     public function handleEncryptedUpdate(array $message): \Generator
     {

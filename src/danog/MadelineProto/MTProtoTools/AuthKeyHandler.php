@@ -18,7 +18,6 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return \Generator
      */
     public function initAuthorization(): \Generator
     {

@@ -52,7 +52,6 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Get maximum connection limit.
      *
-     * @return int
      */
     public function getMaxConnections(): int
     {
@@ -64,7 +63,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @param int $maxConnections Maximum connection limit.
      *
-     * @return self
      */
     public function setMaxConnections(int $maxConnections): self
     {
@@ -76,7 +74,6 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Get idle timeout.
      *
-     * @return int
      */
     public function getIdleTimeout(): int
     {
@@ -88,7 +85,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @param int $idleTimeout Idle timeout.
      *
-     * @return self
      */
     public function setIdleTimeout(int $idleTimeout): self
     {
@@ -100,7 +96,6 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Get database name.
      *
-     * @return string
      */
     public function getDatabase(): string
     {
@@ -112,7 +107,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @param string $database Database name.
      *
-     * @return self
      */
     public function setDatabase($database): self
     {
@@ -124,7 +118,6 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Get username.
      *
-     * @return string
      */
     public function getUsername(): string
     {
@@ -136,7 +129,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @param string $username Username.
      *
-     * @return self
      */
     public function setUsername(string $username): self
     {
@@ -148,7 +140,6 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Get database URI.
      *
-     * @return string
      */
     public function getUri(): string
     {
@@ -160,7 +151,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      *
      * @param string $uri Database URI.
      *
-     * @return self
      */
     public function setUri(string $uri): self
     {

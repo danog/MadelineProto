@@ -64,7 +64,6 @@ class MinDatabase implements TLCallback
     /**
      * List of properties stored in database (memory or external).
      * @see DbPropertiesFactory
-     * @var array
      */
     protected static array $dbProperties = [
         'db' => 'array',
@@ -218,7 +217,6 @@ class MinDatabase implements TLCallback
      *
      * @param float|int $id Peer ID
      *
-     * @return Promise
      * @psalm-return Promise<bool>
      */
     public function hasPeer($id): Promise

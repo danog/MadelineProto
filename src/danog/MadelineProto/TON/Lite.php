@@ -41,7 +41,6 @@ class Lite
     /**
      * Misc settings.
      *
-     * @var SettingsLogger
      */
     private SettingsLogger $settings;
     /**
@@ -65,7 +64,6 @@ class Lite
     /**
      * Construct settings.
      *
-     * @param SettingsLogger $settings
      */
     public function __construct(SettingsLogger $settings)
     {
@@ -82,7 +80,6 @@ class Lite
      *
      * @param string $config Path to config file
      *
-     * @return \Generator
      */
     public function connect(string $config): \Generator
     {
@@ -103,7 +100,6 @@ class Lite
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      *
-     * @return void
      */
     public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
     {
@@ -118,7 +114,6 @@ class Lite
      * @param string $methodName Method name
      * @param array  $args       Arguments
      *
-     * @return \Generator
      */
     public function methodCall(string $methodName, array $args = [], array $aargs = []): \Generator
     {
@@ -131,7 +126,6 @@ class Lite
      *
      * @param callable $func Function
      *
-     * @return \Generator
      */
     public function loop(callable $func): \Generator
     {
@@ -142,7 +136,6 @@ class Lite
      *
      * @param array $parameters Parameters
      *
-     * @return \Generator
      */
     public function botAPItoMTProto(array $parameters): \Generator
     {
@@ -152,7 +145,6 @@ class Lite
     /**
      * Get TL method namespaces.
      *
-     * @return array
      */
     public function getMethodNamespaces(): array
     {

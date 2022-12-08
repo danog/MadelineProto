@@ -86,9 +86,6 @@ class SessionPaths
     /**
      * Serialize object to file.
      *
-     * @param object $object
-     * @param string $path
-     * @return \Generator
      */
     public function serialize(object $object, string $path): \Generator
     {
@@ -120,7 +117,6 @@ class SessionPaths
      *
      * @param string $path Object path, defaults to session path
      *
-     * @return \Generator
      *
      * @psalm-return \Generator<mixed, mixed, mixed, object>
      */
@@ -165,7 +161,6 @@ class SessionPaths
     /**
      * Get session path.
      *
-     * @return string
      */
     public function __toString(): string
     {
@@ -175,7 +170,6 @@ class SessionPaths
     /**
      * Get legacy session path.
      *
-     * @return string
      */
     public function getLegacySessionPath(): string
     {
@@ -185,7 +179,6 @@ class SessionPaths
     /**
      * Get session path.
      *
-     * @return string
      */
     public function getSessionPath(): string
     {
@@ -195,7 +188,6 @@ class SessionPaths
     /**
      * Get lock path.
      *
-     * @return string
      */
     public function getLockPath(): string
     {
@@ -205,7 +197,6 @@ class SessionPaths
     /**
      * Get IPC socket path.
      *
-     * @return string
      */
     public function getIpcPath(): string
     {
@@ -215,7 +206,6 @@ class SessionPaths
     /**
      * Get IPC light state path.
      *
-     * @return string
      */
     public function getIpcStatePath(): string
     {
@@ -236,18 +226,15 @@ class SessionPaths
     /**
      * Store IPC state.
      *
-     * @return \Generator
      */
     public function storeIpcState(IpcState $state): \Generator
     {
         return $this->serialize($state, $this->getIpcStatePath());
     }
 
-
     /**
      * Get light state path.
      *
-     * @return string
      */
     public function getLightStatePath(): string
     {
@@ -266,7 +253,7 @@ class SessionPaths
             return new Success($this->lightState);
         }
         $promise = Tools::call($this->unserialize($this->lightStatePath));
-        $promise->onResolve(function (?\Throwable $e, ?LightState $res) {
+        $promise->onResolve(function (?\Throwable $e, ?LightState $res): void {
             if ($res) {
                 $this->lightState = $res;
             }
@@ -277,7 +264,6 @@ class SessionPaths
     /**
      * Store light state.
      *
-     * @return \Generator
      */
     public function storeLightState(MTProto $state): \Generator
     {
@@ -288,7 +274,6 @@ class SessionPaths
     /**
      * Get IPC callback socket path.
      *
-     * @return string
      */
     public function getIpcCallbackPath(): string
     {
