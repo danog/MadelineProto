@@ -135,9 +135,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }
@@ -181,7 +180,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param array $extra Proxy data
      *
-     * @return void
      */
     public function setExtra($extra): void
     {

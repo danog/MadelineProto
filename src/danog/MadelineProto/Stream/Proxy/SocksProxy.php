@@ -142,9 +142,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }
@@ -181,7 +180,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param array $extra Proxy data
      *
-     * @return void
      */
     public function setExtra($extra): void
     {

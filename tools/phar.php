@@ -41,10 +41,10 @@ class Installer
     public function __construct()
     {
         if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
-            throw new \Exception('MadelineProto requires at least PHP 8.1.');
+            die('MadelineProto requires at least PHP 8.1.'.PHP_EOL);
         }
         if (PHP_INT_SIZE < 8) {
-            throw new \Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.');
+            die('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.'.PHP_EOL);
         }
         $backtrace = \debug_backtrace(0);
         if (\count($backtrace) === 1) {
@@ -178,7 +178,6 @@ class Installer
     /**
      * Unlock phar.
      *
-     * @return void
      */
     public static function unlock(): void
     {

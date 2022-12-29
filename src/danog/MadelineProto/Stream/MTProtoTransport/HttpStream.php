@@ -67,7 +67,6 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param array $extra Proxy parameters
      *
-     * @return void
      */
     public function setExtra($extra): void
     {
@@ -78,9 +77,8 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }

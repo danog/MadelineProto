@@ -69,9 +69,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }
@@ -138,7 +137,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param array $data Keys
      *
-     * @return void
      */
     public function setExtra($data): void
     {

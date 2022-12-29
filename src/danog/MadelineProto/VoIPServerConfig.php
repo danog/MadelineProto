@@ -44,7 +44,6 @@ class VoIPServerConfig
      *
      * @param array $config The settings
      *
-     * @return void
      */
     public static function update(array $config): void
     {
@@ -64,7 +63,6 @@ class VoIPServerConfig
      *
      * @param array $configDefault The settings
      *
-     * @return void
      */
     public static function updateDefault(array $configDefault): void
     {

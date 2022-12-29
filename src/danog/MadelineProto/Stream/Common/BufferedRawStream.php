@@ -80,10 +80,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Async close.
-     *
-     * @return void
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         if ($this->memory_stream) {
             \fclose($this->memory_stream);
@@ -93,6 +91,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->stream->disconnect();
             $this->stream = null;
         }
+        return new Success();
     }
     /**
      * Get read buffer asynchronously.

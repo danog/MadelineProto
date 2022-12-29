@@ -424,7 +424,6 @@ class Magic
      *
      * @param int $code Exit code
      *
-     * @return void
      */
     public static function shutdown(int $code = 0): void
     {

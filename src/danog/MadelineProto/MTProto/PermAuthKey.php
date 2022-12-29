@@ -56,7 +56,6 @@ class PermAuthKey extends AuthKey
      *
      * @param boolean $authorized Whether we are authorized
      *
-     * @return void
      */
     public function authorized(bool $authorized): void
     {

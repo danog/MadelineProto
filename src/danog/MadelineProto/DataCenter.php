@@ -161,7 +161,6 @@ class DataCenter
      *
      * @param array $saved Saved auth array
      *
-     * @return void
      */
     public function setDataCenterConnections(array $saved): void
     {
@@ -201,7 +200,6 @@ class DataCenter
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
      *
-     * @return void
      */
     public function __magic_construct($API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null): void
     {

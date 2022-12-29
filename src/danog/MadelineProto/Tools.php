@@ -821,7 +821,6 @@ abstract class Tools extends StrTools
      *
      * @param string $message Message
      *
-     * @return void
      */
     public static function closeConnection($message): void
     {

@@ -159,7 +159,6 @@ class Connection
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
      *
-     * @return void
      */
     public function needReconnect(bool $needsReconnect): void
     {
@@ -197,7 +196,6 @@ class Connection
     /**
      * Tell the class that we have read a chunk of data from the socket.
      *
-     * @return void
      */
     public function haveRead(): void
     {
@@ -214,7 +212,6 @@ class Connection
     /**
      * Indicate a received HTTP response.
      *
-     * @return void
      */
     public function httpReceived(): void
     {
@@ -232,7 +229,6 @@ class Connection
     /**
      * Indicate a sent HTTP request.
      *
-     * @return void
      */
     public function httpSent(): void
     {
@@ -519,7 +515,6 @@ class Connection
     /**
      * Flush pending packets.
      *
-     * @return void
      */
     public function flush(): void
     {
@@ -530,7 +525,6 @@ class Connection
     /**
      * Resume HttpWaiter.
      *
-     * @return void
      */
     public function pingHttpWaiter(): void
     {
@@ -547,7 +541,6 @@ class Connection
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
      *
-     * @return void
      */
     public function setExtra($extra, int $id): void
     {
@@ -577,7 +570,6 @@ class Connection
      *
      * @param bool $temporary Whether the disconnection is temporary, triggered by the reconnect method
      *
-     * @return void
      */
     public function disconnect(bool $temporary = false): void
     {

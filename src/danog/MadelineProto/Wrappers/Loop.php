@@ -163,7 +163,6 @@ trait Loop
     /**
      * Stop update loop.
      *
-     * @return void
      */
     public function stop(): void
     {
@@ -173,7 +172,6 @@ trait Loop
     /**
      * Restart update loop.
      *
-     * @return void
      */
     public function restart(): void
     {

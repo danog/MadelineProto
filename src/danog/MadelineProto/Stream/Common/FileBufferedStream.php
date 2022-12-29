@@ -23,6 +23,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\File\File;
 use Amp\Promise;
 use Amp\Socket\Socket;
+use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
@@ -88,14 +89,13 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     }
     /**
      * Async close.
-     *
-     * @return void
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         if ($this->stream) {
             $this->stream = null;
         }
+        return new Success();
     }
     /**
      * Get read buffer asynchronously.
@@ -159,7 +159,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      * Set file handle.
      *
      * @param File $extra
-     * @return void
      */
     public function setExtra($extra): void
     {

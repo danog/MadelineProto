@@ -46,7 +46,6 @@ trait PrettyException
      * Update TL trace.
      *
      *
-     * @return void
      */
     public function updateTLTrace(array $trace): void
     {
@@ -79,7 +78,6 @@ trait PrettyException
      * @param string $init  Method name
      * @param array  $trace Async trace
      *
-     * @return void
      */
     public function prettifyTL(string $init = '', array $trace = null): void
     {

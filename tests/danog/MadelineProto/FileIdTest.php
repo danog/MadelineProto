@@ -37,7 +37,6 @@ class FileIdTest extends MadelineTestCase
      *
      * @throws PHPUnit\Framework\AssertionFailedError
      *
-     * @return void
      */
     public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, $message = ''): void
     {

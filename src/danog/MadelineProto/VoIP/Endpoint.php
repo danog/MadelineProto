@@ -79,12 +79,13 @@ class Endpoint
      * Disconnect from endpoint.
      *
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         if ($this->socket !== null) {
             $this->socket->close();
             $this->socket = null;
         }
+        return new Success();
     }
     /**
      * Read packet.

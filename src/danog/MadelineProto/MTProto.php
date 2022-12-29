@@ -216,6 +216,10 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     const INFO_TYPE_ALL = 3;
     /**
+     * Whether to generate all usernames.
+     */
+    const INFO_TYPE_USERNAMES = 4;
+    /**
      * @internal
      */
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
@@ -593,7 +597,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param Settings|SettingsEmpty $settings Settings
      * @param ?APIWrapper            $wrapper  API wrapper
      *
-     * @return void
      */
     public function __magic_construct(SettingsAbstract $settings, ?APIWrapper $wrapper = null): void
     {
@@ -813,7 +816,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             while (yield $iterator->advance()) {
                 [$id, $chat] = $iterator->getCurrent();
                 if (isset($chat['username'])) {
-                    $this->usernames[\strtolower($chat['username'])] = $this->getId($chat);
+                    $this->usernames[\strtolower($chat['username'])] = $id;
+                }
+                foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
+                    $this->usernames[\strtolower($username)] = $id;
                 }
             }
             $this->logger('Cache filled.', Logger::WARNING);
@@ -924,7 +930,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @internal
      *
-     * @return void
      */
     public function serialize(): void
     {
@@ -935,7 +940,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Start all internal loops.
      *
-     * @return void
      */
     private function startLoops(): void
     {
@@ -976,7 +980,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Stop all internal loops.
      *
-     * @return void
      */
     private function stopLoops(): void
     {
@@ -2033,6 +2036,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         return \array_merge(
             \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'addChat']]),
             \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]),
+            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [[$this, 'addFullChat']]),
             ['help.support' => [[$this, 'addSupport']]],
             ['config' => [[$this, 'addConfig']]]
         );

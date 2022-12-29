@@ -48,7 +48,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Enable read hashing.
      *
-     * @return void
      */
     public function startReadHash(): void
     {
@@ -59,7 +58,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $after The number of bytes to read before checking the hash
      *
-     * @return void
      */
     public function checkReadHash(int $after): void
     {
@@ -91,7 +89,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Enable write hashing.
      *
-     * @return void
      */
     public function startWriteHash(): void
     {
@@ -102,7 +99,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $after The number of bytes to read before writing the hash
      *
-     * @return void
      */
     public function checkWriteHash(int $after): void
     {
@@ -164,7 +160,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param string $hash Algorithm name
      *
-     * @return void
      */
     public function setExtra($hash): void
     {
@@ -195,9 +190,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }

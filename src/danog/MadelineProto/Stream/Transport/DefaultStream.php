@@ -26,6 +26,7 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
+use Amp\Success;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -101,10 +102,8 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * Close.
-     *
-     * @return void
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         try {
             if ($this->stream) {
@@ -114,11 +113,11 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         } catch (\Throwable $e) {
             \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
+        return new Success();
     }
     /**
      * Close.
      *
-     * @return void
      */
     public function close(): void
     {

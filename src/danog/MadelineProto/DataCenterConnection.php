@@ -137,7 +137,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
      *
-     * @return void
      */
     public function needReconnect(bool $needsReconnect): void
     {
@@ -392,7 +391,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param bool $pfs Whether to bind using PFS
      *
-     * @return void
      */
     public function bind(bool $pfs = true): void
     {
@@ -424,7 +422,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param boolean $authorized Whether we are authorized
      *
-     * @return void
      */
     public function authorized(bool $authorized): void
     {
@@ -439,7 +436,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param string $dc Main DC ID
      *
-     * @return void
      */
     public function link(string $dc): void
     {
@@ -449,7 +445,6 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Reset MTProto sessions.
      *
-     * @return void
      */
     public function resetSession(): void
     {
@@ -460,7 +455,6 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Create MTProto sessions if needed.
      *
-     * @return void
      */
     public function createSession(): void
     {
@@ -559,7 +553,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param integer $id Connection ID
      *
-     * @return void
      */
     public function signalDisconnect(int $id): void
     {
@@ -614,7 +607,6 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Restore backed up messages.
      *
-     * @return void
      */
     public function restoreBackup(): void
     {
@@ -691,7 +683,6 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Even out round robin values.
      *
-     * @return void
      */
     public function even(): void
     {
@@ -720,7 +711,6 @@ class DataCenterConnection implements JsonSerializable
      * @param boolean $reading Whether we're busy reading
      * @param int     $x       Connection ID
      *
-     * @return void
      */
     public function reading(bool $reading, int $x): void
     {
@@ -735,7 +725,6 @@ class DataCenterConnection implements JsonSerializable
      * @param boolean $writing Whether we're busy writing
      * @param int     $x       Connection ID
      *
-     * @return void
      */
     public function writing(bool $writing, int $x): void
     {
@@ -749,7 +738,6 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param MTProto $API Main instance
      *
-     * @return void
      */
     public function setExtra($API): void
     {

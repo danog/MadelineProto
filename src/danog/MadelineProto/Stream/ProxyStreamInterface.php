@@ -31,7 +31,6 @@ interface ProxyStreamInterface
      *
      * @param mixed $extra Proxy data
      *
-     * @return void
      */
     public function setExtra($extra): void;
 }

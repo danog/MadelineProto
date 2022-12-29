@@ -55,9 +55,8 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }

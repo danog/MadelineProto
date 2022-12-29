@@ -67,7 +67,6 @@ abstract class AuthKey implements JsonSerializable
      *
      * @param string $authKey Authorization key
      *
-     * @return void
      */
     public function setAuthKey(string $authKey): void
     {
@@ -106,7 +105,6 @@ abstract class AuthKey implements JsonSerializable
      *
      * @param string $salt Server salt
      *
-     * @return void
      */
     public function setServerSalt(string $salt): void
     {
@@ -141,7 +139,6 @@ abstract class AuthKey implements JsonSerializable
      *
      * @param boolean $authorized Whether we are authorized
      *
-     * @return void
      */
     abstract public function authorized(bool $authorized): void;
 }

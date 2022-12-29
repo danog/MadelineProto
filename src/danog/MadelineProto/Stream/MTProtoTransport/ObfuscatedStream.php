@@ -73,7 +73,6 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      *
      * @param array $extra Extra
      *
-     * @return void
      */
     public function setExtra($extra): void
     {

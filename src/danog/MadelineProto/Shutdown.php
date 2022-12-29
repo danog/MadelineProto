@@ -45,7 +45,6 @@ class Shutdown
     /**
      * Function to be called on shutdown.
      *
-     * @return void
      */
     private static function shutdown(): void
     {

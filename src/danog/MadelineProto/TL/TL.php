@@ -129,7 +129,6 @@ class TL
      * @param TLSchema     $files   Scheme files
      * @param TLCallback[] $objects TL Callback objects
      *
-     * @return void
      */
     public function init(TLSchema $files, array $objects = []): void
     {
@@ -349,7 +348,6 @@ class TL
      *
      * @param TLCallback[] $objects TL callbacks
      *
-     * @return void
      */
     public function updateCallbacks(array $objects): void
     {

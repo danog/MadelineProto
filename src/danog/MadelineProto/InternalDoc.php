@@ -1578,7 +1578,7 @@ interface contacts
 interface messages
 {
     /**
-     * Returns the list of messages by their IDs.
+     * Please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html).
      *
      * Parameters:
      * * `[InputMessage]` **id** - Message ID list
@@ -1608,7 +1608,7 @@ interface messages
     public function getDialogs($params);
 
     /**
-     * Returns the conversation history with one interlocutor / within a chat.
+     * Please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html).
      *
      * Parameters:
      * * `InputPeer` **peer**        - Target peer
@@ -4561,7 +4561,7 @@ interface channels
     public function reportSpam($params);
 
     /**
-     * Get [channel/supergroup](https://core.telegram.org/api/channel) messages.
+     * Please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html).
      *
      * Parameters:
      * * `InputChannel`   **channel** - Channel/supergroup
@@ -6219,7 +6219,7 @@ class InternalDoc extends APIFactory
      * @param mixed $params Params
      *
       * @return \Amp\Promise
- */
+     */
     public function MTProtoToTd(&$params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -6230,7 +6230,7 @@ class InternalDoc extends APIFactory
      * @param mixed $params Params
      *
       * @return \Amp\Promise
- */
+     */
     public function MTProtoToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -6241,7 +6241,7 @@ class InternalDoc extends APIFactory
      * @param array $call Call
      *
       * @return \Amp\Promise
- */
+     */
     public function acceptCall(array $call, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$call, $extra]);
@@ -6252,7 +6252,7 @@ class InternalDoc extends APIFactory
      * @param array $params Secret chat ID
      *
       * @return \Amp\Promise
- */
+     */
     public function acceptSecretChat($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -6261,7 +6261,7 @@ class InternalDoc extends APIFactory
      * Accept terms of service update.
      *
       * @return \Amp\Promise
- */
+     */
     public function acceptTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -6273,7 +6273,7 @@ class InternalDoc extends APIFactory
      *
      * @throws \danog\MadelineProto\Exception
       * @return \Amp\Promise
- */
+     */
     public function addUser(array $user, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
@@ -6287,7 +6287,7 @@ class InternalDoc extends APIFactory
      * @psalm-suppress InvalidScope
      *
       * @return Amp\Promise
- */
+     */
     public static function after($a, $b)
     {
         return \danog\MadelineProto\Tools::after($a, $b);
@@ -6299,7 +6299,7 @@ class InternalDoc extends APIFactory
      * @param array<\Generator|Promise> $promises Promises
      *
       * @return Amp\Promise
- */
+     */
     public static function all(array $promises)
     {
         return \danog\MadelineProto\Tools::all($promises);
@@ -6310,7 +6310,7 @@ class InternalDoc extends APIFactory
      * @param array<Promise|\Generator> $promises Promises
      *
       * @return Amp\Promise
- */
+     */
     public static function any(array $promises)
     {
         return \danog\MadelineProto\Tools::any($promises);
@@ -6320,7 +6320,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed ...$params Params
      *
- */
+     */
     public static function arr(...$params): array
     {
         return \danog\MadelineProto\Tools::arr(...$params);
@@ -6330,7 +6330,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $data Data to decode
      *
- */
+     */
     public static function base64urlDecode(string $data): string
     {
         return \danog\MadelineProto\Tools::base64urlDecode($data);
@@ -6340,7 +6340,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $data Data to encode
      *
- */
+     */
     public static function base64urlEncode(string $data): string
     {
         return \danog\MadelineProto\Tools::base64urlEncode($data);
@@ -6351,7 +6351,7 @@ class InternalDoc extends APIFactory
      * @param array $arguments Arguments
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function botAPIToMTProto(array $arguments)
     {
         return $this->__call(__FUNCTION__, [$arguments]);
@@ -6362,7 +6362,7 @@ class InternalDoc extends APIFactory
      * @param string $token Bot token
      *
       * @return \Amp\Promise
- */
+     */
     public function botLogin(string $token, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$token, $extra]);
@@ -6377,7 +6377,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return Promise<TReturn>
       * @return Amp\Promise
- */
+     */
     public static function call($promise)
     {
         return \danog\MadelineProto\Tools::call($promise);
@@ -6402,7 +6402,7 @@ class InternalDoc extends APIFactory
      *
      * @param \Generator|Promise $promise Promise to resolve
      *
- */
+     */
     public static function callForkDefer($promise): void
     {
         \danog\MadelineProto\Tools::callForkDefer($promise);
@@ -6424,7 +6424,7 @@ class InternalDoc extends APIFactory
      * Will throw a \danog\MadelineProto\Exception if a new TOS is available.
      *
       * @return \Amp\Promise
- */
+     */
     public function checkTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -6433,7 +6433,7 @@ class InternalDoc extends APIFactory
      * Cleanup memory and session file.
      *
       * @return \Amp\Promise
- */
+     */
     public function cleanup(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -6443,11 +6443,10 @@ class InternalDoc extends APIFactory
      *
      * @param string $message Message
      *
-     * @return void
      */
-    public static function closeConnection($message)
+    public static function closeConnection($message): void
     {
-        return \danog\MadelineProto\Tools::closeConnection($message);
+        \danog\MadelineProto\Tools::closeConnection($message);
     }
     /**
      * Complete 2FA login.
@@ -6455,7 +6454,7 @@ class InternalDoc extends APIFactory
      * @param string $password Password
      *
       * @return \Amp\Promise
- */
+     */
     public function complete2faLogin(string $password, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$password, $extra]);
@@ -6466,7 +6465,7 @@ class InternalDoc extends APIFactory
      * @param array $params Params
      *
       * @return \Amp\Promise
- */
+     */
     public function completeCall(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -6477,7 +6476,7 @@ class InternalDoc extends APIFactory
      * @param string $code Login code
      *
       * @return \Amp\Promise
- */
+     */
     public function completePhoneLogin($code, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$code, $extra]);
@@ -6489,7 +6488,7 @@ class InternalDoc extends APIFactory
      * @param string $last_name  Last name
      *
       * @return \Amp\Promise
- */
+     */
     public function completeSignup(string $first_name, string $last_name = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$first_name, $last_name, $extra]);
@@ -6500,7 +6499,7 @@ class InternalDoc extends APIFactory
      * @param array $params Params
      *
       * @return \Amp\Promise
- */
+     */
     public function confirmCall(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -6511,7 +6510,7 @@ class InternalDoc extends APIFactory
      * @param boolean $reconnectAll Whether to reconnect to all DCs
      *
       * @return \Amp\Promise
- */
+     */
     public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
@@ -6522,7 +6521,7 @@ class InternalDoc extends APIFactory
      * THIS WILL DELETE YOUR ACCOUNT!
      *
       * @return \Amp\Promise
- */
+     */
     public function declineTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -6535,7 +6534,7 @@ class InternalDoc extends APIFactory
      * @param boolean $need_debug Need debug?
      *
       * @return \Amp\Promise
- */
+     */
     public function discardCall(array $call, array $reason, array $rating = [
     ], bool $need_debug = true, array $extra = [])
     {
@@ -6547,7 +6546,7 @@ class InternalDoc extends APIFactory
      * @param int $chat Secret chat ID
      *
       * @return \Amp\Promise
- */
+     */
     public function discardSecretChat(int $chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
@@ -6564,7 +6563,7 @@ class InternalDoc extends APIFactory
      * @param ?string $name Name of file to download, required for bot API file IDs.
      *
       * @return \Amp\Promise
- */
+     */
     public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $name, $mime, $extra]);
@@ -6586,7 +6585,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<true>
       * @return \Amp\Promise
- */
+     */
     public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
@@ -6601,7 +6600,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<false|string>
       * @return \Amp\Promise
- */
+     */
     public function downloadToDir($messageMedia, $dir, $cb = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $dir, $cb, $extra]);
@@ -6653,7 +6652,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $stream, $cb, $offset, $end, $extra]);
@@ -6664,7 +6663,7 @@ class InternalDoc extends APIFactory
      * @param string $string Message to echo
      *
       * @return Amp\Promise
- */
+     */
     public static function echo(string $string)
     {
         return \danog\MadelineProto\Tools::echo($string);
@@ -6674,7 +6673,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $what Array
      *
- */
+     */
     public static function end(array $what)
     {
         return \danog\MadelineProto\Tools::end($what);
@@ -6685,7 +6684,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<array{0: int|string, 1: string}>
       * @return \Amp\Promise
- */
+     */
     public function exportAuthorization(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -6706,7 +6705,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<array>
       * @return \Amp\Promise
- */
+     */
     public function extractMessage(array $updates, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$updates, $extra]);
@@ -6716,7 +6715,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<array>
       * @return \Amp\Promise
- */
+     */
     public function extractMessageUpdate(array $updates, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$updates, $extra]);
@@ -6726,7 +6725,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<array<array>>
       * @return \Amp\Promise
- */
+     */
     public function extractUpdates(array $updates, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$updates, $extra]);
@@ -6739,7 +6738,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<string>
       * @return \Amp\Promise
- */
+     */
     public function fileGetContents(string $url, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $extra]);
@@ -6750,7 +6749,7 @@ class InternalDoc extends APIFactory
      * @param array<Promise|\Generator> $promises Promises
      *
       * @return Amp\Promise
- */
+     */
     public static function first(array $promises)
     {
         return \danog\MadelineProto\Tools::first($promises);
@@ -6776,7 +6775,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $id Bot API channel ID
      *
- */
+     */
     public static function fromSupergroup($id): int
     {
         return \danog\MadelineProto\MTProto::fromSupergroup($id);
@@ -6816,7 +6815,7 @@ class InternalDoc extends APIFactory
      * Get full list of MTProto and API methods.
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getAllMethods()
     {
         return $this->__call(__FUNCTION__, []);
@@ -6825,7 +6824,7 @@ class InternalDoc extends APIFactory
      * Get authorization info.
      *
       * @psalm-return int|\Amp\Promise<int>
- */
+     */
     public function getAuthorization()
     {
         return $this->__call(__FUNCTION__, []);
@@ -6834,7 +6833,7 @@ class InternalDoc extends APIFactory
      * Get cached server-side config.
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getCachedConfig()
     {
         return $this->__call(__FUNCTION__, []);
@@ -6845,7 +6844,7 @@ class InternalDoc extends APIFactory
      * @param int $call Call ID
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getCall($call)
     {
         return $this->__call(__FUNCTION__, [$call]);
@@ -6856,7 +6855,7 @@ class InternalDoc extends APIFactory
      * @param string $datacenter DC ID
      *
       * @return \Amp\Promise
- */
+     */
     public function getCdnConfig(string $datacenter, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
@@ -6868,7 +6867,7 @@ class InternalDoc extends APIFactory
      * @param array $options Options for method call
      *
       * @return \Amp\Promise
- */
+     */
     public function getConfig(array $config = [
     ], array $options = [
     ], array $extra = [])
@@ -6879,7 +6878,7 @@ class InternalDoc extends APIFactory
      * Get async DNS client.
      *
       * @psalm-return \Amp\Dns\Resolver|\Amp\Promise<\Amp\Dns\Resolver>
- */
+     */
     public function getDNSClient()
     {
         return $this->__call(__FUNCTION__, []);
@@ -6919,7 +6918,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<list<mixed>>
       * @return \Amp\Promise
- */
+     */
     public function getDialogs(bool $force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
@@ -6945,7 +6944,7 @@ class InternalDoc extends APIFactory
      * Get event handler.
      *
       * @psalm-return \danog\MadelineProto\EventHandler|\Amp\Promise<\danog\MadelineProto\EventHandler>
- */
+     */
     public function getEventHandler()
     {
         return $this->__call(__FUNCTION__, []);
@@ -6956,7 +6955,7 @@ class InternalDoc extends APIFactory
      * @param mixed  $location File location
      * @param string $default  Default extension
      *
- */
+     */
     public static function getExtensionFromLocation($location, string $default): string
     {
         return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromLocation($location, $default);
@@ -6966,7 +6965,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $mime MIME type
      *
- */
+     */
     public static function getExtensionFromMime(string $mime): string
     {
         return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromMime($mime);
@@ -6999,7 +6998,7 @@ class InternalDoc extends APIFactory
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      *
       * @return \Amp\Promise
- */
+     */
     public function getFullDialogs(bool $force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
@@ -7023,7 +7022,7 @@ class InternalDoc extends APIFactory
      * Get async HTTP client.
      *
       * @psalm-return \Amp\Http\Client\HttpClient|\Amp\Promise<\Amp\Http\Client\HttpClient>
- */
+     */
     public function getHTTPClient()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7032,7 +7031,7 @@ class InternalDoc extends APIFactory
      * Get current password hint.
      *
       * @psalm-return string|\Amp\Promise<string>
- */
+     */
     public function getHint()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7088,7 +7087,7 @@ class InternalDoc extends APIFactory
     /**
      * Get logger.
       * @psalm-return \danog\MadelineProto\Logger|\Amp\Promise<\danog\MadelineProto\Logger>
- */
+     */
     public function getLogger()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7097,7 +7096,7 @@ class InternalDoc extends APIFactory
      * Get TL namespaces.
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getMethodNamespaces()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7106,7 +7105,7 @@ class InternalDoc extends APIFactory
      * Get namespaced methods (method => namespace).
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getMethodsNamespaced()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7116,7 +7115,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $buffer Buffer
      *
- */
+     */
     public static function getMimeFromBuffer(string $buffer): string
     {
         return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromBuffer($buffer);
@@ -7127,7 +7126,7 @@ class InternalDoc extends APIFactory
      * @param string $extension File extension
      * @param string $default   Default mime type
      *
- */
+     */
     public static function getMimeFromExtension(string $extension, string $default): string
     {
         return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromExtension($extension, $default);
@@ -7137,7 +7136,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $file File
      *
- */
+     */
     public static function getMimeFromFile(string $file): string
     {
         return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromFile($file);
@@ -7161,7 +7160,7 @@ class InternalDoc extends APIFactory
     /**
      * Get PSR logger.
       * @psalm-return \Psr\Log\LoggerInterface|\Amp\Promise<\Psr\Log\LoggerInterface>
- */
+     */
     public function getPsrLogger()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7185,7 +7184,7 @@ class InternalDoc extends APIFactory
      * @param array|int $chat Secret chat ID
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function getSecretChat($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
@@ -7196,7 +7195,7 @@ class InternalDoc extends APIFactory
      * Use fullGetSelf to bypass the cache.
      *
       * @psalm-return array|false|\Amp\Promise<array|false>
- */
+     */
     public function getSelf()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7205,7 +7204,7 @@ class InternalDoc extends APIFactory
      * Return current settings.
      *
       * @psalm-return \danog\MadelineProto\Settings|\Amp\Promise<\danog\MadelineProto\Settings>
- */
+     */
     public function getSettings()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7218,7 +7217,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
       * @return \Amp\Promise
- */
+     */
     public function getSponsoredMessages($peer, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$peer, $extra]);
@@ -7227,7 +7226,7 @@ class InternalDoc extends APIFactory
      * Get TL serializer.
      *
       * @psalm-return \danog\MadelineProto\TL\TL|\Amp\Promise<\danog\MadelineProto\TL\TL>
- */
+     */
     public function getTL()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7241,7 +7240,7 @@ class InternalDoc extends APIFactory
      * @psalm-suppress InvalidScope
      *
      * @access public
- */
+     */
     public static function getVar($obj, string $var)
     {
         return \danog\MadelineProto\Tools::getVar($obj, $var);
@@ -7250,7 +7249,7 @@ class InternalDoc extends APIFactory
      * Get a message to show to the user when starting the bot.
      *
       * @psalm-return string|\Amp\Promise<string>
- */
+     */
     public function getWebMessage(string $message)
     {
         return $this->__call(__FUNCTION__, [$message]);
@@ -7259,7 +7258,7 @@ class InternalDoc extends APIFactory
      * Get web template.
      *
       * @psalm-return string|\Amp\Promise<string>
- */
+     */
     public function getWebTemplate()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7311,7 +7310,7 @@ class InternalDoc extends APIFactory
      * @psalm-suppress InvalidScope
      *
      * @access public
- */
+     */
     public static function hasVar($obj, string $var): bool
     {
         return \danog\MadelineProto\Tools::hasVar($obj, $var);
@@ -7323,7 +7322,7 @@ class InternalDoc extends APIFactory
      * @param int $mainDcID Main DC ID
      *
       * @return \Amp\Promise
- */
+     */
     public function importAuthorization(array $authorization, int $mainDcID, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$authorization, $mainDcID, $extra]);
@@ -7343,7 +7342,7 @@ class InternalDoc extends APIFactory
      * Initialize self-restart hack.
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function initSelfRestart(): void
     {
         $this->__call(__FUNCTION__, []);
@@ -7389,7 +7388,7 @@ class InternalDoc extends APIFactory
     /**
      * Returns whether the current user is a premium user, cached.
       * @psalm-return bool|\Amp\Promise<bool>
- */
+     */
     public function isPremium()
     {
         return $this->__call(__FUNCTION__, []);
@@ -7413,7 +7412,7 @@ class InternalDoc extends APIFactory
      * @param string $file  File where the message originated
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
         $this->__call(__FUNCTION__, [$param, $level, $file]);
@@ -7422,7 +7421,7 @@ class InternalDoc extends APIFactory
      * Log out currently logged in user.
      *
       * @return \Amp\Promise
- */
+     */
     public function logout(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -7433,7 +7432,7 @@ class InternalDoc extends APIFactory
      * @param callable|null $callback Async callable to run
      *
       * @return \Amp\Promise
- */
+     */
     public function loop($callback = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$callback, $extra]);
@@ -7442,7 +7441,7 @@ class InternalDoc extends APIFactory
      * Start MadelineProto's update handling loop in background.
      *
       * @return Amp\Promise
- */
+     */
     public function loopFork(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -7452,7 +7451,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $hwat String to escape
      *
- */
+     */
     public static function markdownEscape(string $hwat): string
     {
         return \danog\MadelineProto\StrTools::markdownEscape($hwat);
@@ -7487,7 +7486,7 @@ class InternalDoc extends APIFactory
      * @param integer $offset Offset
      * @param ?int    $length Length
      *
- */
+     */
     public static function mbSubstr(string $text, int $offset, $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
@@ -7504,7 +7503,7 @@ class InternalDoc extends APIFactory
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
       * @return \Amp\Promise
- */
+     */
     public function methodCall(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
@@ -7522,7 +7521,7 @@ class InternalDoc extends APIFactory
      * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
       * @return \Amp\Promise
- */
+     */
     public function methodCallWrite(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
@@ -7535,7 +7534,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $method Method name
      *
- */
+     */
     public static function methodEscape(string $method): string
     {
         return \danog\MadelineProto\StrTools::methodEscape($method);
@@ -7545,7 +7544,7 @@ class InternalDoc extends APIFactory
      *
      * @param float $value Value to convert
      *
- */
+     */
     public static function packDouble(float $value): string
     {
         return \danog\MadelineProto\Tools::packDouble($value);
@@ -7555,7 +7554,7 @@ class InternalDoc extends APIFactory
      *
      * @param integer $value Value to convert
      *
- */
+     */
     public static function packSignedInt(int $value): string
     {
         return \danog\MadelineProto\Tools::packSignedInt($value);
@@ -7565,7 +7564,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $value Value to convert
      *
- */
+     */
     public static function packSignedLong(int $value): string
     {
         return \danog\MadelineProto\Tools::packSignedLong($value);
@@ -7575,7 +7574,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $value Value
      *
- */
+     */
     public static function packUnsignedInt(int $value): string
     {
         return \danog\MadelineProto\Tools::packUnsignedInt($value);
@@ -7588,7 +7587,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<bool>
       * @return \Amp\Promise
- */
+     */
     public function peerIsset($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
@@ -7600,7 +7599,7 @@ class InternalDoc extends APIFactory
      * @param integer $sms_type SMS type
      *
       * @return \Amp\Promise
- */
+     */
     public function phoneLogin($number, $sms_type = 5, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$number, $sms_type, $extra]);
@@ -7634,7 +7633,7 @@ class InternalDoc extends APIFactory
      *
      * @param integer $modulus Modulus
      *
- */
+     */
     public static function randomInt(int $modulus = 0): int
     {
         return \danog\MadelineProto\Tools::randomInt($modulus);
@@ -7655,7 +7654,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id The peer to refresh
       * @return \Amp\Promise
- */
+     */
     public function refreshFullPeerCache($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
@@ -7665,7 +7664,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id The peer to refresh
       * @return \Amp\Promise
- */
+     */
     public function refreshPeerCache($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
@@ -7676,7 +7675,7 @@ class InternalDoc extends APIFactory
      * @param int $chat Secret chat to rekey
      *
       * @return \Amp\Promise
- */
+     */
     public function rekey(int $chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
@@ -7688,7 +7687,7 @@ class InternalDoc extends APIFactory
      * @param string $parseMode Parse mode
      *
       * @return \Amp\Promise
- */
+     */
     public function report(string $message, string $parseMode = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message, $parseMode, $extra]);
@@ -7699,7 +7698,7 @@ class InternalDoc extends APIFactory
      * @param mixed $user User
      *
       * @return \Amp\Promise
- */
+     */
     public function requestCall($user, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
@@ -7710,7 +7709,7 @@ class InternalDoc extends APIFactory
      * @param mixed $user User to start secret chat with
      *
       * @return \Amp\Promise
- */
+     */
     public function requestSecretChat($user, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
@@ -7719,7 +7718,7 @@ class InternalDoc extends APIFactory
      * Reset the update state and fetch all updates from the beginning.
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function resetUpdateState(): void
     {
         $this->__call(__FUNCTION__, []);
@@ -7730,7 +7729,7 @@ class InternalDoc extends APIFactory
      * @param string $username Username
      *
       * @return \Amp\Promise
- */
+     */
     public function resolveUsername(string $username, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$username, $extra]);
@@ -7738,11 +7737,11 @@ class InternalDoc extends APIFactory
     /**
      * Restart update loop.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
      */
-    public function restart(array $extra = [])
+    public function restart(): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Rethrow error catched in strand.
@@ -7752,7 +7751,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
- */
+     */
     public static function rethrow(\Throwable $e, $file = ''): void
     {
         \danog\MadelineProto\Tools::rethrow($e, $file);
@@ -7762,7 +7761,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Data to decode
      *
- */
+     */
     public static function rleDecode(string $string): string
     {
         return \danog\MadelineProto\Tools::rleDecode($string);
@@ -7772,7 +7771,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Data to encode
      *
- */
+     */
     public static function rleEncode(string $string): string
     {
         return \danog\MadelineProto\Tools::rleEncode($string);
@@ -7793,7 +7792,7 @@ class InternalDoc extends APIFactory
      *
      * CALLED ONLY ON SHUTDOWN.
      *
- */
+     */
     public static function serializeAll(): void
     {
         \danog\MadelineProto\MTProto::serializeAll();
@@ -7804,7 +7803,7 @@ class InternalDoc extends APIFactory
      * @param callable $callback Callback
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function setCallback($callback): void
     {
         $this->__call(__FUNCTION__, [$callback]);
@@ -7815,7 +7814,7 @@ class InternalDoc extends APIFactory
      * @param class-string<EventHandler> $eventHandler Event handler
      *
       * @return \Amp\Promise
- */
+     */
     public function setEventHandler(string $eventHandler, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$eventHandler, $extra]);
@@ -7824,7 +7823,7 @@ class InternalDoc extends APIFactory
      * Set NOOP update handler, ignoring all updates.
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function setNoop(): void
     {
         $this->__call(__FUNCTION__, []);
@@ -7835,7 +7834,7 @@ class InternalDoc extends APIFactory
      * @param int|string $userOrId Username(s) or peer ID(s)
      *
       * @return \Amp\Promise
- */
+     */
     public function setReportPeers($userOrId, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$userOrId, $extra]);
@@ -7851,7 +7850,7 @@ class InternalDoc extends APIFactory
      *
      *
      * @access public
- */
+     */
     public static function setVar($obj, string $var, &$val): void
     {
         \danog\MadelineProto\Tools::setVar($obj, $var, $val);
@@ -7862,7 +7861,7 @@ class InternalDoc extends APIFactory
      * @param string $template Template
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function setWebTemplate(string $template): void
     {
         $this->__call(__FUNCTION__, [$template]);
@@ -7874,7 +7873,7 @@ class InternalDoc extends APIFactory
      * @param string $pem_path PEM path for self-signed certificate
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function setWebhook(string $hook_url, string $pem_path = ''): void
     {
         $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
@@ -7883,7 +7882,7 @@ class InternalDoc extends APIFactory
      * Setup logger.
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function setupLogger(): void
     {
         $this->__call(__FUNCTION__, []);
@@ -7894,7 +7893,7 @@ class InternalDoc extends APIFactory
      * @param int|float $time Number of seconds to sleep for
      *
       * @return Amp\Promise
- */
+     */
     public static function sleep($time)
     {
         return \danog\MadelineProto\Tools::sleep($time);
@@ -7906,7 +7905,7 @@ class InternalDoc extends APIFactory
      * @param array<Promise|\Generator> $promises Promises
      *
       * @return Amp\Promise
- */
+     */
     public static function some(array $promises)
     {
         return \danog\MadelineProto\Tools::some($promises);
@@ -7915,7 +7914,7 @@ class InternalDoc extends APIFactory
      * Log in to telegram (via CLI or web).
      *
       * @return \Amp\Promise
- */
+     */
     public function start(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -7923,11 +7922,11 @@ class InternalDoc extends APIFactory
     /**
      * Stop update loop.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
      */
-    public function stop(array $extra = [])
+    public function stop(): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Convert TD to MTProto parameters.
@@ -7945,7 +7944,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Parameters
      *
- */
+     */
     public function tdToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -7957,7 +7956,7 @@ class InternalDoc extends APIFactory
      * @param array $key    Key
      *
       * @psalm-return array|\Amp\Promise<array>
- */
+     */
     public function tdcliToTd(&$params, $key = null)
     {
         return $this->__call(__FUNCTION__, [$params, $key]);
@@ -7969,7 +7968,7 @@ class InternalDoc extends APIFactory
      * @param integer $timeout
      *
       * @return Amp\Promise
- */
+     */
     public static function timeout($promise, int $timeout)
     {
         return \danog\MadelineProto\Tools::timeout($promise, $timeout);
@@ -8004,7 +8003,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $input String
      *
- */
+     */
     public static function toCamelCase(string $input): string
     {
         return \danog\MadelineProto\StrTools::toCamelCase($input);
@@ -8014,7 +8013,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $input String
      *
- */
+     */
     public static function toSnakeCase(string $input): string
     {
         return \danog\MadelineProto\StrTools::toSnakeCase($input);
@@ -8024,7 +8023,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $id MTProto channel ID
      *
- */
+     */
     public static function toSupergroup($id): int
     {
         return \danog\MadelineProto\MTProto::toSupergroup($id);
@@ -8034,7 +8033,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $type String to escape
      *
- */
+     */
     public static function typeEscape(string $type): string
     {
         return \danog\MadelineProto\StrTools::typeEscape($type);
@@ -8044,7 +8043,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $value Value to unpack
      *
- */
+     */
     public static function unpackDouble(string $value): float
     {
         return \danog\MadelineProto\Tools::unpackDouble($value);
@@ -8087,7 +8086,7 @@ class InternalDoc extends APIFactory
      *
      * @param string|int|array $value base256 long
      *
- */
+     */
     public static function unpackSignedLongString($value): string
     {
         return \danog\MadelineProto\Tools::unpackSignedLongString($value);
@@ -8098,7 +8097,7 @@ class InternalDoc extends APIFactory
      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
      *
       * @psalm-return void|\Amp\Promise<void>
- */
+     */
     public function unsetEventHandler(bool $disableUpdateHandling = false): void
     {
         $this->__call(__FUNCTION__, [$disableUpdateHandling]);
@@ -8111,7 +8110,7 @@ class InternalDoc extends APIFactory
      * @param array $params The params
      *
       * @return \Amp\Promise
- */
+     */
     public function update2fa(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -8122,7 +8121,7 @@ class InternalDoc extends APIFactory
      * @param SettingsAbstract $settings Settings
      *
       * @return \Amp\Promise
- */
+     */
     public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$settings, $extra]);
@@ -8138,7 +8137,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function upload($file, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $encrypted, $extra]);
@@ -8153,7 +8152,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function uploadEncrypted($file, string $fileName = '', $cb = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $extra]);
@@ -8175,7 +8174,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
       * @return \Amp\Promise
- */
+     */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $extra]);
@@ -8193,7 +8192,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$stream, $size, $mime, $fileName, $cb, $encrypted, $extra]);
@@ -8208,7 +8207,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function uploadFromTgfile($media, $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
@@ -8225,7 +8224,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-return \Amp\Promise<mixed>
       * @return \Amp\Promise
- */
+     */
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
@@ -8248,7 +8247,7 @@ class InternalDoc extends APIFactory
      * @param \Generator|Promise $promise      The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
      *
- */
+     */
     public static function wait($promise, $ignoreSignal = false)
     {
         return \danog\MadelineProto\Tools::wait($promise, $ignoreSignal);

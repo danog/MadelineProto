@@ -327,7 +327,6 @@ class Logger
      * @param mixed $param Message
      * @param int   $level Logging level
      *
-     * @return void
      */
     public static function log($param, int $level = self::NOTICE): void
     {

@@ -20,7 +20,9 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Http\Client\HttpClientBuilder;
+use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
+use Amp\Success;
 use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Handshake;
@@ -82,12 +84,13 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         try {
             $this->stream->close();
         } catch (\Throwable $e) {
         }
+        return new Success();
     }
     public function readGenerator(): \Generator
     {

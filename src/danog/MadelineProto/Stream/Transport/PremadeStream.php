@@ -23,6 +23,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Socket\Socket;
+use Amp\Success;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
@@ -79,10 +80,8 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * Async close.
-     *
-     * @return void
      */
-    public function disconnect(): void
+    public function disconnect(): Promise
     {
         try {
             if ($this->stream) {
@@ -94,6 +93,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
         } catch (\Throwable $e) {
             \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
+        return new Success();
     }
     public function close(): void
     {

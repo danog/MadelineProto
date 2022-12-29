@@ -113,7 +113,6 @@ class Logger extends SettingsAbstract
     /**
      * Initialize global logging.
      *
-     * @return void
      */
     private function init(): void
     {

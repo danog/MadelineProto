@@ -83,7 +83,6 @@ class AnnotationsBuilder
      * Insert properties
      * save the file with new content.
      *
-     * @return void
      */
     private function setProperties(): void
     {

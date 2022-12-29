@@ -73,7 +73,6 @@ class CombinedUpdatesState
      *
      * @param int $channel Channel whose state should be removed
      *
-     * @return void
      */
     public function remove(int $channel): void
     {

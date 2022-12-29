@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\Stream\ADNLTransport;
 
-use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -52,9 +51,8 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Async close.
      *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): \Amp\Promise
     {
         return $this->stream->disconnect();
     }

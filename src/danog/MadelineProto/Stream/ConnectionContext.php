@@ -336,7 +336,6 @@ class ConnectionContext
      *
      * @param callable $callable Read callback
      *
-     * @return void
      */
     public function setReadCallback(callable $callable): void
     {
