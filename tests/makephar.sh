@@ -136,9 +136,9 @@ db mysql
 k
 
 echo "Testing with new version (upgrade)..."
-php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
+php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-81"
 cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
-echo -n "$COMMIT-$php" > "madeline-$php.phar.version"
+echo -n "$COMMIT-81" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
 runTestSimple
@@ -168,8 +168,8 @@ input=$PWD
 cd "$madelinePath"
 
 if [ "$TAG" != "7777" ]; then
-    cp "$input/madeline$php$branch.phar" "madeline$php.phar"
+    cp "$input/madeline$php$branch.phar" "madeline81.phar"
     git remote add hub https://github.com/danog/MadelineProto
-    gh release upload "$TAG" "madeline$php.phar"
-    rm "madeline$php.phar"
+    gh release upload "$TAG" "madeline81.phar"
+    rm "madeline81.phar"
 fi
