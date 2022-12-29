@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;

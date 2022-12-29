@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Tools module.
@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
-use DOMDocument;
 use Parsedown;
 
 /**
@@ -150,12 +150,6 @@ abstract class StrTools extends Extension
         if ($markdown === '') {
             return $markdown;
         }
-        $html = Parsedown::instance()->text($markdown);
-        $document = new DOMDocument('', 'utf-8');
-        @$document->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-        if (!$document->getElementsByTagName('body')[0]) {
-            return '';
-        }
-        return $document->getElementsByTagName('body')[0]->childNodes[0]->textContent;
+        return (new DOMEntities(Parsedown::instance()->text($markdown)))->message;
     }
 }

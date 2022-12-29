@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use danog\MadelineProto\AbstractAPIFactory;
 use danog\MadelineProto\AnnotationsBuilder;

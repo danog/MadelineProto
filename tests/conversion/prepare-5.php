@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 $input = file_get_contents('vendor/league/uri-interfaces/src/Contracts/UriInterface.php');
 preg_match_all("/public function (\w+)[(].*/", $input, $matches);

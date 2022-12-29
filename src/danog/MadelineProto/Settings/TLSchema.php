@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\Settings;
 
@@ -12,11 +12,11 @@ class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 150;
+    protected int $layer = 151;
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__ . '/../TL_telegram_v150.tl';
+    protected string $APISchema = __DIR__ . '/../TL_telegram_v151.tl';
     /**
      * MTProto schema path.
      */

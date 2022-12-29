@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * PeerHandler module.
@@ -540,7 +540,6 @@ trait PeerHandler
      *
      * @param mixed                $id        Peer
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
-     * @param boolean              $recursive Internal
      *
      * @see https://docs.madelineproto.xyz/Info.html
      *
@@ -624,8 +623,8 @@ trait PeerHandler
             if (!$chat) {
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
             }
-            if (($chat['min'] ?? false) 
-                && yield $this->minDatabase->hasPeer($id) 
+            if (($chat['min'] ?? false)
+                && yield $this->minDatabase->hasPeer($id)
                 && !isset($this->caching_full_info[$id])
             ) {
                 $this->caching_full_info[$id] = true;
