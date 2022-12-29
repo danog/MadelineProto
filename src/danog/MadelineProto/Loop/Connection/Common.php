@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /**
  * Common abstract class for all connection loops.
  *

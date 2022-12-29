@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 if (PHP_OS_FAMILY === 'Windows') {
     //echo(PHP_EOL.'========='.PHP_EOL.'WARNING: MadelineProto does not support Windows, please use Linux or another UNIX system (WSLv2 on Windows, Mac OS, BSD, etc).'.PHP_EOL.'========='.PHP_EOL.PHP_EOL);

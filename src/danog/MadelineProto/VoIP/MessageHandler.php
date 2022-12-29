@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
 Copyright 2016-2018 Daniil Gentili
