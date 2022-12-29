@@ -199,7 +199,7 @@ class Installer
     /**
      * Install MadelineProto.
      */
-    public function install(): void
+    public function install()
     {
         $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
         $madeline_phar = "madeline-$remote_release.phar";
