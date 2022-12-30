@@ -238,11 +238,11 @@ class DataCenter
         }
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
             $configProvider = new class implements ConfigLoader {
-                private function loadConfigGenerator(): Generator
+                private function loadConfigGenerator()
                 {
                     $loader = \stripos(PHP_OS, "win") === 0 ? new WindowsConfigLoader() : new UnixConfigLoader();
                     try {
-                        return yield $loader->loadConfig();
+                        return $loader->loadConfig();
                     } catch (Throwable) {
                         return new Config([
                             '1.1.1.1',
@@ -290,7 +290,7 @@ class DataCenter
      * @param integer $id        Connection ID to re-establish (optional)
      * @return Generator<bool>
      */
-    public function dcConnect(string $dc_number, int $id = -1): Generator
+    public function dcConnect(string $dc_number, int $id = -1)
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
         if (isset($this->sockets[$dc_number]) && !$old) {
@@ -306,12 +306,12 @@ class DataCenter
                 if ($old) {
                     $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", Logger::WARNING);
                     $this->sockets[$dc_number]->setExtra($this->API);
-                    yield from $this->sockets[$dc_number]->connect($ctx, $id);
+                    $this->sockets[$dc_number]->connect($ctx, $id);
                 } else {
                     $this->API->logger->logger("Connecting to DC {$dc_number} from scratch", Logger::WARNING);
                     $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);
-                    yield from $this->sockets[$dc_number]->connect($ctx);
+                    $this->sockets[$dc_number]->connect($ctx);
                 }
                 if ($ctx->getIpv6()) {
                     Magic::setIpv6(true);
@@ -576,9 +576,9 @@ class DataCenter
      * @param string $url URL to fetch
      * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url): Generator
+    public function fileGetContents(string $url)
     {
-        return yield (yield $this->getHTTPClient()->request(new Request($url)))->getBody()->buffer();
+        return ($this->getHTTPClient()->request(new Request($url)))->getBody()->buffer();
     }
     /**
      * Get Connection instance for authorization.
@@ -604,7 +604,7 @@ class DataCenter
      * @param string $dc DC ID
      * @psalm-return Generator<int, Promise, mixed, Connection>
      */
-    public function waitGetConnection(string $dc): Generator
+    public function waitGetConnection(string $dc)
     {
         return $this->sockets[$dc]->waitGetConnection();
     }

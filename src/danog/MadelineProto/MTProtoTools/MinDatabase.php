@@ -82,18 +82,18 @@ class MinDatabase implements TLCallback
     {
         return ['db', 'API', 'clean'];
     }
-    public function init(): Generator
+    public function init()
     {
-        yield from $this->initDb($this->API);
+        $this->initDb($this->API);
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
-            yield $this->db->clear();
+            $this->db->clear();
         }
         if ($this->clean) {
             return;
         }
         EventLoop::defer(function () {
             $iterator = $this->db->getIterator();
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
                     $this->db->unset($id);
@@ -196,17 +196,17 @@ class MinDatabase implements TLCallback
         }
         $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }
-    public function populateFrom(array $object): Generator
+    public function populateFrom(array $object)
     {
         if (!($object['min'] ?? false)) {
             return $object;
         }
         $id = $this->API->getId($object);
-        $dbObject = yield $this->db[$id];
+        $dbObject = $this->db[$id];
         if ($dbObject) {
             $new = \array_merge($object, $dbObject);
             $new['_'] .= 'FromMessage';
-            $new['peer'] = yield from $this->API->getInputPeer($new['peer']);
+            $new['peer'] = $this->API->getInputPeer($new['peer']);
             if ($new['peer']['min']) {
                 $this->API->logger->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
                 return $object;

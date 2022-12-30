@@ -79,7 +79,7 @@ class ADNLConnection
      *
      * @param array $endpoint Endpoint
      */
-    public function connect(array $endpoint): Generator
+    public function connect(array $endpoint)
     {
         if ($endpoint['_'] !== 'liteserver.desc') {
             throw new InvalidArgumentException('Only liteservers are supported at the moment!');
@@ -121,20 +121,20 @@ class ADNLConnection
         $iv = \substr($digest, 0, 4).\substr($secret, 20, 12);
         $encryptedRandom = Crypt::ctrEncrypt($random, $key, $iv);
         // Generating plaintext init payload
-        $payload = \hash('sha256', yield from $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
+        $payload = \hash('sha256', $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
         $payload .= $public;
         $payload .= $digest;
         $payload .= $encryptedRandom;
         $ip = \long2ip(\unpack('V', Tools::packSignedInt($endpoint['ip']))[1]);
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::class)->addStream(BufferedRawStream::class)->addStream(CtrStream::class, $obf)->addStream(HashedBufferedStream::class, 'sha256')->addStream(ADNLStream::class);
-        $this->stream = (yield from $ctx->getStream($payload));
-        Tools::callFork((function (): Generator {
-            //yield Tools::sleep(1);
+        $this->stream = ($ctx->getStream($payload));
+        Tools::callFork((function () {
+            //Tools::sleep(1);
             while (true) {
-                $buffer = yield $this->stream->getReadBuffer($length);
+                $buffer = $this->stream->getReadBuffer($length);
                 if ($length) {
-                    $data = yield $buffer->bufferRead($length);
+                    $data = $buffer->bufferRead($length);
                     $data = $this->TL->deserialize($data)[0];
                     if ($data['_'] !== 'adnl.message.answer') {
                         throw new Exception('Wrong answer type: '.$data['_']);
@@ -149,10 +149,10 @@ class ADNLConnection
      *
      * @param string $payload Payload to send
      */
-    public function query(string $payload): Generator
+    public function query(string $payload)
     {
-        $data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], ''));
-        (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
+        $data = ($this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], ''));
+        ($this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
         $this->requests[$id] = new DeferredFuture();
         return $this->requests[$id]->getFuture();
     }

@@ -96,14 +96,14 @@ class ReferenceDatabase implements TLCallback
     {
         return ['db', 'API'];
     }
-    public function init(): Generator
+    public function init()
     {
-        yield from $this->initDb($this->API);
+        $this->initDb($this->API);
 
         //Clear table on each start to fix fatals with invalid references
-        //Loop::defer(fn () =>yield $this->db->clear());
+        //Loop::defer(fn () =>$this->db->clear());
         //Clear table every day
-        //Loop::repeat(24*1000*3600, fn () =>yield $this->db->clear());
+        //Loop::repeat(24*1000*3600, fn () =>$this->db->clear());
     }
     public function getMethodCallbacks(): array
     {
@@ -208,7 +208,7 @@ class ReferenceDatabase implements TLCallback
         //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOrigin(array $data = []): Generator
+    public function addOrigin(array $data = [])
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
@@ -284,7 +284,7 @@ class ReferenceDatabase implements TLCallback
                 throw new Exception("Unknown origin type provided: {$data['_']}");
         }
         foreach ($cache as $location => $reference) {
-            yield from $this->storeReference($location, $reference, $originType, $origin);
+            $this->storeReference($location, $reference, $originType, $origin);
         }
         $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
@@ -297,7 +297,7 @@ class ReferenceDatabase implements TLCallback
         $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethod(OutgoingMessage $data, array $res): Generator
+    public function addOriginMethod(OutgoingMessage $data, array $res)
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
@@ -338,7 +338,7 @@ class ReferenceDatabase implements TLCallback
                     if (isset($cache[$location])) {
                         $reference = $cache[$location];
                         unset($cache[$location]);
-                        yield from $this->storeReference($location, $reference, $originType, $origin);
+                        $this->storeReference($location, $reference, $originType, $origin);
                         $count++;
                     }
                     if (isset($photo['sizes'])) {
@@ -349,7 +349,7 @@ class ReferenceDatabase implements TLCallback
                                 if (isset($cache[$location])) {
                                     $reference = $cache[$location];
                                     unset($cache[$location]);
-                                    yield from $this->storeReference($location, $reference, $originType, $origin);
+                                    $this->storeReference($location, $reference, $originType, $origin);
                                     $count++;
                                 }
                             }
@@ -365,13 +365,13 @@ class ReferenceDatabase implements TLCallback
                 throw new Exception("Unknown origin type provided: {$constructor}");
         }
         foreach ($cache as $location => $reference) {
-            yield from $this->storeReference($location, $reference, $originType, $origin);
+            $this->storeReference($location, $reference, $originType, $origin);
         }
         $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
-    public function storeReference(string $location, string $reference, int $originType, array $origin): Generator
+    public function storeReference(string $location, string $reference, int $originType, array $origin)
     {
-        $locationValue = yield $this->db[$location];
+        $locationValue = $this->db[$location];
         if (!$locationValue) {
             $locationValue = ['origins' => []];
         }
@@ -404,21 +404,21 @@ class ReferenceDatabase implements TLCallback
             $this->refreshCount--;
         }
     }
-    public function refreshReference(int $locationType, array $location): Generator
+    public function refreshReference(int $locationType, array $location)
     {
         return $this->refreshReferenceInternal(self::serializeLocation($locationType, $location));
     }
-    public function refreshReferenceInternal(string $location): Generator
+    public function refreshReferenceInternal(string $location)
     {
         if (isset($this->refreshed[$location])) {
             $this->API->logger->logger('Reference already refreshed!', Logger::VERBOSE);
-            return (yield $this->db[$location])['reference'];
+            return ($this->db[$location])['reference'];
         }
-        $locationValue = yield $this->db[$location];
+        $locationValue = $this->db[$location];
         \ksort($locationValue['origins']);
         $this->db[$location] = $locationValue;
         $count = 0;
-        foreach ((yield $this->db[$location])['origins'] as $originType => &$origin) {
+        foreach (($this->db[$location])['origins'] as $originType => &$origin) {
             $count++;
             $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
             switch ($originType) {
@@ -428,14 +428,14 @@ class ReferenceDatabase implements TLCallback
                         $origin['peer'] = $this->API->getId($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
-                        yield from $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
+                        $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
                         break;
                     }
-                    yield from $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
                     break;
                     // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
-                    $fullChat = yield $this->API->full_chats[$origin['peer']];
+                    $fullChat = $this->API->full_chats[$origin['peer']];
                     if (isset($fullChat['last_update'])) {
                         $fullChat['last_update'] = 0;
                         $this->API->full_chats[$origin['peer']] = $fullChat;
@@ -444,44 +444,44 @@ class ReferenceDatabase implements TLCallback
                     break;
                     // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::SAVED_GIFS_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::STICKER_SET_ID_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::STICKER_SET_RECENT_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::STICKER_SET_FAVED_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::STICKER_SET_EMOTICON_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('messages.getStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 case self::WALLPAPER_ORIGIN:
-                    yield from $this->API->methodCallAsyncRead('account.getWallPapers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('account.getWallPapers', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 default:
                     throw new Exception("Unknown origin type {$originType}");
             }
             if (isset($this->refreshed[$location])) {
-                return (yield $this->db[$location])['reference'];
+                return ($this->db[$location])['reference'];
             }
         }
         throw new Exception('Did not refresh reference');
     }
-    public function populateReference(array $object): Generator
+    public function populateReference(array $object)
     {
-        $object['file_reference'] = yield from $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
+        $object['file_reference'] = $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
         return $object;
     }
-    public function getReference(int $locationType, array $location): Generator
+    public function getReference(int $locationType, array $location)
     {
         $locationString = self::serializeLocation($locationType, $location);
-        if (!isset((yield $this->db[$locationString])['reference'])) {
+        if (!isset(($this->db[$locationString])['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 return $location['file_reference'];
@@ -496,7 +496,7 @@ class ReferenceDatabase implements TLCallback
         if ($this->refresh) {
             return $this->refreshReferenceInternal($locationString);
         }
-        return (yield $this->db[$locationString])['reference'];
+        return ($this->db[$locationString])['reference'];
     }
     private static function serializeLocation(int $locationType, array $location): string
     {

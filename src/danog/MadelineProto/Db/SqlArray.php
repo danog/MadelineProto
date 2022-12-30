@@ -84,11 +84,11 @@ abstract class SqlArray extends DriverArray
     public function getIterator(): Iterator
     {
         return new Producer(function (callable $emit) {
-            $request = yield $this->execute($this->queries[self::SQL_ITERATE]);
+            $request = $this->execute($this->queries[self::SQL_ITERATE]);
 
-            while (yield $request->advance()) {
+            while ($request->advance()) {
                 $row = $request->getCurrent();
-                yield $emit([$row['key'], $this->getValue($row['value'])]);
+                $emit([$row['key'], $this->getValue($row['value'])]);
             }
         });
     }
@@ -99,7 +99,7 @@ abstract class SqlArray extends DriverArray
         return call(function () {
             $iterator = $this->getIterator();
             $result = [];
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [$key, $value] = $iterator->getCurrent();
                 $result[$key] = $value;
             }
@@ -115,8 +115,8 @@ abstract class SqlArray extends DriverArray
         }
 
         return call(function () use ($key) {
-            $row = yield $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
-            if (!yield $row->advance()) {
+            $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
+            if (!$row->advance()) {
                 return null;
             }
             $row = $row->getCurrent();
@@ -188,8 +188,8 @@ abstract class SqlArray extends DriverArray
     {
         return call(function () {
             /** @var ResultSet */
-            $row = yield $this->execute($this->queries[self::SQL_COUNT]);
-            Assert::true(yield $row->advance());
+            $row = $this->execute($this->queries[self::SQL_COUNT]);
+            Assert::true($row->advance());
             return $row->getCurrent()['count'];
         });
     }

@@ -53,7 +53,7 @@ class RPCErrorException extends \Exception
                 try {
                     $res = \json_decode(
                         yield
-                            (yield HttpClientBuilder::buildDefault()
+                            (HttpClientBuilder::buildDefault()
                                 ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
                             )->getBody()->buffer(),
                         true,

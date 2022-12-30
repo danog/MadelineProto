@@ -56,7 +56,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $this->encrypt = new AES('ctr');
         $this->encrypt->enableContinuousBuffer();
@@ -66,7 +66,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
@@ -80,9 +80,9 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
-        $this->write_buffer = yield $this->stream->getWriteBuffer($length);
+        $this->write_buffer = $this->stream->getWriteBuffer($length);
         if (\strlen($append)) {
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
@@ -94,9 +94,9 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
-        $this->read_buffer = yield $this->stream->getReadBuffer($length);
+        $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
     }
     /**
@@ -104,9 +104,9 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
-    public function bufferReadGenerator(int $length): Generator
+    public function bufferReadGenerator(int $length)
     {
-        return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
+        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length));
     }
     /**
      * Writes data to the stream.

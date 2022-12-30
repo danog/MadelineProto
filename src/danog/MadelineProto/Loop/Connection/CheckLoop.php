@@ -39,7 +39,7 @@ class CheckLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -51,12 +51,12 @@ class CheckLoop extends ResumableSignalLoop
         // Typically 25 seconds, good enough
         while (true) {
             while (empty($connection->new_outgoing)) {
-                if (yield $this->waitSignal($this->pause())) {
+                if ($this->waitSignal($this->pause())) {
                     return;
                 }
             }
             if (!$connection->hasPendingCalls()) {
-                if (yield $this->waitSignal($this->pause($timeoutMs))) {
+                if ($this->waitSignal($this->pause($timeoutMs))) {
                     return;
                 }
                 continue;
@@ -134,7 +134,7 @@ class CheckLoop extends ResumableSignalLoop
                         $list .= $connection->outgoing_messages[$message_id]->getConstructor().', ';
                     }
                     $API->logger->logger("Still missing {$list} on DC {$datacenter}, sending state request", Logger::ERROR);
-                    yield from $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
+                    $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                 }
             } else {
                 foreach ($connection->new_outgoing as $message_id => $message) {
@@ -148,7 +148,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
                 $connection->flush();
             }
-            if (yield $this->waitSignal($this->pause($timeoutMs))) {
+            if ($this->waitSignal($this->pause($timeoutMs))) {
                 return;
             }
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {

@@ -31,7 +31,7 @@ class Mysql
      * @throws Throwable
      * @return Generator<Pool>
      */
-    public static function getConnection(DatabaseMysql $settings): Generator
+    public static function getConnection(DatabaseMysql $settings)
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
@@ -40,7 +40,7 @@ class Mysql
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
 
-            yield from static::createDb($config);
+            static::createDb($config);
             static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
@@ -52,12 +52,12 @@ class Mysql
      * @throws FailureException
      * @throws Throwable
      */
-    private static function createDb(ConnectionConfig $config): Generator
+    private static function createDb(ConnectionConfig $config)
     {
         try {
             $db = $config->getDatabase();
             $connection = pool($config->withDatabase(null));
-            yield $connection->query("
+            $connection->query("
                     CREATE DATABASE IF NOT EXISTS `{$db}`
                     CHARACTER SET 'utf8mb4' 
                     COLLATE 'utf8mb4_general_ci'

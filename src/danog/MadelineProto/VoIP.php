@@ -335,7 +335,7 @@ class VoIP
             }
             foreach ($this->sockets as $k => $socket) {
                 try {
-                    yield from $socket->connect();
+                    $socket->connect();
                 } catch (Throwable $e) {
                     unset($this->sockets[$k]);
                 }
@@ -343,7 +343,7 @@ class VoIP
             foreach ($this->sockets as $socket) {
                 $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
                 Tools::callFork((function () use ($socket) {
-                    while ($payload = yield from $this->recv_message($socket)) {
+                    while ($payload = $this->recv_message($socket)) {
                         $this->lastIncomingTimestamp = \microtime(true);
                         Tools::callFork($this->handlePacket($socket, $payload));
                     }
@@ -356,17 +356,17 @@ class VoIP
     /**
      * Handle incoming packet.
      */
-    private function handlePacket(Endpoint $socket, array $packet): Generator
+    private function handlePacket(Endpoint $socket, array $packet)
     {
         switch ($packet['_']) {
             case self::PKT_INIT:
                 //$this->voip_state = self::STATE_WAIT_INIT_ACK;
                 $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $socket);
 
-                yield from $this->startWriteLoop($socket);
+                $this->startWriteLoop($socket);
                 break;
             case self::PKT_INIT_ACK:
-                yield from $this->startWriteLoop($socket);
+                $this->startWriteLoop($socket);
                 break;
             case self::PKT_STREAM_DATA:
                 $cnt = 1;
@@ -384,7 +384,7 @@ class VoIP
     /**
      * Start write loop.
      */
-    private function startWriteLoop(Endpoint $socket): Generator
+    private function startWriteLoop(Endpoint $socket)
     {
         if ($this->voip_state === self::STATE_ESTABLISHED) {
             return;
@@ -403,34 +403,34 @@ class VoIP
                 }
                 $file = \array_shift($this->tempHoldFiles);
             }
-            $it = yield from $this->openFile($file);
+            $it = $this->openFile($file);
             if ($this->MadelineProto->getSettings()->getVoip()->getPreloadAudio()) {
-                while (yield $it->advance()) {
+                while ($it->advance()) {
                     $this->packetQueue->enqueue($it->getCurrent());
                 }
                 $t = (\microtime(true) / 1000) + 60;
                 while (!$this->packetQueue->isEmpty()) {
-                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
+                    if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
                         return;
                     }
 
                     //Logger::log("Writing {$this->timestamp} in $this!");
-                    yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+                    new Delayed((int) ($t - (\microtime(true) / 1000)));
                     $t = (\microtime(true) / 1000) + 60;
 
                     $this->timestamp += 60;
                 }
             } else {
                 $t = (\microtime(true) / 1000) + 60;
-                while (yield $it->advance()) {
-                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
+                while ($it->advance()) {
+                    if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
                         return;
                     }
 
                     //Logger::log("Writing {$this->timestamp} in $this!");
-                    yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+                    new Delayed((int) ($t - (\microtime(true) / 1000)));
                     $t = (\microtime(true) / 1000) + 60;
 
                     $this->timestamp += 60;
@@ -441,12 +441,12 @@ class VoIP
     /**
      * Open OGG file for reading.
      */
-    private function openFile(string $file): Generator
+    private function openFile(string $file)
     {
         $ctx = new ConnectionContext;
-        $ctx->addStream(FileBufferedStream::class, yield openFile($file, 'r'));
-        $stream = yield from $ctx->getStream();
-        $ogg = yield from Ogg::init($stream, 60000);
+        $ctx->addStream(FileBufferedStream::class, openFile($file, 'r'));
+        $stream = $ctx->getStream();
+        $ogg = Ogg::init($stream, 60000);
         $it = $ogg->getEmitter()->iterate();
         Tools::callFork($ogg->read());
         return $it;

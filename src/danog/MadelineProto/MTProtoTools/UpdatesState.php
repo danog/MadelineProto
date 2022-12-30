@@ -98,9 +98,9 @@ class UpdatesState
     /**
      * Are we currently busy?
      *
-     * @param bool|null $set Update the currently busy flag
+     * @param bool $set Update the currently busy flag
      */
-    public function syncLoading(bool $set = null): bool
+    public function syncLoading(?bool $set = null): bool
     {
         if ($set !== null) {
             $this->syncLoading = $set;

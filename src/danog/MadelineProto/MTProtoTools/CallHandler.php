@@ -53,9 +53,9 @@ trait CallHandler
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
-        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -65,8 +65,8 @@ trait CallHandler
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
-        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
     }
 }

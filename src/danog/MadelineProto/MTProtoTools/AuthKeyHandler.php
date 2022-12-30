@@ -22,10 +22,10 @@ trait AuthKeyHandler
      *
      * @internal
      */
-    public function initAuthorization(): Generator
+    public function initAuthorization()
     {
         $this->auth_mutex ??= new LocalMutex;
-        $lock = yield $this->auth_mutex->acquire();
+        $lock = $this->auth_mutex->acquire();
         $this->logger("Initing authorization...");
         $this->initing_authorization = true;
         try {
@@ -43,10 +43,10 @@ trait AuthKeyHandler
             }
             if ($main) {
                 $first = \array_shift($main)();
-                yield from $first;
+                $first;
             }
-            yield Tools::all(\array_map(fn ($cb) => $cb(), $main));
-            yield Tools::all(\array_map(fn ($cb) => $cb(), $media));
+            Tools::all(\array_map(fn ($cb) => $cb(), $main));
+            Tools::all(\array_map(fn ($cb) => $cb(), $media));
         } finally {
             $lock->release();
             $this->logger("Done initing authorization!");
@@ -59,9 +59,9 @@ trait AuthKeyHandler
      *
      * @return Generator<array>
      */
-    public function getDhConfig(): Generator
+    public function getDhConfig()
     {
-        $dh_config = yield from $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
+        $dh_config = $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger('DH configuration not modified', Logger::VERBOSE);
             return $this->dh_config;

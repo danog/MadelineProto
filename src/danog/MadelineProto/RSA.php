@@ -58,13 +58,13 @@ class RSA
      * @param string $rsa_key RSA key
      * @psalm-return Generator<(int|mixed), (array|mixed), mixed, self>
      */
-    public static function load(TL $TL, string $rsa_key): Generator
+    public static function load(TL $TL, string $rsa_key)
     {
         $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $instance = new self;
         $instance->n = Tools::getVar($key, 'modulus');
         $instance->e = Tools::getVar($key, 'exponent');
-        $instance->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
+        $instance->fp = \substr(\sha1(($TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).($TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
         return $instance;
     }
     /**

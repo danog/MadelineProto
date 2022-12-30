@@ -241,7 +241,7 @@ trait MessageHandler
      */
     public function recv_message(Endpoint $endpoint)
     {
-        if (!$payload = yield from $endpoint->read()) {
+        if (!$payload = $endpoint->read()) {
             return null;
         }
 
@@ -333,7 +333,7 @@ trait MessageHandler
                 }
         }
         if (!$this->received_packet($in_seq_no, $out_seq_no, $ack_mask)) {
-            return yield from $this->recv_message($endpoint);
+            return $this->recv_message($endpoint);
         }
         switch ($result['_']) {
             // streamTypeSimple codec:int8 = StreamType;

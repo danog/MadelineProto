@@ -32,19 +32,19 @@ class RedisArray extends DriverArray
     /**
      * Initialize on startup.
      */
-    public function initStartup(): Generator
+    public function initStartup()
     {
         return $this->initConnection($this->dbSettings);
     }
     /**
      * @psalm-return Generator<int, Success<null>, mixed, void>
      */
-    protected function prepareTable(): Generator
+    protected function prepareTable()
     {
-        yield new Success;
+        new Success;
     }
 
-    protected function renameTable(string $from, string $to): Generator
+    protected function renameTable(string $from, string $to)
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";
@@ -53,10 +53,10 @@ class RedisArray extends DriverArray
         $request = $this->db->scan($from.'*');
 
         $lenK = \strlen($from);
-        while (yield $request->advance()) {
+        while ($request->advance()) {
             $oldKey = $request->getCurrent();
             $newKey = $to.\substr($oldKey, $lenK);
-            $value = yield $this->db->get($oldKey);
+            $value = $this->db->get($oldKey);
             $this->db->set($newKey, $value);
             $this->db->delete($oldKey);
         }
@@ -65,10 +65,10 @@ class RedisArray extends DriverArray
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabaseRedis $settings): Generator
+    public function initConnection(DatabaseRedis $settings)
     {
         if (!isset($this->db)) {
-            $this->db = yield from Redis::getConnection($settings);
+            $this->db = Redis::getConnection($settings);
         }
     }
 
@@ -127,7 +127,7 @@ class RedisArray extends DriverArray
                 return $this->getCache($offset);
             }
 
-            $value = yield $this->db->get($this->rKey($offset));
+            $value = $this->db->get($this->rKey($offset));
 
             if ($value !== null && $value = \unserialize($value)) {
                 $this->setCache($offset, $value);
@@ -156,7 +156,7 @@ class RedisArray extends DriverArray
         return call(function () {
             $iterator = $this->getIterator();
             $result = [];
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [$key, $value] = $iterator->getCurrent();
                 $result[$key] = $value;
             }
@@ -170,9 +170,9 @@ class RedisArray extends DriverArray
             $request = $this->db->scan($this->itKey());
 
             $len = \strlen($this->rKey(''));
-            while (yield $request->advance()) {
+            while ($request->advance()) {
                 $key = $request->getCurrent();
-                yield $emit([\substr($key, $len), \unserialize(yield $this->db->get($key))]);
+                $emit([\substr($key, $len), \unserialize($this->db->get($key))]);
             }
         });
     }
@@ -191,7 +191,7 @@ class RedisArray extends DriverArray
             $request = $this->db->scan($this->itKey());
             $count = 0;
 
-            while (yield $request->advance()) {
+            while ($request->advance()) {
                 $count++;
             }
 
@@ -210,16 +210,16 @@ class RedisArray extends DriverArray
 
             $keys = [];
             $k = 0;
-            while (yield $request->advance()) {
+            while ($request->advance()) {
                 $keys[$k++] = $request->getCurrent();
                 if ($k === 10) {
-                    yield $this->db->delete(...$keys);
+                    $this->db->delete(...$keys);
                     $keys = [];
                     $k = 0;
                 }
             }
             if (!empty($keys)) {
-                yield $this->db->delete(...$keys);
+                $this->db->delete(...$keys);
             }
         });
     }

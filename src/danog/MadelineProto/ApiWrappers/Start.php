@@ -45,7 +45,7 @@ trait Start
      *
      * @param Settings $settings Settings
      */
-    private function APIStart(Settings $settings): Generator
+    private function APIStart(Settings $settings)
     {
         if (Magic::$isIpcWorker) {
             throw new Exception('Not inited!');
@@ -59,32 +59,32 @@ trait Start
             $prepare = Lang::$current_lang['apiChooseManualAuto'].PHP_EOL;
             $prepare .= \sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
             $prepare .= PHP_EOL;
-            yield $stdout->write($prepare);
-            if (\strpos(yield Tools::readLine(Lang::$current_lang['apiChoosePrompt']), 'm') !== false) {
-                yield $stdout->write("1) ".Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
-                yield $stdout->write("2) ".Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
-                yield $stdout->write("3) ");
+            $stdout->write($prepare);
+            if (\strpos(Tools::readLine(Lang::$current_lang['apiChoosePrompt']), 'm') !== false) {
+                $stdout->write("1) ".Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
+                $stdout->write("2) ".Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
+                $stdout->write("3) ");
                 foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
-                    yield $stdout->write($k ? "    $key: " : "$key: ");
-                    yield $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
+                    $stdout->write($k ? "    $key: " : "$key: ");
+                    $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
                 }
-                yield $stdout->write("4) ".Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
+                $stdout->write("4) ".Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
 
-                $app['api_id'] = yield Tools::readLine("5) ".Lang::$current_lang['apiManualPrompt0']);
-                $app['api_hash'] = yield Tools::readLine("6) ".Lang::$current_lang['apiManualPrompt1']);
+                $app['api_id'] = Tools::readLine("5) ".Lang::$current_lang['apiManualPrompt0']);
+                $app['api_hash'] = Tools::readLine("6) ".Lang::$current_lang['apiManualPrompt1']);
                 return $app;
             }
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
-            yield from $this->myTelegramOrgWrapper->login(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt0']));
-            yield from $this->myTelegramOrgWrapper->completeLogin(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt1']));
-            if (!(yield from $this->myTelegramOrgWrapper->hasApp())) {
-                $app_title = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto0']);
-                $short_name = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto1']);
-                $url = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto2']);
-                $description = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto4']);
-                $app = (yield from $this->myTelegramOrgWrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]));
+            $this->myTelegramOrgWrapper->login(Tools::readLine(Lang::$current_lang['apiAutoPrompt0']));
+            $this->myTelegramOrgWrapper->completeLogin(Tools::readLine(Lang::$current_lang['apiAutoPrompt1']));
+            if (!($this->myTelegramOrgWrapper->hasApp())) {
+                $app_title = Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto0']);
+                $short_name = Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto1']);
+                $url = Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto2']);
+                $description = Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto4']);
+                $app = ($this->myTelegramOrgWrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]));
             } else {
-                $app = (yield from $this->myTelegramOrgWrapper->getApp());
+                $app = ($this->myTelegramOrgWrapper->getApp());
             }
             return $app;
         }
@@ -96,69 +96,69 @@ trait Start
                 $this->gettingApiId = false;
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield from $this->webAPIPhoneLogin($settings);
+                $this->webAPIPhoneLogin($settings);
             } else {
-                yield $this->webAPIEcho();
+                $this->webAPIEcho();
             }
         } elseif (!$this->myTelegramOrgWrapper->loggedIn()) {
             if (isset($_POST['code'])) {
-                yield from $this->webAPICompleteLogin();
-                if (yield from $this->myTelegramOrgWrapper->hasApp()) {
-                    return yield from $this->myTelegramOrgWrapper->getApp();
+                $this->webAPICompleteLogin();
+                if ($this->myTelegramOrgWrapper->hasApp()) {
+                    return $this->myTelegramOrgWrapper->getApp();
                 }
-                yield $this->webAPIEcho();
+                $this->webAPIEcho();
             } elseif (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
                 $this->gettingApiId = false;
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield from $this->webAPIPhoneLogin($settings);
+                $this->webAPIPhoneLogin($settings);
             } else {
                 $this->myTelegramOrgWrapper = null;
-                yield $this->webAPIEcho();
+                $this->webAPIEcho();
             }
         } else {
             if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
-                $app = (yield from $this->webAPICreateApp());
+                $app = ($this->webAPICreateApp());
                 $this->gettingApiId = false;
                 return $app;
             }
-            yield $this->webAPIEcho(Lang::$current_lang['apiParamsError']);
+            $this->webAPIEcho(Lang::$current_lang['apiParamsError']);
         }
         return null;
     }
-    private function webAPIPhoneLogin(Settings $settings): Generator
+    private function webAPIPhoneLogin(Settings $settings)
     {
         try {
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
-            yield from $this->myTelegramOrgWrapper->login($_POST['phone_number']);
-            yield $this->webAPIEcho();
+            $this->myTelegramOrgWrapper->login($_POST['phone_number']);
+            $this->webAPIEcho();
         } catch (Throwable $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
+            $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
-    private function webAPICompleteLogin(): Generator
+    private function webAPICompleteLogin()
     {
         try {
-            yield from $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
+            $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
         } catch (RPCErrorException $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
+            $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         } catch (Exception $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
+            $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
-    private function webAPICreateApp(): Generator
+    private function webAPICreateApp()
     {
         try {
             $params = $_POST;
             unset($params['creating_app']);
-            $app = (yield from $this->myTelegramOrgWrapper->createApp($params));
+            $app = ($this->myTelegramOrgWrapper->createApp($params));
             return $app;
         } catch (RPCErrorException $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
+            $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         } catch (Exception $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
+            $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
 }

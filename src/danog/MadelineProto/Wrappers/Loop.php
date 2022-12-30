@@ -107,15 +107,15 @@ trait Loop
      *
      * @param callable|null $callback Async callable to run
      */
-    public function loop(?callable $callback = null): Generator
+    public function loop(?callable $callback = null)
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
-            return (yield $callback());
+            return ($callback());
         }
         if ($callback instanceof Promise) {
             $this->logger->logger('Resolving async promise');
-            return (yield $callback);
+            return ($callback);
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
@@ -138,7 +138,7 @@ trait Loop
         }
         do {
             if (!$this->updateHandler) {
-                yield $this->waitUpdate();
+                $this->waitUpdate();
                 if (!$this->updateHandler) {
                     $this->logger->logger('Exiting update loop, no handler!', Logger::NOTICE);
                     continue;
@@ -155,7 +155,7 @@ trait Loop
                 }
                 $updates = [];
             }
-            yield $this->waitUpdate();
+            $this->waitUpdate();
             $this->logger->logger('Resuming update loop!', Logger::VERBOSE);
         } while (!$this->stopLoop);
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);

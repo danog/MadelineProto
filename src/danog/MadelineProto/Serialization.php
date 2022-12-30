@@ -248,7 +248,7 @@ abstract class Serialization
      * @psalm-param Promise<(Throwable|null)> $cancelConnect
      * @psalm-return Generator<mixed, mixed, mixed, array{0: (ChannelledSocket|Throwable|0), 1: null}>
      */
-    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): Generator
+    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null)
     {
         for ($x = 0; $x < 60; $x++) {
             Logger::log("MadelineProto is starting, please wait...");
@@ -279,7 +279,7 @@ abstract class Serialization
     /**
      * Deserialize legacy session.
      */
-    private static function legacyUnserialize(string $session): Generator
+    private static function legacyUnserialize(string $session)
     {
         $tounserialize = read($session);
 

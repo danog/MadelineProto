@@ -29,7 +29,7 @@ class Redis
      * @throws Throwable
      * @psalm-return Generator<int, Promise<void>, mixed, RedisRedis>
      */
-    public static function getConnection(DatabaseRedis $settings): Generator
+    public static function getConnection(DatabaseRedis $settings)
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
@@ -38,7 +38,7 @@ class Redis
                 ->withDatabase($settings->getDatabase());
 
             static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
-            yield static::$connections[$dbKey]->ping();
+            static::$connections[$dbKey]->ping();
         }
 
         return static::$connections[$dbKey];

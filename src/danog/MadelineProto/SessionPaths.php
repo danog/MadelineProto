@@ -96,7 +96,7 @@ class SessionPaths
     /**
      * Serialize object to file.
      */
-    public function serialize(object $object, string $path): Generator
+    public function serialize(object $object, string $path)
     {
         Logger::log("Waiting for exclusive lock of $path.lock...");
         $unlock = Tools::flock("$path.lock", LOCK_EX, 0.1);
@@ -110,12 +110,12 @@ class SessionPaths
                 .\chr(PHP_MINOR_VERSION)
                 .\serialize($object);
 
-            yield put(
+            put(
                 "$path.temp.php",
                 $object,
             );
 
-            yield renameAsync("$path.temp.php", $path);
+            renameAsync("$path.temp.php", $path);
         } finally {
             $unlock();
         }
@@ -127,11 +127,11 @@ class SessionPaths
      * @param string $path Object path, defaults to session path
      * @psalm-return Generator<mixed, mixed, mixed, object>
      */
-    public function unserialize(string $path = ''): Generator
+    public function unserialize(string $path = '')
     {
         $path = $path ?: $this->sessionPath;
 
-        if (!yield exists($path)) {
+        if (!exists($path)) {
             return null;
         }
         $headerLen = \strlen(Serialization::PHP_HEADER);
@@ -142,14 +142,14 @@ class SessionPaths
         try {
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
-            $file = yield openFile($path, 'rb');
-            $size = yield stat($path);
+            $file = openFile($path, 'rb');
+            $size = stat($path);
             $size = $size['size'] ?? $headerLen;
 
-            yield $file->seek($headerLen++);
-            $v = \ord(yield $file->read(1));
+            $file->seek($headerLen++);
+            $v = \ord($file->read(1));
             if ($v === Serialization::VERSION) {
-                $php = yield $file->read(2);
+                $php = $file->read(2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
                 if (\version_compare("$major.$minor", PHP_VERSION) > 0) {
@@ -157,8 +157,8 @@ class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
-            yield $file->close();
+            $unserialized = \unserialize(($file->read($size - $headerLen)) ?? '');
+            $file->close();
         } finally {
             $unlock();
         }
@@ -227,7 +227,7 @@ class SessionPaths
     /**
      * Store IPC state.
      */
-    public function storeIpcState(IpcState $state): Generator
+    public function storeIpcState(IpcState $state)
     {
         return $this->serialize($state, $this->getIpcStatePath());
     }
@@ -263,7 +263,7 @@ class SessionPaths
     /**
      * Store light state.
      */
-    public function storeLightState(MTProto $state): Generator
+    public function storeLightState(MTProto $state)
     {
         $this->lightState = new LightState($state);
         return $this->serialize($this->lightState, $this->getLightStatePath());

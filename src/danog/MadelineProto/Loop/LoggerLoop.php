@@ -54,10 +54,10 @@ trait LoggerLoop
         if ($this->started) {
             return false;
         }
-        Tools::callFork((function (): Generator {
+        Tools::callFork((function () {
             $this->startedLoop();
             try {
-                yield from $this->loop();
+                $this->loop();
             } finally {
                 $this->exitedLoop();
             }

@@ -37,19 +37,19 @@ class Conversion
      * @param SettingsAbstract|array $settings
      * @return Generator<mixed, mixed, mixed, API>
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings): Generator
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings)
     {
         $settings = Settings::parseFromLegacyFull($settings);
         $settings->getIpc()->setSlow(true);
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
         $settings->getAuth()->setPfs(true);
         $MadelineProto = new API($session, $settings);
-        yield $MadelineProto->help->getConfig();
-        yield $MadelineProto->logger("About to import auth!", Logger::FATAL_ERROR);
-        yield $MadelineProto->importAuthorization($authorization, $main_dc_id);
+        $MadelineProto->help->getConfig();
+        $MadelineProto->logger("About to import auth!", Logger::FATAL_ERROR);
+        $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;
     }
-    public static function telethon(string $session, string $new_session, $settings = []): Generator
+    public static function telethon(string $session, string $new_session, $settings = [])
     {
         if (!\extension_loaded('sqlite3')) {
             throw new Exception(['extension', 'sqlite3']);
@@ -71,7 +71,7 @@ class Conversion
         return self::importAuthorization($dcs, $dc['dc_id'], $new_session, $settings);
     }
 
-    public static function pyrogram(string $session, string $new_session, $settings = []): Generator
+    public static function pyrogram(string $session, string $new_session, $settings = [])
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!isset(\pathinfo($session)['extension'])) {
@@ -95,7 +95,7 @@ class Conversion
         $dc = $session['dc'];
         $key = \hex2bin($session["dc$dc".'_auth_key']);
 
-        return yield from self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
+        return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 
     public static function tdesktop_md5($data)
@@ -445,6 +445,6 @@ class Conversion
             }
         }
 
-        return yield from self::importAuthorization($auth_keys, $main_dc_id, $new_session, $settings);
+        return self::importAuthorization($auth_keys, $main_dc_id, $new_session, $settings);
     }
 }

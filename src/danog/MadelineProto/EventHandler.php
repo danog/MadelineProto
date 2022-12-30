@@ -92,19 +92,19 @@ abstract class EventHandler extends InternalDoc
      *
      * @internal
      */
-    public function startInternal(): Generator
+    public function startInternal()
     {
         $this->startMutex ??= new LocalMutex;
-        $lock = yield $this->startMutex->acquire();
+        $lock = $this->startMutex->acquire();
         try {
             if ($this->startedInternal) {
                 return;
             }
             if (isset(static::$dbProperties)) {
-                yield from $this->internalInitDb($this->API);
+                $this->internalInitDb($this->API);
             }
             if (\method_exists($this, 'onStart')) {
-                yield $this->onStart();
+                $this->onStart();
             }
             $this->startedInternal = true;
         } finally {

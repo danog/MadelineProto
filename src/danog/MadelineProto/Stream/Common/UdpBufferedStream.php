@@ -50,9 +50,9 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
@@ -67,12 +67,12 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      * @param int $length Length of payload, as detected by this layer
      * @psalm-return Generator<int, Promise, mixed, (Failure<mixed>|Success<object>)>
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
         if (!$this->stream) {
             return new Failure(new ClosedException("MadelineProto stream was disconnected"));
         }
-        $chunk = yield $this->read();
+        $chunk = $this->read();
         if ($chunk === null) {
             $this->disconnect();
             throw new NothingInTheSocketException();

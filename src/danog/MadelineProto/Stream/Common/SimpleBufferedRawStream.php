@@ -37,7 +37,7 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      *
      * @param int $length Amount of data to read
      */
-    public function bufferReadGenerator(int $length): Generator
+    public function bufferReadGenerator(int $length)
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -46,7 +46,7 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
             \fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = yield $this->read();
+            $chunk = $this->read();
             if ($chunk === null) {
                 break;
             }

@@ -34,12 +34,12 @@ trait TOS
      *
      * Will throw a \danog\MadelineProto\Exception if a new TOS is available.
      */
-    public function checkTos(): Generator
+    public function checkTos()
     {
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             if ($this->tos['expires'] < \time()) {
                 $this->logger->logger('Fetching TOS...');
-                $this->tos = yield from $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', []);
+                $this->tos = $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', []);
                 $this->tos['accepted'] = $this->tos['_'] === 'help.termsOfServiceUpdateEmpty';
             }
             if (!$this->tos['accepted']) {
@@ -56,9 +56,9 @@ trait TOS
     /**
      * Accept terms of service update.
      */
-    public function acceptTos(): Generator
+    public function acceptTos()
     {
-        $this->tos['accepted'] = yield from $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']]);
+        $this->tos['accepted'] = $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']]);
         if ($this->tos['accepted']) {
             $this->logger->logger('TOS accepted successfully');
         } else {
@@ -70,9 +70,9 @@ trait TOS
      *
      * THIS WILL DELETE YOUR ACCOUNT!
      */
-    public function declineTos(): Generator
+    public function declineTos()
     {
-        yield from $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update']);
-        yield from $this->logout();
+        $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update']);
+        $this->logout();
     }
 }

@@ -130,21 +130,21 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * @param int $length Read and hash $length bytes
      * @return Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
      */
-    public function bufferReadGenerator(int $length): Generator
+    public function bufferReadGenerator(int $length)
     {
         if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
             if ($length + $this->read_check_pos > $this->read_check_after) {
                 throw new Exception('Tried to read too much out of frame data');
             }
-            $data = yield $this->read_buffer->bufferRead($length);
+            $data = $this->read_buffer->bufferRead($length);
             \hash_update($this->read_hash, $data);
             $hash = $this->getReadHash();
-            if ($hash !== yield $this->read_buffer->bufferRead(\strlen($hash))) {
+            if ($hash !== $this->read_buffer->bufferRead(\strlen($hash))) {
                 throw new Exception('Hash mismatch');
             }
             return $data;
         }
-        $data = yield $this->read_buffer->bufferRead($length);
+        $data = $this->read_buffer->bufferRead($length);
         \hash_update($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;
@@ -171,7 +171,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -179,7 +179,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         $this->read_hash = null;
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
@@ -193,26 +193,26 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
         //if ($this->read_hash) {
-        $this->read_buffer = yield $this->stream->getReadBuffer($length);
+        $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
         //}
-        //return yield $this->stream->getReadBuffer($length);
+        //return $this->stream->getReadBuffer($length);
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         //if ($this->write_hash) {
-        $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
+        $this->write_buffer = $this->stream->getWriteBuffer($length, $append);
         return $this;
         //}
-        //return yield $this->stream->getWriteBuffer($length, $append);
+        //return $this->stream->getWriteBuffer($length, $append);
     }
     /**
      * Reads data from the stream.

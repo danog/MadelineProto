@@ -57,7 +57,7 @@ trait TD
      * @param array $params Parameters
      * @return Generator<array>
      */
-    public function tdToMTProto(array $params): Generator
+    public function tdToMTProto(array $params)
     {
         $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
@@ -79,7 +79,7 @@ trait TD
                     default:
                         $newparams[$mtproto[0]] = $params[$td] ?? null;
                         if (\is_array($newparams[$mtproto[0]])) {
-                            $newparams[$mtproto[0]] = (yield from $this->MTProtoToTd($newparams[$mtproto[0]]));
+                            $newparams[$mtproto[0]] = ($this->MTProtoToTd($newparams[$mtproto[0]]));
                         }
                 }
             }
@@ -91,16 +91,16 @@ trait TD
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTdcli($params): Generator
+    public function MTProtoToTdcli($params)
     {
-        return $this->tdToTdcli(yield from $this->MTProtoToTd($params));
+        return $this->tdToTdcli($this->MTProtoToTd($params));
     }
     /**
      * MTProto to TD params.
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTd(&$params): Generator
+    public function MTProtoToTd(&$params)
     {
         if (!\is_array($params)) {
             return $params;
@@ -119,7 +119,7 @@ trait TD
             } else {
                 switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'];
+                        $newparams[$td] = ($this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : ($this->getInfo($params[$mtproto[0]]))['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];
@@ -157,7 +157,7 @@ trait TD
                         if ($params['message'] !== '') {
                             $newparams[$td] = ['_' => 'messageText', 'text' => $params['message']];
                             if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') {
-                                $newparams[$td]['web_page'] = (yield from $this->MTProtoToTd($params['media']['webpage']));
+                                $newparams[$td]['web_page'] = ($this->MTProtoToTd($params['media']['webpage']));
                             }
                             if (isset($params['entities'])) {
                                 $newparams[$td]['entities'] = $params['entities'];
@@ -173,7 +173,7 @@ trait TD
                             $newparams[$td] = $params[$mtproto[0]] ?? null;
                         }
                         if (\is_array($newparams[$td])) {
-                            $newparams[$td] = (yield from $this->MTProtoToTd($newparams[$td]));
+                            $newparams[$td] = ($this->MTProtoToTd($newparams[$td]));
                         }
                 }
             }

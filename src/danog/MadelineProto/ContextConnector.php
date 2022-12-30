@@ -42,7 +42,7 @@ class ContextConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
-        return Tools::call((function () use ($uri, $context, $token): Generator {
+        return Tools::call((function () use ($uri, $context, $token) {
             $ctx = $context ?? new ConnectContext();
             $token ??= new NullCancellationToken();
             $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
@@ -54,7 +54,7 @@ class ContextConnector implements Connector
                 try {
                     $ctx->setIsDns($this->fromDns);
                     $ctx->setCancellationToken($token);
-                    $result = (yield from $ctx->getStream());
+                    $result = ($ctx->getStream());
                     $this->logger->logger('OK!', Logger::WARNING);
                     return $result->getSocket();
                 } catch (Throwable $e) {

@@ -77,37 +77,37 @@ class FeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $this->updater = $API->updaters[$this->channelId];
-        if (yield from $this->waitForAuthOrSignal()) {
+        if ($this->waitForAuthOrSignal()) {
             return;
         }
-        $this->state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $this->state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         while (true) {
             $API->logger->logger("Resumed {$this}");
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                yield from $this->parse($updates);
+                $this->parse($updates);
                 $updates = null;
             }
             while ($this->parsedUpdates) {
                 $parsedUpdates = $this->parsedUpdates;
                 $this->parsedUpdates = [];
                 foreach ($parsedUpdates as $update) {
-                    yield from $API->saveUpdate($update);
+                    $API->saveUpdate($update);
                 }
                 $parsedUpdates = null;
                 $this->API->signalUpdate();
             }
-            if (yield from $this->waitForAuthOrSignal()) {
+            if ($this->waitForAuthOrSignal()) {
                 return;
             }
         }
     }
-    public function parse(array $updates): Generator
+    public function parse(array $updates)
     {
         \reset($updates);
         while ($updates) {
@@ -116,7 +116,7 @@ class FeedLoop extends ResumableSignalLoop
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
                 $this->API->logger->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
-                yield $this->updater->resume();
+                $this->updater->resume();
                 continue;
             }
             if (isset($update['pts'], $update['pts_count'])) {
@@ -135,7 +135,7 @@ class FeedLoop extends ResumableSignalLoop
                 if ($result > 0) {
                     $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
-                    yield $this->updater->resume();
+                    $this->updater->resume();
                     $updates = \array_merge($this->incomingUpdates, $updates);
                     $this->incomingUpdates = [];
                     continue;
@@ -152,15 +152,15 @@ class FeedLoop extends ResumableSignalLoop
             $this->save($update);
         }
     }
-    public function feed(array $updates): Generator
+    public function feed(array $updates)
     {
         $result = [];
         foreach ($updates as $update) {
-            $result[yield from $this->feedSingle($update)] = true;
+            $result[$this->feedSingle($update)] = true;
         }
         return $result;
     }
-    public function feedSingle(array $update): Generator
+    public function feedSingle(array $update)
     {
         $channelId = self::GENERIC;
         switch ($update['_']) {
@@ -205,16 +205,16 @@ class FeedLoop extends ResumableSignalLoop
                 if ($update['message']['_'] !== 'messageEmpty' && (
                     (
                         $from = isset($update['message']['from_id'])
-                        && !(yield from $this->API->peerIsset($update['message']['from_id']))
+                        && !($this->API->peerIsset($update['message']['from_id']))
                     ) || (
-                        $to = !(yield from $this->API->peerIsset($update['message']['peer_id']))
+                        $to = !($this->API->peerIsset($update['message']['peer_id']))
                     )
                         || (
                             $via_bot = isset($update['message']['via_bot_id'])
-                            && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))
+                            && !($this->API->peerIsset($update['message']['via_bot_id']))
                         ) || (
                             $entities = isset($update['message']['entities'])
-                            && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))
+                            && !($this->API->entitiesPeerIsset($update['message']['entities']))
                         )
                 )
                 ) {
@@ -240,7 +240,7 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 break;
             default:
-                if ($channelId && !(yield from $this->API->peerIsset($this->API->toSupergroup($channelId)))) {
+                if ($channelId && !($this->API->peerIsset($this->API->toSupergroup($channelId)))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
                     return false;
                 }
@@ -248,9 +248,9 @@ class FeedLoop extends ResumableSignalLoop
         }
         if ($channelId !== $this->channelId) {
             if (isset($this->API->feeders[$channelId])) {
-                return yield from $this->API->feeders[$channelId]->feedSingle($update);
+                return $this->API->feeders[$channelId]->feedSingle($update);
             } elseif ($this->channelId) {
-                return yield from $this->API->feeders[self::GENERIC]->feedSingle($update);
+                return $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
         $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);

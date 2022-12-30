@@ -60,10 +60,10 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $this->ctx = $ctx->getCtx();
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
         $this->uri = $ctx->getUri();
     }
     /**
@@ -89,11 +89,11 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
-        $buffer = yield $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
-        yield $buffer->bufferWrite($headers);
+        $buffer = $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
+        $buffer->bufferWrite($headers);
         return $buffer;
     }
     /**
@@ -101,17 +101,17 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
+        $buffer = $this->stream->getReadBuffer($l);
         $headers = '';
         $was_crlf = false;
         while (true) {
-            $piece = yield $buffer->bufferRead(2);
+            $piece = $buffer->bufferRead(2);
             $headers .= $piece;
             if ($piece === "\n\r") {
                 // Assume end of headers with \r\n\r\n
-                $headers .= yield $buffer->bufferRead(1);
+                $headers .= $buffer->bufferRead(1);
                 break;
             }
             if ($was_crlf && $piece === "\r\n") {
@@ -142,11 +142,11 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         if ($code !== 200) {
             $read = '';
             if (isset($headers['content-length'])) {
-                $read = yield $buffer->bufferRead((int) $headers['content-length']);
+                $read = $buffer->bufferRead((int) $headers['content-length']);
             }
             if ($close) {
                 $this->disconnect();
-                yield from $this->connect($this->ctx);
+                $this->connect($this->ctx);
             }
             Logger::log($read);
             $this->code = Tools::packSignedInt(-$code);
@@ -155,7 +155,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         if ($close) {
             $this->stream->disconnect();
-            yield $this->stream->connect($this->ctx);
+            $this->stream->connect($this->ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];

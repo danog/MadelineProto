@@ -82,16 +82,16 @@ class Lite
      *
      * @param string $config Path to config file
      */
-    public function connect(string $config): Generator
+    public function connect(string $config)
     {
-        $config = \json_decode(yield read($config), true);
+        $config = \json_decode(read($config), true);
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] ??= $config['validator']['zero_state'];
-        [$this->config] = $this->TL->deserialize(yield from $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
+        [$this->config] = $this->TL->deserialize($this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
-            yield from $connection->connect($lite);
+            $connection->connect($lite);
         }
     }
     /**
@@ -114,27 +114,27 @@ class Lite
      * @param string $methodName Method name
      * @param array  $args       Arguments
      */
-    public function methodCall(string $methodName, array $args = [], array $aargs = []): Generator
+    public function methodCall(string $methodName, array $args = [], array $aargs = [])
     {
-        $data = (yield from $this->TL->serializeMethod($methodName, $args));
-        $data = (yield from $this->TL->serializeMethod('liteServer.query', ['data' => $data]));
-        return yield from $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
+        $data = ($this->TL->serializeMethod($methodName, $args));
+        $data = ($this->TL->serializeMethod('liteServer.query', ['data' => $data]));
+        return $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
     }
     /**
      * Asynchronously run async callable.
      *
      * @param callable $func Function
      */
-    public function loop(callable $func): Generator
+    public function loop(callable $func)
     {
-        return yield $func();
+        return $func();
     }
     /**
      * Convert parameters.
      *
      * @param array $parameters Parameters
      */
-    public function botAPItoMTProto(array $parameters): Generator
+    public function botAPItoMTProto(array $parameters)
     {
         return $parameters;
         yield;

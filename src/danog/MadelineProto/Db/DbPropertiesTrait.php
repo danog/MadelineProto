@@ -26,7 +26,7 @@ trait DbPropertiesTrait
      *
      * @internal
      */
-    public function initDb(MTProto $MadelineProto, bool $reset = false): Generator
+    public function initDb(MTProto $MadelineProto, bool $reset = false)
     {
         if (empty(static::$dbProperties)) {
             throw new LogicException(static::class.' must have $dbProperties');
@@ -43,7 +43,7 @@ trait DbPropertiesTrait
                 $promises[$property] = DbPropertiesFactory::get($dbSettings, $table, $type, $this->{$property});
             }
         }
-        $promises = yield Tools::all($promises);
+        $promises = Tools::all($promises);
         foreach ($promises as $key => $data) {
             $this->{$key} = $data;
         }

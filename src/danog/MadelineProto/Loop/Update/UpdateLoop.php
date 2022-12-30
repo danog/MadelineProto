@@ -64,18 +64,18 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
-        if (yield from $this->waitForAuthOrSignal()) {
+        if ($this->waitForAuthOrSignal()) {
             return;
         }
-        $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $this->state = $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = 10;
         $first = true;
         while (true) {
-            if (yield from $this->waitForAuthOrSignal(false)) {
+            if ($this->waitForAuthOrSignal(false)) {
                 return;
             }
             $result = [];
@@ -93,7 +93,7 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                     $request_pts = $state->pts();
                     try {
-                        $difference = yield from $API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
+                        $difference = $API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
                     } catch (RPCErrorException $e) {
                         if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'])) {
                             $feeder->signal(true);
@@ -131,7 +131,7 @@ class UpdateLoop extends ResumableSignalLoop
                                 $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), Logger::VERBOSE);
                                 $difference['pts'] = $request_pts + 1;
                             }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
+                            $result += ($feeder->feed($difference['other_updates']));
                             $state->update($difference);
                             $feeder->saveMessages($difference['new_messages']);
                             if (!$difference['final']) {
@@ -157,7 +157,7 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 } else {
                     $API->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
-                    $difference = yield from $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
+                    $difference = $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
                     $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':
@@ -169,8 +169,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
-                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
+                            $result += ($feeder->feed($difference['other_updates']));
+                            $result += ($feeder->feed($difference['new_encrypted_messages']));
                             $state->update($difference['state']);
                             $feeder->saveMessages($difference['new_messages']);
                             unset($difference);
@@ -180,8 +180,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
-                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
+                            $result += ($feeder->feed($difference['other_updates']));
+                            $result += ($feeder->feed($difference['new_encrypted_messages']));
                             $state->update($difference['intermediate_state']);
                             $feeder->saveMessages($difference['new_messages']);
                             if ($difference['intermediate_state']['pts'] >= $toPts) {
@@ -207,7 +207,7 @@ class UpdateLoop extends ResumableSignalLoop
             $API->signalUpdate();
             $API->logger->logger("Finished signaling updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
             $first = false;
-            if (yield $this->waitSignal($this->pause($timeout * 1000))) {
+            if ($this->waitSignal($this->pause($timeout * 1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");
                 return;
             }

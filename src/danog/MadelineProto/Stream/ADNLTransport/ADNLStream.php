@@ -46,9 +46,9 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
-        $this->stream = yield from $ctx->getStream($header);
+        $this->stream = $ctx->getStream($header);
     }
     /**
      * Async close.
@@ -62,14 +62,14 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         $length += 64;
-        $buffer = yield $this->stream->getWriteBuffer($length + 4, $append);
-        yield $buffer->bufferWrite(\pack('V', $length));
+        $buffer = $this->stream->getWriteBuffer($length + 4, $append);
+        $buffer->bufferWrite(\pack('V', $length));
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length - 32);
-        yield $buffer->bufferWrite(Tools::random(32));
+        $buffer->bufferWrite(Tools::random(32));
         return $buffer;
     }
     /**
@@ -77,13 +77,13 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \unpack('V', yield $buffer->bufferRead(4))[1] - 32;
+        $buffer = $this->stream->getReadBuffer($l);
+        $length = \unpack('V', $buffer->bufferRead(4))[1] - 32;
         $this->stream->startReadHash();
         $this->stream->checkReadHash($length);
-        yield $buffer->bufferRead(32);
+        $buffer->bufferRead(32);
         $length -= 32;
         return $buffer;
     }

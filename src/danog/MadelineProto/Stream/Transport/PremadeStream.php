@@ -55,10 +55,10 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         if ($header !== '') {
-            yield $this->stream->write($header);
+            $this->stream->write($header);
         }
     }
     /**

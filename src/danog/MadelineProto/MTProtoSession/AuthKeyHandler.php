@@ -60,7 +60,7 @@ trait AuthKeyHandler
      *
      * @psalm-return Generator<mixed, (mixed|string), mixed, (($temp is false ? PermAuthKey : TempAuthKey)|null)>
      */
-    public function createAuthKey(bool $temp): Generator
+    public function createAuthKey(bool $temp)
     {
         $expires_in = $temp ? $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn() : -1;
         $cdn = $this->isCDN();
@@ -90,7 +90,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = Tools::random(16);
-                $ResPQ = yield from $this->methodCallAsyncRead('req_pq_multi', ['nonce' => $nonce]);
+                $ResPQ = $this->methodCallAsyncRead('req_pq_multi', ['nonce' => $nonce]);
                 /*
                  * ***********************************************************************
                  * Check if the client's nonce and the server's nonce are the same
@@ -137,7 +137,7 @@ trait AuthKeyHandler
                     $q = 0;
                     try {
                         if ($method === 'wolfram') {
-                            $p = yield from $this->wolframSingle($pq);
+                            $p = $this->wolframSingle($pq);
                         } else {
                             $p = PrimeModule::$method($pq);
                         }
@@ -168,7 +168,7 @@ trait AuthKeyHandler
                 $q_bytes = \strrev(Tools::packUnsignedInt($q));
                 $new_nonce = Tools::random(32);
                 $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp').'_dc', 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => $datacenter_id];
-                $p_q_inner_data = (yield from $this->API->getTL()->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
+                $p_q_inner_data = ($this->API->getTL()->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
@@ -206,7 +206,7 @@ trait AuthKeyHandler
                  *         string         $encrypted_answer                : Return this value if server responds with server_DH_params_ok
                  * ]
                  */
-                $server_dh_params = yield from $this->methodCallAsyncRead('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $key->fp, 'encrypted_data' => $encrypted_data]);
+                $server_dh_params = $this->methodCallAsyncRead('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $key->fp, 'encrypted_data' => $encrypted_data]);
                 /*
                  * ***********************************************************************
                  * Check if the client's nonce and the server's nonce are the same
@@ -311,7 +311,7 @@ trait AuthKeyHandler
                      *         string        $g_b                            : g^b mod dh_prime
                      * ]
                      */
-                    $data = (yield from $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'client_DH_inner_data', 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data'));
+                    $data = ($this->API->getTL()->serializeObject(['type' => ''], ['_' => 'client_DH_inner_data', 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data'));
                     /*
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
@@ -337,7 +337,7 @@ trait AuthKeyHandler
                      *         int128         $new_nonce_hash2                : Return this value if server responds with dh_gen_fail
                      * ]
                      */
-                    $Set_client_DH_params_answer = yield from $this->methodCallAsyncRead('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
+                    $Set_client_DH_params_answer = $this->methodCallAsyncRead('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
                     /*
                      * ***********************************************************************
                      * Generate auth_key
@@ -402,10 +402,10 @@ trait AuthKeyHandler
                 }
             } catch (SecurityException|Exception|RPCErrorException $e) {
                 $this->logger->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
-                yield from $this->reconnect();
+                $this->reconnect();
             } catch (Throwable $e) {
                 $this->logger->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', Logger::WARNING);
-                yield from $this->reconnect();
+                $this->reconnect();
             }
         }
         if (!$cdn) {
@@ -418,15 +418,15 @@ trait AuthKeyHandler
      * @param string|integer $what Number to factorize
      * @psalm-return Generator<int, Promise<string>, mixed, (false|int|string)>
      */
-    private function wolframSingle($what): Generator
+    private function wolframSingle($what)
     {
-        $code = (yield from $this->API->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
+        $code = ($this->API->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
         $query = 'Do prime factorization of '.$what;
         $params = ['async' => true, 'banners' => 'raw', 'debuggingdata' => false, 'format' => 'moutput', 'formattimeout' => 8, 'input' => $query, 'output' => 'JSON', 'proxycode' => \json_decode($code, true)['code']];
         $url = 'https://www.wolframalpha.com/input/json.jsp?'.\http_build_query($params);
         $request = new Request($url);
         $request->setHeader('referer', 'https://www.wolframalpha.com/input/?i='.\urlencode($query));
-        $res = \json_decode(yield (yield $this->API->datacenter->getHTTPClient()->request($request))->getBody()->buffer(), true);
+        $res = \json_decode(($this->API->datacenter->getHTTPClient()->request($request))->getBody()->buffer(), true);
         if (!isset($res['queryresult']['pods'])) {
             return false;
         }

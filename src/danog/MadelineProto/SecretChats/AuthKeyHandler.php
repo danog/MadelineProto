@@ -58,7 +58,7 @@ trait AuthKeyHandler
      *
      * @param array $params Secret chat ID
      */
-    public function acceptSecretChat(array $params): Generator
+    public function acceptSecretChat(array $params)
     {
         //$this->logger->logger($params['id'],$this->secretChatStatus($params['id']));
         if ($this->secretChatStatus($params['id']) !== 0) {
@@ -66,7 +66,7 @@ trait AuthKeyHandler
             $this->logger->logger("I've already accepted secret chat ".$params['id']);
             return false;
         }
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating b...', Logger::VERBOSE);
         $b = new BigInteger(Tools::random(256), 256);
         $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
@@ -105,8 +105,8 @@ trait AuthKeyHandler
         $this->secretFeeders[$params['id']]->resume();
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
-        yield from $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
-        yield from $this->notifyLayer($params['id']);
+        $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
+        $this->notifyLayer($params['id']);
         $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', Logger::NOTICE);
     }
     /**
@@ -114,21 +114,21 @@ trait AuthKeyHandler
      *
      * @param mixed $user User to start secret chat with
      */
-    public function requestSecretChat($user): Generator
+    public function requestSecretChat($user)
     {
-        $user = (yield from $this->getInfo($user));
+        $user = ($this->getInfo($user));
         if (!isset($user['InputUser'])) {
             throw new Exception('This peer is not present in the internal peer database');
         }
         $user = $user['InputUser'];
         $this->logger->logger('Creating secret chat with '.$user['user_id'].'...', Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating a...', Logger::VERBOSE);
         $a = new BigInteger(Tools::random(256), 256);
         $this->logger->logger('Generating g_a...', Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         Crypt::checkG($g_a, $dh_config['p']);
-        $res = yield from $this->methodCallAsyncRead('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()]);
+        $res = $this->methodCallAsyncRead('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
         $this->updaters[UpdateLoop::GENERIC]->resume();
         $this->logger->logger('Secret chat '.$res['id'].' requested successfully!', Logger::NOTICE);
@@ -139,14 +139,14 @@ trait AuthKeyHandler
      *
      * @param array $params Secret chat
      */
-    private function completeSecretChat(array $params): Generator
+    private function completeSecretChat(array $params)
     {
         if ($this->secretChatStatus($params['id']) !== 1) {
             //$this->logger->logger($this->secretChatStatus($params['id']));
             $this->logger->logger('Could not find and complete secret chat '.$params['id']);
             return false;
         }
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
         Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
@@ -154,7 +154,7 @@ trait AuthKeyHandler
         $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         //$this->logger->logger($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            yield from $this->discardSecretChat($params['id']);
+            $this->discardSecretChat($params['id']);
             throw new SecurityException('Invalid key fingerprint!');
         }
         $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
@@ -163,12 +163,12 @@ trait AuthKeyHandler
         $this->secretFeeders[$params['id']] = new SecretFeedLoop($this, $params['id']);
         $this->secretFeeders[$params['id']]->start();
         $this->secretFeeders[$params['id']]->resume();
-        yield from $this->notifyLayer($params['id']);
+        $this->notifyLayer($params['id']);
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
     }
-    private function notifyLayer($chat): Generator
+    private function notifyLayer($chat)
     {
-        yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->TL->getSecretLayer()]]]);
+        $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->TL->getSecretLayer()]]]);
     }
     /**
      * Temporary rekeyed secret chats.
@@ -181,13 +181,13 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat to rekey
      */
-    public function rekey(int $chat): Generator
+    public function rekey(int $chat)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return;
         }
         $this->logger->logger('Rekeying secret chat '.$chat.'...', Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating a...', Logger::VERBOSE);
         $a = new BigInteger(Tools::random(256), 256);
         $this->logger->logger('Generating g_a...', Logger::VERBOSE);
@@ -196,7 +196,7 @@ trait AuthKeyHandler
         $e = Tools::random(8);
         $this->temp_rekeyed_secret_chats[$e] = $a;
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
-        yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]]);
+        $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]]);
         $this->updaters[UpdateLoop::GENERIC]->resume();
         return $e;
     }
@@ -206,7 +206,7 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function acceptRekey(int $chat, array $params): Generator
+    private function acceptRekey(int $chat, array $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my_exchange_id = new BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
@@ -221,7 +221,7 @@ trait AuthKeyHandler
             }
         }
         $this->logger->logger('Accepting rekeying of secret chat '.$chat.'...', Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating b...', Logger::VERBOSE);
         $b = new BigInteger(Tools::random(256), 256);
         $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
@@ -234,7 +234,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['rekeying'] = [2, $params['exchange_id']];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
-        yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
+        $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
         $this->updaters[UpdateLoop::GENERIC]->resume();
     }
     /**
@@ -243,14 +243,14 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function commitRekey(int $chat, array $params): Generator
+    private function commitRekey(int $chat, array $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 1 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']])) {
             $this->secret_chats[$chat]['rekeying'] = [0];
             return;
         }
         $this->logger->logger('Committing rekeying of secret chat '.$chat.'...', Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
         Crypt::checkG($params['g_b'], $dh_config['p']);
         $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
@@ -258,10 +258,10 @@ trait AuthKeyHandler
         $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
         $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
+            $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
             throw new SecurityException('Invalid key fingerprint!');
         }
-        yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
+        $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         $this->secret_chats[$chat]['rekeying'] = [0];
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
@@ -276,13 +276,13 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function completeRekey(int $chat, array $params): Generator
+    private function completeRekey(int $chat, array $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'])) {
             return;
         }
         if ($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'] !== $params['key_fingerprint']) {
-            yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
+            $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
             throw new SecurityException('Invalid key fingerprint!');
         }
         $this->logger->logger('Completing rekeying of secret chat '.$chat.'...', Logger::VERBOSE);
@@ -292,7 +292,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = \time();
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
-        yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
+        $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
         $this->logger->logger('Secret chat '.$chat.' rekeyed successfully!', Logger::VERBOSE);
         return true;
     }
@@ -335,7 +335,7 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat ID
      */
-    public function discardSecretChat(int $chat): Generator
+    public function discardSecretChat(int $chat)
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', Logger::VERBOSE);
         if (isset($this->secret_chats[$chat])) {
@@ -345,7 +345,7 @@ trait AuthKeyHandler
             unset($this->temp_requested_secret_chats[$chat]);
         }
         try {
-            yield from $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat]);
+            $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat]);
         } catch (RPCErrorException $e) {
             if ($e->rpc !== 'ENCRYPTION_ALREADY_DECLINED') {
                 throw $e;

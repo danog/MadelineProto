@@ -227,9 +227,9 @@ class OutgoingMessage extends Message
     /**
      * Get message body.
      */
-    public function getBody(): Generator
+    public function getBody()
     {
-        return $this->body instanceof Generator ? yield from $this->body : $this->body;
+        return $this->body instanceof Generator ? $this->body : $this->body;
     }
 
     /**

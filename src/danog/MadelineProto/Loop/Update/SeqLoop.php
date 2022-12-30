@@ -53,20 +53,20 @@ class SeqLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $this->feeder = $API->feeders[FeedLoop::GENERIC];
-        if (yield from $this->waitForAuthOrSignal()) {
+        if ($this->waitForAuthOrSignal()) {
             return;
         }
-        $this->state = (yield from $API->loadUpdateState());
+        $this->state = ($API->loadUpdateState());
         while (true) {
             $API->logger->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                yield from $this->parse($updates);
+                $this->parse($updates);
                 $updates = null;
             }
             while ($this->pendingWakeups) {
@@ -77,12 +77,12 @@ class SeqLoop extends ResumableSignalLoop
                     $this->API->feeders[$channelId]->resume();
                 }
             }
-            if (yield from $this->waitForAuthOrSignal()) {
+            if ($this->waitForAuthOrSignal()) {
                 return;
             }
         }
     }
-    public function parse(array $updates): Generator
+    public function parse(array $updates)
     {
         \reset($updates);
         while ($updates) {
@@ -96,9 +96,9 @@ class SeqLoop extends ResumableSignalLoop
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
-                yield $this->pause(1000);
+                $this->pause(1000);
                 if (!$this->incomingUpdates) {
-                    yield $this->API->updaters[UpdateLoop::GENERIC]->resume();
+                    $this->API->updaters[UpdateLoop::GENERIC]->resume();
                 }
                 $this->incomingUpdates = \array_merge($this->incomingUpdates, [$update], $updates);
                 continue;
@@ -111,7 +111,7 @@ class SeqLoop extends ResumableSignalLoop
             if (isset($options['date'])) {
                 $this->state->date($options['date']);
             }
-            yield from $this->save($update);
+            $this->save($update);
         }
     }
     /**
@@ -125,9 +125,9 @@ class SeqLoop extends ResumableSignalLoop
     /**
      * @var array{updates: array} $updates
      */
-    public function save(array $updates): Generator
+    public function save(array $updates)
     {
-        $this->pendingWakeups += (yield from $this->feeder->feed($updates['updates']));
+        $this->pendingWakeups += ($this->feeder->feed($updates['updates']));
     }
     /**
      * @param true[] $wakeups

@@ -54,7 +54,7 @@ trait AuthKeyHandler
     public function acceptCallFrom(VoIP $instance, array $user)
     {
         $promise = Tools::call((function () use ($instance, $user) {
-            if (!$res = yield from $this->acceptCall($user)) {
+            if (!$res = $this->acceptCall($user)) {
                 $instance->discard();
                 return false;
             }
@@ -78,7 +78,7 @@ trait AuthKeyHandler
     public function discardCallFrom(VoIP $instance, array $call, array $reason, array $rating = [], bool $need_debug = true)
     {
         $promise = Tools::call(function () use ($instance, $call, $reason, $rating, $need_debug) {
-            if (!$res = yield from $this->discardCall($call, $reason, $rating, $need_debug)) {
+            if (!$res = $this->discardCall($call, $reason, $rating, $need_debug)) {
                 return false;
             }
             return $instance;
@@ -93,18 +93,18 @@ trait AuthKeyHandler
      *
      * @param mixed $user User
      */
-    public function requestCall($user): Generator
+    public function requestCall($user)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
         }
-        $user = (yield from $this->getInfo($user));
+        $user = ($this->getInfo($user));
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
             throw new Exception(Lang::$current_lang['peer_not_in_db']);
         }
         $user = $user['InputUser'];
         $this->logger->logger(\sprintf("Calling %s...", $user['user_id']), Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger(Lang::$current_lang['generating_a'], Logger::VERBOSE);
         $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
         $this->logger->logger(Lang::$current_lang['generating_g_a'], Logger::VERBOSE);
@@ -112,10 +112,10 @@ trait AuthKeyHandler
         Crypt::checkG($g_a, $dh_config['p']);
         $controller = new VoIP(true, $user['user_id'], $this, VoIP::CALL_STATE_REQUESTED);
         $controller->storage = ['a' => $a, 'g_a' => \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        $res = yield from $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
+        $res = $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
         $controller->setCall($res['phone_call']);
         $this->calls[$res['phone_call']['id']] = $controller;
-        yield $this->updaters[UpdateLoop::GENERIC]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
         return $controller;
     }
     /**
@@ -123,7 +123,7 @@ trait AuthKeyHandler
      *
      * @param array $call Call
      */
-    public function acceptCall(array $call): Generator
+    public function acceptCall(array $call)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new Exception();
@@ -133,13 +133,13 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $this->logger->logger(Lang::$current_lang['generating_b'], Logger::VERBOSE);
         $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
         try {
-            $res = yield from $this->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $call['id'], 'access_hash' => $call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
+            $res = $this->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $call['id'], 'access_hash' => $call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $call['id']));
@@ -147,13 +147,13 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(Lang::$current_lang['call_already_declined']);
-                yield from $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
+                $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
                 return false;
             }
             throw $e;
         }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
-        yield $this->updaters[UpdateLoop::GENERIC]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
         return true;
     }
     /**
@@ -161,7 +161,7 @@ trait AuthKeyHandler
      *
      * @param array $params Params
      */
-    public function confirmCall(array $params): Generator
+    public function confirmCall(array $params)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
@@ -171,12 +171,12 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
         Crypt::checkG($params['g_b'], $dh_config['p']);
         $key = \str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         try {
-            $res = (yield from $this->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]))['phone_call'];
+            $res = ($this->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]))['phone_call'];
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
@@ -184,7 +184,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(Lang::$current_lang['call_already_declined']);
-                yield from $this->discardCall($params['id'], ['_' => 'phoneCallDiscardReasonHangup']);
+                $this->discardCall($params['id'], ['_' => 'phoneCallDiscardReasonHangup']);
                 return false;
             }
             throw $e;
@@ -208,7 +208,7 @@ trait AuthKeyHandler
      *
      * @param array $params Params
      */
-    public function completeCall(array $params): Generator
+    public function completeCall(array $params)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
@@ -218,7 +218,7 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = (yield from $this->getDhConfig());
+        $dh_config = ($this->getDhConfig());
         if (\hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new SecurityException(Lang::$current_lang['invalid_g_a']);
         }
@@ -274,7 +274,7 @@ trait AuthKeyHandler
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      */
-    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): Generator
+    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
@@ -284,7 +284,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $call['id']), Logger::VERBOSE);
         try {
-            $res = yield from $this->methodCallAsyncRead('phone.discardCall', ['peer' => $call, 'duration' => \time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason]);
+            $res = $this->methodCallAsyncRead('phone.discardCall', ['peer' => $call, 'duration' => \time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason]);
         } catch (RPCErrorException $e) {
             if (!\in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'])) {
                 throw $e;
@@ -292,11 +292,11 @@ trait AuthKeyHandler
         }
         if (!empty($rating)) {
             $this->logger->logger(\sprintf(Lang::$current_lang['call_set_rating'], $call['id']), Logger::VERBOSE);
-            yield from $this->methodCallAsyncRead('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
+            $this->methodCallAsyncRead('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
         }
         if ($need_debug && isset($this->calls[$call['id']])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['call_debug_saving'], $call['id']), Logger::VERBOSE);
-            yield from $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
+            $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
         }
         $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];
         $this->updates[$this->updates_key++] = $update;

@@ -26,10 +26,10 @@ class MysqlArray extends SqlArray
     /**
      * Initialize on startup.
      */
-    public function initStartup(): Generator
+    public function initStartup()
     {
         $this->setTable($this->table);
-        yield from $this->initConnection($this->dbSettings);
+        $this->initConnection($this->dbSettings);
     }
 
     /**
@@ -71,7 +71,7 @@ class MysqlArray extends SqlArray
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabaseMysql $settings): Generator
+    public function initConnection(DatabaseMysql $settings)
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
@@ -82,7 +82,7 @@ class MysqlArray extends SqlArray
             $settings->getPassword(),
         );
         if (!isset($this->db)) {
-            $this->db = yield from Mysql::getConnection($settings);
+            $this->db = Mysql::getConnection($settings);
         }
     }
 
@@ -92,10 +92,10 @@ class MysqlArray extends SqlArray
      * @throws Throwable
      * @psalm-return Generator<int, Promise, mixed, mixed>
      */
-    protected function prepareTable(): Generator
+    protected function prepareTable()
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-        return yield $this->db->query("
+        return $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,
@@ -109,16 +109,16 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): Generator
+    protected function renameTable(string $from, string $to)
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
-        yield $this->db->query("
+        $this->db->query("
             REPLACE INTO `{$to}`
             SELECT * FROM `{$from}`;
         ");
 
-        yield $this->db->query("
+        $this->db->query("
             DROP TABLE `{$from}`;
         ");
     }

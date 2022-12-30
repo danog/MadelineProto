@@ -64,15 +64,15 @@ class PostgresArray extends SqlArray
     /**
      * Initialize on startup.
      */
-    public function initStartup(): Generator
+    public function initStartup()
     {
         $this->setTable($this->table);
-        yield from $this->initConnection($this->dbSettings);
+        $this->initConnection($this->dbSettings);
     }
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabasePostgres $settings): Generator
+    public function initConnection(DatabasePostgres $settings)
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
@@ -83,7 +83,7 @@ class PostgresArray extends SqlArray
             $settings->getPassword(),
         );
         if (!isset($this->db)) {
-            $this->db = yield from Postgres::getConnection($settings);
+            $this->db = Postgres::getConnection($settings);
         }
     }
 
@@ -103,11 +103,11 @@ class PostgresArray extends SqlArray
      * @throws Throwable
      * @psalm-return Generator<int, Promise, mixed, void>
      */
-    protected function prepareTable(): Generator
+    protected function prepareTable()
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
 
-        yield $this->db->query("
+        $this->db->query("
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
             (
                 \"key\" VARCHAR(255) PRIMARY KEY NOT NULL,
@@ -116,11 +116,11 @@ class PostgresArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): Generator
+    protected function renameTable(string $from, string $to)
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
-        yield $this->db->query(/** @lang PostgreSQL */ "
+        $this->db->query(/** @lang PostgreSQL */ "
             ALTER TABLE \"$from\" RENAME TO \"$to\";
         ");
     }

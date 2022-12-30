@@ -46,7 +46,7 @@ trait MessageHandler
      * @param DeferredFuture $queuePromise Queue promise
      * @internal
      */
-    public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise): Generator
+    public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise)
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $chat_id));
@@ -56,12 +56,12 @@ trait MessageHandler
         $this->secret_chats[$chat_id]['ttr']--;
         if ($this->secret_chats[$chat_id]['layer'] > 8) {
             if (($this->secret_chats[$chat_id]['ttr'] <= 0 || \time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
-                yield from $this->rekey($chat_id);
+                $this->rekey($chat_id);
             }
             if (isset($this->secretQueue[$chat_id])) {
                 $promise = $this->secretQueue[$chat_id];
                 $this->secretQueue[$chat_id] = $queuePromise->getFuture();
-                yield $promise;
+                $promise;
             } else {
                 $this->secretQueue[$chat_id] = $queuePromise->getFuture();
             }
@@ -70,7 +70,7 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
-        $message = yield from $this->TL->serializeObject(['type' => $constructor], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
+        $message = $this->TL->serializeObject(['type' => $constructor], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
             $padding = Tools::posmod(-\strlen($message), 16);
@@ -93,7 +93,7 @@ trait MessageHandler
      *
      * @internal
      */
-    public function handleEncryptedUpdate(array $message): Generator
+    public function handleEncryptedUpdate(array $message)
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
@@ -104,12 +104,12 @@ trait MessageHandler
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
-                    yield from $this->discardSecretChat($message['message']['chat_id']);
+                    $this->discardSecretChat($message['message']['chat_id']);
                     throw new SecurityException(Lang::$current_lang['fingerprint_mismatch']);
                 }
                 $old = true;
             } else {
-                yield from $this->discardSecretChat($message['message']['chat_id']);
+                $this->discardSecretChat($message['message']['chat_id']);
                 throw new SecurityException(Lang::$current_lang['fingerprint_mismatch']);
             }
         }
@@ -140,16 +140,16 @@ trait MessageHandler
         }
         [$deserialized, $sideEffects] = $this->TL->deserialize($message_data, ['type' => '']);
         if ($sideEffects) {
-            yield $sideEffects;
+            $sideEffects;
         }
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
         if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || \time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
-            yield from $this->rekey($message['message']['chat_id']);
+            $this->rekey($message['message']['chat_id']);
         }
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']] = $message['message'];
-        yield from $this->handleDecryptedUpdate($message);
+        $this->handleDecryptedUpdate($message);
         return true;
     }
     /**

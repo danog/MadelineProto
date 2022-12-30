@@ -115,12 +115,12 @@ trait BotAPI
      * @param array $data Data
      * @return Generator<array>
      */
-    public function MTProtoToBotAPI(array $data): Generator
+    public function MTProtoToBotAPI(array $data)
     {
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = (yield from $this->MTProtoToBotAPI($element));
+                $newd[$key] = ($this->MTProtoToBotAPI($element));
             }
             return $newd;
         }
@@ -132,7 +132,7 @@ trait BotAPI
             case 'updateShortSentMessage':
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $data = yield from $this->extractMessageUpdate($data);
+                $data = $this->extractMessageUpdate($data);
                 // no break
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
@@ -145,11 +145,11 @@ trait BotAPI
                 $newd['post'] = $data['post'];
                 $newd['silent'] = $data['silent'];
                 if (isset($data['from_id'])) {
-                    $newd['from'] = (yield from $this->getPwrChat($data['from_id']));
+                    $newd['from'] = ($this->getPwrChat($data['from_id']));
                 }
-                $newd['chat'] = (yield from $this->getPwrChat($data['peer_id']));
+                $newd['chat'] = ($this->getPwrChat($data['peer_id']));
                 if (isset($data['entities'])) {
-                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities']));
+                    $newd['entities'] = ($this->MTProtoToBotAPI($data['entities']));
                 }
                 if (isset($data['views'])) {
                     $newd['views'] = $data['views'];
@@ -158,14 +158,14 @@ trait BotAPI
                     $newd['edit_date'] = $data['edit_date'];
                 }
                 if (isset($data['via_bot_id'])) {
-                    $newd['via_bot'] = (yield from $this->getPwrChat($data['via_bot_id']));
+                    $newd['via_bot'] = ($this->getPwrChat($data['via_bot_id']));
                 }
                 if (isset($data['fwd_from']['from_id'])) {
-                    $newd['forward_from'] = (yield from $this->getPwrChat($data['fwd_from']['from_id']));
+                    $newd['forward_from'] = ($this->getPwrChat($data['fwd_from']['from_id']));
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
-                        $newd['forward_from_chat'] = yield from $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
+                        $newd['forward_from_chat'] = $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
                     } catch (Throwable $e) {
                     }
                 }
@@ -176,7 +176,7 @@ trait BotAPI
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media']));
+                    $newd = \array_merge($newd, $this->MTProtoToBotAPI($data['media']));
                 }
                 return $newd;
             case 'messageEntityMention':
@@ -234,7 +234,7 @@ trait BotAPI
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
-                $data['user'] = (yield from $this->getPwrChat($data['user_id']));
+                $data['user'] = ($this->getPwrChat($data['user_id']));
                 unset($data['user_id']);
                 return $data;
             case 'messageMediaPhoto':
@@ -366,7 +366,7 @@ trait BotAPI
      * @internal
      * @return Generator<array>
      */
-    public function parseMode(array $arguments): Generator
+    public function parseMode(array $arguments)
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;

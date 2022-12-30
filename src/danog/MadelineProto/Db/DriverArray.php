@@ -28,23 +28,23 @@ abstract class DriverArray implements DbArray
     /**
      * Initialize connection.
      */
-    abstract public function initConnection(DatabaseAbstract $settings): Generator;
+    abstract public function initConnection(DatabaseAbstract $settings);
     /**
      * Initialize on startup.
      */
-    abstract public function initStartup(): Generator;
+    abstract public function initStartup();
 
     /**
      * Create table for property.
      *
      * @throws Throwable
      */
-    abstract protected function prepareTable(): Generator;
+    abstract protected function prepareTable();
 
     /**
      * Rename table.
      */
-    abstract protected function renameTable(string $from, string $to): Generator;
+    abstract protected function renameTable(string $from, string $to);
 
     /**
      * Get the value of table.
@@ -72,7 +72,7 @@ abstract class DriverArray implements DbArray
      */
     public function isset(string|int $key): Future
     {
-        return call(fn () => null !== yield $this->offsetGet($key));
+        return call(fn () => null !== $this->offsetGet($key));
     }
 
     /**
@@ -91,15 +91,15 @@ abstract class DriverArray implements DbArray
         $instance->startCacheCleanupLoop();
 
         return call(static function () use ($instance, $previous, $settings) {
-            yield from $instance->initConnection($settings);
-            yield from $instance->prepareTable();
+            $instance->initConnection($settings);
+            $instance->prepareTable();
 
             if (static::getClassName($previous) !== static::getClassName($instance)) {
                 if ($previous instanceof DriverArray) {
-                    yield from $previous->initStartup();
+                    $previous->initStartup();
                 }
-                yield from static::renameTmpTable($instance, $previous);
-                yield from static::migrateDataToDb($instance, $previous);
+                static::renameTmpTable($instance, $previous);
+                static::migrateDataToDb($instance, $previous);
             }
 
             return $instance;
@@ -114,13 +114,13 @@ abstract class DriverArray implements DbArray
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
      */
-    protected static function renameTmpTable(self $new, $old): Generator
+    protected static function renameTmpTable(self $new, $old)
     {
         if ($old instanceof SqlArray && $old->getTable()) {
             if ($old->getTable() !== $new->getTable() &&
                 !\str_starts_with($new->getTable(), 'tmp')
             ) {
-                yield from $new->renameTable($old->getTable(), $new->getTable());
+                $new->renameTable($old->getTable(), $new->getTable());
             } else {
                 $new->setTable($old->getTable());
             }
@@ -131,28 +131,28 @@ abstract class DriverArray implements DbArray
      * @param DbArray|array|null $old
      * @throws Throwable
      */
-    protected static function migrateDataToDb(self $new, $old): Generator
+    protected static function migrateDataToDb(self $new, $old)
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {
-                $old = yield MemoryArray::getInstance('', $old, new Memory);
+                $old = MemoryArray::getInstance('', $old, new Memory);
             }
             Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
 
             $counter = 0;
-            $total = yield $old->count();
+            $total = $old->count();
             $iterator = $old->getIterator();
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 $counter++;
                 if ($counter % 500 === 0 || $counter === $total) {
-                    yield $new->set(...$iterator->getCurrent());
+                    $new->set(...$iterator->getCurrent());
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
                 } else {
                     $new->set(...$iterator->getCurrent());
                 }
                 $new->clearCache();
             }
-            yield $old->clear();
+            $old->clear();
             Logger::log('Converting database done.', Logger::ERROR);
         }
     }

@@ -75,11 +75,11 @@ class Ogg
      * @param int                     $frameDuration Required frame duration, microseconds
      * @psalm-return Generator<mixed, mixed, mixed, self>
      */
-    public static function init(BufferedStreamInterface $stream, int $frameDuration): Generator
+    public static function init(BufferedStreamInterface $stream, int $frameDuration)
     {
         $self = new self;
         $self->frameDuration = $frameDuration;
-        $self->stream = yield $stream->getReadBuffer($l);
+        $self->stream = $stream->getReadBuffer($l);
         $self->emitter = new Emitter;
         $pack_format = [
             'stream_structure_version' => 'C',
@@ -117,7 +117,7 @@ class Ogg
     /**
      * OPUS state machine.
      */
-    private function opusStateMachine(string $content): Generator
+    private function opusStateMachine(string $content)
     {
         $curStream = 0;
         $offset = 0;
@@ -204,7 +204,7 @@ class Ogg
                 $sum = \array_sum($sizes);
                 $this->opusPayload .= \substr($content, $preOffset, ($offset - $preOffset) + $sum + $paddingLen);
                 if ($this->currentDuration === $this->frameDuration) {
-                    yield $this->emitter->emit($this->opusPayload);
+                    $this->emitter->emit($this->opusPayload);
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
                 }
@@ -222,7 +222,7 @@ class Ogg
                     if ($this->currentDuration > $this->frameDuration) {
                         Logger::log("Emitting packet with duration {$this->currentDuration} but need {$this->frameDuration}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
                     }
-                    yield $this->emitter->emit($this->opusPayload);
+                    $this->emitter->emit($this->opusPayload);
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
                 }
@@ -234,13 +234,13 @@ class Ogg
     /**
      * Read frames.
      */
-    public function read(): Generator
+    public function read()
     {
         $state = self::STATE_READ_HEADER;
         $content = '';
 
         while (true) {
-            $init = yield $this->stream->bufferRead(4+23);
+            $init = $this->stream->bufferRead(4+23);
             if (empty($init)) {
                 $this->emitter->complete();
                 return false; // EOF
@@ -267,7 +267,7 @@ class Ogg
 
             $segments = \unpack(
                 'C*',
-                yield $this->stream->bufferRead(\ord($init[26])),
+                $this->stream->bufferRead(\ord($init[26])),
             );
 
             //$serial = $headers['bitstream_serial_number'];
@@ -282,9 +282,9 @@ class Ogg
             foreach ($segments as $segment_size) {
                 $sizeAccumulated += $segment_size;
                 if ($segment_size < 255) {
-                    $content .= yield $this->stream->bufferRead($sizeAccumulated);
+                    $content .= $this->stream->bufferRead($sizeAccumulated);
                     if ($state === self::STATE_STREAMING) {
-                        yield from $this->opusStateMachine($content);
+                        $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         if (\substr($content, 0, 8) !== 'OpusHead') {
                             throw new RuntimeException("This is not an OPUS stream!");

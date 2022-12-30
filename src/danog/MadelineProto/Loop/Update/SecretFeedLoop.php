@@ -58,10 +58,10 @@ class SecretFeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
-        if (yield from $this->waitForAuthOrSignal()) {
+        if ($this->waitForAuthOrSignal()) {
             return;
         }
         while (true) {
@@ -71,7 +71,7 @@ class SecretFeedLoop extends ResumableSignalLoop
                 $this->incomingUpdates = [];
                 foreach ($updates as $update) {
                     try {
-                        if (!yield from $API->handleEncryptedUpdate($update)) {
+                        if (!$API->handleEncryptedUpdate($update)) {
                             $API->logger->logger("Secret chat deleted, exiting $this...");
                             unset($API->secretFeeders[$this->secretId]);
                             return;
@@ -84,7 +84,7 @@ class SecretFeedLoop extends ResumableSignalLoop
                 }
                 $updates = null;
             }
-            if (yield from $this->waitForAuthOrSignal()) {
+            if ($this->waitForAuthOrSignal()) {
                 return;
             }
         }

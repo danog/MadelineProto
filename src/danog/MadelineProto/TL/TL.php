@@ -393,10 +393,10 @@ class TL
      * @param integer $layer  Layer version
      * @psalm-return Generator<(int|mixed), (array|mixed), mixed, (false|mixed|null|string)>
      */
-    public function serializeObject(array $type, $object, string $ctx, int $layer = -1): Generator
+    public function serializeObject(array $type, $object, string $ctx, int $layer = -1)
     {
         if ($object instanceof Generator) {
-            $object = yield from $object;
+            $object = $object;
         }
         switch ($type['type']) {
             case 'int':
@@ -509,7 +509,7 @@ class TL
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'vector':
@@ -518,7 +518,7 @@ class TL
                 }
                 $concat = Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'Object':
@@ -530,7 +530,7 @@ class TL
             $object = ['_' => 'inputMessageID', 'id' => $object];
         } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
-            $object = $object instanceof Generator ? yield from $object : yield $object;
+            $object = $object instanceof Generator ? $object : $object;
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
                     throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
@@ -547,7 +547,7 @@ class TL
             $object['_'] = $constructorData['predicate'];
         }
         if (isset($this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
-            $object = yield $this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+            $object = $this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
         }
         $predicate = $object['_'];
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
@@ -565,7 +565,7 @@ class TL
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
         $concat = $bare ? '' : $constructorData['id'];
-        return $concat.(yield from $this->serializeParams($constructorData, $object, '', $layer, null));
+        return $concat.($this->serializeParams($constructorData, $object, '', $layer, null));
     }
     /**
      * Serialize method.
@@ -574,13 +574,13 @@ class TL
      * @param mixed  $arguments Arguments
      * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|Promise<string>|StreamInterface|array|int|mixed), mixed, string>
      */
-    public function serializeMethod(string $method, $arguments): Generator
+    public function serializeMethod(string $method, $arguments)
     {
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
             throw new Exception(Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'].(yield from $this->serializeParams($tl, $arguments, $method, -1, $arguments['queuePromise'] ?? null));
+        return $tl['id'].($this->serializeParams($tl, $arguments, $method, -1, $arguments['queuePromise'] ?? null));
     }
     /**
      * Serialize parameters.
@@ -591,7 +591,7 @@ class TL
      * @param integer $layer     Layer
      * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, string>
      */
-    private function serializeParams(array $tl, array $arguments, string $ctx, int $layer, $promise): Generator
+    private function serializeParams(array $tl, array $arguments, string $ctx, int $layer, $promise)
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
@@ -622,11 +622,11 @@ class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= yield from $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt($modulus = 3)), 'random_bytes');
+                    $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= yield from $this->serializeObject($current_argument, yield from $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $promise), 'data');
+                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $promise), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -659,7 +659,7 @@ class TL
                     continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
-                    $serialized .= (yield from $this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
+                    $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
                     continue;
                 }
                 if ($tl['type'] === 'DocumentAttribute' && \in_array($current_argument['name'], ['w', 'h', 'duration'])) {
@@ -700,11 +700,11 @@ class TL
                 });
             }
             if ($current_argument['type'] === 'InputFile' && (!\is_array($arguments[$current_argument['name']]) || !(isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'))) {
-                $arguments[$current_argument['name']] = (yield from $this->API->upload($arguments[$current_argument['name']]));
+                $arguments[$current_argument['name']] = ($this->API->upload($arguments[$current_argument['name']]));
             }
             if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = (yield from $this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = ($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
                         throw new \danog\MadelineProto\Exception(Lang::$current_lang['sec_peer_not_in_db']);
@@ -713,7 +713,7 @@ class TL
                 }
             }
             //$this->API->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
-            $serialized .= (yield from $this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));
+            $serialized .= ($this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));
         }
         return $serialized;
     }

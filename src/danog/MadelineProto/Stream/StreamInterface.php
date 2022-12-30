@@ -37,7 +37,7 @@ interface StreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator;
+    public function connect(ConnectionContext $ctx, string $header = '');
     /**
      * Disconnect from the server.
      */

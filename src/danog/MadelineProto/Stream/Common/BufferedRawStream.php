@@ -52,9 +52,9 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param ConnectionContext $ctx Connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
-        $this->stream = yield from $ctx->getStream($header);
+        $this->stream = $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
         return true;
     }
@@ -155,7 +155,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Amount of data to read
      */
-    public function bufferReadGenerator(int $length): Generator
+    public function bufferReadGenerator(int $length)
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -164,7 +164,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             \fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = yield $this->read();
+            $chunk = $this->read();
             if ($chunk === null) {
                 $this->disconnect();
                 throw new NothingInTheSocketException();

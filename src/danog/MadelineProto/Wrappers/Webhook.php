@@ -60,16 +60,16 @@ trait Webhook
             $this->logger->logger('EMPTY UPDATE');
             return;
         }
-        Tools::callFork((function () use ($payload): Generator {
+        Tools::callFork((function () use ($payload) {
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
-            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
+            $result = ($this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
             $this->logger->logger('Result of webhook query is '.$result, Logger::NOTICE);
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
-                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result));
+                    $this->logger->logger('Reverse webhook command returned', $this->methodCallAsyncRead($result['method'], $result));
                 } catch (Throwable $e) {
                     $this->logger->logger("Reverse webhook command returned: {$e}");
                 }

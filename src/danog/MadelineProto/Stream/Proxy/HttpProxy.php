@@ -52,7 +52,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -61,7 +61,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
-        $this->stream = (yield from $ctx->getStream());
+        $this->stream = ($ctx->getStream());
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
@@ -70,16 +70,16 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             }
         } catch (Exception $e) {
         }
-        yield $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
-        $buffer = yield $this->stream->getReadBuffer($l);
+        $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
+        $buffer = $this->stream->getReadBuffer($l);
         $headers = '';
         $was_crlf = false;
         while (true) {
-            $piece = yield $buffer->bufferRead(2);
+            $piece = $buffer->bufferRead(2);
             $headers .= $piece;
             if ($piece === "\n\r") {
                 // Assume end of headers with \r\n\r\n
-                $headers .= yield $buffer->bufferRead(1);
+                $headers .= $buffer->bufferRead(1);
                 break;
             }
             if ($was_crlf && $piece === "\r\n") {
@@ -110,29 +110,29 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if ($code !== 200) {
             $read = '';
             if (isset($headers['content-length'])) {
-                $read = yield $buffer->bufferRead((int) $headers['content-length']);
+                $read = $buffer->bufferRead((int) $headers['content-length']);
             }
             if ($close) {
                 $this->disconnect();
-                yield $this->connect($ctx);
+                $this->connect($ctx);
             }
             Logger::log(\trim($read));
             throw new Exception($description, $code);
         }
         if ($close) {
-            yield $this->stream->disconnect();
-            yield $this->stream->connect($ctx);
+            $this->stream->disconnect();
+            $this->stream->connect($ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];
-            $read = yield $buffer->bufferRead($length);
+            $read = $buffer->bufferRead($length);
         }
         if ($secure) {
-            yield $this->getSocket()->setupTls();
+            $this->getSocket()->setupTls();
         }
         Logger::log('Connected to '.$address.':'.$port.' via http');
         if (\strlen($header)) {
-            yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
+            ($this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }
     }
     /**

@@ -47,7 +47,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Stream to use as data source.
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $this->in_seq_no = -1;
         $this->out_seq_no = -1;
@@ -67,11 +67,11 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);
-        $buffer = yield $this->stream->getWriteBuffer($length + 12, $append);
+        $buffer = $this->stream->getWriteBuffer($length + 12, $append);
         $this->out_seq_no++;
         $buffer->bufferWrite(\pack('VV', $length + 12, $this->out_seq_no));
         return $buffer;
@@ -81,15 +81,15 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
         $this->stream->startReadHash();
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $read_length = \unpack('V', yield $buffer->bufferRead(4))[1];
+        $buffer = $this->stream->getReadBuffer($l);
+        $read_length = \unpack('V', $buffer->bufferRead(4))[1];
         $length = $read_length - 12;
         $this->stream->checkReadHash($read_length - 8);
         $this->in_seq_no++;
-        $in_seq_no = \unpack('V', yield $buffer->bufferRead(4))[1];
+        $in_seq_no = \unpack('V', $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
             throw new Exception('Incoming seq_no mismatch');
         }

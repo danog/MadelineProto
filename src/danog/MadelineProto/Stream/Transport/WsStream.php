@@ -69,7 +69,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         if (!\class_exists(Handshake::class)) {
             throw new Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
@@ -78,9 +78,9 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
         $handshake = new Handshake($uri);
-        $this->stream = yield ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellationToken());
+        $this->stream = ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellationToken());
         if (\strlen($header)) {
-            yield $this->write($header);
+            $this->write($header);
         }
     }
     /**
@@ -94,15 +94,15 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         }
         return new Success();
     }
-    public function readGenerator(): Generator
+    public function readGenerator()
     {
         try {
-            if (!$this->message || ($data = yield $this->message->buffer()) === null) {
-                $this->message = yield $this->stream->receive();
+            if (!$this->message || ($data = $this->message->buffer()) === null) {
+                $this->message = $this->stream->receive();
                 if (!$this->message) {
                     return null;
                 }
-                $data = yield $this->message->buffer();
+                $data = $this->message->buffer();
                 $this->message = null;
             }
         } catch (Throwable $e) {

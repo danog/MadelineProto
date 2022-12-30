@@ -574,12 +574,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Serialize session, returning object to serialize to db.
      */
-    public function serializeSession(object $data): Generator
+    public function serializeSession(object $data)
     {
         if (!isset($this->session) || !$this->session || $this->session instanceof MemoryArray) {
             return $data;
         }
-        yield $this->session->set('data', $data);
+        $this->session->set('data', $data);
         return $this->session;
     }
 
@@ -629,21 +629,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         self::$references[\spl_object_hash($this)] = $this;
         $this->wrapper = $wrapper;
-        $this->setInitPromise($this->__construct_async($settings));
-    }
-    /**
-     * Async constructor function.
-     *
-     * @param Settings|SettingsEmpty $settings Settings
-     */
-    public function __construct_async(SettingsAbstract $settings): Generator
-    {
+
         // Initialize needed stuffs
         Magic::start();
         // Parse and store settings
         $this->updateSettingsInternal($settings);
         // Actually instantiate needed classes like a boss
-        yield from $this->cleanupProperties();
+        $this->cleanupProperties();
         // Start IPC server
         if (!$this->ipcServer) {
             try {
@@ -665,12 +657,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         // Load rsa keys
         $this->rsa_keys = [];
         foreach (self::RSA_KEYS as $key) {
-            $key = yield from RSA::load($this->TL, $key);
+            $key = RSA::load($this->TL, $key);
             $this->rsa_keys[$key->fp] = $key;
         }
         $this->test_rsa_keys = [];
         foreach (self::TEST_RSA_KEYS as $key) {
-            $key = yield from RSA::load($this->TL, $key);
+            $key = RSA::load($this->TL, $key);
             $this->test_rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
@@ -682,12 +674,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             $callbacks[] = $this->minDatabase;
         }
         $this->TL->init($this->settings->getSchema(), $callbacks);
-        yield from $this->connectToAllDcs();
+        $this->connectToAllDcs();
         $this->startLoops();
         $this->datacenter->curdc = 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
-                $nearest_dc = yield from $this->methodCallAsyncRead('help.getNearestDc', []);
+                $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings->setDefaultDc($this->datacenter->curdc = (int) $nearest_dc['nearest_dc']);
@@ -698,7 +690,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 }
             }
         }
-        yield from $this->getConfig([]);
+        $this->getConfig([]);
         $this->startUpdateSystem(true);
         $this->v = self::V;
 
@@ -811,10 +803,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cleanup memory and session file.
      */
-    public function cleanup(): Generator
+    public function cleanup()
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
-        yield from $this->referenceDatabase->init();
         $callbacks = [$this];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
             $callbacks[] = $this->referenceDatabase;
@@ -825,16 +816,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->TL->updateCallbacks($callbacks);
     }
 
-    private function fillUsernamesCache(): Generator
+    private function fillUsernamesCache()
     {
         if (!$this->settings->getDb()->getEnableUsernameDb()) {
-            yield $this->usernames->clear();
+            $this->usernames->clear();
             return;
         }
-        if (!yield $this->usernames->count()) {
+        if (!$this->usernames->count()) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
             $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [$id, $chat] = $iterator->getCurrent();
                 if (isset($chat['username'])) {
                     $this->usernames[\strtolower($chat['username'])] = $id;
@@ -916,7 +907,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param string $url URL
      * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url): Generator
+    public function fileGetContents(string $url)
     {
         return $this->datacenter->fileGetContents($url);
     }
@@ -1020,7 +1011,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @internal
      * @psalm-return Generator<mixed, mixed, mixed, void>
      */
-    private function cleanupProperties(): Generator
+    private function cleanupProperties()
     {
         if (!$this->channels_state instanceof CombinedUpdatesState) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
@@ -1061,21 +1052,21 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         $db []= $this->initDb($this);
-        yield Tools::all($db);
-        yield from $this->fillUsernamesCache();
+        Tools::all($db);
+        $this->fillUsernamesCache();
 
         if (!$this->settings->getDb()->getEnableFullPeerDb()) {
-            yield $this->full_chats->clear();
+            $this->full_chats->clear();
         }
         if (!$this->settings->getDb()->getEnablePeerInfoDb()) {
-            if (yield $this->chats->isset(0)) {
+            if ($this->chats->isset(0)) {
                 return;
             }
             $this->logger("Cleaning up peer database...");
             $k = 0;
-            $total = yield $this->chats->count();
+            $total = $this->chats->count();
             $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [$key, $value] = $iterator->getCurrent();
                 $value = [
                     '_' => $value['_'],
@@ -1086,14 +1077,14 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $k++;
                 if ($k % 500 === 0 || $k === $total) {
                     $this->logger("Cleaning up peer database ($k/$total)...");
-                    yield $this->chats->set($key, $value);
+                    $this->chats->set($key, $value);
                 } else {
                     $this->chats->set($key, $value);
                 }
             }
-            yield $this->chats->set(0, []);
+            $this->chats->set(0, []);
             $this->logger("Cleaned up peer database!");
-        } elseif (yield $this->chats->isset(0)) {
+        } elseif ($this->chats->isset(0)) {
             $this->chats->unset(0);
         }
     }
@@ -1105,7 +1096,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @throws RPCErrorException
      * @throws Throwable
      */
-    private function upgradeMadelineProto(): Generator
+    private function upgradeMadelineProto()
     {
         if (!isset($this->snitch)) {
             $this->snitch = new Snitch;
@@ -1119,16 +1110,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->settings->setSchema(new TLSchema);
 
-        yield from $this->initDb($this);
+        $this->initDb($this);
 
         if (!isset($this->secret_chats)) {
             $this->secret_chats = [];
         }
         $iterator = $this->full_chats->getIterator();
-        while (yield $iterator->advance()) {
+        while ($iterator->advance()) {
             [$id, $full] = $iterator->getCurrent();
             if (isset($full['full'], $full['last_update'])) {
-                yield $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
+                $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
             }
         }
 
@@ -1148,9 +1139,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                 }
             } else {
                 self::$dbProperties['channel_participants'] = 'array';
-                yield from $this->initDb($this);
+                $this->initDb($this);
                 $iterator = $this->channel_participants->getIterator();
-                while (yield $iterator->advance()) {
+                while ($iterator->advance()) {
                     [$channelId, $filters] = $iterator->getCurrent();
                     foreach ($filters as $filter => $qs) {
                         foreach ($qs as $q => $offsets) {
@@ -1181,11 +1172,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
-        yield from $this->__construct_async($this->settings);
+        $this->__construct_async($this->settings);
         foreach ($this->secret_chats as $chat => $data) {
             try {
                 if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                    yield from $this->notifyLayer($chat);
+                    $this->notifyLayer($chat);
                 }
             } catch (RPCErrorException $e) {
             }
@@ -1198,7 +1189,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param APIWrapper             $wrapper  API wrapper
      * @internal
      */
-    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): Generator
+    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper)
     {
         // Set reference to itself
         self::$references[\spl_object_hash($this)] = $this;
@@ -1238,17 +1229,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         $this->forceInit(false);
-        $this->setInitPromise($this->wakeupAsync($settings));
-
-        return $this->initAsynchronously();
-    }
-    /**
-     * Async wakeup function.
-     *
-     * @param Settings|SettingsEmpty $settings New settings
-     */
-    private function wakeupAsync(SettingsAbstract $settings): Generator
-    {
+        
         // Setup one-time stuffs
         Magic::start();
         $this->settings->getConnection()->init();
@@ -1268,11 +1249,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->v)
             || $this->v !== self::V
             || $this->settings->getSchema()->needsUpgrade()) {
-            yield from $this->upgradeMadelineProto();
+            $this->upgradeMadelineProto();
             $forceDialogs = true;
         }
         // Cleanup old properties, init new stuffs
-        yield from $this->cleanupProperties();
+        $this->cleanupProperties();
         // Update TL callbacks
         $callbacks = [$this];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -1282,19 +1263,19 @@ class MTProto extends AsyncConstruct implements TLCallback
             $callbacks[] = $this->minDatabase;
         }
         // Connect to all DCs, start internal loops
-        yield from $this->connectToAllDcs();
-        if (yield from $this->fullGetSelf()) {
+        $this->connectToAllDcs();
+        if ($this->fullGetSelf()) {
             $this->authorized = self::LOGGED_IN;
             $this->setupLogger();
             $this->startLoops();
-            yield from $this->getCdnConfig($this->datacenter->curdc);
-            yield from $this->initAuthorization();
+            $this->getCdnConfig($this->datacenter->curdc);
+            $this->initAuthorization();
         } else {
             $this->startLoops();
         }
         // onStart event handler
         if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
-            yield from $this->setEventHandler($this->event_handler);
+            $this->setEventHandler($this->event_handler);
         } else {
             if ($this->updateHandler === [$this, 'eventUpdateHandler']) {
                 $this->setNoop();
@@ -1304,11 +1285,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
-            yield from $this->getDialogs($forceDialogs);
+            $this->getDialogs($forceDialogs);
         }
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
-            yield $this->updaters[UpdateLoop::GENERIC]->resume();
+            $this->updaters[UpdateLoop::GENERIC]->resume();
         }
         $this->updaters[UpdateLoop::GENERIC]->start();
 
@@ -1392,12 +1373,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param SettingsAbstract $settings Settings
      */
-    public function updateSettings(SettingsAbstract $settings): Generator
+    public function updateSettings(SettingsAbstract $settings)
     {
         $this->updateSettingsInternal($settings);
 
         if ($this->settings->getDb()->hasChanged()) {
-            yield from $this->initDb($this);
+            $this->initDb($this);
             $this->settings->getDb()->applyChanges();
         }
         if ($this->settings->getIpc()->hasChanged()) {
@@ -1411,7 +1392,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             || $this->settings->getConnection()->hasChanged()
             || $this->settings->getSchema()->hasChanged()
             || $this->settings->getSchema()->needsUpgrade()) {
-            yield from $this->__construct_async($this->settings);
+            $this->__construct_async($this->settings);
         }
     }
     /**
@@ -1527,7 +1508,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
      */
-    public function connectToAllDcs(bool $reconnectAll = true): Generator
+    public function connectToAllDcs(bool $reconnectAll = true)
     {
         $this->channels_state->get(FeedLoop::GENERIC);
         foreach ($this->channels_state->get() as $state) {
@@ -1547,17 +1528,17 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->datacenter->getDcs() as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield Tools::all($dcs);
-        yield from $this->initAuthorization();
-        yield from $this->parseConfig();
+        Tools::all($dcs);
+        $this->initAuthorization();
+        $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield Tools::all($dcs);
-        yield from $this->initAuthorization();
-        yield from $this->parseConfig();
-        yield from $this->getPhoneConfig();
+        Tools::all($dcs);
+        $this->initAuthorization();
+        $this->parseConfig();
+        $this->getPhoneConfig();
     }
     /**
      * Clean up MadelineProto session after logout.
@@ -1565,7 +1546,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @internal
      * @return Generator<void>
      */
-    public function resetSession(): Generator
+    public function resetSession()
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1598,16 +1579,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updates = [];
         $this->secret_chats = [];
 
-        yield from $this->initDb($this, true);
+        $this->initDb($this, true);
 
         $this->tos = ['expires' => 0, 'accepted' => true];
         $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
 
         $this->referenceDatabase = new ReferenceDatabase($this);
-        yield from $this->referenceDatabase->init();
+        $this->referenceDatabase->init();
 
         $this->minDatabase = new MinDatabase($this);
-        yield from $this->minDatabase->init();
+        $this->minDatabase->init();
     }
     /**
      * Reset the update state and fetch all updates from the beginning.
@@ -1705,14 +1686,14 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @internal
      * @return Generator<void>
      */
-    public function getPhoneConfig($watcherId = null): Generator
+    public function getPhoneConfig($watcherId = null)
     {
         if ($this->authorized === self::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
             && !$this->authorization['user']['bot']
             && $this->datacenter->getDataCenterConnection($this->settings->getDefaultDc())->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
-            VoIPServerConfig::updateDefault(yield from $this->methodCallAsyncRead('phone.getCallConfig', [], $this->settings->getDefaultDcParams()));
+            VoIPServerConfig::updateDefault($this->methodCallAsyncRead('phone.getCallConfig', [], $this->settings->getDefaultDcParams()));
         }
     }
     /**
@@ -1720,11 +1701,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param string $datacenter DC ID
      */
-    public function getCdnConfig(string $datacenter): Generator
+    public function getCdnConfig(string $datacenter)
     {
         try {
-            foreach ((yield from $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
-                $curkey = yield from RSA::load($this->TL, $curkey['public_key']);
+            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
+                $curkey = RSA::load($this->TL, $curkey['public_key']);
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
@@ -1744,13 +1725,13 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param array $config  Current config
      * @param array $options Options for method call
      */
-    public function getConfig(array $config = [], array $options = []): Generator
+    public function getConfig(array $config = [], array $options = [])
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? yield from $this->methodCallAsyncRead('help.getConfig', $config, $options ?: $this->settings->getDefaultDcParams()) : $config;
-        yield from $this->parseConfig();
+        $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config, $options ?: $this->settings->getDefaultDcParams()) : $config;
+        $this->parseConfig();
         $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
         $this->logger->logger($this->config, Logger::NOTICE);
         return $this->config;
@@ -1765,12 +1746,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Parse cached config.
      */
-    private function parseConfig(): Generator
+    private function parseConfig()
     {
         if (isset($this->config['dc_options'])) {
             $options = $this->config['dc_options'];
             unset($this->config['dc_options']);
-            yield from $this->parseDcOptions($options);
+            $this->parseDcOptions($options);
         }
     }
     /**
@@ -1778,7 +1759,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param array $dc_options DC options
      */
-    private function parseDcOptions(array $dc_options): Generator
+    private function parseDcOptions(array $dc_options)
     {
         $previous = $this->dcList;
         foreach ($dc_options as $dc) {
@@ -1801,7 +1782,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $curdc = $this->datacenter->curdc;
         if ($previous !== $this->dcList && (!$this->datacenter->has($curdc) || $this->datacenter->getDataCenterConnection($curdc)->byIPAddress())) {
             $this->logger->logger('Got new DC options, reconnecting');
-            yield from $this->connectToAllDcs(false);
+            $this->connectToAllDcs(false);
         }
         $this->datacenter->curdc = $curdc;
     }
@@ -1826,10 +1807,10 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return Generator<(array|bool)>
      */
-    public function fullGetSelf(): Generator
+    public function fullGetSelf()
     {
         try {
-            $this->authorization = ['user' => (yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
+            $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;
@@ -1891,14 +1872,14 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
      */
-    public function setReportPeers($userOrId): Generator
+    public function setReportPeers($userOrId)
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
         }
         foreach ($userOrId as $k => &$peer) {
             try {
-                $peer = (yield from $this->getInfo($peer))['bot_api_id'];
+                $peer = ($this->getInfo($peer))['bot_api_id'];
                 if ($peer === 101374607) {
                     unset($userOrId[$k]);
                 }
@@ -1916,7 +1897,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
      */
-    public function report(string $message, string $parseMode = ''): Generator
+    public function report(string $message, string $parseMode = '')
     {
         if (!$this->reportDest) {
             return;
@@ -1924,11 +1905,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         $file = null;
         if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
             && $path = $this->settings->getLogger()->getExtra()) {
-            yield touchAsync($path);
-            if (!yield getSize($path)) {
+            touchAsync($path);
+            if (!getSize($path)) {
                 $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
             } else {
-                $file = yield from $this->methodCallAsyncRead(
+                $file = $this->methodCallAsyncRead(
                     'messages.uploadMedia',
                     [
                         'peer' => $this->reportDest[0],
@@ -1946,9 +1927,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         $sent = true;
         foreach ($this->reportDest as $id) {
             try {
-                yield from $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
+                $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
                 if ($file) {
-                    yield from $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                    $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                 }
                 $sent &= true;
             } catch (Throwable $e) {

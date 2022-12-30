@@ -61,10 +61,10 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): Generator {
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request) {
             try {
-                $latest = yield $client->request($request);
-                Magic::$version_latest = yield $latest->getBody()->buffer();
+                $latest = $client->request($request);
+                Magic::$version_latest = $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
                     self::$cleanupLoop->signal(true);

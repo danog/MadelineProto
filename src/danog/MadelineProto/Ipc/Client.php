@@ -85,9 +85,9 @@ class Client extends ClientAbstract
      *
      * @param callable $callback Async callable to run
      */
-    public function loop(callable $callback): Generator
+    public function loop(callable $callback)
     {
-        return yield $callback();
+        return $callback();
     }
     /**
      * Unreference.
@@ -139,16 +139,16 @@ class Client extends ClientAbstract
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false): Generator
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
-            $url = yield $url->getFile();
+            $url = $url->getFile();
         }
         $params = [$url, $size, $fileName, &$cb, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('uploadFromUrl', $wrapper);
+        return $this->__call('uploadFromUrl', $wrapper);
     }
     /**
      * Upload file from callable.
@@ -165,17 +165,17 @@ class Client extends ClientAbstract
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false): Generator
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);
-        return yield from $this->__call('uploadFromCallable', $wrapper);
+        return $this->__call('uploadFromCallable', $wrapper);
     }
     /**
      * Reupload telegram file.
@@ -185,16 +185,16 @@ class Client extends ClientAbstract
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false): Generator
+    public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
-            $media = yield $media->getFile();
+            $media = $media->getFile();
         }
         $params = [$media, &$cb, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('uploadFromTgfile', $wrapper);
+        return $this->__call('uploadFromTgfile', $wrapper);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -206,7 +206,7 @@ class Client extends ClientAbstract
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args, array $aargs): Generator
+    public function methodCallAsyncRead(string $method, $args, array $aargs)
     {
         if (\is_array($args)) {
             if (($method === 'messages.editInlineBotMessage' ||
@@ -217,21 +217,21 @@ class Client extends ClientAbstract
                 $args['media']['file'] instanceof FileCallbackInterface
             ) {
                 $params = [$method, &$args, $aargs];
-                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                $wrapper = Wrapper::create($params, $this->session, $this->logger);
                 $wrapper->wrap($args['media']['file'], true);
-                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+                return $this->__call('methodCallAsyncRead', $wrapper);
             } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
                 $params = [$method, &$args, $aargs];
-                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                $wrapper = Wrapper::create($params, $this->session, $this->logger);
                 foreach ($args['multi_media'] as &$media) {
                     if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
                         $wrapper->wrap($media['media']['file'], true);
                     }
                 }
-                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+                return $this->__call('methodCallAsyncRead', $wrapper);
             }
         }
-        return yield from $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
+        return $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
     }
     /**
      * Download file to directory.
@@ -242,16 +242,16 @@ class Client extends ClientAbstract
      * @return Generator Downloaded file path
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToDir($messageMedia, $dir, callable $cb = null): Generator
+    public function downloadToDir($messageMedia, $dir, callable $cb = null)
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
-            $dir = yield $dir->getFile();
+            $dir = $dir->getFile();
         }
         $params = [$messageMedia, $dir, &$cb];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToDir', $wrapper);
+        return $this->__call('downloadToDir', $wrapper);
     }
     /**
      * Download file.
@@ -262,16 +262,16 @@ class Client extends ClientAbstract
      * @return Generator Downloaded file path
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToFile($messageMedia, $file, callable $cb = null): Generator
+    public function downloadToFile($messageMedia, $file, callable $cb = null)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = yield $file->getFile();
+            $file = $file->getFile();
         }
         $params = [$messageMedia, $file, &$cb];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToFile', $wrapper);
+        return $this->__call('downloadToFile', $wrapper);
     }
     /**
      * Download file to callable.
@@ -288,18 +288,18 @@ class Client extends ClientAbstract
      * @param int                            $part_size    Size of each chunk
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): Generator
+    public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null)
     {
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
+        $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         $params = [$messageMedia, &$callable, &$cb, $seekable, $offset, $end, $part_size, ];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($callable, false);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToCallable', $wrapper);
+        return $this->__call('downloadToCallable', $wrapper);
     }
     /**
      * Placeholder.

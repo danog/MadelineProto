@@ -53,7 +53,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -66,20 +66,20 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= \chr(2);
         }
-        $this->stream = (yield from $ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods));
+        $this->stream = ($ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods));
         $l = 2;
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $version = \ord(yield $buffer->bufferRead(1));
-        $method = \ord(yield $buffer->bufferRead(1));
+        $buffer = $this->stream->getReadBuffer($l);
+        $version = \ord($buffer->bufferRead(1));
+        $method = \ord($buffer->bufferRead(1));
         if ($version !== 5) {
             throw new Exception("Wrong SOCKS5 version: {$version}");
         }
         if ($method === 2) {
             $auth = \chr(1).\chr(\strlen($this->extra['username'])).$this->extra['username'].\chr(\strlen($this->extra['password'])).$this->extra['password'];
-            yield $this->stream->write($auth);
-            $buffer = yield $this->stream->getReadBuffer($l);
-            $version = \ord(yield $buffer->bufferRead(1));
-            $result = \ord(yield $buffer->bufferRead(1));
+            $this->stream->write($auth);
+            $buffer = $this->stream->getReadBuffer($l);
+            $version = \ord($buffer->bufferRead(1));
+            $result = \ord($buffer->bufferRead(1));
             if ($version !== 1) {
                 throw new Exception("Wrong authorized SOCKS version: {$version}");
             }
@@ -97,49 +97,49 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             $payload .= \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         }
         $payload .= \pack('n', $uri->getPort());
-        yield $this->stream->write($payload);
+        $this->stream->write($payload);
         $l = 4;
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $version = \ord(yield $buffer->bufferRead(1));
+        $buffer = $this->stream->getReadBuffer($l);
+        $version = \ord($buffer->bufferRead(1));
         if ($version !== 5) {
             throw new Exception("Wrong SOCKS5 version: {$version}");
         }
-        $rep = \ord(yield $buffer->bufferRead(1));
+        $rep = \ord($buffer->bufferRead(1));
         if ($rep !== 0) {
             $rep = self::REPS[$rep] ?? $rep;
             throw new Exception("Wrong SOCKS5 rep: {$rep}");
         }
-        $rsv = \ord(yield $buffer->bufferRead(1));
+        $rsv = \ord($buffer->bufferRead(1));
         if ($rsv !== 0) {
             throw new Exception("Wrong socks5 final RSV: {$rsv}");
         }
-        switch (\ord(yield $buffer->bufferRead(1))) {
+        switch (\ord($buffer->bufferRead(1))) {
             case 1:
-                $buffer = yield $this->stream->getReadBuffer($l);
-                $ip = \inet_ntop(yield $buffer->bufferRead(4));
+                $buffer = $this->stream->getReadBuffer($l);
+                $ip = \inet_ntop($buffer->bufferRead(4));
                 break;
             case 4:
                 $l = 16;
-                $buffer = yield $this->stream->getReadBuffer($l);
-                $ip = \inet_ntop(yield $buffer->bufferRead(16));
+                $buffer = $this->stream->getReadBuffer($l);
+                $ip = \inet_ntop($buffer->bufferRead(16));
                 break;
             case 3:
                 $l = 1;
-                $buffer = yield $this->stream->getReadBuffer($l);
-                $length = \ord(yield $buffer->bufferRead(1));
-                $buffer = yield $this->stream->getReadBuffer($length);
-                $ip = yield $buffer->bufferRead($length);
+                $buffer = $this->stream->getReadBuffer($l);
+                $length = \ord($buffer->bufferRead(1));
+                $buffer = $this->stream->getReadBuffer($length);
+                $ip = $buffer->bufferRead($length);
                 break;
         }
         $l = 2;
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $port = \unpack('n', yield $buffer->bufferRead(2))[1];
+        $buffer = $this->stream->getReadBuffer($l);
+        $port = \unpack('n', $buffer->bufferRead(2))[1];
         Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
         if ($secure) {
-            yield $this->getSocket()->setupTls();
+            $this->getSocket()->setupTls();
         }
         if (\strlen($header)) {
-            yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
+            ($this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }
     }
     /**

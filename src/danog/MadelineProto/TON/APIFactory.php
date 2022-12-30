@@ -82,7 +82,7 @@ class APIFactory extends AbstractAPIFactory
      * @param array $arguments Arguments
      * @psalm-suppress UndefinedThisPropertyFetch
      */
-    public function __call_async(string $name, array $arguments): Generator
+    public function __call_async(string $name, array $arguments)
     {
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
@@ -90,8 +90,8 @@ class APIFactory extends AbstractAPIFactory
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-            return yield from $this->API->methodCall($name, $args, $aargs);
+            return $this->API->methodCall($name, $args, $aargs);
         }
-        return yield $this->methods[$lower_name](...$arguments);
+        return $this->methods[$lower_name](...$arguments);
     }
 }

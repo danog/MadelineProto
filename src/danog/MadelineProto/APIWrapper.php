@@ -119,7 +119,7 @@ final class APIWrapper
      */
     public static function properties(): array
     {
-        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage', 'lua'];
+        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage'];
     }
 
     /**
@@ -179,22 +179,22 @@ final class APIWrapper
         if ($this->API instanceof Client) {
             return new Success(false);
         }
-        return Tools::callFork((function (): Generator {
+        return Tools::callFork((function () {
             if ($this->API) {
-                yield from $this->API->initAsynchronously();
+                $this->API->init();
             }
 
-            yield from $this->session->serialize(
-                $this->API ? yield from $this->API->serializeSession($this) : $this,
+            $this->session->serialize(
+                $this->API ? $this->API->serializeSession($this) : $this,
                 $this->session->getSessionPath(),
             );
 
             if ($this->API) {
-                yield from $this->session->storeLightState($this->API);
+                $this->session->storeLightState($this->API);
             }
 
             // Truncate legacy session
-            yield (yield openFile($this->session->getLegacySessionPath(), 'w'))->close();
+            (openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
             if (!Magic::$suspendPeriodicLogging) {
                 Logger::log('Saved session!');

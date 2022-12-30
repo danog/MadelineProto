@@ -38,13 +38,13 @@ trait DialogHandler
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      * @psalm-return Generator<int, Promise<bool>, mixed, list<mixed>>
      */
-    public function getDialogs(bool $force = true): Generator
+    public function getDialogs(bool $force = true)
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
             /** @uses DbArray::getIterator() */
             $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
+            while ($iterator->advance()) {
                 [, $chat] = $iterator->getCurrent();
                 try {
                     $res[] = $this->genAll($chat, null, MTProto::INFO_TYPE_ALL)['Peer'];
@@ -55,7 +55,7 @@ trait DialogHandler
             return $res;
         }
         $res = [];
-        foreach (yield from $this->getFullDialogs($force) as $dialog) {
+        foreach ($this->getFullDialogs($force) as $dialog) {
             $res[] = $dialog['peer'];
         }
         return $res;
@@ -65,7 +65,7 @@ trait DialogHandler
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      */
-    public function getFullDialogs(bool $force = true): Generator
+    public function getFullDialogs(bool $force = true)
     {
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
@@ -78,7 +78,7 @@ trait DialogHandler
         $dialogs = [];
         $this->logger->logger("Getting dialogs...");
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = yield from $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;

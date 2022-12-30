@@ -72,9 +72,9 @@ class Endpoint
     /**
      * Connect to endpoint.
      */
-    public function connect(): Generator
+    public function connect()
     {
-        $this->socket = yield connect("udp://{$this->ip}:{$this->port}");
+        $this->socket = connect("udp://{$this->ip}:{$this->port}");
     }
 
     /**
@@ -91,10 +91,10 @@ class Endpoint
     /**
      * Read packet.
      */
-    public function read(): Generator
+    public function read()
     {
         do {
-            $packet = yield $this->socket->read();
+            $packet = $this->socket->read();
             if ($packet === null) {
                 return null;
             }

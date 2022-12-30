@@ -40,10 +40,10 @@ class MemoryArray extends ArrayIterator implements DbArray
             if ($previous instanceof DbArray) {
                 Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
                 if ($previous instanceof DriverArray) {
-                    yield from $previous->initStartup();
+                    $previous->initStartup();
                 }
-                $temp = yield $previous->getArrayCopy();
-                yield $previous->clear();
+                $temp = $previous->getArrayCopy();
+                $previous->clear();
                 $previous = $temp;
             }
             return new static($previous);
@@ -102,7 +102,7 @@ class MemoryArray extends ArrayIterator implements DbArray
     {
         return new Producer(function (callable $emit) {
             foreach ($this as $key => $value) {
-                yield $emit([$key, $value]);
+                $emit([$key, $value]);
             }
         });
     }

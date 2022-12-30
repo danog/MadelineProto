@@ -169,28 +169,20 @@ class API extends InternalDoc
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
-        $this->setInitPromise($this->internalInitAPI($settings));
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
-            if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods'])) {
+            if (\in_array($key, ['namespace', 'API', 'asyncAPIPromise', 'methods'])) {
                 continue;
             }
             if (!$this->{$key}) {
                 $this->{$key} = $this->exportNamespace($key);
             }
         }
-    }
-    /**
-     * Async constructor function.
-     *
-     * @param Settings|SettingsEmpty|SettingsIpc $settings Settings
-     */
-    private function internalInitAPI(SettingsAbstract $settings): Generator
-    {
+        
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
             : ($settings instanceof SettingsLogger ? $settings : new SettingsLogger));
 
-        if (yield from $this->connectToMadelineProto($settings)) {
+        if ($this->connectToMadelineProto($settings)) {
             return; // OK
         }
 
@@ -202,7 +194,7 @@ class API extends InternalDoc
 
         $appInfo = $settings->getAppInfo();
         if (!$appInfo->hasApiInfo()) {
-            $app = yield from $this->APIStart($settings);
+            $app = $this->APIStart($settings);
             if (!$app) {
                 $this->forceInit(true);
                 die();
@@ -211,7 +203,6 @@ class API extends InternalDoc
             $appInfo->setApiHash($app['api_hash']);
         }
         $this->API = new MTProto($settings, $this->wrapper);
-        yield from $this->API->initAsynchronously();
         $this->APIFactory();
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
@@ -219,23 +210,20 @@ class API extends InternalDoc
     /**
      * Reconnect to full instance.
      */
-    protected function reconnectFull(): Generator
+    protected function reconnectFull()
     {
-        if (!$this->API) {
-            yield from $this->initAsynchronously();
-        }
         if ($this->API instanceof Client) {
             $this->logger->logger("Restarting to full instance...");
             try {
-                if (!isset($_GET['MadelineSelfRestart']) && ((yield $this->hasEventHandler()) || !(yield $this->isIpcWorker()))) {
+                if (!isset($_GET['MadelineSelfRestart']) && (($this->hasEventHandler()) || !($this->isIpcWorker()))) {
                     $this->logger->logger("Restarting to full instance: the bot is already running!");
-                    Tools::closeConnection(yield $this->getWebMessage("The bot is already running!"));
+                    Tools::closeConnection($this->getWebMessage("The bot is already running!"));
                     return false;
                 }
                 $this->logger->logger("Restarting to full instance: stopping IPC server...");
-                yield $this->API->stopIpcServer();
+                $this->API->stopIpcServer();
                 $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
-                yield $this->API->disconnect();
+                $this->API->disconnect();
             } catch (SecurityException $e) {
                 throw $e;
             } catch (Throwable $e) {
@@ -243,26 +231,26 @@ class API extends InternalDoc
             }
             $this->logger->logger("Restarting to full instance: reconnecting...");
             $cancel = new DeferredFuture;
-            $cb = function () use ($cancel, &$cb): Generator {
-                [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
+            $cb = function () use ($cancel, &$cb) {
+                [$result] = Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
                 if ($result instanceof ChannelledSocket) {
                     try {
                         if (!$this->API instanceof Client) {
                             $this->logger->logger("Restarting to full instance (again): the bot is already running!");
-                            yield $result->disconnect();
+                            $result->disconnect();
                             return;
                         }
                         $API = new Client($result, $this->session, Logger::$default, $this->async);
-                        if ((yield from $API->hasEventHandler()) || !(yield from $API->isIpcWorker())) {
+                        if (($API->hasEventHandler()) || !($API->isIpcWorker())) {
                             $this->logger->logger("Restarting to full instance (again): the bot is already running!");
-                            yield $API->disconnect();
+                            $API->disconnect();
                             $API->unreference();
                             return;
                         }
                         $this->logger->logger("Restarting to full instance: stopping another IPC server...");
-                        yield $API->stopIpcServer();
+                        $API->stopIpcServer();
                         $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
-                        yield $API->disconnect();
+                        $API->disconnect();
                         $API->unreference();
                     } catch (SecurityException $e) {
                         throw $e;
@@ -273,7 +261,7 @@ class API extends InternalDoc
                 }
             };
             Tools::callFork($cb());
-            yield from $this->connectToMadelineProto(new SettingsEmpty, true);
+            $this->connectToMadelineProto(new SettingsEmpty, true);
             $cancel->complete(new Exception('Connected!'));
         }
         return true;
@@ -284,7 +272,7 @@ class API extends InternalDoc
      * @param SettingsAbstract $settings Settings
      * @param bool $forceFull Whether to force full initialization
      */
-    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): Generator
+    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true)
     {
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getSlow();
@@ -293,7 +281,7 @@ class API extends InternalDoc
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 
-        [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
+        [$unserialized, $this->unlock] = Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $settings, $forceFull),
             30000,
             [0, null],
@@ -307,10 +295,10 @@ class API extends InternalDoc
             }
             Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
             // IPC server error, try fetching full session
-            return yield from $this->connectToMadelineProto($settings, true, false);
+            return $this->connectToMadelineProto($settings, true, false);
         } elseif ($unserialized instanceof Throwable) {
             // IPC server error, try fetching full session
-            return yield from $this->connectToMadelineProto($settings, true);
+            return $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
             $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
@@ -336,7 +324,7 @@ class API extends InternalDoc
                     $settings = new SettingsEmpty;
                 }
                 $this->methods = self::getInternalMethodList($this->API, MTProto::class);
-                yield from $this->API->wakeup($settings, $this->wrapper);
+                $this->API->wakeup($settings, $this->wrapper);
                 $this->APIFactory();
                 $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return true;
@@ -358,7 +346,6 @@ class API extends InternalDoc
      */
     public function __destruct()
     {
-        $this->init();
         if (!$this->oldInstance) {
             $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
             $this->destructing = true;
@@ -478,7 +465,7 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      */
-    public function startAndLoopAsync(string $eventHandler): Generator
+    public function startAndLoopAsync(string $eventHandler)
     {
         $started = false;
         return $this->startAndLoopAsyncInternal($eventHandler, $started);
@@ -491,22 +478,22 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      */
-    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): Generator
+    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started)
     {
         $this->async(true);
 
-        yield $this->start();
-        if (!yield from $this->reconnectFull()) {
+        $this->start();
+        if (!$this->reconnectFull()) {
             return;
         }
 
         $errors = [];
         while (true) {
             try {
-                yield $this->setEventHandler($eventHandler);
+                $this->setEventHandler($eventHandler);
                 $started = true;
                 /** @var API $this->API */
-                return yield from $this->API->loop();
+                return $this->API->loop();
             } catch (SecurityException $e) {
                 throw $e;
             } catch (Throwable $e) {

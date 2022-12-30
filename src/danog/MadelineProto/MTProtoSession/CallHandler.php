@@ -90,16 +90,16 @@ trait CallHandler
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
-        $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
+        $readDeferred = $this->methodCallAsyncWrite($method, $args, $aargs);
         if (\is_array($readDeferred)) {
             $readDeferred = Tools::all(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
         } else {
             $readDeferred = $readDeferred->getFuture();
         }
         if (!($aargs['noResponse'] ?? false)) {
-            return yield $readDeferred;
+            return $readDeferred;
         }
     }
     /**
@@ -110,16 +110,16 @@ trait CallHandler
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
-            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
             $aargs['datacenter'] = $this->datacenter.'_media';
-            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
@@ -128,7 +128,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max']) {
+            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
                 $aargs['queue'] = $method;
@@ -148,7 +148,7 @@ trait CallHandler
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return yield Tools::all($promises);
+                return Tools::all($promises);
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
@@ -185,7 +185,7 @@ trait CallHandler
             $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }
         $aargs['postpone'] ??= false;
-        $deferred = yield from $this->sendMessage($message, !$aargs['postpone']);
+        $deferred = $this->sendMessage($message, !$aargs['postpone']);
         $this->checker->resume();
         return $deferred;
     }
@@ -196,7 +196,7 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      */
-    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): Generator
+    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null])
     {
         $message = new OutgoingMessage(
             $args,
@@ -209,6 +209,6 @@ trait CallHandler
             $message->setPromise($aargs['promise']);
         }
         $aargs['postpone'] ??= false;
-        return yield from $this->sendMessage($message, !$aargs['postpone']);
+        return $this->sendMessage($message, !$aargs['postpone']);
     }
 }

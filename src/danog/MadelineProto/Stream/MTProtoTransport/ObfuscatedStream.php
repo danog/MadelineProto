@@ -42,7 +42,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
@@ -66,9 +66,9 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
         $iv = \substr($random, 40, 16);
         $ivRev = \substr($reversed, 40, 16);
         parent::setExtra(['encrypt' => ['key' => $key, 'iv' => $iv], 'decrypt' => ['key' => $keyRev, 'iv' => $ivRev]]);
-        yield from parent::connect($ctx);
+        parent::connect($ctx);
         $random = \substr_replace($random, \substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
-        yield $this->getStream()->write($random);
+        $this->getStream()->write($random);
     }
     /**
      * Set extra.

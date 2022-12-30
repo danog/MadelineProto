@@ -60,7 +60,7 @@ class DoHConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
-        return Tools::call((function () use ($uri, $context, $token): Generator {
+        return Tools::call((function () use ($uri, $context, $token) {
             $socketContext = $context ?? new ConnectContext();
             $token ??= new NullCancellationToken();
             $attempt = 0;
@@ -97,9 +97,9 @@ class DoHConnector implements Connector
                 // Here, we simply check if the connection URI has changed since we first set it:
                 // this would indicate that a proxy class has changed the connection URI to the proxy URI.
                 if ($this->ctx->isDns()) {
-                    $records = yield $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+                    $records = $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
                 } else {
-                    $records = yield $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+                    $records = $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
                 }
                 \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
                 if ($this->ctx->getIpv6()) {
@@ -130,7 +130,7 @@ class DoHConnector implements Connector
                     $watcher = EventLoop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {
-                        yield Promise\timeout($deferred->getFuture(), $timeout);
+                        Promise\timeout($deferred->getFuture(), $timeout);
                     } catch (TimeoutException $e) {
                         throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                         // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno

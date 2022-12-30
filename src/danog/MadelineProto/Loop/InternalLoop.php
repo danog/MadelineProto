@@ -45,13 +45,13 @@ trait InternalLoop
         $this->setLogger($API->getLogger());
     }
 
-    private function waitForAuthOrSignal(bool $waitAfter = true): Generator
+    private function waitForAuthOrSignal(bool $waitAfter = true)
     {
         $API = $this->API;
         while (!$API->hasAllAuth()) {
             $waitAfter = false;
             $API->logger->logger("Waiting for auth in {$this}");
-            if (yield $this->waitSignal($this->pause())) {
+            if ($this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting in {$this} while waiting for auth (init)!", Logger::LEVEL_ULTRA_VERBOSE);
                 return true;
             }
@@ -59,7 +59,7 @@ trait InternalLoop
         if (!$waitAfter) {
             return false;
         }
-        if (yield $this->waitSignal($this->pause())) {
+        if ($this->waitSignal($this->pause())) {
             $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
             return true;
         }

@@ -70,7 +70,7 @@ trait Events
      *
      * @param class-string<EventHandler> $eventHandler Event handler
      */
-    public function setEventHandler(string $eventHandler): Generator
+    public function setEventHandler(string $eventHandler)
     {
         if (!\is_subclass_of($eventHandler, EventHandler::class)) {
             throw new Exception('Wrong event handler was defined');
@@ -94,7 +94,7 @@ trait Events
                 }
             }
         }
-        yield from $this->setReportPeers($this->event_handler_instance->getReportPeers());
+        $this->setReportPeers($this->event_handler_instance->getReportPeers());
         Tools::callFork($this->event_handler_instance->startInternal());
         $this->updateHandler = [$this, 'eventUpdateHandler'];
         if ($this->inited()) {

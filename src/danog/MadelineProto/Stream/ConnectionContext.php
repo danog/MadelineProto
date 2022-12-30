@@ -353,14 +353,14 @@ class ConnectionContext
      *
      * @return Generator<StreamInterface>
      */
-    public function getStream(string $buffer = ''): Generator
+    public function getStream(string $buffer = '')
     {
         [$clazz, $extra] = $this->nextStreams[$this->key--];
         $obj = new $clazz();
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
         }
-        yield from $obj->connect($this, $buffer);
+        $obj->connect($this, $buffer);
         return $obj;
     }
     /**

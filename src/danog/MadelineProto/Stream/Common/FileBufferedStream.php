@@ -47,10 +47,10 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Connect.
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         if ($header !== '') {
-            yield $this->stream->write($header);
+            $this->stream->write($header);
         }
     }
     /**

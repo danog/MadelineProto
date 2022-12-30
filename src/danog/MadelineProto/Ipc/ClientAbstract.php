@@ -80,13 +80,13 @@ abstract class ClientAbstract
     /**
      * Main loop.
      */
-    protected function loopInternal(): Generator
+    protected function loopInternal()
     {
         do {
             while (true) {
                 $payload = null;
                 try {
-                    $payload = yield $this->server->receive();
+                    $payload = $this->server->receive();
                 } catch (Throwable $e) {
                     Logger::log("Got exception while receiving in IPC client: $e");
                 }
@@ -100,7 +100,7 @@ abstract class ClientAbstract
                     $promise = $this->requests[$id];
                     unset($this->requests[$id]);
                     if (isset($this->wrappers[$id])) {
-                        yield $this->wrappers[$id]->disconnect();
+                        $this->wrappers[$id]->disconnect();
                         unset($this->wrappers[$id]);
                     }
                     if ($payload instanceof ExitFailure) {
@@ -114,13 +114,13 @@ abstract class ClientAbstract
             if ($this->run) {
                 $this->logger("Reconnecting to IPC server!");
                 try {
-                    yield $this->server->disconnect();
+                    $this->server->disconnect();
                 } catch (Throwable $e) {
                 }
                 if ($this instanceof Client) {
                     try {
-                        yield Server::startMe($this->session);
-                        $this->server = yield connect($this->session->getIpcPath());
+                        Server::startMe($this->session);
+                        $this->server = connect($this->session->getIpcPath());
                     } catch (Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
                     }
@@ -135,12 +135,12 @@ abstract class ClientAbstract
      *
      * @psalm-return Generator<int, Promise, mixed, void>
      */
-    public function disconnect(): Generator
+    public function disconnect()
     {
         $this->run = false;
-        yield $this->server->disconnect();
+        $this->server->disconnect();
         foreach ($this->wrappers as $w) {
-            yield from $w->disconnect();
+            $w->disconnect();
         }
     }
     /**
@@ -149,13 +149,13 @@ abstract class ClientAbstract
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
      */
-    public function __call($function, $arguments): Generator
+    public function __call($function, $arguments)
     {
         $this->requests []= $deferred = new DeferredFuture;
         if ($arguments instanceof Wrapper) {
             $this->wrappers[\count($this->requests) - 1] = $arguments;
         }
-        yield $this->server->send([$function, $arguments]);
-        return yield $deferred->getFuture();
+        $this->server->send([$function, $arguments]);
+        return $deferred->getFuture();
     }
 }

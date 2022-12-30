@@ -32,7 +32,7 @@ class CombinedUpdatesState
      *
      * @var array<UpdatesState>
      */
-    private $states = [];
+    private array $states = [];
     /**
      * Constructor function.
      *
@@ -40,10 +40,7 @@ class CombinedUpdatesState
      */
     public function __construct(array $init = [])
     {
-        $this->states[false] = new UpdatesState();
-        if (!\is_array($init)) {
-            return;
-        }
+        $this->states[0] = new UpdatesState();
         foreach ($init as $channel => $state) {
             if (\is_array($state)) {
                 $state = new UpdatesState($state, $channel);
@@ -91,10 +88,10 @@ class CombinedUpdatesState
     /**
      * Are we currently busy?
      *
-     * @param int       $channel Channel to get info about
-     * @param bool|null $set     Busy flag to set before returning
+     * @param int   $channel Channel to get info about
+     * @param ?bool $set     Busy flag to set before returning
      */
-    public function syncLoading(int $channel, bool $set = null): bool
+    public function syncLoading(int $channel, ?bool $set = null): bool
     {
         return $this->get($channel)->syncLoading($set);
     }

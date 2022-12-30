@@ -224,8 +224,8 @@ trait ResponseHandler
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    Tools::callFork((function () use ($requestId): Generator {
-                        yield from $this->API->initAuthorization();
+                    Tools::callFork((function () use ($requestId) {
+                        $this->API->initAuthorization();
                         $this->methodRecall('', ['message_id' => $requestId]);
                     })());
                     return;
@@ -346,8 +346,8 @@ trait ResponseHandler
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            Tools::callFork((function () use ($request, $response): Generator {
-                                yield from $this->API->initAuthorization();
+                            Tools::callFork((function () use ($request, $response) {
+                                $this->API->initAuthorization();
                                 $this->handleReject($request, new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             })());
                             return null;
@@ -367,16 +367,16 @@ trait ResponseHandler
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                             throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        Tools::callFork((function () use ($request): Generator {
-                            yield from $this->API->initAuthorization();
+                        Tools::callFork((function () use ($request) {
+                            $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         })());
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        Tools::callFork((function () use ($request): Generator {
-                            yield from $this->API->initAuthorization();
+                        Tools::callFork((function () use ($request) {
+                            $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         })());
                         return null;

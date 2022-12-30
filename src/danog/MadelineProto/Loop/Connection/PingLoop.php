@@ -36,7 +36,7 @@ class PingLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -48,19 +48,19 @@ class PingLoop extends ResumableSignalLoop
         while (true) {
             while (!$shared->hasTempAuthKey()) {
                 $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
-                if (yield $this->waitSignal($this->pause())) {
+                if ($this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
                     return;
                 }
             }
             $API->logger->logger("Ping DC {$datacenter}");
             try {
-                yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
+                $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
             } catch (Throwable $e) {
                 $API->logger->logger("Error while pinging DC {$datacenter}");
                 $API->logger->logger((string) $e);
             }
-            if (yield $this->waitSignal($this->pause($timeoutMs))) {
+            if ($this->waitSignal($this->pause($timeoutMs))) {
                 $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
                 return;
             }

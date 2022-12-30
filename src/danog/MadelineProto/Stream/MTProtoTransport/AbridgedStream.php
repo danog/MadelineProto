@@ -43,9 +43,9 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
-        $this->stream = (yield from $ctx->getStream(\chr(239).$header));
+        $this->stream = ($ctx->getStream(\chr(239).$header));
     }
     /**
      * Async close.
@@ -59,7 +59,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         $length >>= 2;
         if ($length < 127) {
@@ -67,8 +67,8 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         } else {
             $message = \chr(127).\substr(\pack('V', $length), 0, 3);
         }
-        $buffer = yield $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
-        yield $buffer->bufferWrite($message);
+        $buffer = $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
+        $buffer->bufferWrite($message);
         return $buffer;
     }
     /**
@@ -76,12 +76,12 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \ord(yield $buffer->bufferRead(1));
+        $buffer = $this->stream->getReadBuffer($l);
+        $length = \ord($buffer->bufferRead(1));
         if ($length >= 127) {
-            $length = \unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
+            $length = \unpack('V', ($buffer->bufferRead(3))."\0")[1];
         }
         $length <<= 2;
         return $buffer;

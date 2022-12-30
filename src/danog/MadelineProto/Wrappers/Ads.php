@@ -38,14 +38,14 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages($peer): Generator
+    public function getSponsoredMessages($peer)
     {
-        $peer = (yield from $this->getInfo($peer))['bot_api_id'];
-        $cache = yield $this->sponsoredMessages[$peer];
+        $peer = ($this->getInfo($peer))['bot_api_id'];
+        $cache = $this->sponsoredMessages[$peer];
         if ($cache && $cache[0] > \time()) {
             return $cache[1];
         }
-        $result = (yield from $this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]))['messages'];
+        $result = ($this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]))['messages'];
         $this->sponsoredMessages->set($peer, [\time() + 5*60, $result]);
         return $result;
     }
@@ -56,7 +56,7 @@ trait Ads
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      * @return Generator Bool
      */
-    public function viewSponsoredMessage($peer, $message): Generator
+    public function viewSponsoredMessage($peer, $message)
     {
         if (\is_array($message)) {
             $message = $message['random_id'];

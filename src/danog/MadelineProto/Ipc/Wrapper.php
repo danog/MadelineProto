@@ -58,7 +58,7 @@ class Wrapper extends ClientAbstract
      * @param mixed        $data Payload data
      * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, Wrapper>
      */
-    public static function create(&$data, SessionPaths $session, Logger $logger): Generator
+    public static function create(&$data, SessionPaths $session, Logger $logger)
     {
         $instance = new self;
         $instance->data = &$data;
@@ -66,10 +66,10 @@ class Wrapper extends ClientAbstract
         $instance->run = false;
 
         $logger->logger("Connecting to callback IPC server...");
-        $instance->server = yield connect($session->getIpcCallbackPath());
+        $instance->server = connect($session->getIpcCallbackPath());
         $logger->logger("Connected to callback IPC server!");
 
-        $instance->remoteId = yield $instance->server->receive();
+        $instance->remoteId = $instance->server->receive();
         $logger->logger("Got ID {$instance->remoteId} from callback IPC server!");
 
         Tools::callFork($instance->receiverLoop());
@@ -125,16 +125,16 @@ class Wrapper extends ClientAbstract
     /**
      * Receiver loop.
      */
-    private function receiverLoop(): Generator
+    private function receiverLoop()
     {
         $id = 0;
         $payload = null;
         try {
-            while ($payload = yield $this->server->receive()) {
+            while ($payload = $this->server->receive()) {
                 Tools::callFork($this->clientRequest($id++, $payload));
             }
         } finally {
-            yield $this->server->disconnect();
+            $this->server->disconnect();
         }
     }
 
@@ -144,21 +144,21 @@ class Wrapper extends ClientAbstract
      * @param integer          $id      Request ID
      * @param array            $payload Payload
      */
-    private function clientRequest(int $id, array $payload): Generator
+    private function clientRequest(int $id, array $payload)
     {
         try {
             $result = $this->callbacks[$payload[0]](...$payload[1]);
-            $result = $result instanceof Generator ? yield from $result : yield $result;
+            $result = $result instanceof Generator ? $result : $result;
         } catch (Throwable $e) {
             $this->logger->logger("Got error while calling reverse IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
         }
         try {
-            yield $this->server->send([$id, $result]);
+            $this->server->send([$id, $result]);
         } catch (Throwable $e) {
             $this->logger->logger("Got error while trying to send result of reverse method: $e", Logger::ERROR);
             try {
-                yield $this->server->send([$id, new ExitFailure($e)]);
+                $this->server->send([$id, new ExitFailure($e)]);
             } catch (Throwable $e) {
                 $this->logger->logger("Got error while trying to send error of error of reverse method: $e", Logger::ERROR);
             }
@@ -187,7 +187,7 @@ class Wrapper extends ClientAbstract
 
         foreach ($this->callbackIds as &$id) {
             if (\is_int($id)) {
-                $id = fn (...$args): Generator => $this->__call($id, $args);
+                $id = fn (...$args) => $this->__call($id, $args);
             } else {
                 [$class, $ids] = $id;
                 $id = new $class($this, $ids);

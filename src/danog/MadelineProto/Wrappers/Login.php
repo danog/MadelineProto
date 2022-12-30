@@ -40,10 +40,10 @@ trait Login
     /**
      * Log out currently logged in user.
      */
-    public function logout(): Generator
+    public function logout()
     {
-        yield from $this->methodCallAsyncRead('auth.logOut', []);
-        yield from $this->resetSession();
+        $this->methodCallAsyncRead('auth.logOut', []);
+        $this->resetSession();
         $this->logger->logger(Lang::$current_lang['logout_ok'], Logger::NOTICE);
         $this->startUpdateSystem();
         return true;
@@ -53,7 +53,7 @@ trait Login
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token): Generator
+    public function botLogin(string $token)
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             return;
@@ -61,7 +61,7 @@ trait Login
         $callbacks = [$this, $this->referenceDatabase];
         $this->TL->updateCallbacks($callbacks);
         $this->logger->logger(Lang::$current_lang['login_bot'], Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead(
+        $this->authorization = $this->methodCallAsyncRead(
             'auth.importBotAuthorization',
             [
                 'bot_auth_token' => $token,
@@ -74,7 +74,7 @@ trait Login
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         $this->updates = [];
         $this->updates_key = 0;
-        yield from $this->initAuthorization();
+        $this->initAuthorization();
         $this->startUpdateSystem();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         return $this->authorization;
@@ -85,14 +85,14 @@ trait Login
      * @param string  $number   Phone number
      * @param integer $sms_type SMS type
      */
-    public function phoneLogin(string $number, int $sms_type = 5): Generator
+    public function phoneLogin(string $number, int $sms_type = 5)
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             $this->logger->logger(Lang::$current_lang['already_loggedIn'], Logger::NOTICE);
-            yield from $this->logout();
+            $this->logout();
         }
         $this->logger->logger(Lang::$current_lang['login_code_sending'], Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead(
+        $this->authorization = $this->methodCallAsyncRead(
             'auth.sendCode',
             [
                 'settings' => ['_' => 'codeSettings'],
@@ -117,7 +117,7 @@ trait Login
      *
      * @param string $code Login code
      */
-    public function completePhoneLogin(string $code): Generator
+    public function completePhoneLogin(string $code)
     {
         if ($this->authorized !== MTProto::WAITING_CODE) {
             throw new Exception(Lang::$current_lang['login_code_uncalled']);
@@ -125,11 +125,11 @@ trait Login
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         try {
-            $authorization = yield from $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code]);
+            $authorization = $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                $this->authorization = yield from $this->methodCallAsyncRead('account.getPassword', []);
+                $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
                 if (!isset($this->authorization['hint'])) {
                     $this->authorization['hint'] = '';
                 }
@@ -154,8 +154,8 @@ trait Login
         $this->authorized = MTProto::LOGGED_IN;
         $this->authorization = $authorization;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield from $this->initAuthorization();
-        yield from $this->getPhoneConfig();
+        $this->initAuthorization();
+        $this->getPhoneConfig();
         $this->startUpdateSystem();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         return $this->authorization;
@@ -166,11 +166,11 @@ trait Login
      * @param array<int, string> $authorization Authorization info
      * @param int $mainDcID Main DC ID
      */
-    public function importAuthorization(array $authorization, int $mainDcID): Generator
+    public function importAuthorization(array $authorization, int $mainDcID)
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             $this->logger->logger(Lang::$current_lang['already_loggedIn'], Logger::NOTICE);
-            yield from $this->logout();
+            $this->logout();
         }
         $this->logger->logger(Lang::$current_lang['login_auth_key'], Logger::NOTICE);
         foreach ($this->datacenter->getDataCenterConnections() as $connection) {
@@ -191,10 +191,10 @@ trait Login
         }
         $this->authorized_dc = $mainDcID;
         $this->authorized = MTProto::LOGGED_IN;
-        yield from $this->connectToAllDcs(true);
-        yield from $this->initAuthorization();
-        yield from $this->getPhoneConfig();
-        $res = (yield from $this->fullGetSelf());
+        $this->connectToAllDcs(true);
+        $this->initAuthorization();
+        $this->getPhoneConfig();
+        $res = ($this->fullGetSelf());
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
@@ -208,12 +208,12 @@ trait Login
      *
      * @psalm-return Generator<mixed, (array|bool), mixed, array{0: (int|string), 1: string}>
      */
-    public function exportAuthorization(): Generator
+    public function exportAuthorization()
     {
         if ($this->authorized !== MTProto::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['not_loggedIn']);
         }
-        yield from $this->fullGetSelf();
+        $this->fullGetSelf();
         $this->authorized_dc = $this->datacenter->curdc;
         return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }
@@ -223,18 +223,18 @@ trait Login
      * @param string $first_name First name
      * @param string $last_name  Last name
      */
-    public function completeSignup(string $first_name, string $last_name = ''): Generator
+    public function completeSignup(string $first_name, string $last_name = '')
     {
         if ($this->authorized !== MTProto::WAITING_SIGNUP) {
             throw new Exception(Lang::$current_lang['signup_uncalled']);
         }
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(Lang::$current_lang['signing_up'], Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]);
+        $this->authorization = $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]);
         $this->authorized = MTProto::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield from $this->initAuthorization();
-        yield from $this->getPhoneConfig();
+        $this->initAuthorization();
+        $this->getPhoneConfig();
         $this->logger->logger(Lang::$current_lang['signup_ok'], Logger::NOTICE);
         $this->startUpdateSystem();
         return $this->authorization;
@@ -244,21 +244,21 @@ trait Login
      *
      * @param string $password Password
      */
-    public function complete2faLogin(string $password): Generator
+    public function complete2faLogin(string $password)
     {
         if ($this->authorized !== MTProto::WAITING_PASSWORD) {
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
         }
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo(yield from $this->methodCallAsyncRead('account.getPassword', []));
+        $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
+        $this->authorization = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
         $this->authorized = MTProto::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield from $this->initAuthorization();
+        $this->initAuthorization();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
-        yield from $this->getPhoneConfig();
+        $this->getPhoneConfig();
         $this->startUpdateSystem();
         return $this->authorization;
     }
@@ -269,10 +269,10 @@ trait Login
      *
      * @param array $params The params
      */
-    public function update2fa(array $params): Generator
+    public function update2fa(array $params)
     {
         $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo(yield from $this->methodCallAsyncRead('account.getPassword', []));
-        return yield from $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
+        $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
+        return $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
     }
 }

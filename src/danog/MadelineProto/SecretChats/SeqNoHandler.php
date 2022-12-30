@@ -29,7 +29,7 @@ use Generator;
  */
 trait SeqNoHandler
 {
-    private function checkSecretInSeqNo($chat_id, $seqno): Generator
+    private function checkSecretInSeqNo($chat_id, $seqno)
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2;
         $last = 0;
@@ -37,7 +37,7 @@ trait SeqNoHandler
             if (isset($message['decrypted_message']['in_seq_no'])) {
                 if (($message['decrypted_message']['in_seq_no'] - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2 < $last) {
                     $this->logger->logger("Discarding secret chat $chat_id, in_seq_no is not increasing", Logger::LEVEL_FATAL);
-                    yield from $this->discardSecretChat($chat_id);
+                    $this->discardSecretChat($chat_id);
                     throw new SecurityException('in_seq_no is not increasing');
                 }
                 $last = ($message['decrypted_message']['in_seq_no'] - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2;
@@ -45,12 +45,12 @@ trait SeqNoHandler
         }
         if ($seqno > $this->secret_chats[$chat_id]['out_seq_no'] + 1) {
             $this->logger->logger("Discarding secret chat $chat_id, in_seq_no is too big", Logger::LEVEL_FATAL);
-            yield from $this->discardSecretChat($chat_id);
+            $this->discardSecretChat($chat_id);
             throw new SecurityException('in_seq_no is too big');
         }
         return true;
     }
-    private function checkSecretOutSeqNo($chat_id, $seqno): Generator
+    private function checkSecretOutSeqNo($chat_id, $seqno)
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
         $C = 0;
@@ -59,7 +59,7 @@ trait SeqNoHandler
                 $temp = ($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
                 if ($temp !== $C) {
                     $this->logger->logger("Discarding secret chat $chat_id, out_seq_no hole: should be $C, is $temp", Logger::LEVEL_FATAL);
-                    yield from $this->discardSecretChat($chat_id);
+                    $this->discardSecretChat($chat_id);
                     throw new SecurityException("out_seq_no hole: should be $C, is $temp");
                 }
                 $C++;
@@ -74,7 +74,7 @@ trait SeqNoHandler
         if ($seqno > $C) {
             // > C+1
             $this->logger->logger("Discarding secret chat $chat_id, out_seq_no gap detected: ($seqno > $C)", Logger::LEVEL_FATAL);
-            yield from $this->discardSecretChat($chat_id);
+            $this->discardSecretChat($chat_id);
             throw new SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C.')!');
         }
         return true;

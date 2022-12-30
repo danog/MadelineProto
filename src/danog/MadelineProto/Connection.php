@@ -274,7 +274,7 @@ class Connection
      * @param ConnectionContext $ctx Connection context
      * @psalm-return Generator<mixed, StreamInterface, mixed, void>
      */
-    public function connect(ConnectionContext $ctx): Generator
+    public function connect(ConnectionContext $ctx)
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
@@ -282,7 +282,7 @@ class Connection
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
         $this->createSession();
         $ctx->setReadCallback([$this, 'haveRead']);
-        $this->stream = (yield from $ctx->getStream());
+        $this->stream = ($ctx->getStream());
         $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
@@ -329,8 +329,8 @@ class Connection
         /*if (!isset($this->r)) {
             $this->r = true;
             Tools::callFork((function () {
-                yield Tools::sleep(3);
-                yield from $this->reconnect();
+                Tools::sleep(3);
+                $this->reconnect();
             })());
         }*/
     }
@@ -341,7 +341,7 @@ class Connection
      * @param array  $arguments Arguments
      * @return Generator Whether we need to resolve a queue promise
      */
-    private function methodAbstractions(string &$method, array &$arguments): Generator
+    private function methodAbstractions(string &$method, array &$arguments)
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
             [$invite, $content] = $r;
@@ -382,14 +382,14 @@ class Connection
                 if ($singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
                     || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
                 ) {
-                    $singleMedia['media'] = yield from $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
+                    $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
                 }
             }
             $this->logger->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
-                    $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
+                    $arguments['file'] = ($this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -404,7 +404,7 @@ class Connection
             $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = yield from $this->API->getInfo($arguments['chat_id']);
+            $res = $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
@@ -449,22 +449,22 @@ class Connection
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true): Generator
+    public function sendMessage(OutgoingMessage $message, bool $flush = true)
     {
         $message->trySend();
         $promise = $message->getSendPromise();
         if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
-            $body = yield from $message->getBody();
+            $body = $message->getBody();
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod()) {
                 $method = $message->getConstructor();
-                $queuePromise = yield from $this->methodAbstractions($method, $body);
-                $body = yield from $this->API->getTL()->serializeMethod($method, $body);
+                $queuePromise = $this->methodAbstractions($method, $body);
+                $body = $this->API->getTL()->serializeMethod($method, $body);
             } else {
                 $body['_'] = $message->getConstructor();
-                $body = yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
+                $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
             }
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(false);
@@ -479,7 +479,7 @@ class Connection
         if ($flush && isset($this->writer)) {
             $this->writer->resumeDeferOnce();
         }
-        return yield $promise;
+        return $promise;
     }
     /**
      * Flush pending packets.
@@ -558,11 +558,11 @@ class Connection
     /**
      * Reconnect to DC.
      */
-    public function reconnect(): Generator
+    public function reconnect()
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        yield from $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
+        $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
     }
     /**
      * Get name.

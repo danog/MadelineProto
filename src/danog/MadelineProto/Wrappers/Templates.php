@@ -34,9 +34,9 @@ trait Templates
      *
      * @param string $message Error message
      */
-    private function webEcho(string $message = ''): Generator
+    private function webEcho(string $message = '')
     {
-        $auth = yield $this->getAuthorization();
+        $auth = $this->getAuthorization();
         $form = null;
         if ($auth === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['type'])) {
@@ -64,7 +64,7 @@ trait Templates
             $hint = \htmlentities(\sprintf(
                 Lang::$current_lang['loginUserPassHint'],
                 /** @psalm-suppress InvalidIterator */
-                $this instanceof Client ? yield from $this->getHint() : $this->getHint(),
+                $this instanceof Client ? $this->getHint() : $this->getHint(),
             ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
         } elseif ($auth === MTProto::WAITING_SIGNUP) {

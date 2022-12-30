@@ -35,7 +35,7 @@ class Obj
      *
      * @return Generator<mixed, mixed, mixed, mixed>
      */
-    public function __call(string $name, array $arguments = []): Generator
+    public function __call(string $name, array $arguments = [])
     {
         return $this->wrapper->__call($this->methods[$name], $arguments);
     }

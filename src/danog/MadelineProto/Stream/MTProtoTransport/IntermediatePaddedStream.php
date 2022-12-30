@@ -46,9 +46,9 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
-        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4).$header));
+        $this->stream = ($ctx->getStream(\str_repeat(\chr(221), 4).$header));
     }
     /**
      * Async close.
@@ -62,11 +62,11 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
+    public function getWriteBufferGenerator(int $length, string $append = '')
     {
         $padding_length = Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
-        yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
+        $buffer = $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
+        $buffer->bufferWrite(\pack('V', $padding_length + $length));
         return $buffer;
     }
     /**
@@ -74,10 +74,10 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length): Generator
+    public function getReadBufferGenerator(int &$length)
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \unpack('V', yield $buffer->bufferRead(4))[1];
+        $buffer = $this->stream->getReadBuffer($l);
+        $length = \unpack('V', $buffer->bufferRead(4))[1];
         return $buffer;
     }
     /**

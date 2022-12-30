@@ -67,7 +67,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connect(ConnectionContext $ctx, string $header = ''): Generator
+    public function connect(ConnectionContext $ctx, string $header = '')
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -75,11 +75,11 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $this->stream = (yield ($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken()));
+        $this->stream = (($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken()));
         if ($secure) {
-            yield $this->stream->setupTls();
+            $this->stream->setupTls();
         }
-        yield $this->stream->write($header);
+        $this->stream->write($header);
     }
     /**
      * Async chunked read.

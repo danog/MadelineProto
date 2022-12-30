@@ -31,7 +31,7 @@ class Postgres
      * @throws Throwable
      * @return Generator<Pool>
      */
-    public static function getConnection(DatabasePostgres $settings): Generator
+    public static function getConnection(DatabasePostgres $settings)
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
@@ -40,7 +40,7 @@ class Postgres
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
 
-            yield from static::createDb($config);
+            static::createDb($config);
             static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
@@ -52,26 +52,26 @@ class Postgres
      * @throws FailureException
      * @throws Throwable
      */
-    private static function createDb(ConnectionConfig $config): Generator
+    private static function createDb(ConnectionConfig $config)
     {
         try {
             $db = $config->getDatabase();
             $user = $config->getUser();
             $connection = pool($config->withDatabase(null));
 
-            $result = yield $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
+            $result = $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
 
-            while (yield $result->advance()) {
+            while ($result->advance()) {
                 $row = $result->getCurrent();
                 if ($row===false) {
-                    yield $connection->query("
+                    $connection->query("
                             CREATE DATABASE {$db}
                             OWNER {$user}
                             ENCODING utf8
                         ");
                 }
             }
-            yield $connection->query("
+            $connection->query("
                     CREATE OR REPLACE FUNCTION update_ts()
                     RETURNS TRIGGER AS $$
                     BEGIN

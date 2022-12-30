@@ -65,13 +65,13 @@ trait UpdateHandler
      * @internal
      * @psalm-return Generator<int, Promise<(mixed|null)>, mixed, (list<array{update_id: mixed, update: mixed}>|mixed)>
      */
-    public function getUpdates(array $params = []): Generator
+    public function getUpdates(array $params = [])
     {
         $this->updateHandler = MTProto::GETUPDATES_HANDLER;
         $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
         if (empty($this->updates)) {
             $params['timeout'] *= 1000;
-            yield Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
+            Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
         }
         if (empty($this->updates)) {
             return $this->updates;
@@ -145,11 +145,11 @@ trait UpdateHandler
      * @internal
      * @psalm-return <mixed, mixed, mixed, UpdatesState>
      */
-    public function loadUpdateState(): Generator
+    public function loadUpdateState()
     {
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->channels_state->get(0, yield from $this->getUpdatesState());
+            $this->channels_state->get(0, $this->getUpdatesState());
         }
         return $this->channels_state->get(0);
     }
@@ -179,10 +179,10 @@ trait UpdateHandler
      *
      * @internal
      */
-    public function getUpdatesState(): Generator
+    public function getUpdatesState()
     {
-        $data = yield from $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
-        yield from $this->getCdnConfig($this->settings->getDefaultDc());
+        $data = $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
+        $this->getCdnConfig($this->settings->getDefaultDc());
         return $data;
     }
     /**
@@ -190,19 +190,19 @@ trait UpdateHandler
      *
      * @psalm-return Generator<mixed, mixed, mixed, array>
      */
-    public function extractMessage(array $updates): Generator
+    public function extractMessage(array $updates)
     {
-        return (yield from $this->extractMessageUpdate($updates))['message'];
+        return ($this->extractMessageUpdate($updates))['message'];
     }
     /**
      * Extract an update message constructor from an Updates constructor.
      *
      * @psalm-return Generator<mixed, mixed, mixed, array>
      */
-    public function extractMessageUpdate(array $updates): Generator
+    public function extractMessageUpdate(array $updates)
     {
         $result = null;
-        foreach ((yield from $this->extractUpdates($updates)) as $update) {
+        foreach (($this->extractUpdates($updates)) as $update) {
             if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage'])) {
                 if ($result !== null) {
                     throw new Exception("Found more than one update of type message, use extractUpdates to extract all updates");
@@ -220,7 +220,7 @@ trait UpdateHandler
      *
      * @psalm-return Generator<mixed, mixed, mixed, array<array>>
      */
-    public function extractUpdates(array $updates): Generator
+    public function extractUpdates(array $updates)
     {
         switch ($updates['_']) {
             case 'updates':
@@ -229,7 +229,7 @@ trait UpdateHandler
             case 'updateShort':
                 return [$updates['update']];
             case 'updateShortSentMessage':
-                $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -239,8 +239,8 @@ trait UpdateHandler
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = yield from $this->getInfo($from_id, MTProto::INFO_TYPE_PEER);
-                $message['peer_id'] = yield from $this->getInfo($to_id, MTProto::INFO_TYPE_PEER);
+                $message['from_id'] = $this->getInfo($from_id, MTProto::INFO_TYPE_PEER);
+                $message['peer_id'] = $this->getInfo($to_id, MTProto::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
             default:
@@ -271,7 +271,7 @@ trait UpdateHandler
      * @param array $actual_updates Actual updates for deferred
      * @internal
      */
-    public function handleUpdates(array $updates, array $actual_updates = null): Generator
+    public function handleUpdates(array $updates, array $actual_updates = null)
     {
         if ($actual_updates) {
             $updates = $actual_updates;
@@ -283,7 +283,7 @@ trait UpdateHandler
                 $result = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' || $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' || $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' || $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)] = true;
+                        $result[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
@@ -299,13 +299,13 @@ trait UpdateHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
+                $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
                 break;
             case 'updateShortSentMessage':
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -313,15 +313,15 @@ trait UpdateHandler
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                if (!((yield from $this->peerIsset($from_id)) || !((yield from $this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !((yield from $this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !((yield from $this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
-                    yield $this->updaters[FeedLoop::GENERIC]->resume();
+                if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {
+                    $this->updaters[FeedLoop::GENERIC]->resume();
                     return;
                 }
                 $message = $updates;
                 $message['_'] = 'message';
                 try {
-                    $message['from_id'] = (yield from $this->getInfo($from_id))['Peer'];
-                    $message['peer_id'] = (yield from $this->getInfo($to_id))['Peer'];
+                    $message['from_id'] = ($this->getInfo($from_id))['Peer'];
+                    $message['peer_id'] = ($this->getInfo($to_id))['Peer'];
                 } catch (Exception $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', Logger::ERROR);
                     break;
@@ -331,7 +331,7 @@ trait UpdateHandler
                 }
                 $this->populateMessageFlags($message);
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
+                $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
                 break;
             case 'updatesTooLong':
                 $this->updaters[UpdateLoop::GENERIC]->resume();
@@ -347,23 +347,23 @@ trait UpdateHandler
      * @param array $update Update to save
      * @internal
      */
-    public function saveUpdate(array $update): Generator
+    public function saveUpdate(array $update)
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
-            yield from $this->getConfig();
+            $this->getConfig();
         }
         if (\in_array($update['_'], ['updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink']) && $this->getSettings()->getDb()->getEnableFullPeerDb()) {
             $id = $this->getId($update);
-            $chat = yield $this->full_chats[$id];
+            $chat = $this->full_chats[$id];
             $chat['last_update'] = 0;
             $this->full_chats[$id] = $chat;
-            yield from $this->getFullInfo($id);
+            $this->getFullInfo($id);
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', Logger::VERBOSE);
             $this->config['dc_options'] = $update['dc_options'];
-            yield from $this->parseConfig();
+            $this->parseConfig();
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
@@ -383,13 +383,13 @@ trait UpdateHandler
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
-                    if (!(yield from $this->confirmCall($update['phone_call']))) {
+                    if (!($this->confirmCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                     break;
                 case 'phoneCall':
-                    if (!(yield from $this->completeCall($update['phone_call']))) {
+                    if (!($this->completeCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
@@ -403,7 +403,7 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             if (isset($update['qts'])) {
-                $cur_state = (yield from $this->loadUpdateState());
+                $cur_state = ($this->loadUpdateState());
                 if ($cur_state->qts() === -1) {
                     $cur_state->qts($update['qts']);
                 }
@@ -417,7 +417,7 @@ trait UpdateHandler
                     return false;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
-                yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
+                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
             }
             if (!isset($this->secret_chats[$update['message']['chat_id']])) {
                 $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
@@ -440,7 +440,7 @@ trait UpdateHandler
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], Logger::NOTICE);
                     try {
-                        yield from $this->acceptSecretChat($update['chat']);
+                        $this->acceptSecretChat($update['chat']);
                     } catch (RPCErrorException $e) {
                         $this->logger->logger("Error while accepting secret chat: {$e}", Logger::FATAL_ERROR);
                     }
@@ -459,7 +459,7 @@ trait UpdateHandler
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);
-                    yield from $this->completeSecretChat($update['chat']);
+                    $this->completeSecretChat($update['chat']);
                     break;
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);

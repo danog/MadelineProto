@@ -122,12 +122,12 @@ final class ProcessRunner extends RunnerAbstract
     /**
      * Unreference and read data from fd, logging results.
      */
-    private static function readUnref(ProcessInputStream $stream): Generator
+    private static function readUnref(ProcessInputStream $stream)
     {
         $stream->unreference();
         $lastLine = '';
         try {
-            while (($chunk = yield $stream->read()) !== null) {
+            while (($chunk = $stream->read()) !== null) {
                 $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
                 $lastLine .= \array_shift($chunk);
                 while ($chunk) {

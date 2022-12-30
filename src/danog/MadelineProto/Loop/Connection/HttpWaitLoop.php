@@ -35,7 +35,7 @@ class HttpWaitLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -45,20 +45,20 @@ class HttpWaitLoop extends ResumableSignalLoop
             return;
         }
         while (true) {
-            if (yield $this->waitSignal($this->pause())) {
+            if ($this->waitSignal($this->pause())) {
                 return;
             }
             if (!$connection->isHttp()) {
                 return;
             }
             while (!$shared->hasTempAuthKey()) {
-                if (yield $this->waitSignal($this->pause())) {
+                if ($this->waitSignal($this->pause())) {
                     return;
                 }
             }
             $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
             if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pendingOutgoing) || !empty($connection->new_outgoing) && !$connection->hasPendingCalls())) {
-                yield from $connection->sendMessage(
+                $connection->sendMessage(
                     new OutgoingMessage(
                         ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
                         'http_wait',
