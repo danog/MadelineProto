@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 use const SEEK_SET;
@@ -20,7 +20,7 @@ trait SeekableTrait
     *
     * @return Promise<int> New offset position.
     */
-    public function seek(int $position, int $whence = SEEK_SET): Promise
+    public function seek(int $position, int $whence = SEEK_SET): Future
     {
         return Tools::call($this->__call('seek', [$position, $whence]));
     }

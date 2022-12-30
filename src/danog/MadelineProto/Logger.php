@@ -23,6 +23,7 @@ use Amp\Failure;
 use Amp\Loop;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -284,8 +285,8 @@ class Logger
             if ($maxSize !== -1) {
                 $optional = &$this->optional;
                 $stdout = &$this->stdout;
-                $this->rotateId = Loop::repeat(
-                    10*1000,
+                $this->rotateId = EventLoop::repeat(
+                    10,
                     static function () use ($maxSize, $optional, &$stdout): void {
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
@@ -294,7 +295,7 @@ class Logger
                         }
                     },
                 );
-                Loop::unreference($this->rotateId);
+                EventLoop::unreference($this->rotateId);
             }
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
             $result = @\ini_get('error_log');
@@ -326,7 +327,7 @@ class Logger
     public function __destruct()
     {
         if ($this->rotateId) {
-            Loop::cancel($this->rotateId);
+            EventLoop::cancel($this->rotateId);
         }
     }
     /**

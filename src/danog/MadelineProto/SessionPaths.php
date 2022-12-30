@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Success;
 use danog\MadelineProto\Ipc\IpcState;
 use Generator;
@@ -217,7 +217,7 @@ class SessionPaths
      * @psalm-suppress InvalidReturnType
      * @return Promise<?IpcState>
      */
-    public function getIpcState(): Promise
+    public function getIpcState(): Future
     {
         return Tools::call($this->unserialize($this->ipcStatePath));
     }
@@ -244,7 +244,7 @@ class SessionPaths
      * @psalm-suppress InvalidReturnType
      * @return Promise<LightState>
      */
-    public function getLightState(): Promise
+    public function getLightState(): Future
     {
         if ($this->lightState) {
             return new Success($this->lightState);

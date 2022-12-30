@@ -18,8 +18,8 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\Future;
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use Amp\Websocket\Client\Connection;
@@ -84,7 +84,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         try {
             $this->stream->close();
@@ -116,7 +116,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         return $this->stream->sendBinary($data);
     }

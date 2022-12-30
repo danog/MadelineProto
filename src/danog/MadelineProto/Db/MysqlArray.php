@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\ConnectionConfig;
-use Amp\Promise;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;

@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\ApiWrappers;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Lang;
 
 use function Amp\ByteStream\getOutputBufferStream;
@@ -60,7 +60,7 @@ trait Templates
      *
      * @param string $message Message to echo
      */
-    private function webAPIEcho(string $message = ''): Promise
+    private function webAPIEcho(string $message = ''): Future
     {
         $message = \htmlentities($message);
         if (!isset($this->myTelegramOrgWrapper)) {

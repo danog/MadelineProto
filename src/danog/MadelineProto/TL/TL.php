@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\TL;
 
 use Amp\File\File;
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -740,7 +740,7 @@ class TL
      *
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
-     * @psalm-return array{0: mixed, 1: Promise[]}
+     * @psalm-return array{0: mixed, 1: Future[]}
      */
     public function deserialize($stream, array $type = ['type' => '']): array
     {

@@ -17,7 +17,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
 use Generator;
@@ -168,7 +168,7 @@ final class APIWrapper
      *
      * @return Promise<bool>
      */
-    public function serialize(): Promise
+    public function serialize(): Future
     {
         if ($this->API === null && !$this->gettingApiId) {
             return new Success(false);

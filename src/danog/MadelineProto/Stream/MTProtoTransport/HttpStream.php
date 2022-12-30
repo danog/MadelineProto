@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
@@ -78,7 +78,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }
@@ -160,7 +160,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         return $buffer;
     }
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): Future
     {
         return new Success($this->code);
     }

@@ -6,7 +6,6 @@ use Amp\ByteStream\InputStream as ByteStreamInputStream;
 use Amp\ByteStream\OutputStream as ByteStreamOutputStream;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Sync\ExitFailure;
-use Amp\Promise;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
 use danog\MadelineProto\Ipc\Wrapper\InputStream;

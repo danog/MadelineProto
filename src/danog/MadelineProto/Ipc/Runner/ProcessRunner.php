@@ -3,10 +3,10 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Process\Internal\Posix\Runner;
 use Amp\Process\Internal\Windows\Runner as WindowsRunner;
 use Amp\Process\ProcessInputStream;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -55,7 +55,7 @@ final class ProcessRunner extends RunnerAbstract
      * @param string $session Session path
      * @return Promise<true>
      */
-    public static function start(string $session, int $startupId): Promise
+    public static function start(string $session, int $startupId): Future
     {
         if (PHP_SAPI === "cli") {
             $binary = PHP_BINARY;
@@ -98,7 +98,7 @@ final class ProcessRunner extends RunnerAbstract
         $handle->pidDeferred->getFuture()->onResolve(function (?Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
             if ($e) {
                 Logger::log("Got exception while starting process worker: $e");
-                $resDeferred->resolve($e);
+                $resDeferred->complete($e);
                 return;
             }
             Tools::callFork(self::readUnref($handle->stdout));

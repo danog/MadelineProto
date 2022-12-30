@@ -19,11 +19,12 @@
 namespace danog\MadelineProto\MTProto;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Loop;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Generator;
+use Revolt\EventLoop;
 
 use function time;
 
@@ -73,11 +74,11 @@ class OutgoingMessage extends Message
     /**
      * Resolution deferred.
      */
-    private ?Deferred $promise = null;
+    private ?DeferredFuture $promise = null;
     /**
      * Send deferred.
      */
-    private ?Deferred $sendPromise = null;
+    private ?DeferredFuture $sendPromise = null;
 
     /**
      * Whether this is an unencrypted message.
@@ -181,7 +182,7 @@ class OutgoingMessage extends Message
         if (isset($this->sendPromise)) {
             $sendPromise = $this->sendPromise;
             $this->sendPromise = null;
-            $sendPromise->resolve($this->promise ?? true);
+            $sendPromise->complete($this->promise ?? true);
         }
     }
     /**
@@ -201,7 +202,7 @@ class OutgoingMessage extends Message
         if ($this->promise) { // Sometimes can get an RPC error for constructors
             $promise = $this->promise;
             $this->promise = null;
-            Loop::defer(fn () => $promise->resolve($result));
+            EventLoop::defer(fn () => $promise->complete($result));
         }
     }
 
@@ -429,9 +430,9 @@ class OutgoingMessage extends Message
     /**
      * Set resolution deferred.
      *
-     * @param Deferred $promise Resolution deferred.
+     * @param DeferredFuture $promise Resolution deferred.
      */
-    public function setPromise(Deferred $promise): self
+    public function setPromise(DeferredFuture $promise): self
     {
         $this->promise = $promise;
 
@@ -441,7 +442,7 @@ class OutgoingMessage extends Message
     /**
      * Wait for message to be sent.
      */
-    public function getSendPromise(): Promise
+    public function getSendPromise(): Future
     {
         if (!$this->sendPromise) {
             throw new Exception("Message was already sent, can't get send promise!");
@@ -460,7 +461,7 @@ class OutgoingMessage extends Message
     /**
      * Get promise.
      */
-    public function getPromise(): Promise
+    public function getPromise(): Future
     {
         return $this->promise->getFuture();
     }

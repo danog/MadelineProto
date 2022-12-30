@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
@@ -69,7 +69,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }
@@ -112,7 +112,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * @param string $data Bytes to write.
      * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): Future
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);

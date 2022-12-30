@@ -18,8 +18,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Future;
 use Amp\Loop;
-use Amp\Promise;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -90,7 +90,7 @@ class MinDatabase implements TLCallback
         if ($this->clean) {
             return;
         }
-        Loop::defer(function () {
+        EventLoop::defer(function () {
             $iterator = $this->db->getIterator();
             while (yield $iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
@@ -222,7 +222,7 @@ class MinDatabase implements TLCallback
      * @param float|int $id Peer ID
      * @psalm-return Promise<bool>
      */
-    public function hasPeer($id): Promise
+    public function hasPeer($id): Future
     {
         return $this->db->isset($id);
     }

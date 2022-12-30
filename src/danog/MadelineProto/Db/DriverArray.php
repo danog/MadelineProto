@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
@@ -68,7 +68,7 @@ abstract class DriverArray implements DbArray
      * @param mixed $key
      * @return Promise<bool> true if the offset exists, otherwise false
      */
-    public function isset(string|int $key): Promise
+    public function isset(string|int $key): Future
     {
         return call(fn () => null !== yield $this->offsetGet($key));
     }
@@ -77,7 +77,7 @@ abstract class DriverArray implements DbArray
      * @param DbArray|array|null $previous
      * @psalm-return Promise<static>
      */
-    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Promise
+    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Future
     {
         $instance = new static();
         $instance->setTable($table);

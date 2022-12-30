@@ -2,9 +2,9 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Future;
 use Amp\Iterator;
 use Amp\Producer;
-use Amp\Promise;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Redis;
@@ -101,7 +101,7 @@ class RedisArray extends DriverArray
      * </p>
      * @throws Throwable
      */
-    public function set(string|int $index, mixed $value): Promise
+    public function set(string|int $index, mixed $value): Future
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
             return new Success();
@@ -117,7 +117,7 @@ class RedisArray extends DriverArray
         return $request;
     }
 
-    public function offsetGet(mixed $offset): Promise
+    public function offsetGet(mixed $offset): Future
     {
         $offset = (string) $offset;
         return call(function () use ($offset) {
@@ -135,7 +135,7 @@ class RedisArray extends DriverArray
         });
     }
 
-    public function unset(string|int $key): Promise
+    public function unset(string|int $key): Future
     {
         $this->unsetCache($key);
 
@@ -149,7 +149,7 @@ class RedisArray extends DriverArray
      * @throws Throwable
      */
     #[ReturnTypeWillChange]
-    public function getArrayCopy(): Promise
+    public function getArrayCopy(): Future
     {
         return call(function () {
             $iterator = $this->getIterator();
@@ -183,7 +183,7 @@ class RedisArray extends DriverArray
      * array or object, respectively.
      * @throws Throwable
      */
-    public function count(): Promise
+    public function count(): Future
     {
         return call(function () {
             $request = $this->db->scan($this->itKey());
@@ -200,7 +200,7 @@ class RedisArray extends DriverArray
     /**
      * Clear all elements.
      */
-    public function clear(): Promise
+    public function clear(): Future
     {
         $this->clearCache();
         return call(function () {

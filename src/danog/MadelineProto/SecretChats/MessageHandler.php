@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\SecretChats;
 
-use Amp\Promise;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -42,10 +41,10 @@ trait MessageHandler
      *
      * @param integer  $chat_id      Chat ID
      * @param array    $message      Message to encrypt
-     * @param Deferred $queuePromise Queue promise
+     * @param DeferredFuture $queuePromise Queue promise
      * @internal
      */
-    public function encryptSecretMessage(int $chat_id, array $message, Deferred $queuePromise): Generator
+    public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise): Generator
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $chat_id));

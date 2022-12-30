@@ -18,14 +18,15 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Future;
 use Amp\Loop as AmpLoop;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_SAPI;
@@ -132,7 +133,7 @@ trait Loop
         $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopLoop = false;
         if ($this->loop_callback !== null) {
-            $repeat = AmpLoop::repeat(1000, fn () => Tools::callFork(($this->loop_callback)()));
+            $repeat = EventLoop::repeat(1, fn () => Tools::callFork(($this->loop_callback)()));
         }
         do {
             if (!$this->updateHandler) {
@@ -159,7 +160,7 @@ trait Loop
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
         $this->stopLoop = false;
         if (isset($repeat)) {
-            AmpLoop::cancel($repeat);
+            EventEventLoop::cancel($repeat);
         }
     }
     /**
@@ -181,7 +182,7 @@ trait Loop
     /**
      * Start MadelineProto's update handling loop in background.
      */
-    public function loopFork(): Promise
+    public function loopFork(): Future
     {
         return Tools::callFork($this->loop());
     }

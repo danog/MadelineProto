@@ -263,7 +263,7 @@ trait ResponseHandler
                         $deferred->fail($error);
                         return;
                     }
-                    $deferred->resolve(Tools::call($this->API->MTProtoToBotAPI($result)));
+                    $deferred->complete(Tools::call($this->API->MTProtoToBotAPI($result)));
                 });
                 $request->reply($promise);
             } else {
@@ -320,7 +320,7 @@ trait ResponseHandler
                 if ($request->isUserRelated()) {
                     $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
                 }
-                Loop::defer([$this, 'methodRecall'], ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
+                EventLoop::defer(fn () => $this->methodRecall(['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]));
                 //$this->API->methodRecall('', ['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
                 return null;
             case 401:

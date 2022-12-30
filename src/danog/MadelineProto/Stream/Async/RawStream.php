@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 /**
@@ -30,15 +30,15 @@ use danog\MadelineProto\Tools;
  */
 trait RawStream
 {
-    public function read(): Promise
+    public function read(): Future
     {
         return Tools::call($this->readGenerator());
     }
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         return Tools::call($this->writeGenerator($data));
     }
-    public function end(string $finalData = ''): Promise
+    public function end(string $finalData = ''): Future
     {
         if (\method_exists($this, 'endGenerator')) {
             return Tools::call($this->endGenerator($finalData));

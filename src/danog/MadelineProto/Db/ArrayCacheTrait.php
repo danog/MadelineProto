@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Loop;
 use danog\MadelineProto\Logger;
+use Revolt\EventLoop;
 
 /**
  * Array caching trait.
@@ -61,15 +62,15 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        $this->cacheCleanupId = Loop::repeat(
-            \max(1000, ($this->cacheTtl * 1000) / 5),
+        $this->cacheCleanupId = EventLoop::repeat(
+            \max(1, $this->cacheTtl / 5),
             fn () => $this->cleanupCache(),
         );
     }
     protected function stopCacheCleanupLoop(): void
     {
         if ($this->cacheCleanupId) {
-            Loop::cancel($this->cacheCleanupId);
+            EventLoop::cancel($this->cacheCleanupId);
             $this->cacheCleanupId = null;
         }
     }

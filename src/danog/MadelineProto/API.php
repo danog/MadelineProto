@@ -272,7 +272,7 @@ class API extends InternalDoc
             };
             Tools::callFork($cb());
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
-            $cancel->resolve(new Exception('Connected!'));
+            $cancel->complete(new Exception('Connected!'));
         }
         return true;
     }

@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\VoIP;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use danog\MadelineProto\Logger;
@@ -78,7 +78,7 @@ class Endpoint
     /**
      * Disconnect from endpoint.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         if ($this->socket !== null) {
             $this->socket->close();
@@ -140,7 +140,7 @@ class Endpoint
     /**
      * Write data.
      */
-    public function write(string $payload): Promise
+    public function write(string $payload): Future
     {
         if ($this->socket === null) {
             return new Success(0);

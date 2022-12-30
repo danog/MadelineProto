@@ -20,7 +20,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\CancellationToken;
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
@@ -57,7 +57,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      * @var Connector
      */
     private $connector;
-    public function setupTls(?CancellationToken $cancellationToken = null): Promise
+    public function setupTls(?CancellationToken $cancellationToken = null): Future
     {
         return $this->stream->setupTls($cancellationToken);
     }
@@ -82,7 +82,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      */
-    public function read(): Promise
+    public function read(): Future
     {
         return $this->stream ? $this->stream->read() : new Success(null);
     }
@@ -91,7 +91,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -101,7 +101,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         try {
             if ($this->stream) {

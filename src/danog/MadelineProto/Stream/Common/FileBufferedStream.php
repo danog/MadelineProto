@@ -20,7 +20,7 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
 use Amp\File\File;
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\Socket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
@@ -54,7 +54,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async chunked read.
      */
-    public function read(): Promise
+    public function read(): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -66,7 +66,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -76,7 +76,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async write.
      */
-    public function end(string $finalData = ''): Promise
+    public function end(string $finalData = ''): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -86,7 +86,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         if ($this->stream) {
             $this->stream = null;
@@ -98,7 +98,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(int &$length): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -110,7 +110,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Future
     {
         if (\strlen($append)) {
             $this->append = $append;
@@ -123,7 +123,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): Future
     {
         return $this->stream->read($length);
     }
@@ -132,7 +132,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): Future
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);

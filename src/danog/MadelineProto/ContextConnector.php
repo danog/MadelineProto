@@ -19,9 +19,9 @@
 namespace danog\MadelineProto;
 
 use Amp\CancellationToken;
+use Amp\Future;
 use Amp\MultiReasonException;
 use Amp\NullCancellationToken;
-use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Connector;
 use Generator;
@@ -38,7 +38,7 @@ class ContextConnector implements Connector
         $this->fromDns = $fromDns;
         $this->logger = $dataCenter->getAPI()->getLogger();
     }
-    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
+    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
         return Tools::call((function () use ($uri, $context, $token): Generator {
             $ctx = $context ?? new ConnectContext();

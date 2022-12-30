@@ -27,6 +27,7 @@ use Amp\Dns\WindowsConfigLoader;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
+use Amp\Future;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\Cookie\CookieInterceptor;
@@ -35,7 +36,6 @@ use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
-use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsConnector;
 use Amp\Websocket\Client\Handshake;
@@ -250,7 +250,7 @@ class DataCenter
                         ]);
                     }
                 }
-                public function loadConfig(): Promise
+                public function loadConfig(): Future
                 {
                     return Tools::call($this->loadConfigGenerator());
                 }

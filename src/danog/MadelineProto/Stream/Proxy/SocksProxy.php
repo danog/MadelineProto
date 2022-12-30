@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Proxy;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
@@ -143,7 +143,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }
@@ -152,7 +152,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Future
     {
         return $this->stream->getWriteBuffer($length, $append);
     }
@@ -161,15 +161,15 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(int &$length): Future
     {
         return $this->stream->getReadBuffer($length);
     }
-    public function read(): Promise
+    public function read(): Future
     {
         return $this->stream->read();
     }
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         return $this->stream->write($data);
     }

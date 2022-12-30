@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract as DatabaseDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
@@ -30,7 +30,7 @@ abstract class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DriverArray $value = null): Promise
+    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DriverArray $value = null): Future
     {
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;

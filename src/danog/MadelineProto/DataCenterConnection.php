@@ -19,7 +19,6 @@
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
-use Amp\Promise;
 use Amp\Success;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -491,7 +490,7 @@ class DataCenterConnection implements JsonSerializable
             if ($this->connectionsDeferred) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
-                $connectionsDeferred->resolve();
+                $connectionsDeferred->complete();
             }
         } else {
             $this->availableConnections[$id] = 0;

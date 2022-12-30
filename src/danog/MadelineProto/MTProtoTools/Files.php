@@ -21,10 +21,10 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
+use Amp\Future;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -45,7 +45,7 @@ use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
-use function Amp\Promise\all;
+use function Amp\Future\all;
 
 use function end;
 
@@ -309,7 +309,7 @@ trait Files
              * @param integer $offset Offset
              * @param integer $size   Chunk size
              */
-            public function read(int $offset, int $size): Promise
+            public function read(int $offset, int $size): Future
             {
                 $offset /= $this->partSize;
                 return $this->write[$offset]->getFuture();
@@ -320,10 +320,10 @@ trait Files
              * @param string  $data   Data
              * @param integer $offset Offset
              */
-            public function write(string $data, int $offset): Promise
+            public function write(string $data, int $offset): Future
             {
                 $offset /= $this->partSize;
-                $this->write[$offset]->resolve($data);
+                $this->write[$offset]->complete($data);
                 return $this->read[$offset]->getFuture();
             }
             /**
@@ -334,7 +334,7 @@ trait Files
             public function callback(...$params): void
             {
                 $offset = $this->offset++;
-                $this->read[$offset]->resolve($this->wrote[$offset]);
+                $this->read[$offset]->complete($this->wrote[$offset]);
                 if ($this->cb) {
                     Tools::callFork(($this->cb)(...$params));
                 }

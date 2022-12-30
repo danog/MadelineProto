@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;

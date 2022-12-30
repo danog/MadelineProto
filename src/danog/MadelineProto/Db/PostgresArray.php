@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Postgres\ConnectionConfig;
-use Amp\Promise;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;

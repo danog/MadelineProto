@@ -32,6 +32,7 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use Error;
 use Generator;
+use Revolt\EventLoop;
 
 use function substr;
 
@@ -105,9 +106,9 @@ class ReadLoop extends SignalLoop
                 return;
             }
             $connection->httpReceived();
-            Loop::defer([$connection, 'handleMessages']);
+            EventLoop::defer($connection->handleMessages(...));
             if ($shared->isHttp()) {
-                Loop::defer([$connection, 'pingHttpWaiter']);
+                EventLoop::defer($connection->pingHttpWaiter(...));
             }
         }
     }

@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 /**
@@ -35,7 +35,7 @@ trait BufferedStream
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(int &$length): Future
     {
         return Tools::call($this->getReadBufferGenerator($length));
     }
@@ -45,7 +45,7 @@ trait BufferedStream
      * @param int    $length Total length of data that is going to be piped in the buffer
      * @param string $append Data to append after entire buffer is written
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Future
     {
         return Tools::call($this->getWriteBufferGenerator($length, $append));
     }

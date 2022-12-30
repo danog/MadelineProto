@@ -472,7 +472,7 @@ class Connection
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
         if (isset($queuePromise)) {
-            $queuePromise->resolve();
+            $queuePromise->complete();
         }
         if ($flush && isset($this->writer)) {
             $this->writer->resumeDeferOnce();

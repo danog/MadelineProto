@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use Amp\Promise;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Generator;

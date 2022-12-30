@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
+use Amp\Future;
 
 /**
  * Buffered stream interface.
@@ -33,13 +33,13 @@ interface BufferedStreamInterface extends StreamInterface
      * @param int $length Length of payload, as detected by this layer
      * @psalm-return Promise<BufferInterface>
      */
-    public function getReadBuffer(int &$length): Promise;
+    public function getReadBuffer(int &$length): Future;
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise;
+    public function getWriteBuffer(int $length, string $append = ''): Future;
     /**
      * Get stream name.
      *

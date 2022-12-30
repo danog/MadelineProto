@@ -22,15 +22,16 @@ use Amp\CancellationToken;
 use Amp\DeferredFuture;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
+use Amp\Future;
 use Amp\Loop;
 use Amp\NullCancellationToken;
-use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
 use Amp\Socket\Connector;
 use Amp\Socket\ResourceSocket;
 use danog\MadelineProto\Stream\ConnectionContext;
 use Generator;
+use Revolt\EventLoop;
 
 use const STREAM_CLIENT_ASYNC_CONNECT;
 
@@ -56,7 +57,7 @@ class DoHConnector implements Connector
         $this->dataCenter = $dataCenter;
         $this->ctx = $ctx;
     }
-    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
+    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
         return Tools::call((function () use ($uri, $context, $token): Generator {
             $socketContext = $context ?? new ConnectContext();
@@ -95,9 +96,9 @@ class DoHConnector implements Connector
                 // Here, we simply check if the connection URI has changed since we first set it:
                 // this would indicate that a proxy class has changed the connection URI to the proxy URI.
                 if ($this->ctx->isDns()) {
-                    $records = yield $this->dataCenter->getNonProxiedDNSClient()->resolve($host, $socketContext->getDnsTypeRestriction());
+                    $records = yield $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
                 } else {
-                    $records = yield $this->dataCenter->getDNSClient()->resolve($host, $socketContext->getDnsTypeRestriction());
+                    $records = yield $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
                 }
                 \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
                 if ($this->ctx->getIpv6()) {
@@ -125,7 +126,7 @@ class DoHConnector implements Connector
                     \stream_set_blocking($socket, false);
                     $deferred = new DeferredFuture();
                     /** @psalm-suppress InvalidArgument */
-                    $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
+                    $watcher = EventLoop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {
                         yield Promise\timeout($deferred->getFuture(), $timeout);
@@ -133,7 +134,7 @@ class DoHConnector implements Connector
                         throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                         // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
                     } finally {
-                        Loop::cancel($watcher);
+                        EventLoop::cancel($watcher);
                         $token->unsubscribe($id);
                     }
                     // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.

@@ -4,7 +4,7 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\ByteStream\InputStream as AmpInputStream;
 use Amp\ByteStream\PendingReadError;
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 class InputStream extends Obj implements AmpInputStream
@@ -16,7 +16,7 @@ class InputStream extends Obj implements AmpInputStream
      * @psalm-return Promise<string|null>
      * @throws PendingReadError Thrown if another read operation is still pending.
      */
-    public function read(): Promise
+    public function read(): Future
     {
         return Tools::call($this->__call('read'));
     }

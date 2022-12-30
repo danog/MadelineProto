@@ -2,8 +2,8 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Future;
 use Amp\Iterator;
-use Amp\Promise;
 use ArrayAccess;
 use ReturnTypeWillChange;
 
@@ -19,32 +19,32 @@ interface DbArray extends DbType, ArrayAccess
      *
      * @psalm-return Promise<array<string|int, T>>
      */
-    public function getArrayCopy(): Promise;
+    public function getArrayCopy(): Future;
     /**
      * Check if element is set.
      *
      * @psalm-return Promise<bool>
      */
-    public function isset(string|int $key): Promise;
+    public function isset(string|int $key): Future;
     /**
      * Unset element.
      *
      * @psalm-return Promise<mixed>
      */
-    public function unset(string|int $key): Promise;
+    public function unset(string|int $key): Future;
     /**
      * Set element.
      *
      * @psalm-param T $value
      */
-    public function set(string|int $key, mixed $value): Promise;
+    public function set(string|int $key, mixed $value): Future;
     /**
      * Get element.
      *
      * @param string|int $index
      * @psalm-return Promise<T>
      */
-    public function offsetGet(mixed $index): Promise;
+    public function offsetGet(mixed $index): Future;
     /**
      * Set element.
      *
@@ -73,11 +73,11 @@ interface DbArray extends DbType, ArrayAccess
      *
      * @return Promise<integer>
      */
-    public function count(): Promise;
+    public function count(): Future;
     /**
      * Clear all elements.
      */
-    public function clear(): Promise;
+    public function clear(): Future;
     /**
      * Get iterator.
      *

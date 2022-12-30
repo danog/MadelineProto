@@ -7,6 +7,7 @@ use Amp\Http\Client\Request;
 use Amp\Loop;
 use danog\Loop\Generic\PeriodicLoop;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
@@ -19,11 +20,6 @@ final class GarbageCollector
      *      when multiple instances of MadelineProto running.
      */
     public static bool $lock = false;
-
-    /**
-     * How often will check memory.
-     */
-    public static int $checkIntervalMs = 1000;
 
     /**
      * Next cleanup will be triggered when memory consumption will increase by this amount.
@@ -47,7 +43,7 @@ final class GarbageCollector
         }
         self::$lock = true;
 
-        Loop::repeat(self::$checkIntervalMs, static function (): void {
+        EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 \gc_collect_cycles();

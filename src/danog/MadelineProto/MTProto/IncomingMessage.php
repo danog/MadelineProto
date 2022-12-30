@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\MTProto;
 
 use Amp\DeferredFuture;
-use Amp\Promise;
 use danog\MadelineProto\Tools;
 
 /**
@@ -227,7 +226,7 @@ class IncomingMessage extends Message
                 }
 
                 if (0 === --$pending) {
-                    $deferred->resolve($return);
+                    $deferred->complete($return);
                 }
             });
         }

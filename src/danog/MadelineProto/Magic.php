@@ -25,6 +25,7 @@ use danog\MadelineProto\TL\Conversion\Extension;
 use Phar;
 use phpseclib3\Math\BigInteger;
 use ReflectionClass;
+use Revolt\EventLoop;
 use Throwable;
 
 use const DIRECTORY_SEPARATOR;
@@ -40,8 +41,8 @@ use const SIGINT;
 use const SIGTERM;
 use function Amp\ByteStream\getStdin;
 use function Amp\File\read;
+use function Amp\Future\wait;
 use function Amp\Log\hasColorSupport;
-use function Amp\Promise\wait;
 use function define;
 use function function_exists;
 
@@ -300,11 +301,11 @@ class Magic
                 try {
                     \pcntl_signal(SIGINT, fn () => null);
                     \pcntl_signal(SIGINT, SIG_DFL);
-                    Loop::unreference(Loop::onSignal(SIGINT, static function (): void {
+                    EventLoop::unreference(EventLoop::onSignal(SIGINT, static function (): void {
                         Logger::log('Got sigint', Logger::FATAL_ERROR);
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
-                    Loop::unreference(Loop::onSignal(SIGTERM, static function (): void {
+                    EventLoop::unreference(EventLoop::onSignal(SIGTERM, static function (): void {
                         Logger::log('Got sigterm', Logger::FATAL_ERROR);
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
@@ -443,7 +444,7 @@ class Magic
             getStdin()->unreference();
         }
         if ($code !== 0) {
-            $driver = Loop::get();
+            $driver = EventLoop::get();
             $reflectionClass = new ReflectionClass(Driver::class);
             $reflectionProperty = $reflectionClass->getProperty('watchers');
             $reflectionProperty->setAccessible(true);
@@ -452,7 +453,7 @@ class Magic
             }
         }
         MTProto::serializeAll();
-        Loop::stop();
+        EventLoop::stop();
         if (\class_exists(Installer::class)) {
             Installer::unlock();
         }
@@ -466,7 +467,7 @@ class Magic
         if (self::$suspendPeriodicLogging) {
             $deferred = self::$suspendPeriodicLogging;
             self::$suspendPeriodicLogging = null;
-            $deferred->resolve();
+            $deferred->complete();
         } else {
             self::$suspendPeriodicLogging = new DeferredFuture;
         }

@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
-use Amp\Promise;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
@@ -131,7 +130,7 @@ abstract class Serialization
                 Magic::shutdown(1);
             }*/
             Logger::log("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
-            $warningId = EventLoop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
+            $warningId = EventLoop::repeat(5, fn () => Logger::log('Still waiting for exclusive session lock...'));
             EventLoop::unreference($warningId);
         });
         EventLoop::unreference($warningId);
@@ -146,7 +145,7 @@ abstract class Serialization
                 if ($cancelFlock !== null) {
                     $copy = $cancelFlock;
                     $cancelFlock = null;
-                    $copy->resolve(true);
+                    $copy->complete(true);
                 }
             };
             $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull));
@@ -162,7 +161,7 @@ abstract class Serialization
                 }
             });
         });
-        Loop::cancel($warningId);
+        EventLoop::cancel($warningId);
 
         if (!$unlock) { // Canceled, don't have lock
             return $ipcSocket;
@@ -185,7 +184,7 @@ abstract class Serialization
             if (!$class = $lightState->getEventHandler()) {
                 // Unlock and fork
                 $unlock();
-                $cancelIpc->resolve(Server::startMe($session));
+                $cancelIpc->complete(Server::startMe($session));
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
             } elseif (!\class_exists($class)) {
                 // Have lock, can't use it

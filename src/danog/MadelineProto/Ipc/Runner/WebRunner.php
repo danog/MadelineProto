@@ -3,8 +3,8 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\Failure;
+use Amp\Future;
 use Amp\Parallel\Context\ContextException;
-use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -31,7 +31,7 @@ final class WebRunner extends RunnerAbstract
      * @param string $session Session path
      * @return Promise<bool>
      */
-    public static function start(string $session, int $startupId): Promise
+    public static function start(string $session, int $startupId): Future
     {
         if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
             return new Failure(new \Exception("Can't start the web runner!"));

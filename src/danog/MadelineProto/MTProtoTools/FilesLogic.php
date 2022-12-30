@@ -15,7 +15,6 @@ use Amp\Http\Server\Response;
 use Amp\Http\Status;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Producer;
-use Amp\Promise;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;

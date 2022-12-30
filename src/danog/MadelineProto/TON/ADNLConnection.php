@@ -137,7 +137,7 @@ class ADNLConnection
                     if ($data['_'] !== 'adnl.message.answer') {
                         throw new Exception('Wrong answer type: '.$data['_']);
                     }
-                    $this->requests[$data['query_id']]->resolve($this->TL->deserialize((string) $data['answer'])[0]);
+                    $this->requests[$data['query_id']]->complete($this->TL->deserialize((string) $data['answer'])[0]);
                 }
             }
         })());

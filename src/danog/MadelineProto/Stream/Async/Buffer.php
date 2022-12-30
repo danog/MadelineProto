@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 /**
@@ -30,11 +30,11 @@ use danog\MadelineProto\Tools;
  */
 trait Buffer
 {
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): Future
     {
         return Tools::call($this->bufferReadGenerator($length));
     }
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): Future
     {
         return Tools::call($this->bufferWriteGenerator($data));
     }

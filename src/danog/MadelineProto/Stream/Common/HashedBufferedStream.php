@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\BufferedStream;
@@ -182,7 +182,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }
@@ -217,7 +217,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
      */
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): Future
     {
         if ($this->read_hash === null) {
             return $this->read_buffer->bufferRead($length);
@@ -230,7 +230,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * @param string $data Bytes to write.
      * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): Future
     {
         if ($this->write_hash === null) {
             return $this->write_buffer->bufferWrite($data);

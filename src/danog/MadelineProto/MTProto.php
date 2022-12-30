@@ -19,8 +19,8 @@
 namespace danog\MadelineProto;
 
 use Amp\Dns\Resolver;
+use Amp\Future;
 use Amp\Http\Client\HttpClient;
-use Amp\Promise;
 use Amp\Success;
 use Closure;
 use danog\MadelineProto\Async\AsyncConstruct;
@@ -1367,7 +1367,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @internal
      */
-    public function restartIpcServer(): Promise
+    public function restartIpcServer(): Future
     {
         return new Success(); // Can only be called from client
     }

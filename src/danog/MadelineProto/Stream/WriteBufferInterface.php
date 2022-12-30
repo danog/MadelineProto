@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
+use Amp\Future;
 
 /**
  * Write buffer interface.
@@ -32,5 +32,5 @@ interface WriteBufferInterface
      *
      * @param string $data Data to write
      */
-    public function bufferWrite(string $data): Promise;
+    public function bufferWrite(string $data): Future;
 }

@@ -18,9 +18,9 @@
 namespace danog\MadelineProto\Ipc;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use Amp\Success;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Exception;
@@ -34,7 +34,7 @@ use danog\MadelineProto\Tools;
 use Generator;
 use Throwable;
 
-use function Amp\Promise\first;
+use function Amp\Future\first;
 
 /**
  * IPC server.
@@ -57,7 +57,7 @@ class Server extends SignalLoop
     /**
      * Deferred to shut down worker, if started.
      */
-    private static ?Deferred $shutdownDeferred = null;
+    private static ?DeferredFuture $shutdownDeferred = null;
     /**
      * Boolean whether to shut down worker, if started.
      */
@@ -95,7 +95,7 @@ class Server extends SignalLoop
      *
      * @param SessionPaths $session   Session path
      */
-    public static function startMe(SessionPaths $session): Promise
+    public static function startMe(SessionPaths $session): Future
     {
         $id = Tools::randomInt(2000000000);
         $started = false;
@@ -156,7 +156,7 @@ class Server extends SignalLoop
     /**
      * Wait for shutdown.
      */
-    public static function waitShutdown(): Promise
+    public static function waitShutdown(): Future
     {
         if (self::$shutdownNow) {
             return new Success;
@@ -174,7 +174,7 @@ class Server extends SignalLoop
             self::$shutdownNow = true;
             $deferred = self::$shutdownDeferred;
             self::$shutdownDeferred = null;
-            $deferred->resolve();
+            $deferred->complete();
         }
     }
     /**

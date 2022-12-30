@@ -5,7 +5,7 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\OutputStream as AmpOutputStream;
 use Amp\ByteStream\StreamException;
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Tools;
 
 class OutputStream extends Obj implements AmpOutputStream
@@ -18,7 +18,7 @@ class OutputStream extends Obj implements AmpOutputStream
      * @throws ClosedException If the stream has already been closed.
      * @throws StreamException If writing to the stream fails.
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         return Tools::call($this->__call('write', [$data]));
     }
@@ -33,7 +33,7 @@ class OutputStream extends Obj implements AmpOutputStream
      * @throws ClosedException If the stream has already been closed.
      * @throws StreamException If writing to the stream fails.
      */
-    public function end(string $finalData = ""): Promise
+    public function end(string $finalData = ""): Future
     {
         return Tools::call($this->__call('write', [$finalData]));
     }

@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Promise;
+use Amp\Future;
 use Phar;
 
 use const MADELINE_PHP;
@@ -67,5 +67,5 @@ abstract class RunnerAbstract
      * @param string   $session Session path
      * @return Promise<true>
      */
-    abstract public static function start(string $session, int $startupId): Promise;
+    abstract public static function start(string $session, int $startupId): Future;
 }

@@ -19,7 +19,6 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use danog\MadelineProto\Logger;
 use Generator;
 use Throwable;
@@ -104,7 +103,7 @@ abstract class ClientAbstract
                     if ($payload instanceof ExitFailure) {
                         $promise->fail($payload->getException());
                     } else {
-                        $promise->resolve($payload);
+                        $promise->complete($payload);
                     }
                     unset($promise);
                 }

@@ -19,7 +19,7 @@
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\Socket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
@@ -59,7 +59,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async chunked read.
      */
-    public function read(): Promise
+    public function read(): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -71,7 +71,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -81,7 +81,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         if ($this->memory_stream) {
             \fclose($this->memory_stream);
@@ -98,7 +98,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(int &$length): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -122,7 +122,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Future
     {
         if (\strlen($append)) {
             $this->append = $append;
@@ -135,7 +135,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -178,7 +178,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param string $data Data to write
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): Future
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);

@@ -7,7 +7,7 @@
 
 namespace danog\MadelineProto\TON;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\TL\Conversion\Extension;
@@ -718,7 +718,7 @@ class InternalDoc extends APIFactory
          * @param Generator|Promise $b Promise B
      * @psalm-suppress InvalidScope
      */
-    public function after($a, $b): Promise
+    public function after($a, $b): Future
     {
         return Tools::after($a, $b);
     }
@@ -728,7 +728,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<(Generator|Promise)> $promises Promises
      */
-    public function all(array $promises): Promise
+    public function all(array $promises): Future
     {
         return Tools::all($promises);
     }
@@ -737,7 +737,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<(Promise|Generator)> $promises Promises
      */
-    public function any(array $promises): Promise
+    public function any(array $promises): Future
     {
         return Tools::any($promises);
     }
@@ -773,7 +773,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $parameters Parameters
      */
-    public function botAPItoMTProto(array $parameters, array $extra = []): Promise
+    public function botAPItoMTProto(array $parameters, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$parameters, $extra]);
     }
@@ -785,7 +785,7 @@ class InternalDoc extends APIFactory
      * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      * @psalm-return Promise<TReturn>
      */
-    public function call($promise): Promise
+    public function call($promise): Future
     {
         return Tools::call($promise);
     }
@@ -826,7 +826,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $config Path to config file
      */
-    public function connect(string $config, array $extra = []): Promise
+    public function connect(string $config, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$config, $extra]);
     }
@@ -835,7 +835,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Message to echo
      */
-    public function echo(string $string): Promise
+    public function echo(string $string): Future
     {
         return Tools::echo($string);
     }
@@ -853,7 +853,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<(Promise|Generator)> $promises Promises
      */
-    public function first(array $promises): Promise
+    public function first(array $promises): Future
     {
         return Tools::first($promises);
     }
@@ -866,7 +866,7 @@ class InternalDoc extends APIFactory
      * @param float     $polling   Polling interval
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     * @return \Amp\Promise<$token is null ? callable : ?callable>
+     * @return \Amp\Future<$token is null ? callable : ?callable>
      */
     public function flock(string $file, int $operation, float $polling = 0.1, ?Promise $token = null, ?callable $failureCb = null)
     {
@@ -1005,7 +1005,7 @@ class InternalDoc extends APIFactory
      *
      * @param callable $func Function
      */
-    public function loop(callable $func, array $extra = []): Promise
+    public function loop(callable $func, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$func, $extra]);
     }
@@ -1026,7 +1026,7 @@ class InternalDoc extends APIFactory
      */
     public function methodCall(string $methodName, array $args = [
     ], array $aargs = [
-    ], array $extra = []): Promise
+    ], array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$methodName, $args, $aargs, $extra]);
     }
@@ -1112,7 +1112,7 @@ class InternalDoc extends APIFactory
      * @param string $prompt Prompt
      * @return Promise<string>
      */
-    public function readLine(string $prompt = ''): Promise
+    public function readLine(string $prompt = ''): Future
     {
         return Tools::readLine($prompt);
     }
@@ -1163,7 +1163,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|float $time Number of seconds to sleep for
      */
-    public function sleep($time): Promise
+    public function sleep($time): Future
     {
         return Tools::sleep($time);
     }
@@ -1173,7 +1173,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<(Promise|Generator)> $promises Promises
      */
-    public function some(array $promises): Promise
+    public function some(array $promises): Future
     {
         return Tools::some($promises);
     }
@@ -1182,7 +1182,7 @@ class InternalDoc extends APIFactory
      *
      * @param Generator|Promise $promise
      */
-    public function timeout($promise, int $timeout): Promise
+    public function timeout($promise, int $timeout): Future
     {
         return Tools::timeout($promise, $timeout);
     }
@@ -1201,9 +1201,9 @@ class InternalDoc extends APIFactory
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
      * @return Promise<TReturn>|Promise<TReturnAlt>
-     * @throws TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
+     * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
-    public function timeoutWithDefault($promise, int $timeout, $default = null): Promise
+    public function timeoutWithDefault($promise, int $timeout, $default = null): Future
     {
         return Tools::timeoutWithDefault($promise, $timeout, $default);
     }

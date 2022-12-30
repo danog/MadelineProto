@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Loop\Generic;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\Loop\Generic\GenericLoop as GenericGenericLoop;
 use danog\MadelineProto\InternalDoc;
 use danog\MadelineProto\Loop\APILoop;
@@ -52,7 +52,7 @@ class GenericLoop extends GenericGenericLoop
      * @param ?int $time For how long to pause the loop, if null will pause forever (until resume is called from outside of the loop)
      * @return Promise Resolved when the loop is resumed
      */
-    public function pause(?int $time = null): Promise
+    public function pause(?int $time = null): Future
     {
         return parent::pause(\is_integer($time) ? $time * 1000 : $time);
     }

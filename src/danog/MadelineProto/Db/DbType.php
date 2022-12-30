@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Promise;
+use Amp\Future;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 
 interface DbType
@@ -11,5 +11,5 @@ interface DbType
      * @param null|DbType|array $previous
      * @return Promise<self>
      */
-    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Promise;
+    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Future;
 }

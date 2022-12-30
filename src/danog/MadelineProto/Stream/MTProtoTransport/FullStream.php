@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\BufferedStream;
@@ -56,7 +56,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }

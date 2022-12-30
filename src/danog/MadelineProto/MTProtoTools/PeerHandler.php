@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Promise;
+use Amp\Future;
 use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
@@ -530,7 +530,7 @@ trait PeerHandler
      * @template TConstructor
      * @psalm-param array{_: TConstructor}|mixed $id
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array{
+     * @psalm-return \Generator<int|mixed, \Amp\Future|\Amp\Future<string>|array, mixed, array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -1140,7 +1140,7 @@ trait PeerHandler
     {
         return "$channelId'$filter'$q'$offset'$limit";
     }
-    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit): Promise
+    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit): Future
     {
         return $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)];
     }

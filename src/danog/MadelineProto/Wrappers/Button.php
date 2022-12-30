@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use Amp\Promise;
 use danog\MadelineProto\Tools;
 
 /**

@@ -2,9 +2,9 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Future;
 use Amp\Iterator;
 use Amp\Producer;
-use Amp\Promise;
 use Amp\Sql\CommandResult;
 use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
@@ -92,7 +92,7 @@ abstract class SqlArray extends DriverArray
     }
 
     #[ReturnTypeWillChange]
-    public function getArrayCopy(): Promise
+    public function getArrayCopy(): Future
     {
         return call(function () {
             $iterator = $this->getIterator();
@@ -105,7 +105,7 @@ abstract class SqlArray extends DriverArray
         });
     }
 
-    public function offsetGet(mixed $key): Promise
+    public function offsetGet(mixed $key): Future
     {
         $key = (string) $key;
         if ($this->hasCache($key)) {
@@ -127,7 +127,7 @@ abstract class SqlArray extends DriverArray
         });
     }
 
-    public function set(string|int $key, mixed $value): Promise
+    public function set(string|int $key, mixed $value): Future
     {
         $key = (string) $key;
         if ($this->hasCache($key) && $this->getCache($key) === $value) {
@@ -163,7 +163,7 @@ abstract class SqlArray extends DriverArray
      * @return Promise<array>
      * @throws Throwable
      */
-    public function unset(string|int $key): Promise
+    public function unset(string|int $key): Future
     {
         $key = (string) $key;
         $this->unsetCache($key);
@@ -182,7 +182,7 @@ abstract class SqlArray extends DriverArray
      * array or object, respectively.
      * @throws Throwable
      */
-    public function count(): Promise
+    public function count(): Future
     {
         return call(function () {
             /** @var ResultSet */
@@ -197,7 +197,7 @@ abstract class SqlArray extends DriverArray
      *
      * @return Promise<CommandResult>
      */
-    public function clear(): Promise
+    public function clear(): Future
     {
         $this->clearCache();
         return $this->execute($this->queries[self::SQL_CLEAR]);
@@ -210,7 +210,7 @@ abstract class SqlArray extends DriverArray
      * @return Promise<CommandResult|ResultSet>
      * @throws Throwable
      */
-    protected function execute(string $sql, array $params = []): Promise
+    protected function execute(string $sql, array $params = []): Future
     {
         if (isset($params['index'])
             && !\mb_check_encoding($params['index'], 'UTF-8')

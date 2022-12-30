@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Loop;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -35,6 +35,7 @@ use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use Generator;
+use Revolt\EventLoop;
 
 /**
  * Manages updates.
@@ -88,13 +89,13 @@ trait UpdateHandler
         $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
         return $updates;
     }
-    private ?Deferred $update_deferred = null;
+    private ?DeferredFuture $update_deferred = null;
     /**
      * Wait for update.
      *
      * @internal
      */
-    public function waitUpdate(): Promise
+    public function waitUpdate(): Future
     {
         $this->update_deferred = new DeferredFuture();
         return $this->update_deferred->getFuture();
@@ -109,7 +110,7 @@ trait UpdateHandler
         if ($this->update_deferred) {
             $deferred = $this->update_deferred;
             $this->update_deferred = null;
-            Loop::defer(fn () => $deferred->resolve());
+            EventLoop::defer(fn () => $deferred->complete());
         }
     }
     /**

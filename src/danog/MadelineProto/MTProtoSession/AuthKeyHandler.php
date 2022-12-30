@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Http\Client\Request;
-use Amp\Promise;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;

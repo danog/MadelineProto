@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
+use Amp\Future;
 
 /**
  * Read buffer interface.
@@ -32,5 +32,5 @@ interface ReadBufferInterface
      *
      * @param int $length How much data to read
      */
-    public function bufferRead(int $length): Promise;
+    public function bufferRead(int $length): Future;
 }

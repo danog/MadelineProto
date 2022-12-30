@@ -20,7 +20,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\CancellationToken;
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\Socket;
 use Amp\Success;
 use danog\MadelineProto\Logger;
@@ -45,7 +45,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     public function __construct()
     {
     }
-    public function setupTls(?CancellationToken $cancellationToken = null): Promise
+    public function setupTls(?CancellationToken $cancellationToken = null): Future
     {
         return $this->stream->setupTls($cancellationToken);
     }
@@ -62,7 +62,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      */
-    public function read(): Promise
+    public function read(): Future
     {
         return $this->stream ? $this->stream->read() : new Success(null);
     }
@@ -71,7 +71,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Promise
+    public function write(string $data): Future
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -81,7 +81,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         try {
             if ($this->stream) {

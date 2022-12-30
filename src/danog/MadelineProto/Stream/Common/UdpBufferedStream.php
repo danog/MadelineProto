@@ -20,7 +20,7 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Failure;
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
@@ -55,7 +55,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Promise
+    public function disconnect(): Future
     {
         return $this->stream->disconnect();
     }
@@ -100,7 +100,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * @param integer $length Length
              * @return Promise<string>
              */
-            public function bufferRead(int $length): Promise
+            public function bufferRead(int $length): Future
             {
                 return new Success(\fread($this->buffer, $length));
             }
@@ -118,7 +118,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Future
     {
         return new Success(new class($length, $append, $this) implements WriteBufferInterface {
             private int $length;
@@ -143,7 +143,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              *
              * @param string $data Data to write
              */
-            public function bufferWrite(string $data): Promise
+            public function bufferWrite(string $data): Future
             {
                 $this->data .= $data;
                 if ($this->append_after) {

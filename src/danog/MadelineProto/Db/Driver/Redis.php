@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\Db\Driver;
 
-use Amp\Promise;
 use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;

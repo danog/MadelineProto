@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
+use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 use Generator;
@@ -39,7 +39,7 @@ interface StreamInterface
     /**
      * Disconnect from the server.
      */
-    public function disconnect(): Promise;
+    public function disconnect(): Future;
     /**
      * Get underlying AMPHP socket resource.
      *

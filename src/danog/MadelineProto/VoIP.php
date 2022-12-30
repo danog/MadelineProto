@@ -22,6 +22,7 @@ use danog\MadelineProto\VoIP\AckHandler;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
 use Generator;
+use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
 
@@ -272,7 +273,7 @@ class VoIP
         $this->callState = self::CALL_STATE_ENDED;
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
-            Loop::cancel($this->timeoutWatcher);
+            EventLoop::cancel($this->timeoutWatcher);
         }
 
         Logger::log("Closing all sockets in $this");
@@ -318,7 +319,7 @@ class VoIP
             return $this;
         }
         $this->voip_state = self::STATE_WAIT_INIT;
-        $this->timeoutWatcher = Loop::repeat(10000, function (): void {
+        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
             if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }

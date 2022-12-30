@@ -134,6 +134,13 @@ e.php
 
 tests/db-local.php
 a.php
+aa.php
+aaa.php
+aaaa.php
+b.php
+c.php
+d.php
+t.php
 app_test.json
 app.json
 config.json

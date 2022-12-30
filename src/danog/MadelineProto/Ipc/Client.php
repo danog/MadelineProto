@@ -17,8 +17,8 @@
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
@@ -105,7 +105,7 @@ class Client extends ClientAbstract
      *
      * @internal
      */
-    public function stopIpcServer(): Promise
+    public function stopIpcServer(): Future
     {
         $this->run = false;
         return $this->server->send(Server::SHUTDOWN);
@@ -115,7 +115,7 @@ class Client extends ClientAbstract
      *
      * @internal
      */
-    public function restartIpcServer(): Promise
+    public function restartIpcServer(): Future
     {
         return $this->server->send(Server::SHUTDOWN);
     }

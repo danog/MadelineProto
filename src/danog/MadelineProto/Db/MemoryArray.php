@@ -2,9 +2,9 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Future;
 use Amp\Iterator;
 use Amp\Producer;
-use Amp\Promise;
 use Amp\Success;
 use ArrayIterator;
 use danog\MadelineProto\Logger;
@@ -29,7 +29,7 @@ class MemoryArray extends ArrayIterator implements DbArray
      *
      * @return Promise<self>
      */
-    public static function getInstance(string $table, $previous, Memory $settings): Promise
+    public static function getInstance(string $table, $previous, Memory $settings): Future
     {
         return call(static function () use ($previous) {
             if ($previous instanceof MemoryArray) {
@@ -48,16 +48,16 @@ class MemoryArray extends ArrayIterator implements DbArray
         });
     }
 
-    public function set(string|int $key, mixed $value): Promise
+    public function set(string|int $key, mixed $value): Future
     {
         parent::offsetSet($key, $value);
         return new Success();
     }
-    public function isset(string|int $key): Promise
+    public function isset(string|int $key): Future
     {
         return new Success(parent::offsetExists($key));
     }
-    public function unset(string|int $key): Promise
+    public function unset(string|int $key): Future
     {
         parent::offsetUnset($key);
         return new Success();
@@ -68,7 +68,7 @@ class MemoryArray extends ArrayIterator implements DbArray
         throw new RuntimeException('Native isset not support promises. Use isset method');
     }
 
-    public function offsetGet(mixed $offset): Promise
+    public function offsetGet(mixed $offset): Future
     {
         return new Success(parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
     }
@@ -79,18 +79,18 @@ class MemoryArray extends ArrayIterator implements DbArray
     }
 
     #[ReturnTypeWillChange]
-    public function count(): Promise
+    public function count(): Future
     {
         return new Success(parent::count());
     }
 
     #[ReturnTypeWillChange]
-    public function getArrayCopy(): Promise
+    public function getArrayCopy(): Future
     {
         return new Success(parent::getArrayCopy());
     }
 
-    public function clear(): Promise
+    public function clear(): Future
     {
         parent::__construct([], parent::getFlags());
         return new Success();

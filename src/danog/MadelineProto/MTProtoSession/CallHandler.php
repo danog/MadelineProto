@@ -92,7 +92,7 @@ trait CallHandler
     {
         $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
         if (\is_array($readDeferred)) {
-            $readDeferred = Tools::all(\array_map(fn (Deferred $value) => $value->getFuture(), $readDeferred));
+            $readDeferred = Tools::all(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
         } else {
             $readDeferred = $readDeferred->getFuture();
         }

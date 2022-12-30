@@ -33,7 +33,7 @@ use const PHP_SAPI;
 use const STR_PAD_RIGHT;
 use function Amp\File\exists;
 
-use function Amp\Promise\some;
+use function Amp\Future\some;
 use function unpack;
 
 /**
