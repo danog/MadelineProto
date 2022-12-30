@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Tools module.
@@ -18,45 +18,28 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
-use Amp\Failure;
-use Amp\Loop;
-use Amp\Promise;
-use Amp\Success;
-use Amp\TimeoutException;
 use ArrayAccess;
 use Closure;
 use Countable;
 use Exception;
-use Generator;
 use phpseclib3\Crypt\Random;
 use Throwable;
 use Traversable;
 use TypeError;
 
 use const DIRECTORY_SEPARATOR;
-use const LOCK_NB;
-use const LOCK_UN;
 use const PHP_INT_MAX;
 use const PHP_SAPI;
 use const STR_PAD_RIGHT;
-use function Amp\ByteStream\getOutputBufferStream;
-use function Amp\ByteStream\getStdin;
-use function Amp\ByteStream\getStdout;
-use function Amp\delay;
 use function Amp\File\exists;
 
-use function Amp\File\touch as touchAsync;
-use function Amp\Promise\all;
-use function Amp\Promise\any;
-use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function unpack;
 
 /**
  * Some tools.
  */
-abstract class Tools extends StrTools
+abstract class Tools extends AsyncTools
 {
     /**
      * Boolean to avoid problems with exceptions thrown by forked strands, see tools.
@@ -253,369 +236,6 @@ abstract class Tools extends StrTools
         return \unpack('d', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
     /**
-     * Synchronously wait for a promise|generator.
-     *
-     * @param Generator|Promise $promise The promise to wait for
-     * @param boolean            $ignoreSignal Whether to ignore shutdown signals
-     */
-    public static function wait($promise, bool $ignoreSignal = false)
-    {
-        if ($promise instanceof Generator) {
-            $promise = new Coroutine($promise);
-        } elseif (!$promise instanceof Promise) {
-            return $promise;
-        }
-        $exception = null;
-        $value = null;
-        $resolved = false;
-        do {
-            try {
-                //Logger::log("Starting event loop...");
-                Loop::run(function () use (&$resolved, &$value, &$exception, $promise): void {
-                    $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception): void {
-                        Loop::stop();
-                        $resolved = true;
-                        $exception = $e;
-                        $value = $v;
-                    });
-                });
-            } catch (Throwable $throwable) {
-                Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
-                Logger::log((string) $throwable, Logger::FATAL_ERROR);
-                throw $throwable;
-            }
-        } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
-        if ($exception) {
-            throw $exception;
-        }
-        return $value;
-    }
-    /**
-     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
-     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
-     *
-     * @param array<(Generator|Promise)> $promises Promises
-     */
-    public static function all(array $promises): Promise
-    {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        /** @var Promise[] $promises */
-        return all($promises);
-    }
-    /**
-     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
-     *
-     * @param array<(Promise|Generator)> $promises Promises
-     */
-    public static function any(array $promises): Promise
-    {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        /** @var Promise[] $promises */
-        return any($promises);
-    }
-    /**
-     * Resolves with a two-item array delineating successful and failed Promise results.
-     * The returned promise will only fail if the given number of required promises fail.
-     *
-     * @param array<(Promise|Generator)> $promises Promises
-     */
-    public static function some(array $promises): Promise
-    {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        /** @var Promise[] $promises */
-        return some($promises);
-    }
-    /**
-     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
-     *
-     * @param array<(Promise|Generator)> $promises Promises
-     */
-    public static function first(array $promises): Promise
-    {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        /** @var Promise[] $promises */
-        return first($promises);
-    }
-    /**
-     * Create an artificial timeout for any \Generator or Promise.
-     *
-     * @param Generator|Promise $promise
-     */
-    public static function timeout($promise, int $timeout): Promise
-    {
-        $promise = self::call($promise);
-
-        $deferred = new Deferred;
-
-        $watcher = Loop::delay($timeout, static function () use (&$deferred): void {
-            $temp = $deferred; // prevent double resolve
-            $deferred = null;
-            $temp->fail(new TimeoutException);
-        });
-        //Loop::unreference($watcher);
-
-        $promise->onResolve(function () use (&$deferred, $promise, $watcher): void {
-            if ($deferred !== null) {
-                Loop::cancel($watcher);
-                $deferred->resolve($promise);
-            }
-        });
-
-        return $deferred->promise();
-    }
-    /**
-     * Creates an artificial timeout for any `Promise`.
-     *
-     * If the promise is resolved before the timeout expires, the result is returned
-     *
-     * If the timeout expires before the promise is resolved, a default value is returned
-     *
-     * @template TReturnAlt
-     * @template TReturn
-     * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
-     * @param Promise|Generator $promise Promise to which the timeout is applied.
-     * @param int               $timeout Timeout in milliseconds.
-     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $default
-     * @return Promise<TReturn>|Promise<TReturnAlt>
-     * @throws TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
-     */
-    public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
-    {
-        $promise = self::call($promise);
-
-        $deferred = new Deferred;
-
-        $watcher = Loop::delay($timeout, static function () use (&$deferred, $default): void {
-            $temp = $deferred; // prevent double resolve
-            $deferred = null;
-            $temp->resolve($default);
-        });
-        //Loop::unreference($watcher);
-
-        $promise->onResolve(function () use (&$deferred, $promise, $watcher): void {
-            if ($deferred !== null) {
-                Loop::cancel($watcher);
-                $deferred->resolve($promise);
-            }
-        });
-
-        return $deferred->promise();
-    }
-    /**
-     * Convert generator, promise or any other value to a promise.
-     *
-     * @param Generator|Promise|mixed $promise
-     * @template TReturn
-     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     * @psalm-return Promise<TReturn>
-     */
-    public static function call($promise): Promise
-    {
-        if ($promise instanceof Generator) {
-            $promise = new Coroutine($promise);
-        } elseif (!$promise instanceof Promise) {
-            return new Success($promise);
-        }
-        return $promise;
-    }
-    /**
-     * Call promise in background.
-     *
-     * @param Generator|Promise $promise Promise to resolve
-     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
-     * @param string              $file    File
-     * @psalm-suppress InvalidScope
-     * @return Promise|mixed
-     */
-    public static function callFork($promise, $actual = null, string $file = '')
-    {
-        if ($actual) {
-            $promise = $actual;
-        }
-        if ($promise instanceof Generator) {
-            $promise = new Coroutine($promise);
-        }
-        if ($promise instanceof Promise) {
-            $promise->onResolve(function ($e, $res) use ($file): void {
-                if ($e) {
-                    if (isset($this)) {
-                        $this->rethrow($e, $file);
-                    } else {
-                        self::rethrow($e, $file);
-                    }
-                }
-            });
-        }
-        return $promise;
-    }
-    /**
-     * Call promise in background, deferring execution.
-     *
-     * @param Generator|Promise $promise Promise to resolve
-     */
-    public static function callForkDefer($promise): void
-    {
-        Loop::defer(fn () => self::callFork($promise));
-    }
-    /**
-     * Rethrow error catched in strand.
-     *
-     * @param Throwable $e Exception
-     * @param string     $file File where the strand started
-     * @psalm-suppress InvalidScope
-     */
-    public static function rethrow(Throwable $e, string $file = ''): void
-    {
-        $zis = $this ?? null;
-        $logger = $zis->logger ?? Logger::$default;
-        if ($file) {
-            $file = " started @ {$file}";
-        }
-        if ($logger) {
-            $logger->logger("Got the following exception within a forked strand{$file}, trying to rethrow");
-        }
-        if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
-            $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
-            if (!$zis || !$zis->destructing) {
-                Promise\rethrow(new Failure($e));
-            }
-        } else {
-            if ($logger) {
-                $logger->logger($e);
-            }
-            Promise\rethrow(new Failure($e));
-        }
-    }
-    /**
-     * Call promise $b after promise $a.
-     *
-     * @param Generator|Promise $a Promise A
-     * @param Generator|Promise $b Promise B
-     * @psalm-suppress InvalidScope
-     */
-    public static function after($a, $b): Promise
-    {
-        $a = self::call($a);
-        $deferred = new Deferred();
-        $a->onResolve(static function ($e, $res) use ($b, $deferred): void {
-            if ($e) {
-                if (isset($this)) {
-                    $this->rethrow($e);
-                } else {
-                    self::rethrow($e);
-                }
-                return;
-            }
-            $b = self::call($b);
-            $b->onResolve(function ($e, $res) use ($deferred): void {
-                if ($e) {
-                    if (isset($this)) {
-                        $this->rethrow($e);
-                    } else {
-                        self::rethrow($e);
-                    }
-                    return;
-                }
-                $deferred->resolve($res);
-            });
-        });
-        return $deferred->promise();
-    }
-    /**
-     * Asynchronously lock a file
-     * Resolves with a callbable that MUST eventually be called in order to release the lock.
-     *
-     * @param string    $file      File to lock
-     * @param integer   $operation Locking mode
-     * @param float     $polling   Polling interval
-     * @param ?Promise  $token     Cancellation token
-     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     * @return $token is null ? (callable(): void) : ((callable(): void)|null)
-     */
-    public static function flock(string $file, int $operation, float $polling, ?Promise $token = null, ?callable $failureCb = null): ?callable
-    {
-        if (!exists($file)) {
-            touchAsync($file);
-        }
-        $operation |= LOCK_NB;
-        $res = \fopen($file, 'c');
-        do {
-            $result = \flock($res, $operation);
-            if (!$result) {
-                if ($failureCb) {
-                    $failureCb();
-                    $failureCb = null;
-                }
-                if ($token) {
-                    if (self::timeoutWithDefault($token, $polling, false)) {
-                        return;
-                    }
-                } else {
-                    delay($polling);
-                }
-            }
-        } while (!$result);
-        return static function () use (&$res): void {
-            if ($res) {
-                \flock($res, LOCK_UN);
-                \fclose($res);
-                $res = null;
-            }
-        };
-    }
-    /**
-     * Asynchronously sleep.
-     *
-     * @param float $time Number of seconds to sleep for
-     */
-    public static function sleep(float $time): void
-    {
-        delay($time);
-    }
-    /**
-     * Asynchronously read line.
-     *
-     * @param string $prompt Prompt
-     */
-    public static function readLine(string $prompt = ''): string
-    {
-        try {
-            Magic::togglePeriodicLogging();
-            $stdin = getStdin();
-            $stdout = getStdout();
-            if ($prompt) {
-                $stdout->write($prompt);
-            }
-            static $lines = [''];
-            while (\count($lines) < 2 && ($chunk = $stdin->read()) !== null) {
-                $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
-                $lines[\count($lines) - 1] .= \array_shift($chunk);
-                $lines = \array_merge($lines, $chunk);
-            }
-        } finally {
-            Magic::togglePeriodicLogging();
-        }
-        return \array_shift($lines);
-    }
-    /**
-     * Asynchronously write to stdout/browser.
-     *
-     * @param string $string Message to echo
-     */
-    public static function echo(string $string): Promise
-    {
-        return getOutputBufferStream()->write($string);
-    }
-    /**
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
      * @param mixed $var Value to check
@@ -696,6 +316,43 @@ abstract class Tools extends StrTools
         }
         return $new;
     }
+    private const INFLATE_HEADER = "\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49".
+        "\x46\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xdb\x00\x43\x00\x28\x1c".
+        "\x1e\x23\x1e\x19\x28\x23\x21\x23\x2d\x2b\x28\x30\x3c\x64\x41\x3c\x37\x37".
+        "\x3c\x7b\x58\x5d\x49\x64\x91\x80\x99\x96\x8f\x80\x8c\x8a\xa0\xb4\xe6\xc3".
+        "\xa0\xaa\xda\xad\x8a\x8c\xc8\xff\xcb\xda\xee\xf5\xff\xff\xff\x9b\xc1\xff".
+        "\xff\xff\xfa\xff\xe6\xfd\xff\xf8\xff\xdb\x00\x43\x01\x2b\x2d\x2d\x3c\x35".
+        "\x3c\x76\x41\x41\x76\xf8\xa5\x8c\xa5\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
+        "\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
+        "\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
+        "\xf8\xf8\xf8\xf8\xf8\xff\xc0\x00\x11\x08\x00\x00\x00\x00\x03\x01\x22\x00".
+        "\x02\x11\x01\x03\x11\x01\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01".
+        "\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08".
+        "\x09\x0a\x0b\xff\xc4\x00\xb5\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05\x05".
+        "\x04\x04\x00\x00\x01\x7d\x01\x02\x03\x00\x04\x11\x05\x12\x21\x31\x41\x06".
+        "\x13\x51\x61\x07\x22\x71\x14\x32\x81\x91\xa1\x08\x23\x42\xb1\xc1\x15\x52".
+        "\xd1\xf0\x24\x33\x62\x72\x82\x09\x0a\x16\x17\x18\x19\x1a\x25\x26\x27\x28".
+        "\x29\x2a\x34\x35\x36\x37\x38\x39\x3a\x43\x44\x45\x46\x47\x48\x49\x4a\x53".
+        "\x54\x55\x56\x57\x58\x59\x5a\x63\x64\x65\x66\x67\x68\x69\x6a\x73\x74\x75".
+        "\x76\x77\x78\x79\x7a\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96".
+        "\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6".
+        "\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6".
+        "\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3\xf4".
+        "\xf5\xf6\xf7\xf8\xf9\xfa\xff\xc4\x00\x1f\x01\x00\x03\x01\x01\x01\x01\x01".
+        "\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08".
+        "\x09\x0a\x0b\xff\xc4\x00\xb5\x11\x00\x02\x01\x02\x04\x04\x03\x04\x07\x05".
+        "\x04\x04\x00\x01\x02\x77\x00\x01\x02\x03\x11\x04\x05\x21\x31\x06\x12\x41".
+        "\x51\x07\x61\x71\x13\x22\x32\x81\x08\x14\x42\x91\xa1\xb1\xc1\x09\x23\x33".
+        "\x52\xf0\x15\x62\x72\xd1\x0a\x16\x24\x34\xe1\x25\xf1\x17\x18\x19\x1a\x26".
+        "\x27\x28\x29\x2a\x35\x36\x37\x38\x39\x3a\x43\x44\x45\x46\x47\x48\x49\x4a".
+        "\x53\x54\x55\x56\x57\x58\x59\x5a\x63\x64\x65\x66\x67\x68\x69\x6a\x73\x74".
+        "\x75\x76\x77\x78\x79\x7a\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94".
+        "\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4".
+        "\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4".
+        "\xd5\xd6\xd7\xd8\xd9\xda\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf2\xf3\xf4".
+        "\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x00\x0c\x03\x01\x00\x02\x11\x03\x11\x00".
+        "\x3f\x00";
+    private const INFLATE_FOOTER = "\xff\xd9";
     /**
      * Inflate stripped photosize to full JPG payload.
      *
@@ -707,46 +364,10 @@ abstract class Tools extends StrTools
         if (\strlen($stripped) < 3 || \ord($stripped[0]) !== 1) {
             return $stripped;
         }
-        $header = "\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49".
-            "\x46\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xdb\x00\x43\x00\x28\x1c".
-            "\x1e\x23\x1e\x19\x28\x23\x21\x23\x2d\x2b\x28\x30\x3c\x64\x41\x3c\x37\x37".
-            "\x3c\x7b\x58\x5d\x49\x64\x91\x80\x99\x96\x8f\x80\x8c\x8a\xa0\xb4\xe6\xc3".
-            "\xa0\xaa\xda\xad\x8a\x8c\xc8\xff\xcb\xda\xee\xf5\xff\xff\xff\x9b\xc1\xff".
-            "\xff\xff\xfa\xff\xe6\xfd\xff\xf8\xff\xdb\x00\x43\x01\x2b\x2d\x2d\x3c\x35".
-            "\x3c\x76\x41\x41\x76\xf8\xa5\x8c\xa5\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
-            "\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
-            "\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8\xf8".
-            "\xf8\xf8\xf8\xf8\xf8\xff\xc0\x00\x11\x08\x00\x00\x00\x00\x03\x01\x22\x00".
-            "\x02\x11\x01\x03\x11\x01\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01".
-            "\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08".
-            "\x09\x0a\x0b\xff\xc4\x00\xb5\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05\x05".
-            "\x04\x04\x00\x00\x01\x7d\x01\x02\x03\x00\x04\x11\x05\x12\x21\x31\x41\x06".
-            "\x13\x51\x61\x07\x22\x71\x14\x32\x81\x91\xa1\x08\x23\x42\xb1\xc1\x15\x52".
-            "\xd1\xf0\x24\x33\x62\x72\x82\x09\x0a\x16\x17\x18\x19\x1a\x25\x26\x27\x28".
-            "\x29\x2a\x34\x35\x36\x37\x38\x39\x3a\x43\x44\x45\x46\x47\x48\x49\x4a\x53".
-            "\x54\x55\x56\x57\x58\x59\x5a\x63\x64\x65\x66\x67\x68\x69\x6a\x73\x74\x75".
-            "\x76\x77\x78\x79\x7a\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96".
-            "\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6".
-            "\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6".
-            "\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3\xf4".
-            "\xf5\xf6\xf7\xf8\xf9\xfa\xff\xc4\x00\x1f\x01\x00\x03\x01\x01\x01\x01\x01".
-            "\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08".
-            "\x09\x0a\x0b\xff\xc4\x00\xb5\x11\x00\x02\x01\x02\x04\x04\x03\x04\x07\x05".
-            "\x04\x04\x00\x01\x02\x77\x00\x01\x02\x03\x11\x04\x05\x21\x31\x06\x12\x41".
-            "\x51\x07\x61\x71\x13\x22\x32\x81\x08\x14\x42\x91\xa1\xb1\xc1\x09\x23\x33".
-            "\x52\xf0\x15\x62\x72\xd1\x0a\x16\x24\x34\xe1\x25\xf1\x17\x18\x19\x1a\x26".
-            "\x27\x28\x29\x2a\x35\x36\x37\x38\x39\x3a\x43\x44\x45\x46\x47\x48\x49\x4a".
-            "\x53\x54\x55\x56\x57\x58\x59\x5a\x63\x64\x65\x66\x67\x68\x69\x6a\x73\x74".
-            "\x75\x76\x77\x78\x79\x7a\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94".
-            "\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4".
-            "\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4".
-            "\xd5\xd6\xd7\xd8\xd9\xda\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf2\xf3\xf4".
-            "\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x00\x0c\x03\x01\x00\x02\x11\x03\x11\x00".
-            "\x3f\x00";
-        static $footer = "\xff\xd9";
+        $header = self::INFLATE_HEADER;
         $header[164] = $stripped[1];
         $header[166] = $stripped[2];
-        return $header.\substr($stripped, 3).$footer;
+        return $header.\substr($stripped, 3).self::INFLATE_FOOTER;
     }
     /**
      * Close connection with client, connected via web.
