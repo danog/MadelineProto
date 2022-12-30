@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Exception;
@@ -96,8 +96,8 @@ trait UpdateHandler
      */
     public function waitUpdate(): Promise
     {
-        $this->update_deferred = new Deferred();
-        return $this->update_deferred->promise();
+        $this->update_deferred = new DeferredFuture();
+        return $this->update_deferred->getFuture();
     }
     /**
      * Signal update.

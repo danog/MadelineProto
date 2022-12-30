@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
@@ -64,8 +64,8 @@ class CheckLoop extends ResumableSignalLoop
             if ($shared->hasTempAuthKey()) {
                 $full_message_ids = $connection->getPendingCalls();
                 foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
-                    $deferred = new Deferred();
-                    $deferred->promise()->onResolve(function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend): void {
+                    $deferred = new DeferredFuture();
+                    $deferred->getFuture()->onResolve(function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend): void {
                         if ($e) {
                             $API->logger("Got exception in check loop for DC {$datacenter}");
                             $API->logger((string) $e);
@@ -120,8 +120,8 @@ class CheckLoop extends ResumableSignalLoop
                         }
                         /*
                         if ($reply) {
-                            $deferred= new Deferred;
-                            $deferred->promise()->onResolve(fn($e, $res) => var_dump(ord($res['info'][0])));
+                            $deferred= new DeferredFuture;
+                            $deferred->getFuture()->onResolve(fn($e, $res) => var_dump(ord($res['info'][0])));
                             \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]));
                         }*/
                         $connection->flush();

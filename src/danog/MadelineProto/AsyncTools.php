@@ -18,19 +18,22 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Failure;
+use Amp\Future;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Success;
 use Amp\TimeoutException;
 use Exception;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 use TypeError;
 
 use const LOCK_NB;
 use const LOCK_UN;
+
+use function Amp\async;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
@@ -49,50 +52,30 @@ use function Amp\Promise\some;
 abstract class AsyncTools extends StrTools
 {
     /**
-     * Synchronously wait for a promise|generator.
+     * Synchronously wait for a Future|generator.
      *
-     * @param Generator|Promise $promise The promise to wait for
-     * @param boolean            $ignoreSignal Whether to ignore shutdown signals
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future $promise The promise to wait for
      */
-    public static function wait($promise, bool $ignoreSignal = false)
+    public static function wait($promise)
     {
         if ($promise instanceof Generator) {
-            $promise = new Coroutine($promise);
-        } elseif (!$promise instanceof Promise) {
+            return self::call($promise)->await();
+        } elseif (!$promise instanceof Future) {
             return $promise;
         }
-        $exception = null;
-        $value = null;
-        $resolved = false;
-        do {
-            try {
-                //Logger::log("Starting event loop...");
-                Loop::run(function () use (&$resolved, &$value, &$exception, $promise): void {
-                    $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception): void {
-                        Loop::stop();
-                        $resolved = true;
-                        $exception = $e;
-                        $value = $v;
-                    });
-                });
-            } catch (Throwable $throwable) {
-                Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
-                Logger::log((string) $throwable, Logger::FATAL_ERROR);
-                throw $throwable;
-            }
-        } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
-        if ($exception) {
-            throw $exception;
-        }
-        return $value;
+        return $promise->await();
     }
     /**
      * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
      * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
      *
-     * @param array<(Generator|Promise)> $promises Promises
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param array<(Generator|Future)> $promises Promises
      */
-    public static function all(array $promises): Promise
+    public static function all(array $promises): Future
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -103,9 +86,11 @@ abstract class AsyncTools extends StrTools
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
      *
-     * @param array<(Promise|Generator)> $promises Promises
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param array<(Future|Generator)> $promises Promises
      */
-    public static function any(array $promises): Promise
+    public static function any(array $promises): Future
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -117,9 +102,11 @@ abstract class AsyncTools extends StrTools
      * Resolves with a two-item array delineating successful and failed Promise results.
      * The returned promise will only fail if the given number of required promises fail.
      *
-     * @param array<(Promise|Generator)> $promises Promises
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param array<(Future|Generator)> $promises Promises
      */
-    public static function some(array $promises): Promise
+    public static function some(array $promises): Future
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -130,9 +117,11 @@ abstract class AsyncTools extends StrTools
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
      *
-     * @param array<(Promise|Generator)> $promises Promises
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param array<(Future|Generator)> $promises Promises
      */
-    public static function first(array $promises): Promise
+    public static function first(array $promises): Future
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -143,15 +132,17 @@ abstract class AsyncTools extends StrTools
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
-     * @param Generator|Promise $promise
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future $promise
      */
-    public static function timeout($promise, int $timeout): Promise
+    public static function timeout($promise, int $timeout): Future
     {
         $promise = self::call($promise);
 
-        $deferred = new Deferred;
+        $deferred = new DeferredFuture;
 
-        $watcher = Loop::delay($timeout, static function () use (&$deferred): void {
+        $watcher = EventLoop::delay($timeout/1000, static function () use (&$deferred): void {
             $temp = $deferred; // prevent double resolve
             $deferred = null;
             $temp->fail(new TimeoutException);
@@ -165,7 +156,7 @@ abstract class AsyncTools extends StrTools
             }
         });
 
-        return $deferred->promise();
+        return $deferred->getFuture();
     }
     /**
      * Creates an artificial timeout for any `Promise`.
@@ -174,23 +165,26 @@ abstract class AsyncTools extends StrTools
      *
      * If the timeout expires before the promise is resolved, a default value is returned
      *
+     * @deprecated Coroutines are deprecated since amp v3
+     *
      * @template TReturnAlt
      * @template TReturn
      * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
-     * @param Promise|Generator $promise Promise to which the timeout is applied.
-     * @param int               $timeout Timeout in milliseconds.
-     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $default
-     * @return Promise<TReturn>|Promise<TReturnAlt>
+     * @param Future<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @param int                        $timeout Timeout in milliseconds.
+     * @param TReturnAlt                 $default
+     *
+     * @return Future<TReturn>|Future<TReturnAlt>
+     *
      * @throws TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
-    public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
+    public static function timeoutWithDefault($promise, int $timeout, $default = null): Future
     {
         $promise = self::call($promise);
 
-        $deferred = new Deferred;
+        $deferred = new DeferredFuture;
 
-        $watcher = Loop::delay($timeout, static function () use (&$deferred, $default): void {
+        $watcher = EventLoop::delay($timeout/1000, static function () use (&$deferred, $default): void {
             $temp = $deferred; // prevent double resolve
             $deferred = null;
             $temp->resolve($default);
@@ -204,33 +198,60 @@ abstract class AsyncTools extends StrTools
             }
         });
 
-        return $deferred->promise();
+        return $deferred->getFuture();
     }
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @param Generator|Promise|mixed $promise
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future|mixed $promise
      * @template TReturn
-     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     * @psalm-return Promise<TReturn>
+     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Future<TReturn>|TReturn $promise
+     * @psalm-return Future<TReturn>
      */
-    public static function call($promise): Promise
+    public static function call($promise): Future
     {
         if ($promise instanceof Generator) {
-            $promise = new Coroutine($promise);
-        } elseif (!$promise instanceof Promise) {
-            return new Success($promise);
+            $promise = async(function () use ($promise) {
+                $yielded = $promise->current();
+                do {
+                    while (!$yielded instanceof Future) {
+                        if (!$promise->valid()) {
+                            return $promise->getReturn();
+                        }
+                        if ($yielded instanceof Generator) {
+                            $yielded = self::call($yielded);
+                        } else {
+                            $yielded = $promise->send($yielded);
+                        }
+                    }
+                    try {
+                        $result = $yielded->await();
+                    } catch (\Throwable $e) {
+                        $yielded = $promise->throw($e);
+                        continue;
+                    }
+                    $yielded = $promise->send($result);
+                } while (true);
+            });
+        } elseif (!$promise instanceof Future) {
+            $f = new DeferredFuture;
+            $f->complete($promise);
+            return $f->getFuture();
         }
         return $promise;
     }
     /**
      * Call promise in background.
      *
-     * @param Generator|Promise $promise Promise to resolve
-     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future $promise Promise to resolve
+     * @param ?\Generator|Future $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      * @psalm-suppress InvalidScope
-     * @return Promise|mixed
+     * @return Future|mixed
      */
     public static function callFork($promise, $actual = null, string $file = '')
     {
@@ -256,7 +277,9 @@ abstract class AsyncTools extends StrTools
     /**
      * Call promise in background, deferring execution.
      *
-     * @param Generator|Promise $promise Promise to resolve
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future $promise Promise to resolve
      */
     public static function callForkDefer($promise): void
     {
@@ -264,6 +287,8 @@ abstract class AsyncTools extends StrTools
     }
     /**
      * Rethrow error catched in strand.
+     *
+     * @deprecated Coroutines are deprecated since amp v3
      *
      * @param Throwable $e Exception
      * @param string     $file File where the strand started
@@ -294,14 +319,16 @@ abstract class AsyncTools extends StrTools
     /**
      * Call promise $b after promise $a.
      *
-     * @param Generator|Promise $a Promise A
-     * @param Generator|Promise $b Promise B
+     * @deprecated Coroutines are deprecated since amp v3
+     *
+     * @param Generator|Future $a Promise A
+     * @param Generator|Future $b Promise B
      * @psalm-suppress InvalidScope
      */
-    public static function after($a, $b): Promise
+    public static function after($a, $b): Future
     {
         $a = self::call($a);
-        $deferred = new Deferred();
+        $deferred = new DeferredFuture();
         $a->onResolve(static function ($e, $res) use ($b, $deferred): void {
             if ($e) {
                 if (isset($this)) {
@@ -324,7 +351,7 @@ abstract class AsyncTools extends StrTools
                 $deferred->resolve($res);
             });
         });
-        return $deferred->promise();
+        return $deferred->getFuture();
     }
     /**
      * Asynchronously lock a file
@@ -333,11 +360,11 @@ abstract class AsyncTools extends StrTools
      * @param string    $file      File to lock
      * @param integer   $operation Locking mode
      * @param float     $polling   Polling interval
-     * @param ?Promise  $token     Cancellation token
+     * @param ?Future   $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      * @return $token is null ? (callable(): void) : ((callable(): void)|null)
      */
-    public static function flock(string $file, int $operation, float $polling, ?Promise $token = null, ?callable $failureCb = null): ?callable
+    public static function flock(string $file, int $operation, float $polling, ?Future $token = null, ?callable $failureCb = null): ?callable
     {
         if (!exists($file)) {
             touchAsync($file);
@@ -407,8 +434,8 @@ abstract class AsyncTools extends StrTools
      *
      * @param string $string Message to echo
      */
-    public static function echo(string $string): Promise
+    public static function echo(string $string): void
     {
-        return getOutputBufferStream()->write($string);
+        getOutputBufferStream()->write($string);
     }
 }

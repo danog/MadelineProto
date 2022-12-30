@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\MTProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Promise;
 use danog\MadelineProto\Tools;
 
@@ -207,8 +207,8 @@ class IncomingMessage extends Message
             return null;
         }
 
-        $deferred = new Deferred;
-        $result = $deferred->promise();
+        $deferred = new DeferredFuture;
+        $result = $deferred->getFuture();
 
         $pending = \count($this->sideEffects);
 

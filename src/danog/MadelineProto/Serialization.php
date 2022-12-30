@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
 use Amp\Promise;
@@ -28,6 +28,7 @@ use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\PlaceHolder;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
@@ -107,40 +108,40 @@ abstract class Serialization
      * @param SettingsAbstract $settings  Settings
      * @param bool             $forceFull Whether to force full session deserialization
      * @internal
-     * @psalm-return Generator<void, mixed, mixed, array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}>
+     * @return array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}
      */
-    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): Generator
+    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): array
     {
-        if (yield exists($session->getSessionPath())) {
+        if (exists($session->getSessionPath())) {
             // Is new session
             $isNew = true;
-        } elseif (yield exists($session->getLegacySessionPath())) {
+        } elseif (exists($session->getLegacySessionPath())) {
             // Is old session
             $isNew = false;
         } else {
             // No session exists yet, lock for when we create it
-            return [null, yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1)];
+            return [null, Tools::flock($session->getLockPath(), LOCK_EX, 1)];
         }
 
         //Logger::log('Waiting for exclusive session lock...');
-        $warningId = Loop::delay(1000, static function () use (&$warningId): void {
+        $warningId = EventLoop::delay(1, static function () use (&$warningId): void {
             Logger::log("It seems like the session is busy.");
             /*if (\defined(\MADELINE_WORKER::class)) {
                 Logger::log("Exiting since we're in a worker");
                 Magic::shutdown(1);
             }*/
             Logger::log("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
-            $warningId = Loop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
-            Loop::unreference($warningId);
+            $warningId = EventLoop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
+            EventLoop::unreference($warningId);
         });
-        Loop::unreference($warningId);
+        EventLoop::unreference($warningId);
 
         $lightState = null;
-        $cancelFlock = new Deferred;
-        $cancelIpc = new Deferred;
+        $cancelFlock = new DeferredFuture;
+        $cancelIpc = new DeferredFuture;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1, $cancelFlock->promise(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
+        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getFuture(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
             $cancelFull = static function () use (&$cancelFlock): void {
                 if ($cancelFlock !== null) {
                     $copy = $cancelFlock;
@@ -148,7 +149,7 @@ abstract class Serialization
                     $copy->resolve(true);
                 }
             };
-            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFull));
+            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull));
             $session->getLightState()->onResolve(static function (?Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
                 if ($res) {
                     $lightState = $res;
@@ -176,7 +177,7 @@ abstract class Serialization
 
         try {
             /** @var LightState */
-            $lightState ??= yield $session->getLightState();
+            $lightState ??= $session->getLightState();
         } catch (Throwable $e) {
         }
 
@@ -185,14 +186,14 @@ abstract class Serialization
                 // Unlock and fork
                 $unlock();
                 $cancelIpc->resolve(Server::startMe($session));
-                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
+                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
             } elseif (!\class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
                 Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
-                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
+                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
             }
         }
 
@@ -204,7 +205,7 @@ abstract class Serialization
         Logger::log("Got exclusive session lock!");
 
         if ($isNew) {
-            $unserialized = yield from $session->unserialize();
+            $unserialized = $session->unserialize();
             if ($unserialized instanceof DriverArray) {
                 Logger::log("Extracting session from database...");
                 if ($settings instanceof Settings) {
@@ -212,22 +213,22 @@ abstract class Serialization
                 }
                 if ($settings instanceof DatabaseAbstract) {
                     $tableName = (string) $unserialized;
-                    $unserialized = yield DbPropertiesFactory::get(
+                    $unserialized = DbPropertiesFactory::get(
                         $settings,
                         $tableName,
                         DbPropertiesFactory::TYPE_ARRAY,
                         $unserialized,
                     );
                 } else {
-                    yield from $unserialized->initStartup();
+                    $unserialized->initStartup();
                 }
-                $unserialized = yield $unserialized['data'];
+                $unserialized = $unserialized['data'];
                 if (!$unserialized) {
                     throw new Exception("Could not extract session from database!");
                 }
             }
         } else {
-            $unserialized = yield from self::legacyUnserialize($session->getLegacySessionPath());
+            $unserialized = self::legacyUnserialize($session->getLegacySessionPath());
         }
 
         if ($unserialized === false) {
@@ -253,7 +254,7 @@ abstract class Serialization
             Logger::log("MadelineProto is starting, please wait...");
             try {
                 \clearstatcache(true, $ipcPath);
-                $socket = yield connect($ipcPath);
+                $socket = connect($ipcPath);
                 Logger::log("Connected to IPC socket!");
                 if ($cancelFull) {
                     $cancelFull();
@@ -265,11 +266,11 @@ abstract class Serialization
                     Logger::log("$e while connecting to IPC socket");
                 }
             }
-            if ($res = yield Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
+            if ($res = Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
                 if ($res instanceof Throwable) {
                     return [$res, null];
                 }
-                $cancelConnect = (new Deferred)->promise();
+                $cancelConnect = (new DeferredFuture)->getFuture();
             }
         }
         return [0, null];
@@ -280,7 +281,7 @@ abstract class Serialization
      */
     private static function legacyUnserialize(string $session): Generator
     {
-        $tounserialize = yield read($session);
+        $tounserialize = read($session);
 
         try {
             $unserialized = \unserialize($tounserialize);

@@ -19,7 +19,7 @@
 namespace danog\MadelineProto;
 
 use Amp\CancellationToken;
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
 use Amp\Loop;
@@ -123,12 +123,12 @@ class DoHConnector implements Connector
                         throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
                     }
                     \stream_set_blocking($socket, false);
-                    $deferred = new Deferred();
+                    $deferred = new DeferredFuture();
                     /** @psalm-suppress InvalidArgument */
                     $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {
-                        yield Promise\timeout($deferred->promise(), $timeout);
+                        yield Promise\timeout($deferred->getFuture(), $timeout);
                     } catch (TimeoutException $e) {
                         throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                         // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno

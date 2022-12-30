@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
 use Amp\Http\Client\Request;
@@ -183,10 +183,10 @@ trait Files
                     $exception = $e;
                     return;
                 }
-                $resPromises[] = $readDeferred->promise();
+                $resPromises[] = $readDeferred->getFuture();
                 try {
                     // Wrote chunk!
-                    if (!yield Tools::call($readDeferred->promise())) {
+                    if (!yield Tools::call($readDeferred->getFuture())) {
                         throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
@@ -296,8 +296,8 @@ trait Files
             public function __construct(int $size, int $partSize, ?callable $cb)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
-                    $this->read[] = new Deferred();
-                    $this->write[] = new Deferred();
+                    $this->read[] = new DeferredFuture();
+                    $this->write[] = new DeferredFuture();
                     $this->wrote[] = $size - $x < $partSize ? $size - $x : $partSize;
                 }
                 $this->partSize = $partSize;
@@ -312,7 +312,7 @@ trait Files
             public function read(int $offset, int $size): Promise
             {
                 $offset /= $this->partSize;
-                return $this->write[$offset]->promise();
+                return $this->write[$offset]->getFuture();
             }
             /**
              * Write chunk.
@@ -324,7 +324,7 @@ trait Files
             {
                 $offset /= $this->partSize;
                 $this->write[$offset]->resolve($data);
-                return $this->read[$offset]->promise();
+                return $this->read[$offset]->getFuture();
             }
             /**
              * Read callback, called when the chunk is read and fully resent.

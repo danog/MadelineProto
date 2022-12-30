@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Loop;
 use Amp\Loop\Driver;
 use danog\MadelineProto\TL\Conversion\Extension;
@@ -468,7 +468,7 @@ class Magic
             self::$suspendPeriodicLogging = null;
             $deferred->resolve();
         } else {
-            self::$suspendPeriodicLogging = new Deferred;
+            self::$suspendPeriodicLogging = new DeferredFuture;
         }
     }
 

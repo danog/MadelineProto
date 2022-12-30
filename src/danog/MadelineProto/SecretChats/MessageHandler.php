@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\SecretChats;
 
-use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -60,10 +59,10 @@ trait MessageHandler
             }
             if (isset($this->secretQueue[$chat_id])) {
                 $promise = $this->secretQueue[$chat_id];
-                $this->secretQueue[$chat_id] = $queuePromise->promise();
+                $this->secretQueue[$chat_id] = $queuePromise->getFuture();
                 yield $promise;
             } else {
-                $this->secretQueue[$chat_id] = $queuePromise->promise();
+                $this->secretQueue[$chat_id] = $queuePromise->getFuture();
             }
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->secret_chats[$chat_id]['layer'], 'in_seq_no' => $this->generateSecretInSeqNo($chat_id), 'out_seq_no' => $this->generateSecretOutSeqNo($chat_id), 'message' => $message];
             $this->secret_chats[$chat_id]['out_seq_no']++;

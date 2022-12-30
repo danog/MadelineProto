@@ -18,10 +18,10 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
+use Amp\DeferredFuture;
 use Amp\Failure;
 use Amp\Loop;
-use danog\MadelineProto\Coroutine;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
@@ -32,6 +32,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tools;
 use Generator;
 use phpseclib3\Math\BigInteger;
+use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_EOL;
@@ -255,14 +256,14 @@ trait ResponseHandler
 
         if ($side = $message->getSideEffects($response)) {
             if ($botAPI) {
-                $deferred = new Deferred;
-                $promise = $deferred->promise();
+                $deferred = new DeferredFuture;
+                $promise = $deferred->getFuture();
                 $side->onResolve(function (?Throwable $error, $result) use ($deferred): void {
                     if ($error) {
                         $deferred->fail($error);
                         return;
                     }
-                    $deferred->resolve(new Coroutine($this->API->MTProtoToBotAPI($result)));
+                    $deferred->resolve(Tools::call($this->API->MTProtoToBotAPI($result)));
                 });
                 $request->reply($promise);
             } else {
@@ -270,7 +271,7 @@ trait ResponseHandler
             }
         } else {
             if ($botAPI) {
-                $request->reply(new Coroutine($this->API->MTProtoToBotAPI($response)));
+                $request->reply(Tools::call($this->API->MTProtoToBotAPI($response)));
             } else {
                 $request->reply($response);
             }
@@ -307,7 +308,7 @@ trait ResponseHandler
                     return null;
                 }
                 if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
-                    Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
+                    EventLoop::delay(1.0, fn () => $this->methodRecall(['message_id' => $request->getMsgId()]));
                     return null;
                 }
                 return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
@@ -389,7 +390,7 @@ trait ResponseHandler
                     $request->setSent(($request->getSent() ?? \time()) + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $msgId]);
+                    EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
                     return null;
                 }
                 // no break

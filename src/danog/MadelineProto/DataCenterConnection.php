@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Promise;
 use Amp\Success;
 use Amp\Sync\LocalMutex;
@@ -544,8 +544,8 @@ class DataCenterConnection implements JsonSerializable
      */
     public function disconnect(): void
     {
-        $this->connectionsDeferred = new Deferred();
-        $this->connectionsPromise = $this->connectionsDeferred->promise();
+        $this->connectionsDeferred = new DeferredFuture();
+        $this->connectionsPromise = $this->connectionsDeferred->getFuture();
         $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");
         if ($this->robinLoop) {
             $this->robinLoop->signal(true);

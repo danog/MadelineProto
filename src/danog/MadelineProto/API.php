@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\ApiWrappers\Templates;
@@ -240,9 +240,9 @@ class API extends InternalDoc
                 $this->logger->logger("Restarting to full instance: error $e");
             }
             $this->logger->logger("Restarting to full instance: reconnecting...");
-            $cancel = new Deferred;
+            $cancel = new DeferredFuture;
             $cb = function () use ($cancel, &$cb): Generator {
-                [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->promise());
+                [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
                 if ($result instanceof ChannelledSocket) {
                     try {
                         if (!$this->API instanceof Client) {

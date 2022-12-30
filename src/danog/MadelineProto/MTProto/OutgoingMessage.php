@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\MTProto;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Exception;
@@ -152,7 +152,7 @@ class OutgoingMessage extends Message
         $this->method = $method;
         $this->unencrypted = $unencrypted;
         if ($method) {
-            $this->promise = new Deferred;
+            $this->promise = new DeferredFuture;
         }
 
         $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$constructor]);
@@ -164,7 +164,7 @@ class OutgoingMessage extends Message
     public function trySend(): void
     {
         if (!isset($this->sendPromise)) {
-            $this->sendPromise = new Deferred;
+            $this->sendPromise = new DeferredFuture;
         }
         $this->tries++;
     }
@@ -446,7 +446,7 @@ class OutgoingMessage extends Message
         if (!$this->sendPromise) {
             throw new Exception("Message was already sent, can't get send promise!");
         }
-        return $this->sendPromise->promise();
+        return $this->sendPromise->getFuture();
     }
 
     /**
@@ -462,7 +462,7 @@ class OutgoingMessage extends Message
      */
     public function getPromise(): Promise
     {
-        return $this->promise->promise();
+        return $this->promise->getFuture();
     }
 
     /**

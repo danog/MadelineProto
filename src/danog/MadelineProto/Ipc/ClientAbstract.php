@@ -17,7 +17,7 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
 use danog\MadelineProto\Logger;
@@ -149,11 +149,11 @@ abstract class ClientAbstract
      */
     public function __call($function, $arguments): Generator
     {
-        $this->requests []= $deferred = new Deferred;
+        $this->requests []= $deferred = new DeferredFuture;
         if ($arguments instanceof Wrapper) {
             $this->wrappers[\count($this->requests) - 1] = $arguments;
         }
         yield $this->server->send([$function, $arguments]);
-        return yield $deferred->promise();
+        return yield $deferred->getFuture();
     }
 }

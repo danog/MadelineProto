@@ -23,6 +23,7 @@ use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\SessionPaths;
+use Revolt\EventLoop;
 
 /**
  * IPC callback server.
@@ -64,7 +65,7 @@ class ServerCallback extends Server
         $id = $this->id++;
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
         $this->socketList[$id] = $socket;
-        $this->watcherList[$id] = Loop::delay(30*1000, function () use ($id): void {
+        $this->watcherList[$id] = EventLoop::delay(30, function () use ($id): void {
             unset($this->watcherList[$id], $this->socketList[$id]);
         });
 

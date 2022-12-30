@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Deferred;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
@@ -93,9 +92,9 @@ trait CallHandler
     {
         $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
         if (\is_array($readDeferred)) {
-            $readDeferred = Tools::all(\array_map(fn (Deferred $value) => $value->promise(), $readDeferred));
+            $readDeferred = Tools::all(\array_map(fn (Deferred $value) => $value->getFuture(), $readDeferred));
         } else {
-            $readDeferred = $readDeferred->promise();
+            $readDeferred = $readDeferred->getFuture();
         }
         if (!($aargs['noResponse'] ?? false)) {
             return yield $readDeferred;

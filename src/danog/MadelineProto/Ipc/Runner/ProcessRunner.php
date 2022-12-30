@@ -2,7 +2,7 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Process\Internal\Posix\Runner;
 use Amp\Process\Internal\Windows\Runner as WindowsRunner;
 use Amp\Process\ProcessInputStream;
@@ -91,11 +91,11 @@ final class ProcessRunner extends RunnerAbstract
             ['QUERY_STRING' => \http_build_query($params)],
         );
 
-        $resDeferred = new Deferred;
+        $resDeferred = new DeferredFuture;
 
         $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
         $handle = $runner->start($command, null, $envVars);
-        $handle->pidDeferred->promise()->onResolve(function (?Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
+        $handle->pidDeferred->getFuture()->onResolve(function (?Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
             if ($e) {
                 Logger::log("Got exception while starting process worker: $e");
                 $resDeferred->resolve($e);
@@ -115,7 +115,7 @@ final class ProcessRunner extends RunnerAbstract
                 }
             });
         });
-        return $resDeferred->promise();
+        return $resDeferred->getFuture();
     }
     /**
      * Unreference and read data from fd, logging results.

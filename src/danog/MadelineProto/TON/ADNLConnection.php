@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\TON;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -151,7 +151,7 @@ class ADNLConnection
     {
         $data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], ''));
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
-        $this->requests[$id] = new Deferred();
-        return $this->requests[$id]->promise();
+        $this->requests[$id] = new DeferredFuture();
+        return $this->requests[$id]->getFuture();
     }
 }

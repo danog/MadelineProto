@@ -19,7 +19,7 @@
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Failure;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
@@ -399,7 +399,7 @@ class Connection
                     $arguments['message']['media']['size'] = $arguments['file']['size'];
                 }
             }
-            $arguments['queuePromise'] = new Deferred;
+            $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
             $res = yield from $this->API->getInfo($arguments['chat_id']);
@@ -436,7 +436,7 @@ class Connection
             }
         }
         if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
-            $arguments['queuePromise'] = new Deferred;
+            $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         }
         return null;

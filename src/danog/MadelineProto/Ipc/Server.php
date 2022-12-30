@@ -17,7 +17,7 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
@@ -81,7 +81,7 @@ class Server extends SignalLoop
      */
     public function setIpcPath(SessionPaths $session): void
     {
-        self::$shutdownDeferred ??= new Deferred;
+        self::$shutdownDeferred ??= new DeferredFuture;
         $this->server = new IpcServer($session->getIpcPath());
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
@@ -116,7 +116,7 @@ class Server extends SignalLoop
         } catch (Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new Deferred)->promise()));
+        return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new DeferredFuture)->getFuture()));
     }
     /**
      * Monitor session.
@@ -143,7 +143,7 @@ class Server extends SignalLoop
             }
             try {
                 yield Tools::timeoutWithDefault($cancelConnect, 500, null);
-                $cancelConnect = (new Deferred)->promise();
+                $cancelConnect = (new DeferredFuture)->getFuture();
             } catch (Throwable $e) {
                 Logger::log("$e");
                 Logger::log("Could not start IPC server, please check the logs for more details!");
@@ -161,8 +161,8 @@ class Server extends SignalLoop
         if (self::$shutdownNow) {
             return new Success;
         }
-        self::$shutdownDeferred ??= new Deferred;
-        return self::$shutdownDeferred->promise();
+        self::$shutdownDeferred ??= new DeferredFuture;
+        return self::$shutdownDeferred->getFuture();
     }
     /**
      * Shutdown.
