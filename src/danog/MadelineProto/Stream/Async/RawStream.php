@@ -13,13 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
+use danog\MadelineProto\Tools;
 
 /**
  * Raw stream helper trait.
@@ -32,16 +32,16 @@ trait RawStream
 {
     public function read(): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->readGenerator());
+        return Tools::call($this->readGenerator());
     }
     public function write(string $data): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->writeGenerator($data));
+        return Tools::call($this->writeGenerator($data));
     }
     public function end(string $finalData = ''): Promise
     {
         if (\method_exists($this, 'endGenerator')) {
-            return \danog\MadelineProto\Tools::call($this->endGenerator($finalData));
+            return Tools::call($this->endGenerator($finalData));
         }
         $promise = $this->write($finalData);
         $promise->onResolve(fn () => $this->disconnect());

@@ -13,13 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
+use danog\MadelineProto\Tools;
 
 /**
  * Buffered stream helper trait.
@@ -34,21 +34,19 @@ trait BufferedStream
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(int &$length): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->getReadBufferGenerator($length));
+        return Tools::call($this->getReadBufferGenerator($length));
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int    $length Total length of data that is going to be piped in the buffer
      * @param string $append Data to append after entire buffer is written
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->getWriteBufferGenerator($length, $append));
+        return Tools::call($this->getWriteBufferGenerator($length, $append));
     }
 }

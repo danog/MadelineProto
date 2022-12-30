@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,6 +23,9 @@ use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
+use Generator;
+
+use function time;
 
 /**
  * Outgoing message.
@@ -85,7 +87,7 @@ class OutgoingMessage extends Message
     /**
      * Message body.
      *
-     * @var \Generator|array|null
+     * @var Generator|array|null
      */
     private $body;
 
@@ -136,7 +138,7 @@ class OutgoingMessage extends Message
     /**
      * Create outgoing message.
      *
-     * @param \Generator|array  $body        Body
+     * @param Generator|array $body Body
      * @param string            $constructor Constructor name
      * @param string            $type        Constructor type
      * @param boolean           $method      Is this a method?
@@ -158,7 +160,6 @@ class OutgoingMessage extends Message
 
     /**
      * Signal that we're trying to send the message.
-     *
      */
     public function trySend(): void
     {
@@ -169,7 +170,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Signal that the message was sent.
-     *
      */
     public function sent(): void
     {
@@ -207,7 +207,6 @@ class OutgoingMessage extends Message
 
     /**
      * ACK message.
-     *
      */
     public function ack(): void
     {
@@ -225,16 +224,14 @@ class OutgoingMessage extends Message
 
     /**
      * Get message body.
-     *
      */
-    public function getBody(): \Generator
+    public function getBody(): Generator
     {
-        return $this->body instanceof \Generator ? yield from $this->body : $this->body;
+        return $this->body instanceof Generator ? yield from $this->body : $this->body;
     }
 
     /**
      * Get message body or empty array.
-     *
      */
     public function getBodyOrEmpty(): array
     {
@@ -242,8 +239,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Check if we have a body.
-     *
-     * @return boolean
      */
     public function hasBody(): bool
     {
@@ -252,8 +247,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get serialized body.
-     *
-     * @return ?string
      */
     public function getSerializedBody(): ?string
     {
@@ -261,8 +254,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Check if we have a serialized body.
-     *
-     * @return boolean
      */
     public function hasSerializedBody(): bool
     {
@@ -271,7 +262,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get number of times this message was sent.
-     *
      */
     public function getTries(): int
     {
@@ -280,7 +270,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get constructor name.
-     *
      */
     public function getConstructor(): string
     {
@@ -289,7 +278,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get constructor type.
-     *
      */
     public function getType(): string
     {
@@ -298,7 +286,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether this is a method.
-     *
      */
     public function isMethod(): bool
     {
@@ -307,7 +294,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether this is an unencrypted message.
-     *
      */
     public function isUnencrypted(): bool
     {
@@ -315,7 +301,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Get whether this is an encrypted message.
-     *
      */
     public function isEncrypted(): bool
     {
@@ -324,7 +309,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether this message is related to a user, as in getting a successful reply means we have auth.
-     *
      */
     public function isUserRelated(): bool
     {
@@ -333,7 +317,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether we should refresh references upon serialization of this message.
-     *
      */
     public function shouldRefreshReferences(): bool
     {
@@ -342,8 +325,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get queue ID.
-     *
-     * @return ?string
      */
     public function getQueueId(): ?string
     {
@@ -351,7 +332,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Get whether we have a queue ID.
-     *
      */
     public function hasQueue(): bool
     {
@@ -362,7 +342,6 @@ class OutgoingMessage extends Message
      * Set serialized body.
      *
      * @param string $serializedBody Serialized body.
-     *
      */
     public function setSerializedBody(string $serializedBody): self
     {
@@ -375,7 +354,6 @@ class OutgoingMessage extends Message
      * Set whether this message is related to a user, as in getting a successful reply means we have auth.
      *
      * @param bool $userRelated Whether this message is related to a user, as in getting a successful reply means we have auth.
-     *
      */
     public function setUserRelated(bool $userRelated): self
     {
@@ -388,7 +366,6 @@ class OutgoingMessage extends Message
      * Set whether we should refresh references upon serialization of this message.
      *
      * @param bool $refreshReferences Whether we should refresh references upon serialization of this message.
-     *
      */
     public function setRefreshReferences(bool $refreshReferences): self
     {
@@ -401,7 +378,6 @@ class OutgoingMessage extends Message
      * Set queue ID.
      *
      * @param ?string $queueId Queue ID.
-     *
      */
     public function setQueueId(?string $queueId): self
     {
@@ -412,7 +388,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get when was this message sent.
-     *
      */
     public function getSent(): int
     {
@@ -421,8 +396,6 @@ class OutgoingMessage extends Message
 
     /**
      * Check if the message was sent.
-     *
-     * @return boolean
      */
     public function wasSent(): bool
     {
@@ -430,8 +403,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Check if can garbage collect this message.
-     *
-     * @return boolean
      */
     public function canGarbageCollect(): bool
     {
@@ -445,10 +416,8 @@ class OutgoingMessage extends Message
     }
     /**
      * For logging.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->msgId) {
             $msgId = MsgIdHandler::toString($this->msgId);
@@ -461,7 +430,6 @@ class OutgoingMessage extends Message
      * Set resolution deferred.
      *
      * @param Deferred $promise Resolution deferred.
-     *
      */
     public function setPromise(Deferred $promise): self
     {
@@ -472,7 +440,6 @@ class OutgoingMessage extends Message
 
     /**
      * Wait for message to be sent.
-     *
      */
     public function getSendPromise(): Promise
     {
@@ -484,7 +451,6 @@ class OutgoingMessage extends Message
 
     /**
      * Check if we have a promise.
-     *
      */
     public function hasPromise(): bool
     {
@@ -493,7 +459,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get promise.
-     *
      */
     public function getPromise(): Promise
     {
@@ -502,7 +467,6 @@ class OutgoingMessage extends Message
 
     /**
      * Reset sent time to trigger resending.
-     *
      */
     public function resetSent(): self
     {
@@ -513,7 +477,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether we should try converting the result to a bot API object.
-     *
      */
     public function getBotAPI(): bool
     {
@@ -524,7 +487,6 @@ class OutgoingMessage extends Message
      * Set whether we should try converting the result to a bot API object.
      *
      * @param bool $botAPI Whether we should try converting the result to a bot API object
-     *
      */
     public function setBotAPI(bool $botAPI): self
     {
@@ -535,7 +497,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     *
      */
     public function isFileRelated(): bool
     {
@@ -546,7 +507,6 @@ class OutgoingMessage extends Message
      * Set whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
      *
      * @param bool $fileRelated Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     *
      */
     public function setFileRelated(bool $fileRelated): self
     {
@@ -557,8 +517,6 @@ class OutgoingMessage extends Message
 
     /**
      * Get custom flood wait limit for this bot.
-     *
-     * @return ?int
      */
     public function getFloodWaitLimit(): ?int
     {
@@ -569,7 +527,6 @@ class OutgoingMessage extends Message
      * Set custom flood wait limit for this bot.
      *
      * @param ?int $floodWaitLimit Custom flood wait limit for this bot
-     *
      */
     public function setFloodWaitLimit(?int $floodWaitLimit): self
     {
@@ -582,7 +539,6 @@ class OutgoingMessage extends Message
      * Set when was this message sent.
      *
      * @param int $sent When was this message sent.
-     *
      */
     public function setSent(int $sent): self
     {

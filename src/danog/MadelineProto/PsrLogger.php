@@ -3,7 +3,9 @@
 namespace danog\MadelineProto;
 
 use Psr\Log\AbstractLogger;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
+use Stringable;
 
 /**
  * PSR-3 wrapper for MadelineProto's Logger.
@@ -18,7 +20,7 @@ class PsrLogger extends AbstractLogger
         LogLevel::WARNING => Logger::LEVEL_WARNING,
         LogLevel::NOTICE => Logger::LEVEL_NOTICE,
         LogLevel::INFO => Logger::LEVEL_VERBOSE,
-        LogLevel::DEBUG => Logger::LEVEL_ULTRA_VERBOSE
+        LogLevel::DEBUG => Logger::LEVEL_ULTRA_VERBOSE,
     ];
     /**
      * Logger.
@@ -26,7 +28,6 @@ class PsrLogger extends AbstractLogger
     private Logger $logger;
     /**
      * Constructor.
-     *
      */
     public function __construct(Logger $logger)
     {
@@ -35,13 +36,10 @@ class PsrLogger extends AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @param string  $message
      * @param mixed[] $context
-     *
-     *
-     * @throws \Psr\Log\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function log($level, $message, array $context = []): void
+    public function log($level, Stringable|string $message, array $context = []): void
     {
         $this->logger->logger($message, self::LEVEL_MAP[$level]);
     }

@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,6 +23,7 @@ use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use Generator;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
 
@@ -76,13 +76,13 @@ class ConnectionContext
     /**
      * Socket context.
      *
-     * @var \Amp\Socket\ConnectContext
+     * @var ConnectContext
      */
     private $socketContext;
     /**
      * Cancellation token.
      *
-     * @var \Amp\CancellationToken
+     * @var CancellationToken
      */
     private $cancellationToken;
     /**
@@ -117,8 +117,6 @@ class ConnectionContext
     private $readCallback;
     /**
      * Set the socket context.
-     *
-     *
      */
     public function setSocketContext(ConnectContext $socketContext): self
     {
@@ -127,7 +125,6 @@ class ConnectionContext
     }
     /**
      * Get the socket context.
-     *
      */
     public function getSocketContext(): ConnectContext
     {
@@ -137,7 +134,6 @@ class ConnectionContext
      * Set the connection URI.
      *
      * @param string|UriInterface $uri
-     *
      */
     public function setUri($uri): self
     {
@@ -146,7 +142,6 @@ class ConnectionContext
     }
     /**
      * Get the URI as a string.
-     *
      */
     public function getStringUri(): string
     {
@@ -154,7 +149,6 @@ class ConnectionContext
     }
     /**
      * Get the URI.
-     *
      */
     public function getUri(): UriInterface
     {
@@ -162,27 +156,21 @@ class ConnectionContext
     }
     /**
      * Set the cancellation token.
-     *
-     * @param CancellationToken $cancellationToken
-     *
      */
-    public function setCancellationToken($cancellationToken): self
+    public function setCancellationToken(CancellationToken $cancellationToken): self
     {
         $this->cancellationToken = $cancellationToken;
         return $this;
     }
     /**
      * Get the cancellation token.
-     *
-     * @return CancellationToken
      */
-    public function getCancellationToken()
+    public function getCancellationToken(): CancellationToken
     {
         return $this->cancellationToken;
     }
     /**
      * Return a clone of the current connection context.
-     *
      */
     public function getCtx(): self
     {
@@ -190,8 +178,6 @@ class ConnectionContext
     }
     /**
      * Set the test boolean.
-     *
-     *
      */
     public function setTest(bool $test): self
     {
@@ -200,7 +186,6 @@ class ConnectionContext
     }
     /**
      * Whether this is a test connection.
-     *
      */
     public function isTest(): bool
     {
@@ -208,7 +193,6 @@ class ConnectionContext
     }
     /**
      * Whether this is a media connection.
-     *
      */
     public function isMedia(): bool
     {
@@ -216,7 +200,6 @@ class ConnectionContext
     }
     /**
      * Whether this is a CDN connection.
-     *
      */
     public function isCDN(): bool
     {
@@ -224,7 +207,6 @@ class ConnectionContext
     }
     /**
      * Whether this connection context will only be used by the DNS client.
-     *
      */
     public function isDns(): bool
     {
@@ -232,8 +214,6 @@ class ConnectionContext
     }
     /**
      * Whether this connection context will only be used by the DNS client.
-     *
-     * @param boolean $isDns
      */
     public function setIsDns(bool $isDns): self
     {
@@ -242,8 +222,6 @@ class ConnectionContext
     }
     /**
      * Set the secure boolean.
-     *
-     *
      */
     public function secure(bool $secure): self
     {
@@ -252,7 +230,6 @@ class ConnectionContext
     }
     /**
      * Whether to use TLS with socket connections.
-     *
      */
     public function isSecure(): bool
     {
@@ -262,7 +239,6 @@ class ConnectionContext
      * Set the DC ID.
      *
      * @param string|int $dc
-     *
      */
     public function setDc($dc): self
     {
@@ -302,8 +278,6 @@ class ConnectionContext
     }
     /**
      * Whether to use ipv6.
-     *
-     *
      */
     public function setIpv6(bool $ipv6): self
     {
@@ -312,7 +286,6 @@ class ConnectionContext
     }
     /**
      * Whether to use ipv6.
-     *
      */
     public function getIpv6(): bool
     {
@@ -321,9 +294,7 @@ class ConnectionContext
     /**
      * Add a stream to the stream chain.
      *
-     *
      * @psalm-param class-string $streamName
-     *
      */
     public function addStream(string $streamName, $extra = null): self
     {
@@ -335,7 +306,6 @@ class ConnectionContext
      * Set read callback, called every time the socket reads at least a byte.
      *
      * @param callable $callable Read callback
-     *
      */
     public function setReadCallback(callable $callable): void
     {
@@ -343,8 +313,6 @@ class ConnectionContext
     }
     /**
      * Check if a read callback is present.
-     *
-     * @return boolean
      */
     public function hasReadCallback(): bool
     {
@@ -352,7 +320,6 @@ class ConnectionContext
     }
     /**
      * Get read callback.
-     *
      */
     public function getReadCallback(): callable
     {
@@ -360,7 +327,6 @@ class ConnectionContext
     }
     /**
      * Get the current stream name from the stream chain.
-     *
      */
     public function getStreamName(): string
     {
@@ -370,12 +336,10 @@ class ConnectionContext
      * Check if has stream within stream chain.
      *
      * @param string $stream Stream name
-     *
-     * @return boolean
      */
     public function hasStreamName(string $stream): bool
     {
-        foreach ($this->nextStreams as list($name)) {
+        foreach ($this->nextStreams as [$name]) {
             if ($name === $stream) {
                 return true;
             }
@@ -385,11 +349,11 @@ class ConnectionContext
     /**
      * Get a stream from the stream chain.
      *
-     * @return \Generator<StreamInterface>
+     * @return Generator<StreamInterface>
      */
-    public function getStream(string $buffer = ''): \Generator
+    public function getStream(string $buffer = ''): Generator
     {
-        list($clazz, $extra) = $this->nextStreams[$this->key--];
+        [$clazz, $extra] = $this->nextStreams[$this->key--];
         $obj = new $clazz();
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
@@ -405,7 +369,7 @@ class ConnectionContext
     public function getInputClientProxy(): ?array
     {
         foreach ($this->nextStreams as $couple) {
-            list($streamName, $extra) = $couple;
+            [$streamName, $extra] = $couple;
             if ($streamName === ObfuscatedStream::class && isset($extra['address'])) {
                 $extra['_'] = 'inputClientProxy';
                 return $extra;
@@ -415,7 +379,6 @@ class ConnectionContext
     }
     /**
      * Get a description "name" of the context.
-     *
      */
     public function getName(): string
     {
@@ -442,10 +405,8 @@ class ConnectionContext
     }
     /**
      * Returns a representation of the context.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getName();
     }

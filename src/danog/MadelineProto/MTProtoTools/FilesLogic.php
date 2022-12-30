@@ -9,27 +9,34 @@ use Amp\ByteStream\ResourceInputStream;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
 use Amp\File\Driver\BlockingFile;
-
 use Amp\File\File;
-use Amp\Http\Client\Request;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
+use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Producer;
+use Amp\Promise;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
+use Generator;
 
+use const FILTER_VALIDATE_URL;
+use const SEEK_END;
 use function Amp\File\exists;
+
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 
@@ -45,16 +52,15 @@ trait FilesLogic
      * @param ?int $size Size of file to download, required for bot API file IDs.
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
-     *
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): \Generator
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): Generator
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
             $messageMedia = yield $messageMedia->getFile();
         }
         if (\is_string($messageMedia) && ($size === null || $mime === null || $name === null)) {
-            throw new \danog\MadelineProto\Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
+            throw new Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
         }
 
         $headers = [];
@@ -72,7 +78,7 @@ trait FilesLogic
         $result = ResponseInfo::parseHeaders(
             $_SERVER['REQUEST_METHOD'],
             $headers,
-            $messageMedia
+            $messageMedia,
         );
 
         foreach ($result->getHeaders() as $key => $value) {
@@ -107,11 +113,9 @@ trait FilesLogic
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
-     *
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<mixed>|mixed, mixed, mixed>
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>|mixed), mixed, mixed>
      */
-    public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1): \Generator
+    public function downloadToStream($messageMedia, $stream, callable $cb = null, int $offset = 0, int $end = -1): Generator
     {
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
@@ -134,7 +138,7 @@ trait FilesLogic
             }
         }
         $lock = new LocalMutex;
-        $callable = static function (string $payload, int $offset) use ($stream, $seekable, $lock): \Generator {
+        $callable = static function (string $payload, int $offset) use ($stream, $seekable, $lock): Generator {
             /** @var Lock */
             $l = yield $lock->acquire();
             try {
@@ -163,12 +167,10 @@ trait FilesLogic
      * @param ?int          $size         Size of file to download, required for bot API file IDs.
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
-     *
-     * @return \Generator Returned response
-     *
-     * @psalm-return \Generator<mixed, array, mixed, \Amp\Http\Server\Response>
+     * @return Generator Returned response
+     * @psalm-return Generator<mixed, array, mixed, Response>
      */
-    public function downloadToResponse($messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): \Generator
+    public function downloadToResponse($messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Generator
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -176,7 +178,7 @@ trait FilesLogic
         }
 
         if (\is_string($messageMedia) && ($size === null || $mime === null || $name === null)) {
-            throw new \danog\MadelineProto\Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
+            throw new Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
@@ -189,7 +191,7 @@ trait FilesLogic
         $result = ResponseInfo::parseHeaders(
             $request->getMethod(),
             \array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
-            $messageMedia
+            $messageMedia,
         );
 
         $body = null;
@@ -197,13 +199,13 @@ trait FilesLogic
             $body = new IteratorStream(
                 new Producer(
                     function (callable $emit) use (&$messageMedia, &$cb, &$result) {
-                        $emit = static function (string $payload) use ($emit): \Generator {
+                        $emit = static function (string $payload) use ($emit): Generator {
                             yield $emit($payload);
                             return \strlen($payload);
                         };
                         yield Tools::call($this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result->getServeRange()));
-                    }
-                )
+                    },
+                ),
             );
         } elseif (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
             $body = $result->getCodeExplanation();
@@ -226,11 +228,9 @@ trait FilesLogic
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<int>|\Amp\Promise<mixed>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
-    public function uploadEncrypted($file, string $fileName = '', $cb = null): \Generator
+    public function uploadEncrypted($file, string $fileName = '', callable $cb = null): Generator
     {
         return $this->upload($file, $fileName, $cb, true);
     }
@@ -242,11 +242,9 @@ trait FilesLogic
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
-     *
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<int>|\Amp\Promise<mixed>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
-    public function upload($file, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
+    public function upload($file, string $fileName = '', callable $cb = null, bool $encrypted = false): Generator
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -269,14 +267,14 @@ trait FilesLogic
         }
         $file = Tools::absolute($file);
         if (!yield exists($file)) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
+            throw new Exception(Lang::$current_lang['file_not_exist']);
         }
         if (empty($fileName)) {
             $fileName = \basename($file);
         }
         $size = yield getSize($file);
         if ($size > 512 * 1024 * 8000) {
-            throw new \danog\MadelineProto\Exception('Given file is too big!');
+            throw new Exception('Given file is too big!');
         }
         $stream = yield openFile($file, 'rb');
         $mime = Extension::getMimeFromFile($file);
@@ -296,11 +294,9 @@ trait FilesLogic
      * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return Generator<(int|mixed), (Promise|Promise<int>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
-    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', callable $cb = null, bool $encrypted = false): Generator
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -324,7 +320,7 @@ trait FilesLogic
         $created = false;
         if ($stream instanceof File) {
             $lock = new LocalMutex;
-            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock): \Generator {
+            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock): Generator {
                 /** @var Lock */
                 $l = yield $lock->acquire();
                 try {
@@ -344,11 +340,11 @@ trait FilesLogic
                 $stream = (yield from $ctx->getStream());
                 $created = true;
             }
-            $callable = static function (int $offset, int $size) use ($stream): \Generator {
+            $callable = static function (int $offset, int $size) use ($stream): Generator {
                 $reader = yield $stream->getReadBuffer($l);
                 try {
                     return yield $reader->bufferRead($size);
-                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                } catch (NothingInTheSocketException $e) {
                     $reader = yield $stream->getReadBuffer($size);
                     return yield $reader->bufferRead($size);
                 }
@@ -356,7 +352,7 @@ trait FilesLogic
             $seekable = false;
         }
         if (!$size && $seekable && \method_exists($stream, 'tell')) {
-            yield $stream->seek(0, \SEEK_END);
+            yield $stream->seek(0, SEEK_END);
             $size = yield $stream->tell();
             yield $stream->seek(0);
         } elseif (!$size) {

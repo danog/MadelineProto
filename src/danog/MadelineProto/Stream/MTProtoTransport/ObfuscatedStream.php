@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,6 +21,8 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Obfuscated2 stream wrapper.
@@ -38,16 +39,15 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
             $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
         do {
-            $random = \danog\MadelineProto\Tools::random(64);
+            $random = Tools::random(64);
         } while (\in_array(\substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', \str_repeat(\chr(238), 4), \str_repeat(\chr(221), 4)]) || $random[0] === \chr(0xef) || \substr($random, 4, 4) === "\0\0\0\0");
         if (\strlen($header) === 1) {
             $header = \str_repeat($header, 4);
@@ -72,9 +72,8 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      * Set extra.
      *
      * @param array $extra Extra
-     *
      */
-    public function setExtra($extra): void
+    public function setExtra(array $extra): void
     {
         if (isset($extra['secret'])) {
             if (\strlen($extra['secret']) > 17) {

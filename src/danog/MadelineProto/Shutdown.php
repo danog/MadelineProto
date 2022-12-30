@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -44,7 +43,6 @@ class Shutdown
     private static $id = 0;
     /**
      * Function to be called on shutdown.
-     *
      */
     private static function shutdown(): void
     {
@@ -59,10 +57,9 @@ class Shutdown
      *
      * @param callable $callback The callback to set
      * @param null|string $id The optional callback ID
-     *
      * @return int|string The callback ID
      */
-    public static function addCallback($callback, $id = null)
+    public static function addCallback(callable $callback, ?string $id = null)
     {
         if (!$id) {
             $id = self::$id++;
@@ -78,10 +75,9 @@ class Shutdown
      * Remove a callback from the script shutdown callable list.
      *
      * @param null|string|int $id The optional callback ID
-     *
      * @return bool true if the callback was removed correctly, false otherwise
      */
-    public static function removeCallback($id)
+    public static function removeCallback($id): bool
     {
         if (isset(self::$callbacks[$id])) {
             unset(self::$callbacks[$id]);

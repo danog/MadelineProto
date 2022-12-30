@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use Generator;
 
 /**
  * Event handler.
@@ -50,7 +50,6 @@ abstract class EventHandler extends InternalDoc
      *
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
-     *
      */
     final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
@@ -65,7 +64,6 @@ abstract class EventHandler extends InternalDoc
      * @param string $session Session name
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
-     *
      */
     final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
     {
@@ -77,9 +75,7 @@ abstract class EventHandler extends InternalDoc
      * Internal constructor.
      *
      * @internal
-     *
      * @param APIWrapper $MadelineProto MadelineProto instance
-     *
      */
     public function initInternal(APIWrapper $MadelineProto): void
     {
@@ -93,9 +89,8 @@ abstract class EventHandler extends InternalDoc
      * Start method handler.
      *
      * @internal
-     *
      */
-    public function startInternal(): \Generator
+    public function startInternal(): Generator
     {
         $this->startMutex ??= new LocalMutex;
         $lock = yield $this->startMutex->acquire();
@@ -126,7 +121,6 @@ abstract class EventHandler extends InternalDoc
 
     /**
      * Get API instance.
-     *
      */
     public function getAPI(): MTProto
     {

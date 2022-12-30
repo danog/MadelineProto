@@ -8,6 +8,9 @@ use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+use Generator;
+use PDO;
+use Throwable;
 
 /**
  * Postgres database backend.
@@ -23,7 +26,6 @@ class PostgresArray extends SqlArray
      * Prepare statements.
      *
      * @param SqlArray::STATEMENT_* $type
-     *
      */
     protected function getSqlQuery(int $type): string
     {
@@ -60,27 +62,24 @@ class PostgresArray extends SqlArray
 
     /**
      * Initialize on startup.
-     *
      */
-    public function initStartup(): \Generator
+    public function initStartup(): Generator
     {
         $this->setTable($this->table);
         yield from $this->initConnection($this->dbSettings);
     }
     /**
      * Initialize connection.
-     *
-     * @param DatabasePostgres $settings
      */
-    public function initConnection($settings): \Generator
+    public function initConnection(DatabasePostgres $settings): Generator
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
-        $this->pdo = new \PDO(
+        $this->pdo = new PDO(
             "pgsql:host={$host};port={$port}",
             $settings->getUsername(),
-            $settings->getPassword()
+            $settings->getPassword(),
         );
         if (!isset($this->db)) {
             $this->db = yield from Postgres::getConnection($settings);
@@ -100,12 +99,10 @@ class PostgresArray extends SqlArray
     /**
      * Create table for property.
      *
-     *
-     * @throws \Throwable
-     *
-     * @psalm-return \Generator<int, Promise, mixed, void>
+     * @throws Throwable
+     * @psalm-return Generator<int, Promise, mixed, void>
      */
-    protected function prepareTable(): \Generator
+    protected function prepareTable(): Generator
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
 
@@ -118,7 +115,7 @@ class PostgresArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): \Generator
+    protected function renameTable(string $from, string $to): Generator
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 

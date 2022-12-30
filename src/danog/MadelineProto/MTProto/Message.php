@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -75,7 +74,6 @@ abstract class Message
 
     /**
      * Get whether constructor is content related.
-     *
      */
     public function isContentRelated(): bool
     {
@@ -84,7 +82,6 @@ abstract class Message
 
     /**
      * Get my message ID.
-     *
      */
     public function getMsgId()
     {
@@ -95,7 +92,6 @@ abstract class Message
      * Set my message ID.
      *
      * @param mixed $msgId My message ID
-     *
      */
     public function setMsgId($msgId): self
     {
@@ -106,8 +102,6 @@ abstract class Message
 
     /**
      * Check if we have a message ID.
-     *
-     * @return boolean
      */
     public function hasMsgId(): bool
     {
@@ -116,8 +110,6 @@ abstract class Message
 
     /**
      * Get sequence number.
-     *
-     * @return ?int
      */
     public function getSeqNo(): ?int
     {
@@ -126,7 +118,6 @@ abstract class Message
 
     /**
      * Has sequence number.
-     *
      */
     public function hasSeqNo(): bool
     {
@@ -137,7 +128,6 @@ abstract class Message
      * Set sequence number.
      *
      * @param ?int $seqNo Sequence number
-     *
      */
     public function setSeqNo(?int $seqNo): self
     {
@@ -148,8 +138,6 @@ abstract class Message
 
     /**
      * Check whether this message can be garbage collected.
-     *
-     * @return boolean
      */
     abstract public function canGarbageCollect(): bool;
 }

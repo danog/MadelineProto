@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,6 +21,10 @@ use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
 use danog\MadelineProto\Logger;
+use Generator;
+use Throwable;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
 use function Amp\Ipc\connect;
 
@@ -64,9 +67,8 @@ abstract class ClientAbstract
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     *
      */
-    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
@@ -75,16 +77,15 @@ abstract class ClientAbstract
     }
     /**
      * Main loop.
-     *
      */
-    protected function loopInternal(): \Generator
+    protected function loopInternal(): Generator
     {
         do {
             while (true) {
                 $payload = null;
                 try {
                     $payload = yield $this->server->receive();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Logger::log("Got exception while receiving in IPC client: $e");
                 }
                 if (!$payload) {
@@ -112,13 +113,13 @@ abstract class ClientAbstract
                 $this->logger("Reconnecting to IPC server!");
                 try {
                     yield $this->server->disconnect();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
                 if ($this instanceof Client) {
                     try {
                         yield Server::startMe($this->session);
                         $this->server = yield connect($this->session->getIpcPath());
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
                     }
                 } else {
@@ -130,10 +131,9 @@ abstract class ClientAbstract
     /**
      * Disconnect cleanly from main instance.
      *
-     *
-     * @psalm-return \Generator<int, Promise, mixed, void>
+     * @psalm-return Generator<int, Promise, mixed, void>
      */
-    public function disconnect(): \Generator
+    public function disconnect(): Generator
     {
         $this->run = false;
         yield $this->server->disconnect();
@@ -146,9 +146,8 @@ abstract class ClientAbstract
      *
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
-     *
      */
-    public function __call($function, $arguments): \Generator
+    public function __call($function, $arguments): Generator
     {
         $this->requests []= $deferred = new Deferred;
         if ($arguments instanceof Wrapper) {

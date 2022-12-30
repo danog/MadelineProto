@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,6 +21,7 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * HTTPS stream wrapper.
@@ -34,15 +34,13 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         return parent::connect($ctx->getCtx()->secure(true), $header);
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

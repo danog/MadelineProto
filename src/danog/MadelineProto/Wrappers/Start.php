@@ -13,18 +13,21 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
-
 use danog\MadelineProto\Tools;
+use Generator;
+
+use const PHP_SAPI;
 
 /**
  * Manages simple logging in and out.
@@ -35,9 +38,8 @@ trait Start
 {
     /**
      * Log in to telegram (via CLI or web).
-     *
      */
-    public function start(): \Generator
+    public function start(): Generator
     {
         if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
             return $this instanceof Client ? yield from $this->getSelf() : yield from $this->fullGetSelf();
@@ -99,58 +101,58 @@ trait Start
         }
         exit;
     }
-    private function webPhoneLogin(): \Generator
+    private function webPhoneLogin(): Generator
     {
         try {
             yield from $this->phoneLogin($_POST['phone_number']);
             yield from $this->webEcho();
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webCompletePhoneLogin(): \Generator
+    private function webCompletePhoneLogin(): Generator
     {
         try {
             yield from $this->completePhoneLogin($_POST['phone_code']);
             yield from $this->webEcho();
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webComplete2faLogin(): \Generator
+    private function webComplete2faLogin(): Generator
     {
         try {
             yield from $this->complete2faLogin($_POST['password']);
             yield from $this->webEcho();
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webCompleteSignup(): \Generator
+    private function webCompleteSignup(): Generator
     {
         try {
-            yield from $this->completeSignup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
+            yield from $this->completeSignup($_POST['first_name'], $_POST['last_name'] ?? '');
             yield from $this->webEcho();
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webBotLogin(): \Generator
+    private function webBotLogin(): Generator
     {
         try {
             yield from $this->botLogin($_POST['token']);
             yield from $this->webEcho();
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }

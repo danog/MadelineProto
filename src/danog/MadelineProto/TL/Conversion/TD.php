@@ -13,11 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Conversion;
+
+use danog\MadelineProto\Lang;
+use Generator;
 
 trait TD
 {
@@ -26,9 +28,8 @@ trait TD
      *
      * @param array $params Params
      * @param array $key    Key
-     *
      */
-    public function tdcliToTd(&$params, $key = null): array
+    public function tdcliToTd(array &$params, array $key = null): array
     {
         if (!\is_array($params)) {
             return $params;
@@ -52,10 +53,9 @@ trait TD
      * Convert TD to MTProto parameters.
      *
      * @param array $params Parameters
-     *
-     * @return \Generator<array>
+     * @return Generator<array>
      */
-    public function tdToMTProto(array $params): \Generator
+    public function tdToMTProto(array $params): Generator
     {
         $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
@@ -71,11 +71,11 @@ trait TD
                                 $newparams = \array_merge($params[$td], $newparams);
                                 break;
                             default:
-                                throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
+                                throw new Exception(Lang::$current_lang['non_text_conversion']);
                         }
                         break;
                     default:
-                        $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
+                        $newparams[$mtproto[0]] = $params[$td] ?? null;
                         if (\is_array($newparams[$mtproto[0]])) {
                             $newparams[$mtproto[0]] = (yield from $this->MTProtoToTd($newparams[$mtproto[0]]));
                         }
@@ -88,9 +88,8 @@ trait TD
      * MTProto to TDCLI params.
      *
      * @param mixed $params Params
-     *
      */
-    public function MTProtoToTdcli($params): \Generator
+    public function MTProtoToTdcli($params): Generator
     {
         return $this->tdToTdcli(yield from $this->MTProtoToTd($params));
     }
@@ -98,9 +97,8 @@ trait TD
      * MTProto to TD params.
      *
      * @param mixed $params Params
-     *
      */
-    public function MTProtoToTd(&$params): \Generator
+    public function MTProtoToTd(&$params): Generator
     {
         if (!\is_array($params)) {
             return $params;
@@ -148,7 +146,7 @@ trait TD
                         }
                         break;
                     case 'choose_ttl':
-                        $newparams[$td] = isset($params['ttl']) ? $params['ttl'] : 0;
+                        $newparams[$td] = $params['ttl'] ?? 0;
                         break;
                     case 'choose_ttl_expires_in':
                         $newparams[$td] = $newparams['ttl'] - \microtime(true);
@@ -163,14 +161,14 @@ trait TD
                                 $newparams[$td]['entities'] = $params['entities'];
                             }
                         } else {
-                            throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
+                            throw new Exception(Lang::$current_lang['non_text_conversion']);
                         }
                         break;
                     default:
                         if (isset($mtproto[1])) {
-                            $newparams[$td] = isset($params[$mtproto[0]][$mtproto[1]]) ? $params[$mtproto[0]][$mtproto[1]] : null;
+                            $newparams[$td] = $params[$mtproto[0]][$mtproto[1]] ?? null;
                         } else {
-                            $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
+                            $newparams[$td] = $params[$mtproto[0]] ?? null;
                         }
                         if (\is_array($newparams[$td])) {
                             $newparams[$td] = (yield from $this->MTProtoToTd($newparams[$td]));
@@ -184,7 +182,6 @@ trait TD
      * Convert TD parameters to tdcli.
      *
      * @param mixed $params Parameters
-     *
      */
     public function tdToTdcli($params)
     {

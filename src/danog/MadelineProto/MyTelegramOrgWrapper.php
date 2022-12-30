@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\Request;
+use Generator;
 
 /**
  * Wrapper for my.telegram.org.
@@ -37,7 +37,6 @@ class MyTelegramOrgWrapper
     private string $hash = '';
     /**
      * Phone number.
-     *
      */
     private string $number = '';
     /**
@@ -70,7 +69,6 @@ class MyTelegramOrgWrapper
     private const MY_TELEGRAM_URL = 'https://my.telegram.org';
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -93,7 +91,6 @@ class MyTelegramOrgWrapper
     }
     /**
      * Wakeup function.
-     *
      */
     public function __wakeup(): void
     {
@@ -126,9 +123,8 @@ class MyTelegramOrgWrapper
      * Login.
      *
      * @param string $number Phone number
-     *
      */
-    public function login(string $number): \Generator
+    public function login(string $number): Generator
     {
         $this->number = $number;
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
@@ -146,9 +142,8 @@ class MyTelegramOrgWrapper
      * Complete login.
      *
      * @param string $password Password
-     *
      */
-    public function completeLogin(string $password): \Generator
+    public function completeLogin(string $password): Generator
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');
@@ -170,8 +165,6 @@ class MyTelegramOrgWrapper
     }
     /**
      * Whether we are logged in.
-     *
-     * @return boolean
      */
     public function loggedIn(): bool
     {
@@ -179,9 +172,8 @@ class MyTelegramOrgWrapper
     }
     /**
      * Check if an app was already created.
-     *
      */
-    public function hasApp(): \Generator
+    public function hasApp(): Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -203,9 +195,8 @@ class MyTelegramOrgWrapper
     }
     /**
      * Get the currently created app.
-     *
      */
-    public function getApp(): \Generator
+    public function getApp(): Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -230,9 +221,8 @@ class MyTelegramOrgWrapper
      * Create an app.
      *
      * @param array $settings App parameters
-     *
      */
-    public function createApp(array $settings): \Generator
+    public function createApp(array $settings): Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -255,7 +245,7 @@ class MyTelegramOrgWrapper
         $title = \explode('</title>', \explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {
             $this->creation_hash = \explode('"/>', \explode('<input type="hidden" name="hash" value="', $result)[1])[0];
-            throw new \danog\MadelineProto\Exception('App creation failed');
+            throw new Exception('App creation failed');
         }
         $cose = \explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
@@ -273,7 +263,6 @@ class MyTelegramOrgWrapper
      * Function for generating curl request headers.
      *
      * @param string $httpType Origin
-     *
      */
     private function getHeaders(string $httpType): array
     {
@@ -311,7 +300,7 @@ class MyTelegramOrgWrapper
         }
         $final_headers = [];
         foreach ($headers as $header) {
-            list($key, $value) = \explode(':', $header, 2);
+            [$key, $value] = \explode(':', $header, 2);
             $final_headers[\trim($key)] = \trim($value);
         }
         return $final_headers;
@@ -320,7 +309,6 @@ class MyTelegramOrgWrapper
      * Enable or disable async.
      *
      * @param boolean $async Async
-     *
      */
     public function async(bool $async): void
     {
@@ -330,7 +318,6 @@ class MyTelegramOrgWrapper
      * Run specified callable synchronously.
      *
      * @param callable $callable Callable
-     *
      */
     public function loop(callable $callable)
     {
@@ -341,7 +328,6 @@ class MyTelegramOrgWrapper
      *
      * @param string $name      Function name
      * @param array  $arguments Arguments
-     *
      */
     public function __call(string $name, array $arguments)
     {

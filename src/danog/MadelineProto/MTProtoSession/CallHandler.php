@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,6 +23,7 @@ use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Manages method and object calls.
@@ -35,7 +35,6 @@ trait CallHandler
      *
      * @param string $watcherId Watcher ID for defer
      * @param array  $args      Args
-     *
      */
     public function methodRecall(string $watcherId, array $args): void
     {
@@ -86,13 +85,11 @@ trait CallHandler
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|Generator $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
+     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
     {
         $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
         if (\is_array($readDeferred)) {
@@ -108,13 +105,11 @@ trait CallHandler
      * Call method and make sure it is asynchronously sent (generator).
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|Generator $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
+     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Generator
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
@@ -168,7 +163,7 @@ trait CallHandler
             $method,
             $methodInfo['type'],
             true,
-            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect'
+            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect',
         );
         if (isset($aargs['queue'])) {
             $message->setQueueId($aargs['queue']);
@@ -188,7 +183,7 @@ trait CallHandler
         if (isset($aargs['FloodWaitLimit'])) {
             $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }
-        $aargs['postpone'] = $aargs['postpone'] ?? false;
+        $aargs['postpone'] ??= false;
         $deferred = yield from $this->sendMessage($message, !$aargs['postpone']);
         $this->checker->resume();
         return $deferred;
@@ -199,21 +194,20 @@ trait CallHandler
      * @param string $object Object name
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
-     *
      */
-    public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): Generator
     {
         $message = new OutgoingMessage(
             $args,
             $object,
             '',
             false,
-            !$this->shared->hasTempAuthKey()
+            !$this->shared->hasTempAuthKey(),
         );
         if (isset($aargs['promise'])) {
             $message->setPromise($aargs['promise']);
         }
-        $aargs['postpone'] = $aargs['postpone'] ?? false;
+        $aargs['postpone'] ??= false;
         return yield from $this->sendMessage($message, !$aargs['postpone']);
     }
 }

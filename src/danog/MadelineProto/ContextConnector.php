@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -25,6 +24,8 @@ use Amp\NullCancellationToken;
 use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Connector;
+use Generator;
+use Throwable;
 
 class ContextConnector implements Connector
 {
@@ -39,9 +40,9 @@ class ContextConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $context, $token): \Generator {
+        return Tools::call((function () use ($uri, $context, $token): Generator {
             $ctx = $context ?? new ConnectContext();
-            $token = $token ?? new NullCancellationToken();
+            $token ??= new NullCancellationToken();
             $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
             if (empty($ctxs)) {
                 throw new Exception("No contexts for raw connection to URI {$uri}");
@@ -52,21 +53,21 @@ class ContextConnector implements Connector
                     $ctx->setIsDns($this->fromDns);
                     $ctx->setCancellationToken($token);
                     $result = (yield from $ctx->getStream());
-                    $this->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger('OK!', Logger::WARNING);
                     return $result->getSocket();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     if (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
                         throw $e;
                     }
-                    $this->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
+                    $this->logger->logger('Connection failed: '.$e, Logger::ERROR);
                     if ($e instanceof MultiReasonException) {
                         foreach ($e->getReasons() as $reason) {
-                            $this->logger->logger('Multireason: '.$reason, \danog\MadelineProto\Logger::ERROR);
+                            $this->logger->logger('Multireason: '.$reason, Logger::ERROR);
                         }
                     }
                 }
             }
-            throw new \danog\MadelineProto\Exception("Could not connect to URI {$uri}");
+            throw new Exception("Could not connect to URI {$uri}");
         })());
     }
 }

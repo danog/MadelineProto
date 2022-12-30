@@ -13,17 +13,24 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\ApiWrappers;
 
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MyTelegramOrgWrapper;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
+
+use const PHP_EOL;
+
+use const PHP_SAPI;
 use function Amp\ByteStream\getStdout;
 
 /**
@@ -35,12 +42,11 @@ trait Start
      * Start API ID generation process.
      *
      * @param Settings $settings Settings
-     *
      */
-    private function APIStart(Settings $settings): \Generator
+    private function APIStart(Settings $settings): Generator
     {
         if (Magic::$isIpcWorker) {
-            throw new \danog\MadelineProto\Exception('Not inited!');
+            throw new Exception('Not inited!');
         }
         if ($this->getWebAPITemplate() === 'legacy') {
             $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
@@ -66,7 +72,7 @@ trait Start
                 $app['api_hash'] = yield Tools::readLine("6) ".Lang::$current_lang['apiManualPrompt1']);
                 return $app;
             }
-            $this->myTelegramOrgWrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
+            $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
             yield from $this->myTelegramOrgWrapper->login(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt0']));
             yield from $this->myTelegramOrgWrapper->completeLogin(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt1']));
             if (!(yield from $this->myTelegramOrgWrapper->hasApp())) {
@@ -120,36 +126,36 @@ trait Start
         }
         return null;
     }
-    private function webAPIPhoneLogin(Settings $settings): \Generator
+    private function webAPIPhoneLogin(Settings $settings): Generator
     {
         try {
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
             yield from $this->myTelegramOrgWrapper->login($_POST['phone_number']);
             yield $this->webAPIEcho();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
-    private function webAPICompleteLogin(): \Generator
+    private function webAPICompleteLogin(): Generator
     {
         try {
             yield from $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
-    private function webAPICreateApp(): \Generator
+    private function webAPICreateApp(): Generator
     {
         try {
             $params = $_POST;
             unset($params['creating_app']);
             $app = (yield from $this->myTelegramOrgWrapper->createApp($params));
             return $app;
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }

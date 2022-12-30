@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\Ipc\Wrapper;
+use Generator;
 
 /**
  * Generic callback wrapper object.
@@ -21,7 +22,6 @@ class Obj
     private Wrapper $wrapper;
     /**
      * Constructor.
-     *
      */
     public function __construct(Wrapper $wrapper, array $methods)
     {
@@ -31,10 +31,9 @@ class Obj
     /**
      * Call method.
      *
-     *
-     * @return \Generator<mixed, mixed, mixed, mixed>
+     * @return Generator<mixed, mixed, mixed, mixed>
      */
-    public function __call(string $name, array $arguments = []): \Generator
+    public function __call(string $name, array $arguments = []): Generator
     {
         return $this->wrapper->__call($this->methods[$name], $arguments);
     }

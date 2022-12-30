@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,6 +21,7 @@ namespace danog\MadelineProto\Stream\Common;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * Buffered raw stream, that simply returns less data on EOF instead of throwing.
@@ -34,9 +34,8 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
-     *
      */
-    public function bufferReadGenerator(int $length): \Generator
+    public function bufferReadGenerator(int $length): Generator
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -57,7 +56,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {
@@ -65,7 +63,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     }
     /**
      * Get class name.
-     *
      */
     public static function getName(): string
     {

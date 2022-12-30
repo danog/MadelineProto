@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,7 +25,6 @@ class FileCallback implements FileCallbackInterface
 {
     /**
      * File to download/upload.
-     *
      */
     private $file;
     /**
@@ -48,7 +46,6 @@ class FileCallback implements FileCallbackInterface
     }
     /**
      * Get file.
-     *
      */
     public function getFile()
     {
@@ -60,9 +57,8 @@ class FileCallback implements FileCallbackInterface
      * @param int $percent Percent
      * @param int $speed   Speed in mbps
      * @param int $time    Time
-     *
      */
-    public function __invoke($percent, $speed, $time)
+    public function __invoke(int $percent, int $speed, int $time)
     {
         $callback = $this->callback;
         return $callback($percent, $speed, $time);

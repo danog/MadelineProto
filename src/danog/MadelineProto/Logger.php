@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,7 +23,18 @@ use Amp\Failure;
 use Amp\Loop;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use const DIRECTORY_SEPARATOR;
+
+use const E_ALL;
+use const FILE_APPEND;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use const PATHINFO_DIRNAME;
+use const PHP_EOL;
+use const PHP_SAPI;
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
 
@@ -226,7 +236,6 @@ class Logger
      * Construct global static logger from MadelineProto settings.
      *
      * @param SettingsLogger $settings Settings instance
-     *
      */
     public static function constructorFromSettings(SettingsLogger $settings): self
     {
@@ -235,7 +244,6 @@ class Logger
 
     /**
      * Construct logger.
-     *
      */
     public function __construct(SettingsLogger $settings, string $prefix = '')
     {
@@ -284,7 +292,7 @@ class Logger
                             \ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize");
                         }
-                    }
+                    },
                 );
                 Loop::unreference($this->rotateId);
             }
@@ -307,7 +315,7 @@ class Logger
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger('Could not enable PHP logging');
             }
         }
@@ -326,7 +334,6 @@ class Logger
      *
      * @param mixed $param Message
      * @param int   $level Logging level
-     *
      */
     public static function log($param, int $level = self::NOTICE): void
     {
@@ -342,7 +349,6 @@ class Logger
      * @param mixed  $param Message to log
      * @param int    $level Logging level
      * @param string $file  File that originated the message
-     *
      */
     public function logger($param, int $level = self::NOTICE, string $file = ''): void
     {
@@ -367,7 +373,7 @@ class Logger
             return;
         }
         $prefix = $this->prefix;
-        if ($param instanceof \Throwable) {
+        if ($param instanceof Throwable) {
             $param = (string) $param;
         } elseif (!\is_string($param)) {
             $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -397,7 +403,6 @@ class Logger
 
     /**
      * Get PSR logger.
-     *
      */
     public function getPsrLogger(): LoggerInterface
     {

@@ -6,12 +6,17 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Loop;
 use danog\Loop\Generic\PeriodicLoop;
+use Generator;
+use Throwable;
+
+use const LOCK_EX;
+use const LOCK_NB;
 
 final class GarbageCollector
 {
     /**
      * Ensure only one instance of GarbageCollector
-     * 		when multiple instances of MadelineProto running.
+     *      when multiple instances of MadelineProto running.
      */
     public static bool $lock = false;
 
@@ -32,7 +37,6 @@ final class GarbageCollector
 
     /**
      * Phar cleanup loop.
-     *
      */
     private static PeriodicLoop $cleanupLoop;
 
@@ -60,7 +64,7 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): \Generator {
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): Generator {
             try {
                 $latest = yield $client->request($request);
                 Magic::$version_latest = yield $latest->getBody()->buffer();
@@ -87,7 +91,7 @@ final class GarbageCollector
                         \fclose($f);
                     }
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
         }, "Phar cleanup loop", 60*1000);

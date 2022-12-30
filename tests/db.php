@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Switch to another database driver, for testing
 
@@ -15,12 +17,13 @@ if (getenv('ACTIONS_PHAR')) {
     require_once 'vendor/autoload.php';
 }
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 
-$MadelineProto = new \danog\MadelineProto\API(__DIR__.'/../testing.madeline');
+$MadelineProto = new API(__DIR__.'/../testing.madeline');
 
 $map = [
     'memory' => new Memory,

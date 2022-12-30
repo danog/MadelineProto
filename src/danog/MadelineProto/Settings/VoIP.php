@@ -16,7 +16,6 @@ class VoIP extends SettingsAbstract
 
     /**
      * Get whether to preload all songs in memory.
-     *
      */
     public function getPreloadAudio(): bool
     {
@@ -27,7 +26,6 @@ class VoIP extends SettingsAbstract
      * Set whether to preload all songs in memory.
      *
      * @param bool $preloadAudio Whether to preload all songs in memory
-     *
      */
     public function setPreloadAudio(bool $preloadAudio): self
     {

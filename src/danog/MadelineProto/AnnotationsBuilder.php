@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,7 +22,10 @@ use Amp\Promise;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
+use Generator;
 use phpDocumentor\Reflection\DocBlockFactory;
+use ReflectionClass;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionUnionType;
 
@@ -74,7 +76,7 @@ class AnnotationsBuilder
     }
     public function mkAnnotations(): void
     {
-        \danog\MadelineProto\Logger::log('Generating annotations...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating annotations...', Logger::NOTICE);
         $this->setProperties();
         $this->createInternalClasses();
     }
@@ -82,13 +84,12 @@ class AnnotationsBuilder
      * Open file of class APIFactory
      * Insert properties
      * save the file with new content.
-     *
      */
     private function setProperties(): void
     {
-        \danog\MadelineProto\Logger::log('Generating properties...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating properties...', Logger::NOTICE);
         $fixture = DocBlockFactory::createInstance();
-        $class = new \ReflectionClass($this->reflectionClasses['APIFactory']);
+        $class = new ReflectionClass($this->reflectionClasses['APIFactory']);
         $content = \file_get_contents($filename = $class->getFileName());
         foreach ($class->getProperties() as $property) {
             if ($raw_docblock = $property->getDocComment()) {
@@ -105,21 +106,20 @@ class AnnotationsBuilder
     }
     /**
      * Create internalDoc.
-     *
      */
     private function createInternalClasses(): void
     {
-        \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Creating internal classes...', Logger::NOTICE);
         $handle = \fopen($this->output, 'w');
         \fwrite($handle, "<?php namespace {$this->namespace}; class InternalDoc extends APIFactory {}");
-        $class = new \ReflectionClass($this->reflectionClasses['API']);
-        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass($this->reflectionClasses['API']);
+        $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
         $ignoreMethods = ['fetchserializableobject'];
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
-        $class = new \ReflectionClass(TLCallback::class);
-        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass(TLCallback::class);
+        $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
@@ -130,7 +130,7 @@ class AnnotationsBuilder
             if (!\strpos($data['method'], '.')) {
                 continue;
             }
-            list($namespace, $method) = \explode('.', $data['method']);
+            [$namespace, $method] = \explode('.', $data['method']);
             if (!\in_array($namespace, $this->TL->getMethodNamespaces())) {
                 continue;
             }
@@ -171,10 +171,10 @@ class AnnotationsBuilder
             }
             $internalDoc[$namespace][$method]['return'] = $type;
         }
-        $class = new \ReflectionClass($this->reflectionClasses['MTProto']);
-        $methods = $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC);
-        $class = new \ReflectionClass(Tools::class);
-        $methods = \array_merge($methods, $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC));
+        $class = new ReflectionClass($this->reflectionClasses['MTProto']);
+        $methods = $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass(Tools::class);
+        $methods = \array_merge($methods, $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($method == 'methodCallAsyncRead') {
@@ -282,7 +282,7 @@ class AnnotationsBuilder
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;
-            if ($type instanceof ReflectionNamedType && \in_array($type->getName(), [\Generator::class, Promise::class])) {
+            if ($type instanceof ReflectionNamedType && \in_array($type->getName(), [Generator::class, Promise::class])) {
                 $hasReturnValue = false;
             }
             if (!$hasVariadic && !$static && !$hasReturnValue) {
@@ -375,7 +375,7 @@ class AnnotationsBuilder
             $phpdoc = \preg_replace(
                 "/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/",
                 "@psalm-return $promise<$1>",
-                $phpdoc
+                $phpdoc,
             );
             $internalDoc['InternalDoc'][$name]['method'] = $phpdoc;
             $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));

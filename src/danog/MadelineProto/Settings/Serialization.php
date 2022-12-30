@@ -22,7 +22,6 @@ class Serialization extends SettingsAbstract
     }
     /**
      * Get serialization interval, in seconds.
-     *
      */
     public function getInterval(): int
     {
@@ -33,7 +32,6 @@ class Serialization extends SettingsAbstract
      * Set serialization interval, in seconds.
      *
      * @param int $interval Serialization interval, in seconds.
-     *
      */
     public function setInterval(int $interval): self
     {

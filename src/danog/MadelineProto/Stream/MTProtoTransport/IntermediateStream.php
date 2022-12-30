@@ -13,18 +13,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -41,17 +42,15 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(238), 4).$header));
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -59,9 +58,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
     {
         $buffer = yield $this->stream->getWriteBuffer($length + 4, $append);
         yield $buffer->bufferWrite(\pack('V', $length));
@@ -71,9 +69,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBufferGenerator(int &$length): Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \unpack('V', yield $buffer->bufferRead(4))[1];
@@ -81,7 +78,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {
@@ -89,7 +85,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

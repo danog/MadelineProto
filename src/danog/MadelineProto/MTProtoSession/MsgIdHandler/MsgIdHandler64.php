@@ -13,12 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use danog\MadelineProto\Tools;
 
@@ -44,39 +45,38 @@ class MsgIdHandler64 extends MsgIdHandler
      *
      * @param string $newMessageId New message ID
      * @param array  $aargs        Params
-     *
      */
-    public function checkMessageId($newMessageId, array $aargs): void
+    public function checkMessageId(string $newMessageId, array $aargs): void
     {
         $newMessageId = \is_integer($newMessageId) ? $newMessageId : Tools::unpackSignedLong($newMessageId);
         $minMessageId = (\time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
-            $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', \danog\MadelineProto\Logger::WARNING);
+            $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', Logger::WARNING);
         }
         $maxMessageId = (\time() + $this->session->time_delta + 30) << 32;
         if ($newMessageId > $maxMessageId) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
+            throw new Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
         }
         if ($aargs['outgoing']) {
             if ($newMessageId % 4) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
+                throw new Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
             }
             if ($newMessageId <= $this->maxOutgoingId) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Please sync your date using NTP.');
+                throw new Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Please sync your date using NTP.');
             }
             $this->maxOutgoingId = $newMessageId;
         } else {
             if (!($newMessageId % 2)) {
-                throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
+                throw new Exception('message id mod 4 != 1 or 3');
             }
             $key = $this->maxIncomingId;
             if ($aargs['container']) {
                 if ($newMessageId >= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
                 }
             } else {
                 if ($newMessageId <= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
                 }
             }
             $this->maxIncomingId = $newMessageId;
@@ -84,7 +84,6 @@ class MsgIdHandler64 extends MsgIdHandler
     }
     /**
      * Generate message ID.
-     *
      */
     public function generateMessageId(): string
     {
@@ -99,7 +98,6 @@ class MsgIdHandler64 extends MsgIdHandler
      * Get maximum message ID.
      *
      * @param boolean $incoming Incoming or outgoing message ID
-     *
      */
     public function getMaxId(bool $incoming)
     {
@@ -108,7 +106,6 @@ class MsgIdHandler64 extends MsgIdHandler
 
     /**
      * Get readable representation of message ID.
-     *
      */
     protected static function toStringInternal(string $messageId): string
     {

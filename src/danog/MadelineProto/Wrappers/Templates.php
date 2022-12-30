@@ -13,15 +13,16 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
-use \danog\MadelineProto\MTProto;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\MTProto;
+use Generator;
+
 use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
@@ -30,9 +31,8 @@ trait Templates
      * Echo page to console.
      *
      * @param string $message Error message
-     *
      */
-    private function webEcho(string $message = ''): \Generator
+    private function webEcho(string $message = ''): Generator
     {
         $auth = yield $this->getAuthorization();
         $form = null;
@@ -62,7 +62,7 @@ trait Templates
             $hint = \htmlentities(\sprintf(
                 Lang::$current_lang['loginUserPassHint'],
                 /** @psalm-suppress InvalidIterator */
-                $this instanceof Client ? yield from $this->getHint() : $this->getHint()
+                $this instanceof Client ? yield from $this->getHint() : $this->getHint(),
             ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
         } elseif ($auth === MTProto::WAITING_SIGNUP) {
@@ -88,7 +88,6 @@ trait Templates
      *
      * @param string $message Message
      * @param string $form    Form contents
-     *
      */
     private function webEchoTemplate(string $message, string $form): string
     {
@@ -96,7 +95,6 @@ trait Templates
     }
     /**
      * Get web template.
-     *
      */
     public function getWebTemplate(): string
     {
@@ -106,7 +104,6 @@ trait Templates
      * Set web template.
      *
      * @param string $template Template
-     *
      */
     public function setWebTemplate(string $template): void
     {

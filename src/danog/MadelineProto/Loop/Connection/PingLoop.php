@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,8 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
+use Generator;
+use Throwable;
 
 /**
  * Ping loop.
@@ -32,9 +33,8 @@ class PingLoop extends ResumableSignalLoop
     use Common;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -54,7 +54,7 @@ class PingLoop extends ResumableSignalLoop
             $API->logger->logger("Ping DC {$datacenter}");
             try {
                 yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $API->logger->logger("Error while pinging DC {$datacenter}");
                 $API->logger->logger((string) $e);
             }
@@ -66,7 +66,6 @@ class PingLoop extends ResumableSignalLoop
     }
     /**
      * Get loop name.
-     *
      */
     public function __toString(): string
     {

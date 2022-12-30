@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,10 +23,13 @@ use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Socket\Socket;
 use Amp\Success;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
+use Throwable;
 
 /**
  * Premade stream wrapper.
@@ -43,7 +45,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     public function __construct()
     {
     }
-    public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
+    public function setupTls(?CancellationToken $cancellationToken = null): Promise
     {
         return $this->stream->setupTls($cancellationToken);
     }
@@ -51,7 +53,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         if ($header !== '') {
             yield $this->stream->write($header);
@@ -59,17 +61,15 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * Async chunked read.
-     *
      */
     public function read(): Promise
     {
-        return $this->stream ? $this->stream->read() : new \Amp\Success(null);
+        return $this->stream ? $this->stream->read() : new Success(null);
     }
     /**
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
     public function write(string $data): Promise
     {
@@ -90,8 +90,8 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
                 }
                 $this->stream = null;
             }
-        } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
         return new Success();
     }
@@ -101,7 +101,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): Socket
     {

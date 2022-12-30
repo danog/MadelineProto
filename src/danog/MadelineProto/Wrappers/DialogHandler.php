@@ -13,14 +13,16 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Promise;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
+use Generator;
+use Throwable;
 
 /**
  * Dialog handler.
@@ -33,11 +35,9 @@ trait DialogHandler
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<bool>, mixed, list<mixed>>
+     * @psalm-return Generator<int, Promise<bool>, mixed, list<mixed>>
      */
-    public function getDialogs(bool $force = true): \Generator
+    public function getDialogs(bool $force = true): Generator
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
@@ -47,7 +47,7 @@ trait DialogHandler
                 [, $chat] = $iterator->getCurrent();
                 try {
                     $res[] = $this->genAll($chat, null, MTProto::INFO_TYPE_ALL)['Peer'];
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     continue;
                 }
             }
@@ -63,9 +63,8 @@ trait DialogHandler
      * Get full info of all dialogs.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
      */
-    public function getFullDialogs(bool $force = true): \Generator
+    public function getFullDialogs(bool $force = true): Generator
     {
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];

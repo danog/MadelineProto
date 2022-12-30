@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -42,7 +41,6 @@ abstract class IGE
     protected $iv_part_2;
     /**
      * Instantiate appropriate handler.
-     *
      */
     public static function getInstance(string $key, string $iv): IGE
     {

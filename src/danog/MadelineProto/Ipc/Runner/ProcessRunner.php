@@ -11,8 +11,18 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tools;
+use Error;
+use Generator;
+use Throwable;
 
 use const Amp\Process\IS_WINDOWS;
+use const ARRAY_FILTER_USE_BOTH;
+use const DIRECTORY_SEPARATOR;
+use const PATH_SEPARATOR;
+use const PHP_BINARY;
+use const PHP_BINDIR;
+use const PHP_OS;
+use const PHP_SAPI;
 
 final class ProcessRunner extends RunnerAbstract
 {
@@ -33,7 +43,7 @@ final class ProcessRunner extends RunnerAbstract
         "SERVER_NAME",
         "SERVER_PORT",
         "SERVER_PROTOCOL",
-        "SERVER_SOFTWARE"
+        "SERVER_SOFTWARE",
     ];
 
     /** @var string|null Cached path to located PHP binary. */
@@ -43,13 +53,12 @@ final class ProcessRunner extends RunnerAbstract
      * Runner.
      *
      * @param string $session Session path
-     *
      * @return Promise<true>
      */
     public static function start(string $session, int $startupId): Promise
     {
-        if (\PHP_SAPI === "cli") {
-            $binary = \PHP_BINARY;
+        if (PHP_SAPI === "cli") {
+            $binary = PHP_BINARY;
         } else {
             $binary = self::$binaryPath ?? self::locateBinary();
         }
@@ -68,25 +77,25 @@ final class ProcessRunner extends RunnerAbstract
             $runner,
             'madeline-ipc',
             $session,
-            $startupId
+            $startupId,
         ];
         $command = \implode(" ", \array_map('Amp\\Process\\escapeArguments', $command));
         Logger::log("Starting process with $command");
 
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => Magic::getcwd()
+            'cwd' => Magic::getcwd(),
         ];
         $envVars = \array_merge(
             \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS), ARRAY_FILTER_USE_BOTH),
-            ['QUERY_STRING' => \http_build_query($params)]
+            ['QUERY_STRING' => \http_build_query($params)],
         );
 
         $resDeferred = new Deferred;
 
         $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
         $handle = $runner->start($command, null, $envVars);
-        $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
+        $handle->pidDeferred->promise()->onResolve(function (?Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
             if ($e) {
                 Logger::log("Got exception while starting process worker: $e");
                 $resDeferred->resolve($e);
@@ -95,7 +104,7 @@ final class ProcessRunner extends RunnerAbstract
             Tools::callFork(self::readUnref($handle->stdout));
             Tools::callFork(self::readUnref($handle->stderr));
 
-            $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
+            $runner->join($handle)->onResolve(function (?Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
                 $runner->destroy($handle);
                 if ($e) {
                     Logger::log("Got exception from process worker: $e");
@@ -110,9 +119,8 @@ final class ProcessRunner extends RunnerAbstract
     }
     /**
      * Unreference and read data from fd, logging results.
-     *
      */
-    private static function readUnref(ProcessInputStream $stream): \Generator
+    private static function readUnref(ProcessInputStream $stream): Generator
     {
         $stream->unreference();
         $lastLine = '';
@@ -125,7 +133,7 @@ final class ProcessRunner extends RunnerAbstract
                     $lastLine = \array_shift($chunk);
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log("An error occurred while reading the process status: $e");
         } finally {
             Logger::log("Got final message from worker: $lastLine");
@@ -133,20 +141,20 @@ final class ProcessRunner extends RunnerAbstract
     }
     private static function locateBinary(): string
     {
-        $executable = \strncasecmp(\PHP_OS, "WIN", 3) === 0 ? "php.exe" : "php";
+        $executable = \strncasecmp(PHP_OS, "WIN", 3) === 0 ? "php.exe" : "php";
 
-        $paths = \array_filter(\explode(\PATH_SEPARATOR, \getenv("PATH")));
-        $paths[] = \PHP_BINDIR;
+        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv("PATH")));
+        $paths[] = PHP_BINDIR;
         $paths = \array_unique($paths);
 
         foreach ($paths as $path) {
-            $path .= \DIRECTORY_SEPARATOR.$executable;
+            $path .= DIRECTORY_SEPARATOR.$executable;
             if (\is_executable($path)) {
                 return self::$binaryPath = $path;
             }
         }
 
-        throw new \Error("Could not locate PHP executable binary");
+        throw new Error("Could not locate PHP executable binary");
     }
 
     /**

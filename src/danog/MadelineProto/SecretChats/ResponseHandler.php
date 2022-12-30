@@ -13,18 +13,21 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\SecretChats;
+
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\ResponseException;
+use Generator;
 
 /**
  * Manages responses.
  */
 trait ResponseHandler
 {
-    private function handleDecryptedUpdate(array $update): \Generator
+    private function handleDecryptedUpdate(array $update): Generator
     {
         $chatId = $update['message']['chat_id'];
         $decryptedMessage = $update['message']['decrypted_message'];
@@ -64,7 +67,7 @@ trait ResponseHandler
                     $action['end_seq_no'] -= $this->secret_chats[$chatId]['out_seq_no_x'];
                     $action['start_seq_no'] /= 2;
                     $action['end_seq_no'] /= 2;
-                    $this->logger->logger('Resending messages for secret chat '.$chatId, \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger('Resending messages for secret chat '.$chatId, Logger::WARNING);
                     foreach ($this->secret_chats[$chatId]['outgoing'] as $seq => $message) {
                         if ($seq >= $action['start_seq_no'] && $seq <= $action['end_seq_no']) {
                             yield from $this->methodCallAsyncRead('messages.sendEncrypted', ['peer' => $chatId, 'message' => $message]);
@@ -91,6 +94,6 @@ trait ResponseHandler
             }
             return;
         }
-        throw new \danog\MadelineProto\ResponseException('Unrecognized decrypted message received: '.\var_export($update, true));
+        throw new ResponseException('Unrecognized decrypted message received: '.\var_export($update, true));
     }
 }

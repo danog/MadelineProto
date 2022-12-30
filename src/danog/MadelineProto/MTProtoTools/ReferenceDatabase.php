@@ -13,19 +13,20 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Manages upload and download of files.
@@ -48,15 +49,11 @@ class ReferenceDatabase implements TLCallback
     const STICKER_SET_ID_ORIGIN = 2;
     // Peer + msg ID
     const MESSAGE_ORIGIN = 3;
-    //
     const SAVED_GIFS_ORIGIN = 4;
-    //
     const STICKER_SET_RECENT_ORIGIN = 5;
-    //
     const STICKER_SET_FAVED_ORIGIN = 6;
     // emoticon
     const STICKER_SET_EMOTICON_ORIGIN = 8;
-    //
     const WALLPAPER_ORIGIN = 9;
     const LOCATION_CONTEXT = [
         //'inputFileLocation'         => self::PHOTO_LOCATION_LOCATION, // DEPRECATED
@@ -82,6 +79,7 @@ class ReferenceDatabase implements TLCallback
 
     /**
      * List of properties stored in database (memory or external).
+     *
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
@@ -96,7 +94,7 @@ class ReferenceDatabase implements TLCallback
     {
         return ['db', 'API'];
     }
-    public function init(): \Generator
+    public function init(): Generator
     {
         yield from $this->initDb($this->API);
 
@@ -132,18 +130,18 @@ class ReferenceDatabase implements TLCallback
     public function reset(): void
     {
         if ($this->cacheContexts) {
-            $this->API->logger->logger('Found '.\count($this->cacheContexts).' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cacheContexts).' pending contexts', Logger::ERROR);
             $this->cacheContexts = [];
         }
         if ($this->cache) {
-            $this->API->logger->logger('Found pending locations', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found pending locations', Logger::ERROR);
             $this->cache = [];
         }
     }
     public function addReference(array $location): bool
     {
         if (!$this->cacheContexts) {
-            $this->API->logger->logger('Trying to add reference out of context, report the following message to @danogentili!', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Trying to add reference out of context, report the following message to @danogentili!', Logger::ERROR);
             $frames = [];
             $previous = '';
             foreach (\debug_backtrace(0) as $k => $frame) {
@@ -171,11 +169,11 @@ class ReferenceDatabase implements TLCallback
             foreach ($frames as $frame) {
                 $tlTrace .= "['".$frame."']";
             }
-            $this->API->logger->logger($tlTrace, \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger($tlTrace, Logger::ERROR);
             return false;
         }
         if (!isset($location['file_reference'])) {
-            $this->API->logger->logger("Object {$location['_']} does not have reference", \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger("Object {$location['_']} does not have reference", Logger::ERROR);
             return false;
         }
         $key = \count($this->cacheContexts) - 1;
@@ -192,7 +190,7 @@ class ReferenceDatabase implements TLCallback
             default:
                 throw new Exception('Unknown location type provided: '.$location['_']);
         }
-        $this->API->logger->logger("Caching reference from location of type {$locationType} from {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Caching reference from location of type {$locationType} from {$location['_']}", Logger::ULTRA_VERBOSE);
         if (!isset($this->cache[$key])) {
             $this->cache[$key] = [];
         }
@@ -202,17 +200,17 @@ class ReferenceDatabase implements TLCallback
     public function addOriginContext(string $type): void
     {
         if (!isset(self::CONSTRUCTOR_CONTEXT[$type])) {
-            throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$type}");
+            throw new Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::CONSTRUCTOR_CONTEXT[$type];
         //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOrigin(array $data = []): \Generator
+    public function addOrigin(array $data = []): Generator
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
-            throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
+            throw new Exception('Trying to add origin with no origin context set');
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
@@ -273,7 +271,7 @@ class ReferenceDatabase implements TLCallback
                     foreach ($cache as $location => $reference) {
                         $this->cache[$key][$location] = $reference;
                     }
-                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
                     return;
                 }
                 break;
@@ -281,32 +279,32 @@ class ReferenceDatabase implements TLCallback
                 $origin['stickerset'] = ['_' => 'inputStickerSetID', 'id' => $data['set']['id'], 'access_hash' => $data['set']['access_hash']];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+                throw new Exception("Unknown origin type provided: {$data['_']}");
         }
         foreach ($cache as $location => $reference) {
             yield from $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
     public function addOriginMethodContext(string $type): void
     {
         if (!isset(self::METHOD_CONTEXT[$type])) {
-            throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$type}");
+            throw new Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::METHOD_CONTEXT[$type];
-        $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethod(OutgoingMessage $data, array $res): \Generator
+    public function addOriginMethod(OutgoingMessage $data, array $res): Generator
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
-            throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
+            throw new Exception('Trying to add origin with no origin context set');
         }
         $constructor = $data->getConstructor();
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            $this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
@@ -356,20 +354,20 @@ class ReferenceDatabase implements TLCallback
                         }
                     }
                 }
-                $this->API->logger->logger("Added origin {$originType} ($constructor) to {$count} references", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->API->logger->logger("Added origin {$originType} ($constructor) to {$count} references", Logger::ULTRA_VERBOSE);
                 return;
             case 'messages.getStickers':
                 $origin['emoticon'] = $body['emoticon'];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$constructor}");
+                throw new Exception("Unknown origin type provided: {$constructor}");
         }
         foreach ($cache as $location => $reference) {
             yield from $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
-    public function storeReference(string $location, string $reference, int $originType, array $origin): \Generator
+    public function storeReference(string $location, string $reference, int $originType, array $origin): Generator
     {
         $locationValue = yield $this->db[$location];
         if (!$locationValue) {
@@ -404,14 +402,14 @@ class ReferenceDatabase implements TLCallback
             $this->refreshCount--;
         }
     }
-    public function refreshReference(int $locationType, array $location): \Generator
+    public function refreshReference(int $locationType, array $location): Generator
     {
         return $this->refreshReferenceInternal(self::serializeLocation($locationType, $location));
     }
-    public function refreshReferenceInternal(string $location): \Generator
+    public function refreshReferenceInternal(string $location): Generator
     {
         if (isset($this->refreshed[$location])) {
-            $this->API->logger->logger('Reference already refreshed!', \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger('Reference already refreshed!', Logger::VERBOSE);
             return (yield $this->db[$location])['reference'];
         }
         $locationValue = yield $this->db[$location];
@@ -420,7 +418,7 @@ class ReferenceDatabase implements TLCallback
         $count = 0;
         foreach ((yield $this->db[$location])['origins'] as $originType => &$origin) {
             $count++;
-            $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
             switch ($originType) {
                 // Peer + msg ID
                 case self::MESSAGE_ORIGIN:
@@ -465,7 +463,7 @@ class ReferenceDatabase implements TLCallback
                     yield from $this->API->methodCallAsyncRead('account.getWallPapers', $origin, $this->API->getSettings()->getDefaultDcParams());
                     break;
                 default:
-                    throw new \danog\MadelineProto\Exception("Unknown origin type {$originType}");
+                    throw new Exception("Unknown origin type {$originType}");
             }
             if (isset($this->refreshed[$location])) {
                 return (yield $this->db[$location])['reference'];
@@ -473,26 +471,26 @@ class ReferenceDatabase implements TLCallback
         }
         throw new Exception('Did not refresh reference');
     }
-    public function populateReference(array $object): \Generator
+    public function populateReference(array $object): Generator
     {
         $object['file_reference'] = yield from $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
         return $object;
     }
-    public function getReference(int $locationType, array $location): \Generator
+    public function getReference(int $locationType, array $location): Generator
     {
         $locationString = self::serializeLocation($locationType, $location);
         if (!isset((yield $this->db[$locationString])['reference'])) {
             if (isset($location['file_reference'])) {
-                $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 return $location['file_reference'];
             }
             if (!$this->refresh) {
-                $this->API->logger->logger("Using null file reference for location of type {$locationType} object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->API->logger->logger("Using null file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 return '';
             }
-            throw new \danog\MadelineProto\Exception("Could not find file reference for location of type {$locationType} object {$location['_']}");
+            throw new Exception("Could not find file reference for location of type {$locationType} object {$location['_']}");
         }
-        $this->API->logger->logger("Getting file reference for location of type {$locationType} object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Getting file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
         if ($this->refresh) {
             return $this->refreshReferenceInternal($locationString);
         }
@@ -503,14 +501,14 @@ class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.(\is_int($location['id']) ? \danog\MadelineProto\Tools::packSignedLong($location['id']) : $location['id']);
+                return $locationType.(\is_int($location['id']) ? Tools::packSignedLong($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:
-                $dc_id = \danog\MadelineProto\Tools::packSignedInt($location['dc_id']);
-                $volume_id = \is_int($location['volume_id']) ? \danog\MadelineProto\Tools::packSignedLong($location['volume_id']) : $location['volume_id'];
-                $local_id = \danog\MadelineProto\Tools::packSignedInt($location['local_id']);
+                $dc_id = Tools::packSignedInt($location['dc_id']);
+                $volume_id = \is_int($location['volume_id']) ? Tools::packSignedLong($location['volume_id']) : $location['volume_id'];
+                $local_id = Tools::packSignedInt($location['local_id']);
                 return $locationType.$dc_id.$volume_id.$local_id;
         }
-        throw new \danog\MadelineProto\Exception("Invalid location type specified!");
+        throw new Exception("Invalid location type specified!");
     }
     public function __debugInfo()
     {

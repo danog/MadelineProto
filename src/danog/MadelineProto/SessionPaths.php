@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,12 +21,21 @@ namespace danog\MadelineProto;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Ipc\IpcState;
+use Generator;
+use Throwable;
 
+use const LOCK_EX;
+use const LOCK_SH;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+use const PHP_VERSION;
 use function Amp\File\exists;
+
 use function Amp\File\openFile;
 use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
+use function serialize;
 
 /**
  * Session path information.
@@ -85,9 +93,8 @@ class SessionPaths
     }
     /**
      * Serialize object to file.
-     *
      */
-    public function serialize(object $object, string $path): \Generator
+    public function serialize(object $object, string $path): Generator
     {
         Logger::log("Waiting for exclusive lock of $path.lock...");
         $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_EX, 0.1);
@@ -103,7 +110,7 @@ class SessionPaths
 
             yield put(
                 "$path.temp.php",
-                $object
+                $object,
             );
 
             yield renameAsync("$path.temp.php", $path);
@@ -116,11 +123,9 @@ class SessionPaths
      * Deserialize new object.
      *
      * @param string $path Object path, defaults to session path
-     *
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, object>
+     * @psalm-return Generator<mixed, mixed, mixed, object>
      */
-    public function unserialize(string $path = ''): \Generator
+    public function unserialize(string $path = ''): Generator
     {
         $path = $path ?: $this->sessionPath;
 
@@ -160,7 +165,6 @@ class SessionPaths
 
     /**
      * Get session path.
-     *
      */
     public function __toString(): string
     {
@@ -169,7 +173,6 @@ class SessionPaths
 
     /**
      * Get legacy session path.
-     *
      */
     public function getLegacySessionPath(): string
     {
@@ -178,7 +181,6 @@ class SessionPaths
 
     /**
      * Get session path.
-     *
      */
     public function getSessionPath(): string
     {
@@ -187,7 +189,6 @@ class SessionPaths
 
     /**
      * Get lock path.
-     *
      */
     public function getLockPath(): string
     {
@@ -196,7 +197,6 @@ class SessionPaths
 
     /**
      * Get IPC socket path.
-     *
      */
     public function getIpcPath(): string
     {
@@ -205,7 +205,6 @@ class SessionPaths
 
     /**
      * Get IPC light state path.
-     *
      */
     public function getIpcStatePath(): string
     {
@@ -225,16 +224,14 @@ class SessionPaths
 
     /**
      * Store IPC state.
-     *
      */
-    public function storeIpcState(IpcState $state): \Generator
+    public function storeIpcState(IpcState $state): Generator
     {
         return $this->serialize($state, $this->getIpcStatePath());
     }
 
     /**
      * Get light state path.
-     *
      */
     public function getLightStatePath(): string
     {
@@ -253,7 +250,7 @@ class SessionPaths
             return new Success($this->lightState);
         }
         $promise = Tools::call($this->unserialize($this->lightStatePath));
-        $promise->onResolve(function (?\Throwable $e, ?LightState $res): void {
+        $promise->onResolve(function (?Throwable $e, ?LightState $res): void {
             if ($res) {
                 $this->lightState = $res;
             }
@@ -263,9 +260,8 @@ class SessionPaths
 
     /**
      * Store light state.
-     *
      */
-    public function storeLightState(MTProto $state): \Generator
+    public function storeLightState(MTProto $state): Generator
     {
         $this->lightState = new LightState($state);
         return $this->serialize($this->lightState, $this->getLightStatePath());
@@ -273,7 +269,6 @@ class SessionPaths
 
     /**
      * Get IPC callback socket path.
-     *
      */
     public function getIpcCallbackPath(): string
     {

@@ -47,7 +47,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get RPC timeout.
-     *
      */
     public function getRpcTimeout(): int
     {
@@ -58,7 +57,6 @@ class RPC extends SettingsAbstract
      * Set RPC timeout.
      *
      * @param int $rpcTimeout RPC timeout.
-     *
      */
     public function setRpcTimeout(int $rpcTimeout): self
     {
@@ -69,7 +67,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
-     *
      */
     public function getFloodTimeout(): int
     {
@@ -80,7 +77,6 @@ class RPC extends SettingsAbstract
      * Set flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
      *
      * @param int $floodTimeout Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously
-     *
      */
     public function setFloodTimeout(int $floodTimeout): self
     {
@@ -91,7 +87,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get maximum number of messages to consider when using call queues.
-     *
      */
     public function getLimitCallQueue(): int
     {
@@ -102,7 +97,6 @@ class RPC extends SettingsAbstract
      * Set maximum number of messages to consider when using call queues.
      *
      * @param int $limitCallQueue Maximum number of messages to consider when using call queues
-     *
      */
     public function setLimitCallQueue(int $limitCallQueue): self
     {
@@ -113,7 +107,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get encode payload with GZIP if bigger than.
-     *
      */
     public function getGzipEncodeIfGt(): int
     {
@@ -124,7 +117,6 @@ class RPC extends SettingsAbstract
      * Set encode payload with GZIP if bigger than.
      *
      * @param int $gzipEncodeIfGt Encode payload with GZIP if bigger than
-     *
      */
     public function setGzipEncodeIfGt(int $gzipEncodeIfGt): self
     {

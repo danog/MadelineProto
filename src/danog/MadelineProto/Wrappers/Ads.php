@@ -13,13 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\Db\DbArray;
+use Generator;
 
 /**
  * Manages ads.
@@ -36,7 +36,7 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages($peer): \Generator
+    public function getSponsoredMessages($peer): Generator
     {
         $peer = (yield from $this->getInfo($peer))['bot_api_id'];
         $cache = yield $this->sponsoredMessages[$peer];
@@ -52,10 +52,9 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
-     *
-     * @return \Generator Bool
+     * @return Generator Bool
      */
-    public function viewSponsoredMessage($peer, $message): \Generator
+    public function viewSponsoredMessage($peer, $message): Generator
     {
         if (\is_array($message)) {
             $message = $message['random_id'];

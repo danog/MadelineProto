@@ -56,7 +56,7 @@
         "symfony/polyfill-php80": "^1.18",
         "amphp/websocket-client": "^1.0",
         "psr/http-factory": "^1.0",
-        "psr/log": "^1|^2|^3",
+        "psr/log": "^3",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
@@ -137,7 +137,8 @@
     "config": {
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
-            "phabel/phabel": true
+            "phabel/phabel": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

@@ -13,21 +13,26 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Conversion;
+
+use danog\MadelineProto\Magic;
+use danog\MadelineProto\TL\PrettyException;
+
+use const PHP_EOL;
+use const PHP_SAPI;
 
 /**
  * TL conversion exception.
  */
 class Exception extends \Exception
 {
-    use \danog\MadelineProto\TL\PrettyException;
+    use PrettyException;
     public function __toString()
     {
-        $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }

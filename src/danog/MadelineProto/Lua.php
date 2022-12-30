@@ -13,11 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
+
+use Generator;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Lua interface.
@@ -30,7 +32,7 @@ class Lua
     public function __construct(string $script, API $MadelineProto)
     {
         if (!\file_exists($script)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
+            throw new Exception(Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
         $this->script = $script;
@@ -77,7 +79,7 @@ class Lua
         }
     }
     /**
-     * @return \Generator|int
+     * @return Generator|int
      */
     public function tdcliFunction($params, $cb = null, $cb_extra = null)
     {
@@ -110,9 +112,7 @@ class Lua
             return $array;
         }
         if ($this->is_seqential($array)) {
-            return \array_flip(\array_map(function ($el) {
-                return $el + 1;
-            }, \array_flip($array)));
+            return \array_flip(\array_map(fn ($el) => $el + 1, \array_flip($array)));
         }
     }
     private function isSequential(array $arr): bool
@@ -134,17 +134,17 @@ class Lua
         self::convertObjects($params);
         try {
             return $this->Lua->{$name}(...$params);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         } catch (\danog\MadelineProto\TL\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
-        } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+        } catch (NothingInTheSocketException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
-        } catch (\danog\MadelineProto\PTSException $e) {
+        } catch (PTSException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
-        } catch (\danog\MadelineProto\SecurityException $e) {
+        } catch (SecurityException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         } catch (\danog\MadelineProto\TL\Conversion\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
@@ -157,7 +157,7 @@ class Lua
     public static function convertObjects(&$data): void
     {
         \array_walk_recursive($data, function (&$value, $key): void {
-            if (\is_object($value) && !$value instanceof \phpseclib3\Math\BigInteger) {
+            if (\is_object($value) && !$value instanceof BigInteger) {
                 $newval = [];
                 foreach (\get_class_methods($value) as $name) {
                     $newval[$name] = [$value, $name];

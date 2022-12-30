@@ -13,21 +13,21 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Types;
 
-use danog\MadelineProto\API;
+use ArrayAccess;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
+use JsonSerializable;
 
 /**
  * Clickable button.
  */
-class Button implements \JsonSerializable, \ArrayAccess
+class Button implements JsonSerializable, ArrayAccess
 {
     /**
      * Button data.
@@ -81,7 +81,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -91,7 +90,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Click on button.
      *
      * @param boolean $donotwait Whether to wait for the result of the method
-     *
      */
     public function click(bool $donotwait = true)
     {
@@ -118,7 +116,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Get debug info.
-     *
      */
     public function __debugInfo(): array
     {
@@ -128,7 +125,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Serialize button.
-     *
      */
     public function jsonSerialize(): array
     {
@@ -139,7 +135,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param mixed $name  Offset
      * @param mixed $value Value
-     *
      */
     public function offsetSet(mixed $name, mixed $value): void
     {
@@ -153,7 +148,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Get button info.
      *
      * @param mixed $name Field name
-     *
      */
     public function offsetGet(mixed $name): mixed
     {
@@ -163,7 +157,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Unset button info.
      *
      * @param mixed $name Offset
-     *
      */
     public function offsetUnset(mixed $name): void
     {
@@ -173,8 +166,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Check if button field exists.
      *
      * @param mixed $name Offset
-     *
-     * @return boolean
      */
     public function offsetExists(mixed $name): bool
     {

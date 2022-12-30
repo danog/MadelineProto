@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,10 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Throwable;
+
+use const PHP_EOL;
+use const PHP_SAPI;
 
 /**
  * Indicates an error returned by Telegram's API.
@@ -51,14 +54,14 @@ class RPCErrorException extends \Exception
                             (yield HttpClientBuilder::buildDefault()
                                 ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
                             )->getBody()->buffer(),
-                        true
+                        true,
                     );
                     if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
                         $description = $res['result'];
                         RPCErrorException::$descriptions[$error] = $description;
                         RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
             })());
         }
@@ -70,7 +73,7 @@ class RPCErrorException extends \Exception
     public function __toString()
     {
         $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
-        $result = \sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = \sprintf(Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
@@ -78,7 +81,6 @@ class RPCErrorException extends \Exception
     }
     /**
      * Get localized error name.
-     *
      */
     public function getLocalization(): string
     {
@@ -87,7 +89,6 @@ class RPCErrorException extends \Exception
     }
     /**
      * Set localized error name.
-     *
      */
     public function setLocalization(string $localization): void
     {

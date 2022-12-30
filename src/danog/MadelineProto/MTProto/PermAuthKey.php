@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -44,8 +43,6 @@ class PermAuthKey extends AuthKey
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     public function isAuthorized(): bool
     {
@@ -55,7 +52,6 @@ class PermAuthKey extends AuthKey
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
      */
     public function authorized(bool $authorized): void
     {
@@ -63,7 +59,6 @@ class PermAuthKey extends AuthKey
     }
     /**
      * JSON serialization function.
-     *
      */
     public function jsonSerialize(): array
     {
@@ -72,9 +67,8 @@ class PermAuthKey extends AuthKey
     /**
      * Sleep function.
      *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['authKey', 'id', 'serverSalt', 'authorized'];
     }

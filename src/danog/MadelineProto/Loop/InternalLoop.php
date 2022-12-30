@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -20,6 +19,7 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use Generator;
 
 trait InternalLoop
 {
@@ -42,7 +42,7 @@ trait InternalLoop
         $this->setLogger($API->getLogger());
     }
 
-    private function waitForAuthOrSignal(bool $waitAfter = true): \Generator
+    private function waitForAuthOrSignal(bool $waitAfter = true): Generator
     {
         $API = $this->API;
         while (!$API->hasAllAuth()) {

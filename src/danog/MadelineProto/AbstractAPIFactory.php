@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,7 +20,9 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Ipc\Client;
+use Generator;
 use InvalidArgumentException;
+use Throwable;
 
 abstract class AbstractAPIFactory extends AsyncConstruct
 {
@@ -29,14 +30,12 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * Namespace.
      *
      * @internal
-     *
      */
     private string $namespace = '';
     /**
      * Whether lua is being used.
      *
      * @internal
-     *
      * @var boolean
      */
     public bool $lua = false;
@@ -44,7 +43,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * Whether async is enabled.
      *
      * @internal
-     *
      * @var boolean
      */
     protected bool $async = false;
@@ -64,7 +62,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * Export APIFactory instance with the specified namespace.
      *
      * @param string $namespace Namespace
-     *
      */
     protected function exportNamespace(string $namespace = ''): self
     {
@@ -81,7 +78,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @param self $a First instance
      * @param self $b Second instance
-     *
      */
     protected static function link(self $a, self $b): void
     {
@@ -105,7 +101,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * Enable or disable async.
      *
      * @param bool $async Whether to enable or disable async
-     *
      */
     public function async(bool $async): void
     {
@@ -116,9 +111,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @param string $name      Method name
      * @param array  $arguments Arguments
-     *
      * @internal
-     *
      */
     public function __call(string $name, array $arguments)
     {
@@ -140,13 +133,12 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         try {
             Lua::convertObjects($yielded);
             return $yielded;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
     /**
      * Info to dump.
-     *
      */
     public function __debugInfo(): array
     {
@@ -162,9 +154,8 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     /**
      * Sleep function.
      *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return [];
     }
@@ -173,11 +164,9 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @param string $name      Method name
      * @param array  $arguments Arguments
-     *
      * @internal
-     *
      */
-    public function __call_async(string $name, array $arguments): \Generator
+    public function __call_async(string $name, array $arguments): Generator
     {
         yield from $this->initAsynchronously();
         $lower_name = \strtolower($name);
@@ -197,14 +186,13 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             yield from $this->mainAPI->reconnectFull();
         }
         $res = $this->methods[$lower_name](...$arguments);
-        return $res instanceof \Generator ? yield from $res : yield $res;
+        return $res instanceof Generator ? yield from $res : yield $res;
     }
     /**
      * Get fully resolved method list for object, including snake_case and camelCase variants.
      *
      * @param API|MTProto|Client $value Value
      * @param string             $class Custom class name
-     *
      */
     protected static function getInternalMethodList($value, string $class = null): array
     {
@@ -214,7 +202,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * Get fully resolved method list for object, including snake_case and camelCase variants.
      *
      * @param string $class Class name
-     *
      */
     protected static function getInternalMethodListClass(string $class): array
     {

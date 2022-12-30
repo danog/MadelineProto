@@ -13,14 +13,17 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
+
+use const PHP_EOL;
 
 trait Methods
 {
@@ -54,7 +57,7 @@ trait Methods
         \mkdir('methods');
         $this->docs_methods = [];
         $this->human_docs_methods = [];
-        $this->logger->logger('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating methods documentation...', Logger::NOTICE);
         foreach ($this->TL->getMethods($this->td)->by_id as $id => $data) {
             $method = $data['method'];
             $phpMethod = StrTools::methodEscape($method);
@@ -86,8 +89,8 @@ trait Methods
             }
             if (!isset($this->tdDescriptions['methods'][$method])) {
                 $this->addToLang('method_'.$method);
-                if (\danog\MadelineProto\Lang::$lang['en']['method_'.$method] !== '') {
-                    $this->tdDescriptions['methods'][$method]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method];
+                if (Lang::$lang['en']['method_'.$method] !== '') {
+                    $this->tdDescriptions['methods'][$method]['description'] = Lang::$lang['en']['method_'.$method];
                 }
             }
             $md_method = '['.$phpMethod.'](/API_docs/methods/'.$method.'.md)';
@@ -132,7 +135,7 @@ trait Methods
                 }
                 if (!isset($this->tdDescriptions['methods'][$method]['params'][$param['name']])) {
                     if (isset($this->tdDescriptions['methods'][$method]['description'])) {
-                        $this->tdDescriptions['methods'][$method]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
+                        $this->tdDescriptions['methods'][$method]['params'][$param['name']] = Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
                     }
                 }
                 if ($param['name'] === 'hash' && ($param['type'] === 'long' || $param['type'] === 'int')) {
@@ -246,7 +249,7 @@ trait Methods
             }
             \file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
-        $this->logger->logger('Generating methods index...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating methods index...', Logger::NOTICE);
         \ksort($this->docs_methods);
         \ksort($this->human_docs_methods);
         $last_namespace = '';

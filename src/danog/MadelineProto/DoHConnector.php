@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -31,6 +30,11 @@ use Amp\Socket\ConnectException;
 use Amp\Socket\Connector;
 use Amp\Socket\ResourceSocket;
 use danog\MadelineProto\Stream\ConnectionContext;
+use Generator;
+
+use const STREAM_CLIENT_ASYNC_CONNECT;
+
+use const STREAM_CLIENT_CONNECT;
 use function Amp\Socket\Internal\parseUri;
 
 class DoHConnector implements Connector
@@ -54,9 +58,9 @@ class DoHConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $context, $token): \Generator {
+        return Tools::call((function () use ($uri, $context, $token): Generator {
             $socketContext = $context ?? new ConnectContext();
-            $token = $token ?? new NullCancellationToken();
+            $token ??= new NullCancellationToken();
             $attempt = 0;
             $uris = [];
             $failures = [];
@@ -90,15 +94,12 @@ class DoHConnector implements Connector
                 //
                 // Here, we simply check if the connection URI has changed since we first set it:
                 // this would indicate that a proxy class has changed the connection URI to the proxy URI.
-                //
                 if ($this->ctx->isDns()) {
                     $records = yield $this->dataCenter->getNonProxiedDNSClient()->resolve($host, $socketContext->getDnsTypeRestriction());
                 } else {
                     $records = yield $this->dataCenter->getDNSClient()->resolve($host, $socketContext->getDnsTypeRestriction());
                 }
-                \usort($records, function (Record $a, Record $b) {
-                    return $a->getType() - $b->getType();
-                });
+                \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
                 if ($this->ctx->getIpv6()) {
                     $records = \array_reverse($records);
                 }
@@ -111,7 +112,7 @@ class DoHConnector implements Connector
                     }
                 }
             }
-            $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
+            $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
             $timeout = $socketContext->getConnectTimeout();
             $e = null;
             foreach ($uris as $builtUri) {

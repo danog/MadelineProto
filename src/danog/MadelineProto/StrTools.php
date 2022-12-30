@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -32,7 +31,6 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
-     *
      * @return float|int
      */
     public static function mbStrlen(string $text)
@@ -53,18 +51,17 @@ abstract class StrTools extends Extension
      * @param string  $text   Text to substring
      * @param integer $offset Offset
      * @param ?int    $length Length
-     *
      */
-    public static function mbSubstr(string $text, int $offset, $length = null): string
+    public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \mb_convert_encoding(
             \substr(
                 \mb_convert_encoding($text, 'UTF-16'),
                 $offset<<1,
-                $length === null ? null : ($length<<1)
+                $length === null ? null : ($length<<1),
             ),
             'UTF-8',
-            'UTF-16'
+            'UTF-16',
         );
     }
     /**
@@ -72,7 +69,6 @@ abstract class StrTools extends Extension
      *
      * @param string  $text   Text
      * @param integer $length Length
-     *
      * @return array<string>
      */
     public static function mbStrSplit(string $text, int $length): array
@@ -87,7 +83,6 @@ abstract class StrTools extends Extension
      * Convert to camelCase.
      *
      * @param string $input String
-     *
      */
     public static function toCamelCase(string $input): string
     {
@@ -97,7 +92,6 @@ abstract class StrTools extends Extension
      * Convert to snake_case.
      *
      * @param string $input String
-     *
      */
     public static function toSnakeCase(string $input): string
     {
@@ -112,7 +106,6 @@ abstract class StrTools extends Extension
      * Escape string for markdown.
      *
      * @param string $hwat String to escape
-     *
      */
     public static function markdownEscape(string $hwat): string
     {
@@ -122,7 +115,6 @@ abstract class StrTools extends Extension
      * Escape type name.
      *
      * @param string $type String to escape
-     *
      */
     public static function typeEscape(string $type): string
     {
@@ -133,7 +125,6 @@ abstract class StrTools extends Extension
      * Escape method name.
      *
      * @param string $method Method name
-     *
      */
     public static function methodEscape(string $method): string
     {
@@ -143,7 +134,6 @@ abstract class StrTools extends Extension
      * Strip markdown tags.
      *
      * @internal
-     *
      */
     public static function toString(string $markdown): string
     {

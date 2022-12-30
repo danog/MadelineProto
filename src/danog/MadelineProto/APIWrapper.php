@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,7 @@ namespace danog\MadelineProto;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
+use Generator;
 
 use function Amp\File\openFile;
 
@@ -40,13 +40,11 @@ final class APIWrapper
 
     /**
      * Getting API ID flag.
-     *
      */
     private bool $gettingApiId = false;
 
     /**
      * Web API template.
-     *
      */
     private string $webApiTemplate = '';
 
@@ -67,7 +65,6 @@ final class APIWrapper
      * Whether lua is being used.
      *
      * @internal
-     *
      * @var boolean
      */
     private bool $lua = false;
@@ -75,14 +72,12 @@ final class APIWrapper
      * Whether async is enabled.
      *
      * @internal
-     *
      * @var boolean
      */
     private bool $async = false;
 
     /**
      * AbstractAPIFactory instance.
-     *
      */
     private AbstractAPIFactory $factory;
 
@@ -107,7 +102,6 @@ final class APIWrapper
      *
      * @param API|APIWrapper $a Instance to which link
      * @param API|APIWrapper $b Instance from which link
-     *
      */
     public static function link($a, $b): void
     {
@@ -119,7 +113,6 @@ final class APIWrapper
 
     /**
      * Property list.
-     *
      */
     public static function properties(): array
     {
@@ -128,7 +121,6 @@ final class APIWrapper
 
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -147,8 +139,6 @@ final class APIWrapper
 
     /**
      * Whether async is being used.
-     *
-     * @return boolean
      */
     public function isAsync(): bool
     {
@@ -157,7 +147,6 @@ final class APIWrapper
 
     /**
      * Get API factory.
-     *
      */
     public function getFactory(): AbstractAPIFactory
     {
@@ -168,7 +157,6 @@ final class APIWrapper
      * Get IPC path.
      *
      * @internal
-     *
      */
     public function getIpcPath(): string
     {
@@ -188,14 +176,14 @@ final class APIWrapper
         if ($this->API instanceof Client) {
             return new Success(false);
         }
-        return Tools::callFork((function (): \Generator {
+        return Tools::callFork((function (): Generator {
             if ($this->API) {
                 yield from $this->API->initAsynchronously();
             }
 
             yield from $this->session->serialize(
                 $this->API ? yield from $this->API->serializeSession($this) : $this,
-                $this->session->getSessionPath()
+                $this->session->getSessionPath(),
             );
 
             if ($this->API) {
@@ -214,7 +202,6 @@ final class APIWrapper
 
     /**
      * Get session path.
-     *
      */
     public function getSession(): SessionPaths
     {

@@ -13,16 +13,16 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
-
 use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Event handler.
@@ -53,7 +53,6 @@ trait Events
      * Initialize event handler.
      *
      * @param class-string<EventHandler> $eventHandler
-     *
      */
     private function initEventHandler(string $eventHandler): void
     {
@@ -68,12 +67,11 @@ trait Events
      * Set event handler.
      *
      * @param class-string<EventHandler> $eventHandler Event handler
-     *
      */
-    public function setEventHandler(string $eventHandler): \Generator
+    public function setEventHandler(string $eventHandler): Generator
     {
         if (!\is_subclass_of($eventHandler, EventHandler::class)) {
-            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
+            throw new Exception('Wrong event handler was defined');
         }
         $this->initEventHandler($eventHandler);
         $this->eventHandlerMethods = [];
@@ -105,7 +103,6 @@ trait Events
      * Unset event handler.
      *
      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
-     *
      */
     public function unsetEventHandler(bool $disableUpdateHandling = false): void
     {
@@ -116,7 +113,6 @@ trait Events
     }
     /**
      * Get event handler.
-     *
      */
     public function getEventHandler(): EventHandler
     {
@@ -124,8 +120,6 @@ trait Events
     }
     /**
      * Check if an event handler instance is present.
-     *
-     * @return boolean
      */
     public function hasEventHandler(): bool
     {
@@ -135,9 +129,7 @@ trait Events
      * Event update handler.
      *
      * @param array $update Update
-     *
      * @return void
-     *
      * @internal Internal event handler
      */
     public function eventUpdateHandler(array $update)

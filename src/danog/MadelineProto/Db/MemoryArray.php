@@ -6,15 +6,18 @@ use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Success;
+use ArrayIterator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
+use ReturnTypeWillChange;
+use RuntimeException;
 
 use function Amp\call;
 
 /**
  * Memory database backend.
  */
-class MemoryArray extends \ArrayIterator implements DbArray
+class MemoryArray extends ArrayIterator implements DbArray
 {
     public function __construct($array = [], $flags = 0)
     {
@@ -24,10 +27,9 @@ class MemoryArray extends \ArrayIterator implements DbArray
     /**
      * Get instance.
      *
-     * @param Memory $settings
      * @return Promise<self>
      */
-    public static function getInstance(string $table, $previous, $settings): Promise
+    public static function getInstance(string $table, $previous, Memory $settings): Promise
     {
         return call(static function () use ($previous) {
             if ($previous instanceof MemoryArray) {
@@ -63,7 +65,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public function offsetExists(mixed $offset): bool
     {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
+        throw new RuntimeException('Native isset not support promises. Use isset method');
     }
 
     public function offsetGet(mixed $offset): Promise
@@ -76,13 +78,13 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::offsetUnset($offset);
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function count(): Promise
     {
         return new Success(parent::count());
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return new Success(parent::getArrayCopy());

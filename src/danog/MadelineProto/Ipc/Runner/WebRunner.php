@@ -9,6 +9,11 @@ use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use Throwable;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use const DIRECTORY_SEPARATOR;
+use const PHP_URL_PATH;
 
 final class WebRunner extends RunnerAbstract
 {
@@ -24,7 +29,6 @@ final class WebRunner extends RunnerAbstract
      * Start.
      *
      * @param string $session Session path
-     *
      * @return Promise<bool>
      */
     public static function start(string $session, int $startupId): Promise
@@ -81,7 +85,7 @@ final class WebRunner extends RunnerAbstract
 
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => Magic::getcwd()
+            'cwd' => Magic::getcwd(),
         ];
 
         $params = \http_build_query($params);
@@ -92,7 +96,7 @@ final class WebRunner extends RunnerAbstract
                 $port = $_SERVER['SERVER_PORT'];
                 $res = \fsockopen($address, $port);
                 break;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Logger::log("Error while connecting to ourselves: $e");
             }
         }

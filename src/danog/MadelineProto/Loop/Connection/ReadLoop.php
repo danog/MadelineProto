@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -28,8 +27,13 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
+use Error;
+use Generator;
+
+use function substr;
 
 /**
  * Socket read loop.
@@ -41,9 +45,8 @@ class ReadLoop extends SignalLoop
     use Common;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -52,11 +55,11 @@ class ReadLoop extends SignalLoop
         while (true) {
             try {
                 $error = yield $this->waitSignal($this->readMessage());
-            } catch (NothingInTheSocketException|StreamException|PendingReadError|\Error $e) {
+            } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): \Generator {
+                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): Generator {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     yield from $connection->reconnect();
@@ -70,7 +73,7 @@ class ReadLoop extends SignalLoop
             }
             if (\is_int($error)) {
                 //$this->exitedLoop();
-                Tools::callForkDefer((function () use ($error, $shared, $connection, $datacenter, $API): \Generator {
+                Tools::callForkDefer((function () use ($error, $shared, $connection, $datacenter, $API): Generator {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
@@ -96,7 +99,7 @@ class ReadLoop extends SignalLoop
                         yield from $connection->reconnect();
                     } else {
                         yield from $connection->reconnect();
-                        throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                        throw new RPCErrorException($error, $error);
                     }
                 })());
                 return;
@@ -108,7 +111,7 @@ class ReadLoop extends SignalLoop
             }
         }
     }
-    public function readMessage(): \Generator
+    public function readMessage(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -130,7 +133,7 @@ class ReadLoop extends SignalLoop
             throw $e;
         }
         if ($payload_length === 4) {
-            $payload = \danog\MadelineProto\Tools::unpackSignedInt(yield $buffer->bufferRead(4));
+            $payload = Tools::unpackSignedInt(yield $buffer->bufferRead(4));
             $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ULTRA_VERBOSE);
             return $payload;
         }
@@ -152,7 +155,7 @@ class ReadLoop extends SignalLoop
                 }
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
                 $message_key = yield $buffer->bufferRead(16);
-                list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
+                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
                 $payload_length -= 24;
                 $left = $payload_length & 15;
                 $payload_length -= $left;
@@ -161,7 +164,7 @@ class ReadLoop extends SignalLoop
                     yield $buffer->bufferRead($left);
                 }
                 if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
-                    throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+                    throw new SecurityException('msg_key mismatch');
                 }
                 /*
                                 $server_salt = substr($decrypted_data, 0, 8);
@@ -180,19 +183,19 @@ class ReadLoop extends SignalLoop
                 $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
                 $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {
-                    throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
+                    throw new SecurityException('message_data_length is too big');
                 }
                 if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
-                    throw new \danog\MadelineProto\SecurityException('padding is too small');
+                    throw new SecurityException('padding is too small');
                 }
                 if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
-                    throw new \danog\MadelineProto\SecurityException('padding is too big');
+                    throw new SecurityException('padding is too big');
                 }
                 if ($message_data_length < 0) {
-                    throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
+                    throw new SecurityException('message_data_length not positive');
                 }
                 if ($message_data_length % 4 != 0) {
-                    throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
+                    throw new SecurityException('message_data_length not divisible by 4');
                 }
                 $message_data = \substr($decrypted_data, 32, $message_data_length);
             } else {
@@ -219,7 +222,6 @@ class ReadLoop extends SignalLoop
     }
     /**
      * Get loop name.
-     *
      */
     public function __toString(): string
     {

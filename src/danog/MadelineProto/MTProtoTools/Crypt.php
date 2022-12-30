@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,8 +21,12 @@ namespace danog\MadelineProto\MTProtoTools;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\SecurityException;
 use phpseclib3\Crypt\AES;
 use phpseclib3\Math\BigInteger;
+
+use const OPENSSL_RAW_DATA;
+use const OPENSSL_ZERO_PADDING;
 
 abstract class Crypt
 {
@@ -33,9 +36,7 @@ abstract class Crypt
      * @param string  $msg_key   Message key
      * @param string  $auth_key  Auth key
      * @param boolean $to_server To server/from server direction
-     *
      * @internal
-     *
      */
     public static function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
@@ -52,9 +53,7 @@ abstract class Crypt
      * @param string  $msg_key   Message key
      * @param string  $auth_key  Auth key
      * @param boolean $to_server To server/from server direction
-     *
      * @internal
-     *
      */
     public static function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
@@ -73,9 +72,7 @@ abstract class Crypt
      * @param string $message Message to encrypt
      * @param string $key     Key
      * @param string $iv      IV
-     *
      * @internal
-     *
      */
     public static function ctrEncrypt(string $message, string $key, string $iv): string
     {
@@ -90,9 +87,7 @@ abstract class Crypt
      * @param string $plaintext Message to encrypt
      * @param string $key       Key
      * @param string $iv        IV
-     *
      * @internal
-     *
      */
     public static function igeEncrypt(string $plaintext, string $key, string $iv): string
     {
@@ -121,9 +116,7 @@ abstract class Crypt
      * @param string $ciphertext Message to decrypt
      * @param string $key        Key
      * @param string $iv         IV
-     *
      * @internal
-     *
      */
     public static function igeDecrypt(string $ciphertext, string $key, string $iv): string
     {
@@ -149,9 +142,7 @@ abstract class Crypt
     /**
      * Check validity of g_a parameters.
      *
-     *
      * @internal
-     *
      */
     public static function checkG(BigInteger $g_a, BigInteger $p): bool
     {
@@ -160,23 +151,20 @@ abstract class Crypt
          * Check validity of g_a
          * 1 < g_a < p - 1
          */
-        Logger::log('Executing g_a check (1/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g_a->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
-            throw new \danog\MadelineProto\SecurityException('g_a is invalid (1 < g_a < p - 1 is false).');
+        Logger::log('Executing g_a check (1/2)...', Logger::VERBOSE);
+        if ($g_a->compare(Magic::$one) <= 0 || $g_a->compare($p->subtract(Magic::$one)) >= 0) {
+            throw new SecurityException('g_a is invalid (1 < g_a < p - 1 is false).');
         }
-        Logger::log('Executing g_a check (2/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g_a->compare(\danog\MadelineProto\Magic::$twoe1984) < 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$twoe1984)) >= 0) {
-            throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < g_a < p - 2^1984 is false).');
+        Logger::log('Executing g_a check (2/2)...', Logger::VERBOSE);
+        if ($g_a->compare(Magic::$twoe1984) < 0 || $g_a->compare($p->subtract(Magic::$twoe1984)) >= 0) {
+            throw new SecurityException('g_a is invalid (2^1984 < g_a < p - 2^1984 is false).');
         }
         return true;
     }
     /**
      * Check validity of p and g parameters.
      *
-     *
      * @internal
-     *
-     * @return boolean
      */
     public static function checkPG(BigInteger $p, BigInteger $g): bool
     {
@@ -185,9 +173,9 @@ abstract class Crypt
          * Check validity of dh_prime
          * Is it a prime?
          */
-        Logger::log('Executing p/g checks (1/2)...', \danog\MadelineProto\Logger::VERBOSE);
+        Logger::log('Executing p/g checks (1/2)...', Logger::VERBOSE);
         if (!$p->isPrime()) {
-            throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime (p isn't a prime).");
+            throw new SecurityException("p isn't a safe 2048-bit prime (p isn't a prime).");
         }
         /*
          * ***********************************************************************
@@ -207,18 +195,18 @@ abstract class Crypt
          * Check validity of p
          * 2^2047 < p < 2^2048
          */
-        Logger::log('Executing p/g checks (2/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($p->compare(\danog\MadelineProto\Magic::$twoe2047) <= 0 || $p->compare(\danog\MadelineProto\Magic::$twoe2048) >= 0) {
-            throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
+        Logger::log('Executing p/g checks (2/2)...', Logger::VERBOSE);
+        if ($p->compare(Magic::$twoe2047) <= 0 || $p->compare(Magic::$twoe2048) >= 0) {
+            throw new SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
         }
         /*
          * ***********************************************************************
          * Check validity of g
          * 1 < g < p - 1
          */
-        Logger::log('Executing g check...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
-            throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
+        Logger::log('Executing g check...', Logger::VERBOSE);
+        if ($g->compare(Magic::$one) <= 0 || $g->compare($p->subtract(Magic::$one)) >= 0) {
+            throw new SecurityException('g is invalid (1 < g < p - 1 is false).');
         }
         return true;
     }

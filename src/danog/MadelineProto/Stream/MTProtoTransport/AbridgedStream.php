@@ -13,18 +13,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * Abridged stream wrapper.
@@ -39,17 +40,15 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $this->stream = (yield from $ctx->getStream(\chr(239).$header));
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -57,9 +56,8 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
     {
         $length >>= 2;
         if ($length < 127) {
@@ -75,9 +73,8 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBufferGenerator(int &$length): Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \ord(yield $buffer->bufferRead(1));
@@ -89,7 +86,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {
@@ -97,7 +93,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,7 +22,6 @@ trait Noop
 {
     /**
      * Set NOOP update handler, ignoring all updates.
-     *
      */
     public function setNoop(): void
     {
@@ -35,7 +33,6 @@ trait Noop
      * Noop update handler.
      *
      * @internal
-     *
      */
     public static function noop(): void
     {

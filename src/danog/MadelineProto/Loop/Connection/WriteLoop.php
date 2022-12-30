@@ -13,20 +13,22 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\StreamException;
-use Amp\Loop;
 use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
+use Generator;
+
+use function strlen;
 
 /**
  * Socket write loop.
@@ -42,9 +44,8 @@ class WriteLoop extends ResumableSignalLoop
     use Common;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $connection = $this->connection;
@@ -76,7 +77,7 @@ class WriteLoop extends ResumableSignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): \Generator {
+                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): Generator {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     yield from $connection->reconnect();
@@ -88,7 +89,7 @@ class WriteLoop extends ResumableSignalLoop
             //$connection->waiter->resume();
         }
     }
-    public function unencryptedWriteLoop(): \Generator
+    public function unencryptedWriteLoop(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -108,17 +109,17 @@ class WriteLoop extends ResumableSignalLoop
                     continue;
                 }
                 $skipped_all = false;
-                $API->logger->logger("Sending $message as unencrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Sending $message as unencrypted message to DC $datacenter", Logger::ULTRA_VERBOSE);
                 $message_id = $message->getMsgId() ?? $connection->msgIdHandler->generateMessageId();
                 $length = \strlen($message->getSerializedBody());
                 $pad_length = -$length & 15;
-                $pad_length += 16 * \danog\MadelineProto\Tools::randomInt($modulus = 16);
-                $pad = \danog\MadelineProto\Tools::random($pad_length);
+                $pad_length += 16 * Tools::randomInt($modulus = 16);
+                $pad = Tools::random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
-                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.\danog\MadelineProto\Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
                 $connection->httpSent();
 
-                $API->logger->logger("Sent $message as unencrypted message to DC $datacenter!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Sent $message as unencrypted message to DC $datacenter!", Logger::ULTRA_VERBOSE);
 
                 unset($connection->pendingOutgoing[$k]);
                 $message->setMsgId($message_id);
@@ -132,7 +133,7 @@ class WriteLoop extends ResumableSignalLoop
             }
         }
     }
-    public function encryptedWriteLoop(): \Generator
+    public function encryptedWriteLoop(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -199,7 +200,7 @@ class WriteLoop extends ResumableSignalLoop
                 $body_length = \strlen($message->getSerializedBody());
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760 || $count >= 1020) {
-                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
                     break;
                 }
                 if ($message->hasSeqNo()) {
@@ -207,17 +208,17 @@ class WriteLoop extends ResumableSignalLoop
                 }
 
                 $message_id = $message->getMsgId() ?? $connection->msgIdHandler->generateMessageId();
-                $API->logger->logger("Sending $message as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Sending $message as encrypted message to DC $datacenter", Logger::ULTRA_VERBOSE);
                 $MTmessage = [
                     '_' => 'MTmessage',
                     'msg_id' => $message_id,
                     'body' => $message->getSerializedBody(),
-                    'seqno' => $message->getSeqNo() ?? $connection->generateOutSeqNo($message->isContentRelated())
+                    'seqno' => $message->getSeqNo() ?? $connection->generateOutSeqNo($message->isContentRelated()),
                 ];
                 if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
                     if (!$shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
-                            $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $constructor), \danog\MadelineProto\Logger::NOTICE);
+                            $API->logger->logger(\sprintf(Lang::$current_lang['write_client_info'], $constructor), Logger::NOTICE);
                             $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings->getSchema()->getLayer(), 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings->getAppInfo()->getApiId(), 'api_hash' => $API->settings->getAppInfo()->getApiHash(), 'device_model' => !$connection->isCDN() ? $API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $API->settings->getAppInfo()->getLangPack(), 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                         } else {
                             $API->logger->logger("Skipping $message due to uninited connection in DC $datacenter");
@@ -250,7 +251,7 @@ class WriteLoop extends ResumableSignalLoop
                 $body_length = \strlen($MTmessage['body']);
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760) {
-                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
                     break;
                 }
                 $count++;
@@ -274,7 +275,7 @@ class WriteLoop extends ResumableSignalLoop
                     'msg_id' => $connection->msgIdHandler->generateMessageId(),
                     'body' => $body,
                     'seqno' => $connection->generateOutSeqNo(false),
-                    'bytes' => \strlen($body)
+                    'bytes' => \strlen($body),
                 ];
                 $count++;
                 unset($acks, $body);
@@ -287,14 +288,14 @@ class WriteLoop extends ResumableSignalLoop
                     'msg_id' => $connection->msgIdHandler->generateMessageId(),
                     'body' => $body,
                     'seqno' => $connection->generateOutSeqNo(true),
-                    'bytes' => \strlen($body)
+                    'bytes' => \strlen($body),
                 ];
                 $count++;
                 unset($body);
             }
 
             if ($count > 1 || $has_seq) {
-                $API->logger->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $connection->msgIdHandler->generateMessageId();
                 $connection->pendingOutgoing[$connection->pendingOutgoingKey] = new Container(\array_values($keys));
                 $keys[$connection->pendingOutgoingKey++] = $message_id;
@@ -308,23 +309,23 @@ class WriteLoop extends ResumableSignalLoop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $API->logger->logger("NO MESSAGE SENT in DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                $API->logger->logger("NO MESSAGE SENT in DC {$datacenter}", Logger::WARNING);
                 return true;
             }
             unset($messages);
             $plaintext = $shared->getTempAuthKey()->getServerSalt().$connection->session_id.$message_id.\pack('VV', $seq_no, $message_data_length).$message_data;
-            $padding = \danog\MadelineProto\Tools::posmod(-\strlen($plaintext), 16);
+            $padding = Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
-            $padding = \danog\MadelineProto\Tools::random($padding);
+            $padding = Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
-            list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
+            [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
             $message = $shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
             $buffer = yield $connection->stream->getWriteBuffer(\strlen($message));
             yield $buffer->bufferWrite($message);
             $connection->httpSent();
-            $API->logger->logger("Sent encrypted payload to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Sent encrypted payload to DC {$datacenter}", Logger::ULTRA_VERBOSE);
 
             if ($ackCount) {
                 $connection->ack_queue = \array_slice($connection->ack_queue, $ackCount);
@@ -348,7 +349,6 @@ class WriteLoop extends ResumableSignalLoop
     }
     /**
      * Get loop name.
-     *
      */
     public function __toString(): string
     {

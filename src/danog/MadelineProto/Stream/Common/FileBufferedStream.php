@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -30,6 +29,8 @@ use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
+use RuntimeException;
 
 /**
  * Buffered raw stream.
@@ -43,9 +44,8 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     private string $append;
     /**
      * Connect.
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         if ($header !== '') {
             yield $this->stream->write($header);
@@ -53,7 +53,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     }
     /**
      * Async chunked read.
-     *
      */
     public function read(): Promise
     {
@@ -66,7 +65,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
     public function write(string $data): Promise
     {
@@ -77,8 +75,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     }
     /**
      * Async write.
-     *
-     *
      */
     public function end(string $finalData = ''): Promise
     {
@@ -101,20 +97,18 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(int &$length): Promise
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
         }
-        return new \Amp\Success($this);
+        return new Success($this);
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -122,13 +116,12 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-        return new \Amp\Success($this);
+        return new Success($this);
     }
     /**
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
-     *
      */
     public function bufferRead(int $length): Promise
     {
@@ -138,7 +131,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
     public function bufferWrite(string $data): Promise
     {
@@ -157,31 +149,27 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     }
     /**
      * Set file handle.
-     *
-     * @param File $extra
      */
-    public function setExtra($extra): void
+    public function setExtra(File $extra): void
     {
         $this->stream = $extra;
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {
-        throw new \RuntimeException("Can't get underlying RawStreamInterface, is a File handle!");
+        throw new RuntimeException("Can't get underlying RawStreamInterface, is a File handle!");
     }
     /**
      * {@inheritDoc}
      */
     public function getSocket(): Socket
     {
-        throw new \RuntimeException("Can't get underlying socket, is a File handle!");
+        throw new RuntimeException("Can't get underlying socket, is a File handle!");
     }
     /**
      * Get class name.
-     *
      */
     public static function getName(): string
     {

@@ -15,7 +15,6 @@ namespace danog\MadelineProto\TL\Conversion;
  * @author    Mahdi <mahdi.talaee1379@gmail.com>
  * @copyright 2022 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,8 +25,6 @@ final class Entities
     /**
      * setOffset
      * setOffset for text.
-     *
-     *
      */
     private function setOffset(string $start, mixed $end = "</a>"): void
     {
@@ -38,9 +35,6 @@ final class Entities
     /**
      * checkEntity
      * checkEntity in text and identify it.
-     *
-     *
-     *
      */
     private function checkEntity(object|array $entity, &$type): array
     {
@@ -60,15 +54,13 @@ final class Entities
             if (\is_array($entity["_"]) || \is_object($entity["_"])) {
                 throw new Exception('Field "type" must be of type String');
             }
-            if (
-                \is_array($entity["offset"]) ||
+            if (\is_array($entity["offset"]) ||
                 \is_object($entity["offset"]) ||
                 (string) (int) $entity["offset"] !== (string) $entity["offset"]
             ) {
                 throw new Exception('Field "offset" must be of type Integer');
             }
-            if (
-                \is_array($entity["length"]) ||
+            if (\is_array($entity["length"]) ||
                 \is_object($entity["length"]) ||
                 (string) (int) $entity["length"] !== (string) $entity["length"]
             ) {
@@ -85,10 +77,6 @@ final class Entities
     /**
      * entitiesToHtml
      * Covert entities to html tags.
-     *
-     *
-     *
-     *
      */
     public function entitiesToHtml(
         string $text,
@@ -108,7 +96,7 @@ final class Entities
                 $this->setOffset(
                     '<a href="tg://user?id=' .
                         ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
-                        '">'
+                        '">',
                 );
             } elseif ($type == PRE) {
                 if (isset($entity["language"])) {
@@ -116,7 +104,7 @@ final class Entities
                         '<pre><code class="language-' .
                             $entity["language"] .
                             '">',
-                        "</code></pre>"
+                        "</code></pre>",
                     );
                 } else {
                     $this->setOffset("<pre>", "</pre>");
@@ -139,7 +127,7 @@ final class Entities
             }
             $this->setOffset[$key] = \array_merge(
                 \array_reverse($this->setOffset2[$key]),
-                $this->setOffset[$key]
+                $this->setOffset[$key],
             );
         }
         $htmlext = "";
@@ -174,10 +162,6 @@ final class Entities
     /**
      * entitiesToMarkdownV1
      * Covert entities to html tags v1 (Telegram version).
-     *
-     *
-     *
-     *
      */
 
     public function entitiesToMarkdownV1(
@@ -199,7 +183,7 @@ final class Entities
                     "[",
                     "](tg://user?id=" .
                         ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
-                        ")"
+                        ")",
                 );
             } elseif ($type == PRE) {
                 if (isset($entity["language"])) {
@@ -219,7 +203,7 @@ final class Entities
             }
             $this->setOffset[$key] = \array_merge(
                 \array_reverse($this->setOffset2[$key]),
-                $this->setOffset[$key]
+                $this->setOffset[$key],
             );
         }
         $htmlext = "";
@@ -256,10 +240,6 @@ final class Entities
     /**
      * entitiesToMarkdown
      * convert given entities to markdown.
-     *
-     *
-     *
-     *
      */
     public function entitiesToMarkdown(
         string $text,
@@ -280,7 +260,7 @@ final class Entities
                     "[",
                     "](tg://user?id=" .
                         ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
-                        ")"
+                        ")",
                 );
             } elseif ($type == PRE) {
                 if (isset($entity["language"])) {
@@ -306,7 +286,7 @@ final class Entities
             }
             $this->setOffset[$key] = \array_merge(
                 \array_reverse($this->setOffset2[$key]),
-                $this->setOffset[$key]
+                $this->setOffset[$key],
             );
         }
         $htmlext = "";
@@ -391,8 +371,7 @@ final class Entities
             for ($i = 0; $i < \mb_strlen($str); $i++) {
                 $curchar = \mb_substr($str, $i, 1);
 
-                if (
-                    $curchar == "\\" &&
+                if ($curchar == "\\" &&
                     \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
                     $newstr .= \mb_substr($str, $i + 1, 1);
@@ -412,7 +391,11 @@ final class Entities
             $htmli += \mb_strlen($starttag);
         };
         $i = 0;
-        $setmark = function ($mark, &$currentmarki = 0, $fakemark = false) use (
+        $setmark = function (
+            $mark,
+            &$currentmarki = 0,
+            $fakemark = false
+        ) use (
             &$marks,
             &$marksi,
             &$htmli,
@@ -433,7 +416,10 @@ final class Entities
             return false;
         };
         $currentmarki = 0;
-        $setstr2 = function ($endtag, $starttaglen) use (
+        $setstr2 = function (
+            $endtag,
+            $starttaglen
+        ) use (
             &$setstr,
             &$html,
             &$htmli,
@@ -448,8 +434,7 @@ final class Entities
         };
         for ($i = 0; $i < $len; $i++) {
             $curchar = \mb_substr($str, $i, 1);
-            if (
-                $curchar == "\\" &&
+            if ($curchar == "\\" &&
                 \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
                 $setstr(\mb_substr($str, $i + 1, 1));
@@ -473,7 +458,7 @@ final class Entities
                     $txt = \mb_substr(
                         $html,
                         $currentmarki,
-                        $htmli - $currentmarki
+                        $htmli - $currentmarki,
                     );
                     if ($txt !== "") {
                         $i++;
@@ -517,7 +502,7 @@ final class Entities
                                             $lang .
                                             '">' .
                                             $strfind .
-                                            "</code></pre>"
+                                            "</code></pre>",
                                     );
                                 }
                             } else {
@@ -526,7 +511,7 @@ final class Entities
                         }
                     } else {
                         throw new Exception(
-                            'Can\'t find end of Pre entity at byte offset ' . $i
+                            'Can\'t find end of Pre entity at byte offset ' . $i,
                         );
                     }
                 } else {
@@ -539,13 +524,13 @@ final class Entities
                     } else {
                         throw new Exception(
                             'Can\'t find end of Code entity at byte offset ' .
-                                $i
+                                $i,
                         );
                     }
                 }
             } elseif (\in_array($curchar, $backslash)) {
                 throw new Exception(
-                    "Character '$curchar' is reserved and must be escaped with the preceding '\'"
+                    "Character '$curchar' is reserved and must be escaped with the preceding '\'",
                 );
             } else {
                 $setstr($curchar);
@@ -561,7 +546,7 @@ final class Entities
                 'Can\'t find end of ' .
                     ($ar[$mark[0]] ?? $mark[0]) .
                     " entity at byte offset " .
-                    $mark[2]
+                    $mark[2],
             );
         }
         return $html;
@@ -608,8 +593,7 @@ final class Entities
             for ($i = 0; $i < \mb_strlen($str); $i++) {
                 $curchar = \mb_substr($str, $i, 1);
 
-                if (
-                    $curchar == "\\" &&
+                if ($curchar == "\\" &&
                     \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
                     $newstr .= \mb_substr($str, $i + 1, 1);
@@ -629,7 +613,11 @@ final class Entities
             $htmli += \mb_strlen($starttag);
         };
         $i = 0;
-        $setmark = function ($mark, &$currentmarki = 0, $fakemark = false) use (
+        $setmark = function (
+            $mark,
+            &$currentmarki = 0,
+            $fakemark = false
+        ) use (
             &$marks,
             &$marksi,
             &$htmli,
@@ -650,7 +638,10 @@ final class Entities
             return false;
         };
         $currentmarki = 0;
-        $setstr2 = function ($endtag, $starttaglen) use (
+        $setstr2 = function (
+            $endtag,
+            $starttaglen
+        ) use (
             &$setstr,
             &$html,
             &$htmli,
@@ -665,16 +656,14 @@ final class Entities
         };
         for ($i = 0; $i < $len; $i++) {
             $curchar = \mb_substr($str, $i, 1);
-            if (
-                $curchar == "\\" &&
+            if ($curchar == "\\" &&
                 \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
                 $setstr(\mb_substr($str, $i + 1, 1));
                 $i++;
             } elseif ($curchar == "*") {
                 $tag = "i";
-                if (
-                    ($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
+                if (($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
                     $is("**")
                 ) {
                     $curchar = "**";
@@ -688,8 +677,7 @@ final class Entities
                 }
             } elseif ($curchar == "_") {
                 $tag = "u";
-                if (
-                    ($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
+                if (($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
                     $is("__")
                 ) {
                     $curchar = "__";
@@ -722,7 +710,7 @@ final class Entities
                     $txt = \mb_substr(
                         $html,
                         $currentmarki,
-                        $htmli - $currentmarki
+                        $htmli - $currentmarki,
                     );
                     if ($txt !== "") {
                         $i++;
@@ -766,7 +754,7 @@ final class Entities
                                             $lang .
                                             '">' .
                                             $strfind .
-                                            "</code></pre>"
+                                            "</code></pre>",
                                     );
                                 }
                             } else {
@@ -775,7 +763,7 @@ final class Entities
                         }
                     } else {
                         throw new Exception(
-                            'Can\'t find end of Pre entity at byte offset ' . $i
+                            'Can\'t find end of Pre entity at byte offset ' . $i,
                         );
                     }
                 } else {
@@ -788,13 +776,13 @@ final class Entities
                     } else {
                         throw new Exception(
                             'Can\'t find end of Code entity at byte offset ' .
-                                $i
+                                $i,
                         );
                     }
                 }
             } elseif (\in_array($curchar, $backslash)) {
                 throw new Exception(
-                    "Character '$curchar' is reserved and must be escaped with the preceding '\'"
+                    "Character '$curchar' is reserved and must be escaped with the preceding '\'",
                 );
             } else {
                 $setstr($curchar);
@@ -814,7 +802,7 @@ final class Entities
                 'Can\'t find end of ' .
                     ($ar[$mark[0]] ?? $mark[0]) .
                     " entity at byte offset " .
-                    $mark[2]
+                    $mark[2],
             );
         }
         return $html;
@@ -835,7 +823,7 @@ final class Entities
     public function markdownToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownToHtml($text)
+            $this->markdownToHtml($text),
         );
     }
 
@@ -846,7 +834,7 @@ final class Entities
     public function markdownV1ToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownV1ToHtml($text)
+            $this->markdownV1ToHtml($text),
         );
     }
 
@@ -857,7 +845,7 @@ final class Entities
     public function markdownhtmlToEntities(string $text): DOMEntities
     {
         return $this->htmlToEntities(
-            $this->markdownToHtml($text, false)
+            $this->markdownToHtml($text, false),
         );
     }
 
@@ -898,7 +886,6 @@ final class Entities
      *
      * @param non-empty-string $text
      * @param "html"|"markdown"|"markdownv1"|"markdownv2"|"markdownhtml"|"markdownv2html"|"markdownv1html" $mode
-     *
      */
     public function parseText(string $text, string $mode = "html"): DOMEntities
     {

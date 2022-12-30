@@ -13,16 +13,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use Exception;
+
+use const PHP_EOL;
+
 /**
  * Internal error indicating a problem with Telegram's servers.
  */
-class PTSException extends \Exception
+class PTSException extends Exception
 {
     use TL\PrettyException;
     public function __toString()

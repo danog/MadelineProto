@@ -17,6 +17,8 @@ use danog\MadelineProto\Ipc\Wrapper\SeekableOutputStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
 
 use function Amp\Ipc\connect;
 
@@ -27,7 +29,6 @@ class Wrapper extends ClientAbstract
 {
     /**
      * Payload data.
-     *
      */
     private $data;
     /**
@@ -54,10 +55,9 @@ class Wrapper extends ClientAbstract
      * Constructor.
      *
      * @param mixed        $data Payload data
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, Wrapper>
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, Wrapper>
      */
-    public static function create(&$data, SessionPaths $session, Logger $logger): \Generator
+    public static function create(&$data, SessionPaths $session, Logger $logger): Generator
     {
         $instance = new self;
         $instance->data = &$data;
@@ -76,7 +76,6 @@ class Wrapper extends ClientAbstract
     }
     /**
      * Serialization function.
-     *
      */
     public function __sleep(): array
     {
@@ -87,9 +86,7 @@ class Wrapper extends ClientAbstract
      *
      * @param object|callable $callback    Callback to wrap
      * @param bool            $wrapObjects Whether to wrap object methods, too
-     *
      * @param-out int $callback Callback ID
-     *
      */
     public function wrap(&$callback, bool $wrapObjects = true): void
     {
@@ -119,7 +116,6 @@ class Wrapper extends ClientAbstract
     }
     /**
      * Get copy of data.
-     *
      */
     private static function copy($data)
     {
@@ -127,9 +123,8 @@ class Wrapper extends ClientAbstract
     }
     /**
      * Receiver loop.
-     *
      */
-    private function receiverLoop(): \Generator
+    private function receiverLoop(): Generator
     {
         $id = 0;
         $payload = null;
@@ -147,24 +142,23 @@ class Wrapper extends ClientAbstract
      *
      * @param integer          $id      Request ID
      * @param array            $payload Payload
-     *
      */
-    private function clientRequest(int $id, $payload): \Generator
+    private function clientRequest(int $id, array $payload): Generator
     {
         try {
             $result = $this->callbacks[$payload[0]](...$payload[1]);
-            $result = $result instanceof \Generator ? yield from $result : yield $result;
-        } catch (\Throwable $e) {
+            $result = $result instanceof Generator ? yield from $result : yield $result;
+        } catch (Throwable $e) {
             $this->logger->logger("Got error while calling reverse IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
         }
         try {
             yield $this->server->send([$id, $result]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->logger("Got error while trying to send result of reverse method: $e", Logger::ERROR);
             try {
                 yield $this->server->send([$id, new ExitFailure($e)]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->logger->logger("Got error while trying to send error of error of reverse method: $e", Logger::ERROR);
             }
         }
@@ -173,7 +167,6 @@ class Wrapper extends ClientAbstract
      * Get remote socket ID.
      *
      * @internal
-     *
      */
     public function getRemoteId(): int
     {
@@ -184,9 +177,7 @@ class Wrapper extends ClientAbstract
      * Set socket and unwrap data.
      *
      * @param ChannelledSocket $server Socket.
-     *
      * @internal
-     *
      */
     public function unwrap(ChannelledSocket $server)
     {
@@ -195,7 +186,7 @@ class Wrapper extends ClientAbstract
 
         foreach ($this->callbackIds as &$id) {
             if (\is_int($id)) {
-                $id = fn (...$args): \Generator => $this->__call($id, $args);
+                $id = fn (...$args): Generator => $this->__call($id, $args);
             } else {
                 [$class, $ids] = $id;
                 $id = new $class($this, $ids);

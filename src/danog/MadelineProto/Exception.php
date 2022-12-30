@@ -13,11 +13,16 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+use const PHP_SAPI;
 
 /**
  * Basic exception.
@@ -27,7 +32,7 @@ class Exception extends \Exception
     use TL\PrettyException;
     public function __toString()
     {
-        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
+        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
     }
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
@@ -42,14 +47,13 @@ class Exception extends \Exception
         if (\strpos($message, 'socket_accept') === false
             && !\in_array(\basename($this->file), ['PKCS8.php', 'PSS.php'])
         ) {
-            \danog\MadelineProto\Logger::log($message.' in '.\basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+            Logger::log($message.' in '.\basename($this->file).':'.$this->line, Logger::FATAL_ERROR);
         }
     }
     /**
      * Complain about missing extensions.
      *
      * @param string $extensionName Extension name
-     *
      */
     public static function extension(string $extensionName): self
     {
@@ -95,7 +99,6 @@ class Exception extends \Exception
      * ExceptionErrorHandler.
      *
      * Error handler
-     *
      */
     public static function exceptionHandler($exception): void
     {

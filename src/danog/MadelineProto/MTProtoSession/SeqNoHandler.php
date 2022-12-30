@@ -13,12 +13,12 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 
 /**
@@ -48,7 +48,7 @@ trait SeqNoHandler
                 if ($message->isContentRelated()) {
                     $this->session_in_seq_no -= 1;
                 }
-                $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$message->getSeqNo().", $message)", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$message->getSeqNo().", $message)", Logger::ULTRA_VERBOSE);
             }
         }
     }

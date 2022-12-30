@@ -2,10 +2,15 @@
 
 namespace danog\MadelineProto\Db\Driver;
 
+use Amp\Promise;
 use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;
+use Amp\Sql\ConnectionException;
+use Amp\Sql\FailureException;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
+use Generator;
+use Throwable;
 
 /**
  * Redis driver wrapper.
@@ -18,15 +23,12 @@ class Redis
     private static array $connections = [];
 
     /**
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<void>, mixed, RedisRedis>
+     * @throws ConnectionException
+     * @throws FailureException
+     * @throws Throwable
+     * @psalm-return Generator<int, Promise<void>, mixed, RedisRedis>
      */
-    public static function getConnection(DatabaseRedis $settings): \Generator
+    public static function getConnection(DatabaseRedis $settings): Generator
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {

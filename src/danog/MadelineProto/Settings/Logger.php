@@ -2,10 +2,13 @@
 
 namespace danog\MadelineProto\Settings;
 
+use Closure;
 use danog\MadelineProto\Logger as MadelineProtoLogger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SettingsAbstract;
 use danog\MadelineProto\Tools;
+
+use const PHP_SAPI;
 
 /**
  * Logger settings.
@@ -92,7 +95,7 @@ class Logger extends SettingsAbstract
 
     public function __sleep()
     {
-        return $this->extra instanceof \Closure
+        return $this->extra instanceof Closure
             ? ['type', 'extra', 'level', 'maxSize']
             : ['type', 'level', 'maxSize'];
     }
@@ -112,7 +115,6 @@ class Logger extends SettingsAbstract
     }
     /**
      * Initialize global logging.
-     *
      */
     private function init(): void
     {
@@ -133,7 +135,6 @@ class Logger extends SettingsAbstract
      * Set $type Logger type.
      *
      * @param MadelineProtoLogger::LOGGER_* $type $type Logger type.
-     *
      */
     public function setType(int $type): self
     {
@@ -163,7 +164,6 @@ class Logger extends SettingsAbstract
      * Set extra parameter for logger.
      *
      * @param null|callable|string $extra Extra parameter for logger.
-     *
      */
     public function setExtra($extra): self
     {
@@ -192,7 +192,6 @@ class Logger extends SettingsAbstract
      * Set logging level.
      *
      * @param MadelineProtoLogger::LEVEL_* $level Logging level.
-     *
      */
     public function setLevel(int $level): self
     {
@@ -203,7 +202,6 @@ class Logger extends SettingsAbstract
 
     /**
      * Get maximum filesize for logger, in case of file logging.
-     *
      */
     public function getMaxSize(): int
     {
@@ -214,7 +212,6 @@ class Logger extends SettingsAbstract
      * Set maximum filesize for logger, in case of file logging.
      *
      * @param int $maxSize Maximum filesize for logger, in case of file logging.
-     *
      */
     public function setMaxSize(int $maxSize): self
     {

@@ -16,7 +16,6 @@ class Templates extends SettingsAbstract
 
     /**
      * Get web template used for querying app information.
-     *
      */
     public function getHtmlTemplate(): string
     {
@@ -27,7 +26,6 @@ class Templates extends SettingsAbstract
      * Set web template used for querying app information.
      *
      * @param string $htmlTemplate Web template used for querying app information.
-     *
      */
     public function setHtmlTemplate(string $htmlTemplate): self
     {

@@ -13,31 +13,34 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\TL;
+use danog\Serializable;
+use Generator;
 use phpseclib3\Math\BigInteger;
+
+use const STR_PAD_LEFT;
 
 /**
  * RSA class.
  */
 class RSA
 {
-    use \danog\Serializable;
+    use Serializable;
     /**
      * Exponent.
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     public $e;
     /**
      * Modulus.
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     public $n;
     /**
@@ -51,11 +54,9 @@ class RSA
      *
      * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
-     *
-     *
-     * @psalm-return \Generator<int|mixed, array|mixed, mixed, self>
+     * @psalm-return Generator<(int|mixed), (array|mixed), mixed, self>
      */
-    public static function load(TL $TL, string $rsa_key): \Generator
+    public static function load(TL $TL, string $rsa_key): Generator
     {
         $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $instance = new self;
@@ -72,7 +73,6 @@ class RSA
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -90,7 +90,6 @@ class RSA
      * Encrypt data.
      *
      * @param BigInteger $data Data to encrypt
-     *
      */
     public function encrypt(BigInteger $data): string
     {

@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,6 +22,7 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SecurityException;
+use Generator;
 
 /**
  * Secret feed loop.
@@ -55,9 +55,8 @@ class SecretFeedLoop extends ResumableSignalLoop
     }
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         if (yield from $this->waitForAuthOrSignal()) {
@@ -90,7 +89,6 @@ class SecretFeedLoop extends ResumableSignalLoop
     }
     /**
      * Feed incoming update to loop.
-     *
      */
     public function feed(array $update): void
     {

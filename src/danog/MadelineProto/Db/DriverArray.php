@@ -7,7 +7,10 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
+use Generator;
 use ReflectionClass;
+use RuntimeException;
+use Throwable;
 
 use function Amp\call;
 
@@ -23,30 +26,26 @@ abstract class DriverArray implements DbArray
     /**
      * Initialize connection.
      */
-    abstract public function initConnection(DatabaseAbstract $settings): \Generator;
+    abstract public function initConnection(DatabaseAbstract $settings): Generator;
     /**
      * Initialize on startup.
-     *
      */
-    abstract public function initStartup(): \Generator;
+    abstract public function initStartup(): Generator;
 
     /**
      * Create table for property.
      *
-     *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    abstract protected function prepareTable(): \Generator;
+    abstract protected function prepareTable(): Generator;
 
     /**
      * Rename table.
-     *
      */
-    abstract protected function renameTable(string $from, string $to): \Generator;
+    abstract protected function renameTable(string $from, string $to): Generator;
 
     /**
      * Get the value of table.
-     *
      */
     public function getTable(): string
     {
@@ -55,8 +54,6 @@ abstract class DriverArray implements DbArray
 
     /**
      * Set the value of table.
-     *
-     *
      */
     public function setTable(string $table): self
     {
@@ -69,24 +66,18 @@ abstract class DriverArray implements DbArray
      * Check if key isset.
      *
      * @param mixed $key
-     *
      * @return Promise<bool> true if the offset exists, otherwise false
      */
     public function isset(string|int $key): Promise
     {
-        return call(function () use ($key) {
-            return null !== yield $this->offsetGet($key);
-        });
+        return call(fn () => null !== yield $this->offsetGet($key));
     }
 
     /**
      * @param DbArray|array|null $previous
-     * @param DatabaseAbstract $settings
-     *
-     *
      * @psalm-return Promise<static>
      */
-    public static function getInstance(string $table, $previous, $settings): Promise
+    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Promise
     {
         $instance = new static();
         $instance->setTable($table);
@@ -120,13 +111,11 @@ abstract class DriverArray implements DbArray
      *
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
-     *
      */
-    protected static function renameTmpTable(self $new, $old): \Generator
+    protected static function renameTmpTable(self $new, $old): Generator
     {
         if ($old instanceof SqlArray && $old->getTable()) {
-            if (
-                $old->getTable() !== $new->getTable() &&
+            if ($old->getTable() !== $new->getTable() &&
                 !\str_starts_with($new->getTable(), 'tmp')
             ) {
                 yield from $new->renameTable($old->getTable(), $new->getTable());
@@ -138,10 +127,9 @@ abstract class DriverArray implements DbArray
 
     /**
      * @param DbArray|array|null $old
-     *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    protected static function migrateDataToDb(self $new, $old): \Generator
+    protected static function migrateDataToDb(self $new, $old): Generator
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {
@@ -174,7 +162,6 @@ abstract class DriverArray implements DbArray
 
     /**
      * Get the value of table.
-     *
      */
     public function __toString(): string
     {
@@ -183,7 +170,6 @@ abstract class DriverArray implements DbArray
 
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -205,7 +191,7 @@ abstract class DriverArray implements DbArray
     }
     final public function offsetExists($index): bool
     {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
+        throw new RuntimeException('Native isset not support promises. Use isset method');
     }
 
     final public function offsetSet(mixed $index, mixed $value): void

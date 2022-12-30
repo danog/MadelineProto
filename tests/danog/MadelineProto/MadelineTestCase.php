@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
@@ -10,14 +12,11 @@ abstract class MadelineTestCase extends TestCase
 {
     /**
      * MadelineProto instance.
-     *
-     * @var API
      */
-    protected static $MadelineProto;
+    protected static API $MadelineProto;
 
     /**
      * Setup MadelineProto instance.
-     *
      */
     public static function setUpBeforeClass(): void
     {
@@ -34,16 +33,15 @@ abstract class MadelineTestCase extends TestCase
                 'logger' => [
                     'logger' => Logger::FILE_LOGGER,
                     'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE
-                ]
-            ]
+                    'logger_level' => Logger::ULTRA_VERBOSE,
+                ],
+            ],
         );
         self::$MadelineProto->botLogin(\getenv('BOT_TOKEN'));
     }
 
     /**
      * Teardown.
-     *
      */
     public static function tearDownAfterClass(): void
     {

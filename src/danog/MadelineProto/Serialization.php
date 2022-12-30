@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,12 +25,17 @@ use Amp\Promise;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
-use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Settings\DatabaseAbstract;
+use danog\PlaceHolder;
+use Generator;
+use Throwable;
 
+use const LOCK_EX;
 use function Amp\File\exists;
 use function Amp\File\read;
 use function Amp\Ipc\connect;
+
+use function unserialize;
 
 /**
  * Manages serialization of the MadelineProto instance.
@@ -102,13 +106,10 @@ abstract class Serialization
      * @param SessionPaths     $session   Session name
      * @param SettingsAbstract $settings  Settings
      * @param bool             $forceFull Whether to force full session deserialization
-     *
      * @internal
-     *
-     *
-     * @psalm-return \Generator<void, mixed, mixed, array{0: ChannelledSocket|APIWrapper|\Throwable|null|0, 1: callable|null}>
+     * @psalm-return Generator<void, mixed, mixed, array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}>
      */
-    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): \Generator
+    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): Generator
     {
         if (yield exists($session->getSessionPath())) {
             // Is new session
@@ -148,7 +149,7 @@ abstract class Serialization
                 }
             };
             $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFull));
-            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
+            $session->getLightState()->onResolve(static function (?Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
                 if ($res) {
                     $lightState = $res;
                     if (!$res->canStartIpc()) {
@@ -176,7 +177,7 @@ abstract class Serialization
         try {
             /** @var LightState */
             $lightState ??= yield $session->getLightState();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
         if ($lightState && !$forceFull) {
@@ -215,7 +216,7 @@ abstract class Serialization
                         $settings,
                         $tableName,
                         DbPropertiesFactory::TYPE_ARRAY,
-                        $unserialized
+                        $unserialized,
                     );
                 } else {
                     yield from $unserialized->initStartup();
@@ -230,7 +231,7 @@ abstract class Serialization
         }
 
         if ($unserialized === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
+            throw new Exception(Lang::$current_lang['deserialization_error']);
         }
 
         Shutdown::removeCallback($tempId);
@@ -243,12 +244,10 @@ abstract class Serialization
      * @param string    $ipcPath       IPC path
      * @param Promise   $cancelConnect Cancelation token (triggers cancellation of connection)
      * @param ?callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
-     *
-     * @psalm-param Promise<\Throwable|null> $cancelConnect
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, array{0: ChannelledSocket|\Throwable|0, 1: null}>
+     * @psalm-param Promise<(Throwable|null)> $cancelConnect
+     * @psalm-return Generator<mixed, mixed, mixed, array{0: (ChannelledSocket|Throwable|0), 1: null}>
      */
-    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): \Generator
+    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): Generator
     {
         for ($x = 0; $x < 60; $x++) {
             Logger::log("MadelineProto is starting, please wait...");
@@ -260,14 +259,14 @@ abstract class Serialization
                     $cancelFull();
                 }
                 return [$socket, null];
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $e = $e->getMessage();
                 if ($e !== 'The endpoint does not exist!') {
                     Logger::log("$e while connecting to IPC socket");
                 }
             }
             if ($res = yield Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
-                if ($res instanceof \Throwable) {
+                if ($res instanceof Throwable) {
                     return [$res, null];
                 }
                 $cancelConnect = (new Deferred)->promise();
@@ -278,22 +277,21 @@ abstract class Serialization
 
     /**
      * Deserialize legacy session.
-     *
      */
-    private static function legacyUnserialize(string $session): \Generator
+    private static function legacyUnserialize(string $session): Generator
     {
         $tounserialize = yield read($session);
 
         try {
             $unserialized = \unserialize($tounserialize);
-        } catch (\danog\MadelineProto\Bug74586Exception $e) {
+        } catch (Bug74586Exception $e) {
             \class_exists('\\Volatile');
             $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
             foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                 \class_exists('\\danog\\MadelineProto\\'.$class);
             }
             $unserialized = \danog\Serialization::unserialize($tounserialize);
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
                 throw $e;
             }
@@ -326,14 +324,14 @@ abstract class Serialization
             }
             try {
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $unserialized = \unserialize($tounserialize);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log((string) $e, Logger::ERROR);
             throw $e;
         }
-        if ($unserialized instanceof \danog\PlaceHolder) {
+        if ($unserialized instanceof PlaceHolder) {
             $unserialized = \danog\Serialization::unserialize($tounserialize);
         }
 

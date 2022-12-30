@@ -13,11 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
+
+use const PHP_EOL;
+use const PHP_SAPI;
 
 /**
  * Handle async stack traces.
@@ -44,8 +46,6 @@ trait PrettyException
     private $updated = false;
     /**
      * Update TL trace.
-     *
-     *
      */
     public function updateTLTrace(array $trace): void
     {
@@ -56,7 +56,6 @@ trait PrettyException
     }
     /**
      * Get TL trace.
-     *
      */
     public function getTLTrace(): string
     {
@@ -66,7 +65,6 @@ trait PrettyException
      * Set TL trace.
      *
      * @param string $tlTrace TL trace
-     *
      */
     public function setTLTrace(string $tlTrace): void
     {
@@ -77,7 +75,6 @@ trait PrettyException
      *
      * @param string $init  Method name
      * @param array  $trace Async trace
-     *
      */
     public function prettifyTL(string $init = '', array $trace = null): void
     {

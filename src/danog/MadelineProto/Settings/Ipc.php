@@ -21,7 +21,6 @@ class Ipc extends SettingsAbstract
 
     /**
      * Get WARNING: this will cause slow startup if enabled.
-     *
      */
     public function getSlow(): bool
     {

@@ -4,6 +4,8 @@ namespace danog\MadelineProto\Settings\Database;
 
 use danog\MadelineProto\Settings\DatabaseAbstract as SettingsDatabaseAbstract;
 
+use function time;
+
 /**
  * Base class for database backends.
  */
@@ -23,7 +25,7 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
         foreach (self::toCamel([
             'database',
             'password',
-            'cache_ttl'
+            'cache_ttl',
         ]) as $object => $array) {
             if (isset($settings[$array])) {
                 $this->{$object}($settings[$array]);
@@ -33,7 +35,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get DB key.
-     *
      */
     public function getKey(): string
     {
@@ -45,7 +46,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get for how long to keep records in memory after last read, for cached backends.
-     *
      */
     public function getCacheTtl(): int
     {
@@ -62,7 +62,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Clean up is done once per minute.
      *
      * @param int|string $cacheTtl For how long to keep records in memory after last read, for cached backends.
-     *
      */
     public function setCacheTtl($cacheTtl): self
     {
@@ -73,7 +72,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get password.
-     *
      */
     public function getPassword(): string
     {
@@ -84,7 +82,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Set password.
      *
      * @param string $password Password.
-     *
      */
     public function setPassword(string $password): self
     {
@@ -101,7 +98,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     abstract public function getDatabase();
     /**
      * Get database URI.
-     *
      */
     abstract public function getUri(): string;
 
@@ -113,7 +109,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     abstract public function setDatabase($database): self;
     /**
      * Set database URI.
-     *
      */
     abstract public function setUri(string $uri): self;
 }

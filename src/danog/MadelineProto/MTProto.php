@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,7 +20,6 @@ namespace danog\MadelineProto;
 
 use Amp\Dns\Resolver;
 use Amp\Http\Client\HttpClient;
-use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
@@ -36,18 +34,47 @@ use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\MTProtoTools\AuthKeyHandler;
+use danog\MadelineProto\MTProtoTools\CallHandler;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
+use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
+use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\MadelineProto\SecretChats\MessageHandler;
+use danog\MadelineProto\SecretChats\ResponseHandler;
+use danog\MadelineProto\SecretChats\SeqNoHandler;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\TL\Conversion\BotAPI;
+use danog\MadelineProto\TL\Conversion\BotAPIFiles;
+use danog\MadelineProto\TL\Conversion\TD;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\Wrappers\Ads;
+use danog\MadelineProto\Wrappers\Button;
+use danog\MadelineProto\Wrappers\Callback;
+use danog\MadelineProto\Wrappers\DialogHandler;
+use danog\MadelineProto\Wrappers\Events;
+use danog\MadelineProto\Wrappers\Login;
+use danog\MadelineProto\Wrappers\Loop;
+use danog\MadelineProto\Wrappers\Noop;
+use danog\MadelineProto\Wrappers\Start;
+use danog\MadelineProto\Wrappers\Templates;
+use danog\MadelineProto\Wrappers\TOS;
+use danog\MadelineProto\Wrappers\Webhook;
+use danog\Serializable;
+use Generator;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use function Amp\File\getSize;
 use function Amp\File\touch as touchAsync;
+
+use function time;
 
 /**
  * Manages all of the mtproto stuff.
@@ -56,32 +83,32 @@ use function Amp\File\touch as touchAsync;
  */
 class MTProto extends AsyncConstruct implements TLCallback
 {
-    use \danog\Serializable;
-    use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
-    use \danog\MadelineProto\MTProtoTools\CallHandler;
-    use \danog\MadelineProto\MTProtoTools\PeerHandler;
-    use \danog\MadelineProto\MTProtoTools\UpdateHandler;
-    use \danog\MadelineProto\MTProtoTools\Files;
+    use Serializable;
+    use AuthKeyHandler;
+    use CallHandler;
+    use PeerHandler;
+    use UpdateHandler;
+    use Files;
     use \danog\MadelineProto\SecretChats\AuthKeyHandler;
-    use \danog\MadelineProto\SecretChats\MessageHandler;
-    use \danog\MadelineProto\SecretChats\ResponseHandler;
-    use \danog\MadelineProto\SecretChats\SeqNoHandler;
-    use \danog\MadelineProto\TL\Conversion\BotAPI;
-    use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
-    use \danog\MadelineProto\TL\Conversion\TD;
+    use MessageHandler;
+    use ResponseHandler;
+    use SeqNoHandler;
+    use BotAPI;
+    use BotAPIFiles;
+    use TD;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
-    use \danog\MadelineProto\Wrappers\Ads;
-    use \danog\MadelineProto\Wrappers\Button;
-    use \danog\MadelineProto\Wrappers\DialogHandler;
-    use \danog\MadelineProto\Wrappers\Events;
-    use \danog\MadelineProto\Wrappers\Webhook;
-    use \danog\MadelineProto\Wrappers\Callback;
-    use \danog\MadelineProto\Wrappers\Login;
-    use \danog\MadelineProto\Wrappers\Loop;
-    use \danog\MadelineProto\Wrappers\Noop;
-    use \danog\MadelineProto\Wrappers\Start;
-    use \danog\MadelineProto\Wrappers\Templates;
-    use \danog\MadelineProto\Wrappers\TOS;
+    use Ads;
+    use Button;
+    use DialogHandler;
+    use Events;
+    use Webhook;
+    use Callback;
+    use Login;
+    use Loop;
+    use Noop;
+    use Start;
+    use Templates;
+    use TOS;
     use DbPropertiesTrait;
     private const RSA_KEYS = [
         "-----BEGIN RSA PUBLIC KEY-----\n".
@@ -91,7 +118,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n".
         "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n".
         "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n".
-        "-----END RSA PUBLIC KEY-----"
+        "-----END RSA PUBLIC KEY-----",
     ];
     private const TEST_RSA_KEYS = [
         "-----BEGIN RSA PUBLIC KEY-----\n".
@@ -101,7 +128,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         "j25sIWeYPHYeOrFp/eXaqhISP6G+q2IeTaWTXpwZj4LzXq5YOpk4bYEQ6mvRq7D1\n".
         "aHWfYmlEGepfaYR8Q0YqvvhYtMte3ITnuSJs171+GDqpdKcSwHnd6FudwGO4pcCO\n".
         "j4WcDuXc2CTHgH8gFTNhp/Y8/SpDOhvn9QIDAQAB\n".
-        "-----END RSA PUBLIC KEY-----"
+        "-----END RSA PUBLIC KEY-----",
     ];
     /**
      * Internal version of MadelineProto.
@@ -109,7 +136,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Increased every time the default settings array or something big changes
      *
      * @internal
-     *
      * @var int
      */
     const V = 161;
@@ -153,7 +179,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Bad message error codes.
      *
      * @internal
-     *
      * @var array
      */
     const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the correct msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container'];
@@ -161,7 +186,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Localized message info flags.
      *
      * @internal
-     *
      * @var array
      */
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
@@ -390,13 +414,13 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * File reference database.
      *
-     * @var \danog\MadelineProto\MTProtoTools\ReferenceDatabase
+     * @var ReferenceDatabase
      */
     public $referenceDatabase;
     /**
      * min database.
      *
-     * @var \danog\MadelineProto\MTProtoTools\MinDatabase
+     * @var MinDatabase
      */
     public $minDatabase;
     /**
@@ -430,19 +454,19 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Feeder loops.
      *
-     * @var array<\danog\MadelineProto\Loop\Update\FeedLoop>
+     * @var array<FeedLoop>
      */
     public $feeders = [];
     /**
      * Secret chat feeder loops.
      *
-     * @var array<\danog\MadelineProto\Loop\Update\SecretFeedLoop>
+     * @var array<SecretFeedLoop>
      */
     public $secretFeeders = [];
     /**
      * Updater loops.
      *
-     * @var array<\danog\MadelineProto\Loop\Update\UpdateLoop>
+     * @var array<UpdateLoop>
      */
     public $updaters = [];
     /**
@@ -460,7 +484,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * TL serializer.
      *
-     * @var \danog\MadelineProto\TL\TL
+     * @var TL
      */
     private $TL;
 
@@ -518,7 +542,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                     'tcpo_only' => false,
                 ],
             ],
-        ]
+        ],
     ];
 
     /**
@@ -530,6 +554,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     /**
      * List of properties stored in database (memory or external).
+     *
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
@@ -540,15 +565,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         'usernames' => 'array',
         'session' => [
             'type' => 'array',
-            'config' => ['enableCache' => false]
-        ]
+            'config' => ['enableCache' => false],
+        ],
     ];
 
     /**
      * Serialize session, returning object to serialize to db.
-     *
      */
-    public function serializeSession(object $data): \Generator
+    public function serializeSession(object $data): Generator
     {
         if (!isset($this->session) || !$this->session || $this->session instanceof MemoryArray) {
             return $data;
@@ -575,7 +599,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Serialize all instances.
      *
      * CALLED ONLY ON SHUTDOWN.
-     *
      */
     public static function serializeAll(): void
     {
@@ -596,7 +619,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param Settings|SettingsEmpty $settings Settings
      * @param ?APIWrapper            $wrapper  API wrapper
-     *
      */
     public function __magic_construct(SettingsAbstract $settings, ?APIWrapper $wrapper = null): void
     {
@@ -611,9 +633,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Async constructor function.
      *
      * @param Settings|SettingsEmpty $settings Settings
-     *
      */
-    public function __construct_async(SettingsAbstract $settings): \Generator
+    public function __construct_async(SettingsAbstract $settings): Generator
     {
         // Initialize needed stuffs
         Magic::start();
@@ -627,13 +648,13 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
                 $this->ipcServer->setIpcPath($this->wrapper->session);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
         }
         try {
             $this->ipcServer->start();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (Magic::$isIpcWorker) {
                 throw $e;
             }
@@ -702,7 +723,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -788,9 +808,8 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     /**
      * Cleanup memory and session file.
-     *
      */
-    public function cleanup(): \Generator
+    public function cleanup(): Generator
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         yield from $this->referenceDatabase->init();
@@ -804,7 +823,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->TL->updateCallbacks($callbacks);
     }
 
-    private function fillUsernamesCache(): \Generator
+    private function fillUsernamesCache(): Generator
     {
         if (!$this->settings->getDb()->getEnableUsernameDb()) {
             yield $this->usernames->clear();
@@ -832,9 +851,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     *
      */
-    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
@@ -843,7 +861,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get TL namespaces.
-     *
      */
     public function getMethodNamespaces(): array
     {
@@ -851,7 +868,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get namespaced methods (method => namespace).
-     *
      */
     public function getMethodsNamespaced(): array
     {
@@ -859,9 +875,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get TL serializer.
-     *
      */
-    public function getTL(): \danog\MadelineProto\TL\TL
+    public function getTL(): TL
     {
         return $this->TL;
     }
@@ -881,7 +896,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get async HTTP client.
-     *
      */
     public function getHTTPClient(): HttpClient
     {
@@ -889,7 +903,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get async DNS client.
-     *
      */
     public function getDNSClient(): Resolver
     {
@@ -899,11 +912,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Get contents of remote file asynchronously.
      *
      * @param string $url URL
-     *
-     *
-     * @psalm-return \Generator<int, Promise<string>, mixed, string>
+     * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url): \Generator
+    public function fileGetContents(string $url): Generator
     {
         return $this->datacenter->fileGetContents($url);
     }
@@ -929,7 +940,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Prompt serialization of instance.
      *
      * @internal
-     *
      */
     public function serialize(): void
     {
@@ -939,7 +949,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Start all internal loops.
-     *
      */
     private function startLoops(): void
     {
@@ -960,7 +969,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
                 $this->ipcServer->setIpcPath($this->wrapper->session);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
         }
@@ -970,7 +979,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->configLoop->start();
         try {
             $this->ipcServer->start();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (Magic::$isIpcWorker) {
                 throw $e;
             }
@@ -979,7 +988,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Stop all internal loops.
-     *
      */
     private function stopLoops(): void
     {
@@ -1008,11 +1016,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Clean up properties from previous versions of MadelineProto.
      *
      * @internal
-     *
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, void>
+     * @psalm-return Generator<mixed, mixed, mixed, void>
      */
-    private function cleanupProperties(): \Generator
+    private function cleanupProperties(): Generator
     {
         if (!$this->channels_state instanceof CombinedUpdatesState) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
@@ -1095,9 +1101,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @throws Exception
      * @throws RPCErrorException
-     * @throws \Throwable
+     * @throws Throwable
      */
-    private function upgradeMadelineProto(): \Generator
+    private function upgradeMadelineProto(): Generator
     {
         if (!isset($this->snitch)) {
             $this->snitch = new Snitch;
@@ -1179,7 +1185,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
                     yield from $this->notifyLayer($chat);
                 }
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
+            } catch (RPCErrorException $e) {
             }
         }
     }
@@ -1188,11 +1194,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param Settings|SettingsEmpty $settings New settings
      * @param APIWrapper             $wrapper  API wrapper
-     *
      * @internal
-     *
      */
-    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): \Generator
+    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): Generator
     {
         // Set reference to itself
         self::$references[\spl_object_hash($this)] = $this;
@@ -1240,9 +1244,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Async wakeup function.
      *
      * @param Settings|SettingsEmpty $settings New settings
-     *
      */
-    private function wakeupAsync(SettingsAbstract $settings): \Generator
+    private function wakeupAsync(SettingsAbstract $settings): Generator
     {
         // Setup one-time stuffs
         Magic::start();
@@ -1313,7 +1316,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Unreference instance, allowing destruction.
      *
      * @internal
-     *
      */
     public function unreference(): void
     {
@@ -1371,8 +1373,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Whether we're an IPC client instance.
-     *
-     * @return boolean
      */
     public function isIpc(): bool
     {
@@ -1380,8 +1380,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Whether we're an IPC server process (as opposed to an event handler).
-     *
-     * @return boolean
      */
     public function isIpcWorker(): bool
     {
@@ -1391,9 +1389,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Parse, update and store settings.
      *
      * @param SettingsAbstract $settings Settings
-     *
      */
-    public function updateSettings(SettingsAbstract $settings): \Generator
+    public function updateSettings(SettingsAbstract $settings): Generator
     {
         $this->updateSettingsInternal($settings);
 
@@ -1419,7 +1416,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Parse, update and store settings.
      *
      * @param SettingsAbstract $settings Settings
-     *
      */
     private function updateSettingsInternal(SettingsAbstract $settings): void
     {
@@ -1442,7 +1438,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
         if (!$this->settings->getAppInfo()->hasApiInfo()) {
-            throw new \danog\MadelineProto\Exception(Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+            throw new Exception(Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
 
         // Setup logger
@@ -1452,7 +1448,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Return current settings.
-     *
      */
     public function getSettings(): Settings
     {
@@ -1460,13 +1455,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Setup logger.
-     *
      */
     public function setupLogger(): void
     {
         $this->logger = new Logger(
             $this->settings->getLogger(),
-            $this->authorization['user']['username'] ?? $this->authorization['user']['id'] ?? ''
+            $this->authorization['user']['username'] ?? $this->authorization['user']['id'] ?? '',
         );
     }
     /**
@@ -1474,9 +1468,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param boolean $de       Whether to reset the session ID
      * @param boolean $auth_key Whether to reset the auth key
-     *
      * @internal
-     *
      */
     public function resetMTProtoSession(bool $de = true, bool $auth_key = false): void
     {
@@ -1496,10 +1488,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Check if connected to datacenter using HTTP.
      *
      * @param string $datacenter DC ID
-     *
      * @internal
-     *
-     * @return boolean
      */
     public function isHttp(string $datacenter): bool
     {
@@ -1507,8 +1496,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Checks whether all datacenters are authorized.
-     *
-     * @return boolean
      */
     public function hasAllAuth(): bool
     {
@@ -1528,10 +1515,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Whether we're initing authorization.
      *
      * @internal
-     *
-     * @return boolean
      */
-    public function isInitingAuthorization()
+    public function isInitingAuthorization(): bool
     {
         return $this->initing_authorization;
     }
@@ -1539,9 +1524,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
-     *
      */
-    public function connectToAllDcs(bool $reconnectAll = true): \Generator
+    public function connectToAllDcs(bool $reconnectAll = true): Generator
     {
         $this->channels_state->get(FeedLoop::GENERIC);
         foreach ($this->channels_state->get() as $state) {
@@ -1561,14 +1545,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->datacenter->getDcs() as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield \danog\MadelineProto\Tools::all($dcs);
+        yield Tools::all($dcs);
         yield from $this->initAuthorization();
         yield from $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield \danog\MadelineProto\Tools::all($dcs);
+        yield Tools::all($dcs);
         yield from $this->initAuthorization();
         yield from $this->parseConfig();
         yield from $this->getPhoneConfig();
@@ -1577,10 +1561,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Clean up MadelineProto session after logout.
      *
      * @internal
-     *
-     * @return \Generator<void>
+     * @return Generator<void>
      */
-    public function resetSession(): \Generator
+    public function resetSession(): Generator
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1626,7 +1609,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Reset the update state and fetch all updates from the beginning.
-     *
      */
     public function resetUpdateState(): void
     {
@@ -1658,11 +1640,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Start the update system.
      *
      * @param boolean $anyway Force start update system?
-     *
      * @internal
-     *
      */
-    public function startUpdateSystem($anyway = false): void
+    public function startUpdateSystem(bool $anyway = false): void
     {
         if (!$this->inited() && !$anyway) {
             $this->logger("Not starting update system");
@@ -1709,7 +1689,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Flush all datacenter connections.
-     *
      */
     private function flushAll(): void
     {
@@ -1721,12 +1700,10 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Store shared phone config.
      *
      * @param mixed $watcherId Watcher ID
-     *
      * @internal
-     *
-     * @return \Generator<void>
+     * @return Generator<void>
      */
-    public function getPhoneConfig($watcherId = null): \Generator
+    public function getPhoneConfig($watcherId = null): Generator
     {
         if ($this->authorized === self::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
@@ -1740,9 +1717,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Store RSA keys for CDN datacenters.
      *
      * @param string $datacenter DC ID
-     *
      */
-    public function getCdnConfig(string $datacenter): \Generator
+    public function getCdnConfig(string $datacenter): Generator
     {
         try {
             foreach ((yield from $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
@@ -1750,12 +1726,11 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
-            $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);
+            $this->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
         }
     }
     /**
      * Get cached server-side config.
-     *
      */
     public function getCachedConfig(): array
     {
@@ -1766,9 +1741,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param array $config  Current config
      * @param array $options Options for method call
-     *
      */
-    public function getConfig(array $config = [], array $options = []): \Generator
+    public function getConfig(array $config = [], array $options = []): Generator
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;
@@ -1788,9 +1762,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Parse cached config.
-     *
      */
-    private function parseConfig(): \Generator
+    private function parseConfig(): Generator
     {
         if (isset($this->config['dc_options'])) {
             $options = $this->config['dc_options'];
@@ -1802,9 +1775,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Parse DC options from config.
      *
      * @param array $dc_options DC options
-     *
      */
-    private function parseDcOptions(array $dc_options): \Generator
+    private function parseDcOptions(array $dc_options): Generator
     {
         $previous = $this->dcList;
         foreach ($dc_options as $dc) {
@@ -1835,7 +1807,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Get info about the logged-in user, cached.
      *
      * Use fullGetSelf to bypass the cache.
-     *
      */
     public function getSelf(): array|false
     {
@@ -1851,9 +1822,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Get info about the logged-in user, not cached.
      *
-     * @return \Generator<array|bool>
+     * @return Generator<(array|bool)>
      */
-    public function fullGetSelf(): \Generator
+    public function fullGetSelf(): Generator
     {
         try {
             $this->authorization = ['user' => (yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
@@ -1865,7 +1836,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get authorization info.
-     *
      */
     public function getAuthorization(): int
     {
@@ -1873,7 +1843,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get current password hint.
-     *
      */
     public function getHint(): string
     {
@@ -1890,8 +1859,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $reportDest = [];
     /**
      * Check if has report peers.
-     *
-     * @return boolean
      */
     public function hasReportPeers(): bool
     {
@@ -1899,7 +1866,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get a message to show to the user when starting the bot.
-     *
      */
     public function getWebMessage(string $message): string
     {
@@ -1922,9 +1888,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Set peer(s) where to send errors occurred in the event loop.
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
-     *
      */
-    public function setReportPeers($userOrId): \Generator
+    public function setReportPeers($userOrId): Generator
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
@@ -1935,7 +1900,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 if ($peer === 101374607) {
                     unset($userOrId[$k]);
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 unset($userOrId[$k]);
                 $this->logger("Could not obtain info about report peer $peer: $e", Logger::FATAL_ERROR);
             }
@@ -1948,9 +1913,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
-     *
      */
-    public function report(string $message, string $parseMode = ''): \Generator
+    public function report(string $message, string $parseMode = ''): Generator
     {
         if (!$this->reportDest) {
             return;
@@ -1970,10 +1934,10 @@ class MTProto extends AsyncConstruct implements TLCallback
                             '_' => 'inputMediaUploadedDocument',
                             'file' => $path,
                             'attributes' => [
-                                ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log']
-                            ]
-                        ]
-                    ]
+                                ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log'],
+                            ],
+                        ],
+                    ],
                 );
             }
         }
@@ -1985,7 +1949,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                     yield from $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                 }
                 $sent &= true;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $sent &= false;
                 $this->logger("While reporting to $id: $e", Logger::FATAL_ERROR);
             }
@@ -1997,7 +1961,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get full list of MTProto and API methods.
-     *
      */
     public function getAllMethods(): array
     {
@@ -2011,7 +1974,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Called right before serialization of method starts.
      *
      * Pass the method name
-     *
      */
     public function getMethodCallbacks(): array
     {
@@ -2021,7 +1983,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Called right before serialization of method starts.
      *
      * Pass the method name
-     *
      */
     public function getMethodBeforeCallbacks(): array
     {
@@ -2029,7 +1990,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Called right after deserialization of object, passing the final object.
-     *
      */
     public function getConstructorCallbacks(): array
     {
@@ -2038,14 +1998,13 @@ class MTProto extends AsyncConstruct implements TLCallback
             \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]),
             \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [[$this, 'addFullChat']]),
             ['help.support' => [[$this, 'addSupport']]],
-            ['config' => [[$this, 'addConfig']]]
+            ['config' => [[$this, 'addConfig']]],
         );
     }
     /**
      * Called right before deserialization of object.
      *
      * Pass only the constructor name
-     *
      */
     public function getConstructorBeforeCallbacks(): array
     {
@@ -2055,7 +2014,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Called right before serialization of constructor.
      *
      * Passed the object, will return a modified version.
-     *
      */
     public function getConstructorSerializeCallbacks(): array
     {
@@ -2066,7 +2024,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * Passed the unserializable object,
      * will try to convert it to an object of the proper type.
-     *
      */
     public function getTypeMismatchCallbacks(): array
     {
@@ -2075,14 +2032,14 @@ class MTProto extends AsyncConstruct implements TLCallback
                 [
                     'InputPeer',
                 ],
-                [$this, 'getInputPeer']
+                [$this, 'getInputPeer'],
             ),
             \array_fill_keys(
                 [
                     'InputUser',
                     'InputChannel',
                 ],
-                [$this, 'getInputConstructor']
+                [$this, 'getInputConstructor'],
             ),
             \array_fill_keys(
                 [
@@ -2090,27 +2047,26 @@ class MTProto extends AsyncConstruct implements TLCallback
                     'Chat',
                     'Peer',
                     'InputDialogPeer',
-                    'InputNotifyPeer'
+                    'InputNotifyPeer',
                 ],
-                [$this, 'getInfo']
+                [$this, 'getInfo'],
             ),
             \array_fill_keys(
                 [
                     'InputMedia',
                     'InputDocument',
-                    'InputPhoto'
+                    'InputPhoto',
                 ],
-                [$this, 'getFileInfo']
+                [$this, 'getFileInfo'],
             ),
             \array_fill_keys(
                 ['InputFileLocation'],
-                [$this, 'getDownloadInfo']
-            )
+                [$this, 'getDownloadInfo'],
+            ),
         );
     }
     /**
      * Get debug information for var_dump.
-     *
      */
     public function __debugInfo(): array
     {

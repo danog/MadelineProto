@@ -13,14 +13,17 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Http\Client\Request;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
 
 /**
  * Manages logging in and out.
@@ -34,7 +37,6 @@ trait Webhook
      *
      * @param string $hook_url Webhook URL
      * @param string $pem_path PEM path for self-signed certificate
-     *
      */
     public function setWebhook(string $hook_url, string $pem_path = ''): void
     {
@@ -47,7 +49,6 @@ trait Webhook
      * Send update to webhook.
      *
      * @param array $update Update
-     *
      */
     private function pwrWebhook(array $update): void
     {
@@ -57,17 +58,17 @@ trait Webhook
             $this->logger->logger('EMPTY UPDATE');
             return;
         }
-        \danog\MadelineProto\Tools::callFork((function () use ($payload): \Generator {
+        Tools::callFork((function () use ($payload): Generator {
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
-            $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger('Result of webhook query is '.$result, Logger::NOTICE);
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
                     $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result));
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $this->logger->logger("Reverse webhook command returned: {$e}");
                 }
             }

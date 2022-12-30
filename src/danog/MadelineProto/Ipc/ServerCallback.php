@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -50,7 +49,6 @@ class ServerCallback extends Server
      * Set IPC path.
      *
      * @param SessionPaths $session Session
-     *
      */
     public function setIpcPath(SessionPaths $session): void
     {
@@ -60,10 +58,8 @@ class ServerCallback extends Server
      * Client handler loop.
      *
      * @param ChannelledSocket $socket Client
-     *
-     * @return Promise
      */
-    protected function clientLoop(ChannelledSocket $socket)
+    protected function clientLoop(ChannelledSocket $socket): Promise
     {
         $id = $this->id++;
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
@@ -77,7 +73,6 @@ class ServerCallback extends Server
 
     /**
      * Unwrap value.
-     *
      */
     protected function unwrap(Wrapper $wrapper)
     {

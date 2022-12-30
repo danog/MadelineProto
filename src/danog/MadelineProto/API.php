@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,11 +20,14 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Loop;
+use danog\MadelineProto\ApiWrappers\Start;
+use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
-use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\Serializable;
+use Generator;
+use Throwable;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -86,9 +88,9 @@ class API extends InternalDoc
      * @var int
      */
     const SECRET_READY = MTProto::SECRET_READY;
-    use \danog\Serializable;
-    use \danog\MadelineProto\ApiWrappers\Start;
-    use \danog\MadelineProto\ApiWrappers\Templates;
+    use Serializable;
+    use Start;
+    use Templates;
     /**
      * Session paths.
      *
@@ -106,7 +108,6 @@ class API extends InternalDoc
 
     /**
      * Storage for externally set properties to be serialized.
-     *
      */
     protected array $storage = [];
 
@@ -114,7 +115,6 @@ class API extends InternalDoc
      * Whether we're getting our API ID.
      *
      * @internal
-     *
      * @var boolean
      */
     private bool $gettingApiId = false;
@@ -123,7 +123,6 @@ class API extends InternalDoc
      * my.telegram.org API wrapper.
      *
      * @internal
-     *
      * @var null|MyTelegramOrgWrapper
      */
     private $myTelegramOrgWrapper;
@@ -160,7 +159,6 @@ class API extends InternalDoc
      *
      * @param string         $session  Session name
      * @param array|Settings $settings Settings
-     *
      */
     public function __magic_construct(string $session, $settings = []): void
     {
@@ -183,9 +181,8 @@ class API extends InternalDoc
      * Async constructor function.
      *
      * @param Settings|SettingsEmpty|SettingsIpc $settings Settings
-     *
      */
-    private function internalInitAPI(SettingsAbstract $settings): \Generator
+    private function internalInitAPI(SettingsAbstract $settings): Generator
     {
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
@@ -219,9 +216,8 @@ class API extends InternalDoc
 
     /**
      * Reconnect to full instance.
-     *
      */
-    protected function reconnectFull(): \Generator
+    protected function reconnectFull(): Generator
     {
         if (!$this->API) {
             yield from $this->initAsynchronously();
@@ -240,12 +236,12 @@ class API extends InternalDoc
                 yield $this->API->disconnect();
             } catch (SecurityException $e) {
                 throw $e;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->logger->logger("Restarting to full instance: error $e");
             }
             $this->logger->logger("Restarting to full instance: reconnecting...");
             $cancel = new Deferred;
-            $cb = function () use ($cancel, &$cb): \Generator {
+            $cb = function () use ($cancel, &$cb): Generator {
                 [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->promise());
                 if ($result instanceof ChannelledSocket) {
                     try {
@@ -268,7 +264,7 @@ class API extends InternalDoc
                         $API->unreference();
                     } catch (SecurityException $e) {
                         throw $e;
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
                     Tools::callFork($cb());
@@ -285,9 +281,8 @@ class API extends InternalDoc
      *
      * @param SettingsAbstract $settings Settings
      * @param bool $forceFull Whether to force full initialization
-     *
      */
-    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): \Generator
+    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): Generator
     {
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getSlow();
@@ -299,7 +294,7 @@ class API extends InternalDoc
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $settings, $forceFull),
             30000,
-            [0, null]
+            [0, null],
         );
 
         if ($unserialized === 0) {
@@ -311,7 +306,7 @@ class API extends InternalDoc
             Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true, false);
-        } elseif ($unserialized instanceof \Throwable) {
+        } elseif ($unserialized instanceof Throwable) {
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
@@ -325,7 +320,7 @@ class API extends InternalDoc
                 $this->API->unreference();
                 $this->API = null;
             }
-            $unserialized->storage = $unserialized->storage ?? [];
+            $unserialized->storage ??= [];
             $unserialized->session = $this->session;
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
@@ -349,7 +344,6 @@ class API extends InternalDoc
     }
     /**
      * Wakeup function.
-     *
      */
     public function __wakeup(): void
     {
@@ -386,7 +380,6 @@ class API extends InternalDoc
     }
     /**
      * Init API wrapper.
-     *
      */
     private function APIFactory(): void
     {
@@ -408,7 +401,6 @@ class API extends InternalDoc
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $eventHandler Event handler class name
-     *
      */
     public function startAndLoop(string $eventHandler): void
     {
@@ -420,7 +412,7 @@ class API extends InternalDoc
                 return;
             } catch (SecurityException $e) {
                 throw $e;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
                     throw $e;
                 }
@@ -442,7 +434,6 @@ class API extends InternalDoc
      *
      * @param API[]           $instances    Instances of madeline
      * @param string[]|string $eventHandler Event handler(s)
-     *
      */
     public static function startAndLoopMulti(array $instances, $eventHandler): void
     {
@@ -464,7 +455,7 @@ class API extends InternalDoc
                 return;
             } catch (SecurityException $e) {
                 throw $e;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
@@ -484,9 +475,8 @@ class API extends InternalDoc
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $eventHandler Event handler class name
-     *
      */
-    public function startAndLoopAsync(string $eventHandler): \Generator
+    public function startAndLoopAsync(string $eventHandler): Generator
     {
         $started = false;
         return $this->startAndLoopAsyncInternal($eventHandler, $started);
@@ -498,9 +488,8 @@ class API extends InternalDoc
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $eventHandler Event handler class name
-     *
      */
-    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): \Generator
+    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): Generator
     {
         $this->async(true);
 
@@ -518,7 +507,7 @@ class API extends InternalDoc
                 return yield from $this->API->loop();
             } catch (SecurityException $e) {
                 throw $e;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
@@ -536,9 +525,7 @@ class API extends InternalDoc
      * Get attribute.
      *
      * @param string $name Attribute nam
-     *
      * @internal
-     *
      */
     public function &__get(string $name)
     {
@@ -555,9 +542,7 @@ class API extends InternalDoc
      *
      * @param string $name  Name
      * @param mixed  $value Value
-     *
      * @internal
-     *
      */
     public function __set(string $name, $value)
     {
@@ -567,8 +552,6 @@ class API extends InternalDoc
      * Whether an attribute exists.
      *
      * @param string $name Attribute name
-     *
-     * @return boolean
      */
     public function __isset(string $name): bool
     {
@@ -578,7 +561,6 @@ class API extends InternalDoc
      * Unset attribute.
      *
      * @param string $name Attribute name
-     *
      */
     public function __unset(string $name): void
     {

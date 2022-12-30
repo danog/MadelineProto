@@ -3,6 +3,9 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\Promise;
+use Phar;
+
+use const MADELINE_PHP;
 
 abstract class RunnerAbstract
 {
@@ -20,7 +23,7 @@ abstract class RunnerAbstract
          * If using madeline.php, simply return madeline.php path.
          */
         if (\defined('MADELINE_PHP')) {
-            return \MADELINE_PHP;
+            return MADELINE_PHP;
         }
         // Write process runner to external file if inside a PHAR different from madeline.phar,
         // because PHP can't open files inside a PHAR directly except for the stub.
@@ -32,15 +35,15 @@ abstract class RunnerAbstract
             } else {
                 $path = \dirname(self::SCRIPT_PATH);
 
-                if (\substr(\Phar::running(false), -5) !== ".phar") {
+                if (\substr(Phar::running(false), -5) !== ".phar") {
                     self::$pharCopy = $alternateTmpDir."/phar-".\bin2hex(\random_bytes(10)).".phar";
-                    \copy(\Phar::running(false), self::$pharCopy);
+                    \copy(Phar::running(false), self::$pharCopy);
 
                     \register_shutdown_function(static function (): void {
                         @\unlink(self::$pharCopy);
                     });
 
-                    $path = "phar://".self::$pharCopy."/".\substr($path, \strlen(\Phar::running(true)));
+                    $path = "phar://".self::$pharCopy."/".\substr($path, \strlen(Phar::running(true)));
                 }
 
                 $contents = \file_get_contents(self::SCRIPT_PATH);
@@ -62,7 +65,6 @@ abstract class RunnerAbstract
      * Runner.
      *
      * @param string   $session Session path
-     *
      * @return Promise<true>
      */
     abstract public static function start(string $session, int $startupId): Promise;

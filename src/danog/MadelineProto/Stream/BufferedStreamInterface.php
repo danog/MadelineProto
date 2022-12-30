@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -32,27 +31,23 @@ interface BufferedStreamInterface extends StreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      * @psalm-return Promise<BufferInterface>
      */
-    public function getReadBuffer(&$length): Promise;
+    public function getReadBuffer(int &$length): Promise;
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise;
     /**
      * Get stream name.
      *
      * Is supposed to return __CLASS__
-     *
      */
     public static function getName(): string;
     /**
      * Get underlying stream resource.
-     *
      */
     public function getStream(): RawStreamInterface;
 }

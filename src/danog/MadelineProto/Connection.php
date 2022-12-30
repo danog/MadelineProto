@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -34,6 +33,8 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\StreamInterface;
+use danog\Serializable;
+use Generator;
 
 /**
  * Connection class.
@@ -41,47 +42,46 @@ use danog\MadelineProto\Stream\StreamInterface;
  * Manages connection to Telegram datacenters
  *
  * @internal
- *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 class Connection
 {
     use Session;
-    use \danog\Serializable;
+    use Serializable;
     /**
      * Writer loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\WriteLoop
+     * @var WriteLoop
      */
     protected $writer;
     /**
      * Reader loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\ReadLoop
+     * @var ReadLoop
      */
     protected $reader;
     /**
      * Checker loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\CheckLoop
+     * @var CheckLoop
      */
     protected $checker;
     /**
      * Waiter loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\HttpWaitLoop
+     * @var HttpWaitLoop
      */
     protected $waiter;
     /**
      * Ping loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\PingLoop
+     * @var PingLoop
      */
     protected $pinger;
     /**
      * Cleanup loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\CleanupLoop
+     * @var CleanupLoop
      */
     protected $cleanup;
     /**
@@ -110,7 +110,6 @@ class Connection
     private $httpResCount = 0;
     /**
      * Date of last chunk received.
-     *
      */
     private float $lastChunk = 0;
     /**
@@ -145,7 +144,6 @@ class Connection
     private $id = 0;
     /**
      * DC ID and connection ID concatenated.
-     *
      */
     private $datacenterId = '';
     /**
@@ -158,7 +156,6 @@ class Connection
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
-     *
      */
     public function needReconnect(bool $needsReconnect): void
     {
@@ -166,8 +163,6 @@ class Connection
     }
     /**
      * Whether this sockets needs to be reconnected.
-     *
-     * @return boolean
      */
     public function shouldReconnect(): bool
     {
@@ -175,9 +170,6 @@ class Connection
     }
     /**
      * Set writing boolean.
-     *
-     * @param boolean $writing
-     *
      */
     public function writing(bool $writing): void
     {
@@ -185,9 +177,6 @@ class Connection
     }
     /**
      * Set reading boolean.
-     *
-     * @param boolean $reading
-     *
      */
     public function reading(bool $reading): void
     {
@@ -195,7 +184,6 @@ class Connection
     }
     /**
      * Tell the class that we have read a chunk of data from the socket.
-     *
      */
     public function haveRead(): void
     {
@@ -203,7 +191,6 @@ class Connection
     }
     /**
      * Get the receive date of the latest chunk of data from the socket.
-     *
      */
     public function getLastChunk(): float
     {
@@ -211,7 +198,6 @@ class Connection
     }
     /**
      * Indicate a received HTTP response.
-     *
      */
     public function httpReceived(): void
     {
@@ -219,8 +205,6 @@ class Connection
     }
     /**
      * Count received HTTP responses.
-     *
-     * @return integer
      */
     public function countHttpReceived(): int
     {
@@ -228,7 +212,6 @@ class Connection
     }
     /**
      * Indicate a sent HTTP request.
-     *
      */
     public function httpSent(): void
     {
@@ -236,8 +219,6 @@ class Connection
     }
     /**
      * Count sent HTTP requests.
-     *
-     * @return integer
      */
     public function countHttpSent(): int
     {
@@ -245,8 +226,6 @@ class Connection
     }
     /**
      * Get connection ID.
-     *
-     * @return integer
      */
     public function getID(): int
     {
@@ -254,7 +233,6 @@ class Connection
     }
     /**
      * Get datacenter concatenated with connection ID.
-     *
      */
     public function getDatacenterID(): string
     {
@@ -262,7 +240,6 @@ class Connection
     }
     /**
      * Get connection context.
-     *
      */
     public function getCtx(): ConnectionContext
     {
@@ -270,8 +247,6 @@ class Connection
     }
     /**
      * Check if is an HTTP connection.
-     *
-     * @return boolean
      */
     public function isHttp(): bool
     {
@@ -279,8 +254,6 @@ class Connection
     }
     /**
      * Check if is a media connection.
-     *
-     * @return boolean
      */
     public function isMedia(): bool
     {
@@ -288,8 +261,6 @@ class Connection
     }
     /**
      * Check if is a CDN connection.
-     *
-     * @return boolean
      */
     public function isCDN(): bool
     {
@@ -299,20 +270,18 @@ class Connection
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
      * @param ConnectionContext $ctx Connection context
-     *
-     *
-     * @psalm-return \Generator<mixed, StreamInterface, mixed, void>
+     * @psalm-return Generator<mixed, StreamInterface, mixed, void>
      */
-    public function connect(ConnectionContext $ctx): \Generator
+    public function connect(ConnectionContext $ctx): Generator
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->datacenterId = $this->datacenter . '.' . $this->id;
-        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
         $this->createSession();
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = (yield from $ctx->getStream());
-        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
         }
@@ -368,10 +337,9 @@ class Connection
      *
      * @param string $method    Method name
      * @param array  $arguments Arguments
-     *
-     * @return \Generator Whether we need to resolve a queue promise
+     * @return Generator Whether we need to resolve a queue promise
      */
-    private function methodAbstractions(string &$method, array &$arguments): \Generator
+    private function methodAbstractions(string &$method, array &$arguments): Generator
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
             [$invite, $content] = $r;
@@ -436,7 +404,7 @@ class Connection
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
             $res = yield from $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
-                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
+                throw new Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
             $arguments['chat_id'] = $res['chat_id'];
         } elseif ($method === 'photos.updateProfilePhoto') {
@@ -478,9 +446,8 @@ class Connection
      *
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
-     *
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true): \Generator
+    public function sendMessage(OutgoingMessage $message, bool $flush = true): Generator
     {
         $message->trySend();
         $promise = $message->getSendPromise();
@@ -514,7 +481,6 @@ class Connection
     }
     /**
      * Flush pending packets.
-     *
      */
     public function flush(): void
     {
@@ -524,7 +490,6 @@ class Connection
     }
     /**
      * Resume HttpWaiter.
-     *
      */
     public function pingHttpWaiter(): void
     {
@@ -540,9 +505,8 @@ class Connection
      *
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
-     *
      */
-    public function setExtra($extra, int $id): void
+    public function setExtra(DataCenterConnection $extra, int $id): void
     {
         $this->shared = $extra;
         $this->id = $id;
@@ -551,7 +515,6 @@ class Connection
     }
     /**
      * Get main instance.
-     *
      */
     public function getExtra(): MTProto
     {
@@ -559,7 +522,6 @@ class Connection
     }
     /**
      * Get shared connection instance.
-     *
      */
     public function getShared(): DataCenterConnection
     {
@@ -569,7 +531,6 @@ class Connection
      * Disconnect from DC.
      *
      * @param bool $temporary Whether the disconnection is temporary, triggered by the reconnect method
-     *
      */
     public function disconnect(bool $temporary = false): void
     {
@@ -594,9 +555,8 @@ class Connection
     }
     /**
      * Reconnect to DC.
-     *
      */
-    public function reconnect(): \Generator
+    public function reconnect(): Generator
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
@@ -604,7 +564,6 @@ class Connection
     }
     /**
      * Get name.
-     *
      */
     public function getName(): string
     {

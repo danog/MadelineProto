@@ -4,8 +4,12 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
+use Amp\Sql\ConnectionException;
+use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+use Generator;
+use Throwable;
 
 use function Amp\Mysql\Pool;
 
@@ -20,15 +24,12 @@ class Mysql
     private static array $connections = [];
 
     /**
-     *
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator<Pool>
+     * @throws ConnectionException
+     * @throws FailureException
+     * @throws Throwable
+     * @return Generator<Pool>
      */
-    public static function getConnection(DatabaseMysql $settings): \Generator
+    public static function getConnection(DatabaseMysql $settings): Generator
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
@@ -45,13 +46,11 @@ class Mysql
     }
 
     /**
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
+     * @throws ConnectionException
+     * @throws FailureException
+     * @throws Throwable
      */
-    private static function createDb(ConnectionConfig $config): \Generator
+    private static function createDb(ConnectionConfig $config): Generator
     {
         try {
             $db = $config->getDatabase();
@@ -62,7 +61,7 @@ class Mysql
                     COLLATE 'utf8mb4_general_ci'
                 ");
             $connection->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
         }
     }

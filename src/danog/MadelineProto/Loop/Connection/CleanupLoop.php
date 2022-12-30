@@ -13,14 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Loop;
 use danog\Loop\ResumableSignalLoop;
+use Generator;
 
 /**
  * Message cleanup loop.
@@ -32,9 +31,8 @@ class CleanupLoop extends ResumableSignalLoop
     use Common;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $connection = $this->connection;
         while (!yield $this->waitSignal($this->pause(1000))) {
@@ -45,7 +43,6 @@ class CleanupLoop extends ResumableSignalLoop
     }
     /**
      * Loop name.
-     *
      */
     public function __toString(): string
     {

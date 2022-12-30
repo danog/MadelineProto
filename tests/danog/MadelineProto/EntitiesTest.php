@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
@@ -46,9 +48,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -58,9 +60,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -70,9 +72,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -82,9 +84,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -94,9 +96,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -106,9 +108,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -118,9 +120,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 5,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -130,9 +132,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 5,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -142,14 +144,14 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 5,
                         'length' => 25,
-                        'type' => 'bold'
+                        'type' => 'bold',
                     ],
                     [
                         'offset' => 10,
                         'length' => 15,
-                        'type' => 'italic'
-                    ]
-                ]
+                        'type' => 'italic',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -159,9 +161,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 2,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -172,15 +174,15 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention
+                        'user' => $mention,
                     ],
                     [
                         'offset' => 9,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention
-                    ]
-                ]
+                        'user' => $mention,
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -192,7 +194,7 @@ class EntitiesTest extends MadelineTestCase
                         'length' => 15,
                         'type' => 'italic',
                     ],
-                ]
+                ],
             ],
             [
                 'markdown',
@@ -202,40 +204,40 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 5,
                         'length' => 6,
-                        'type' => 'italic'
+                        'type' => 'italic',
                     ],
                     [
                         'offset' => 12,
                         'length' => 4,
-                        'type' => 'bold'
+                        'type' => 'bold',
                     ],
                     [
                         'offset' => 17,
                         'length' => 10,
-                        'type' => 'underline'
+                        'type' => 'underline',
                     ],
                     [
                         'offset' => 28,
                         'length' => 13,
-                        'type' => 'strikethrough'
+                        'type' => 'strikethrough',
                     ],
                     [
                         'offset' => 42,
                         'length' => 3,
                         'type' => 'pre',
-                        'language' => 'test'
+                        'language' => 'test',
                     ],
                     [
                         'offset' => 46,
                         'length' => 4,
-                        'type' => 'code'
+                        'type' => 'code',
                     ],
                     [
                         'offset' => 51,
                         'length' => 7,
-                        'type' => 'spoiler'
+                        'type' => 'spoiler',
                     ],
-                ]
+                ],
             ],
         ];
     }

@@ -7,106 +7,89 @@
 
 namespace danog\MadelineProto\TON;
 
+use Amp\Promise;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Conversion\Extension;
+use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
+use TypeError;
+
 interface liteServer
 {
     /**
-     *
-     *
      * @return liteServer.MasterchainInfo
      */
-    public function getMasterchainInfo();
+    public function getMasterchainInfo(): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#` **mode** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.MasterchainInfoExt
      */
-    public function getMasterchainInfoExt($params);
+    public function getMasterchainInfoExt(array $params): liteServer;
 
     /**
-     *
-     *
      * @return liteServer.CurrentTime
      */
-    public function getTime();
+    public function getTime(): liteServer;
 
     /**
-     *
-     *
      * @return liteServer.Version
      */
-    public function getVersion();
+    public function getVersion(): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **id** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.BlockData
      */
-    public function getBlock($params);
+    public function getBlock(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **id** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.BlockState
      */
-    public function getState($params);
+    public function getState(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **id**   -
      * * `#`                  **mode** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.BlockHeader
      */
-    public function getBlockHeader($params);
+    public function getBlockHeader(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `bytes` **body** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.SendMsgStatus
      */
-    public function sendMessage($params);
+    public function sendMessage(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt`   **id**      -
      * * `liteServer.accountId` **account** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.AccountState
      */
-    public function getAccountState($params);
+    public function getAccountState(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                    **mode**      -
      * * `tonNode.blockIdExt`   **id**        -
@@ -115,14 +98,11 @@ interface liteServer
      * * `bytes`                **params**    -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.RunMethodResult
      */
-    public function runSmcMethod($params);
+    public function runSmcMethod(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **id**        -
      * * `int`                **workchain** -
@@ -130,40 +110,31 @@ interface liteServer
      * * `Bool`               **exact**     -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.ShardInfo
      */
-    public function getShardInfo($params);
+    public function getShardInfo(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **id** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.AllShardsInfo
      */
-    public function getAllShardsInfo($params);
+    public function getAllShardsInfo(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt`   **id**      -
      * * `liteServer.accountId` **account** -
      * * `long`                 **lt**      -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.TransactionInfo
      */
-    public function getOneTransaction($params);
+    public function getOneTransaction(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                    **count**   -
      * * `liteServer.accountId` **account** -
@@ -171,14 +142,11 @@ interface liteServer
      * * `int256`               **hash**    -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.TransactionList
      */
-    public function getTransactions($params);
+    public function getTransactions(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`               **mode**  -
      * * `tonNode.blockId` **id**    -
@@ -186,14 +154,11 @@ interface liteServer
      * * `int`             **utime** - Optional:.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.BlockHeader
      */
-    public function lookupBlock($params);
+    public function lookupBlock(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt`        **id**            -
      * * `#`                         **mode**          -
@@ -203,55 +168,43 @@ interface liteServer
      * * `boolean`                   **want_proof**    - Optional:.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.BlockTransactions
      */
-    public function listBlockTransactions($params);
+    public function listBlockTransactions(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                  **mode**         -
      * * `tonNode.blockIdExt` **known_block**  -
      * * `tonNode.blockIdExt` **target_block** - Optional:.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.PartialBlockProof
      */
-    public function getBlockProof($params);
+    public function getBlockProof(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                  **mode** -
      * * `tonNode.blockIdExt` **id**   -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.ConfigInfo
      */
-    public function getConfigAll($params);
+    public function getConfigAll(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                  **mode**       -
      * * `tonNode.blockIdExt` **id**         -
      * * `[int]`              **param_list** -.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.ConfigInfo
      */
-    public function getConfigParams($params);
+    public function getConfigParams(array $params): liteServer;
 
     /**
-     *
-     *
      * Parameters:
      * * `#`                  **mode**           -
      * * `tonNode.blockIdExt` **id**             -
@@ -260,446 +213,337 @@ interface liteServer
      * * `int`                **modified_after** - Optional:.
      *
      * @param array $params Parameters
-     *
      * @return liteServer.ValidatorStats
      */
-    public function getValidatorStats($params);
+    public function getValidatorStats(array $params): liteServer;
+
+    public function queryPrefix(): object;
 
     /**
-     *
-     *
-     * @return object
-     */
-    public function queryPrefix();
-
-    /**
-     *
-     *
      * Parameters:
      * * `bytes` **data** -.
      *
      * @param array $params Parameters
-     *
-     * @return object
      */
-    public function query($params);
+    public function query(array $params): object;
 
     /**
-     *
-     *
      * Parameters:
      * * `int` **seqno**      -
      * * `int` **timeout_ms** -.
      *
      * @param array $params Parameters
-     *
-     * @return object
      */
-    public function waitMasterchainSeqno($params);
+    public function waitMasterchainSeqno(array $params): object;
 }
 
 interface tcp
 {
     /**
-     *
-     *
      * @return tcp.Pong
      */
-    public function ping();
+    public function ping(): tcp;
 }
 
 interface dht
 {
     /**
-     *
-     *
      * @return dht.Pong
      */
-    public function ping();
+    public function ping(): dht;
 
     /**
-     *
-     *
      * Parameters:
      * * `dht.value` **value** -.
      *
      * @param array $params Parameters
-     *
      * @return dht.Stored
      */
-    public function store($params);
+    public function store(array $params): dht;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256` **key** -
      * * `int`    **k**   -.
      *
      * @param array $params Parameters
-     *
      * @return dht.Nodes
      */
-    public function findNode($params);
+    public function findNode(array $params): dht;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256` **key** -
      * * `int`    **k**   -.
      *
      * @param array $params Parameters
-     *
      * @return dht.ValueResult
      */
-    public function findValue($params);
+    public function findValue(array $params): dht;
 
     /**
-     *
-     *
      * @return dht.Node
      */
-    public function getSignedAddressList();
+    public function getSignedAddressList(): dht;
 
     /**
-     *
-     *
      * Parameters:
      * * `dht.node` **node** -.
      *
      * @param array $params Parameters
-     *
      * @return true
      */
-    public function query($params);
+    public function query(array $params): bool;
 }
 
 interface overlay
 {
     /**
-     *
-     *
      * Parameters:
      * * `overlay.nodes` **peers** -.
      *
      * @param array $params Parameters
-     *
      * @return overlay.Nodes
      */
-    public function getRandomPeers($params);
+    public function getRandomPeers(array $params): overlay;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256` **overlay** -.
      *
      * @param array $params Parameters
-     *
      * @return true
      */
-    public function query($params);
+    public function query(array $params): bool;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256` **hash** -.
      *
      * @param array $params Parameters
-     *
      * @return overlay.Broadcast
      */
-    public function getBroadcast($params);
+    public function getBroadcast(array $params): overlay;
 
     /**
-     *
-     *
      * Parameters:
      * * `overlay.broadcastList` **list** -.
      *
      * @param array $params Parameters
-     *
      * @return overlay.BroadcastList
      */
-    public function getBroadcastList($params);
+    public function getBroadcastList(array $params): overlay;
 }
 
 interface catchain
 {
     /**
-     *
-     *
      * Parameters:
      * * `int256` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return catchain.BlockResult
      */
-    public function getBlock($params);
+    public function getBlock(array $params): catchain;
 
     /**
-     *
-     *
      * Parameters:
      * * `[int256]` **blocks** -.
      *
      * @param array $params Parameters
-     *
      * @return catchain.Sent
      */
-    public function getBlocks($params);
+    public function getBlocks(array $params): catchain;
 
     /**
-     *
-     *
      * Parameters:
      * * `[int]` **rt** -.
      *
      * @param array $params Parameters
-     *
      * @return catchain.Difference
      */
-    public function getDifference($params);
+    public function getDifference(array $params): catchain;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256`   **block**   -
      * * `long`     **height**  -
      * * `[int256]` **stop_if** -.
      *
      * @param array $params Parameters
-     *
      * @return catchain.Sent
      */
-    public function getBlockHistory($params);
+    public function getBlockHistory(array $params): catchain;
 }
 
 interface validatorSession
 {
     /**
-     *
-     *
      * Parameters:
      * * `long` **hash** -.
      *
      * @param array $params Parameters
-     *
      * @return validatorSession.Pong
      */
-    public function ping($params);
+    public function ping(array $params): validatorSession;
 
     /**
-     *
-     *
      * Parameters:
      * * `int`                          **round** -
      * * `validatorSession.candidateId` **id**    -.
      *
      * @param array $params Parameters
-     *
      * @return validatorSession.Candidate
      */
-    public function downloadCandidate($params);
+    public function downloadCandidate(array $params): validatorSession;
 }
 
 interface tonNode
 {
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **prev_block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.BlockDescription
      */
-    public function getNextBlockDescription($params);
+    public function getNextBlockDescription(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **prev_block** -
      * * `int`                **limit**      -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.BlocksDescription
      */
-    public function getNextBlocksDescription($params);
+    public function getNextBlocksDescription(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **next_block**   -
      * * `int`                **limit**        -
      * * `int`                **cutoff_seqno** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.BlocksDescription
      */
-    public function getPrevBlocksDescription($params);
+    public function getPrevBlocksDescription(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block**         -
      * * `Bool`               **allow_partial** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.PreparedProof
      */
-    public function prepareBlockProof($params);
+    public function prepareBlockProof(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `[tonNode.blockIdExt]` **blocks**        -
      * * `Bool`                 **allow_partial** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.PreparedProof
      */
-    public function prepareBlockProofs($params);
+    public function prepareBlockProofs(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Prepared
      */
-    public function prepareBlock($params);
+    public function prepareBlock(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `[tonNode.blockIdExt]` **blocks** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Prepared
      */
-    public function prepareBlocks($params);
+    public function prepareBlocks(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block**             -
      * * `tonNode.blockIdExt` **masterchain_block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.PreparedState
      */
-    public function preparePersistentState($params);
+    public function preparePersistentState(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.PreparedState
      */
-    public function prepareZeroState($params);
+    public function prepareZeroState(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block**    -
      * * `int`                **max_size** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.KeyBlocks
      */
-    public function getNextKeyBlockIds($params);
+    public function getNextKeyBlockIds(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **prev_block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.DataFull
      */
-    public function downloadNextBlockFull($params);
+    public function downloadNextBlockFull(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.DataFull
      */
-    public function downloadBlockFull($params);
+    public function downloadBlockFull(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadBlock($params);
+    public function downloadBlock(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `[tonNode.blockIdExt]` **blocks** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.DataList
      */
-    public function downloadBlocks($params);
+    public function downloadBlocks(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block**             -
      * * `tonNode.blockIdExt` **masterchain_block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadPersistentState($params);
+    public function downloadPersistentState(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block**             -
      * * `tonNode.blockIdExt` **masterchain_block** -
@@ -707,144 +551,107 @@ interface tonNode
      * * `long`               **max_size**          -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadPersistentStateSlice($params);
+    public function downloadPersistentStateSlice(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadZeroState($params);
+    public function downloadZeroState(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadBlockProof($params);
+    public function downloadBlockProof(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `[tonNode.blockIdExt]` **blocks** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.DataList
      */
-    public function downloadBlockProofs($params);
+    public function downloadBlockProofs(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.blockIdExt` **block** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function downloadBlockProofLink($params);
+    public function downloadBlockProofLink(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `[tonNode.blockIdExt]` **blocks** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.DataList
      */
-    public function downloadBlockProofLinks($params);
+    public function downloadBlockProofLinks(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `int` **masterchain_seqno** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.ArchiveInfo
      */
-    public function getArchiveInfo($params);
+    public function getArchiveInfo(array $params): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `long` **archive_id** -
      * * `long` **offset**     -
      * * `int`  **max_size**   -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Data
      */
-    public function getArchiveSlice($params);
+    public function getArchiveSlice(array $params): tonNode;
 
     /**
-     *
-     *
      * @return tonNode.Capabilities
      */
-    public function getCapabilities();
+    public function getCapabilities(): tonNode;
 
     /**
-     *
-     *
      * Parameters:
      * * `tonNode.externalMessage` **message** -.
      *
      * @param array $params Parameters
-     *
      * @return tonNode.Success
      */
-    public function slave($params);
+    public function slave(array $params): tonNode;
 
-    /**
-     *
-     *
-     * @return object
-     */
-    public function query();
+    public function query(): object;
 }
 
 interface adnl
 {
     /**
-     *
-     *
      * Parameters:
      * * `long` **value** -.
      *
      * @param array $params Parameters
-     *
      * @return adnl.Pong
      */
-    public function ping($params);
+    public function ping(array $params): adnl;
 }
 
 interface engine
 {
     /**
-     *
-     *
      * Parameters:
      * * `PrivateKey` **key**                 -
      * * `int256`     **key_hash**            -
@@ -871,17 +678,13 @@ interface engine
      * * `int256`     **id**                  -.
      *
      * @param array $params Parameters
-     *
-     * @return object
      */
-    public function validator($params);
+    public function validator(array $params): object;
 }
 
 interface http
 {
     /**
-     *
-     *
      * Parameters:
      * * `int256`        **id**           -
      * * `string`        **method**       -
@@ -890,24 +693,20 @@ interface http
      * * `[http.header]` **headers**      -.
      *
      * @param array $params Parameters
-     *
      * @return http.Response
      */
-    public function request($params);
+    public function request(array $params): http;
 
     /**
-     *
-     *
      * Parameters:
      * * `int256` **id**             -
      * * `int`    **seqno**          -
      * * `int`    **max_chunk_size** -.
      *
      * @param array $params Parameters
-     *
      * @return http.PayloadPart
      */
-    public function getNextPayloadPart($params);
+    public function getNextPayloadPart(array $params): http;
 }
 
 class InternalDoc extends APIFactory
@@ -915,140 +714,119 @@ class InternalDoc extends APIFactory
     /**
          * Call promise $b after promise $a.
          *
-         * @param \Generator|Promise $a Promise A
-         * @param \Generator|Promise $b Promise B
-         *
-         * @psalm-suppress InvalidScope
-         *
-         * @return \Amp\Promise
-         */
-    public function after($a, $b)
+         * @param Generator|Promise $a Promise A
+         * @param Generator|Promise $b Promise B
+     * @psalm-suppress InvalidScope
+     */
+    public function after($a, $b): Promise
     {
-        return \danog\MadelineProto\Tools::after($a, $b);
+        return Tools::after($a, $b);
     }
     /**
      * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
      * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
      *
-     * @param array<\Generator|Promise> $promises Promises
-     *
-     * @return \Amp\Promise
+     * @param array<(Generator|Promise)> $promises Promises
      */
-    public function all(array $promises)
+    public function all(array $promises): Promise
     {
-        return \danog\MadelineProto\Tools::all($promises);
+        return Tools::all($promises);
     }
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return \Amp\Promise
+     * @param array<(Promise|Generator)> $promises Promises
      */
-    public function any(array $promises)
+    public function any(array $promises): Promise
     {
-        return \danog\MadelineProto\Tools::any($promises);
+        return Tools::any($promises);
     }
     /**
      * Create array.
      *
      * @param mixed ...$params Params
-     *
      */
     public function arr(...$params): array
     {
-        return \danog\MadelineProto\Tools::arr(...$params);
+        return Tools::arr(...$params);
     }
     /**
      * base64URL decode.
      *
      * @param string $data Data to decode
-     *
      */
     public function base64urlDecode(string $data): string
     {
-        return \danog\MadelineProto\Tools::base64urlDecode($data);
+        return Tools::base64urlDecode($data);
     }
     /**
      * Base64URL encode.
      *
      * @param string $data Data to encode
-     *
      */
     public function base64urlEncode(string $data): string
     {
-        return \danog\MadelineProto\Tools::base64urlEncode($data);
+        return Tools::base64urlEncode($data);
     }
     /**
      * Convert parameters.
      *
      * @param array $parameters Parameters
-     *
-     * @return \Amp\Promise
      */
-    public function botAPItoMTProto(array $parameters, array $extra = [])
+    public function botAPItoMTProto(array $parameters, array $extra = []): Promise
     {
         return $this->__call(__FUNCTION__, [$parameters, $extra]);
     }
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @param \Generator|Promise|mixed $promise
-     *
+     * @param Generator|Promise|mixed $promise
      * @template TReturn
-     * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     *
-     * @return \Amp\Promise
+     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      * @psalm-return Promise<TReturn>
      */
-    public function call($promise)
+    public function call($promise): Promise
     {
-        return \danog\MadelineProto\Tools::call($promise);
+        return Tools::call($promise);
     }
     /**
      * Call promise in background.
      *
-     * @param \Generator|Promise  $promise Promise to resolve
+     * @param Generator|Promise $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
-     *
      * @psalm-suppress InvalidScope
-     *
-     * @return \Amp\Promise|mixed
+     * @return Promise|mixed
      */
-    public function callFork($promise, $actual = null, $file = '')
+    public function callFork($promise, $actual = null, string $file = '')
     {
-        return \danog\MadelineProto\Tools::callFork($promise, $actual, $file);
+        return Tools::callFork($promise, $actual, $file);
     }
     /**
      * Call promise in background, deferring execution.
      *
-     * @param \Generator|Promise $promise Promise to resolve
-     *
+     * @param Generator|Promise $promise Promise to resolve
      */
     public function callForkDefer($promise): void
     {
-        \danog\MadelineProto\Tools::callForkDefer($promise);
+        Tools::callForkDefer($promise);
     }
     /**
      * Close connection with client, connected via web.
      *
      * @param string $message Message
-     *
      * @return void
      */
-    public function closeConnection($message)
+    public function closeConnection(string $message)
     {
-        return \danog\MadelineProto\Tools::closeConnection($message);
+        return Tools::closeConnection($message);
     }
     /**
      * Connect to the lite endpoints specified in the config file.
      *
      * @param string $config Path to config file
-     *
-     * @return \Amp\Promise
      */
-    public function connect(string $config, array $extra = [])
+    public function connect(string $config, array $extra = []): Promise
     {
         return $this->__call(__FUNCTION__, [$config, $extra]);
     }
@@ -1056,33 +834,28 @@ class InternalDoc extends APIFactory
      * Asynchronously write to stdout/browser.
      *
      * @param string $string Message to echo
-     *
-     * @return \Amp\Promise
      */
-    public function echo(string $string)
+    public function echo(string $string): Promise
     {
-        return \danog\MadelineProto\Tools::echo($string);
+        return Tools::echo($string);
     }
     /**
      * Get final element of array.
      *
      * @param array $what Array
-     *
      */
     public function end(array $what)
     {
-        return \danog\MadelineProto\Tools::end($what);
+        return Tools::end($what);
     }
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return \Amp\Promise
+     * @param array<(Promise|Generator)> $promises Promises
      */
-    public function first(array $promises)
+    public function first(array $promises): Promise
     {
-        return \danog\MadelineProto\Tools::first($promises);
+        return Tools::first($promises);
     }
     /**
      * Asynchronously lock a file
@@ -1093,49 +866,45 @@ class InternalDoc extends APIFactory
      * @param float     $polling   Polling interval
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     *
      * @return \Amp\Promise<$token is null ? callable : ?callable>
      */
-    public function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Promise $token = null, $failureCb = null)
+    public function flock(string $file, int $operation, float $polling = 0.1, ?Promise $token = null, ?callable $failureCb = null)
     {
-        return \danog\MadelineProto\Tools::flock($file, $operation, $polling, $token, $failureCb);
+        return Tools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
      * Generate MTProto vector hash.
      *
      * @param array $ints IDs
-     *
      * @return string Vector hash
      */
     public function genVectorHash(array $ints): string
     {
-        return \danog\MadelineProto\Tools::genVectorHash($ints);
+        return Tools::genVectorHash($ints);
     }
     /**
      * Get extension from file location.
      *
      * @param mixed  $location File location
      * @param string $default  Default extension
-     *
      */
     public function getExtensionFromLocation($location, string $default): string
     {
-        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromLocation($location, $default);
+        return Extension::getExtensionFromLocation($location, $default);
     }
     /**
      * Get extension from mime type.
      *
      * @param string $mime MIME type
-     *
      */
     public function getExtensionFromMime(string $mime): string
     {
-        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromMime($mime);
+        return Extension::getExtensionFromMime($mime);
     }
     /**
      * Get TL method namespaces.
      *
-     * @psalm-return array|\Amp\Promise<array>
+     * @psalm-return array|Promise<array>
      */
     public function getMethodNamespaces()
     {
@@ -1145,91 +914,79 @@ class InternalDoc extends APIFactory
      * Get mime type from buffer.
      *
      * @param string $buffer Buffer
-     *
      */
     public function getMimeFromBuffer(string $buffer): string
     {
-        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromBuffer($buffer);
+        return Extension::getMimeFromBuffer($buffer);
     }
     /**
      * Get mime type from file extension.
      *
      * @param string $extension File extension
      * @param string $default   Default mime type
-     *
      */
     public function getMimeFromExtension(string $extension, string $default): string
     {
-        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromExtension($extension, $default);
+        return Extension::getMimeFromExtension($extension, $default);
     }
     /**
      * Get mime type of file.
      *
      * @param string $file File
-     *
      */
     public function getMimeFromFile(string $file): string
     {
-        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromFile($file);
+        return Extension::getMimeFromFile($file);
     }
     /**
      * Accesses a private variable from an object.
      *
      * @param object $obj Object
      * @param string $var Attribute name
-     *
      * @psalm-suppress InvalidScope
-     *
      * @access public
      */
-    public function getVar($obj, string $var)
+    public function getVar(object $obj, string $var)
     {
-        return \danog\MadelineProto\Tools::getVar($obj, $var);
+        return Tools::getVar($obj, $var);
     }
     /**
      * Checks private property exists in an object.
      *
      * @param object $obj Object
      * @param string $var Attribute name
-     *
      * @psalm-suppress InvalidScope
-     *
      * @access public
      */
-    public function hasVar($obj, string $var): bool
+    public function hasVar(object $obj, string $var): bool
     {
-        return \danog\MadelineProto\Tools::hasVar($obj, $var);
+        return Tools::hasVar($obj, $var);
     }
     /**
      * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
-     *
      * @return string JPG payload
      */
     public function inflateStripped(string $stripped): string
     {
-        return \danog\MadelineProto\Tools::inflateStripped($stripped);
+        return Tools::inflateStripped($stripped);
     }
     /**
      * Whether this is altervista.
-     *
-     * @return boolean
      */
     public function isAltervista(): bool
     {
-        return \danog\MadelineProto\Tools::isAltervista();
+        return Tools::isAltervista();
     }
     /**
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
      * @param mixed $var Value to check
-     *
-     * @return boolean
      */
     public function isArrayOrAlike($var): bool
     {
-        return \danog\MadelineProto\Tools::isArrayOrAlike($var);
+        return Tools::isArrayOrAlike($var);
     }
     /**
      * Logger.
@@ -1237,10 +994,9 @@ class InternalDoc extends APIFactory
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     *
-     * @psalm-return void|\Amp\Promise<void>
+     * @psalm-return void|Promise<void>
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
+    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
@@ -1248,10 +1004,8 @@ class InternalDoc extends APIFactory
      * Asynchronously run async callable.
      *
      * @param callable $func Function
-     *
-     * @return \Amp\Promise
      */
-    public function loop(callable $func, array $extra = [])
+    public function loop(callable $func, array $extra = []): Promise
     {
         return $this->__call(__FUNCTION__, [$func, $extra]);
     }
@@ -1259,23 +1013,20 @@ class InternalDoc extends APIFactory
      * Escape string for markdown.
      *
      * @param string $hwat String to escape
-     *
      */
     public function markdownEscape(string $hwat): string
     {
-        return \danog\MadelineProto\StrTools::markdownEscape($hwat);
+        return StrTools::markdownEscape($hwat);
     }
     /**
      * Call lite method.
      *
      * @param string $methodName Method name
      * @param array  $args       Arguments
-     *
-     * @return \Amp\Promise
      */
     public function methodCall(string $methodName, array $args = [
     ], array $aargs = [
-    ], array $extra = [])
+    ], array $extra = []): Promise
     {
         return $this->__call(__FUNCTION__, [$methodName, $args, $aargs, $extra]);
     }
@@ -1283,51 +1034,46 @@ class InternalDoc extends APIFactory
      * Escape method name.
      *
      * @param string $method Method name
-     *
      */
     public function methodEscape(string $method): string
     {
-        return \danog\MadelineProto\StrTools::methodEscape($method);
+        return StrTools::methodEscape($method);
     }
     /**
      * Convert double to binary version.
      *
      * @param float $value Value to convert
-     *
      */
     public function packDouble(float $value): string
     {
-        return \danog\MadelineProto\Tools::packDouble($value);
+        return Tools::packDouble($value);
     }
     /**
      * Convert integer to base256 signed int.
      *
      * @param integer $value Value to convert
-     *
      */
     public function packSignedInt(int $value): string
     {
-        return \danog\MadelineProto\Tools::packSignedInt($value);
+        return Tools::packSignedInt($value);
     }
     /**
      * Convert integer to base256 long.
      *
      * @param int $value Value to convert
-     *
      */
     public function packSignedLong(int $value): string
     {
-        return \danog\MadelineProto\Tools::packSignedLong($value);
+        return Tools::packSignedLong($value);
     }
     /**
      * Convert value to unsigned base256 int.
      *
      * @param int $value Value
-     *
      */
     public function packUnsignedInt(int $value): string
     {
-        return \danog\MadelineProto\Tools::packUnsignedInt($value);
+        return Tools::packUnsignedInt($value);
     }
     /**
      * Positive modulo
@@ -1335,77 +1081,69 @@ class InternalDoc extends APIFactory
      *
      * @param int $a A
      * @param int $b B
-     *
      * @return int Modulo
      */
     public function posmod(int $a, int $b): int
     {
-        return \danog\MadelineProto\Tools::posmod($a, $b);
+        return Tools::posmod($a, $b);
     }
     /**
      * Get random string of specified length.
      *
      * @param integer $length Length
-     *
      * @return string Random string
      */
     public function random(int $length): string
     {
-        return \danog\MadelineProto\Tools::random($length);
+        return Tools::random($length);
     }
     /**
      * Get random integer.
      *
      * @param integer $modulus Modulus
-     *
      */
     public function randomInt(int $modulus = 0): int
     {
-        return \danog\MadelineProto\Tools::randomInt($modulus);
+        return Tools::randomInt($modulus);
     }
     /**
      * Asynchronously read line.
      *
      * @param string $prompt Prompt
-     *
-     * @return \Amp\Promise<string>
+     * @return Promise<string>
      */
-    public function readLine(string $prompt = '')
+    public function readLine(string $prompt = ''): Promise
     {
-        return \danog\MadelineProto\Tools::readLine($prompt);
+        return Tools::readLine($prompt);
     }
     /**
      * Rethrow error catched in strand.
      *
-     * @param \Throwable $e    Exception
+     * @param Throwable $e Exception
      * @param string     $file File where the strand started
-     *
      * @psalm-suppress InvalidScope
-     *
      */
-    public function rethrow(\Throwable $e, $file = ''): void
+    public function rethrow(Throwable $e, string $file = ''): void
     {
-        \danog\MadelineProto\Tools::rethrow($e, $file);
+        Tools::rethrow($e, $file);
     }
     /**
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
-     *
      */
     public function rleDecode(string $string): string
     {
-        return \danog\MadelineProto\Tools::rleDecode($string);
+        return Tools::rleDecode($string);
     }
     /**
      * null-byte RLE encode.
      *
      * @param string $string Data to encode
-     *
      */
     public function rleEncode(string $string): string
     {
-        return \danog\MadelineProto\Tools::rleEncode($string);
+        return Tools::rleEncode($string);
     }
     /**
      * Sets a private variable in an object.
@@ -1413,50 +1151,40 @@ class InternalDoc extends APIFactory
      * @param object $obj Object
      * @param string $var Attribute name
      * @param mixed  $val Attribute value
-     *
      * @psalm-suppress InvalidScope
-     *
-     *
      * @access public
      */
-    public function setVar($obj, string $var, &$val): void
+    public function setVar(object $obj, string $var, &$val): void
     {
-        \danog\MadelineProto\Tools::setVar($obj, $var, $val);
+        Tools::setVar($obj, $var, $val);
     }
     /**
      * Asynchronously sleep.
      *
      * @param int|float $time Number of seconds to sleep for
-     *
-     * @return \Amp\Promise
      */
-    public function sleep($time)
+    public function sleep($time): Promise
     {
-        return \danog\MadelineProto\Tools::sleep($time);
+        return Tools::sleep($time);
     }
     /**
      * Resolves with a two-item array delineating successful and failed Promise results.
      * The returned promise will only fail if the given number of required promises fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return \Amp\Promise
+     * @param array<(Promise|Generator)> $promises Promises
      */
-    public function some(array $promises)
+    public function some(array $promises): Promise
     {
-        return \danog\MadelineProto\Tools::some($promises);
+        return Tools::some($promises);
     }
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
-     * @param \Generator|Promise $promise
-     * @param integer $timeout
-     *
-     * @return \Amp\Promise
+     * @param Generator|Promise $promise
      */
-    public function timeout($promise, int $timeout)
+    public function timeout($promise, int $timeout): Promise
     {
-        return \danog\MadelineProto\Tools::timeout($promise, $timeout);
+        return Tools::timeout($promise, $timeout);
     }
     /**
      * Creates an artificial timeout for any `Promise`.
@@ -1467,103 +1195,89 @@ class InternalDoc extends APIFactory
      *
      * @template TReturnAlt
      * @template TReturn
-     * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
-     *
+     * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
-     *
-     * @return \Amp\Promise<TReturn>|Promise<TReturnAlt>
-     *
-     * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
+     * @return Promise<TReturn>|Promise<TReturnAlt>
+     * @throws TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
-    public function timeoutWithDefault($promise, int $timeout, $default = null)
+    public function timeoutWithDefault($promise, int $timeout, $default = null): Promise
     {
-        return \danog\MadelineProto\Tools::timeoutWithDefault($promise, $timeout, $default);
+        return Tools::timeoutWithDefault($promise, $timeout, $default);
     }
     /**
      * Convert to camelCase.
      *
      * @param string $input String
-     *
      */
     public function toCamelCase(string $input): string
     {
-        return \danog\MadelineProto\StrTools::toCamelCase($input);
+        return StrTools::toCamelCase($input);
     }
     /**
      * Convert to snake_case.
      *
      * @param string $input String
-     *
      */
     public function toSnakeCase(string $input): string
     {
-        return \danog\MadelineProto\StrTools::toSnakeCase($input);
+        return StrTools::toSnakeCase($input);
     }
     /**
      * Escape type name.
      *
      * @param string $type String to escape
-     *
      */
     public function typeEscape(string $type): string
     {
-        return \danog\MadelineProto\StrTools::typeEscape($type);
+        return StrTools::typeEscape($type);
     }
     /**
      * Unpack binary double.
      *
      * @param string $value Value to unpack
-     *
      */
     public function unpackDouble(string $value): float
     {
-        return \danog\MadelineProto\Tools::unpackDouble($value);
+        return Tools::unpackDouble($value);
     }
     /**
      * Unpack base256 signed int.
      *
      * @param string $value base256 int
-     *
-     * @return integer
      */
     public function unpackSignedInt(string $value): int
     {
-        return \danog\MadelineProto\Tools::unpackSignedInt($value);
+        return Tools::unpackSignedInt($value);
     }
     /**
      * Unpack base256 signed long.
      *
      * @param string $value base256 long
-     *
-     * @return integer
      */
     public function unpackSignedLong(string $value): int
     {
-        return \danog\MadelineProto\Tools::unpackSignedLong($value);
+        return Tools::unpackSignedLong($value);
     }
     /**
      * Unpack base256 signed long to string.
      *
      * @param string|int|array $value base256 long
-     *
      */
     public function unpackSignedLongString($value): string
     {
-        return \danog\MadelineProto\Tools::unpackSignedLongString($value);
+        return Tools::unpackSignedLongString($value);
     }
     /**
      * Synchronously wait for a promise|generator.
      *
-     * @param \Generator|Promise $promise      The promise to wait for
+     * @param Generator|Promise $promise The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
-     *
      */
-    public function wait($promise, $ignoreSignal = false)
+    public function wait($promise, bool $ignoreSignal = false)
     {
-        return \danog\MadelineProto\Tools::wait($promise, $ignoreSignal);
+        return Tools::wait($promise, $ignoreSignal);
     }
 }

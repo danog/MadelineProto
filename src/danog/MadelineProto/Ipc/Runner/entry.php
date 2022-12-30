@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -54,7 +53,7 @@ use danog\MadelineProto\Tools;
     if (defined('SIGHUP')) {
         try {
             pcntl_signal(SIGHUP, fn () => null);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
     }
     if (!class_exists(API::class)) {
@@ -77,8 +76,8 @@ use danog\MadelineProto\Tools;
 
         include $autoloadPath;
     }
-    if (\MADELINE_WORKER_TYPE === 'madeline-ipc') {
-        $ipcPath = \MADELINE_WORKER_ARGS[0];
+    if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
+        $ipcPath = MADELINE_WORKER_ARGS[0];
         if (!file_exists($ipcPath)) {
             trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
             exit(1);
@@ -94,7 +93,7 @@ use danog\MadelineProto\Tools;
         }
         define('MADELINE_WORKER', 1);
 
-        $runnerId = \MADELINE_WORKER_ARGS[1];
+        $runnerId = MADELINE_WORKER_ARGS[1];
         $session = new SessionPaths($ipcPath);
 
         try {
@@ -110,12 +109,12 @@ use danog\MadelineProto\Tools;
                     Tools::wait(Server::waitShutdown());
                     Shutdown::removeCallback('restarter');
                     return;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Logger::log((string) $e, Logger::FATAL_ERROR);
                     Tools::wait($API->report("Surfaced: $e"));
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             echo "$e";
             echo "Got exception in IPC server, exiting...";
 

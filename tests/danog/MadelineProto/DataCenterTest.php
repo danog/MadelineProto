@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
@@ -8,7 +10,9 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\SettingsEmpty;
 use danog\MadelineProto\Tools;
+use Generator;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 \define('MADELINEPROTO_TEST', 'pony');
 
@@ -63,7 +67,7 @@ final class DataCenterTest extends TestCase
                     'tcpo_only' => false,
                 ],
             ],
-        ]
+        ],
     ];
 
     /**
@@ -74,9 +78,7 @@ final class DataCenterTest extends TestCase
      * @param string  $protocol   Protocol name
      * @param boolean $test_mode  Test mode
      * @param boolean $ipv6       IPv6
-     *
      * @dataProvider protocolProvider
-     *
      */
     public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
@@ -90,15 +92,15 @@ final class DataCenterTest extends TestCase
                         'obfuscated' => $obfuscated,
                         'transport'  => $transport,
                         'do_not_retry' => true,
-                        'timeout' => 10
+                        'timeout' => 10,
                     ],
                 ],
                 'logger' => [
                     'logger' => Logger::FILE_LOGGER,
                     'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE
-                ]
-            ]
+                    'logger_level' => Logger::ULTRA_VERBOSE,
+                ],
+            ],
         );
         $datacenter = null;
         $API = new class(new SettingsEmpty) extends MTProto {
@@ -115,7 +117,6 @@ final class DataCenterTest extends TestCase
             }
             /**
              * Get logger.
-             *
              */
             public function getLogger(): Logger
             {
@@ -124,7 +125,6 @@ final class DataCenterTest extends TestCase
 
             /**
              * Get settings.
-             *
              */
             public function getSettings(): Settings
             {
@@ -144,7 +144,7 @@ final class DataCenterTest extends TestCase
         \sleep(1);
         try {
             Tools::wait($datacenter->dcConnect(2));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (!$test_mode) {
                 throw $e;
             }
@@ -154,7 +154,7 @@ final class DataCenterTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function protocolProvider(): \Generator
+    public function protocolProvider(): Generator
     {
         $ipv6Pair = [false];
         if (@\file_get_contents('https://ipv6.google.com')) {

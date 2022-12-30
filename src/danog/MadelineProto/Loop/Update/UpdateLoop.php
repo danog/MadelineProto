@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,6 +25,7 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
+use Generator;
 
 /**
  * Update loop.
@@ -53,8 +53,6 @@ class UpdateLoop extends ResumableSignalLoop
     private ?FeedLoop $feeder = null;
     /**
      * Constructor.
-     *
-     * @param integer $channelId
      */
     public function __construct(MTProto $API, int $channelId)
     {
@@ -63,9 +61,8 @@ class UpdateLoop extends ResumableSignalLoop
     }
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
@@ -84,7 +81,7 @@ class UpdateLoop extends ResumableSignalLoop
             $this->toPts = null;
             while (true) {
                 if ($this->channelId) {
-                    $API->logger->logger('Resumed and fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::ULTRA_VERBOSE);
                     if ($state->pts() <= 1) {
                         $limit = 10;
                     } elseif ($API->authorization['user']['bot']) {
@@ -121,7 +118,7 @@ class UpdateLoop extends ResumableSignalLoop
                         $timeout = $difference['timeout'];
                     }
                     $timeout = \min(10, $timeout);
-                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
                             $state->update($difference);
@@ -129,7 +126,7 @@ class UpdateLoop extends ResumableSignalLoop
                             break 2;
                         case 'updates.channelDifference':
                             if ($request_pts >= $difference['pts'] && $request_pts > 1) {
-                                $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
+                                $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), Logger::VERBOSE);
                                 $difference['pts'] = $request_pts + 1;
                             }
                             $result += (yield from $feeder->feed($difference['other_updates']));
@@ -154,12 +151,12 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break;
                         default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
+                            throw new Exception('Unrecognized update difference received: '.\var_export($difference, true));
                     }
                 } else {
-                    $API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
                     $difference = yield from $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
-                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':
                             $state->update($difference);
@@ -196,7 +193,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break;
                         default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
+                            throw new Exception('Unrecognized update difference received: '.\var_export($difference, true));
                     }
                 }
             }
@@ -220,7 +217,6 @@ class UpdateLoop extends ResumableSignalLoop
     }
     /**
      * Get loop name.
-     *
      */
     public function __toString(): string
     {

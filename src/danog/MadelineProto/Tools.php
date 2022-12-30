@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -25,19 +24,34 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
+use ArrayAccess;
+use Closure;
+use Countable;
+use Exception;
+use Generator;
+use phpseclib3\Crypt\Random;
+use Throwable;
+use Traversable;
+use TypeError;
 
+use const DIRECTORY_SEPARATOR;
+use const LOCK_NB;
+use const LOCK_UN;
+use const PHP_INT_MAX;
+use const PHP_SAPI;
+use const STR_PAD_RIGHT;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 use function Amp\delay;
 use function Amp\File\exists;
+
 use function Amp\File\touch as touchAsync;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
 use function Amp\Promise\first;
 use function Amp\Promise\some;
-use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
+use function unpack;
 
 /**
  * Some tools.
@@ -54,9 +68,7 @@ abstract class Tools extends StrTools
      * Sanify TL obtained from JSON for TL serialization.
      *
      * @param array $input Data to sanitize
-     *
      * @internal
-     *
      */
     public static function convertJsonTL(array $input): array
     {
@@ -74,7 +86,6 @@ abstract class Tools extends StrTools
      * Generate MTProto vector hash.
      *
      * @param array $ints IDs
-     *
      * @return string Vector hash
      */
     public static function genVectorHash(array $ints): string
@@ -86,13 +97,12 @@ abstract class Tools extends StrTools
             $hash = $hash ^ ($id >> 4);
             $hash = $hash + $id;
         }
-        return Tools::packSignedLong($hash);
+        return self::packSignedLong($hash);
     }
     /**
      * Get random integer.
      *
      * @param integer $modulus Modulus
-     *
      */
     public static function randomInt(int $modulus = 0): int
     {
@@ -101,9 +111,9 @@ abstract class Tools extends StrTools
         }
         try {
             return \random_int(0, PHP_INT_MAX) % $modulus;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // random_compat will throw an Exception, which in PHP 5 does not implement Throwable
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // If a sufficient source of randomness is unavailable, random_bytes() will throw an
             // object that implements the Throwable interface (Exception, TypeError, Error).
             // We don't actually need to do anything here. The string() method should just continue
@@ -116,12 +126,11 @@ abstract class Tools extends StrTools
      * Get random string of specified length.
      *
      * @param integer $length Length
-     *
      * @return string Random string
      */
     public static function random(int $length): string
     {
-        return $length === 0 ? '' : \phpseclib3\Crypt\Random::string($length);
+        return $length === 0 ? '' : Random::string($length);
     }
     /**
      * Positive modulo
@@ -129,7 +138,6 @@ abstract class Tools extends StrTools
      *
      * @param int $a A
      * @param int $b B
-     *
      * @return int Modulo
      */
     public static function posmod(int $a, int $b): int
@@ -141,35 +149,30 @@ abstract class Tools extends StrTools
      * Unpack base256 signed int.
      *
      * @param string $value base256 int
-     *
-     * @return integer
      */
     public static function unpackSignedInt(string $value): int
     {
         if (\strlen($value) !== 4) {
-            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
+            throw new TL\Exception(Lang::$current_lang['length_not_4']);
         }
-        return \unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return \unpack('l', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
     /**
      * Unpack base256 signed long.
      *
      * @param string $value base256 long
-     *
-     * @return integer
      */
     public static function unpackSignedLong(string $value): int
     {
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
+            throw new TL\Exception(Lang::$current_lang['length_not_8']);
         }
-        return \unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return \unpack('q', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
     /**
      * Unpack base256 signed long to string.
      *
      * @param string|int|array $value base256 long
-     *
      */
     public static function unpackSignedLongString($value): string
     {
@@ -180,7 +183,7 @@ abstract class Tools extends StrTools
             $value = \pack('l2', $value);
         }
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
+            throw new TL\Exception(Lang::$current_lang['length_not_8']);
         }
         return (string) self::unpackSignedLong($value);
     }
@@ -188,42 +191,39 @@ abstract class Tools extends StrTools
      * Convert integer to base256 signed int.
      *
      * @param integer $value Value to convert
-     *
      */
     public static function packSignedInt(int $value): string
     {
         if ($value > 2147483647) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_2147483647'], $value));
         }
         if ($value < -2147483648) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
         $res = \pack('l', $value);
-        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
+        return Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
     /**
      * Convert integer to base256 long.
      *
      * @param int $value Value to convert
-     *
      */
     public static function packSignedLong(int $value): string
     {
-        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value);
+        return Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value);
     }
     /**
      * Convert value to unsigned base256 int.
      *
      * @param int $value Value
-     *
      */
     public static function packUnsignedInt(int $value): string
     {
         if ($value > 4294967295) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_4294967296'], $value));
         }
         if ($value < 0) {
-            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_0'], $value));
         }
         return \pack('V', $value);
     }
@@ -231,39 +231,36 @@ abstract class Tools extends StrTools
      * Convert double to binary version.
      *
      * @param float $value Value to convert
-     *
      */
     public static function packDouble(float $value): string
     {
         $res = \pack('d', $value);
         if (\strlen($res) !== 8) {
-            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
+            throw new TL\Exception(Lang::$current_lang['encode_double_error']);
         }
-        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
+        return Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
     /**
      * Unpack binary double.
      *
      * @param string $value Value to unpack
-     *
      */
     public static function unpackDouble(string $value): float
     {
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
+            throw new TL\Exception(Lang::$current_lang['length_not_8']);
         }
-        return \unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return \unpack('d', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
     /**
      * Synchronously wait for a promise|generator.
      *
-     * @param \Generator|Promise $promise      The promise to wait for
+     * @param Generator|Promise $promise The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
-     *
      */
-    public static function wait($promise, $ignoreSignal = false)
+    public static function wait($promise, bool $ignoreSignal = false)
     {
-        if ($promise instanceof \Generator) {
+        if ($promise instanceof Generator) {
             $promise = new Coroutine($promise);
         } elseif (!$promise instanceof Promise) {
             return $promise;
@@ -282,7 +279,7 @@ abstract class Tools extends StrTools
                         $value = $v;
                     });
                 });
-            } catch (\Throwable $throwable) {
+            } catch (Throwable $throwable) {
                 Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
                 Logger::log((string) $throwable, Logger::FATAL_ERROR);
                 throw $throwable;
@@ -297,8 +294,7 @@ abstract class Tools extends StrTools
      * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
      * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
      *
-     * @param array<\Generator|Promise> $promises Promises
-     *
+     * @param array<(Generator|Promise)> $promises Promises
      */
     public static function all(array $promises): Promise
     {
@@ -311,8 +307,7 @@ abstract class Tools extends StrTools
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
+     * @param array<(Promise|Generator)> $promises Promises
      */
     public static function any(array $promises): Promise
     {
@@ -326,8 +321,7 @@ abstract class Tools extends StrTools
      * Resolves with a two-item array delineating successful and failed Promise results.
      * The returned promise will only fail if the given number of required promises fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
+     * @param array<(Promise|Generator)> $promises Promises
      */
     public static function some(array $promises): Promise
     {
@@ -340,8 +334,7 @@ abstract class Tools extends StrTools
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
      *
-     * @param array<Promise|\Generator> $promises Promises
-     *
+     * @param array<(Promise|Generator)> $promises Promises
      */
     public static function first(array $promises): Promise
     {
@@ -354,9 +347,7 @@ abstract class Tools extends StrTools
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
-     * @param \Generator|Promise $promise
-     * @param integer $timeout
-     *
+     * @param Generator|Promise $promise
      */
     public static function timeout($promise, int $timeout): Promise
     {
@@ -389,17 +380,13 @@ abstract class Tools extends StrTools
      *
      * @template TReturnAlt
      * @template TReturn
-     * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
-     *
+     * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
-     *
      * @return Promise<TReturn>|Promise<TReturnAlt>
-     *
-     * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
+     * @throws TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
     public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
     {
@@ -426,16 +413,14 @@ abstract class Tools extends StrTools
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @param \Generator|Promise|mixed $promise
-     *
+     * @param Generator|Promise|mixed $promise
      * @template TReturn
-     * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     *
+     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      * @psalm-return Promise<TReturn>
      */
     public static function call($promise): Promise
     {
-        if ($promise instanceof \Generator) {
+        if ($promise instanceof Generator) {
             $promise = new Coroutine($promise);
         } elseif (!$promise instanceof Promise) {
             return new Success($promise);
@@ -445,20 +430,18 @@ abstract class Tools extends StrTools
     /**
      * Call promise in background.
      *
-     * @param \Generator|Promise  $promise Promise to resolve
+     * @param Generator|Promise $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
-     *
      * @psalm-suppress InvalidScope
-     *
      * @return Promise|mixed
      */
-    public static function callFork($promise, $actual = null, $file = '')
+    public static function callFork($promise, $actual = null, string $file = '')
     {
         if ($actual) {
             $promise = $actual;
         }
-        if ($promise instanceof \Generator) {
+        if ($promise instanceof Generator) {
             $promise = new Coroutine($promise);
         }
         if ($promise instanceof Promise) {
@@ -477,8 +460,7 @@ abstract class Tools extends StrTools
     /**
      * Call promise in background, deferring execution.
      *
-     * @param \Generator|Promise $promise Promise to resolve
-     *
+     * @param Generator|Promise $promise Promise to resolve
      */
     public static function callForkDefer($promise): void
     {
@@ -487,16 +469,14 @@ abstract class Tools extends StrTools
     /**
      * Rethrow error catched in strand.
      *
-     * @param \Throwable $e    Exception
+     * @param Throwable $e Exception
      * @param string     $file File where the strand started
-     *
      * @psalm-suppress InvalidScope
-     *
      */
-    public static function rethrow(\Throwable $e, $file = ''): void
+    public static function rethrow(Throwable $e, string $file = ''): void
     {
-        $zis = isset($this) ? $this : null;
-        $logger = isset($zis->logger) ? $zis->logger : Logger::$default;
+        $zis = $this ?? null;
+        $logger = $zis->logger ?? Logger::$default;
         if ($file) {
             $file = " started @ {$file}";
         }
@@ -518,11 +498,9 @@ abstract class Tools extends StrTools
     /**
      * Call promise $b after promise $a.
      *
-     * @param \Generator|Promise $a Promise A
-     * @param \Generator|Promise $b Promise B
-     *
+     * @param Generator|Promise $a Promise A
+     * @param Generator|Promise $b Promise B
      * @psalm-suppress InvalidScope
-     *
      */
     public static function after($a, $b): Promise
     {
@@ -561,32 +539,12 @@ abstract class Tools extends StrTools
      * @param float     $polling   Polling interval
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     *
-     * @return Promise<$token is null ? callable : ?callable>
+     * @return $token is null ? (callable(): void) : ((callable(): void)|null)
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1, ?Promise $token = null, $failureCb = null): Promise
+    public static function flock(string $file, int $operation, float $polling, ?Promise $token = null, ?callable $failureCb = null): ?callable
     {
-        return self::call(Tools::flockGenerator($file, $operation, $polling, $token, $failureCb));
-    }
-    /**
-     * Asynchronously lock a file (internal generator function).
-     *
-     * @param string    $file      File to lock
-     * @param integer   $operation Locking mode
-     * @param float     $polling   Polling interval
-     * @param ?Promise  $token     Cancellation token
-     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     *
-     * @internal Generator function
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, ?callable>
-     */
-    public static function flockGenerator(string $file, int $operation, float $polling, ?Promise $token = null, $failureCb = null): \Generator
-    {
-        $polling *= 1000;
-        $polling = (int) $polling;
-        if (!yield exists($file)) {
-            yield touchAsync($file);
+        if (!exists($file)) {
+            touchAsync($file);
         }
         $operation |= LOCK_NB;
         $res = \fopen($file, 'c');
@@ -598,11 +556,11 @@ abstract class Tools extends StrTools
                     $failureCb = null;
                 }
                 if ($token) {
-                    if (yield Tools::timeoutWithDefault($token, $polling, false)) {
+                    if (self::timeoutWithDefault($token, $polling, false)) {
                         return;
                     }
                 } else {
-                    yield delay($polling);
+                    delay($polling);
                 }
             }
         } while (!$result);
@@ -617,45 +575,28 @@ abstract class Tools extends StrTools
     /**
      * Asynchronously sleep.
      *
-     * @param int|float $time Number of seconds to sleep for
-     *
+     * @param float $time Number of seconds to sleep for
      */
-    public static function sleep($time): Promise
+    public static function sleep(float $time): void
     {
-        return new \Amp\Delayed((int) ($time * 1000));
+        delay($time);
     }
     /**
      * Asynchronously read line.
      *
      * @param string $prompt Prompt
-     *
-     * @return Promise<string>
      */
-    public static function readLine(string $prompt = ''): Promise
-    {
-        return self::call(Tools::readLineGenerator($prompt));
-    }
-    /**
-     * Asynchronously read line (generator function).
-     *
-     * @param string $prompt Prompt
-     *
-     * @internal Generator function
-     *
-     *
-     * @psalm-return \Generator<int, Promise|Promise<null|string>, mixed, mixed|null>
-     */
-    public static function readLineGenerator(string $prompt = ''): \Generator
+    public static function readLine(string $prompt = ''): string
     {
         try {
             Magic::togglePeriodicLogging();
             $stdin = getStdin();
             $stdout = getStdout();
             if ($prompt) {
-                yield $stdout->write($prompt);
+                $stdout->write($prompt);
             }
             static $lines = [''];
-            while (\count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
+            while (\count($lines) < 2 && ($chunk = $stdin->read()) !== null) {
                 $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
                 $lines[\count($lines) - 1] .= \array_shift($chunk);
                 $lines = \array_merge($lines, $chunk);
@@ -669,7 +610,6 @@ abstract class Tools extends StrTools
      * Asynchronously write to stdout/browser.
      *
      * @param string $string Message to echo
-     *
      */
     public static function echo(string $string): Promise
     {
@@ -679,18 +619,15 @@ abstract class Tools extends StrTools
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
      * @param mixed $var Value to check
-     *
-     * @return boolean
      */
     public static function isArrayOrAlike($var): bool
     {
-        return \is_array($var) || $var instanceof \ArrayAccess && $var instanceof \Traversable && $var instanceof \Countable;
+        return \is_array($var) || $var instanceof ArrayAccess && $var instanceof Traversable && $var instanceof Countable;
     }
     /**
      * Create array.
      *
      * @param mixed ...$params Params
-     *
      */
     public static function arr(...$params): array
     {
@@ -700,7 +637,6 @@ abstract class Tools extends StrTools
      * base64URL decode.
      *
      * @param string $data Data to decode
-     *
      */
     public static function base64urlDecode(string $data): string
     {
@@ -710,7 +646,6 @@ abstract class Tools extends StrTools
      * Base64URL encode.
      *
      * @param string $data Data to encode
-     *
      */
     public static function base64urlEncode(string $data): string
     {
@@ -720,7 +655,6 @@ abstract class Tools extends StrTools
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
-     *
      */
     public static function rleDecode(string $string): string
     {
@@ -743,7 +677,6 @@ abstract class Tools extends StrTools
      * null-byte RLE encode.
      *
      * @param string $string Data to encode
-     *
      */
     public static function rleEncode(string $string): string
     {
@@ -767,7 +700,6 @@ abstract class Tools extends StrTools
      * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
-     *
      * @return string JPG payload
      */
     public static function inflateStripped(string $stripped): string
@@ -820,9 +752,8 @@ abstract class Tools extends StrTools
      * Close connection with client, connected via web.
      *
      * @param string $message Message
-     *
      */
-    public static function closeConnection($message): void
+    public static function closeConnection(string $message): void
     {
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
@@ -843,7 +774,6 @@ abstract class Tools extends StrTools
      * Get maximum photo size.
      *
      * @internal
-     *
      */
     public static function maxSize(array $sizes): array
     {
@@ -874,7 +804,6 @@ abstract class Tools extends StrTools
      * Get final element of array.
      *
      * @param array $what Array
-     *
      */
     public static function end(array $what)
     {
@@ -882,8 +811,6 @@ abstract class Tools extends StrTools
     }
     /**
      * Whether this is altervista.
-     *
-     * @return boolean
      */
     public static function isAltervista(): bool
     {
@@ -894,19 +821,15 @@ abstract class Tools extends StrTools
      *
      * @param object $obj Object
      * @param string $var Attribute name
-     *
      * @psalm-suppress InvalidScope
-     *
      * @access public
      */
-    public static function hasVar($obj, string $var): bool
+    public static function hasVar(object $obj, string $var): bool
     {
-        return \Closure::bind(
-            function () use ($var) {
-                return isset($this->{$var});
-            },
+        return Closure::bind(
+            fn () => isset($this->{$var}),
             $obj,
-            \get_class($obj)
+            \get_class($obj),
         )->__invoke();
     }
     /**
@@ -914,19 +837,15 @@ abstract class Tools extends StrTools
      *
      * @param object $obj Object
      * @param string $var Attribute name
-     *
      * @psalm-suppress InvalidScope
-     *
      * @access public
      */
-    public static function &getVar($obj, string $var)
+    public static function &getVar(object $obj, string $var)
     {
-        return \Closure::bind(
-            function &() use ($var) {
-                return $this->{$var};
-            },
+        return Closure::bind(
+            fn &() => $this->{$var},
             $obj,
-            \get_class($obj)
+            \get_class($obj),
         )->__invoke();
     }
     /**
@@ -935,29 +854,24 @@ abstract class Tools extends StrTools
      * @param object $obj Object
      * @param string $var Attribute name
      * @param mixed  $val Attribute value
-     *
      * @psalm-suppress InvalidScope
-     *
-     *
      * @access public
      */
-    public static function setVar($obj, string $var, &$val): void
+    public static function setVar(object $obj, string $var, &$val): void
     {
-        \Closure::bind(
+        Closure::bind(
             function () use ($var, &$val): void {
                 $this->{$var} =& $val;
             },
             $obj,
-            \get_class($obj)
+            \get_class($obj),
         )->__invoke();
     }
     /**
      * Get absolute path to file, related to session path.
      *
      * @param string $file File
-     *
      * @internal
-     *
      */
     public static function absolute(string $file): string
     {
@@ -970,7 +884,6 @@ abstract class Tools extends StrTools
      * Parse t.me link.
      *
      * @internal
-     *
      * @return array{0: bool, 1: string}|null
      */
     public static function parseLink(string $link): ?array

@@ -13,16 +13,18 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Types;
 
+use ArrayAccess;
+use JsonSerializable;
+
 /**
  * Bytes wrapper.
  */
-class Bytes implements \JsonSerializable, \ArrayAccess
+class Bytes implements JsonSerializable, ArrayAccess
 {
     /**
      * Bytes.
@@ -41,7 +43,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {
@@ -49,7 +50,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Cast bytes to string.
-     *
      */
     public function __toString(): string
     {
@@ -57,7 +57,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Obtain values for JSON-encoding.
-     *
      */
     public function jsonSerialize(): array
     {
@@ -68,7 +67,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      *
      * @param integer|null $offset Offset
      * @param string       $value  Char
-     *
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -82,7 +80,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      * Get char at offset.
      *
      * @param integer $offset Name
-     *
      * @return string
      */
     public function offsetGet(mixed $offset): mixed
@@ -93,7 +90,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      * Unset char at offset.
      *
      * @param integer $offset Offset
-     *
      */
     public function offsetUnset(mixed $offset): void
     {
@@ -103,8 +99,6 @@ class Bytes implements \JsonSerializable, \ArrayAccess
      * Check if char at offset exists.
      *
      * @param integer $offset Offset
-     *
-     * @return boolean
      */
     public function offsetExists(mixed $offset): bool
     {

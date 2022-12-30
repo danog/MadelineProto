@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\StrTools;
+use DOMDocument;
 use DOMNode;
 use DOMText;
 
@@ -22,7 +23,7 @@ final class DOMEntities
     public string $message = '';
     public function __construct(string $html)
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $html = \preg_replace("/\<br(\s*)?\/?\>/i", "\n", $html);
         $dom->loadxml("<body>" . \trim($html) . "</body>");
         $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);

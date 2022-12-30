@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -28,7 +27,7 @@ class ResponseInfo
     private const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
     private const NO_CACHE = [
         'Cache-Control' => ['no-store, no-cache, must-revalidate, max-age=0', 'post-check=0, pre-check=0'],
-        'Pragma' => 'no-cache'
+        'Pragma' => 'no-cache',
     ];
 
     /**
@@ -123,7 +122,6 @@ class ResponseInfo
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
-     *
      */
     public static function parseHeaders(string $method, array $headers, array $messageMedia): self
     {
@@ -131,7 +129,6 @@ class ResponseInfo
     }
     /**
      * Get explanation for HTTP code.
-     *
      */
     public function getCodeExplanation(): string
     {

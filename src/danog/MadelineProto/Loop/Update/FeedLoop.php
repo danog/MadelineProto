@@ -13,16 +13,17 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use Generator;
 
 /**
  * Update feed loop.
@@ -73,9 +74,8 @@ class FeedLoop extends ResumableSignalLoop
     }
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $this->updater = $API->updaters[$this->channelId];
@@ -105,7 +105,7 @@ class FeedLoop extends ResumableSignalLoop
             }
         }
     }
-    public function parse(array $updates): \Generator
+    public function parse(array $updates): Generator
     {
         \reset($updates);
         while ($updates) {
@@ -113,17 +113,17 @@ class FeedLoop extends ResumableSignalLoop
             $update = $updates[$key];
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
-                $this->API->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
                 yield $this->updater->resume();
                 continue;
             }
             if (isset($update['pts'], $update['pts_count'])) {
                 $logger = function ($msg) use ($update): void {
                     $pts_count = $update['pts_count'];
-                    $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
+                    $mid = $update['message']['id'] ?? '-';
                     $mypts = $this->state->pts();
                     $computed = $mypts + $pts_count;
-                    $this->API->logger->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", Logger::ULTRA_VERBOSE);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
@@ -150,7 +150,7 @@ class FeedLoop extends ResumableSignalLoop
             $this->save($update);
         }
     }
-    public function feed(array $updates): \Generator
+    public function feed(array $updates): Generator
     {
         $result = [];
         foreach ($updates as $update) {
@@ -158,13 +158,13 @@ class FeedLoop extends ResumableSignalLoop
         }
         return $result;
     }
-    public function feedSingle(array $update): \Generator
+    public function feedSingle(array $update): Generator
     {
         $channelId = self::GENERIC;
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $channelId = isset($update['message']['peer_id']['channel_id']) ? $update['message']['peer_id']['channel_id'] : self::GENERIC;
+                $channelId = $update['message']['peer_id']['channel_id'] ?? self::GENERIC;
                 if (!$channelId) {
                     return false;
                 }
@@ -174,7 +174,7 @@ class FeedLoop extends ResumableSignalLoop
                 $channelId = $update['channel_id'];
                 break;
             case 'updateChannelTooLong':
-                $channelId = isset($update['channel_id']) ? $update['channel_id'] : self::GENERIC;
+                $channelId = $update['channel_id'] ?? self::GENERIC;
                 if (!isset($update['pts'])) {
                     $update['pts'] = 1;
                 }
@@ -230,7 +230,7 @@ class FeedLoop extends ResumableSignalLoop
                     if ($entities) {
                         $log .= 'entities '.\json_encode($update['message']['entities']).', ';
                     }
-                    $this->API->logger->logger("Not enough data: for message update {$log}, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
+                    $this->API->logger->logger("Not enough data: for message update {$log}, getting difference...", Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
                     if ($channelId && $to) {
                         $channelId = self::GENERIC;
@@ -239,7 +239,7 @@ class FeedLoop extends ResumableSignalLoop
                 break;
             default:
                 if ($channelId && !(yield from $this->API->peerIsset($this->API->toSupergroup($channelId)))) {
-                    $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
+                    $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
                     return false;
                 }
                 break;
@@ -251,7 +251,7 @@ class FeedLoop extends ResumableSignalLoop
                 return yield from $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
-        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);
         $this->incomingUpdates[] = $update;
         return $this->channelId;
     }
@@ -267,7 +267,7 @@ class FeedLoop extends ResumableSignalLoop
                 continue;
             }
             if ($message['_'] !== 'messageEmpty') {
-                $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", Logger::VERBOSE);
             }
             $this->parsedUpdates[] = ['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }

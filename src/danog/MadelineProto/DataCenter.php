@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -57,13 +56,19 @@ use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
+use danog\Serializable;
+use Generator;
+use Throwable;
+
+use const PHP_OS;
+use const SORT_REGULAR;
 
 /**
  * Manages datacenters.
  */
 class DataCenter
 {
-    use \danog\Serializable;
+    use Serializable;
     /**
      * All socket connections to DCs.
      *
@@ -97,7 +102,7 @@ class DataCenter
     /**
      * HTTP client.
      *
-     * @var \Amp\Http\Client\HttpClient
+     * @var HttpClient
      */
     private $HTTPClient;
     /**
@@ -115,7 +120,7 @@ class DataCenter
     /**
      * Cookie jar.
      *
-     * @var \Amp\Http\Client\Cookie\CookieJar
+     * @var CookieJar
      */
     private $CookieJar;
     /**
@@ -142,7 +147,7 @@ class DataCenter
         }
         $array = [];
         foreach ($this->sockets as $id => $socket) {
-            if ($socket instanceof \danog\MadelineProto\Connection) {
+            if ($socket instanceof Connection) {
                 if (isset($socket->temp_auth_key) && $socket->temp_auth_key) {
                     $array[$id]['tempAuthKey'] = $socket->temp_auth_key;
                 }
@@ -160,7 +165,6 @@ class DataCenter
      * Set auth key information from saved auth array.
      *
      * @param array $saved Saved auth array
-     *
      */
     public function setDataCenterConnections(array $saved): void
     {
@@ -199,9 +203,8 @@ class DataCenter
      * @param ConnectionSettings $settings     Settings
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
-     *
      */
-    public function __magic_construct($API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null): void
+    public function __magic_construct(MTProto $API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null): void
     {
         $this->API = $API;
         $changed = [];
@@ -233,12 +236,12 @@ class DataCenter
         }
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
             $configProvider = new class implements ConfigLoader {
-                private function loadConfigGenerator(): \Generator
+                private function loadConfigGenerator(): Generator
                 {
                     $loader = \stripos(PHP_OS, "win") === 0 ? new WindowsConfigLoader() : new UnixConfigLoader();
                     try {
                         return yield $loader->loadConfig();
-                    } catch (\Throwable) {
+                    } catch (Throwable) {
                         return new Config([
                             '1.1.1.1',
                             '1.0.0.1',
@@ -274,7 +277,6 @@ class DataCenter
      * Set VoIP endpoints.
      *
      * @param array $endpoints Endpoints
-     *
      */
     public function setVoIPEndpoints(array $endpoints): void
     {
@@ -284,10 +286,9 @@ class DataCenter
      *
      * @param string  $dc_number DC to connect to
      * @param integer $id        Connection ID to re-establish (optional)
-     *
-     * @return \Generator<bool>
+     * @return Generator<bool>
      */
-    public function dcConnect(string $dc_number, int $id = -1): \Generator
+    public function dcConnect(string $dc_number, int $id = -1): Generator
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
         if (isset($this->sockets[$dc_number]) && !$old) {
@@ -315,7 +316,7 @@ class DataCenter
                 }
                 $this->API->logger->logger('OK!', Logger::WARNING);
                 return true;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 if (\defined("MADELINEPROTO_TEST") && \constant("MADELINEPROTO_TEST") === 'pony') {
                     throw $e;
                 }
@@ -330,10 +331,9 @@ class DataCenter
      * @param integer        $dc_number DC ID to generate contexts for
      * @param string         $uri       URI
      * @param ConnectContext $context   Connection context
-     *
      * @return ConnectionContext[]
      */
-    public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null): array
+    public function generateContexts(int $dc_number = 0, string $uri = '', ConnectContext $context = null): array
     {
         $ctxs = [];
         $combos = [];
@@ -445,7 +445,7 @@ class DataCenter
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [
                     $this->settings->getIpv6() ? 'ipv6' : 'ipv4',
-                    $this->settings->getIpv6() ? 'ipv4' : 'ipv6'
+                    $this->settings->getIpv6() ? 'ipv4' : 'ipv6',
                 ];
                 foreach ($ipv6Combos as $ipv6) {
                     // This is only for non-MTProto connections
@@ -535,16 +535,13 @@ class DataCenter
     }
     /**
      * Get main API.
-     *
-     * @return MTProto
      */
-    public function getAPI()
+    public function getAPI(): MTProto
     {
         return $this->API;
     }
     /**
      * Get async HTTP client.
-     *
      */
     public function getHTTPClient(): HttpClient
     {
@@ -552,7 +549,6 @@ class DataCenter
     }
     /**
      * Get async HTTP client cookies.
-     *
      */
     public function getCookieJar(): CookieJar
     {
@@ -560,7 +556,6 @@ class DataCenter
     }
     /**
      * Get DNS over HTTPS async DNS client.
-     *
      */
     public function getDNSClient(): Resolver
     {
@@ -568,7 +563,6 @@ class DataCenter
     }
     /**
      * Get non-proxied DNS over HTTPS async DNS client.
-     *
      */
     public function getNonProxiedDNSClient(): Resolver
     {
@@ -578,11 +572,9 @@ class DataCenter
      * Get contents of file.
      *
      * @param string $url URL to fetch
-     *
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<string>, mixed, string>
+     * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url): \Generator
+    public function fileGetContents(string $url): Generator
     {
         return yield (yield $this->getHTTPClient()->request(new Request($url)))->getBody()->buffer();
     }
@@ -590,7 +582,6 @@ class DataCenter
      * Get Connection instance for authorization.
      *
      * @param string $dc DC ID
-     *
      */
     public function getAuthConnection(string $dc): Connection
     {
@@ -600,7 +591,6 @@ class DataCenter
      * Get Connection instance.
      *
      * @param string $dc DC ID
-     *
      */
     public function getConnection(string $dc): Connection
     {
@@ -610,11 +600,9 @@ class DataCenter
      * Get Connection instance asynchronously.
      *
      * @param string $dc DC ID
-     *
-     *
-     * @psalm-return \Generator<int, \Amp\Promise, mixed, Connection>
+     * @psalm-return Generator<int, Promise, mixed, Connection>
      */
-    public function waitGetConnection(string $dc): \Generator
+    public function waitGetConnection(string $dc): Generator
     {
         return $this->sockets[$dc]->waitGetConnection();
     }
@@ -622,7 +610,6 @@ class DataCenter
      * Get DataCenterConnection instance.
      *
      * @param string $dc DC ID
-     *
      */
     public function getDataCenterConnection(string $dc): DataCenterConnection
     {
@@ -641,8 +628,6 @@ class DataCenter
      * Check if a DC is present.
      *
      * @param string $dc DC ID
-     *
-     * @return boolean
      */
     public function has(string $dc): bool
     {
@@ -652,10 +637,8 @@ class DataCenter
      * Check if connected to datacenter using HTTP.
      *
      * @param string $datacenter DC ID
-     *
-     * @return boolean
      */
-    public function isHttp(string $datacenter)
+    public function isHttp(string $datacenter): bool
     {
         return $this->sockets[$datacenter]->isHttp();
     }
@@ -663,8 +646,6 @@ class DataCenter
      * Check if connected to datacenter directly using IP address.
      *
      * @param string $datacenter DC ID
-     *
-     * @return boolean
      */
     public function byIPAddress(string $datacenter): bool
     {
@@ -674,9 +655,8 @@ class DataCenter
      * Get all DC IDs.
      *
      * @param boolean $all Whether to get all possible DC IDs, or only connected ones
-     *
      */
-    public function getDcs($all = true): array
+    public function getDcs(bool $all = true): array
     {
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';

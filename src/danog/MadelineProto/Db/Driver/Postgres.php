@@ -4,8 +4,12 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Postgres\ConnectionConfig;
 use Amp\Postgres\Pool;
+use Amp\Sql\ConnectionException;
+use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+use Generator;
+use Throwable;
 
 use function Amp\Postgres\Pool;
 
@@ -20,15 +24,12 @@ class Postgres
     private static array $connections = [];
 
     /**
-     *
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator<Pool>
+     * @throws ConnectionException
+     * @throws FailureException
+     * @throws Throwable
+     * @return Generator<Pool>
      */
-    public static function getConnection(DatabasePostgres $settings): \Generator
+    public static function getConnection(DatabasePostgres $settings): Generator
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
@@ -45,12 +46,11 @@ class Postgres
     }
 
     /**
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
+     * @throws ConnectionException
+     * @throws FailureException
+     * @throws Throwable
      */
-    private static function createDb(ConnectionConfig $config): \Generator
+    private static function createDb(ConnectionConfig $config): Generator
     {
         try {
             $db = $config->getDatabase();
@@ -83,7 +83,7 @@ class Postgres
                     $$ language 'plpgsql'
                 ");
             $connection->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
         }
     }

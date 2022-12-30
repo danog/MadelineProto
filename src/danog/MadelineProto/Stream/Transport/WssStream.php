@@ -13,13 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Transport;
 
 use danog\MadelineProto\Stream\ConnectionContext;
+use Generator;
 
 /**
  * Websocket TLS stream wrapper.
@@ -32,9 +32,8 @@ class WssStream extends WsStream
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         return parent::connect($ctx->getCtx()->secure(true), $header);
     }

@@ -44,7 +44,6 @@ trait ArrayCacheTrait
 
     /**
      * Save item in cache.
-     *
      */
     protected function setCache(string $key, $value): void
     {
@@ -54,7 +53,6 @@ trait ArrayCacheTrait
 
     /**
      * Remove key from cache.
-     *
      */
     protected function unsetCache(string $key): void
     {
@@ -107,9 +105,9 @@ trait ArrayCacheTrait
                 "cache for table: %s; keys left: %s; keys removed: %s",
                 (string) $this,
                 \count($this->cache),
-                $oldCount
+                $oldCount,
             ),
-            Logger::VERBOSE
+            Logger::VERBOSE,
         );
     }
 }

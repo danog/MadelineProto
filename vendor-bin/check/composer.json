@@ -4,5 +4,14 @@
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^9",
         "amphp/php-cs-fixer-config": "v2.x-dev"
+    },
+    "require-dev": {
+        "slevomat/coding-standard": "^8.7",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

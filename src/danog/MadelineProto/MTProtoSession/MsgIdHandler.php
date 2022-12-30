@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -48,7 +47,6 @@ abstract class MsgIdHandler
      * Create MsgIdHandler instance.
      *
      * @param Connection $session Session
-     *
      */
     public static function createInstance(Connection $session): self
     {
@@ -60,31 +58,26 @@ abstract class MsgIdHandler
      *
      * @param string $newMessageId New message ID
      * @param array  $aargs        Params
-     *
      */
-    abstract public function checkMessageId($newMessageId, array $aargs): void;
+    abstract public function checkMessageId(string $newMessageId, array $aargs): void;
     /**
      * Generate outgoing message ID.
-     *
      */
     abstract public function generateMessageId(): string;
     /**
      * Get maximum message ID.
      *
      * @param boolean $incoming Incoming or outgoing message ID
-     *
      */
-    abstract public function getMaxId(bool $incoming);
+    abstract public function getMaxId(bool $incoming): void;
 
     /**
      * Get readable representation of message ID.
-     *
      */
     abstract protected static function toStringInternal(string $messageId): string;
 
     /**
      * Cleanup incoming and outgoing messages.
-     *
      */
     public function cleanup(): void
     {
@@ -97,7 +90,6 @@ abstract class MsgIdHandler
     }
     /**
      * Get readable representation of message ID.
-     *
      */
     public static function toString(string $messageId): string
     {

@@ -9,10 +9,13 @@ use Amp\Sql\CommandResult;
 use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
 use Amp\Success;
+use PDO;
+use ReturnTypeWillChange;
 use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\call;
+use function serialize;
 
 /**
  * Generic SQL database backend.
@@ -21,7 +24,7 @@ abstract class SqlArray extends DriverArray
 {
     protected Pool $db;
     //Pdo driver used for value quoting, to prevent sql injections.
-    protected \PDO $pdo;
+    protected PDO $pdo;
 
     protected const SQL_GET = 0;
     protected const SQL_SET = 1;
@@ -39,7 +42,6 @@ abstract class SqlArray extends DriverArray
      * Prepare statements.
      *
      * @param SqlArray::SQL_* $type
-     *
      */
     abstract protected function getSqlQuery(int $type): string;
 
@@ -89,7 +91,7 @@ abstract class SqlArray extends DriverArray
         });
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return call(function () {
@@ -139,7 +141,7 @@ abstract class SqlArray extends DriverArray
             [
                 'index' => $key,
                 'value' => $this->setValue($value),
-            ]
+            ],
         );
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.
@@ -158,10 +160,8 @@ abstract class SqlArray extends DriverArray
      * Unset value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
-     *
-     *
      * @return Promise<array>
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function unset(string|int $key): Promise
     {
@@ -170,7 +170,7 @@ abstract class SqlArray extends DriverArray
 
         return $this->execute(
             $this->queries[self::SQL_UNSET],
-            ['index' => $key]
+            ['index' => $key],
         );
     }
 
@@ -180,7 +180,7 @@ abstract class SqlArray extends DriverArray
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return Promise<int> The number of elements or public properties in the associated
      * array or object, respectively.
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function count(): Promise
     {
@@ -206,16 +206,13 @@ abstract class SqlArray extends DriverArray
     /**
      * Perform async request to db.
      *
-     *
      * @psalm-param self::STATEMENT_* $stmt
-     *
      * @return Promise<CommandResult|ResultSet>
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function execute(string $sql, array $params = []): Promise
     {
-        if (
-            isset($params['index'])
+        if (isset($params['index'])
             && !\mb_check_encoding($params['index'], 'UTF-8')
         ) {
             $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');

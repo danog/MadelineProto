@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -29,11 +28,13 @@ use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Rfc6455Connector;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Websocket\Client\connector;
+use Generator;
+use Throwable;
 
 /**
  * Websocket stream wrapper.
@@ -65,12 +66,11 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         if (!\class_exists(Handshake::class)) {
-            throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
+            throw new Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
         }
         $this->dc = $ctx->getIntDc();
         $uri = $ctx->getStringUri();
@@ -88,11 +88,11 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     {
         try {
             $this->stream->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
         return new Success();
     }
-    public function readGenerator(): \Generator
+    public function readGenerator(): Generator
     {
         try {
             if (!$this->message || ($data = yield $this->message->buffer()) === null) {
@@ -103,7 +103,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
                 $data = yield $this->message->buffer();
                 $this->message = null;
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($e instanceof ClosedException && $e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
@@ -115,15 +115,13 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
-    public function write(string $data): \Amp\Promise
+    public function write(string $data): Promise
     {
         return $this->stream->sendBinary($data);
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {

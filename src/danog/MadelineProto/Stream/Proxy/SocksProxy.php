@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,11 +21,14 @@ namespace danog\MadelineProto\Stream\Proxy;
 use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * Socks5 stream wrapper.
@@ -48,9 +50,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -69,7 +70,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $version = \ord(yield $buffer->bufferRead(1));
         $method = \ord(yield $buffer->bufferRead(1));
         if ($version !== 5) {
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: {$version}");
+            throw new Exception("Wrong SOCKS5 version: {$version}");
         }
         if ($method === 2) {
             $auth = \chr(1).\chr(\strlen($this->extra['username'])).$this->extra['username'].\chr(\strlen($this->extra['password'])).$this->extra['password'];
@@ -78,19 +79,19 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             $version = \ord(yield $buffer->bufferRead(1));
             $result = \ord(yield $buffer->bufferRead(1));
             if ($version !== 1) {
-                throw new \danog\MadelineProto\Exception("Wrong authorized SOCKS version: {$version}");
+                throw new Exception("Wrong authorized SOCKS version: {$version}");
             }
             if ($result !== 0) {
-                throw new \danog\MadelineProto\Exception("Wrong authorization status: {$version}");
+                throw new Exception("Wrong authorization status: {$version}");
             }
         } elseif ($method !== 0) {
-            throw new \danog\MadelineProto\Exception("Wrong method: {$method}");
+            throw new Exception("Wrong method: {$method}");
         }
         $payload = \pack('C3', 0x5, 0x1, 0x0);
         try {
             $ip = \inet_pton($uri->getHost());
             $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4).$ip : \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             $payload .= \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         }
         $payload .= \pack('n', $uri->getPort());
@@ -99,16 +100,16 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $buffer = yield $this->stream->getReadBuffer($l);
         $version = \ord(yield $buffer->bufferRead(1));
         if ($version !== 5) {
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: {$version}");
+            throw new Exception("Wrong SOCKS5 version: {$version}");
         }
         $rep = \ord(yield $buffer->bufferRead(1));
         if ($rep !== 0) {
             $rep = self::REPS[$rep] ?? $rep;
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 rep: {$rep}");
+            throw new Exception("Wrong SOCKS5 rep: {$rep}");
         }
         $rsv = \ord(yield $buffer->bufferRead(1));
         if ($rsv !== 0) {
-            throw new \danog\MadelineProto\Exception("Wrong socks5 final RSV: {$rsv}");
+            throw new Exception("Wrong socks5 final RSV: {$rsv}");
         }
         switch (\ord(yield $buffer->bufferRead(1))) {
             case 1:
@@ -131,7 +132,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = \unpack('n', yield $buffer->bufferRead(2))[1];
-        \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
+        Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
@@ -141,9 +142,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -151,7 +151,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -161,9 +160,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(int &$length): Promise
     {
         return $this->stream->getReadBuffer($length);
     }
@@ -179,15 +177,13 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      * Sets proxy data.
      *
      * @param array $extra Proxy data
-     *
      */
-    public function setExtra($extra): void
+    public function setExtra(array $extra): void
     {
         $this->extra = $extra;
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {
@@ -195,7 +191,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {

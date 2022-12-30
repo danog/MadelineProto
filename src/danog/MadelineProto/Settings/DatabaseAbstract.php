@@ -32,7 +32,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
 
     /**
      * Get whether to enable the file reference database. If disabled, will break file downloads.
-     *
      */
     public function getEnableFileReferenceDb(): bool
     {
@@ -43,7 +42,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the file reference database. If disabled, will break file downloads.
      *
      * @param bool $enableFileReferenceDb Whether to enable the file reference database. If disabled, will break file downloads.
-     *
      */
     public function setEnableFileReferenceDb(bool $enableFileReferenceDb): self
     {
@@ -54,7 +52,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
 
     /**
      * Get whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
-     *
      */
     public function getEnableMinDb(): bool
     {
@@ -65,7 +62,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
      *
      * @param bool $enableMinDb Whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
-     *
      */
     public function setEnableMinDb(bool $enableMinDb): self
     {
@@ -76,7 +72,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
 
     /**
      * Get whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
-     *
      */
     public function getEnableUsernameDb(): bool
     {
@@ -87,7 +82,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
      *
      * @param bool $enableUsernameDb Whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
-     *
      */
     public function setEnableUsernameDb(bool $enableUsernameDb): self
     {
@@ -98,7 +92,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
 
     /**
      * Get whether to enable the full peer info database. If disabled, will break getFullInfo.
-     *
      */
     public function getEnableFullPeerDb(): bool
     {
@@ -109,7 +102,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the full peer info database. If disabled, will break getFullInfo.
      *
      * @param bool $enableFullPeerDb Whether to enable the full peer info database. If disabled, will break getFullInfo.
-     *
      */
     public function setEnableFullPeerDb(bool $enableFullPeerDb): self
     {
@@ -120,7 +112,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
 
     /**
      * Get whether to enable the peer info database. If disabled, will break getInfo.
-     *
      */
     public function getEnablePeerInfoDb(): bool
     {
@@ -131,7 +122,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the peer info database. If disabled, will break getInfo.
      *
      * @param bool $enablePeerInfoDb Whether to enable the peer info database. If disabled, will break getInfo.
-     *
      */
     public function setEnablePeerInfoDb(bool $enablePeerInfoDb): self
     {

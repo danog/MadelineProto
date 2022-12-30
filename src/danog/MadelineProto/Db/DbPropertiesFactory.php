@@ -9,6 +9,7 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\DatabaseAbstract;
+use InvalidArgumentException;
 
 /**
  * This factory class initializes the correct database backend for MadelineProto.
@@ -22,18 +23,14 @@ abstract class DbPropertiesFactory
     const TYPE_ARRAY = 'array';
     /**
      * @param self::TYPE_*|array $propertyType
-     * @param DriverArray|null $value
-     *
      * @return Promise<DbType>
-     *
      * @internal
-     *
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, $value = null): Promise
+    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DriverArray $value = null): Promise
     {
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
@@ -56,7 +53,7 @@ abstract class DbPropertiesFactory
                 $class .= '\\Redis';
                 break;
             default:
-                throw new \InvalidArgumentException("Unknown dbType: ".\get_class($dbSettings));
+                throw new InvalidArgumentException("Unknown dbType: ".\get_class($dbSettings));
         }
 
         /** @var DbType $class */
@@ -65,7 +62,7 @@ abstract class DbPropertiesFactory
                 $class .= 'Array';
                 break;
             default:
-                throw new \InvalidArgumentException("Unknown $propertyType: {$propertyType}");
+                throw new InvalidArgumentException("Unknown $propertyType: {$propertyType}");
         }
 
         return $class::getInstance($table, $value, $dbSettings);

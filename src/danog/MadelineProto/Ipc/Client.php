@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,14 +25,18 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\Wrappers\Start;
+use danog\MadelineProto\Wrappers\Templates;
+use Generator;
+use Throwable;
 
 /**
  * IPC client.
  */
 class Client extends ClientAbstract
 {
-    use \danog\MadelineProto\Wrappers\Start;
-    use \danog\MadelineProto\Wrappers\Templates;
+    use Start;
+    use Templates;
     use FilesLogic;
 
     /**
@@ -43,7 +46,6 @@ class Client extends ClientAbstract
 
     /**
      * Returns an instance of a client by session name.
-     *
      */
     public static function giveInstanceBySession(string $session): Client
     {
@@ -79,21 +81,19 @@ class Client extends ClientAbstract
      * Run the provided async callable.
      *
      * @param callable $callback Async callable to run
-     *
      */
-    public function loop(callable $callback): \Generator
+    public function loop(callable $callback): Generator
     {
         return yield $callback();
     }
     /**
      * Unreference.
-     *
      */
     public function unreference(): void
     {
         try {
             Tools::wait($this->disconnect());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger("An error occurred while disconnecting the client: $e");
         }
         if (isset(self::$instances[$this->session->getLegacySessionPath()])) {
@@ -121,8 +121,6 @@ class Client extends ClientAbstract
     }
     /**
      * Whether we're an IPC client instance.
-     *
-     * @return boolean
      */
     public function isIpc(): bool
     {
@@ -137,9 +135,8 @@ class Client extends ClientAbstract
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     *
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false): Generator
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -163,11 +160,9 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false): Generator
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -185,11 +180,9 @@ class Client extends ClientAbstract
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false): Generator
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -206,14 +199,11 @@ class Client extends ClientAbstract
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|Generator $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
+     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args, array $aargs)
+    public function methodCallAsyncRead(string $method, $args, array $aargs): Generator
     {
         if (\is_array($args)) {
             if (($method === 'messages.editInlineBotMessage' ||
@@ -246,12 +236,10 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator Downloaded file path
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
+     * @return Generator Downloaded file path
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
+    public function downloadToDir($messageMedia, $dir, callable $cb = null): Generator
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
@@ -268,12 +256,10 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator Downloaded file path
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
+     * @return Generator Downloaded file path
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToFile($messageMedia, $file, $cb = null): \Generator
+    public function downloadToFile($messageMedia, $file, callable $cb = null): Generator
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -297,11 +283,9 @@ class Client extends ClientAbstract
      * @param int                            $offset       Offset where to start downloading
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
-     *
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
+     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
-    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
+    public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): Generator
     {
         $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
@@ -318,7 +302,6 @@ class Client extends ClientAbstract
      * Placeholder.
      *
      * @param mixed ...$params Params
-     *
      */
     public function setEventHandler(...$params): void
     {
@@ -328,7 +311,6 @@ class Client extends ClientAbstract
      * Placeholder.
      *
      * @param mixed ...$params Params
-     *
      */
     public function getEventHandler(...$params): void
     {

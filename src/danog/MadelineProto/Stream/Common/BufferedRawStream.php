@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,13 +20,17 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Promise;
+use Amp\Socket\Socket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Buffered raw stream.
@@ -46,9 +49,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Asynchronously connect to a TCP/TLS server.
      *
      * @param ConnectionContext $ctx Connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $this->stream = yield from $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
@@ -56,7 +58,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Async chunked read.
-     *
      */
     public function read(): Promise
     {
@@ -69,7 +70,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
     public function write(string $data): Promise
     {
@@ -97,9 +97,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(int &$length): Promise
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -116,13 +115,12 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             \fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
-        return new \Amp\Success($this);
+        return new Success($this);
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -130,13 +128,12 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-        return new \Amp\Success($this);
+        return new Success($this);
     }
     /**
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
-     *
      */
     public function bufferRead(int $length): Promise
     {
@@ -149,15 +146,14 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if ($buffer_length >= $length) {
             return new Success(\fread($this->memory_stream, $length));
         }
-        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
+        return Tools::call($this->bufferReadGenerator($length));
     }
     /**
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
-     *
      */
-    public function bufferReadGenerator(int $length): \Generator
+    public function bufferReadGenerator(int $length): Generator
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -169,7 +165,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $chunk = yield $this->read();
             if ($chunk === null) {
                 $this->disconnect();
-                throw new \danog\MadelineProto\NothingInTheSocketException();
+                throw new NothingInTheSocketException();
             }
             \fwrite($this->memory_stream, $chunk);
             $buffer_length += \strlen($chunk);
@@ -181,7 +177,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Async write.
      *
      * @param string $data Data to write
-     *
      */
     public function bufferWrite(string $data): Promise
     {
@@ -200,7 +195,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Get remaining data from buffer.
-     *
      */
     public function bufferClear(): string
     {
@@ -214,15 +208,13 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * {@inheritdoc}
-     *
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {
@@ -230,7 +222,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Get class name.
-     *
      */
     public static function getName(): string
     {

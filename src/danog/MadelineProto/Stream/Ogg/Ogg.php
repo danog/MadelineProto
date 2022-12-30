@@ -7,6 +7,10 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
+use Generator;
+use RuntimeException;
+
+use function count;
 
 /**
  * Async OGG stream reader.
@@ -67,10 +71,9 @@ class Ogg
      *
      * @param BufferedStreamInterface $stream        The stream
      * @param int                     $frameDuration Required frame duration, microseconds
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, self>
+     * @psalm-return Generator<mixed, mixed, mixed, self>
      */
-    public static function init(BufferedStreamInterface $stream, int $frameDuration): \Generator
+    public static function init(BufferedStreamInterface $stream, int $frameDuration): Generator
     {
         $self = new self;
         $self->frameDuration = $frameDuration;
@@ -83,7 +86,7 @@ class Ogg
             'bitstream_serial_number'  => 'V',
             'page_sequence_number'     => 'V',
             'CRC_checksum'             => 'V',
-            'number_page_segments'     => 'C'
+            'number_page_segments'     => 'C',
         ];
 
         $self->packFormat = \implode(
@@ -91,8 +94,8 @@ class Ogg
             \array_map(
                 fn (string $v, string $k): string => $v.$k,
                 $pack_format,
-                \array_keys($pack_format)
-            )
+                \array_keys($pack_format),
+            ),
         );
 
         return $self;
@@ -100,9 +103,6 @@ class Ogg
 
     /**
      * Read OPUS length.
-     *
-     * @param integer $offset
-     * @return integer
      */
     private function readLen(string $content, int &$offset): int
     {
@@ -114,9 +114,8 @@ class Ogg
     }
     /**
      * OPUS state machine.
-     *
      */
-    private function opusStateMachine(string $content): \Generator
+    private function opusStateMachine(string $content): Generator
     {
         $curStream = 0;
         $offset = 0;
@@ -232,9 +231,8 @@ class Ogg
 
     /**
      * Read frames.
-     *
      */
-    public function read(): \Generator
+    public function read(): Generator
     {
         $state = self::STATE_READ_HEADER;
         $content = '';
@@ -267,7 +265,7 @@ class Ogg
 
             $segments = \unpack(
                 'C*',
-                yield $this->stream->bufferRead(\ord($init[26]))
+                yield $this->stream->bufferRead(\ord($init[26])),
             );
 
             //$serial = $headers['bitstream_serial_number'];
@@ -287,7 +285,7 @@ class Ogg
                         yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         if (\substr($content, 0, 8) !== 'OpusHead') {
-                            throw new \RuntimeException("This is not an OPUS stream!");
+                            throw new RuntimeException("This is not an OPUS stream!");
                         }
                         $opus_head = \unpack('Cversion/Cchannel_count/vpre_skip/Vsample_rate/voutput_gain/Cchannel_mapping_family/', \substr($content, 8));
                         if ($opus_head['channel_mapping_family']) {
@@ -296,7 +294,7 @@ class Ogg
                             $opus_head['channel_mapping'] = [
                                 'stream_count' => 1,
                                 'coupled_count' => $opus_head['channel_count'] - 1,
-                                'channel_mapping' => [0]
+                                'channel_mapping' => [0],
                             ];
                             if ($opus_head['channel_count'] === 2) {
                                 $opus_head['channel_mapping']['channel_mapping'][] = 1;
@@ -326,7 +324,6 @@ class Ogg
 
     /**
      * Get OPUS packet emitter.
-     *
      */
     public function getEmitter(): Emitter
     {

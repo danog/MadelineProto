@@ -13,11 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
+
+use const OPENSSL_RAW_DATA;
+use const OPENSSL_ZERO_PADDING;
 
 /**
  * Openssl IGE implementation.

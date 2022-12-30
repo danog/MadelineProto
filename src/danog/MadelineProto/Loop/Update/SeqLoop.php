@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,6 +22,7 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use Generator;
 
 /**
  * update feed loop.
@@ -50,9 +50,8 @@ class SeqLoop extends ResumableSignalLoop
     private ?UpdatesState $state = null;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $this->feeder = $API->feeders[FeedLoop::GENERIC];
@@ -81,7 +80,7 @@ class SeqLoop extends ResumableSignalLoop
             }
         }
     }
-    public function parse(array $updates): \Generator
+    public function parse(array $updates): Generator
     {
         \reset($updates);
         while ($updates) {
@@ -94,7 +93,7 @@ class SeqLoop extends ResumableSignalLoop
             $seq_end = $options['seq_end'];
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
                 yield $this->pause(1000);
                 if (!$this->incomingUpdates) {
                     yield $this->API->updaters[UpdateLoop::GENERIC]->resume();
@@ -103,7 +102,7 @@ class SeqLoop extends ResumableSignalLoop
                 continue;
             }
             if ($result < 0) {
-                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
                 continue;
             }
             $this->state->seq($seq_end);
@@ -118,13 +117,13 @@ class SeqLoop extends ResumableSignalLoop
      */
     public function feed(array $updates): void
     {
-        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
+        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', Logger::VERBOSE);
         $this->incomingUpdates[] = $updates;
     }
     /**
      * @var array{updates: array} $updates
      */
-    public function save(array $updates): \Generator
+    public function save(array $updates): Generator
     {
         $this->pendingWakeups += (yield from $this->feeder->feed($updates['updates']));
     }

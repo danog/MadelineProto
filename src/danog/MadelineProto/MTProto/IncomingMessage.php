@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -99,7 +98,6 @@ class IncomingMessage extends Message
     }
     /**
      * Get deserialized response content.
-     *
      */
     public function getContent(): array
     {
@@ -108,7 +106,6 @@ class IncomingMessage extends Message
 
     /**
      * Get was present in container.
-     *
      */
     public function isFromContainer(): bool
     {
@@ -119,7 +116,6 @@ class IncomingMessage extends Message
      * Get log line.
      *
      * @param int|string $dc DC ID
-     *
      */
     public function log($dc): string
     {
@@ -131,7 +127,6 @@ class IncomingMessage extends Message
 
     /**
      * Get message type.
-     *
      */
     public function getType(): string
     {
@@ -140,7 +135,6 @@ class IncomingMessage extends Message
 
     /**
      * Get message type.
-     *
      */
     public function __toString(): string
     {
@@ -149,7 +143,6 @@ class IncomingMessage extends Message
 
     /**
      * We have acked this message.
-     *
      */
     public function ack(): void
     {
@@ -157,7 +150,6 @@ class IncomingMessage extends Message
     }
     /**
      * Read this message, clearing its contents.
-     *
      */
     public function read(): array
     {
@@ -169,8 +161,6 @@ class IncomingMessage extends Message
 
     /**
      * Check if this message can be garbage collected.
-     *
-     * @return boolean
      */
     public function canGarbageCollect(): bool
     {
@@ -179,7 +169,6 @@ class IncomingMessage extends Message
 
     /**
      * Get ID of message to which this message replies.
-     *
      */
     public function getRequestId(): string
     {
@@ -187,7 +176,6 @@ class IncomingMessage extends Message
     }
     /**
      * Get state.
-     *
      */
     public function getState(): int
     {
@@ -198,7 +186,6 @@ class IncomingMessage extends Message
      * Set DB side effects to be resolved before using the content.
      *
      * @param Promise[] $sideEffects DB side effects to be resolved before using the content
-     *
      */
     public function setSideEffects(array $sideEffects): self
     {
@@ -211,9 +198,7 @@ class IncomingMessage extends Message
      * Get DB side effects to be resolved before using the specified content.
      *
      * @template T
-     *
      * @param T $return Return value
-     *
      * @psalm-return ?Promise<T>
      */
     public function getSideEffects($return): ?Promise
@@ -252,7 +237,6 @@ class IncomingMessage extends Message
 
     /**
      * Get receive date.
-     *
      */
     public function getReceived(): int
     {

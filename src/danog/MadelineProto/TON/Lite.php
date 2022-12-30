@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,6 +23,9 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
+use Generator;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
 use function Amp\File\read;
 
@@ -40,13 +42,12 @@ class Lite
     private $config;
     /**
      * Misc settings.
-     *
      */
     private SettingsLogger $settings;
     /**
      * TL serializer instance.
      *
-     * @var \danog\MadelineProto\TL\TL
+     * @var TL
      */
     private $TL;
     /**
@@ -63,7 +64,6 @@ class Lite
     private $connections = [];
     /**
      * Construct settings.
-     *
      */
     public function __construct(SettingsLogger $settings)
     {
@@ -79,14 +79,13 @@ class Lite
      * Connect to the lite endpoints specified in the config file.
      *
      * @param string $config Path to config file
-     *
      */
-    public function connect(string $config): \Generator
+    public function connect(string $config): Generator
     {
         $config = \json_decode(yield read($config), true);
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
-        $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];
+        $config['validator']['init_block'] ??= $config['validator']['zero_state'];
         [$this->config] = $this->TL->deserialize(yield from $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
@@ -99,9 +98,8 @@ class Lite
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     *
      */
-    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
@@ -113,9 +111,8 @@ class Lite
      *
      * @param string $methodName Method name
      * @param array  $args       Arguments
-     *
      */
-    public function methodCall(string $methodName, array $args = [], array $aargs = []): \Generator
+    public function methodCall(string $methodName, array $args = [], array $aargs = []): Generator
     {
         $data = (yield from $this->TL->serializeMethod($methodName, $args));
         $data = (yield from $this->TL->serializeMethod('liteServer.query', ['data' => $data]));
@@ -125,9 +122,8 @@ class Lite
      * Asynchronously run async callable.
      *
      * @param callable $func Function
-     *
      */
-    public function loop(callable $func): \Generator
+    public function loop(callable $func): Generator
     {
         return yield $func();
     }
@@ -135,16 +131,14 @@ class Lite
      * Convert parameters.
      *
      * @param array $parameters Parameters
-     *
      */
-    public function botAPItoMTProto(array $parameters): \Generator
+    public function botAPItoMTProto(array $parameters): Generator
     {
         return $parameters;
         yield;
     }
     /**
      * Get TL method namespaces.
-     *
      */
     public function getMethodNamespaces(): array
     {

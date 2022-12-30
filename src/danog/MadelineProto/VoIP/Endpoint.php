@@ -5,9 +5,12 @@ namespace danog\MadelineProto\VoIP;
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
+use Generator;
 
 use function Amp\Socket\connect;
 
@@ -52,8 +55,6 @@ class Endpoint
 
     /**
      * Create endpoint.
-     *
-     * @param integer $port
      */
     public function __construct(string $ip, int $port, string $peerTag, bool $reflector, VoIP $instance)
     {
@@ -68,16 +69,14 @@ class Endpoint
 
     /**
      * Connect to endpoint.
-     *
      */
-    public function connect(): \Generator
+    public function connect(): Generator
     {
         $this->socket = yield connect("udp://{$this->ip}:{$this->port}");
     }
 
     /**
      * Disconnect from endpoint.
-     *
      */
     public function disconnect(): Promise
     {
@@ -89,9 +88,8 @@ class Endpoint
     }
     /**
      * Read packet.
-     *
      */
-    public function read(): \Generator
+    public function read(): Generator
     {
         do {
             $packet = yield $this->socket->read();
@@ -107,7 +105,7 @@ class Endpoint
             if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
                 $hasPeerTag = true;
                 if (\stream_get_contents($payload, 16) !== $this->peerTag) {
-                    \danog\MadelineProto\Logger::log("Received packet has wrong peer tag", \danog\MadelineProto\Logger::ERROR);
+                    Logger::log("Received packet has wrong peer tag", Logger::ERROR);
                     continue;
                 }
             }
@@ -121,13 +119,13 @@ class Endpoint
                 $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
                 if ($message_key != \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
-                    \danog\MadelineProto\Logger::log("msg_key mismatch!", \danog\MadelineProto\Logger::ERROR);
+                    Logger::log("msg_key mismatch!", Logger::ERROR);
                     return false;
                 }
 
                 $innerLen = \unpack('v', \substr($packet, 0, 2))[1];
                 if ($innerLen > \strlen($packet)) {
-                    \danog\MadelineProto\Logger::log("Received packet has wrong inner length!", \danog\MadelineProto\Logger::ERROR);
+                    Logger::log("Received packet has wrong inner length!", Logger::ERROR);
                     return false;
                 }
                 $packet = \substr($packet, 2);
@@ -141,7 +139,6 @@ class Endpoint
     }
     /**
      * Write data.
-     *
      */
     public function write(string $payload): Promise
     {
@@ -153,9 +150,9 @@ class Endpoint
         if ($padding < 16) {
             $padding += 16;
         }
-        $plaintext .= \danog\MadelineProto\Tools::random($padding);
+        $plaintext .= Tools::random($padding);
         $message_key = \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 0 : 8), 32).$plaintext, true), 8, 16);
-        list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $this->authKey->getAuthKey(), $this->creator);
+        [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey->getAuthKey(), $this->creator);
         $payload = $message_key.Crypt::igeEncrypt($plaintext, $aes_key, $aes_iv);
 
         if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
@@ -166,7 +163,6 @@ class Endpoint
     }
     /**
      * Get peer tag.
-     *
      */
     public function getPeerTag(): string
     {

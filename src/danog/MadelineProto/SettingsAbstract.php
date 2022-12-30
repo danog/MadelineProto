@@ -17,9 +17,7 @@ abstract class SettingsAbstract
      * Merge legacy settings array.
      *
      * @param array $settings Settings array
-     *
      * @internal
-     *
      */
     public function mergeArray(array $settings): void
     {
@@ -28,9 +26,7 @@ abstract class SettingsAbstract
     /**
      * Merge with other settings instance.
      *
-     *
      * @internal
-     *
      */
     public function merge(self $other): void
     {
@@ -64,7 +60,6 @@ abstract class SettingsAbstract
      * Convert array of legacy array property names to new camel case names.
      *
      * @param array $properties Properties
-     *
      */
     protected static function toCamel(array $properties): array
     {
@@ -79,8 +74,6 @@ abstract class SettingsAbstract
      * Get whether this setting was changed, also applies changes.
      *
      * @internal
-     *
-     * @return boolean
      */
     public function hasChanged(): bool
     {
@@ -90,7 +83,6 @@ abstract class SettingsAbstract
      * Apply changes.
      *
      * @internal
-     *
      * @return static
      */
     public function applyChanges(): self
@@ -101,7 +93,6 @@ abstract class SettingsAbstract
 
     /**
      * @deprecated
-     *
      * @return static
      */
     public function __call(string $name, array $arguments): mixed

@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,16 +25,14 @@ interface FileCallbackInterface
 {
     /**
      * Get file.
-     *
      */
-    public function getFile();
+    public function getFile(): void;
     /**
      * Invoke callback.
      *
      * @param float $percent Percent
      * @param float $speed   Speed in mbps
      * @param float $time    Time
-     *
      */
-    public function __invoke($percent, $speed, $time);
+    public function __invoke(float $percent, float $speed, float $time): void;
 }

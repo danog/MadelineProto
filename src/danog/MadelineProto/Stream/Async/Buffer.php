@@ -13,13 +13,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
+use danog\MadelineProto\Tools;
 
 /**
  * Buffer helper trait.
@@ -32,10 +32,10 @@ trait Buffer
 {
     public function bufferRead(int $length): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
+        return Tools::call($this->bufferReadGenerator($length));
     }
     public function bufferWrite(string $data): Promise
     {
-        return \danog\MadelineProto\Tools::call($this->bufferWriteGenerator($data));
+        return Tools::call($this->bufferWriteGenerator($data));
     }
 }

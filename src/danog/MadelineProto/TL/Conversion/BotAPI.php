@@ -13,17 +13,20 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
+use Generator;
+use Parsedown;
+use Throwable;
 
 use const danog\Decoder\TYPES_IDS;
 
@@ -35,7 +38,6 @@ trait BotAPI
     }
     /**
      * @return ((bool|mixed|string)[][]|string)[][]
-     *
      * @psalm-return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
      */
     private function parseButtons($rows): array
@@ -109,10 +111,9 @@ trait BotAPI
      * Convert MTProto parameters to bot API parameters.
      *
      * @param array $data Data
-     *
-     * @return \Generator<array>
+     * @return Generator<array>
      */
-    public function MTProtoToBotAPI(array $data): \Generator
+    public function MTProtoToBotAPI(array $data): Generator
     {
         $newd = [];
         if (!isset($data['_'])) {
@@ -163,7 +164,7 @@ trait BotAPI
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
                         $newd['forward_from_chat'] = yield from $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                     }
                 }
                 if (isset($data['fwd_from']['date'])) {
@@ -332,14 +333,13 @@ trait BotAPI
                 $res['file_unique_id'] = $fileId->getUniqueBotAPI();
                 return [$type_name => $res, 'caption' => $data['caption'] ?? ''];
             default:
-                throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
+                throw new Exception(\sprintf(Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
     /**
      * Convert bot API parameters to MTProto parameters.
      *
      * @param array $arguments Arguments
-     *
      */
     public function botAPIToMTProto(array $arguments): array
     {
@@ -361,12 +361,10 @@ trait BotAPI
      * Convert markdown and HTML messages.
      *
      * @param array $arguments Arguments
-     *
      * @internal
-     *
-     * @return \Generator<array>
+     * @return Generator<array>
      */
-    public function parseMode(array $arguments)
+    public function parseMode(array $arguments): Generator
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -378,7 +376,7 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
+            $arguments['message'] = Parsedown::instance()->line($arguments['message']);
             $arguments['parse_mode'] = 'HTML';
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
@@ -396,10 +394,9 @@ trait BotAPI
      * Split too long message into chunks.
      *
      * @param array $args Arguments
-     *
      * @internal
      */
-    public function splitToChunks($args): array
+    public function splitToChunks(array $args): array
     {
         $args = $this->parseMode($args);
         if (!isset($args['entities'])) {
@@ -500,7 +497,6 @@ trait BotAPI
     }
     /**
      * @return string[]
-     *
      * @psalm-return list<string>
      */
     private function multipleExplodeKeepDelimiters($delimiters, $string): array
@@ -519,7 +515,6 @@ trait BotAPI
     }
     /**
      * @return ((array|string)[][]|string)[]
-     *
      * @psalm-return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
      */
     private function buildRows($button_list): array

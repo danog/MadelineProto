@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -51,7 +50,6 @@ class GenericLoop extends GenericGenericLoop
      * Pause the loop.
      *
      * @param ?int $time For how long to pause the loop, if null will pause forever (until resume is called from outside of the loop)
-     *
      * @return Promise Resolved when the loop is resumed
      */
     public function pause(?int $time = null): Promise

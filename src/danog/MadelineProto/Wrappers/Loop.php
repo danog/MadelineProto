@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,10 +20,15 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\Loop as AmpLoop;
 use Amp\Promise;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
-
 use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
+
+use const PHP_SAPI;
 
 /**
  * Manages logging in and out.
@@ -42,7 +46,6 @@ trait Loop
     private $stopLoop = false;
     /**
      * Initialize self-restart hack.
-     *
      */
     public function initSelfRestart(): void
     {
@@ -53,7 +56,7 @@ trait Loop
                 if (\function_exists('set_time_limit')) {
                     \set_time_limit(-1);
                 }
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (Exception $e) {
                 $needs_restart = true;
             }
             if (isset($_REQUEST['MadelineSelfRestart'])) {
@@ -93,7 +96,7 @@ trait Loop
                 if (\function_exists('shell_exec') && \file_exists('/data/data/com.termux/files/usr/bin/termux-wake-lock')) {
                     \shell_exec('/data/data/com.termux/files/usr/bin/termux-wake-lock');
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
         }
     }
@@ -101,9 +104,8 @@ trait Loop
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
      * @param callable|null $callback Async callable to run
-     *
      */
-    public function loop($callback = null): \Generator
+    public function loop(?callable $callback = null): Generator
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
@@ -114,11 +116,11 @@ trait Loop
             return (yield $callback);
         }
         if (!$this->authorized) {
-            $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
+            $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
             return false;
         }
         if ($this->updateHandler === self::GETUPDATES_HANDLER) {
-            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
+            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', Logger::FATAL_ERROR);
             return false;
         }
         $this->logger->logger('Starting event loop');
@@ -127,7 +129,7 @@ trait Loop
         }
         $this->initSelfRestart();
         $this->startUpdateSystem();
-        $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopLoop = false;
         if ($this->loop_callback !== null) {
             $repeat = AmpLoop::repeat(1000, fn () => Tools::callFork(($this->loop_callback)()));
@@ -136,7 +138,7 @@ trait Loop
             if (!$this->updateHandler) {
                 yield $this->waitUpdate();
                 if (!$this->updateHandler) {
-                    $this->logger->logger('Exiting update loop, no handler!', \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Exiting update loop, no handler!', Logger::NOTICE);
                     continue;
                 }
             }
@@ -146,15 +148,15 @@ trait Loop
                 foreach ($updates as $update) {
                     $r = ($this->updateHandler)($update);
                     if (\is_object($r)) {
-                        \danog\MadelineProto\Tools::callFork($r);
+                        Tools::callFork($r);
                     }
                 }
                 $updates = [];
             }
             yield $this->waitUpdate();
-            $this->logger->logger('Resuming update loop!', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('Resuming update loop!', Logger::VERBOSE);
         } while (!$this->stopLoop);
-        $this->logger->logger('Exiting update loop!', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Exiting update loop!', Logger::NOTICE);
         $this->stopLoop = false;
         if (isset($repeat)) {
             AmpLoop::cancel($repeat);
@@ -162,16 +164,14 @@ trait Loop
     }
     /**
      * Stop update loop.
-     *
      */
     public function stop(): void
     {
-        \danog\MadelineProto\Shutdown::removeCallback('restarter');
+        Shutdown::removeCallback('restarter');
         $this->restart();
     }
     /**
      * Restart update loop.
-     *
      */
     public function restart(): void
     {
@@ -180,7 +180,6 @@ trait Loop
     }
     /**
      * Start MadelineProto's update handling loop in background.
-     *
      */
     public function loopFork(): Promise
     {

@@ -22,7 +22,6 @@ class Memory extends DatabaseAbstract
     }
     /**
      * Get whether to cleanup the memory before serializing.
-     *
      */
     public function getCleanup(): bool
     {
@@ -33,7 +32,6 @@ class Memory extends DatabaseAbstract
      * Set whether to cleanup the memory before serializing.
      *
      * @param bool $cleanup Whether to cleanup the memory before serializing.
-     *
      */
     public function setCleanup(bool $cleanup): self
     {

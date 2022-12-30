@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -28,7 +27,14 @@ use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tools;
+use Generator;
+use phpseclib3\Math\BigInteger;
+use Throwable;
+
+use const PHP_EOL;
 
 /**
  * Manages responses.
@@ -155,7 +161,7 @@ trait ResponseHandler
             $this->writer->resume();
         }
     }
-    public function handleReject(OutgoingMessage $message, \Throwable $data): void
+    public function handleReject(OutgoingMessage $message, Throwable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
         $message->reply(new Failure($data));
@@ -166,9 +172,8 @@ trait ResponseHandler
      *
      * @param IncomingMessage $message   Incoming message
      * @param string          $requestId Request ID
-     *
      */
-    private function handleResponse(IncomingMessage $message, $requestId = null): void
+    private function handleResponse(IncomingMessage $message, string $requestId = null): void
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();
@@ -190,7 +195,7 @@ trait ResponseHandler
         if ($constructor === 'rpc_error') {
             try {
                 $exception = $this->handleRpcError($request, $response);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $exception = $e;
             }
             if ($exception) {
@@ -212,17 +217,17 @@ trait ResponseHandler
                     return;
                 case 16:
                 case 17:
-                    $this->time_delta = (int) (new \phpseclib3\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \phpseclib3\Math\BigInteger(\time()))->toString();
+                    $this->time_delta = (int) (new BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new BigInteger(\time()))->toString();
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    Tools::callFork((function () use ($requestId): \Generator {
+                    Tools::callFork((function () use ($requestId): Generator {
                         yield from $this->API->initAuthorization();
                         $this->methodRecall('', ['message_id' => $requestId]);
                     })());
                     return;
             }
-            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
             return;
         }
 
@@ -236,7 +241,7 @@ trait ResponseHandler
             if (isset($trimmed['peer'])) {
                 try {
                     $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
             }
             if (isset($trimmed['message'])) {
@@ -252,7 +257,7 @@ trait ResponseHandler
             if ($botAPI) {
                 $deferred = new Deferred;
                 $promise = $deferred->promise();
-                $side->onResolve(function (?\Throwable $error, $result) use ($deferred): void {
+                $side->onResolve(function (?Throwable $error, $result) use ($deferred): void {
                     if ($error) {
                         $deferred->fail($error);
                         return;
@@ -271,13 +276,13 @@ trait ResponseHandler
             }
         }
     }
-    public function handleRpcError(OutgoingMessage $request, array $response): ?\Throwable
+    public function handleRpcError(OutgoingMessage $request, array $response): ?Throwable
     {
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
         if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
-            return new \danog\MadelineProto\PTSException($response['error_message']);
+            return new PTSException($response['error_message']);
         }
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
@@ -305,7 +310,7 @@ trait ResponseHandler
                     Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
                     return null;
                 }
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
                 $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($request->isFileRelated() && $this->API->datacenter->has($datacenter . '_media')) {
@@ -333,14 +338,14 @@ trait ResponseHandler
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                         }
-                        throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                        throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            Tools::callFork((function () use ($request, $response): \Generator {
+                            Tools::callFork((function () use ($request, $response): Generator {
                                 yield from $this->API->initAuthorization();
-                                $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                                $this->handleReject($request, new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             })());
                             return null;
                         }
@@ -357,9 +362,9 @@ trait ResponseHandler
                             $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
-                            throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                            throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        Tools::callFork((function () use ($request): \Generator {
+                        Tools::callFork((function () use ($request): Generator {
                             yield from $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         })());
@@ -367,13 +372,13 @@ trait ResponseHandler
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        Tools::callFork((function () use ($request): \Generator {
+                        Tools::callFork((function () use ($request): Generator {
                             yield from $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         })());
                         return null;
                 }
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 420:
                 $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->getFloodWaitLimit() ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -389,7 +394,7 @@ trait ResponseHandler
                 }
                 // no break
             default:
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }
     }
 }

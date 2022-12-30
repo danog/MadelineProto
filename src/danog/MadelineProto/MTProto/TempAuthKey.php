@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -63,7 +62,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Init or deinit connection for auth key.
      *
      * @param boolean $init Init or deinit
-     *
      */
     public function init(bool $init = true): void
     {
@@ -71,8 +69,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if connection is inited for auth key.
-     *
-     * @return boolean
      */
     public function isInited(): bool
     {
@@ -83,7 +79,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      *
      * @param PermAuthKey|null $bound Permanent auth key
      * @param bool             $pfs   Whether to bind using PFS
-     *
      */
     public function bind(?PermAuthKey $bound, bool $pfs = true): void
     {
@@ -96,8 +91,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key is bound.
-     *
-     * @return boolean
      */
     public function isBound(): bool
     {
@@ -105,8 +98,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     public function isAuthorized(): bool
     {
@@ -116,7 +107,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
      */
     public function authorized(bool $authorized): void
     {
@@ -126,7 +116,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Set expiration date of temporary auth key.
      *
      * @param integer $expires Expiration date
-     *
      */
     public function expires(int $expires): void
     {
@@ -134,8 +123,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key has expired.
-     *
-     * @return boolean
      */
     public function expired(): bool
     {
@@ -143,7 +130,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * JSON serialization function.
-     *
      */
     public function jsonSerialize(): array
     {
@@ -152,15 +138,13 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     /**
      * Sleep function.
      *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['authKey', 'id', 'serverSalt', 'bound', 'expires', 'inited'];
     }
     /**
      * Wakeup function.
-     *
      */
     public function __wakeup(): void
     {

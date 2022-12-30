@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -33,12 +32,16 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use Exception;
+use Generator;
+use InvalidArgumentException;
 use phpseclib3\Crypt\DH;
 use phpseclib3\Crypt\EC;
 use phpseclib3\Crypt\EC\Curves\Curve25519;
 use phpseclib3\Crypt\EC\PrivateKey;
 use phpseclib3\Crypt\EC\PublicKey;
 use phpseclib3\Math\BigInteger;
+
+use function strrev;
 
 class ADNLConnection
 {
@@ -73,15 +76,14 @@ class ADNLConnection
      * Connect to specified ADNL endpoint.
      *
      * @param array $endpoint Endpoint
-     *
      */
-    public function connect(array $endpoint): \Generator
+    public function connect(array $endpoint): Generator
     {
         if ($endpoint['_'] !== 'liteserver.desc') {
-            throw new \InvalidArgumentException('Only liteservers are supported at the moment!');
+            throw new InvalidArgumentException('Only liteservers are supported at the moment!');
         }
         if ($endpoint['id']['_'] !== 'pub.ed25519') {
-            throw new \InvalidArgumentException('Only ECDH is supported at the moment!');
+            throw new InvalidArgumentException('Only ECDH is supported at the moment!');
         }
         $random = Tools::random(256 - 32 - 64);
         //$random = strrev(hex2bin(strrev('9E7C27765D12CE634414F0875D55CE5C58E7A9D58CD45C57CAB516D1241B7864691E5B0AFC4ECB54BFF2CEFC2060F1D45F5B5DEB76A9EF6471D75816AAAEC83CD7DE39EE99B9E980B6C0D4565A916D00908613E63657D5539118F89A14FD73ABB8ECD3AC26C287EEBD0FA44F52B315F01DD60F486EFF4C5B4D71EA6F443358FF141E7294BBBB5D7C079F16BD46C28A12507E1948722E7121B94C3B5C7832ADE7')));
@@ -125,7 +127,7 @@ class ADNLConnection
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::class)->addStream(BufferedRawStream::class)->addStream(CtrStream::class, $obf)->addStream(HashedBufferedStream::class, 'sha256')->addStream(ADNLStream::class);
         $this->stream = (yield from $ctx->getStream($payload));
-        Tools::callFork((function (): \Generator {
+        Tools::callFork((function (): Generator {
             //yield Tools::sleep(1);
             while (true) {
                 $buffer = yield $this->stream->getReadBuffer($length);
@@ -144,9 +146,8 @@ class ADNLConnection
      * Send ADNL query.
      *
      * @param string $payload Payload to send
-     *
      */
-    public function query(string $payload): \Generator
+    public function query(string $payload): Generator
     {
         $data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], ''));
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);

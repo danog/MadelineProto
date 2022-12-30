@@ -13,16 +13,17 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use danog\MadelineProto\Connection;
-use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\Tools;
+
+use function time;
 
 /**
  * Manages MTProto session-specific data.
@@ -99,12 +100,11 @@ trait Session
     public $msgIdHandler;
     /**
      * Reset MTProto session.
-     *
      */
     public function resetSession(): void
     {
-        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", \danog\MadelineProto\Logger::WARNING);
-        $this->session_id = \danog\MadelineProto\Tools::random(8);
+        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", Logger::WARNING);
+        $this->session_id = Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
         if (!isset($this->msgIdHandler)) {
@@ -121,7 +121,6 @@ trait Session
     }
     /**
      * Cleanup incoming and outgoing messages.
-     *
      */
     public function cleanupSession(): void
     {
@@ -131,14 +130,14 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", Logger::VERBOSE);
                 $incoming[$key] = $message;
             }
         }
         $this->incoming_messages = $incoming;
         $total = \count($this->incoming_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
 
         $count = 0;
@@ -149,7 +148,7 @@ trait Session
             } else {
                 $ago = \time() - $message->getSent();
                 if ($ago > 2) {
-                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter} sent $ago seconds ago, no response has been received or it wasn't yet handled!", \danog\MadelineProto\Logger::VERBOSE);
+                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter} sent $ago seconds ago, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }
                 $outgoing[$key] = $message;
             }
@@ -157,12 +156,11 @@ trait Session
         $this->outgoing_messages = $outgoing;
         $total = \count($this->outgoing_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
     }
     /**
      * Create MTProto session if needed.
-     *
      */
     public function createSession(): void
     {

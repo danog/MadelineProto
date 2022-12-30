@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,7 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use Generator;
 
 /**
  * HttpWait loop.
@@ -32,9 +32,8 @@ class HttpWaitLoop extends ResumableSignalLoop
     use Common;
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -63,8 +62,8 @@ class HttpWaitLoop extends ResumableSignalLoop
                         'http_wait',
                         '',
                         false,
-                        false
-                    )
+                        false,
+                    ),
                 );
             }
             $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
@@ -72,7 +71,6 @@ class HttpWaitLoop extends ResumableSignalLoop
     }
     /**
      * Loop name.
-     *
      */
     public function __toString(): string
     {

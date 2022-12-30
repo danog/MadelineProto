@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,11 +21,14 @@ namespace danog\MadelineProto\Stream\Proxy;
 use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Generator;
 
 /**
  * HTTP proxy stream wrapper.
@@ -47,9 +49,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -65,7 +66,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             if (\strlen(\inet_pton($address) === 16)) {
                 $address = '['.$address.']';
             }
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
         }
         yield $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
         $buffer = yield $this->stream->getReadBuffer($l);
@@ -85,15 +86,15 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $was_crlf = $piece === "\r\n";
         }
         $headers = \explode("\r\n", $headers);
-        list($protocol, $code, $description) = \explode(' ', $headers[0], 3);
-        list($protocol, $protocol_version) = \explode('/', $protocol);
+        [$protocol, $code, $description] = \explode(' ', $headers[0], 3);
+        [$protocol, $protocol_version] = \explode('/', $protocol);
         if ($protocol !== 'HTTP') {
-            throw new \danog\MadelineProto\Exception('Wrong protocol');
+            throw new Exception('Wrong protocol');
         }
         $code = (int) $code;
         unset($headers[0]);
         if (\array_pop($headers).\array_pop($headers) !== '') {
-            throw new \danog\MadelineProto\Exception('Wrong last header');
+            throw new Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
             unset($headers[$key]);
@@ -113,8 +114,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
                 $this->disconnect();
                 yield $this->connect($ctx);
             }
-            \danog\MadelineProto\Logger::log(\trim($read));
-            throw new \danog\MadelineProto\Exception($description, $code);
+            Logger::log(\trim($read));
+            throw new Exception($description, $code);
         }
         if ($close) {
             yield $this->stream->disconnect();
@@ -127,16 +128,15 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
-        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
+        Logger::log('Connected to '.$address.':'.$port.' via http');
         if (\strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -144,7 +144,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -154,9 +153,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(int &$length): Promise
     {
         return $this->stream->getReadBuffer($length);
     }
@@ -179,15 +177,13 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      * Sets proxy data.
      *
      * @param array $extra Proxy data
-     *
      */
-    public function setExtra($extra): void
+    public function setExtra(array $extra): void
     {
         $this->extra = $extra;
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {
@@ -195,7 +191,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

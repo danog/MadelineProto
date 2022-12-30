@@ -8,6 +8,9 @@ use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+use Generator;
+use PDO;
+use Throwable;
 
 /**
  * MySQL database backend.
@@ -21,9 +24,8 @@ class MysqlArray extends SqlArray
 
     /**
      * Initialize on startup.
-     *
      */
-    public function initStartup(): \Generator
+    public function initStartup(): Generator
     {
         $this->setTable($this->table);
         yield from $this->initConnection($this->dbSettings);
@@ -33,7 +35,6 @@ class MysqlArray extends SqlArray
      * Prepare statements.
      *
      * @param SqlArray::STATEMENT_* $type
-     *
      */
     protected function getSqlQuery(int $type): string
     {
@@ -68,18 +69,16 @@ class MysqlArray extends SqlArray
 
     /**
      * Initialize connection.
-     *
-     * @param DatabaseMysql $settings
      */
-    public function initConnection($settings): \Generator
+    public function initConnection(DatabaseMysql $settings): Generator
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
-        $this->pdo = new \PDO(
+        $this->pdo = new PDO(
             "mysql:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
-            $settings->getPassword()
+            $settings->getPassword(),
         );
         if (!isset($this->db)) {
             $this->db = yield from Mysql::getConnection($settings);
@@ -89,12 +88,10 @@ class MysqlArray extends SqlArray
     /**
      * Create table for property.
      *
-     *
-     * @throws \Throwable
-     *
-     * @psalm-return \Generator<int, Promise, mixed, mixed>
+     * @throws Throwable
+     * @psalm-return Generator<int, Promise, mixed, mixed>
      */
-    protected function prepareTable(): \Generator
+    protected function prepareTable(): Generator
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
         return yield $this->db->query("
@@ -111,7 +108,7 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): \Generator
+    protected function renameTable(string $from, string $to): Generator
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 

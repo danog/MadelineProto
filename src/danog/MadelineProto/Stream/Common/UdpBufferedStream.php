@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -25,6 +24,7 @@ use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -33,6 +33,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\WriteBufferInterface;
+use Generator;
 
 /**
  * UDP stream wrapper.
@@ -46,17 +47,15 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $this->stream = (yield from $ctx->getStream($header));
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -64,11 +63,9 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     *
-     * @psalm-return \Generator<int, Promise, mixed, Failure<mixed>|Success<object>>
+     * @psalm-return Generator<int, Promise, mixed, (Failure<mixed>|Success<object>)>
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBufferGenerator(int &$length): Generator
     {
         if (!$this->stream) {
             return new Failure(new ClosedException("MadelineProto stream was disconnected"));
@@ -76,7 +73,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
         $chunk = yield $this->read();
         if ($chunk === null) {
             $this->disconnect();
-            throw new \danog\MadelineProto\NothingInTheSocketException();
+            throw new NothingInTheSocketException();
         }
         $length = \strlen($chunk);
         return new Success(new class($chunk) implements ReadBufferInterface {
@@ -101,7 +98,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * Read data from buffer.
              *
              * @param integer $length Length
-             *
              * @return Promise<string>
              */
             public function bufferRead(int $length): Promise
@@ -121,7 +117,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
-     *
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -133,8 +128,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             private string $data = '';
             /**
              * Constructor function.
-             *
-             * @param integer $length
              */
             public function __construct(int $length, string $append, RawStreamInterface $rawStreamInterface)
             {
@@ -149,7 +142,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * Async write.
              *
              * @param string $data Data to write
-             *
              */
             public function bufferWrite(string $data): Promise
             {
@@ -172,7 +164,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {
@@ -180,7 +171,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

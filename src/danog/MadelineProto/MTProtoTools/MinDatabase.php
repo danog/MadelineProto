@@ -13,17 +13,20 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
+use Generator;
 
 /**
  * Manages min peers.
@@ -50,7 +53,7 @@ class MinDatabase implements TLCallback
     /**
      * Instance of MTProto.
      *
-     * @var \danog\MadelineProto\MTProto
+     * @var MTProto
      */
     private $API;
 
@@ -63,6 +66,7 @@ class MinDatabase implements TLCallback
 
     /**
      * List of properties stored in database (memory or external).
+     *
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
@@ -77,7 +81,7 @@ class MinDatabase implements TLCallback
     {
         return ['db', 'API', 'clean'];
     }
-    public function init(): \Generator
+    public function init(): Generator
     {
         yield from $this->initDb($this->API);
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
@@ -86,7 +90,7 @@ class MinDatabase implements TLCallback
         if ($this->clean) {
             return;
         }
-        \Amp\Loop::defer(function () {
+        Loop::defer(function () {
             $iterator = $this->db->getIterator();
             while (yield $iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
@@ -124,7 +128,7 @@ class MinDatabase implements TLCallback
     public function reset(): void
     {
         if ($this->cache) {
-            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
             $this->cache = [];
         }
     }
@@ -155,7 +159,7 @@ class MinDatabase implements TLCallback
             default:
                 $peers[$this->API->getId($location)] = true;
         }
-        $this->API->logger->logger("Caching peer location info from location from {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Caching peer location info from location from {$location['_']}", Logger::ULTRA_VERBOSE);
         $key = \count($this->cache) - 1;
         foreach ($peers as $id => $true) {
             $this->cache[$key][$id] = $id;
@@ -164,14 +168,14 @@ class MinDatabase implements TLCallback
     }
     public function addOriginContext(string $type): void
     {
-        $this->API->logger->logger("Adding peer origin context for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Adding peer origin context for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cache[] = [];
     }
     public function addOrigin(array $data = []): void
     {
         $cache = \array_pop($this->cache);
         if ($cache === null) {
-            throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
+            throw new Exception('Trying to add origin with no origin context set');
         }
         $origin = [];
         switch ($data['_']) {
@@ -181,7 +185,7 @@ class MinDatabase implements TLCallback
                 $origin['msg_id'] = $data['id'];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+                throw new Exception("Unknown origin type provided: {$data['_']}");
         }
         foreach ($cache as $id) {
             if ($origin['peer'] === $id) {
@@ -189,9 +193,9 @@ class MinDatabase implements TLCallback
             }
             $this->db[$id] = $origin;
         }
-        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }
-    public function populateFrom(array $object): \Generator
+    public function populateFrom(array $object): Generator
     {
         if (!($object['min'] ?? false)) {
             return $object;
@@ -216,7 +220,6 @@ class MinDatabase implements TLCallback
      * Check if location info is available for peer.
      *
      * @param float|int $id Peer ID
-     *
      * @psalm-return Promise<bool>
      */
     public function hasPeer($id): Promise

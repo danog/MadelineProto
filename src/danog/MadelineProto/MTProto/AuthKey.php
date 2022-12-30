@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -66,7 +65,6 @@ abstract class AuthKey implements JsonSerializable
      * Set auth key.
      *
      * @param string $authKey Authorization key
-     *
      */
     public function setAuthKey(string $authKey): void
     {
@@ -75,8 +73,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key is present.
-     *
-     * @return boolean
      */
     public function hasAuthKey(): bool
     {
@@ -84,7 +80,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key.
-     *
      */
     public function getAuthKey(): string
     {
@@ -93,7 +88,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key ID.
-     *
      */
     public function getID(): string
     {
@@ -104,7 +98,6 @@ abstract class AuthKey implements JsonSerializable
      * Set server salt.
      *
      * @param string $salt Server salt
-     *
      */
     public function setServerSalt(string $salt): void
     {
@@ -112,7 +105,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get server salt.
-     *
      */
     public function getServerSalt(): string
     {
@@ -121,8 +113,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if has server salt.
-     *
-     * @return boolean
      */
     public function hasServerSalt(): bool
     {
@@ -130,15 +120,12 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     abstract public function isAuthorized(): bool;
     /**
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
      */
     abstract public function authorized(bool $authorized): void;
 }

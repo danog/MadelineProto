@@ -13,18 +13,20 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -41,17 +43,15 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): Generator
     {
         $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4).$header));
     }
     /**
      * Async close.
-     *
      */
-    public function disconnect(): \Amp\Promise
+    public function disconnect(): Promise
     {
         return $this->stream->disconnect();
     }
@@ -59,12 +59,11 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): Generator
     {
-        $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
+        $padding_length = Tools::randomInt($modulus = 16);
+        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
         yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
         return $buffer;
     }
@@ -72,9 +71,8 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBufferGenerator(int &$length): Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \unpack('V', yield $buffer->bufferRead(4))[1];
@@ -82,7 +80,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     }
     /**
      * {@inheritdoc}
-     *
      */
     public function getSocket(): EncryptableSocket
     {
@@ -90,7 +87,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     }
     /**
      * {@inheritDoc}
-     *
      */
     public function getStream(): RawStreamInterface
     {

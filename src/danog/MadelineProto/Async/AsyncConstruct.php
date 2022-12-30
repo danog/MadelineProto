@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +20,7 @@ namespace danog\MadelineProto\Async;
 
 use Amp\Promise;
 use danog\MadelineProto\Tools;
+use Generator;
 
 /**
  * Async constructor class.
@@ -34,12 +34,11 @@ class AsyncConstruct
     /**
      * Async init promise.
      *
-     * @var Promise|\Generator|null|boolean
+     * @var Promise|Generator|null|boolean
      */
     private $asyncInitPromise;
     /**
      * Blockingly init.
-     *
      */
     public function init(): void
     {
@@ -50,9 +49,8 @@ class AsyncConstruct
     }
     /**
      * Asynchronously init.
-     *
      */
-    public function initAsynchronously(): \Generator
+    public function initAsynchronously(): Generator
     {
         if ($this->asyncInitPromise) {
             yield $this->asyncInitPromise;
@@ -61,8 +59,6 @@ class AsyncConstruct
     }
     /**
      * Check if we've already inited.
-     *
-     * @return boolean
      */
     public function inited(): bool
     {
@@ -72,7 +68,6 @@ class AsyncConstruct
      * Mark instance as (de)inited forcefully.
      *
      * @param boolean $inited Whether to mark the instance as inited or deinited
-     *
      */
     public function forceInit(bool $inited): void
     {
@@ -81,10 +76,8 @@ class AsyncConstruct
     /**
      * Set init promise.
      *
-     * @param Promise|\Generator $promise Promise
-     *
+     * @param Promise|Generator $promise Promise
      * @internal
-     *
      */
     public function setInitPromise($promise): void
     {

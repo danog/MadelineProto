@@ -12,11 +12,13 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
+
+use const DIRECTORY_SEPARATOR;
+use const HAD_MADELINE_PHAR;
 
 /**
  * Snitch.
@@ -36,9 +38,8 @@ class Snitch
     /**
      * Called before serialization.
      *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['hadInstalled'];
     }
@@ -48,7 +49,7 @@ class Snitch
     public function __wakeup(): void
     {
         if (\defined('HAD_MADELINE_PHAR')) {
-            $this->hadInstalled []= \HAD_MADELINE_PHAR;
+            $this->hadInstalled []= HAD_MADELINE_PHAR;
             if (\count($this->hadInstalled) > self::MAX_NO_PHAR_STARTS) {
                 \array_shift($this->hadInstalled);
                 if (!\array_sum($this->hadInstalled)) { // For three times, MadelineProto was started with no phar file
@@ -60,7 +61,6 @@ class Snitch
 
     /**
      * Die.
-     *
      */
     private function die(): void
     {

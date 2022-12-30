@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -20,6 +19,7 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
+use Generator;
 
 trait LoggerLoop
 {
@@ -45,14 +45,13 @@ trait LoggerLoop
      * Start the loop.
      *
      * Returns false if the loop is already running.
-     *
      */
     public function start(): bool
     {
         if ($this->started) {
             return false;
         }
-        Tools::callFork((function (): \Generator {
+        Tools::callFork((function (): Generator {
             $this->startedLoop();
             try {
                 yield from $this->loop();
@@ -64,8 +63,6 @@ trait LoggerLoop
     }
     /**
      * Check whether loop is running.
-     *
-     * @return boolean
      */
     public function isRunning(): bool
     {
@@ -74,7 +71,6 @@ trait LoggerLoop
 
     /**
      * Signal that loop has started.
-     *
      */
     protected function startedLoop(): void
     {
@@ -85,7 +81,6 @@ trait LoggerLoop
 
     /**
      * Signal that loop has exited.
-     *
      */
     protected function exitedLoop(): void
     {
@@ -98,19 +93,17 @@ trait LoggerLoop
      * Report pause, can be overriden for logging.
      *
      * @param integer $timeout Pause duration, 0 = forever
-     *
      */
     protected function reportPause(int $timeout): void
     {
         $this->logger->logger(
             "Pausing $this for $timeout",
-            Logger::ULTRA_VERBOSE
+            Logger::ULTRA_VERBOSE,
         );
     }
 
     /**
      * Get loop name.
-     *
      */
     abstract public function __toString(): string;
 }

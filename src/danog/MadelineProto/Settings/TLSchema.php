@@ -68,8 +68,6 @@ class TLSchema extends SettingsAbstract
     }
     /**
      * Returns whether the TL parser should re-parse the TL schemes.
-     *
-     * @return boolean
      */
     public function needsUpgrade(): bool
     {
@@ -77,7 +75,6 @@ class TLSchema extends SettingsAbstract
     }
     /**
      * Signal that scheme was re-parsed.
-     *
      */
     public function upgrade(): void
     {
@@ -85,7 +82,6 @@ class TLSchema extends SettingsAbstract
     }
     /**
      * Get TL layer version.
-     *
      */
     public function getLayer(): int
     {
@@ -96,7 +92,6 @@ class TLSchema extends SettingsAbstract
      * Set TL layer version.
      *
      * @param int $layer TL layer version.
-     *
      */
     public function setLayer(int $layer): self
     {
@@ -107,7 +102,6 @@ class TLSchema extends SettingsAbstract
 
     /**
      * Get MTProto schema path.
-     *
      */
     public function getMTProtoSchema(): string
     {
@@ -118,7 +112,6 @@ class TLSchema extends SettingsAbstract
      * Set MTProto schema path.
      *
      * @param string $MTProtoSchema MTProto schema path.
-     *
      */
     public function setMTProtoSchema(string $MTProtoSchema): self
     {
@@ -129,7 +122,6 @@ class TLSchema extends SettingsAbstract
 
     /**
      * Get API schema path.
-     *
      */
     public function getAPISchema(): string
     {
@@ -140,7 +132,6 @@ class TLSchema extends SettingsAbstract
      * Set API schema path.
      *
      * @param string $APISchema API schema path.
-     *
      */
     public function setAPISchema(string $APISchema): self
     {
@@ -151,7 +142,6 @@ class TLSchema extends SettingsAbstract
 
     /**
      * Get secret schema path.
-     *
      */
     public function getSecretSchema(): string
     {
@@ -162,7 +152,6 @@ class TLSchema extends SettingsAbstract
      * Set secret schema path.
      *
      * @param string $secretSchema Secret schema path.
-     *
      */
     public function setSecretSchema(string $secretSchema): self
     {
@@ -173,7 +162,6 @@ class TLSchema extends SettingsAbstract
 
     /**
      * Get the value of other.
-     *
      */
     public function getOther(): array
     {
@@ -182,8 +170,6 @@ class TLSchema extends SettingsAbstract
 
     /**
      * Set the value of other.
-     *
-     *
      */
     public function setOther(array $other): self
     {

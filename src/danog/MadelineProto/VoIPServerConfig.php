@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -43,7 +42,6 @@ class VoIPServerConfig
      * Update shared call settings.
      *
      * @param array $config The settings
-     *
      */
     public static function update(array $config): void
     {
@@ -62,7 +60,6 @@ class VoIPServerConfig
      * Update default shared call settings.
      *
      * @param array $configDefault The settings
-     *
      */
     public static function updateDefault(array $configDefault): void
     {
@@ -79,7 +76,6 @@ class VoIPServerConfig
     }
     /**
      * Get final settings.
-     *
      */
     public static function getFinal(): array
     {

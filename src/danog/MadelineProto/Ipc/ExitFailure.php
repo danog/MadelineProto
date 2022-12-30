@@ -3,6 +3,8 @@
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
+use RuntimeException;
+use Throwable;
 use TypeError;
 
 use function Amp\Parallel\Sync\flattenThrowableBacktrace;
@@ -30,7 +32,7 @@ final class ExitFailure
     /** @var string|null */
     private $localized;
 
-    public function __construct(\Throwable $exception)
+    public function __construct(Throwable $exception)
     {
         $this->type = \get_class($exception);
         $this->message = $exception->getMessage();
@@ -56,7 +58,7 @@ final class ExitFailure
         try {
             $exception = new $this->type($this->message, $this->code, $previous);
         } catch (TypeError) {
-            $exception = new \RuntimeException($this->message, $this->code, $previous);
+            $exception = new RuntimeException($this->message, $this->code, $previous);
         }
 
         if ($this->tlTrace) {

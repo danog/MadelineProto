@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -37,7 +36,6 @@ trait Templates
      *
      * @param string $message Message
      * @param string $form    Form
-     *
      */
     private function webAPIEchoTemplate(string $message, string $form): string
     {
@@ -45,7 +43,6 @@ trait Templates
     }
     /**
      * Get web API login HTML template string.
-     *
      */
     public function getWebAPITemplate(): string
     {
@@ -53,7 +50,6 @@ trait Templates
     }
     /**
      * Set web API login HTML template string.
-     *
      */
     public function setWebAPITemplate(string $template): void
     {
@@ -63,7 +59,6 @@ trait Templates
      * Echo to browser.
      *
      * @param string $message Message to echo
-     *
      */
     private function webAPIEcho(string $message = ''): Promise
     {
@@ -131,7 +126,7 @@ trait Templates
                             'desktop' => 'Desktop',
                             'web' => 'Web',
                             'ubp' => 'Ubuntu phone',
-                            'other' => \htmlentities(Lang::$current_lang['apiAppInstructionsAutoTypeOther'])
+                            'other' => \htmlentities(Lang::$current_lang['apiAppInstructionsAutoTypeOther']),
                         ] as $key => $desc) {
                             $form .= "<label><input type='radio' name='app_platform' value='$key' checked> $desc</label>";
                         }

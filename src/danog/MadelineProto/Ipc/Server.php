@@ -12,7 +12,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,7 +23,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
 use Amp\Success;
 use danog\Loop\SignalLoop;
-use danog\MadelineProto\Exception as Exception;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
@@ -32,6 +31,8 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
+use Generator;
+use Throwable;
 
 use function Amp\Promise\first;
 
@@ -77,7 +78,6 @@ class Server extends SignalLoop
      * Set IPC path.
      *
      * @param SessionPaths $session Session
-     *
      */
     public function setIpcPath(SessionPaths $session): void
     {
@@ -94,7 +94,6 @@ class Server extends SignalLoop
      * Start IPC server in background.
      *
      * @param SessionPaths $session   Session path
-     *
      */
     public static function startMe(SessionPaths $session): Promise
     {
@@ -107,14 +106,14 @@ class Server extends SignalLoop
             $started = true;
             $promises []= WebRunner::start($session, $id);
             return Tools::call(self::monitor($session, $id, $started, first($promises)));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
             $promises []= WebRunner::start($session, $id);
             $started = true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e);
         }
         return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new Deferred)->promise()));
@@ -123,9 +122,8 @@ class Server extends SignalLoop
      * Monitor session.
      *
      * @param Promise<bool> $cancelConnect
-     *
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): \Generator
+    private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): Generator
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -146,7 +144,7 @@ class Server extends SignalLoop
             try {
                 yield Tools::timeoutWithDefault($cancelConnect, 500, null);
                 $cancelConnect = (new Deferred)->promise();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Logger::log("$e");
                 Logger::log("Could not start IPC server, please check the logs for more details!");
                 return $e;
@@ -157,7 +155,6 @@ class Server extends SignalLoop
     }
     /**
      * Wait for shutdown.
-     *
      */
     public static function waitShutdown(): Promise
     {
@@ -169,7 +166,6 @@ class Server extends SignalLoop
     }
     /**
      * Shutdown.
-     *
      */
     final public function shutdown(): void
     {
@@ -183,9 +179,8 @@ class Server extends SignalLoop
     }
     /**
      * Main loop.
-     *
      */
-    public function loop(): \Generator
+    public function loop(): Generator
     {
         while ($socket = yield $this->waitSignal($this->server->accept())) {
             Tools::callFork($this->clientLoop($socket));
@@ -199,8 +194,7 @@ class Server extends SignalLoop
      * Client handler loop.
      *
      * @param ChannelledSocket $socket Client
-     *
-     * @return \Generator|Promise
+     * @return Generator|Promise
      */
     protected function clientLoop(ChannelledSocket $socket)
     {
@@ -212,12 +206,12 @@ class Server extends SignalLoop
             while ($payload = yield $socket->receive()) {
                 Tools::callFork($this->clientRequest($socket, $id++, $payload));
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
             try {
                 yield $socket->disconnect();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
             if ($payload === self::SHUTDOWN) {
                 $this->shutdown();
@@ -229,9 +223,8 @@ class Server extends SignalLoop
      *
      * @param ChannelledSocket                   $socket  Socket
      * @param array{0: string, 1: array|Wrapper} $payload Payload
-     *
      */
-    private function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
+    private function clientRequest(ChannelledSocket $socket, int $id, array $payload): Generator
     {
         try {
             yield from $this->API->initAsynchronously();
@@ -240,36 +233,35 @@ class Server extends SignalLoop
                 $payload[1] = $this->callback->unwrap($wrapper);
             }
             $result = $this->API->{$payload[0]}(...$payload[1]);
-            $result = $result instanceof \Generator
+            $result = $result instanceof Generator
                 ? yield from $result
                 : ($result instanceof Promise
                     ? yield $result
                     : $result);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->API->logger("Got error while calling IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
         } finally {
             if (isset($wrapper)) {
                 try {
                     yield $wrapper->disconnect();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
             }
         }
         try {
             yield $socket->send([$id, $result]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->API->logger("Got error while trying to send result of {$payload[0]}: $e", Logger::ERROR);
             try {
                 yield $socket->send([$id, new ExitFailure($e)]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->API->logger("Got error while trying to send error of error of {$payload[0]}: $e", Logger::ERROR);
             }
         }
     }
     /**
      * Get the name of the loop.
-     *
      */
     public function __toString(): string
     {
@@ -280,7 +272,6 @@ class Server extends SignalLoop
      * Set IPC settings.
      *
      * @param Ipc $settings IPC settings
-     *
      */
     public function setSettings(Ipc $settings): self
     {

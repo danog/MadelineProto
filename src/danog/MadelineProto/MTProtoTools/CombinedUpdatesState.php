@@ -13,7 +13,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -37,7 +36,7 @@ class CombinedUpdatesState
      *
      * @param array $init Initial array of states
      */
-    public function __construct($init = [])
+    public function __construct(array $init = [])
     {
         $this->states[false] = new UpdatesState();
         if (!\is_array($init)) {
@@ -55,7 +54,6 @@ class CombinedUpdatesState
      *
      * @param int   $channel Channel to get info about (optional, if not provided returns the entire info array)
      * @param array $init    Parameters to update
-     *
      * @return UpdatesState|UpdatesState[]
      */
     public function get(int $channel = null, array $init = [])
@@ -72,7 +70,6 @@ class CombinedUpdatesState
      * Remove update state.
      *
      * @param int $channel Channel whose state should be removed
-     *
      */
     public function remove(int $channel): void
     {
@@ -84,7 +81,6 @@ class CombinedUpdatesState
      * Check if update state is present.
      *
      * @param int $channel Channel ID
-     *
      */
     public function has(int $channel): bool
     {
@@ -95,7 +91,6 @@ class CombinedUpdatesState
      *
      * @param int       $channel Channel to get info about
      * @param bool|null $set     Busy flag to set before returning
-     *
      */
     public function syncLoading(int $channel, bool $set = null): bool
     {

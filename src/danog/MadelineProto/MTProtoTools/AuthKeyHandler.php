@@ -4,7 +4,9 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
+use Generator;
 use phpseclib3\Math\BigInteger;
 
 /**
@@ -17,9 +19,8 @@ trait AuthKeyHandler
      * Asynchronously create, bind and check auth keys for all DCs.
      *
      * @internal
-     *
      */
-    public function initAuthorization(): \Generator
+    public function initAuthorization(): Generator
     {
         $this->auth_mutex ??= new LocalMutex;
         $lock = yield $this->auth_mutex->acquire();
@@ -54,13 +55,13 @@ trait AuthKeyHandler
     /**
      * Get diffie-hellman configuration.
      *
-     * @return \Generator<array>
+     * @return Generator<array>
      */
-    public function getDhConfig(): \Generator
+    public function getDhConfig(): Generator
     {
         $dh_config = yield from $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
-            $this->logger->logger('DH configuration not modified', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('DH configuration not modified', Logger::VERBOSE);
             return $this->dh_config;
         }
         $dh_config['p'] = new BigInteger((string) $dh_config['p'], 256);

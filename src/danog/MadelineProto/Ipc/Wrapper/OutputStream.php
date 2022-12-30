@@ -14,9 +14,7 @@ class OutputStream extends Obj implements AmpOutputStream
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     *
      * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
      * @throws StreamException If writing to the stream fails.
      */
@@ -31,9 +29,7 @@ class OutputStream extends Obj implements AmpOutputStream
      * stream. Socket streams implementing this interface should only close the writable side of the stream.
      *
      * @param string $finalData Bytes to write.
-     *
      * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
      * @throws StreamException If writing to the stream fails.
      */

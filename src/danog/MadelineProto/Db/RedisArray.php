@@ -7,10 +7,12 @@ use Amp\Producer;
 use Amp\Promise;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Success;
-use danog\MadelineProto\Db\Driver\Redis as Redis;
+use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 use Generator;
+use ReturnTypeWillChange;
+use Throwable;
 
 use function Amp\call;
 
@@ -27,14 +29,12 @@ class RedisArray extends DriverArray
 
     /**
      * Initialize on startup.
-     *
      */
-    public function initStartup(): \Generator
+    public function initStartup(): Generator
     {
         return $this->initConnection($this->dbSettings);
     }
     /**
-     *
      * @psalm-return Generator<int, Success<null>, mixed, void>
      */
     protected function prepareTable(): Generator
@@ -42,7 +42,7 @@ class RedisArray extends DriverArray
         yield new Success;
     }
 
-    protected function renameTable(string $from, string $to): \Generator
+    protected function renameTable(string $from, string $to): Generator
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";
@@ -62,10 +62,8 @@ class RedisArray extends DriverArray
 
     /**
      * Initialize connection.
-     *
-     * @param DatabaseRedis $settings
      */
-    public function initConnection($settings): \Generator
+    public function initConnection(DatabaseRedis $settings): Generator
     {
         if (!isset($this->db)) {
             $this->db = yield from Redis::getConnection($settings);
@@ -74,7 +72,6 @@ class RedisArray extends DriverArray
 
     /**
      * Get redis key name.
-     *
      */
     private function rKey(string $key): string
     {
@@ -82,7 +79,6 @@ class RedisArray extends DriverArray
     }
     /**
      * Get redis ts name.
-     *
      */
     private function tsKey(string $key): string
     {
@@ -91,7 +87,6 @@ class RedisArray extends DriverArray
 
     /**
      * Get iterator key.
-     *
      */
     private function itKey(): string
     {
@@ -101,12 +96,10 @@ class RedisArray extends DriverArray
      * Set value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetset.php
-     *
      * @param string $index <p>
      * The index to set for.
      * </p>
-     *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function set(string|int $index, mixed $value): Promise
     {
@@ -153,9 +146,9 @@ class RedisArray extends DriverArray
      * Get array copy.
      *
      * @return Promise<array>
-     * @throws \Throwable
+     * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function getArrayCopy(): Promise
     {
         return call(function () {
@@ -188,7 +181,7 @@ class RedisArray extends DriverArray
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return Promise<int> The number of elements or public properties in the associated
      * array or object, respectively.
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function count(): Promise
     {
@@ -206,7 +199,6 @@ class RedisArray extends DriverArray
 
     /**
      * Clear all elements.
-     *
      */
     public function clear(): Promise
     {
