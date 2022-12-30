@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Loop;
 use danog\MadelineProto\Logger;
 use Revolt\EventLoop;
 

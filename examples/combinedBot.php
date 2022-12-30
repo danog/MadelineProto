@@ -15,7 +15,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -57,9 +56,8 @@ class MyEventHandler extends EventHandler
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewChannelMessage(array $update): \Generator
+    public function onUpdateNewChannelMessage(array $update): Generator
     {
         return $this->onUpdateNewMessage($update);
     }
@@ -67,16 +65,15 @@ class MyEventHandler extends EventHandler
      * Handle updates from users.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): Generator
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
         $res = json_encode($update, JSON_PRETTY_PRINT);
 
-        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
+        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => $update['message']['id'] ?? null, 'parse_mode' => 'HTML']);
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
             yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
@@ -87,7 +84,7 @@ $MadelineProtos = [];
 foreach ([
     'bot.madeline' => 'Bot Login',
     'user.madeline' => 'Userbot login',
-    'user2.madeline' => 'Userbot login (2)'
+    'user2.madeline' => 'Userbot login (2)',
 ] as $session => $message) {
     Logger::log($message, Logger::WARNING);
     $MadelineProtos []= new API($session);

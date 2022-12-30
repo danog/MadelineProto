@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Socket read loop.
@@ -20,7 +22,6 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\PendingReadError;
 use Amp\ByteStream\StreamException;
-use Amp\Loop;
 use Amp\Websocket\ClosedException;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Logger;

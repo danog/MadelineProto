@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
-use Amp\Loop;
 use danog\Loop\Generic\PeriodicLoop;
 use Generator;
 use Revolt\EventLoop;

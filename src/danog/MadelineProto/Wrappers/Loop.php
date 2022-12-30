@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Loop module.
@@ -19,7 +21,6 @@
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Future;
-use Amp\Loop as AmpLoop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;

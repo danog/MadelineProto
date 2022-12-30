@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Magic module.
@@ -19,7 +21,6 @@
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
-use Amp\Loop;
 use Amp\Loop\Driver;
 use danog\MadelineProto\TL\Conversion\Extension;
 use Phar;

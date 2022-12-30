@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Logger module.
@@ -20,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Failure;
-use Amp\Loop;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * ResponseHandler module.
@@ -19,9 +21,9 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
+
 use Amp\DeferredFuture;
 use Amp\Failure;
-use Amp\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;

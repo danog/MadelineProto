@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Files module.
@@ -19,7 +21,6 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Future;
-use Amp\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;

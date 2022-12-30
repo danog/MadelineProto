@@ -1,6 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Database\Mysql;
 
 /*
     * load MadelineProto in Your Project
@@ -18,7 +22,7 @@ if (file_exists('vendor/autoload.php')) {
 /*
     * create default mysql object
 */
-$database = new \danog\MadelineProto\Settings\Database\Mysql;
+$database = new Mysql;
 
 /*
     config and set auth information

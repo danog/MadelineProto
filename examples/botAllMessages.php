@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Get all messages in multiple threads.
  *
@@ -15,9 +16,11 @@
  * @author    Alexander Panlratov <alexander@i-c-a.su>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
+use danog\MadelineProto\API;
+
+use function Amp\Promise\all;
 
 /*
  * Various ways to load MadelineProto
@@ -34,7 +37,7 @@ if (file_exists('vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
+$MadelineProto = new API('bot.madeline');
 
 $MadelineProto->async(true);
 $MadelineProto->loop(static function () use ($MadelineProto) {
@@ -51,7 +54,7 @@ $MadelineProto->loop(static function () use ($MadelineProto) {
             $promises[] = $MadelineProto->messages->getMessages(['id' => range($lastMessageId+1, $lastMessageId+$step)]);
             $lastMessageId +=$step;
         }
-        $results = yield \Amp\Promise\all($promises);
+        $results = yield all($promises);
         foreach ($results as $result) {
             foreach ($result['messages'] as $message) {
                 if ($message['_'] === 'messageEmpty') {

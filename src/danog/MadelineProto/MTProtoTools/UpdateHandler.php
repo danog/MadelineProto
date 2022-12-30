@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * UpdateHandler module.
@@ -20,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
 use Amp\Future;
-use Amp\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;

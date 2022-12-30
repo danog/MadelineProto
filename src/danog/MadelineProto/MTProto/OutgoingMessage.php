@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Outgoing message.
@@ -20,7 +22,6 @@ namespace danog\MadelineProto\MTProto;
 
 use Amp\DeferredFuture;
 use Amp\Future;
-use Amp\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Generator;

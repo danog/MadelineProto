@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * IPC callback server.
  *
@@ -20,7 +23,6 @@ namespace danog\MadelineProto\Ipc;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\SessionPaths;
 use Revolt\EventLoop;

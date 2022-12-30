@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * MTProto temporary auth key.
@@ -137,7 +139,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {

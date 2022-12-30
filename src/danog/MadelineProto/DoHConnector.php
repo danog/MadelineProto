@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * DataCenter DoH proxying AMPHP connector.
@@ -23,7 +25,6 @@ use Amp\DeferredFuture;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
 use Amp\Future;
-use Amp\Loop;
 use Amp\NullCancellationToken;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;

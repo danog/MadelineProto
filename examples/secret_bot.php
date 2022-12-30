@@ -15,11 +15,11 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Settings;
 
 /*
@@ -34,7 +34,7 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-class SecretHandler extends \danog\MadelineProto\EventHandler
+class SecretHandler extends EventHandler
 {
     private $sent = [-440592694 => true];
     public function __construct(?APIWrapper $API)
@@ -59,9 +59,8 @@ class SecretHandler extends \danog\MadelineProto\EventHandler
      * Handle updates from users.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): Generator
     {
         if ($update['message']['message'] === 'request') {
             yield $this->requestSecretChat($update);
@@ -74,9 +73,8 @@ class SecretHandler extends \danog\MadelineProto\EventHandler
      * Handle secret chat messages.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewEncryptedMessage(array $update): \Generator
+    public function onUpdateNewEncryptedMessage(array $update): Generator
     {
         if (isset($update['message']['decrypted_message']['media'])) {
             $this->logger(yield $this->downloadToDir($update, '.'));

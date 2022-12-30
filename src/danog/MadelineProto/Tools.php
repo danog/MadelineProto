@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Tools module.
@@ -25,15 +27,12 @@ use Exception;
 use phpseclib3\Crypt\Random;
 use Throwable;
 use Traversable;
-use TypeError;
 
 use const DIRECTORY_SEPARATOR;
+
 use const PHP_INT_MAX;
 use const PHP_SAPI;
 use const STR_PAD_RIGHT;
-use function Amp\File\exists;
-
-use function Amp\Future\some;
 use function unpack;
 
 /**

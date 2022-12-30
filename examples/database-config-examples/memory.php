@@ -1,6 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Database\Memory;
 
 /*
     * load MadelineProto in Your Project
@@ -18,7 +22,7 @@ if (file_exists('vendor/autoload.php')) {
 /*
     * create default Memory object
 */
-$database = new \danog\MadelineProto\Settings\Database\Memory;
+$database = new Memory;
 
 /*
     config and set auth information

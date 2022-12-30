@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Serialization module.
@@ -20,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Loop;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;

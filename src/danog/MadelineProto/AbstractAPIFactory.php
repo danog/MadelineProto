@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * APIFactory module.
@@ -153,7 +155,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {

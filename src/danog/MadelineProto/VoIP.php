@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -13,7 +16,6 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 use Amp\Delayed;
-use Amp\Loop;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -180,7 +182,6 @@ class VoIP
     private array $tempHoldFiles = [];
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {

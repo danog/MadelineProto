@@ -15,7 +15,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,6 +25,9 @@ if (function_exists('memprof_enable')) {
 use Amp\Http\Server\HttpServer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\FileCallback;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -47,7 +49,7 @@ if (file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  */
-class MyEventHandler extends \danog\MadelineProto\EventHandler
+class MyEventHandler extends EventHandler
 {
     const START = "Send me a file URL and I will download it and send it to you!\n\n".
                 "Usage: `https://example.com`\n".
@@ -99,10 +101,8 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
      * Handle updates from channels and supergroups.
      *
      * @param array $update Update
-     *
-     * @return \Generator
      */
-    public function onUpdateNewChannelMessage(array $update)
+    public function onUpdateNewChannelMessage(array $update): Generator
     {
         //yield $this->onUpdateNewMessage($update);
     }
@@ -110,9 +110,8 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
      * Handle updates from users.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): Generator
     {
         if ($update['message']['out'] ?? false) {
             return;
@@ -182,7 +181,7 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                 $id = $id['id'];
             }
 
-            $url = new \danog\MadelineProto\FileCallback(
+            $url = new FileCallback(
                 $url,
                 function ($progress, $speed, $time) use ($peerId, $id) {
                     $this->logger("Upload progress: $progress%");
@@ -195,9 +194,9 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                     $prev = $now;
                     try {
                         yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"], ['FloodWaitLimit' => 0]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    } catch (RPCErrorException $e) {
                     }
-                }
+                },
             );
             yield $this->messages->sendMedia(
                 [
@@ -207,12 +206,12 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                         '_' => 'inputMediaUploadedDocument',
                         'file' => $url,
                         'attributes' => [
-                            ['_' => 'documentAttributeFilename', 'file_name' => $name]
-                        ]
+                            ['_' => 'documentAttributeFilename', 'file_name' => $name],
+                        ],
                     ],
                     'message' => 'Powered by @MadelineProto!',
-                    'parse_mode' => 'Markdown'
-                ]
+                    'parse_mode' => 'Markdown',
+                ],
             );
 
             if (in_array($peer['type'], ['channel', 'supergroup'])) {
@@ -220,18 +219,18 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
             } else {
                 yield $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && strpos($e->getMessage(), 'URI') === false) {
                 $this->report((string) $e);
-                $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+                $this->logger((string) $e, Logger::FATAL_ERROR);
             }
             if ($e instanceof RPCErrorException && $e->rpc === 'FILE_PARTS_INVALID') {
                 $this->report(json_encode($url));
             }
             try {
                 yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);
-            } catch (\Throwable $e) {
-                $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            } catch (Throwable $e) {
+                $this->logger((string) $e, Logger::FATAL_ERROR);
             }
         }
     }

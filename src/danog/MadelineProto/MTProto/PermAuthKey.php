@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * MTProto permanent auth key.
@@ -66,7 +68,6 @@ class PermAuthKey extends AuthKey
     }
     /**
      * Sleep function.
-     *
      */
     public function __sleep(): array
     {

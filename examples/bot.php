@@ -15,7 +15,6 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,9 +22,6 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Settings\Database\Mysql;
-use danog\MadelineProto\Settings\Database\Postgres;
-use danog\MadelineProto\Settings\Database\Redis;
 
 /*
  * Various ways to load MadelineProto
@@ -54,10 +50,11 @@ class MyEventHandler extends EventHandler
 
     /**
      * List of properties automatically stored in database (MySQL, Postgres, redis or memory).
+     *
      * @see https://docs.madelineproto.xyz/docs/DATABASE.html
      */
     protected static array $dbProperties = [
-        'dataStoredOnDb' => 'array'
+        'dataStoredOnDb' => 'array',
     ];
 
     /**
@@ -86,10 +83,9 @@ class MyEventHandler extends EventHandler
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update
-     *
      * @return void
      */
-    public function onUpdateNewChannelMessage(array $update): \Generator
+    public function onUpdateNewChannelMessage(array $update): Generator
     {
         return $this->onUpdateNewMessage($update);
     }
@@ -98,9 +94,8 @@ class MyEventHandler extends EventHandler
      * Handle updates from users.
      *
      * @param array $update Update
-     *
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): Generator
     {
         $this->logger($update);
 
