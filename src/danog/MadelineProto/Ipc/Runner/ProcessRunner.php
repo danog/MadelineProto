@@ -17,6 +17,8 @@ use Error;
 use Generator;
 use Throwable;
 
+use function Amp\async;
+
 use const Amp\Process\IS_WINDOWS;
 use const ARRAY_FILTER_USE_BOTH;
 use const DIRECTORY_SEPARATOR;
@@ -103,8 +105,8 @@ final class ProcessRunner extends RunnerAbstract
                 $resDeferred->complete($e);
                 return;
             }
-            Tools::callFork(self::readUnref($handle->stdout));
-            Tools::callFork(self::readUnref($handle->stderr));
+            async(self::readUnref(...), $handle->stdout);
+            async(self::readUnref(...), $handle->stderr);
 
             $runner->join($handle)->onResolve(function (?Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
                 $runner->destroy($handle);

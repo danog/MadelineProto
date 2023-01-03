@@ -149,7 +149,7 @@ abstract class Serialization
                     $copy->complete(true);
                 }
             };
-            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull));
+            $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
             $session->getLightState()->onResolve(static function (?Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
                 if ($res) {
                     $lightState = $res;

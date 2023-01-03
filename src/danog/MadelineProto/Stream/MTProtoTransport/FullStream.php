@@ -47,7 +47,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Stream to use as data source.
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->in_seq_no = -1;
         $this->out_seq_no = -1;
@@ -58,7 +58,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }
@@ -67,7 +67,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = '')
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);
@@ -81,7 +81,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length)
+    public function getReadBuffer(int &$length)
     {
         $this->stream->startReadHash();
         $buffer = $this->stream->getReadBuffer($l);

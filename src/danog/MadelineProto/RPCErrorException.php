@@ -24,6 +24,8 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Throwable;
 
+use function Amp\async;
+
 use const PHP_EOL;
 use const PHP_SAPI;
 
@@ -49,13 +51,12 @@ class RPCErrorException extends \Exception
         $error = \preg_replace('/\\d+$/', "X", $error);
         $description = self::$descriptions[$error] ?? '';
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error])) {
-            Tools::callFork((function () use ($method, $code, $error) {
+            async(function () use ($method, $code, $error) {
                 try {
                     $res = \json_decode(
-                        yield
-                            (HttpClientBuilder::buildDefault()
-                                ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
-                            )->getBody()->buffer(),
+                        (HttpClientBuilder::buildDefault()
+                            ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
+                        )->getBody()->buffer(),
                         true,
                     );
                     if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
@@ -65,7 +66,7 @@ class RPCErrorException extends \Exception
                     }
                 } catch (Throwable $e) {
                 }
-            })());
+            });
         }
         if (!$description) {
             return $error;

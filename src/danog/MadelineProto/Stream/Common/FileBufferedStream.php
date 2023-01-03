@@ -47,7 +47,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Connect.
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if ($header !== '') {
             $this->stream->write($header);
@@ -88,7 +88,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         if ($this->stream) {
             $this->stream = null;

@@ -37,6 +37,7 @@ use danog\MadelineProto\Stream\Transport\WssStream;
 use Generator;
 use JsonSerializable;
 
+use function Amp\async;
 use function count;
 
 /**
@@ -488,7 +489,9 @@ class DataCenterConnection implements JsonSerializable
             }
             $this->connectMore($count);
             $this->restoreBackup();
-            $this->connectionsPromise = new Success();
+            $f = new DeferredFuture;
+            $f->complete();
+            $this->connectionsPromise = $f->getFuture();
             if ($this->connectionsDeferred) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
@@ -588,7 +591,7 @@ class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                Tools::callFork($this->getConnection()->sendMessage($message, false));
+                async(fn () => $this->getConnection()->sendMessage($message, false));
             }
         }
         $this->flush();
@@ -618,7 +621,7 @@ class DataCenterConnection implements JsonSerializable
     public function waitGetConnection()
     {
         if (empty($this->availableConnections)) {
-            $this->connectionsPromise;
+            $this->connectionsPromise->await();
         }
         return $this->getConnection();
     }

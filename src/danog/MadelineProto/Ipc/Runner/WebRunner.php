@@ -33,10 +33,10 @@ final class WebRunner extends RunnerAbstract
      * @param string $session Session path
      * @return Promise<bool>
      */
-    public static function start(string $session, int $startupId): Future
+    public static function start(string $session, int $startupId): bool
     {
         if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
-            return new Failure(new \Exception("Can't start the web runner!"));
+            throw new \Exception("Can't start the web runner!");
         }
 
         if (!self::$runPath) {
@@ -115,6 +115,6 @@ final class WebRunner extends RunnerAbstract
         \fwrite($res, $payload);
         self::$resources []= $res;
 
-        return new Success(true);
+        return true;
     }
 }

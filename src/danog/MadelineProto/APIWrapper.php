@@ -25,6 +25,7 @@ use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
 use Generator;
 
+use function Amp\async;
 use function Amp\File\openFile;
 
 final class APIWrapper
@@ -145,7 +146,7 @@ final class APIWrapper
      */
     public function isAsync(): bool
     {
-        return $this->async;
+        return true;
     }
 
     /**
@@ -171,15 +172,14 @@ final class APIWrapper
      *
      * @return Promise<bool>
      */
-    public function serialize(): Future
+    public function serialize(): bool
     {
         if ($this->API === null && !$this->gettingApiId) {
-            return new Success(false);
+            return false;
         }
         if ($this->API instanceof Client) {
-            return new Success(false);
+            return false;
         }
-        return Tools::callFork((function () {
             if ($this->API) {
                 $this->API->init();
             }
@@ -200,7 +200,6 @@ final class APIWrapper
                 Logger::log('Saved session!');
             }
             return true;
-        })());
     }
 
     /**

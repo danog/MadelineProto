@@ -53,7 +53,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -145,7 +145,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }

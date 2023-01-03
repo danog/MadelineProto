@@ -42,7 +42,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();

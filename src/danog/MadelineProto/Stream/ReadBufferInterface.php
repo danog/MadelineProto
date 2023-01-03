@@ -34,5 +34,5 @@ interface ReadBufferInterface
      *
      * @param int $length How much data to read
      */
-    public function bufferRead(int $length): Future;
+    public function bufferRead(int $length): ?string;
 }

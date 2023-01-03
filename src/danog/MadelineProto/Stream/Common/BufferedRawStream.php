@@ -52,7 +52,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param ConnectionContext $ctx Connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
@@ -83,7 +83,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         if ($this->memory_stream) {
             \fclose($this->memory_stream);
@@ -148,14 +148,14 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if ($buffer_length >= $length) {
             return new Success(\fread($this->memory_stream, $length));
         }
-        return Tools::call($this->bufferReadGenerator($length));
+        return Tools::call($this->bufferRead($length));
     }
     /**
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
      */
-    public function bufferReadGenerator(int $length)
+    public function bufferRead(int $length)
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);

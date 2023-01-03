@@ -37,6 +37,8 @@ use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
 
+use function Amp\async;
+
 use const PHP_EOL;
 
 /**
@@ -137,7 +139,7 @@ trait ResponseHandler
                     $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
                     if ($response_type == 'Updates') {
                         if (!$this->isCdn()) {
-                            Tools::callForkDefer($this->API->handleUpdates($message->read()));
+                            EventLoop::defer(fn () => async($this->API->handleUpdates($message->read())));
                         }
                         break;
                     }
@@ -224,10 +226,10 @@ trait ResponseHandler
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    Tools::callFork((function () use ($requestId) {
+                    async(function () use ($requestId) {
                         $this->API->initAuthorization();
                         $this->methodRecall('', ['message_id' => $requestId]);
-                    })());
+                    });
                     return;
             }
             $this->handleReject($request, new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
@@ -252,7 +254,7 @@ trait ResponseHandler
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
             unset($body);
-            Tools::callForkDefer($this->API->handleUpdates($response));
+            EventLoop::defer(fn () => async($this->API->handleUpdates($response)));
         }
         $this->gotResponseForOutgoingMessage($request);
 
@@ -346,10 +348,10 @@ trait ResponseHandler
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            Tools::callFork((function () use ($request, $response) {
+                            async(function () use ($request, $response) {
                                 $this->API->initAuthorization();
                                 $this->handleReject($request, new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
-                            })());
+                            });
                             return null;
                         }
                         $this->session_id = null;
@@ -367,18 +369,18 @@ trait ResponseHandler
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                             throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        Tools::callFork((function () use ($request) {
+                        async(function () use ($request) {
                             $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
-                        })());
+                        });
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        Tools::callFork((function () use ($request) {
+                        async(function () use ($request) {
                             $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
-                        })());
+                        });
                         return null;
                 }
                 return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());

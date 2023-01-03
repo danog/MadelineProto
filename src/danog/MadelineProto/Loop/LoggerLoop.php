@@ -27,10 +27,6 @@ use Generator;
 trait LoggerLoop
 {
     /**
-     * Whether the loop was started.
-     */
-    private bool $started = false;
-    /**
      * Logger instance.
      */
     protected Logger $logger;
@@ -44,40 +40,12 @@ trait LoggerLoop
         $this->logger = $logger;
     }
 
-    /**
-     * Start the loop.
-     *
-     * Returns false if the loop is already running.
-     */
-    public function start(): bool
-    {
-        if ($this->started) {
-            return false;
-        }
-        Tools::callFork((function () {
-            $this->startedLoop();
-            try {
-                $this->loop();
-            } finally {
-                $this->exitedLoop();
-            }
-        })());
-        return true;
-    }
-    /**
-     * Check whether loop is running.
-     */
-    public function isRunning(): bool
-    {
-        return $this->started;
-    }
 
     /**
      * Signal that loop has started.
      */
     protected function startedLoop(): void
     {
-        $this->started = true;
         $this->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         parent::startedLoop();
     }
@@ -87,7 +55,6 @@ trait LoggerLoop
      */
     protected function exitedLoop(): void
     {
-        $this->started = false;
         $this->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
         parent::exitedLoop();
     }

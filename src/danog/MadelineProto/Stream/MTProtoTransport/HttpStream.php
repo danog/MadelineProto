@@ -60,7 +60,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->ctx = $ctx->getCtx();
         $this->stream = ($ctx->getStream($header));
@@ -80,7 +80,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }
@@ -89,7 +89,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = '')
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
         $buffer = $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
@@ -101,7 +101,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length)
+    public function getReadBuffer(int &$length)
     {
         $buffer = $this->stream->getReadBuffer($l);
         $headers = '';

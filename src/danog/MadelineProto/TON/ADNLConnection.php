@@ -43,6 +43,7 @@ use phpseclib3\Crypt\EC\PrivateKey;
 use phpseclib3\Crypt\EC\PublicKey;
 use phpseclib3\Math\BigInteger;
 
+use function Amp\async;
 use function strrev;
 
 class ADNLConnection
@@ -129,7 +130,7 @@ class ADNLConnection
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::class)->addStream(BufferedRawStream::class)->addStream(CtrStream::class, $obf)->addStream(HashedBufferedStream::class, 'sha256')->addStream(ADNLStream::class);
         $this->stream = ($ctx->getStream($payload));
-        Tools::callFork((function () {
+        async(function () {
             //Tools::sleep(1);
             while (true) {
                 $buffer = $this->stream->getReadBuffer($length);
@@ -142,7 +143,7 @@ class ADNLConnection
                     $this->requests[$data['query_id']]->complete($this->TL->deserialize((string) $data['answer'])[0]);
                 }
             }
-        })());
+        });
     }
     /**
      * Send ADNL query.

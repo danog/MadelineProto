@@ -21,6 +21,7 @@ use danog\MadelineProto\Tools;
 use Generator;
 use Throwable;
 
+use function Amp\async;
 use function Amp\Ipc\connect;
 
 /**
@@ -72,7 +73,7 @@ class Wrapper extends ClientAbstract
         $instance->remoteId = $instance->server->receive();
         $logger->logger("Got ID {$instance->remoteId} from callback IPC server!");
 
-        Tools::callFork($instance->receiverLoop());
+        async($instance->receiverLoop(...));
         return $instance;
     }
     /**
@@ -131,7 +132,7 @@ class Wrapper extends ClientAbstract
         $payload = null;
         try {
             while ($payload = $this->server->receive()) {
-                Tools::callFork($this->clientRequest($id++, $payload));
+                async($this->clientRequest(...), $id++, $payload);
             }
         } finally {
             $this->server->disconnect();
@@ -183,7 +184,7 @@ class Wrapper extends ClientAbstract
     public function unwrap(ChannelledSocket $server)
     {
         $this->server = $server;
-        Tools::callFork($this->loopInternal());
+        async($this->loopInternal(...));
 
         foreach ($this->callbackIds as &$id) {
             if (\is_int($id)) {

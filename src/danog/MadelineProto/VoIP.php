@@ -28,6 +28,7 @@ use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
 
+use function Amp\async;
 use function Amp\File\openFile;
 
 if (\extension_loaded('php-libtgvoip')) {
@@ -342,13 +343,13 @@ class VoIP
             }
             foreach ($this->sockets as $socket) {
                 $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
-                Tools::callFork((function () use ($socket) {
+                async(function () use ($socket) {
                     while ($payload = $this->recv_message($socket)) {
                         $this->lastIncomingTimestamp = \microtime(true);
-                        Tools::callFork($this->handlePacket($socket, $payload));
+                        async($this->handlePacket(...), $socket, $payload);
                     }
                     Logger::log("Exiting VoIP read loop in $this!");
-                })());
+                });
             }
         })());
         return $this;

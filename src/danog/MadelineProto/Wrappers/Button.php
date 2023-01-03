@@ -22,6 +22,8 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\Tools;
 
+use function Amp\async;
+
 /**
  * Manages clicking buttons.
  */
@@ -31,15 +33,14 @@ trait Button
      * Click on button.
      *
      * @internal
-     * @return Promise|true
+     * @return array|true
      */
     public function clickInternal(bool $donotwait, string $method, array $parameters)
     {
-        $internal = $donotwait ? 'methodCallAsyncWrite' : 'methodCallAsyncRead';
-        $result = $this->{$internal}($method, $parameters);
         if ($donotwait) {
-            Tools::callFork($result);
+            $this->methodCallAsyncWrite($method, $parameters);
+            return true;
         }
-        return $donotwait ? true : $result;
+        return $this->methodCallAsyncRead($method, $parameters);
     }
 }

@@ -32,11 +32,12 @@ use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
 use function Amp\File\exists;
-
+use function Amp\File\move;
 use function Amp\File\openFile;
 use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
+use function Amp\File\write;
 use function serialize;
 
 /**
@@ -96,7 +97,7 @@ class SessionPaths
     /**
      * Serialize object to file.
      */
-    public function serialize(object $object, string $path)
+    public function serialize(object $object, string $path): void
     {
         Logger::log("Waiting for exclusive lock of $path.lock...");
         $unlock = Tools::flock("$path.lock", LOCK_EX, 0.1);
@@ -110,12 +111,12 @@ class SessionPaths
                 .\chr(PHP_MINOR_VERSION)
                 .\serialize($object);
 
-            put(
+            write(
                 "$path.temp.php",
                 $object,
             );
 
-            renameAsync("$path.temp.php", $path);
+            move("$path.temp.php", $path);
         } finally {
             $unlock();
         }
@@ -125,9 +126,8 @@ class SessionPaths
      * Deserialize new object.
      *
      * @param string $path Object path, defaults to session path
-     * @psalm-return Generator<mixed, mixed, mixed, object>
      */
-    public function unserialize(string $path = '')
+    public function unserialize(string $path = ''): ?object
     {
         $path = $path ?: $this->sessionPath;
 
@@ -147,9 +147,9 @@ class SessionPaths
             $size = $size['size'] ?? $headerLen;
 
             $file->seek($headerLen++);
-            $v = \ord($file->read(1));
+            $v = \ord($file->read(null, 1));
             if ($v === Serialization::VERSION) {
-                $php = $file->read(2);
+                $php = $file->read(null, 2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
                 if (\version_compare("$major.$minor", PHP_VERSION) > 0) {
@@ -157,7 +157,7 @@ class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $unserialized = \unserialize(($file->read($size - $headerLen)) ?? '');
+            $unserialized = \unserialize(($file->read(null, $size - $headerLen)) ?? '');
             $file->close();
         } finally {
             $unlock();
@@ -215,21 +215,18 @@ class SessionPaths
 
     /**
      * Get IPC state.
-     *
-     * @psalm-suppress InvalidReturnType
-     * @return Promise<?IpcState>
      */
-    public function getIpcState(): Future
+    public function getIpcState(): ?IpcState
     {
-        return Tools::call($this->unserialize($this->ipcStatePath));
+        return $this->unserialize($this->ipcStatePath);
     }
 
     /**
      * Store IPC state.
      */
-    public function storeIpcState(IpcState $state)
+    public function storeIpcState(IpcState $state): void
     {
-        return $this->serialize($state, $this->getIpcStatePath());
+        $this->serialize($state, $this->getIpcStatePath());
     }
 
     /**
@@ -242,31 +239,19 @@ class SessionPaths
 
     /**
      * Get light state.
-     *
-     * @psalm-suppress InvalidReturnType
-     * @return Promise<LightState>
      */
-    public function getLightState(): Future
+    public function getLightState(): LightState
     {
-        if ($this->lightState) {
-            return new Success($this->lightState);
-        }
-        $promise = Tools::call($this->unserialize($this->lightStatePath));
-        $promise->onResolve(function (?Throwable $e, ?LightState $res): void {
-            if ($res) {
-                $this->lightState = $res;
-            }
-        });
-        return $promise;
+        return $this->lightState ??= $this->unserialize($this->lightStatePath);
     }
 
     /**
      * Store light state.
      */
-    public function storeLightState(MTProto $state)
+    public function storeLightState(MTProto $state): void
     {
         $this->lightState = new LightState($state);
-        return $this->serialize($this->lightState, $this->getLightStatePath());
+        $this->serialize($this->lightState, $this->getLightStatePath());
     }
 
     /**

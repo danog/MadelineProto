@@ -43,6 +43,8 @@ use Generator;
 use Throwable;
 
 use const LOCK_EX;
+
+use function Amp\async;
 use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -160,7 +162,7 @@ trait Files
         $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
             static $cur = 0;
             $cur++;
-            Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
+            async(fn () => $cb($cur * 100 / $part_total_num, $speed, $time));
         };
         $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
             $bytes = $callable($part_num * $part_size, $part_size);
@@ -175,20 +177,16 @@ trait Files
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
             $resa = $callable($part_num);
-            $writePromise = Tools::call($this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
+            $writePromise = $this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
             if (!$seekable) {
-                $writePromise;
+                $writePromise->await();
             }
-            $writePromise->onResolve(function ($e, $readDeferred) use ($cb, $part_num, &$resPromises, &$exception) {
-                if ($e) {
-                    $this->logger("Got exception while uploading: {$e}");
-                    $exception = $e;
-                    return;
-                }
-                $resPromises[] = $readDeferred->getFuture();
+            async(function () use ($writePromise, $cb, $part_num, &$resPromises, &$exception) {
+                $readFuture = $writePromise->await()->getFuture();
+                $resPromises[] = $readFuture;
                 try {
                     // Wrote chunk!
-                    if (!Tools::call($readDeferred->getFuture())) {
+                    if (!$readFuture->getFuture()->await()) {
                         throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
@@ -338,7 +336,7 @@ trait Files
                 $offset = $this->offset++;
                 $this->read[$offset]->complete($this->wrote[$offset]);
                 if ($this->cb) {
-                    Tools::callFork(($this->cb)(...$params));
+                    async(fn () => ($this->cb)(...$params));
                 }
             }
         };
@@ -885,7 +883,7 @@ trait Files
         $cb = static function () use ($cb, $count, &$time, &$speed): void {
             static $cur = 0;
             $cur++;
-            Tools::callFork($cb($cur * 100 / $count, $time, $speed));
+            async(fn () => $cb($cur * 100 / $count, $time, $speed));
         };
         $cdn = false;
         $params[0]['previous_promise'] = new Success(true);

@@ -34,5 +34,5 @@ interface WriteBufferInterface
      *
      * @param string $data Data to write
      */
-    public function bufferWrite(string $data): Future;
+    public function bufferWrite(string $data): void;
 }

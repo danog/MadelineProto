@@ -22,12 +22,14 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\ByteStream\InputStream;
 use Amp\ByteStream\OutputStream;
+use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 
 /**
  * Raw stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface RawStreamInterface extends InputStream, OutputStream, StreamInterface
+interface RawStreamInterface extends ReadableStream, WritableStream, StreamInterface
 {
 }

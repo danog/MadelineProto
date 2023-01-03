@@ -27,6 +27,8 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use Generator;
 
+use function Amp\Future\awaitAll;
+
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
  */
@@ -140,7 +142,7 @@ trait MessageHandler
         }
         [$deserialized, $sideEffects] = $this->TL->deserialize($message_data, ['type' => '']);
         if ($sideEffects) {
-            $sideEffects;
+            awaitAll($sideEffects);
         }
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
         if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || \time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {

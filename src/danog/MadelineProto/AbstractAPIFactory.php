@@ -26,7 +26,7 @@ use Generator;
 use InvalidArgumentException;
 use Throwable;
 
-abstract class AbstractAPIFactory extends AsyncConstruct
+abstract class AbstractAPIFactory
 {
     /**
      * Namespace.
@@ -53,7 +53,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     protected function exportNamespace(string $namespace = ''): self
     {
-        $class = \array_reverse(\array_values(\class_parents(static::class)))[$namespace ? 2 : 3];
+        $class = \array_reverse(\array_values(\class_parents(static::class)))[$namespace ? 1 : 2];
 
         $instance = new $class;
         $instance->namespace = $namespace ? $namespace.'.' : '';

@@ -25,7 +25,9 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
 use Generator;
+use Revolt\EventLoop;
 
+use function Amp\async;
 use function ord;
 
 /**
@@ -124,7 +126,7 @@ class CheckLoop extends ResumableSignalLoop
                         if ($reply) {
                             $deferred= new DeferredFuture;
                             $deferred->getFuture()->onResolve(fn($e, $res) => var_dump(ord($res['info'][0])));
-                            \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]));
+                            async($connection->objectCall(...), 'msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]);
                         }*/
                         $connection->flush();
                     });
@@ -154,7 +156,7 @@ class CheckLoop extends ResumableSignalLoop
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                 $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
                 //$this->exitedLoop();
-                Tools::callForkDefer($connection->reconnect());
+                EventLoop::defer(fn () => async($connection->reconnect(...)));
                 return;
             }
         }

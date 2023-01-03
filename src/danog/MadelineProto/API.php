@@ -31,6 +31,8 @@ use danog\Serializable;
 use Generator;
 use Throwable;
 
+use function Amp\async;
+
 /**
  * Main API wrapper for MadelineProto.
  */
@@ -257,10 +259,10 @@ class API extends InternalDoc
                     } catch (Throwable $e) {
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
-                    Tools::callFork($cb());
+                    async($cb);
                 }
             };
-            Tools::callFork($cb());
+            async($cb);
             $this->connectToMadelineProto(new SettingsEmpty, true);
             $cancel->complete(new Exception('Connected!'));
         }

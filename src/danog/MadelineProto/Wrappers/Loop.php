@@ -30,6 +30,8 @@ use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
+use function Amp\async;
+
 use const PHP_SAPI;
 
 /**
@@ -39,13 +41,18 @@ use const PHP_SAPI;
  */
 trait Loop
 {
+    /**
+     * Loop callback
+     * 
+     * @deprecated
+     *
+     * @var callable()
+     */
     private $loop_callback;
     /**
      * Whether to stop the loop.
-     *
-     * @var boolean
      */
-    private $stopLoop = false;
+    private bool $stopLoop = false;
     /**
      * Initialize self-restart hack.
      */
@@ -111,11 +118,7 @@ trait Loop
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
-            return ($callback());
-        }
-        if ($callback instanceof Promise) {
-            $this->logger->logger('Resolving async promise');
-            return ($callback);
+            return async(fn () => $callback());
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
@@ -134,7 +137,15 @@ trait Loop
         $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopLoop = false;
         if ($this->loop_callback !== null) {
-            $repeat = EventLoop::repeat(1, fn () => Tools::callFork(($this->loop_callback)()));
+            $repeat = EventLoop::repeat(1, fn () => async(function () {
+                $r = ($this->loop_callback)();
+                if ($r instanceof Generator) {
+                    $r = Tools::call($r);
+                }
+                if ($r instanceof Future) {
+                    $r->await();
+                }
+            }));
         }
         do {
             if (!$this->updateHandler) {
@@ -148,10 +159,15 @@ trait Loop
                 $updates = $this->updates;
                 $this->updates = [];
                 foreach ($updates as $update) {
-                    $r = ($this->updateHandler)($update);
-                    if (\is_object($r)) {
-                        Tools::callFork($r);
-                    }
+                    async(function () use ($update) {
+                        $r = ($this->updateHandler)($update);
+                        if ($r instanceof Generator) {
+                            $r = Tools::call($r);
+                        }
+                        if ($r instanceof Future) {
+                            $r->await();
+                        }
+                    });
                 }
                 $updates = [];
             }
@@ -161,7 +177,7 @@ trait Loop
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
         $this->stopLoop = false;
         if (isset($repeat)) {
-            EventEventLoop::cancel($repeat);
+            EventLoop::cancel($repeat);
         }
     }
     /**
@@ -185,6 +201,6 @@ trait Loop
      */
     public function loopFork(): Future
     {
-        return Tools::callFork($this->loop());
+        return async($this->loop(...));
     }
 }

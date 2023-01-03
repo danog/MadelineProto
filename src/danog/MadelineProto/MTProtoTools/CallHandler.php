@@ -32,28 +32,16 @@ use Generator;
 trait CallHandler
 {
     /**
-     * Synchronous wrapper for methodCall.
-     *
-     * @param string            $method Method name
-     * @param array|Generator $args Arguments
-     * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
-     */
-    public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
-    {
-        return Tools::wait($this->methodCallAsyncRead($method, $args, $aargs));
-    }
-    /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|Generator $args Arguments
+     * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
         return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
     }
@@ -61,11 +49,11 @@ trait CallHandler
      * Call method and make sure it is asynchronously sent.
      *
      * @param string            $method Method name
-     * @param array|Generator $args Arguments
+     * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
         return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
     }

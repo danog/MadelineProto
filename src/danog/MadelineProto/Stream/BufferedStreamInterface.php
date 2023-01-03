@@ -35,13 +35,13 @@ interface BufferedStreamInterface extends StreamInterface
      * @param int $length Length of payload, as detected by this layer
      * @psalm-return Promise<BufferInterface>
      */
-    public function getReadBuffer(int &$length): Future;
+    public function getReadBuffer(int &$length): void;
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Future;
+    public function getWriteBuffer(int $length, string $append = ''): void;
     /**
      * Get stream name.
      *

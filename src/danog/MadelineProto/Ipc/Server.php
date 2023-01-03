@@ -37,6 +37,7 @@ use danog\MadelineProto\Tools;
 use Generator;
 use Throwable;
 
+use function Amp\async;
 use function Amp\Future\first;
 
 /**
@@ -108,7 +109,7 @@ class Server extends SignalLoop
             $promises []= ProcessRunner::start($session, $id);
             $started = true;
             $promises []= WebRunner::start($session, $id);
-            return Tools::call(self::monitor($session, $id, $started, first($promises)));
+            return self::monitor($session, $id, $started, first($promises));
         } catch (Throwable $e) {
             Logger::log($e);
         }
@@ -119,7 +120,7 @@ class Server extends SignalLoop
         } catch (Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new DeferredFuture)->getFuture()));
+        return self::monitor($session, $id, $started, $promises ? first($promises) : (new DeferredFuture)->getFuture());
     }
     /**
      * Monitor session.
@@ -186,7 +187,7 @@ class Server extends SignalLoop
     public function loop()
     {
         while ($socket = $this->waitSignal($this->server->accept())) {
-            Tools::callFork($this->clientLoop($socket));
+            async($this->clientLoop(...), $socket);
         }
         $this->server->close();
         if (isset($this->callback)) {
@@ -207,7 +208,7 @@ class Server extends SignalLoop
         $payload = null;
         try {
             while ($payload = $socket->receive()) {
-                Tools::callFork($this->clientRequest($socket, $id++, $payload));
+                async($this->clientRequest(...), $socket, $id++, $payload);
             }
         } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");

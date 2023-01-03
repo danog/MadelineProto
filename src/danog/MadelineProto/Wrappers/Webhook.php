@@ -27,6 +27,8 @@ use danog\MadelineProto\Tools;
 use Generator;
 use Throwable;
 
+use function Amp\async;
+
 /**
  * Manages logging in and out.
  *
@@ -60,7 +62,7 @@ trait Webhook
             $this->logger->logger('EMPTY UPDATE');
             return;
         }
-        Tools::callFork((function () use ($payload) {
+        async(function () use ($payload) {
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
@@ -74,6 +76,6 @@ trait Webhook
                     $this->logger->logger("Reverse webhook command returned: {$e}");
                 }
             }
-        })());
+        });
     }
 }

@@ -83,7 +83,7 @@ use function time;
  *
  * @internal
  */
-class MTProto extends AsyncConstruct implements TLCallback
+class MTProto implements TLCallback
 {
     use Serializable;
     use AuthKeyHandler;

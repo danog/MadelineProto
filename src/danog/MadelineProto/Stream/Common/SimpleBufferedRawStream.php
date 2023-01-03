@@ -37,7 +37,7 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      *
      * @param int $length Amount of data to read
      */
-    public function bufferReadGenerator(int $length)
+    public function bufferRead(int $length)
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);

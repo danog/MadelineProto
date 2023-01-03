@@ -60,7 +60,6 @@ class DoHConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
-        return Tools::call((function () use ($uri, $context, $token) {
             $socketContext = $context ?? new ConnectContext();
             $token ??= new NullCancellationToken();
             $attempt = 0;
@@ -165,6 +164,5 @@ class DoHConnector implements Connector
             if ($e) {
                 throw $e;
             }
-        })());
     }
 }

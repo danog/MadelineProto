@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
+use Amp\Cancellation;
 use Amp\CancellationToken;
 use Amp\Future;
 use Amp\Socket\Socket;
@@ -47,7 +48,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     public function __construct()
     {
     }
-    public function setupTls(?CancellationToken $cancellationToken = null): Future
+    public function setupTls(?Cancellation $cancellationToken = null): Future
     {
         return $this->stream->setupTls($cancellationToken);
     }
@@ -55,7 +56,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if ($header !== '') {
             $this->stream->write($header);
@@ -64,16 +65,16 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      */
-    public function read(): Future
+    public function read(?Cancellation $cancellation = null): ?string
     {
-        return $this->stream ? $this->stream->read() : new Success(null);
+        return $this->stream ? $this->stream->read($cancellation) : null;
     }
     /**
      * Async write.
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Future
+    public function write(string $data): void
     {
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
@@ -83,7 +84,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         try {
             if ($this->stream) {
@@ -95,23 +96,16 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
         } catch (Throwable $e) {
             Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
-        return new Success();
     }
     public function close(): void
     {
         $this->disconnect();
     }
-    /**
-     * {@inheritdoc}
-     */
     public function getSocket(): Socket
     {
         return $this->stream;
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtra($extra): void
+    public function setExtra(mixed $extra): void
     {
         $this->stream = $extra;
     }

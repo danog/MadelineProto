@@ -98,23 +98,18 @@ class Button implements JsonSerializable, ArrayAccess
         if (!isset($this->API)) {
             $this->API = Client::giveInstanceBySession($this->session);
         }
-        $async = $this->API instanceof Client ? $this->API->async : $this->API->wrapper->isAsync();
         switch ($this->button['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
                 return $this->button['url'];
             case 'keyboardButton':
-                $res = $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
             case 'keyboardButtonCallback':
-                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
             case 'keyboardButtonGame':
-                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
         }
-        return $async ? $res : Tools::wait($res);
     }
     /**
      * Get debug info.

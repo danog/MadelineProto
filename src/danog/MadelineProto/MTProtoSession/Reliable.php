@@ -25,6 +25,8 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
 
+use function Amp\async;
+
 /**
  * Manages responses.
  */
@@ -38,7 +40,7 @@ trait Reliable
         if (isset($this->incoming_messages[$content['answer_msg_id']])) {
             $this->ackIncomingMessage($this->incoming_messages[$content['answer_msg_id']]);
         } else {
-            Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], ['postpone' => true]));
+            async(fn () => $this->objectCall('msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], ['postpone' => true]));
         }
     }
     /**
@@ -128,6 +130,6 @@ trait Reliable
             }
             $info .= \chr($cur_info);
         }
-        Tools::callFork($this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true]));
+        async(fn () => $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true]));
     }
 }

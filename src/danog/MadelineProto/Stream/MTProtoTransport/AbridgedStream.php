@@ -43,14 +43,14 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = ($ctx->getStream(\chr(239).$header));
     }
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }
@@ -59,7 +59,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = '')
     {
         $length >>= 2;
         if ($length < 127) {
@@ -76,7 +76,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length)
+    public function getReadBuffer(int &$length)
     {
         $buffer = $this->stream->getReadBuffer($l);
         $length = \ord($buffer->bufferRead(1));

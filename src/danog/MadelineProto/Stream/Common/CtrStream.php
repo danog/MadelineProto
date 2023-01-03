@@ -42,7 +42,6 @@ use phpseclib3\Crypt\AES;
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {
     use Buffer;
-    use BufferedStream;
     private $encrypt;
     private $decrypt;
     private $stream;
@@ -56,7 +55,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->encrypt = new AES('ctr');
         $this->encrypt->enableContinuousBuffer();
@@ -71,7 +70,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }
@@ -80,7 +79,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBufferGenerator(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = '')
     {
         $this->write_buffer = $this->stream->getWriteBuffer($length);
         if (\strlen($append)) {
@@ -94,7 +93,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBufferGenerator(int &$length)
+    public function getReadBuffer(int &$length)
     {
         $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
@@ -104,7 +103,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
-    public function bufferReadGenerator(int $length)
+    public function bufferRead(int $length)
     {
         return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length));
     }

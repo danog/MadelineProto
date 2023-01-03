@@ -20,9 +20,9 @@ trait SeekableTrait
     * SEEK_CUR - Set position to current location plus offset.
     * SEEK_END - Set position to end-of-file plus offset.
     *
-    * @return Promise<int> New offset position.
+    * @return int New offset position.
     */
-    public function seek(int $position, int $whence = SEEK_SET): Future
+    public function seek(int $position, int $whence = SEEK_SET): int
     {
         return Tools::call($this->__call('seek', [$position, $whence]));
     }

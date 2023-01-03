@@ -80,7 +80,7 @@ class Endpoint
     /**
      * Disconnect from endpoint.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         if ($this->socket !== null) {
             $this->socket->close();

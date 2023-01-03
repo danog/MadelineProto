@@ -125,13 +125,78 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return $this->write_hash !== null;
     }
     /**
-     * Hashes read data asynchronously.
+     * Set the hash algorithm.
      *
-     * @param int $length Read and hash $length bytes
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
+     * @param string $hash Algorithm name
      */
-    public function bufferReadGenerator(int $length)
+    public function setExtra(string $hash): void
     {
+        $rev = \strpos($hash, '_rev');
+        $this->rev = false;
+        if ($rev !== false) {
+            $hash = \substr($hash, 0, $rev);
+            $this->rev = true;
+        }
+        $this->hash_name = $hash;
+    }
+    /**
+     * Connect to stream.
+     *
+     * @param ConnectionContext $ctx The connection context
+     */
+    public function connect(ConnectionContext $ctx, string $header = ''): void
+    {
+        $this->write_hash = null;
+        $this->write_check_after = 0;
+        $this->write_check_pos = 0;
+        $this->read_hash = null;
+        $this->read_check_after = 0;
+        $this->read_check_pos = 0;
+        $this->stream = ($ctx->getStream($header));
+    }
+    /**
+     * Async close.
+     */
+    public function disconnect(): void
+    {
+        return $this->stream->disconnect();
+    }
+    /**
+     * Get read buffer asynchronously.
+     *
+     * @param int $length Length of payload, as detected by this layer
+     */
+    public function getReadBuffer(int &$length)
+    {
+        //if ($this->read_hash) {
+        $this->read_buffer = $this->stream->getReadBuffer($length);
+        return $this;
+        //}
+        //return $this->stream->getReadBuffer($length);
+    }
+    /**
+     * Get write buffer asynchronously.
+     *
+     * @param int $length Length of data that is going to be written to the write buffer
+     */
+    public function getWriteBuffer(int $length, string $append = '')
+    {
+        //if ($this->write_hash) {
+        $this->write_buffer = $this->stream->getWriteBuffer($length, $append);
+        return $this;
+        //}
+        //return $this->stream->getWriteBuffer($length, $append);
+    }
+    /**
+     * Reads data from the stream.
+     *
+     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
+     */
+    public function bufferRead(int $length): ?string
+    {
+        if ($this->read_hash === null) {
+            return $this->read_buffer->bufferRead($length);
+        }
         if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
             if ($length + $this->read_check_pos > $this->read_check_after) {
                 throw new Exception('Tried to read too much out of frame data');
@@ -152,87 +217,11 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return $data;
     }
     /**
-     * Set the hash algorithm.
-     *
-     * @param string $hash Algorithm name
-     */
-    public function setExtra(string $hash): void
-    {
-        $rev = \strpos($hash, '_rev');
-        $this->rev = false;
-        if ($rev !== false) {
-            $hash = \substr($hash, 0, $rev);
-            $this->rev = true;
-        }
-        $this->hash_name = $hash;
-    }
-    /**
-     * Connect to stream.
-     *
-     * @param ConnectionContext $ctx The connection context
-     */
-    public function connect(ConnectionContext $ctx, string $header = '')
-    {
-        $this->write_hash = null;
-        $this->write_check_after = 0;
-        $this->write_check_pos = 0;
-        $this->read_hash = null;
-        $this->read_check_after = 0;
-        $this->read_check_pos = 0;
-        $this->stream = ($ctx->getStream($header));
-    }
-    /**
-     * Async close.
-     */
-    public function disconnect(): Future
-    {
-        return $this->stream->disconnect();
-    }
-    /**
-     * Get read buffer asynchronously.
-     *
-     * @param int $length Length of payload, as detected by this layer
-     */
-    public function getReadBufferGenerator(int &$length)
-    {
-        //if ($this->read_hash) {
-        $this->read_buffer = $this->stream->getReadBuffer($length);
-        return $this;
-        //}
-        //return $this->stream->getReadBuffer($length);
-    }
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     */
-    public function getWriteBufferGenerator(int $length, string $append = '')
-    {
-        //if ($this->write_hash) {
-        $this->write_buffer = $this->stream->getWriteBuffer($length, $append);
-        return $this;
-        //}
-        //return $this->stream->getWriteBuffer($length, $append);
-    }
-    /**
-     * Reads data from the stream.
-     *
-     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
-     */
-    public function bufferRead(int $length): Future
-    {
-        if ($this->read_hash === null) {
-            return $this->read_buffer->bufferRead($length);
-        }
-        return Tools::call($this->bufferReadGenerator($length));
-    }
-    /**
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Future
+    public function bufferWrite(string $data): void
     {
         if ($this->write_hash === null) {
             return $this->write_buffer->bufferWrite($data);

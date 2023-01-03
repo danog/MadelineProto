@@ -20,11 +20,16 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\DeferredFuture;
+use Amp\Future;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use Generator;
+
+use function Amp\async;
+use function Amp\Future\awaitAll;
 
 /**
  * Manages method and object calls.
@@ -57,8 +62,9 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
-                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message): void {
-                        Tools::callFork($r->sendMessage($message, false));
+                    async(function () use ($datacenter, $message) {
+                        $this->API->datacenter->waitGetConnection($datacenter)
+                            ->sendMessage($message, false);
                     });
                 } else {
                     /** @var OutgoingMessage */
@@ -66,7 +72,7 @@ trait CallHandler
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
-                    Tools::callFork($this->sendMessage($message, false));
+                    async($this->sendMessage(...), $message, false);
                 }
             } else {
                 $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
@@ -86,31 +92,30 @@ trait CallHandler
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|Generator $args Arguments
+     * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
         $readDeferred = $this->methodCallAsyncWrite($method, $args, $aargs);
+        if ($aargs['noResponse'] ?? false) {
+            return null;
+        }
         if (\is_array($readDeferred)) {
-            $readDeferred = Tools::all(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
-        } else {
-            $readDeferred = $readDeferred->getFuture();
+            return awaitAll(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
         }
-        if (!($aargs['noResponse'] ?? false)) {
-            return $readDeferred;
-        }
+        return $readDeferred->getFuture()->await();
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
      * @param string            $method Method name
-     * @param array|Generator $args Arguments
+     * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
+     * 
+     * @return list<DeferredFuture>|DeferredFuture
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): DeferredFuture|array
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
@@ -143,12 +148,12 @@ trait CallHandler
                 }
                 $promises = [];
                 foreach ($args as $single_args) {
-                    $promises[] = Tools::call($this->methodCallAsyncWrite($method, $single_args, $new_aargs));
+                    $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return Tools::all($promises);
+                return awaitAll($promises);
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {

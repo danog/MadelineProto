@@ -34,10 +34,10 @@ trait Buffer
 {
     public function bufferRead(int $length): Future
     {
-        return Tools::call($this->bufferReadGenerator($length));
+        return Tools::call($this->bufferRead($length));
     }
     public function bufferWrite(string $data): Future
     {
-        return Tools::call($this->bufferWriteGenerator($data));
+        return Tools::call($this->bufferWrite($data));
     }
 }

@@ -52,7 +52,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -138,7 +138,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         return $this->stream->disconnect();
     }

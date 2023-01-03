@@ -26,6 +26,8 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Generator;
 
+use function Amp\async;
+
 /**
  * Event handler.
  *
@@ -95,7 +97,7 @@ trait Events
             }
         }
         $this->setReportPeers($this->event_handler_instance->getReportPeers());
-        Tools::callFork($this->event_handler_instance->startInternal());
+        async(fn () => $this->event_handler_instance->startInternal());
         $this->updateHandler = [$this, 'eventUpdateHandler'];
         if ($this->inited()) {
             $this->startUpdateSystem();

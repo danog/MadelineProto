@@ -325,14 +325,6 @@ class Connection
         if ($this->pinger) {
             $this->pinger->start();
         }
-
-        /*if (!isset($this->r)) {
-            $this->r = true;
-            Tools::callFork((function () {
-                Tools::sleep(3);
-                $this->reconnect();
-            })());
-        }*/
     }
     /**
      * Apply method abstractions.

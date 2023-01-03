@@ -26,10 +26,12 @@ use Amp\MultiReasonException;
 use Amp\NullCancellationToken;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Connector;
+use Amp\Socket\EncryptableSocket;
+use Amp\Socket\SocketConnector;
 use Generator;
 use Throwable;
 
-class ContextConnector implements Connector
+class ContextConnector implements SocketConnector
 {
     private $dataCenter;
     private $logger;
@@ -40,9 +42,8 @@ class ContextConnector implements Connector
         $this->fromDns = $fromDns;
         $this->logger = $dataCenter->getAPI()->getLogger();
     }
-    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
+    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): EncryptableSocket
     {
-        return Tools::call((function () use ($uri, $context, $token) {
             $ctx = $context ?? new ConnectContext();
             $token ??= new NullCancellationToken();
             $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
@@ -70,6 +71,5 @@ class ContextConnector implements Connector
                 }
             }
             throw new Exception("Could not connect to URI {$uri}");
-        })());
     }
 }

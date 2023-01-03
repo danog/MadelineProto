@@ -33,6 +33,8 @@ use danog\MadelineProto\Wrappers\Templates;
 use Generator;
 use Throwable;
 
+use function Amp\async;
+
 /**
  * IPC client.
  */
@@ -78,7 +80,7 @@ class Client extends ClientAbstract
         $this->server = $server;
         $this->session = $session;
         self::$instances[$session->getLegacySessionPath()] = $this;
-        Tools::callFork($this->loopInternal());
+        async($this->loopInternal(...));
     }
     /**
      * Run the provided async callable.
@@ -108,19 +110,19 @@ class Client extends ClientAbstract
      *
      * @internal
      */
-    public function stopIpcServer(): Future
+    public function stopIpcServer(): void
     {
         $this->run = false;
-        return $this->server->send(Server::SHUTDOWN);
+        $this->server->send(Server::SHUTDOWN);
     }
     /**
      * Restart IPC server instance.
      *
      * @internal
      */
-    public function restartIpcServer(): Future
+    public function restartIpcServer(): void
     {
-        return $this->server->send(Server::SHUTDOWN);
+        $this->server->send(Server::SHUTDOWN);
     }
     /**
      * Whether we're an IPC client instance.

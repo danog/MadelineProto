@@ -35,6 +35,8 @@ use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
 use Generator;
 
+use function Amp\async;
+
 use const STR_PAD_LEFT;
 
 /**
@@ -395,9 +397,6 @@ class TL
      */
     public function serializeObject(array $type, $object, string $ctx, int $layer = -1)
     {
-        if ($object instanceof Generator) {
-            $object = $object;
-        }
         switch ($type['type']) {
             case 'int':
                 if (!\is_numeric($object)) {
@@ -530,7 +529,6 @@ class TL
             $object = ['_' => 'inputMessageID', 'id' => $object];
         } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
-            $object = $object instanceof Generator ? $object : $object;
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
                     throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
@@ -976,8 +974,8 @@ class TL
         }
         if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                $promise = Tools::callFork($callback($x));
-                if ($promise instanceof Promise) {
+                $promise = async($callback, $x);
+                if ($promise instanceof Future) {
                     $promises []= $promise;
                 }
             }

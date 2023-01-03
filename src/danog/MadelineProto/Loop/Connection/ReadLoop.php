@@ -35,6 +35,7 @@ use Error;
 use Generator;
 use Revolt\EventLoop;
 
+use function Amp\async;
 use function substr;
 
 /**
@@ -56,16 +57,16 @@ class ReadLoop extends SignalLoop
         $shared = $this->datacenterConnection;
         while (true) {
             try {
-                $error = $this->waitSignal($this->readMessage());
+                $error = yield $this->waitSignal($this->readMessage());
             } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e) {
+                EventLoop::defer(fn () => async(function () use ($API, $connection, $datacenter, $e) {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();
-                })());
+                }));
                 return;
             } catch (SecurityException $e) {
                 $connection->resetSession();
@@ -75,7 +76,7 @@ class ReadLoop extends SignalLoop
             }
             if (\is_int($error)) {
                 //$this->exitedLoop();
-                Tools::callForkDefer((function () use ($error, $shared, $connection, $datacenter, $API) {
+                EventLoop::defer(fn () => async(function () use ($error, $shared, $connection, $datacenter, $API) {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
@@ -97,13 +98,13 @@ class ReadLoop extends SignalLoop
                         $connection->reconnect();
                     } elseif ($error === -429) {
                         $API->logger->logger("Got -429 from DC {$datacenter}", Logger::WARNING);
-                        Tools::sleep(3);
+                        yield Tools::sleep(3);
                         $connection->reconnect();
                     } else {
                         $connection->reconnect();
                         throw new RPCErrorException($error, $error);
                     }
-                })());
+                }));
                 return;
             }
             $connection->httpReceived();
@@ -124,7 +125,7 @@ class ReadLoop extends SignalLoop
             throw new NothingInTheSocketException();
         }
         try {
-            $buffer = $connection->stream->getReadBuffer($payload_length);
+            $buffer = yield $connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
             $API->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
@@ -135,35 +136,35 @@ class ReadLoop extends SignalLoop
             throw $e;
         }
         if ($payload_length === 4) {
-            $payload = Tools::unpackSignedInt($buffer->bufferRead(4));
+            $payload = Tools::unpackSignedInt(yield $buffer->bufferRead(4));
             $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ULTRA_VERBOSE);
             return $payload;
         }
         $connection->reading(true);
         try {
-            $auth_key_id = $buffer->bufferRead(8);
+            $auth_key_id = yield $buffer->bufferRead(8);
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-                $message_id = $buffer->bufferRead(8);
+                $message_id = yield $buffer->bufferRead(8);
                 $connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
-                $message_length = \unpack('V', $buffer->bufferRead(4))[1];
-                $message_data = $buffer->bufferRead($message_length);
+                $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
+                $message_data = yield $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
                 if ($left) {
                     $API->logger->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
                     if ($left < (-$message_length & 15)) {
                         $API->logger->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
                     }
-                    $buffer->bufferRead($left);
+                    yield $buffer->bufferRead($left);
                 }
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
-                $message_key = $buffer->bufferRead(16);
+                $message_key = yield $buffer->bufferRead(16);
                 [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
                 $payload_length -= 24;
                 $left = $payload_length & 15;
                 $payload_length -= $left;
-                $decrypted_data = Crypt::igeDecrypt($buffer->bufferRead($payload_length), $aes_key, $aes_iv);
+                $decrypted_data = Crypt::igeDecrypt(yield $buffer->bufferRead($payload_length), $aes_key, $aes_iv);
                 if ($left) {
-                    $buffer->bufferRead($left);
+                    yield $buffer->bufferRead($left);
                 }
                 if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new SecurityException('msg_key mismatch');

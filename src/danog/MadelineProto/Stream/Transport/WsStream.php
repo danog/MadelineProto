@@ -28,6 +28,9 @@ use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Rfc6455Connector;
+use Amp\Websocket\Client\WebsocketConnection;
+use Amp\Websocket\Client\WebsocketConnector;
+use Amp\Websocket\Client\WebsocketHandshake;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
 use danog\MadelineProto\Exception;
@@ -45,13 +48,10 @@ use Throwable;
  */
 class WsStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
     /**
      * Websocket stream.
-     *
-     * @var Connection
      */
-    private $stream;
+    private WebsocketConnection $stream;
     /**
      * Websocket message.
      *
@@ -69,15 +69,12 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
-    public function connect(ConnectionContext $ctx, string $header = '')
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        if (!\class_exists(Handshake::class)) {
-            throw new Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
-        }
         $this->dc = $ctx->getIntDc();
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
-        $handshake = new Handshake($uri);
+        $handshake = new WebsocketHandshake($uri);
         $this->stream = ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellationToken());
         if (\strlen($header)) {
             $this->write($header);
@@ -86,15 +83,14 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
-    public function disconnect(): Future
+    public function disconnect(): void
     {
         try {
             $this->stream->close();
         } catch (Throwable $e) {
         }
-        return new Success();
     }
-    public function readGenerator()
+    public function read()
     {
         try {
             if (!$this->message || ($data = $this->message->buffer()) === null) {
@@ -118,9 +114,9 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Future
+    public function write(string $data): void
     {
-        return $this->stream->sendBinary($data);
+        $this->stream->sendBinary($data);
     }
     /**
      * {@inheritdoc}
@@ -131,7 +127,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function setExtra($extra): void
     {
-        if ($extra instanceof Connector) {
+        if ($extra instanceof WebsocketConnector) {
             $this->connector = $extra;
         }
     }
