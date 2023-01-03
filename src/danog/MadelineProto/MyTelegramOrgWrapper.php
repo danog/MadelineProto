@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\Request;
-use Generator;
 
 /**
  * Wrapper for my.telegram.org.
@@ -126,7 +125,7 @@ class MyTelegramOrgWrapper
      *
      * @param string $number Phone number
      */
-    public function login(string $number)
+    public function login(string $number): void
     {
         $this->number = $number;
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');

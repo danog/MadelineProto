@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
@@ -37,13 +36,13 @@ class ServerCallback extends Server
      *
      * @var array<int, string>
      */
-    private $watcherList = [];
+    private array $watcherList = [];
     /**
      * Timeout watcher list, indexed by socket ID.
      *
      * @var array<int, ChannelledSocket>
      */
-    private $socketList = [];
+    private array $socketList = [];
     /**
      * Counter.
      */
@@ -62,7 +61,7 @@ class ServerCallback extends Server
      *
      * @param ChannelledSocket $socket Client
      */
-    protected function clientLoop(ChannelledSocket $socket): Future
+    protected function clientLoop(ChannelledSocket $socket): void
     {
         $id = $this->id++;
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
@@ -71,7 +70,7 @@ class ServerCallback extends Server
             unset($this->watcherList[$id], $this->socketList[$id]);
         });
 
-        return $socket->send($id);
+        $socket->send($id);
     }
 
     /**

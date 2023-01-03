@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Future;
 use Amp\Iterator;
-use Amp\Producer;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 use Generator;
-use ReturnTypeWillChange;
 use Throwable;
-
-use function Amp\call;
 
 /**
  * Redis database backend.
@@ -39,12 +34,11 @@ class RedisArray extends DriverArray
     /**
      * @psalm-return Generator<int, Success<null>, mixed, void>
      */
-    protected function prepareTable()
+    protected function prepareTable(): void
     {
-        new Success;
     }
 
-    protected function renameTable(string $from, string $to)
+    protected function renameTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";
@@ -65,7 +59,7 @@ class RedisArray extends DriverArray
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabaseRedis $settings)
+    public function initConnection(DatabaseRedis $settings): void
     {
         if (!isset($this->db)) {
             $this->db = Redis::getConnection($settings);
@@ -78,13 +72,6 @@ class RedisArray extends DriverArray
     private function rKey(string $key): string
     {
         return 'va:'.$this->table.':'.$key;
-    }
-    /**
-     * Get redis ts name.
-     */
-    private function tsKey(string $key): string
-    {
-        return 'ts:'.$this->table.$key;
     }
 
     /**
@@ -103,78 +90,66 @@ class RedisArray extends DriverArray
      * </p>
      * @throws Throwable
      */
-    public function set(string|int $index, mixed $value): Future
+    public function set(string|int $index, mixed $value): void
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
-            return new Success();
+            return null;
         }
 
         $this->setCache($index, $value);
 
-        $request = $this->db->set($this->rKey($index), \serialize($value));
-
-        //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn () => $this->setCache($index, $value));
-
-        return $request;
+        $this->db->set($this->rKey($index), \serialize($value));
+        $this->setCache($index, $value);
     }
 
-    public function offsetGet(mixed $offset): Future
+    public function offsetGet(mixed $offset): mixed
     {
         $offset = (string) $offset;
-        return call(function () use ($offset) {
-            if ($this->hasCache($offset)) {
-                return $this->getCache($offset);
-            }
+        if ($this->hasCache($offset)) {
+            return $this->getCache($offset);
+        }
 
-            $value = $this->db->get($this->rKey($offset));
+        $value = $this->db->get($this->rKey($offset));
 
-            if ($value !== null && $value = \unserialize($value)) {
-                $this->setCache($offset, $value);
-            }
+        if ($value !== null && $value = \unserialize($value)) {
+            $this->setCache($offset, $value);
+        }
 
-            return $value;
-        });
+        return $value;
     }
 
-    public function unset(string|int $key): Future
+    public function unset(string|int $key): void
     {
         $this->unsetCache($key);
 
-        return $this->db->delete($this->rkey($key));
+        $this->db->delete($this->rkey($key));
     }
 
     /**
      * Get array copy.
      *
-     * @return Promise<array>
      * @throws Throwable
      */
-    #[ReturnTypeWillChange]
-    public function getArrayCopy(): Future
+    public function getArrayCopy(): array
     {
-        return call(function () {
-            $iterator = $this->getIterator();
-            $result = [];
-            while ($iterator->advance()) {
-                [$key, $value] = $iterator->getCurrent();
-                $result[$key] = $value;
-            }
-            return $result;
-        });
+        $iterator = $this->getIterator();
+        $result = [];
+        while ($iterator->advance()) {
+            [$key, $value] = $iterator->getCurrent();
+            $result[$key] = $value;
+        }
+        return $result;
     }
 
     public function getIterator(): Iterator
     {
-        return new Producer(function (callable $emit) {
-            $request = $this->db->scan($this->itKey());
+        $request = $this->db->scan($this->itKey());
 
-            $len = \strlen($this->rKey(''));
-            while ($request->advance()) {
-                $key = $request->getCurrent();
-                $emit([\substr($key, $len), \unserialize($this->db->get($key))]);
-            }
-        });
+        $len = \strlen($this->rKey(''));
+        while ($request->advance()) {
+            $key = $request->getCurrent();
+            $emit([\substr($key, $len), \unserialize($this->db->get($key))]);
+        }
     }
 
     /**
@@ -185,42 +160,38 @@ class RedisArray extends DriverArray
      * array or object, respectively.
      * @throws Throwable
      */
-    public function count(): Future
+    public function count(): int
     {
-        return call(function () {
-            $request = $this->db->scan($this->itKey());
-            $count = 0;
+        $request = $this->db->scan($this->itKey());
+        $count = 0;
 
-            while ($request->advance()) {
-                $count++;
-            }
+        while ($request->advance()) {
+            $count++;
+        }
 
-            return $count;
-        });
+        return $count;
     }
 
     /**
      * Clear all elements.
      */
-    public function clear(): Future
+    public function clear(): void
     {
         $this->clearCache();
-        return call(function () {
-            $request = $this->db->scan($this->itKey());
+        $request = $this->db->scan($this->itKey());
 
-            $keys = [];
-            $k = 0;
-            while ($request->advance()) {
-                $keys[$k++] = $request->getCurrent();
-                if ($k === 10) {
-                    $this->db->delete(...$keys);
-                    $keys = [];
-                    $k = 0;
-                }
-            }
-            if (!empty($keys)) {
+        $keys = [];
+        $k = 0;
+        while ($request->advance()) {
+            $keys[$k++] = $request->getCurrent();
+            if ($k === 10) {
                 $this->db->delete(...$keys);
+                $keys = [];
+                $k = 0;
             }
-        });
+        }
+        if (!empty($keys)) {
+            $this->db->delete(...$keys);
+        }
     }
 }

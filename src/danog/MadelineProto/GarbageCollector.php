@@ -7,7 +7,6 @@ namespace danog\MadelineProto;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use danog\Loop\Generic\PeriodicLoop;
-use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -61,7 +60,7 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request) {
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): void {
             try {
                 $latest = $client->request($request);
                 Magic::$version_latest = $latest->getBody()->buffer();

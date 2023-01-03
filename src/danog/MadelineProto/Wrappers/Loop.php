@@ -30,9 +30,9 @@ use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
-use function Amp\async;
-
 use const PHP_SAPI;
+
+use function Amp\async;
 
 /**
  * Manages logging in and out.
@@ -42,8 +42,8 @@ use const PHP_SAPI;
 trait Loop
 {
     /**
-     * Loop callback
-     * 
+     * Loop callback.
+     *
      * @deprecated
      *
      * @var callable()
@@ -137,7 +137,7 @@ trait Loop
         $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopLoop = false;
         if ($this->loop_callback !== null) {
-            $repeat = EventLoop::repeat(1, fn () => async(function () {
+            $repeat = EventLoop::repeat(1, fn () => async(function (): void {
                 $r = ($this->loop_callback)();
                 if ($r instanceof Generator) {
                     $r = Tools::call($r);
@@ -159,7 +159,7 @@ trait Loop
                 $updates = $this->updates;
                 $this->updates = [];
                 foreach ($updates as $update) {
-                    async(function () use ($update) {
+                    async(function () use ($update): void {
                         $r = ($this->updateHandler)($update);
                         if ($r instanceof Generator) {
                             $r = Tools::call($r);

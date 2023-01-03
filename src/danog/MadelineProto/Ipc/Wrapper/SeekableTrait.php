@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
-use Amp\Future;
 use danog\MadelineProto\Tools;
 
 use const SEEK_SET;

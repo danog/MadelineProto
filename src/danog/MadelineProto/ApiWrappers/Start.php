@@ -27,7 +27,6 @@ use danog\MadelineProto\MyTelegramOrgWrapper;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
-use Generator;
 use Throwable;
 
 use const PHP_EOL;
@@ -128,7 +127,7 @@ trait Start
         }
         return null;
     }
-    private function webAPIPhoneLogin(Settings $settings)
+    private function webAPIPhoneLogin(Settings $settings): void
     {
         try {
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
@@ -138,7 +137,7 @@ trait Start
             $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
-    private function webAPICompleteLogin()
+    private function webAPICompleteLogin(): void
     {
         try {
             $this->myTelegramOrgWrapper->completeLogin($_POST['code']);

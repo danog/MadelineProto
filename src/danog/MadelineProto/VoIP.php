@@ -23,7 +23,6 @@ use danog\MadelineProto\Stream\Ogg\Ogg;
 use danog\MadelineProto\VoIP\AckHandler;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
-use Generator;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
@@ -326,7 +325,7 @@ class VoIP
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }
         });
-        Tools::callFork((function () {
+        Tools::callFork((function (): void {
             $this->authKey = new PermAuthKey();
             $this->authKey->setAuthKey($this->configuration['auth_key']);
 
@@ -343,7 +342,7 @@ class VoIP
             }
             foreach ($this->sockets as $socket) {
                 $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
-                async(function () use ($socket) {
+                async(function () use ($socket): void {
                     while ($payload = $this->recv_message($socket)) {
                         $this->lastIncomingTimestamp = \microtime(true);
                         async($this->handlePacket(...), $socket, $payload);
@@ -357,7 +356,7 @@ class VoIP
     /**
      * Handle incoming packet.
      */
-    private function handlePacket(Endpoint $socket, array $packet)
+    private function handlePacket(Endpoint $socket, array $packet): void
     {
         switch ($packet['_']) {
             case self::PKT_INIT:
@@ -385,7 +384,7 @@ class VoIP
     /**
      * Start write loop.
      */
-    private function startWriteLoop(Endpoint $socket)
+    private function startWriteLoop(Endpoint $socket): void
     {
         if ($this->voip_state === self::STATE_ESTABLISHED) {
             return;

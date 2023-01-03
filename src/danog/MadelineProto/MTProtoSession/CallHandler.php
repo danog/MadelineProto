@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
@@ -62,7 +61,7 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
-                    async(function () use ($datacenter, $message) {
+                    async(function () use ($datacenter, $message): void {
                         $this->API->datacenter->waitGetConnection($datacenter)
                             ->sendMessage($message, false);
                     });
@@ -112,7 +111,7 @@ trait CallHandler
      * @param string            $method Method name
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * 
+     *
      * @return list<DeferredFuture>|DeferredFuture
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): DeferredFuture|array

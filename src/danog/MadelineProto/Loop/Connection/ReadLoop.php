@@ -32,7 +32,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use Error;
-use Generator;
 use Revolt\EventLoop;
 
 use function Amp\async;
@@ -62,7 +61,7 @@ class ReadLoop extends SignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                EventLoop::defer(fn () => async(function () use ($API, $connection, $datacenter, $e) {
+                EventLoop::defer(fn () => async(function () use ($API, $connection, $datacenter, $e): void {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();

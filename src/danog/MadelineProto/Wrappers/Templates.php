@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Wrappers;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
-use Generator;
 
 use function Amp\ByteStream\getOutputBufferStream;
 

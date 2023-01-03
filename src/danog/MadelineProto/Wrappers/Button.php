@@ -20,10 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
-use danog\MadelineProto\Tools;
-
-use function Amp\async;
-
 /**
  * Manages clicking buttons.
  */

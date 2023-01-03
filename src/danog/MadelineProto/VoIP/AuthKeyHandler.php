@@ -30,7 +30,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
-use Generator;
 use phpseclib3\Math\BigInteger;
 
 use const STR_PAD_LEFT;
@@ -274,7 +273,7 @@ trait AuthKeyHandler
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      */
-    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true)
+    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): void
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');

@@ -20,11 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Ipc\Client;
-use Generator;
 use InvalidArgumentException;
-use Throwable;
 
 abstract class AbstractAPIFactory
 {

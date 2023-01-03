@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream\Common;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 
 /**
  * Buffered raw stream, that simply returns less data on EOF instead of throwing.

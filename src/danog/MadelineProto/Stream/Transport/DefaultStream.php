@@ -22,19 +22,15 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
-use Amp\CancellationToken;
-use Amp\Future;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketConnector;
-use Amp\Success;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 use Throwable;
 
 use function Amp\Socket\connector;

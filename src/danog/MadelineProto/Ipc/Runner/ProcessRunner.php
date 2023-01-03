@@ -5,21 +5,17 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use Amp\Process\Internal\Posix\Runner;
 use Amp\Process\Internal\Windows\Runner as WindowsRunner;
 use Amp\Process\ProcessInputStream;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
-use danog\MadelineProto\Tools;
 use Error;
-use Generator;
 use Throwable;
 
-use function Amp\async;
-
 use const Amp\Process\IS_WINDOWS;
+
 use const ARRAY_FILTER_USE_BOTH;
 use const DIRECTORY_SEPARATOR;
 use const PATH_SEPARATOR;
@@ -27,6 +23,7 @@ use const PHP_BINARY;
 use const PHP_BINDIR;
 use const PHP_OS;
 use const PHP_SAPI;
+use function Amp\async;
 
 final class ProcessRunner extends RunnerAbstract
 {
@@ -59,7 +56,7 @@ final class ProcessRunner extends RunnerAbstract
      * @param string $session Session path
      * @return Promise<true>
      */
-    public static function start(string $session, int $startupId): Future
+    public static function start(string $session, int $startupId): boool
     {
         if (PHP_SAPI === "cli") {
             $binary = PHP_BINARY;
@@ -124,7 +121,7 @@ final class ProcessRunner extends RunnerAbstract
     /**
      * Unreference and read data from fd, logging results.
      */
-    private static function readUnref(ProcessInputStream $stream)
+    private static function readUnref(ProcessInputStream $stream): void
     {
         $stream->unreference();
         $lastLine = '';

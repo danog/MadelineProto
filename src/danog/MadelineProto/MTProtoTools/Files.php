@@ -27,7 +27,6 @@ use Amp\Future;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
@@ -181,7 +180,7 @@ trait Files
             if (!$seekable) {
                 $writePromise->await();
             }
-            async(function () use ($writePromise, $cb, $part_num, &$resPromises, &$exception) {
+            async(function () use ($writePromise, $cb, $part_num, &$resPromises, &$exception): void {
                 $readFuture = $writePromise->await()->getFuture();
                 $resPromises[] = $readFuture;
                 try {
@@ -886,7 +885,7 @@ trait Files
             async(fn () => $cb($cur * 100 / $count, $time, $speed));
         };
         $cdn = false;
-        $params[0]['previous_promise'] = new Success(true);
+        $params[0]['previous_promise'] = true;
         $start = \microtime(true);
         $old_dc = null;
         $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
@@ -897,7 +896,7 @@ trait Files
         }
         $parallel_chunks = $seekable ? $parallel_chunks : 1;
         if ($params) {
-            $previous_promise = new Success(true);
+            $previous_promise = true;
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;

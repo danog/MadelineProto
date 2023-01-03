@@ -25,7 +25,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
-use Generator;
 
 /**
  * Update feed loop.
@@ -77,7 +76,7 @@ class FeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         $this->updater = $API->updaters[$this->channelId];
@@ -107,7 +106,7 @@ class FeedLoop extends ResumableSignalLoop
             }
         }
     }
-    public function parse(array $updates)
+    public function parse(array $updates): void
     {
         \reset($updates);
         while ($updates) {

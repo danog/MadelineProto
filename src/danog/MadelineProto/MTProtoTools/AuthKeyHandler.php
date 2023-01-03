@@ -22,7 +22,7 @@ trait AuthKeyHandler
      *
      * @internal
      */
-    public function initAuthorization()
+    public function initAuthorization(): void
     {
         $this->auth_mutex ??= new LocalMutex;
         $lock = $this->auth_mutex->acquire();

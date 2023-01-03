@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use Generator;
 
 /**
  * Manages terms of service.
@@ -34,7 +33,7 @@ trait TOS
      *
      * Will throw a \danog\MadelineProto\Exception if a new TOS is available.
      */
-    public function checkTos()
+    public function checkTos(): void
     {
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             if ($this->tos['expires'] < \time()) {
@@ -56,7 +55,7 @@ trait TOS
     /**
      * Accept terms of service update.
      */
-    public function acceptTos()
+    public function acceptTos(): void
     {
         $this->tos['accepted'] = $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']]);
         if ($this->tos['accepted']) {
@@ -70,7 +69,7 @@ trait TOS
      *
      * THIS WILL DELETE YOUR ACCOUNT!
      */
-    public function declineTos()
+    public function declineTos(): void
     {
         $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update']);
         $this->logout();

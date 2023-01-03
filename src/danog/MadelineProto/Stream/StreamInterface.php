@@ -20,10 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
-use Generator;
 
 /**
  * Generic stream interface.

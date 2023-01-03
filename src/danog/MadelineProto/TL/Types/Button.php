@@ -23,7 +23,6 @@ namespace danog\MadelineProto\TL\Types;
 use ArrayAccess;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Tools;
 use JsonSerializable;
 
 /**

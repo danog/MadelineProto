@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -96,10 +95,10 @@ trait UpdateHandler
      *
      * @internal
      */
-    public function waitUpdate(): Future
+    public function waitUpdate(): void
     {
         $this->update_deferred = new DeferredFuture();
-        return $this->update_deferred->getFuture();
+        $this->update_deferred->getFuture()->await();
     }
     /**
      * Signal update.
@@ -271,7 +270,7 @@ trait UpdateHandler
      * @param array $actual_updates Actual updates for deferred
      * @internal
      */
-    public function handleUpdates(array $updates, array $actual_updates = null)
+    public function handleUpdates(array $updates, array $actual_updates = null): void
     {
         if ($actual_updates) {
             $updates = $actual_updates;

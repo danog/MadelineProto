@@ -20,14 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Future;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
-use Generator;
 
 /**
  * Manages min peers.
@@ -82,7 +80,7 @@ class MinDatabase implements TLCallback
     {
         return ['db', 'API', 'clean'];
     }
-    public function init()
+    public function init(): void
     {
         $this->initDb($this->API);
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
@@ -91,7 +89,7 @@ class MinDatabase implements TLCallback
         if ($this->clean) {
             return;
         }
-        EventLoop::defer(function () {
+        EventLoop::defer(function (): void {
             $iterator = $this->db->getIterator();
             while ($iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
@@ -221,9 +219,8 @@ class MinDatabase implements TLCallback
      * Check if location info is available for peer.
      *
      * @param float|int $id Peer ID
-     * @psalm-return Promise<bool>
      */
-    public function hasPeer($id): Future
+    public function hasPeer($id): bool
     {
         return $this->db->isset($id);
     }

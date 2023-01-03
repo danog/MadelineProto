@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 
 /**
  * HTTPS stream wrapper.

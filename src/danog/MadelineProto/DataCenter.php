@@ -29,7 +29,6 @@ use Amp\Dns\WindowsConfigLoader;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
-use Amp\Future;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\Cookie\CookieInterceptor;

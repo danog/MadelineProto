@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TON;
 
 use danog\MadelineProto\AbstractAPIFactory;
-use Generator;
 
 class APIFactory extends AbstractAPIFactory
 {

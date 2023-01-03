@@ -23,8 +23,6 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tools;
-use Generator;
 use Revolt\EventLoop;
 
 use function Amp\async;
@@ -41,7 +39,7 @@ class CheckLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

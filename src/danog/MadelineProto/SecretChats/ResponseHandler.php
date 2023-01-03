@@ -22,14 +22,13 @@ namespace danog\MadelineProto\SecretChats;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ResponseException;
-use Generator;
 
 /**
  * Manages responses.
  */
 trait ResponseHandler
 {
-    private function handleDecryptedUpdate(array $update)
+    private function handleDecryptedUpdate(array $update): void
     {
         $chatId = $update['message']['chat_id'];
         $decryptedMessage = $update['message']['decrypted_message'];

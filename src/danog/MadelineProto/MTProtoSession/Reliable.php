@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
 
 use function Amp\async;

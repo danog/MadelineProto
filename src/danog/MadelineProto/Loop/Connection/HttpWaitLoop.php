@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\MTProto\OutgoingMessage;
-use Generator;
 
 /**
  * HttpWait loop.
@@ -35,7 +34,7 @@ class HttpWaitLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

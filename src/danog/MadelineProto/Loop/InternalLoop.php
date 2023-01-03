@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use Generator;
 
 trait InternalLoop
 {

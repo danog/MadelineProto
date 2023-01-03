@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Failure;
-use Amp\Future;
 use Amp\Parallel\Context\ContextException;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;

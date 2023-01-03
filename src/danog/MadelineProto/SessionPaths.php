@@ -20,11 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Future;
-use Amp\Success;
 use danog\MadelineProto\Ipc\IpcState;
-use Generator;
-use Throwable;
 
 use const LOCK_EX;
 use const LOCK_SH;
@@ -34,8 +30,6 @@ use const PHP_VERSION;
 use function Amp\File\exists;
 use function Amp\File\move;
 use function Amp\File\openFile;
-use function Amp\File\put;
-use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
 use function Amp\File\write;
 use function serialize;

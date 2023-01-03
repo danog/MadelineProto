@@ -35,9 +35,9 @@ use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
 use Generator;
 
-use function Amp\async;
-
 use const STR_PAD_LEFT;
+
+use function Amp\async;
 
 /**
  * TL serialization.

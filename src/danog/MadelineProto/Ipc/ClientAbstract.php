@@ -80,7 +80,7 @@ abstract class ClientAbstract
     /**
      * Main loop.
      */
-    protected function loopInternal()
+    protected function loopInternal(): void
     {
         do {
             while (true) {
@@ -135,7 +135,7 @@ abstract class ClientAbstract
      *
      * @psalm-return Generator<int, Promise, mixed, void>
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->run = false;
         $this->server->disconnect();

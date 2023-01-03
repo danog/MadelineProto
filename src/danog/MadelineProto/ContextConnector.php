@@ -21,14 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\CancellationToken;
-use Amp\Future;
 use Amp\MultiReasonException;
 use Amp\NullCancellationToken;
 use Amp\Socket\ConnectContext;
-use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketConnector;
-use Generator;
 use Throwable;
 
 class ContextConnector implements SocketConnector
@@ -44,32 +41,32 @@ class ContextConnector implements SocketConnector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): EncryptableSocket
     {
-            $ctx = $context ?? new ConnectContext();
-            $token ??= new NullCancellationToken();
-            $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
-            if (empty($ctxs)) {
-                throw new Exception("No contexts for raw connection to URI {$uri}");
-            }
-            foreach ($ctxs as $ctx) {
-                /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-                try {
-                    $ctx->setIsDns($this->fromDns);
-                    $ctx->setCancellationToken($token);
-                    $result = ($ctx->getStream());
-                    $this->logger->logger('OK!', Logger::WARNING);
-                    return $result->getSocket();
-                } catch (Throwable $e) {
-                    if (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
-                        throw $e;
-                    }
-                    $this->logger->logger('Connection failed: '.$e, Logger::ERROR);
-                    if ($e instanceof MultiReasonException) {
-                        foreach ($e->getReasons() as $reason) {
-                            $this->logger->logger('Multireason: '.$reason, Logger::ERROR);
-                        }
+        $ctx = $context ?? new ConnectContext();
+        $token ??= new NullCancellationToken();
+        $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
+        if (empty($ctxs)) {
+            throw new Exception("No contexts for raw connection to URI {$uri}");
+        }
+        foreach ($ctxs as $ctx) {
+            /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+            try {
+                $ctx->setIsDns($this->fromDns);
+                $ctx->setCancellationToken($token);
+                $result = ($ctx->getStream());
+                $this->logger->logger('OK!', Logger::WARNING);
+                return $result->getSocket();
+            } catch (Throwable $e) {
+                if (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
+                    throw $e;
+                }
+                $this->logger->logger('Connection failed: '.$e, Logger::ERROR);
+                if ($e instanceof MultiReasonException) {
+                    foreach ($e->getReasons() as $reason) {
+                        $this->logger->logger('Multireason: '.$reason, Logger::ERROR);
                     }
                 }
             }
-            throw new Exception("Could not connect to URI {$uri}");
+        }
+        throw new Exception("Could not connect to URI {$uri}");
     }
 }

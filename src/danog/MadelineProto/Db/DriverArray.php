@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Future;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
-use Generator;
 use ReflectionClass;
 use RuntimeException;
 use Throwable;
-
-use function Amp\call;
 
 /**
  * Array caching trait.
@@ -68,18 +64,17 @@ abstract class DriverArray implements DbArray
      * Check if key isset.
      *
      * @param mixed $key
-     * @return Promise<bool> true if the offset exists, otherwise false
+     * @return bool true if the offset exists, otherwise false
      */
-    public function isset(string|int $key): Future
+    public function isset(string|int $key): bool
     {
-        return call(fn () => null !== $this->offsetGet($key));
+        return $this->offsetGet($key) !== null;
     }
 
     /**
      * @param DbArray|array|null $previous
-     * @psalm-return Promise<static>
      */
-    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): Future
+    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): static
     {
         $instance = new static();
         $instance->setTable($table);
@@ -90,20 +85,18 @@ abstract class DriverArray implements DbArray
 
         $instance->startCacheCleanupLoop();
 
-        return call(static function () use ($instance, $previous, $settings) {
-            $instance->initConnection($settings);
-            $instance->prepareTable();
+        $instance->initConnection($settings);
+        $instance->prepareTable();
 
-            if (static::getClassName($previous) !== static::getClassName($instance)) {
-                if ($previous instanceof DriverArray) {
-                    $previous->initStartup();
-                }
-                static::renameTmpTable($instance, $previous);
-                static::migrateDataToDb($instance, $previous);
+        if (static::getClassName($previous) !== static::getClassName($instance)) {
+            if ($previous instanceof DriverArray) {
+                $previous->initStartup();
             }
+            static::renameTmpTable($instance, $previous);
+            static::migrateDataToDb($instance, $previous);
+        }
 
-            return $instance;
-        });
+        return $instance;
     }
 
     /**
@@ -114,7 +107,7 @@ abstract class DriverArray implements DbArray
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
      */
-    protected static function renameTmpTable(self $new, $old)
+    protected static function renameTmpTable(self $new, $old): void
     {
         if ($old instanceof SqlArray && $old->getTable()) {
             if ($old->getTable() !== $new->getTable() &&
@@ -131,7 +124,7 @@ abstract class DriverArray implements DbArray
      * @param DbArray|array|null $old
      * @throws Throwable
      */
-    protected static function migrateDataToDb(self $new, $old)
+    protected static function migrateDataToDb(self $new, $old): void
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {

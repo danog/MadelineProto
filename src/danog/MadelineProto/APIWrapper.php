@@ -20,10 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Future;
-use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
-use Generator;
 
 use function Amp\async;
 use function Amp\File\openFile;
@@ -180,26 +177,26 @@ final class APIWrapper
         if ($this->API instanceof Client) {
             return false;
         }
-            if ($this->API) {
-                $this->API->init();
-            }
+        if ($this->API) {
+            $this->API->init();
+        }
 
-            $this->session->serialize(
-                $this->API ? $this->API->serializeSession($this) : $this,
-                $this->session->getSessionPath(),
-            );
+        $this->session->serialize(
+            $this->API ? $this->API->serializeSession($this) : $this,
+            $this->session->getSessionPath(),
+        );
 
-            if ($this->API) {
-                $this->session->storeLightState($this->API);
-            }
+        if ($this->API) {
+            $this->session->storeLightState($this->API);
+        }
 
-            // Truncate legacy session
-            (openFile($this->session->getLegacySessionPath(), 'w'))->close();
+        // Truncate legacy session
+        (openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
-            if (!Magic::$suspendPeriodicLogging) {
-                Logger::log('Saved session!');
-            }
-            return true;
+        if (!Magic::$suspendPeriodicLogging) {
+            Logger::log('Saved session!');
+        }
+        return true;
     }
 
     /**

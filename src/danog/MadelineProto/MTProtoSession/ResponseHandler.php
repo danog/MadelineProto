@@ -32,14 +32,13 @@ use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tools;
-use Generator;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
 
-use function Amp\async;
-
 use const PHP_EOL;
+
+use function Amp\async;
 
 /**
  * Manages responses.
@@ -226,7 +225,7 @@ trait ResponseHandler
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    async(function () use ($requestId) {
+                    async(function () use ($requestId): void {
                         $this->API->initAuthorization();
                         $this->methodRecall('', ['message_id' => $requestId]);
                     });
@@ -348,7 +347,7 @@ trait ResponseHandler
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            async(function () use ($request, $response) {
+                            async(function () use ($request, $response): void {
                                 $this->API->initAuthorization();
                                 $this->handleReject($request, new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             });
@@ -369,7 +368,7 @@ trait ResponseHandler
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                             throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        async(function () use ($request) {
+                        async(function () use ($request): void {
                             $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         });
@@ -377,7 +376,7 @@ trait ResponseHandler
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        async(function () use ($request) {
+                        async(function () use ($request): void {
                             $this->API->initAuthorization();
                             $this->methodRecall('', ['message_id' => $request->getMsgId()]);
                         });

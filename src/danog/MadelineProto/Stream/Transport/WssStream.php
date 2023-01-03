@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Transport;
 
 use danog\MadelineProto\Stream\ConnectionContext;
-use Generator;
 
 /**
  * Websocket TLS stream wrapper.

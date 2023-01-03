@@ -25,7 +25,6 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
@@ -82,7 +81,7 @@ class Lite
      *
      * @param string $config Path to config file
      */
-    public function connect(string $config)
+    public function connect(string $config): void
     {
         $config = \json_decode(read($config), true);
         $config['_'] = 'liteclient.config.global';

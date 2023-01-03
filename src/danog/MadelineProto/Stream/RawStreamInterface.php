@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\ByteStream\InputStream;
-use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 

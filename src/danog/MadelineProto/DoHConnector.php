@@ -31,7 +31,6 @@ use Amp\Socket\ConnectException;
 use Amp\Socket\Connector;
 use Amp\Socket\ResourceSocket;
 use danog\MadelineProto\Stream\ConnectionContext;
-use Generator;
 use Revolt\EventLoop;
 
 use const STREAM_CLIENT_ASYNC_CONNECT;
@@ -60,109 +59,109 @@ class DoHConnector implements Connector
     }
     public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
     {
-            $socketContext = $context ?? new ConnectContext();
-            $token ??= new NullCancellationToken();
-            $attempt = 0;
-            $uris = [];
-            $failures = [];
-            [$scheme, $host, $port] = parseUri($uri);
-            if ($host[0] === '[') {
-                $host = \substr($host, 1, -1);
-            }
-            if ($port === 0 || @\inet_pton($host)) {
-                // Host is already an IP address or file path.
-                $uris = [$uri];
-            } else {
-                // Host is not an IP address, so resolve the domain name.
-                // When we're connecting to a host, we may need to resolve the domain name, first.
-                // The resolution is usually done using DNS over HTTPS.
+        $socketContext = $context ?? new ConnectContext();
+        $token ??= new NullCancellationToken();
+        $attempt = 0;
+        $uris = [];
+        $failures = [];
+        [$scheme, $host, $port] = parseUri($uri);
+        if ($host[0] === '[') {
+            $host = \substr($host, 1, -1);
+        }
+        if ($port === 0 || @\inet_pton($host)) {
+            // Host is already an IP address or file path.
+            $uris = [$uri];
+        } else {
+            // Host is not an IP address, so resolve the domain name.
+            // When we're connecting to a host, we may need to resolve the domain name, first.
+            // The resolution is usually done using DNS over HTTPS.
                 //
-                // The DNS over HTTPS resolver needs to resolve the domain name of the DOH server:
-                // this is handled internally by the DNS over HTTPS client,
-                // by redirecting the resolution request to the plain DNS client.
+            // The DNS over HTTPS resolver needs to resolve the domain name of the DOH server:
+            // this is handled internally by the DNS over HTTPS client,
+            // by redirecting the resolution request to the plain DNS client.
                 //
-                // However, if the DoH connection is proxied with a proxy that has a domain name itself,
-                // we cannot resolve it with the DoH resolver, since this will cause an infinite loop
+            // However, if the DoH connection is proxied with a proxy that has a domain name itself,
+            // we cannot resolve it with the DoH resolver, since this will cause an infinite loop
                 //
-                // resolve host.com => (DoH resolver) => resolve dohserver.com => (simple resolver) => OK
+            // resolve host.com => (DoH resolver) => resolve dohserver.com => (simple resolver) => OK
                 //
                 //                                     |> resolve dohserver.com => (simple resolver) => OK
-                // resolve host.com => (DoH resolver) =|
+            // resolve host.com => (DoH resolver) =|
                 //                                     |> resolve proxy.com => (non-proxied resolver) => OK
                 //
                 //
-                // This means that we must detect if the domain name we're trying to resolve is a proxy domain name.
+            // This means that we must detect if the domain name we're trying to resolve is a proxy domain name.
                 //
-                // Here, we simply check if the connection URI has changed since we first set it:
-                // this would indicate that a proxy class has changed the connection URI to the proxy URI.
-                if ($this->ctx->isDns()) {
-                    $records = $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+            // Here, we simply check if the connection URI has changed since we first set it:
+            // this would indicate that a proxy class has changed the connection URI to the proxy URI.
+            if ($this->ctx->isDns()) {
+                $records = $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+            } else {
+                $records = $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+            }
+            \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
+            if ($this->ctx->getIpv6()) {
+                $records = \array_reverse($records);
+            }
+            foreach ($records as $record) {
+                /** @var Record $record */
+                if ($record->getType() === Record::AAAA) {
+                    $uris[] = \sprintf("%s://[%s]:%d", $scheme, $record->getValue(), $port);
                 } else {
-                    $records = $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
-                }
-                \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
-                if ($this->ctx->getIpv6()) {
-                    $records = \array_reverse($records);
-                }
-                foreach ($records as $record) {
-                    /** @var Record $record */
-                    if ($record->getType() === Record::AAAA) {
-                        $uris[] = \sprintf("%s://[%s]:%d", $scheme, $record->getValue(), $port);
-                    } else {
-                        $uris[] = \sprintf("%s://%s:%d", $scheme, $record->getValue(), $port);
-                    }
+                    $uris[] = \sprintf("%s://%s:%d", $scheme, $record->getValue(), $port);
                 }
             }
-            $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
-            $timeout = $socketContext->getConnectTimeout();
-            $e = null;
-            foreach ($uris as $builtUri) {
+        }
+        $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
+        $timeout = $socketContext->getConnectTimeout();
+        $e = null;
+        foreach ($uris as $builtUri) {
+            try {
+                $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
+                /** @psalm-suppress NullArgument */
+                if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
+                    throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
+                }
+                \stream_set_blocking($socket, false);
+                $deferred = new DeferredFuture();
+                /** @psalm-suppress InvalidArgument */
+                $watcher = EventLoop::onWritable($socket, [$deferred, 'resolve']);
+                $id = $token->subscribe([$deferred, 'fail']);
                 try {
-                    $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
-                    /** @psalm-suppress NullArgument */
-                    if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
-                        throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
-                    }
-                    \stream_set_blocking($socket, false);
-                    $deferred = new DeferredFuture();
-                    /** @psalm-suppress InvalidArgument */
-                    $watcher = EventLoop::onWritable($socket, [$deferred, 'resolve']);
-                    $id = $token->subscribe([$deferred, 'fail']);
-                    try {
-                        Promise\timeout($deferred->getFuture(), $timeout);
-                    } catch (TimeoutException $e) {
-                        throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
-                        // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
-                    } finally {
-                        EventLoop::cancel($watcher);
-                        $token->unsubscribe($id);
-                    }
-                    // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
-                    if (\stream_socket_get_name($socket, true) === false) {
-                        \fclose($socket);
-                        throw new ConnectException(\sprintf('Connection to %s refused%s', $uri, $failures ? '; previous attempts: '.\implode($failures) : ''), 111);
-                        // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
-                    }
-                } catch (ConnectException $e) {
-                    // Includes only error codes used in this file, as error codes on other OS families might be different.
-                    // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
-                    $knownReasons = [110 => 'connection timeout', 111 => 'connection refused'];
-                    $code = $e->getCode();
-                    $reason = $knownReasons[$code] ?? 'Error #'.$code;
-                    if (++$attempt === $socketContext->getMaxAttempts()) {
-                        break;
-                    }
-                    $failures[] = "{$uri} ({$reason})";
-                    continue;
-                    // Could not connect to host, try next host in the list.
+                    Promise\timeout($deferred->getFuture(), $timeout);
+                } catch (TimeoutException $e) {
+                    throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
+                    // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
+                } finally {
+                    EventLoop::cancel($watcher);
+                    $token->unsubscribe($id);
                 }
-                return ResourceSocket::fromClientSocket($socket, $socketContext->getTlsContext());
+                // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
+                if (\stream_socket_get_name($socket, true) === false) {
+                    \fclose($socket);
+                    throw new ConnectException(\sprintf('Connection to %s refused%s', $uri, $failures ? '; previous attempts: '.\implode($failures) : ''), 111);
+                    // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
+                }
+            } catch (ConnectException $e) {
+                // Includes only error codes used in this file, as error codes on other OS families might be different.
+                // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
+                $knownReasons = [110 => 'connection timeout', 111 => 'connection refused'];
+                $code = $e->getCode();
+                $reason = $knownReasons[$code] ?? 'Error #'.$code;
+                if (++$attempt === $socketContext->getMaxAttempts()) {
+                    break;
+                }
+                $failures[] = "{$uri} ({$reason})";
+                continue;
+                // Could not connect to host, try next host in the list.
             }
+            return ResourceSocket::fromClientSocket($socket, $socketContext->getTlsContext());
+        }
 
-            // This is reached if either all URIs failed or the maximum number of attempts is reached.
-            /** @noinspection PhpUndefinedVariableInspection */
-            if ($e) {
-                throw $e;
-            }
+        // This is reached if either all URIs failed or the maximum number of attempts is reached.
+        /** @noinspection PhpUndefinedVariableInspection */
+        if ($e) {
+            throw $e;
+        }
     }
 }

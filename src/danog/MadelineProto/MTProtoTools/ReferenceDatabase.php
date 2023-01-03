@@ -28,7 +28,6 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
-use Generator;
 
 /**
  * Manages upload and download of files.
@@ -96,7 +95,7 @@ class ReferenceDatabase implements TLCallback
     {
         return ['db', 'API'];
     }
-    public function init()
+    public function init(): void
     {
         $this->initDb($this->API);
 
@@ -208,7 +207,7 @@ class ReferenceDatabase implements TLCallback
         //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOrigin(array $data = [])
+    public function addOrigin(array $data = []): void
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
@@ -297,7 +296,7 @@ class ReferenceDatabase implements TLCallback
         $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethod(OutgoingMessage $data, array $res)
+    public function addOriginMethod(OutgoingMessage $data, array $res): void
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
@@ -369,7 +368,7 @@ class ReferenceDatabase implements TLCallback
         }
         $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
-    public function storeReference(string $location, string $reference, int $originType, array $origin)
+    public function storeReference(string $location, string $reference, int $originType, array $origin): void
     {
         $locationValue = $this->db[$location];
         if (!$locationValue) {

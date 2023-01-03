@@ -29,7 +29,6 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use Generator;
 use phpseclib3\Math\BigInteger;
 
 use const STR_PAD_LEFT;
@@ -166,7 +165,7 @@ trait AuthKeyHandler
         $this->notifyLayer($params['id']);
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
     }
-    private function notifyLayer($chat)
+    private function notifyLayer($chat): void
     {
         $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->TL->getSecretLayer()]]]);
     }
@@ -206,7 +205,7 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function acceptRekey(int $chat, array $params)
+    private function acceptRekey(int $chat, array $params): void
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my_exchange_id = new BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
@@ -243,7 +242,7 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function commitRekey(int $chat, array $params)
+    private function commitRekey(int $chat, array $params): void
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 1 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']])) {
             $this->secret_chats[$chat]['rekeying'] = [0];
@@ -335,7 +334,7 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat ID
      */
-    public function discardSecretChat(int $chat)
+    public function discardSecretChat(int $chat): void
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', Logger::VERBOSE);
         if (isset($this->secret_chats[$chat])) {

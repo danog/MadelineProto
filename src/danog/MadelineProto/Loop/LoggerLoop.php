@@ -21,8 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tools;
-use Generator;
 
 trait LoggerLoop
 {
@@ -39,7 +37,6 @@ trait LoggerLoop
     {
         $this->logger = $logger;
     }
-
 
     /**
      * Signal that loop has started.

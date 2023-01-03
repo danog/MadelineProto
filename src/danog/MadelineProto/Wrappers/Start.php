@@ -27,7 +27,6 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use const PHP_SAPI;
 
@@ -103,7 +102,7 @@ trait Start
         }
         exit;
     }
-    private function webPhoneLogin()
+    private function webPhoneLogin(): void
     {
         try {
             $this->phoneLogin($_POST['phone_number']);
@@ -114,7 +113,7 @@ trait Start
             $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webCompletePhoneLogin()
+    private function webCompletePhoneLogin(): void
     {
         try {
             $this->completePhoneLogin($_POST['phone_code']);
@@ -125,7 +124,7 @@ trait Start
             $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webComplete2faLogin()
+    private function webComplete2faLogin(): void
     {
         try {
             $this->complete2faLogin($_POST['password']);
@@ -136,7 +135,7 @@ trait Start
             $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webCompleteSignup()
+    private function webCompleteSignup(): void
     {
         try {
             $this->completeSignup($_POST['first_name'], $_POST['last_name'] ?? '');
@@ -147,7 +146,7 @@ trait Start
             $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webBotLogin()
+    private function webBotLogin(): void
     {
         try {
             $this->botLogin($_POST['token']);

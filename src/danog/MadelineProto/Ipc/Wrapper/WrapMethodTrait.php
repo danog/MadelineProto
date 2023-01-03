@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\Ipc\Wrapper;
-use Generator;
 
 trait WrapMethodTrait
 {

@@ -34,7 +34,6 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use Exception;
-use Generator;
 use InvalidArgumentException;
 use phpseclib3\Crypt\DH;
 use phpseclib3\Crypt\EC;
@@ -80,7 +79,7 @@ class ADNLConnection
      *
      * @param array $endpoint Endpoint
      */
-    public function connect(array $endpoint)
+    public function connect(array $endpoint): void
     {
         if ($endpoint['_'] !== 'liteserver.desc') {
             throw new InvalidArgumentException('Only liteservers are supported at the moment!');
@@ -130,7 +129,7 @@ class ADNLConnection
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::class)->addStream(BufferedRawStream::class)->addStream(CtrStream::class, $obf)->addStream(HashedBufferedStream::class, 'sha256')->addStream(ADNLStream::class);
         $this->stream = ($ctx->getStream($payload));
-        async(function () {
+        async(function (): void {
             //Tools::sleep(1);
             while (true) {
                 $buffer = $this->stream->getReadBuffer($length);

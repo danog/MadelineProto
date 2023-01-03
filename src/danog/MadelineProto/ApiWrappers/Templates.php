@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\ApiWrappers;
 
-use Amp\Future;
 use danog\MadelineProto\Lang;
 
 use function Amp\ByteStream\getOutputBufferStream;
@@ -62,7 +61,7 @@ trait Templates
      *
      * @param string $message Message to echo
      */
-    private function webAPIEcho(string $message = ''): Future
+    private function webAPIEcho(string $message = ''): void
     {
         $message = \htmlentities($message);
         if (!isset($this->myTelegramOrgWrapper)) {
@@ -140,6 +139,6 @@ trait Templates
                 }
             }
         }
-        return getOutputBufferStream()->write($this->webAPIEchoTemplate($title, $form));
+        getOutputBufferStream()->write($this->webAPIEchoTemplate($title, $form));
     }
 }

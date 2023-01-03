@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
-use Generator;
 
 /**
  * Message cleanup loop.
@@ -34,7 +33,7 @@ class CleanupLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $connection = $this->connection;
         while (!$this->waitSignal($this->pause(1000))) {

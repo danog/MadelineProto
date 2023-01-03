@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
-use Amp\Success;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
@@ -158,7 +157,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @internal
      */
-    public function initAuthorization()
+    public function initAuthorization(): void
     {
         $logger = $this->API->logger;
         $this->initingAuth ??= new LocalMutex;
@@ -261,7 +260,7 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Sync authorization data between DCs.
      */
-    private function syncAuthorization()
+    private function syncAuthorization(): void
     {
         $socket = $this->getAuthConnection();
         $logger = $this->API->logger;
@@ -467,7 +466,7 @@ class DataCenterConnection implements JsonSerializable
      * @param ConnectionContext $ctx Connection context
      * @param int               $id  Optional connection ID to reconnect
      */
-    public function connect(ConnectionContext $ctx, int $id = -1)
+    public function connect(ConnectionContext $ctx, int $id = -1): void
     {
         $this->API->logger->logger("Trying shared connection via {$ctx} ({$id})");
         $this->ctx = $ctx->getCtx();
@@ -507,7 +506,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param integer $count Number of sockets to open
      */
-    private function connectMore(int $count)
+    private function connectMore(int $count): void
     {
         $ctx = $this->ctx->getCtx();
         $count += $previousCount = \count($this->connections);
@@ -567,7 +566,7 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Reconnect to DC.
      */
-    public function reconnect()
+    public function reconnect(): void
     {
         $this->API->logger->logger("Reconnecting shared DC {$this->datacenter}");
         $this->disconnect();

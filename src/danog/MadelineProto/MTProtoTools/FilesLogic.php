@@ -54,7 +54,7 @@ trait FilesLogic
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null)
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -199,7 +199,7 @@ trait FilesLogic
         if ($result->shouldServe()) {
             $body = new IteratorStream(
                 new Producer(
-                    function (callable $emit) use (&$messageMedia, &$cb, &$result) {
+                    function (callable $emit) use (&$messageMedia, &$cb, &$result): void {
                         $emit = static function (string $payload) use ($emit) {
                             $emit($payload);
                             return \strlen($payload);

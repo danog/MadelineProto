@@ -92,7 +92,7 @@ trait PeerHandler
      * @param array $user User info
      * @throws Exception
      */
-    public function addUser(array $user)
+    public function addUser(array $user): void
     {
         if ($user['_'] === 'userEmpty') {
             return;
@@ -157,7 +157,7 @@ trait PeerHandler
      * @internal
      * @psalm-return Generator<int, (Promise|null), mixed, void>
      */
-    public function addChat(array $chat)
+    public function addChat(array $chat): void
     {
         if ($chat['_'] === 'chat'
             || $chat['_'] === 'chatEmpty'
@@ -236,7 +236,7 @@ trait PeerHandler
         }
     }
 
-    private function cacheChatUsername(int $id, array $chat)
+    private function cacheChatUsername(int $id, array $chat): void
     {
         if (!$this->getSettings()->getDb()->getEnableUsernameDb()) {
             return;
@@ -245,7 +245,7 @@ trait PeerHandler
             $this->usernames->offsetSet($username, $id);
         }
     }
-    private function decacheChatUsername(int $id, ?array $chat)
+    private function decacheChatUsername(int $id, ?array $chat): void
     {
         if (!$chat || !$this->getSettings()->getDb()->getEnableUsernameDb()) {
             return;
@@ -785,7 +785,7 @@ trait PeerHandler
      *
      * @param mixed $id The peer to refresh
      */
-    public function refreshPeerCache($id)
+    public function refreshPeerCache($id): void
     {
         $id = ($this->getInfo($id))['bot_api_id'];
         if ($this->isSupergroup($id)) {
@@ -801,7 +801,7 @@ trait PeerHandler
      *
      * @param mixed $id The peer to refresh
      */
-    public function refreshFullPeerCache($id)
+    public function refreshFullPeerCache($id): void
     {
         $this->full_chats->unset(($this->getFullInfo($id))['bot_api_id']);
         $this->getFullInfo($id);
@@ -849,7 +849,7 @@ trait PeerHandler
     /**
      * @internal
      */
-    public function addFullChat(array $full)
+    public function addFullChat(array $full): void
     {
         $this->full_chats->offsetSet(
             $this->getId($full),
@@ -1082,7 +1082,7 @@ trait PeerHandler
             }
             $promises = [];
             foreach ($gres['participants'] as $participant) {
-                $promises []= Tools::call((function () use (&$res, $participant) {
+                $promises []= Tools::call((function () use (&$res, $participant): void {
                     $newres = [];
                     $newres['user'] = ($this->getPwrChat($participant['user_id'] ?? $participant['peer'], false));
                     if (isset($participant['inviter_id'])) {

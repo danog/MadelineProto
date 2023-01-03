@@ -21,11 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\Dns\Resolver;
-use Amp\Future;
 use Amp\Http\Client\HttpClient;
-use Amp\Success;
 use Closure;
-use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
@@ -803,7 +800,7 @@ class MTProto implements TLCallback
     /**
      * Cleanup memory and session file.
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this];
@@ -816,7 +813,7 @@ class MTProto implements TLCallback
         $this->TL->updateCallbacks($callbacks);
     }
 
-    private function fillUsernamesCache()
+    private function fillUsernamesCache(): void
     {
         if (!$this->settings->getDb()->getEnableUsernameDb()) {
             $this->usernames->clear();
@@ -1011,7 +1008,7 @@ class MTProto implements TLCallback
      * @internal
      * @psalm-return Generator<mixed, mixed, mixed, void>
      */
-    private function cleanupProperties()
+    private function cleanupProperties(): void
     {
         if (!$this->channels_state instanceof CombinedUpdatesState) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
@@ -1096,7 +1093,7 @@ class MTProto implements TLCallback
      * @throws RPCErrorException
      * @throws Throwable
      */
-    private function upgradeMadelineProto()
+    private function upgradeMadelineProto(): void
     {
         if (!isset($this->snitch)) {
             $this->snitch = new Snitch;
@@ -1189,7 +1186,7 @@ class MTProto implements TLCallback
      * @param APIWrapper             $wrapper  API wrapper
      * @internal
      */
-    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper)
+    public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void
     {
         // Set reference to itself
         self::$references[\spl_object_hash($this)] = $this;
@@ -1229,7 +1226,7 @@ class MTProto implements TLCallback
         }
 
         $this->forceInit(false);
-        
+
         // Setup one-time stuffs
         Magic::start();
         $this->settings->getConnection()->init();
@@ -1350,9 +1347,9 @@ class MTProto implements TLCallback
      *
      * @internal
      */
-    public function restartIpcServer(): Future
+    public function restartIpcServer(): void
     {
-        return new Success(); // Can only be called from client
+        // Can only be called from client
     }
     /**
      * Whether we're an IPC client instance.
@@ -1373,7 +1370,7 @@ class MTProto implements TLCallback
      *
      * @param SettingsAbstract $settings Settings
      */
-    public function updateSettings(SettingsAbstract $settings)
+    public function updateSettings(SettingsAbstract $settings): void
     {
         $this->updateSettingsInternal($settings);
 
@@ -1508,7 +1505,7 @@ class MTProto implements TLCallback
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
      */
-    public function connectToAllDcs(bool $reconnectAll = true)
+    public function connectToAllDcs(bool $reconnectAll = true): void
     {
         $this->channels_state->get(FeedLoop::GENERIC);
         foreach ($this->channels_state->get() as $state) {
@@ -1701,7 +1698,7 @@ class MTProto implements TLCallback
      *
      * @param string $datacenter DC ID
      */
-    public function getCdnConfig(string $datacenter)
+    public function getCdnConfig(string $datacenter): void
     {
         try {
             foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
@@ -1746,7 +1743,7 @@ class MTProto implements TLCallback
     /**
      * Parse cached config.
      */
-    private function parseConfig()
+    private function parseConfig(): void
     {
         if (isset($this->config['dc_options'])) {
             $options = $this->config['dc_options'];
@@ -1759,7 +1756,7 @@ class MTProto implements TLCallback
      *
      * @param array $dc_options DC options
      */
-    private function parseDcOptions(array $dc_options)
+    private function parseDcOptions(array $dc_options): void
     {
         $previous = $this->dcList;
         foreach ($dc_options as $dc) {
@@ -1872,7 +1869,7 @@ class MTProto implements TLCallback
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
      */
-    public function setReportPeers($userOrId)
+    public function setReportPeers($userOrId): void
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
@@ -1897,7 +1894,7 @@ class MTProto implements TLCallback
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
      */
-    public function report(string $message, string $parseMode = '')
+    public function report(string $message, string $parseMode = ''): void
     {
         if (!$this->reportDest) {
             return;

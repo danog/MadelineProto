@@ -23,8 +23,6 @@ namespace danog\MadelineProto\Wrappers;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tools;
-use Generator;
 
 use function Amp\async;
 
@@ -72,7 +70,7 @@ trait Events
      *
      * @param class-string<EventHandler> $eventHandler Event handler
      */
-    public function setEventHandler(string $eventHandler)
+    public function setEventHandler(string $eventHandler): void
     {
         if (!\is_subclass_of($eventHandler, EventHandler::class)) {
             throw new Exception('Wrong event handler was defined');

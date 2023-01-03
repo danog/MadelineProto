@@ -184,7 +184,7 @@ class Server extends SignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         while ($socket = $this->waitSignal($this->server->accept())) {
             async($this->clientLoop(...), $socket);
@@ -228,7 +228,7 @@ class Server extends SignalLoop
      * @param ChannelledSocket                   $socket  Socket
      * @param array{0: string, 1: array|Wrapper} $payload Payload
      */
-    private function clientRequest(ChannelledSocket $socket, int $id, array $payload)
+    private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
     {
         try {
             $this->API->init();

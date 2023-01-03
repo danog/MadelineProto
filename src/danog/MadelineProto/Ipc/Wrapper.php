@@ -17,7 +17,6 @@ use danog\MadelineProto\Ipc\Wrapper\SeekableInputStream;
 use danog\MadelineProto\Ipc\Wrapper\SeekableOutputStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
-use danog\MadelineProto\Tools;
 use Generator;
 use Throwable;
 
@@ -126,7 +125,7 @@ class Wrapper extends ClientAbstract
     /**
      * Receiver loop.
      */
-    private function receiverLoop()
+    private function receiverLoop(): void
     {
         $id = 0;
         $payload = null;
@@ -145,7 +144,7 @@ class Wrapper extends ClientAbstract
      * @param integer          $id      Request ID
      * @param array            $payload Payload
      */
-    private function clientRequest(int $id, array $payload)
+    private function clientRequest(int $id, array $payload): void
     {
         try {
             $result = $this->callbacks[$payload[0]](...$payload[1]);

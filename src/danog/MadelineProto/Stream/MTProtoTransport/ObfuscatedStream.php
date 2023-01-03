@@ -24,7 +24,6 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Tools;
-use Generator;
 
 /**
  * Obfuscated2 stream wrapper.

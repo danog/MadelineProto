@@ -25,7 +25,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use function Amp\Future\awaitAll;
 

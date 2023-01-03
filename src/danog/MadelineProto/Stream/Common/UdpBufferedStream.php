@@ -78,7 +78,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             throw new NothingInTheSocketException();
         }
         $length = \strlen($chunk);
-        return new Success(new class($chunk) implements ReadBufferInterface {
+        return new class($chunk) implements ReadBufferInterface {
             /**
              * Buffer.
              *
@@ -100,11 +100,10 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * Read data from buffer.
              *
              * @param integer $length Length
-             * @return Promise<string>
              */
-            public function bufferRead(int $length): Future
+            public function bufferRead(int $length): string
             {
-                return new Success(\fread($this->buffer, $length));
+                return \fread($this->buffer, $length);
             }
             /**
              * Destructor function.
@@ -113,7 +112,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             {
                 \fclose($this->buffer);
             }
-        });
+        };
     }
     /**
      * Get write buffer asynchronously.
@@ -122,7 +121,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      */
     public function getWriteBuffer(int $length, string $append = ''): Future
     {
-        return new Success(new class($length, $append, $this) implements WriteBufferInterface {
+        return new class($length, $append, $this) implements WriteBufferInterface {
             private int $length;
             private string $append;
             private int $append_after;
@@ -145,7 +144,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              *
              * @param string $data Data to write
              */
-            public function bufferWrite(string $data): Future
+            public function bufferWrite(string $data): int
             {
                 $this->data .= $data;
                 if ($this->append_after) {
@@ -160,9 +159,9 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
                 }
-                return new Success(\strlen($data));
+                return \strlen($data);
             }
-        });
+        };
     }
     /**
      * {@inheritdoc}

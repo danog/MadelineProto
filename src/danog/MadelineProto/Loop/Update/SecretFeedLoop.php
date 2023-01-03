@@ -24,7 +24,6 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SecurityException;
-use Generator;
 
 /**
  * Secret feed loop.
@@ -58,7 +57,7 @@ class SecretFeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         if ($this->waitForAuthOrSignal()) {

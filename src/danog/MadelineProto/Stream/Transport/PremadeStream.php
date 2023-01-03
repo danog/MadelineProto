@@ -22,16 +22,13 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
-use Amp\CancellationToken;
 use Amp\Future;
 use Amp\Socket\Socket;
-use Amp\Success;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 use Throwable;
 
 /**

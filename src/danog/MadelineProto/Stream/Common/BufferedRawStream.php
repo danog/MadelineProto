@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream\Common;
 use Amp\ByteStream\ClosedException;
 use Amp\Future;
 use Amp\Socket\Socket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\Async\RawStream;
@@ -31,8 +30,6 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use danog\MadelineProto\Tools;
-use Generator;
 
 /**
  * Buffered raw stream.
@@ -93,7 +90,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->stream->disconnect();
             $this->stream = null;
         }
-        return new Success();
     }
     /**
      * Get read buffer asynchronously.
@@ -117,7 +113,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             \fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
-        return new Success($this);
+        return $this;
     }
     /**
      * Get write buffer asynchronously.
@@ -130,7 +126,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-        return new Success($this);
+        return $this;
     }
     /**
      * Read data asynchronously.
@@ -146,17 +142,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
-            return new Success(\fread($this->memory_stream, $length));
+            return \fread($this->memory_stream, $length);
         }
-        return Tools::call($this->bufferRead($length));
-    }
-    /**
-     * Read data asynchronously.
-     *
-     * @param int $length Amount of data to read
-     */
-    public function bufferRead(int $length)
-    {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;

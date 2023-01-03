@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Future;
 use Amp\Socket\EncryptableSocket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\Async\BufferedStream;
@@ -31,7 +30,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
-use Generator;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -164,7 +162,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     }
     public function bufferRead(int $length): Future
     {
-        return new Success($this->code);
+        return $this->code;
     }
     /**
      * {@inheritdoc}

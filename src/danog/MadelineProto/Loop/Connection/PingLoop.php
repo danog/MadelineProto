@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
-use Generator;
 use Throwable;
 
 /**
@@ -36,7 +35,7 @@ class PingLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

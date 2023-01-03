@@ -28,7 +28,6 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\Serializable;
-use Generator;
 use Throwable;
 
 use function Amp\async;
@@ -179,7 +178,7 @@ class API extends InternalDoc
                 $this->{$key} = $this->exportNamespace($key);
             }
         }
-        
+
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
             : ($settings instanceof SettingsLogger ? $settings : new SettingsLogger));
@@ -233,7 +232,7 @@ class API extends InternalDoc
             }
             $this->logger->logger("Restarting to full instance: reconnecting...");
             $cancel = new DeferredFuture;
-            $cb = function () use ($cancel, &$cb) {
+            $cb = function () use ($cancel, &$cb): void {
                 [$result] = Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
                 if ($result instanceof ChannelledSocket) {
                     try {

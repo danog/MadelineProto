@@ -22,7 +22,6 @@ namespace danog\MadelineProto\SecretChats;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SecurityException;
-use Generator;
 
 /**
  * Manages sequence numbers.

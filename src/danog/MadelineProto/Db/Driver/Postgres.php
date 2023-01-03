@@ -52,7 +52,7 @@ class Postgres
      * @throws FailureException
      * @throws Throwable
      */
-    private static function createDb(ConnectionConfig $config)
+    private static function createDb(ConnectionConfig $config): void
     {
         try {
             $db = $config->getDatabase();

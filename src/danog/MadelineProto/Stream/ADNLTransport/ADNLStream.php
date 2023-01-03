@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\ADNLTransport;
 
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -28,7 +27,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
-use Generator;
 
 /**
  * ADNL stream wrapper.

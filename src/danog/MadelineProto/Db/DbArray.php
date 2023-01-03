@@ -4,56 +4,50 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Future;
 use Amp\Iterator;
 use ArrayAccess;
-use ReturnTypeWillChange;
+use Countable;
 
 /**
  * DB array interface.
  *
  * @template T as mixed
  */
-interface DbArray extends DbType, ArrayAccess
+interface DbArray extends DbType, ArrayAccess, Countable
 {
     /**
      * Get Array copy.
      *
-     * @psalm-return Promise<array<string|int, T>>
+     * @return array<string|int, mixed>
      */
-    public function getArrayCopy(): Future;
+    public function getArrayCopy(): array;
     /**
      * Check if element is set.
-     *
-     * @psalm-return Promise<bool>
      */
-    public function isset(string|int $key): Future;
+    public function isset(string|int $key): bool;
     /**
      * Unset element.
-     *
-     * @psalm-return Promise<mixed>
      */
-    public function unset(string|int $key): Future;
+    public function unset(string|int $key): void;
     /**
      * Set element.
      *
      * @psalm-param T $value
      */
-    public function set(string|int $key, mixed $value): Future;
+    public function set(string|int $key, mixed $value): void;
     /**
      * Get element.
      *
      * @param string|int $index
      * @psalm-return Promise<T>
      */
-    public function offsetGet(mixed $index): Future;
+    public function offsetGet(mixed $index): mixed;
     /**
      * Set element.
      *
      * @param string|int $index
      * @psalm-param T $value
      */
-    #[ReturnTypeWillChange]
     public function offsetSet(mixed $index, mixed $value): void;
     /**
      * @deprecated
@@ -71,15 +65,9 @@ interface DbArray extends DbType, ArrayAccess
      */
     public function offsetExists(mixed $index): bool;
     /**
-     * Count number of elements.
-     *
-     * @return Promise<integer>
-     */
-    public function count(): Future;
-    /**
      * Clear all elements.
      */
-    public function clear(): Future;
+    public function clear(): void;
     /**
      * Get iterator.
      *

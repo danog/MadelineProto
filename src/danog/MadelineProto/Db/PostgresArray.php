@@ -64,7 +64,7 @@ class PostgresArray extends SqlArray
     /**
      * Initialize on startup.
      */
-    public function initStartup()
+    public function initStartup(): void
     {
         $this->setTable($this->table);
         $this->initConnection($this->dbSettings);
@@ -72,7 +72,7 @@ class PostgresArray extends SqlArray
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabasePostgres $settings)
+    public function initConnection(DatabasePostgres $settings): void
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
@@ -103,7 +103,7 @@ class PostgresArray extends SqlArray
      * @throws Throwable
      * @psalm-return Generator<int, Promise, mixed, void>
      */
-    protected function prepareTable()
+    protected function prepareTable(): void
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
 
@@ -116,7 +116,7 @@ class PostgresArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to)
+    protected function renameTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 

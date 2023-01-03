@@ -24,10 +24,10 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Throwable;
 
-use function Amp\async;
-
 use const PHP_EOL;
+
 use const PHP_SAPI;
+use function Amp\async;
 
 /**
  * Indicates an error returned by Telegram's API.
@@ -51,10 +51,11 @@ class RPCErrorException extends \Exception
         $error = \preg_replace('/\\d+$/', "X", $error);
         $description = self::$descriptions[$error] ?? '';
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error])) {
-            async(function () use ($method, $code, $error) {
+            async(function () use ($method, $code, $error): void {
                 try {
                     $res = \json_decode(
-                        (HttpClientBuilder::buildDefault()
+                        (
+                            HttpClientBuilder::buildDefault()
                             ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
                         )->getBody()->buffer(),
                         true,

@@ -27,7 +27,6 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
-use Generator;
 
 /**
  * Update loop.

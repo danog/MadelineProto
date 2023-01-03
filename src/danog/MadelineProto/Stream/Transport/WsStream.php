@@ -20,25 +20,19 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Transport;
 
-use Amp\Future;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Socket\EncryptableSocket;
-use Amp\Success;
 use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
-use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Rfc6455Connector;
 use Amp\Websocket\Client\WebsocketConnection;
 use Amp\Websocket\Client\WebsocketConnector;
 use Amp\Websocket\Client\WebsocketHandshake;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 use Throwable;
 
 /**

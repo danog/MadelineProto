@@ -24,14 +24,12 @@ use Amp\ByteStream\ClosedException;
 use Amp\File\File;
 use Amp\Future;
 use Amp\Socket\Socket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 use RuntimeException;
 
 /**
@@ -93,7 +91,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
         if ($this->stream) {
             $this->stream = null;
         }
-        return new Success();
     }
     /**
      * Get read buffer asynchronously.
@@ -105,7 +102,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
         }
-        return new Success($this);
+        return $this;
     }
     /**
      * Get write buffer asynchronously.
@@ -118,7 +115,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-        return new Success($this);
+        return $this;
     }
     /**
      * Read data asynchronously.

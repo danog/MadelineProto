@@ -117,7 +117,7 @@ class Ogg
     /**
      * OPUS state machine.
      */
-    private function opusStateMachine(string $content)
+    private function opusStateMachine(string $content): void
     {
         $curStream = 0;
         $offset = 0;

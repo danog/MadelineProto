@@ -23,8 +23,6 @@ namespace danog\MadelineProto\Wrappers;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tools;
-use Generator;
 use Throwable;
 
 use function Amp\async;
@@ -62,7 +60,7 @@ trait Webhook
             $this->logger->logger('EMPTY UPDATE');
             return;
         }
-        async(function () use ($payload) {
+        async(function () use ($payload): void {
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
-use Amp\Success;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
-use Generator;
 
 use function Amp\Socket\connect;
 
@@ -72,7 +69,7 @@ class Endpoint
     /**
      * Connect to endpoint.
      */
-    public function connect()
+    public function connect(): void
     {
         $this->socket = connect("udp://{$this->ip}:{$this->port}");
     }
@@ -86,7 +83,6 @@ class Endpoint
             $this->socket->close();
             $this->socket = null;
         }
-        return new Success();
     }
     /**
      * Read packet.
@@ -142,10 +138,10 @@ class Endpoint
     /**
      * Write data.
      */
-    public function write(string $payload): Future
+    public function write(string $payload): int
     {
         if ($this->socket === null) {
-            return new Success(0);
+            return 0;
         }
         $plaintext = \pack('v', \strlen($payload)).$payload;
         $padding = 16 - (\strlen($plaintext) % 16);

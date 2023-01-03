@@ -6,7 +6,6 @@ namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
-use Generator;
 use LogicException;
 
 /**
@@ -26,7 +25,7 @@ trait DbPropertiesTrait
      *
      * @internal
      */
-    public function initDb(MTProto $MadelineProto, bool $reset = false)
+    public function initDb(MTProto $MadelineProto, bool $reset = false): void
     {
         if (empty(static::$dbProperties)) {
             throw new LogicException(static::class.' must have $dbProperties');

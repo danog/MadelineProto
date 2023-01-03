@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
-use Generator;
 
 /**
  * Event handler.
@@ -92,7 +91,7 @@ abstract class EventHandler extends InternalDoc
      *
      * @internal
      */
-    public function startInternal()
+    public function startInternal(): void
     {
         $this->startMutex ??= new LocalMutex;
         $lock = $this->startMutex->acquire();

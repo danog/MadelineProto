@@ -274,7 +274,7 @@ class Connection
      * @param ConnectionContext $ctx Connection context
      * @psalm-return Generator<mixed, StreamInterface, mixed, void>
      */
-    public function connect(ConnectionContext $ctx)
+    public function connect(ConnectionContext $ctx): void
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
@@ -550,7 +550,7 @@ class Connection
     /**
      * Reconnect to DC.
      */
-    public function reconnect()
+    public function reconnect(): void
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);

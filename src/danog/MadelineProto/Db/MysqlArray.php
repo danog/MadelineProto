@@ -26,7 +26,7 @@ class MysqlArray extends SqlArray
     /**
      * Initialize on startup.
      */
-    public function initStartup()
+    public function initStartup(): void
     {
         $this->setTable($this->table);
         $this->initConnection($this->dbSettings);
@@ -71,7 +71,7 @@ class MysqlArray extends SqlArray
     /**
      * Initialize connection.
      */
-    public function initConnection(DatabaseMysql $settings)
+    public function initConnection(DatabaseMysql $settings): void
     {
         $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
         $host = $config->getHost();
@@ -109,7 +109,7 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to)
+    protected function renameTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
