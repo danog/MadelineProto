@@ -75,7 +75,7 @@ class ReadLoop extends SignalLoop
             }
             if (\is_int($error)) {
                 //$this->exitedLoop();
-                EventLoop::defer(fn () => async(function () use ($error, $shared, $connection, $datacenter, $API) {
+                EventLoop::defer(fn () => async(function () use ($error, $shared, $connection, $datacenter, $API): void {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);

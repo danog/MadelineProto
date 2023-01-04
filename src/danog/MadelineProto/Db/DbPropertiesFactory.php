@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Future;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract as DatabaseDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;

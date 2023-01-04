@@ -336,20 +336,17 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Internal peer database.
      *
-     * @var DbArray
      */
     public DbArray $chats;
 
     /**
      * Cache of usernames for chats.
      *
-     * @var DbArray
      */
     public DbArray $usernames;
     /**
      * Cached parameters for fetching channel participants.
      *
-     * @var DbArray
      */
     public DbArray $channelParticipants;
     /**
@@ -365,7 +362,6 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Full chat info database.
      *
-     * @var DbArray
      */
     public DbArray $full_chats;
     /**

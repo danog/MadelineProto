@@ -65,19 +65,19 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): ?bool
+    public function loop(): void
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
         if ($this->waitForAuthOrSignal()) {
-            return null;
+            return;
         }
         $this->state = $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = 10;
         $first = true;
         while (true) {
             if ($this->waitForAuthOrSignal(false)) {
-                return null;
+                return;
             }
             $result = [];
             $toPts = $this->toPts;
@@ -101,7 +101,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
                             $API->getChannelStates()->remove($this->channelId);
                             $API->logger->logger("Channel private, exiting {$this}");
-                            return true;
+                            return;
                         }
                         throw $e;
                     } catch (Exception $e) {
@@ -110,12 +110,12 @@ class UpdateLoop extends ResumableSignalLoop
                             $API->getChannelStates()->remove($this->channelId);
                             unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
                             $API->logger->logger("Channel private, exiting {$this}");
-                            return true;
+                            return;
                         }
                         throw $e;
                     } catch (PTSException $e) {
                         $API->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
-                        return true;
+                        return;
                     }
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
@@ -210,7 +210,7 @@ class UpdateLoop extends ResumableSignalLoop
             $first = false;
             if ($this->waitSignal(async($this->pause(...), $timeout*1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");
-                return null;
+                return;
             }
         }
     }
