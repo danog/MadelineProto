@@ -7,9 +7,11 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tools;
 use Generator;
 use phpseclib3\Math\BigInteger;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * @property DataCenter $datacenter
@@ -36,17 +38,16 @@ trait AuthKeyHandler
                     continue;
                 }
                 if ($socket->isMedia()) {
-                    $media []= [$socket, 'initAuthorization'];
+                    $media []= $socket->initAuthorization(...);
                 } else {
-                    $main []= [$socket, 'initAuthorization'];
+                    $main []= $socket->initAuthorization(...);
                 }
             }
             if ($main) {
-                $first = \array_shift($main)();
-                $first;
+                \array_shift($main)();
             }
-            Tools::all(\array_map(fn ($cb) => $cb(), $main));
-            Tools::all(\array_map(fn ($cb) => $cb(), $media));
+            await(\array_map(async(...), $main));
+            await(\array_map(async(...), $media));
         } finally {
             $lock->release();
             $this->logger("Done initing authorization!");

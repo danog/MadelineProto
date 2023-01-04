@@ -204,7 +204,7 @@ trait FilesLogic
                             $emit($payload);
                             return \strlen($payload);
                         };
-                        Tools::call($this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result->getServeRange()));
+                        $this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result->getServeRange());
                     },
                 ),
             );

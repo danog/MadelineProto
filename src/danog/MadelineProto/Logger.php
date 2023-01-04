@@ -358,7 +358,7 @@ class Logger
             return;
         }
         if (Magic::$suspendPeriodicLogging) {
-            Magic::$suspendPeriodicLogging->getFuture()->onResolve(fn () => $this->logger($param, $level, $file));
+            Magic::$suspendPeriodicLogging->getFuture()->complete(fn () => $this->logger($param, $level, $file));
             return;
         }
         if (!self::$printed) {

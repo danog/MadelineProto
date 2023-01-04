@@ -49,7 +49,7 @@ use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\all;
-
+use function Amp\Future\await;
 use function end;
 
 /**
@@ -199,7 +199,7 @@ trait Files
             ++$part_num;
             if (!($part_num % $parallel_chunks)) {
                 // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                Tools::all($promises);
+                await($promises);
                 $promises = [];
                 if ($exception) {
                     throw $exception;
@@ -344,7 +344,7 @@ trait Files
         $cb = [$bridge, 'callback'];
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
-        [$res] = Tools::all([$read, $write]);
+        [$res] = await([$read, $write]);
         return $res;
     }
 
@@ -900,8 +900,8 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = Tools::call($this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
-                $previous_promise->onResolve(static function ($e, $res) use (&$size): void {
+                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable);
+                $previous_promise->map(static function ($e, $res) use (&$size): void {
                     if ($res) {
                         $size += $res;
                     }
@@ -909,7 +909,7 @@ trait Files
                 $promises[] = $previous_promise;
                 if (!($key % $parallel_chunks)) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps
-                    $res = Tools::all($promises);
+                    $res = await($promises);
                     $promises = [];
                     foreach ($res as $r) {
                         if (!$r) {
@@ -923,7 +923,7 @@ trait Files
                 }
             }
             if ($promises) {
-                Tools::all($promises);
+                await($promises);
             }
         }
         $time = \microtime(true) - $start;

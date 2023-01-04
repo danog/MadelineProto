@@ -108,13 +108,13 @@ use danog\MadelineProto\Tools;
             $API->initSelfRestart();
             while (true) {
                 try {
-                    Tools::wait($session->storeIpcState(new IpcState($runnerId)));
-                    Tools::wait(Server::waitShutdown());
+                    $session->storeIpcState(new IpcState($runnerId));
+                    Server::waitShutdown();
                     Shutdown::removeCallback('restarter');
                     return;
                 } catch (Throwable $e) {
                     Logger::log((string) $e, Logger::FATAL_ERROR);
-                    Tools::wait($API->report("Surfaced: $e"));
+                    $API->report("Surfaced: $e");
                 }
             }
         } catch (Throwable $e) {

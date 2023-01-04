@@ -189,7 +189,6 @@ class OutgoingMessage extends Message
     /**
      * Set reply to message.
      *
-     * @param Promise|mixed $result
      */
     public function reply($result): void
     {

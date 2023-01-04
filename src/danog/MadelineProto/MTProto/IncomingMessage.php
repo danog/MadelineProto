@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
-use Amp\DeferredFuture;
-use danog\MadelineProto\Tools;
+use Amp\Future;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Incoming message.
@@ -74,9 +76,9 @@ class IncomingMessage extends Message
     /**
      * DB side effects to be resolved before using the content.
      *
-     * @var Promise[]
+     * @var list<Future>
      */
-    private $sideEffects = [];
+    private array $sideEffects = [];
 
     /**
      * Constructor.
@@ -186,7 +188,7 @@ class IncomingMessage extends Message
     /**
      * Set DB side effects to be resolved before using the content.
      *
-     * @param Promise[] $sideEffects DB side effects to be resolved before using the content
+     * @param list<Future> $sideEffects DB side effects to be resolved before using the content
      */
     public function setSideEffects(array $sideEffects): self
     {
@@ -199,41 +201,20 @@ class IncomingMessage extends Message
      * Get DB side effects to be resolved before using the specified content.
      *
      * @template T
-     * @param T $return Return value
-     * @psalm-return ?Promise<T>
+     * @param T $return
+     * @return ?Future<T>
      */
-    public function getSideEffects($return): ?Promise
+    public function getSideEffects(mixed $return): ?Future
     {
         if (!$this->sideEffects) {
             return null;
         }
-
-        $deferred = new DeferredFuture;
-        $result = $deferred->getFuture();
-
-        $pending = \count($this->sideEffects);
-
-        foreach ($this->sideEffects as $promise) {
-            $promise = Tools::call($promise);
-            $promise->onResolve(function ($exception, $value) use (&$deferred, &$pending, $return): void {
-                if ($pending === 0) {
-                    return;
-                }
-
-                if ($exception) {
-                    $pending = 0;
-                    $deferred->fail($exception);
-                    $deferred = null;
-                    return;
-                }
-
-                if (0 === --$pending) {
-                    $deferred->complete($return);
-                }
-            });
-        }
+        $sideEffects = $this->sideEffects;
         $this->sideEffects = [];
-        return $result;
+        return async(static function () use ($sideEffects, $return) {
+            await($sideEffects);
+            return $return;
+        });
     }
 
     /**

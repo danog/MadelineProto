@@ -20,9 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\DeferredFuture;
-
-use Amp\DeferredFuture;
 use Amp\Failure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -31,7 +28,6 @@ use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
@@ -259,22 +255,13 @@ trait ResponseHandler
 
         if ($side = $message->getSideEffects($response)) {
             if ($botAPI) {
-                $deferred = new DeferredFuture;
-                $promise = $deferred->getFuture();
-                $side->onResolve(function (?Throwable $error, $result) use ($deferred): void {
-                    if ($error) {
-                        $deferred->fail($error);
-                        return;
-                    }
-                    $deferred->complete(Tools::call($this->API->MTProtoToBotAPI($result)));
-                });
-                $request->reply($promise);
+                async(fn () => $request->reply($this->API->MTProtoToBotAPI($side->await())));
             } else {
-                $request->reply($side);
+                async(fn () => $request->reply($side->await()));
             }
         } else {
             if ($botAPI) {
-                $request->reply(Tools::call($this->API->MTProtoToBotAPI($response)));
+                async(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
             } else {
                 $request->reply($response);
             }

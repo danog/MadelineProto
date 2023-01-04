@@ -28,7 +28,6 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use phpseclib3\Math\BigInteger;
 
@@ -52,17 +51,11 @@ trait AuthKeyHandler
      */
     public function acceptCallFrom(VoIP $instance, array $user)
     {
-        $promise = Tools::call((function () use ($instance, $user) {
-            if (!$res = $this->acceptCall($user)) {
-                $instance->discard();
-                return false;
-            }
-            return $instance;
-        })());
-        if ($this->wrapper && $this->wrapper->isAsync()) {
-            return $promise;
+        if (!$res = $this->acceptCall($user)) {
+            $instance->discard();
+            return false;
         }
-        return Tools::wait($promise);
+        return $instance;
     }
     /**
      * Undocumented function.
@@ -76,16 +69,10 @@ trait AuthKeyHandler
      */
     public function discardCallFrom(VoIP $instance, array $call, array $reason, array $rating = [], bool $need_debug = true)
     {
-        $promise = Tools::call(function () use ($instance, $call, $reason, $rating, $need_debug) {
-            if (!$res = $this->discardCall($call, $reason, $rating, $need_debug)) {
-                return false;
-            }
-            return $instance;
-        });
-        if ($this->wrapper && $this->wrapper->isAsync()) {
-            return $promise;
+        if (!$res = $this->discardCall($call, $reason, $rating, $need_debug)) {
+            return false;
         }
-        return Tools::wait($promise);
+        return $instance;
     }
     /**
      * Request VoIP call.

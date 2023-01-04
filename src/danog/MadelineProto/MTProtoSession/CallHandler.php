@@ -28,7 +28,7 @@ use danog\MadelineProto\Tools;
 use Generator;
 
 use function Amp\async;
-use function Amp\Future\awaitAll;
+use function Amp\Future\await;
 
 /**
  * Manages method and object calls.
@@ -101,7 +101,7 @@ trait CallHandler
             return null;
         }
         if (\is_array($readDeferred)) {
-            return awaitAll(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
+            return await(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
         }
         return $readDeferred->getFuture()->await();
     }
@@ -152,7 +152,7 @@ trait CallHandler
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return awaitAll($promises);
+                return await($promises);
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {

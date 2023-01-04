@@ -302,11 +302,11 @@ class VoIP
         }
         $this->callState = self::CALL_STATE_ACCEPTED;
 
-        Tools::call($this->MadelineProto->acceptCall($this->callID))->onResolve(function ($e, $res): void {
-            if ($e || !$res) {
-                $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
-            }
-        });
+        $res = $this->MadelineProto->acceptCall($this->callID);
+
+        if (!$res) {
+            $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+        }
 
         return $this;
     }

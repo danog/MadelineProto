@@ -70,9 +70,11 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
+
+use function Amp\async;
 use function Amp\File\getSize;
 use function Amp\File\touch as touchAsync;
-
+use function Amp\Future\await;
 use function time;
 
 /**
@@ -1029,15 +1031,15 @@ class MTProto implements TLCallback
         $db = [];
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
-            $db []= $this->referenceDatabase->init();
+            $db []= async($this->referenceDatabase->init(...));
         } else {
-            $db []= $this->referenceDatabase->init();
+            $db []= async($this->referenceDatabase->init(...));
         }
         if (!isset($this->minDatabase)) {
             $this->minDatabase = new MinDatabase($this);
-            $db []= $this->minDatabase->init();
+            $db []= async($this->minDatabase->init(...));
         } else {
-            $db []= $this->minDatabase->init();
+            $db []= async($this->minDatabase->init(...));
         }
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
@@ -1049,7 +1051,7 @@ class MTProto implements TLCallback
         }
 
         $db []= $this->initDb($this);
-        Tools::all($db);
+        await($db);
         $this->fillUsernamesCache();
 
         if (!$this->settings->getDb()->getEnableFullPeerDb()) {
@@ -1523,16 +1525,16 @@ class MTProto implements TLCallback
         $this->datacenter->__construct($this, $this->dcList, $this->settings->getConnection(), $reconnectAll);
         $dcs = [];
         foreach ($this->datacenter->getDcs() as $new_dc) {
-            $dcs[] = $this->datacenter->dcConnect($new_dc);
+            $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
-        Tools::all($dcs);
+        await($dcs);
         $this->initAuthorization();
         $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
-            $dcs[] = $this->datacenter->dcConnect($new_dc);
+            $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
-        Tools::all($dcs);
+        await($dcs);
         $this->initAuthorization();
         $this->parseConfig();
         $this->getPhoneConfig();

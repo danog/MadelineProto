@@ -38,8 +38,11 @@ use Webmozart\Assert\Assert;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
+
 use const danog\Decoder\PROFILE_PHOTO;
 use const SORT_NUMERIC;
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Manages peers.
@@ -982,17 +985,17 @@ trait PeerHandler
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= $this->fetchParticipants($full['InputChannel'], $filter, '', $total_count, $res);
+                $promises []= async($this->fetchParticipants(...), $full['InputChannel'], $filter, '', $total_count, $res);
             }
-            Tools::all($promises);
+            await($promises);
 
             $q = '';
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= $this->recurseAlphabetSearchParticipants($full['InputChannel'], $filter, $q, $total_count, $res, 0);
+                $promises []= async($this->recurseAlphabetSearchParticipants(...), $full['InputChannel'], $filter, $q, $total_count, $res, 0);
             }
-            Tools::all($promises);
+            await($promises);
 
             $this->logger->logger('Fetched '.\count($res['participants'])." out of {$total_count}");
             $res['participants'] = \array_values($res['participants']);
@@ -1033,19 +1036,19 @@ trait PeerHandler
         }
         $promises = [];
         for ($x = 'a'; $x !== 'aa' && $total_count > \count($res['participants']); $x++) {
-            $promises []= $this->recurseAlphabetSearchParticipants($channel, $filter, $q.$x, $total_count, $res, $depth + 1);
+            $promises []= async($this->recurseAlphabetSearchParticipants(...), $channel, $filter, $q.$x, $total_count, $res, $depth + 1);
         }
 
         if ($depth > 2) {
             return $promises;
         }
 
-        $yielded = [...Tools::all($promises)];
+        $yielded = [...await($promises)];
         while ($yielded) {
             $newYielded = [];
 
             foreach (\array_chunk($yielded, 10) as $promises) {
-                $newYielded = \array_merge($newYielded, ...(Tools::all($promises)));
+                $newYielded = \array_merge($newYielded, ...(await($promises)));
             }
 
             $yielded = $newYielded;
@@ -1082,7 +1085,7 @@ trait PeerHandler
             }
             $promises = [];
             foreach ($gres['participants'] as $participant) {
-                $promises []= Tools::call((function () use (&$res, $participant): void {
+                $promises []= async(function () use (&$res, $participant): void {
                     $newres = [];
                     $newres['user'] = ($this->getPwrChat($participant['user_id'] ?? $participant['peer'], false));
                     if (isset($participant['inviter_id'])) {
@@ -1124,9 +1127,9 @@ trait PeerHandler
                             break;
                     }
                     $res['participants'][$participant['user_id'] ?? $this->getId($participant['peer'])] = $newres;
-                })());
+                });
             }
-            Tools::all($promises);
+            await($promises);
             $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
             $offset += \count($gres['participants']);
         } while (\count($gres['participants']));

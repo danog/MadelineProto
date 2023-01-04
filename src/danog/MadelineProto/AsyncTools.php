@@ -39,7 +39,7 @@ use function Amp\delay;
 use function Amp\File\exists;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
-use function Amp\Future\awaitAll;
+use function Amp\Future\await;
 
 use function Amp\Future\awaitAny;
 use function Amp\Future\awaitFirst;
@@ -103,7 +103,7 @@ abstract class AsyncTools extends StrTools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
-        return awaitAll($promises);
+        return await($promises);
     }
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.

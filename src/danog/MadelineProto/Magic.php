@@ -224,10 +224,8 @@ class Magic
     public static $signaled = false;
     /**
      * Whether to suspend certain stdout log printing, when reading input.
-     *
-     * @var ?Deferred
      */
-    public static $suspendPeriodicLogging;
+    public static ?DeferredFuture $suspendPeriodicLogging = null;
     /**
      * All mime types.
      *

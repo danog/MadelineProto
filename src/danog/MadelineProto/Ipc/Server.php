@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Success;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
@@ -160,13 +159,13 @@ class Server extends SignalLoop
     /**
      * Wait for shutdown.
      */
-    public static function waitShutdown(): Future
+    public static function waitShutdown(): void
     {
         if (self::$shutdownNow) {
-            return new Success;
+            return;
         }
         self::$shutdownDeferred ??= new DeferredFuture;
-        return self::$shutdownDeferred->getFuture();
+        self::$shutdownDeferred->getFuture()->await();
     }
     /**
      * Shutdown.

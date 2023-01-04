@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Tools;
 use LogicException;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Include this trait and call DbPropertiesTrait::initDb to use MadelineProto's database backend for properties.
@@ -39,10 +41,10 @@ trait DbPropertiesTrait
                 unset($this->{$property});
             } else {
                 $table = "{$prefix}_{$property}";
-                $promises[$property] = DbPropertiesFactory::get($dbSettings, $table, $type, $this->{$property});
+                $promises[$property] = async(DbPropertiesFactory::get(...), $dbSettings, $table, $type, $this->{$property});
             }
         }
-        $promises = Tools::all($promises);
+        $promises = await($promises);
         foreach ($promises as $key => $data) {
             $this->{$key} = $data;
         }
