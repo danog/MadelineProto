@@ -25,7 +25,6 @@ use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -94,7 +93,7 @@ trait CallHandler
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
         $readDeferred = $this->methodCallAsyncWrite($method, $args, $aargs);
         if ($aargs['noResponse'] ?? false) {
@@ -111,10 +110,9 @@ trait CallHandler
      * @param string            $method Method name
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     *
      * @return list<DeferredFuture>|DeferredFuture
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): DeferredFuture|array
+    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null]): DeferredFuture|array
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];

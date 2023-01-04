@@ -63,7 +63,7 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop()
+    public function loop(): void
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];

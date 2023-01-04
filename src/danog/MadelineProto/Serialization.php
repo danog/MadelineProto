@@ -21,17 +21,18 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\PlaceHolder;
-use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
+use function Amp\async;
 use function Amp\File\exists;
 use function Amp\File\read;
 use function Amp\Ipc\connect;
@@ -150,14 +151,14 @@ abstract class Serialization
                 }
             };
             $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
-            $session->getLightState()->onResolve(static function (?Throwable $e, ?LightState $res) use ($cancelFull, &$canContinue, &$lightState): void {
-                if ($res) {
-                    $lightState = $res;
-                    if (!$res->canStartIpc()) {
+            async(function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+                try {
+                    $lightState = $session->getLightState();
+                    if (!$lightState->canStartIpc()) {
                         $canContinue = false;
                         $cancelFull();
                     }
-                } else {
+                } catch (Throwable) {
                     $lightState = false;
                 }
             });
@@ -243,12 +244,11 @@ abstract class Serialization
      * Try connecting to IPC socket.
      *
      * @param string    $ipcPath       IPC path
-     * @param Promise   $cancelConnect Cancelation token (triggers cancellation of connection)
+     * @param Future<(Throwable|null)> $cancelConnect Cancelation token (triggers cancellation of connection)
      * @param ?callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
-     * @psalm-param Promise<(Throwable|null)> $cancelConnect
-     * @psalm-return Generator<mixed, mixed, mixed, array{0: (ChannelledSocket|Throwable|0), 1: null}>
+     * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
      */
-    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null)
+    public static function tryConnect(string $ipcPath, Future $cancelConnect, ?callable $cancelFull = null): array
     {
         for ($x = 0; $x < 60; $x++) {
             Logger::log("MadelineProto is starting, please wait...");

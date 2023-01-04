@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\Lang;
-use Generator;
 
 trait TD
 {
@@ -55,9 +54,8 @@ trait TD
      * Convert TD to MTProto parameters.
      *
      * @param array $params Parameters
-     * @return Generator<array>
      */
-    public function tdToMTProto(array $params)
+    public function tdToMTProto(array $params): array
     {
         $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {

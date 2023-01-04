@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Socket\EncryptableSocket;
-use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Rfc6455Connector;
 use Amp\Websocket\Client\WebsocketConnection;

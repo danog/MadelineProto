@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\MTProtoTools\Crypt;
-use Generator;
 use PDO;
 
 use const DIRECTORY_SEPARATOR;
@@ -35,9 +34,8 @@ class Conversion
      *
      * @param array<int, string> $authorization Authorization info
      * @param SettingsAbstract|array $settings
-     * @return Generator<mixed, mixed, mixed, API>
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings)
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings): API
     {
         $settings = Settings::parseFromLegacyFull($settings);
         $settings->getIpc()->setSlow(true);

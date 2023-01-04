@@ -28,7 +28,6 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Generator;
 use phpseclib3\Crypt\AES;
 
 /**
@@ -99,10 +98,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * Decrypts read data asynchronously.
-     *
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
-    public function bufferRead(int $length)
+    public function bufferRead(int $length): string
     {
         return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length));
     }

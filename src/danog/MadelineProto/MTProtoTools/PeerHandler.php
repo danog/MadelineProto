@@ -304,9 +304,8 @@ trait PeerHandler
      *
      * @param array $entities Entity list
      * @internal
-     * @return Generator<bool>
      */
-    public function entitiesPeerIsset(array $entities)
+    public function entitiesPeerIsset(array $entities): bool
     {
         try {
             foreach ($entities as $entity) {
@@ -552,7 +551,7 @@ trait PeerHandler
      *      type: string
      * }>|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
-    public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL)
+    public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -813,9 +812,8 @@ trait PeerHandler
      * When were full info for this chat last cached.
      *
      * @param mixed $id Chat ID
-     * @return Generator<integer>
      */
-    public function fullChatLastUpdated($id)
+    public function fullChatLastUpdated($id): int
     {
         return ($this->full_chats[$id])['last_update'] ?? 0;
     }
@@ -824,10 +822,8 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/FullInfo.html
-     * @return Generator FullInfo object
-     * @psalm-return Generator<(int|mixed), (Promise|array), mixed, array>
      */
-    public function getFullInfo($id)
+    public function getFullInfo($id): array
     {
         $partial = ($this->getInfo($id));
         if (\time() - ($this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
@@ -867,9 +863,8 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/Chat.html
-     * @return Generator Chat object
      */
-    public function getPwrChat($id, bool $fullfetch = true)
+    public function getPwrChat($id, bool $fullfetch = true): array
     {
         $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];

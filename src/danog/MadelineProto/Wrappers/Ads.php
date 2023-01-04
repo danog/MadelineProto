@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\Db\DbArray;
-use Generator;
 
 /**
  * Manages ads.
@@ -54,9 +53,8 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
-     * @return Generator Bool
      */
-    public function viewSponsoredMessage($peer, $message)
+    public function viewSponsoredMessage($peer, $message): bool
     {
         if (\is_array($message)) {
             $message = $message['random_id'];

@@ -283,9 +283,8 @@ class DataCenter
      *
      * @param string  $dc_number DC to connect to
      * @param integer $id        Connection ID to re-establish (optional)
-     * @return Generator<bool>
      */
-    public function dcConnect(string $dc_number, int $id = -1)
+    public function dcConnect(string $dc_number, int $id = -1): bool
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
         if (isset($this->sockets[$dc_number]) && !$old) {
@@ -569,9 +568,8 @@ class DataCenter
      * Get contents of file.
      *
      * @param string $url URL to fetch
-     * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url)
+    public function fileGetContents(string $url): string
     {
         return ($this->getHTTPClient()->request(new Request($url)))->getBody()->buffer();
     }

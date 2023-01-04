@@ -9,7 +9,6 @@ use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
-use Generator;
 use PDO;
 use Throwable;
 
@@ -101,7 +100,6 @@ class PostgresArray extends SqlArray
      * Create table for property.
      *
      * @throws Throwable
-     * @psalm-return Generator<int, Promise, mixed, void>
      */
     protected function prepareTable(): void
     {

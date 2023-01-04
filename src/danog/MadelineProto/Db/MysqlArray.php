@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\ConnectionConfig;
+use Amp\Sql\Result;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
-use Generator;
 use PDO;
 use Throwable;
 
@@ -90,9 +90,8 @@ class MysqlArray extends SqlArray
      * Create table for property.
      *
      * @throws Throwable
-     * @psalm-return Generator<int, Promise, mixed, mixed>
      */
-    protected function prepareTable()
+    protected function prepareTable(): Result
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
         return $this->db->query("

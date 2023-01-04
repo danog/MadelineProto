@@ -24,23 +24,23 @@ abstract class DriverArray implements DbArray
     /**
      * Initialize connection.
      */
-    abstract public function initConnection(DatabaseAbstract $settings);
+    abstract public function initConnection(DatabaseAbstract $settings): void;
     /**
      * Initialize on startup.
      */
-    abstract public function initStartup();
+    abstract public function initStartup(): void;
 
     /**
      * Create table for property.
      *
      * @throws Throwable
      */
-    abstract protected function prepareTable();
+    abstract protected function prepareTable(): void;
 
     /**
      * Rename table.
      */
-    abstract protected function renameTable(string $from, string $to);
+    abstract protected function renameTable(string $from, string $to): void;
 
     /**
      * Get the value of table.

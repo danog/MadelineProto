@@ -26,7 +26,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
-use Generator;
 use Parsedown;
 use Throwable;
 
@@ -113,9 +112,8 @@ trait BotAPI
      * Convert MTProto parameters to bot API parameters.
      *
      * @param array $data Data
-     * @return Generator<array>
      */
-    public function MTProtoToBotAPI(array $data)
+    public function MTProtoToBotAPI(array $data): array
     {
         $newd = [];
         if (!isset($data['_'])) {
@@ -364,9 +362,8 @@ trait BotAPI
      *
      * @param array $arguments Arguments
      * @internal
-     * @return Generator<array>
      */
-    public function parseMode(array $arguments)
+    public function parseMode(array $arguments): array
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;

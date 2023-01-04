@@ -25,7 +25,6 @@ use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
-use Generator;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
 
@@ -350,10 +349,8 @@ class ConnectionContext
     }
     /**
      * Get a stream from the stream chain.
-     *
-     * @return Generator<StreamInterface>
      */
-    public function getStream(string $buffer = '')
+    public function getStream(string $buffer = ''): StreamInterface
     {
         [$clazz, $extra] = $this->nextStreams[$this->key--];
         $obj = new $clazz();

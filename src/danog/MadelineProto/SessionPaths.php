@@ -28,6 +28,7 @@ use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
 use function Amp\File\exists;
+
 use function Amp\File\move;
 use function Amp\File\openFile;
 use function Amp\File\stat;

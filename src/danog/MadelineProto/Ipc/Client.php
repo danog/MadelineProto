@@ -241,7 +241,6 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @return Generator Downloaded file path
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
     public function downloadToDir($messageMedia, $dir, callable $cb = null)
     {
@@ -261,7 +260,6 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @return Generator Downloaded file path
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
     public function downloadToFile($messageMedia, $file, callable $cb = null)
     {

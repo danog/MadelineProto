@@ -180,7 +180,7 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat to rekey
      */
-    public function rekey(int $chat)
+    public function rekey(int $chat): void
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return;
@@ -275,7 +275,7 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function completeRekey(int $chat, array $params)
+    private function completeRekey(int $chat, array $params): void
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'])) {
             return;

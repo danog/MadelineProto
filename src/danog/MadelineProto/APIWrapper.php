@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\Ipc\Client;
 
-use function Amp\async;
 use function Amp\File\openFile;
 
 final class APIWrapper

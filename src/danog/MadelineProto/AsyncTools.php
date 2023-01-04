@@ -39,7 +39,6 @@ use function Amp\delay;
 use function Amp\File\exists;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
-use function Amp\Future\await;
 
 use function Amp\Future\awaitAny;
 use function Amp\Future\awaitFirst;
@@ -251,7 +250,7 @@ abstract class AsyncTools extends StrTools
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      * @return $token is null ? (callable(): void) : ((callable(): void)|null)
      */
-    public static function flock(string $file, int $operation, float $polling, ?Future $token = null, ?callable $failureCb = null): ?callable
+    public static function flock(string $file, int $operation, float $polling = 0.1, ?Future $token = null, ?callable $failureCb = null): ?callable
     {
         if (!exists($file)) {
             touchAsync($file);
@@ -266,7 +265,7 @@ abstract class AsyncTools extends StrTools
                     $failureCb = null;
                 }
                 if ($token) {
-                    if (self::timeoutWithDefault($token, $polling, false)) {
+                    if (self::timeoutWithDefault($token, (int) ($polling*1000), false)) {
                         return null;
                     }
                 } else {

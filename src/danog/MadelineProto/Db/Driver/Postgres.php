@@ -10,7 +10,6 @@ use Amp\Sql\ConnectionException;
 use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
-use Generator;
 use Throwable;
 
 use function Amp\Postgres\Pool;
@@ -29,9 +28,8 @@ class Postgres
      * @throws ConnectionException
      * @throws FailureException
      * @throws Throwable
-     * @return Generator<Pool>
      */
-    public static function getConnection(DatabasePostgres $settings)
+    public static function getConnection(DatabasePostgres $settings): Pool
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {

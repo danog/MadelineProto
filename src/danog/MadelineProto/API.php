@@ -479,7 +479,7 @@ class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      */
-    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started)
+    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): void
     {
         $this->async(true);
 

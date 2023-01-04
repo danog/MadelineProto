@@ -45,7 +45,6 @@ trait Loop
      * Loop callback.
      *
      * @deprecated
-     *
      * @var callable()
      */
     private $loop_callback;

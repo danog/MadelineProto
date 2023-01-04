@@ -12,6 +12,7 @@ use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
+use Amp\Http\Client\Response as ClientResponse;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
@@ -168,10 +169,8 @@ trait FilesLogic
      * @param ?int          $size         Size of file to download, required for bot API file IDs.
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
-     * @return Generator Returned response
-     * @psalm-return Generator<mixed, array, mixed, Response>
      */
-    public function downloadToResponse($messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null)
+    public function downloadToResponse($messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): ClientResponse
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;

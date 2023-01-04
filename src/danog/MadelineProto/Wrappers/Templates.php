@@ -33,7 +33,7 @@ trait Templates
      *
      * @param string $message Error message
      */
-    private function webEcho(string $message = '')
+    private function webEcho(string $message = ''): void
     {
         $auth = $this->getAuthorization();
         $form = null;

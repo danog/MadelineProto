@@ -91,7 +91,7 @@ class WriteLoop extends ResumableSignalLoop
             //$connection->waiter->resume();
         }
     }
-    public function unencryptedWriteLoop()
+    public function unencryptedWriteLoop(): void
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -135,7 +135,7 @@ class WriteLoop extends ResumableSignalLoop
             }
         }
     }
-    public function encryptedWriteLoop()
+    public function encryptedWriteLoop(): void
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

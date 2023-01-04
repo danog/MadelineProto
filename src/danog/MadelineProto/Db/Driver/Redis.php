@@ -10,7 +10,6 @@ use Amp\Redis\RemoteExecutorFactory;
 use Amp\Sql\ConnectionException;
 use Amp\Sql\FailureException;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
-use Generator;
 use Throwable;
 
 /**
@@ -27,9 +26,8 @@ class Redis
      * @throws ConnectionException
      * @throws FailureException
      * @throws Throwable
-     * @psalm-return Generator<int, Promise<void>, mixed, RedisRedis>
      */
-    public static function getConnection(DatabaseRedis $settings)
+    public static function getConnection(DatabaseRedis $settings): RedisRedis
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {

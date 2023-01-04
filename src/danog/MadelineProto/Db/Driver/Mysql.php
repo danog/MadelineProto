@@ -10,7 +10,6 @@ use Amp\Sql\ConnectionException;
 use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
-use Generator;
 use Throwable;
 
 use function Amp\Mysql\Pool;
@@ -29,9 +28,8 @@ class Mysql
      * @throws ConnectionException
      * @throws FailureException
      * @throws Throwable
-     * @return Generator<Pool>
      */
-    public static function getConnection(DatabaseMysql $settings)
+    public static function getConnection(DatabaseMysql $settings): Pool
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {

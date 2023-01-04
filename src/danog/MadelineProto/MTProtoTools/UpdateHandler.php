@@ -346,7 +346,7 @@ trait UpdateHandler
      * @param array $update Update to save
      * @internal
      */
-    public function saveUpdate(array $update)
+    public function saveUpdate(array $update): void
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;

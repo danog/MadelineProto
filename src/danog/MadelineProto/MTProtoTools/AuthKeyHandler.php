@@ -7,7 +7,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
-use Generator;
 use phpseclib3\Math\BigInteger;
 
 use function Amp\async;
@@ -57,10 +56,8 @@ trait AuthKeyHandler
     }
     /**
      * Get diffie-hellman configuration.
-     *
-     * @return Generator<array>
      */
-    public function getDhConfig()
+    public function getDhConfig(): array
     {
         $dh_config = $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {

@@ -36,7 +36,6 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\StreamInterface;
 use danog\Serializable;
-use Generator;
 
 /**
  * Connection class.
@@ -272,7 +271,6 @@ class Connection
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
      * @param ConnectionContext $ctx Connection context
-     * @psalm-return Generator<mixed, StreamInterface, mixed, void>
      */
     public function connect(ConnectionContext $ctx): void
     {
@@ -331,9 +329,8 @@ class Connection
      *
      * @param string $method    Method name
      * @param array  $arguments Arguments
-     * @return Generator Whether we need to resolve a queue promise
      */
-    private function methodAbstractions(string &$method, array &$arguments)
+    private function methodAbstractions(string &$method, array &$arguments): ?DeferredFuture
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
             [$invite, $content] = $r;

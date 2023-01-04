@@ -70,11 +70,11 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
-
 use function Amp\async;
 use function Amp\File\getSize;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
+
 use function time;
 
 /**
@@ -1543,9 +1543,8 @@ class MTProto implements TLCallback
      * Clean up MadelineProto session after logout.
      *
      * @internal
-     * @return Generator<void>
      */
-    public function resetSession()
+    public function resetSession(): void
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1683,9 +1682,8 @@ class MTProto implements TLCallback
      *
      * @param mixed $watcherId Watcher ID
      * @internal
-     * @return Generator<void>
      */
-    public function getPhoneConfig($watcherId = null)
+    public function getPhoneConfig($watcherId = null): void
     {
         if ($this->authorized === self::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
@@ -1803,10 +1801,8 @@ class MTProto implements TLCallback
     }
     /**
      * Get info about the logged-in user, not cached.
-     *
-     * @return Generator<(array|bool)>
      */
-    public function fullGetSelf()
+    public function fullGetSelf(): array|false
     {
         try {
             $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];

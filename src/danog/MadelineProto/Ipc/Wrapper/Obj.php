@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\Ipc\Wrapper;
-use Generator;
 
 /**
  * Generic callback wrapper object.
@@ -32,8 +31,6 @@ class Obj
     }
     /**
      * Call method.
-     *
-     * @return Generator<mixed, mixed, mixed, mixed>
      */
     public function __call(string $name, array $arguments = [])
     {

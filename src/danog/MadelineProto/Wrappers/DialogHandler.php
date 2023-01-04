@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
-use Generator;
 use Throwable;
 
 /**
@@ -36,7 +35,7 @@ trait DialogHandler
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     * @psalm-return Generator<int, Promise<bool>, mixed, list<mixed>>
+     * @return list<array>
      */
     public function getDialogs(bool $force = true)
     {

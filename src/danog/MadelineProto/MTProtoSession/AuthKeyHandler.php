@@ -60,7 +60,7 @@ trait AuthKeyHandler
      *
      * @psalm-return Generator<mixed, (mixed|string), mixed, (($temp is false ? PermAuthKey : TempAuthKey)|null)>
      */
-    public function createAuthKey(bool $temp)
+    public function createAuthKey(bool $temp): void
     {
         $expires_in = $temp ? $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn() : -1;
         $cdn = $this->isCDN();

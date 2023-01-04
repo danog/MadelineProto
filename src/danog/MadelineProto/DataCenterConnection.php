@@ -33,7 +33,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
-use Generator;
 use JsonSerializable;
 
 use function Amp\async;
@@ -218,9 +217,9 @@ class DataCenterConnection implements JsonSerializable
      * Bind temporary and permanent auth keys.
      *
      * @internal
-     * @psalm-return Generator<(int|mixed), (array|mixed), mixed, true>
+     * @return true
      */
-    public function bindTempAuthKey()
+    public function bindTempAuthKey(): bool
     {
         $connection = $this->getAuthConnection();
         $logger = $this->API->logger;
@@ -614,10 +613,8 @@ class DataCenterConnection implements JsonSerializable
     }
     /**
      * Get best socket in round robin, asynchronously.
-     *
-     * @psalm-return Generator<int, Promise, mixed, Connection>
      */
-    public function waitGetConnection()
+    public function waitGetConnection(): Connection
     {
         if (empty($this->availableConnections)) {
             $this->connectionsPromise->await();

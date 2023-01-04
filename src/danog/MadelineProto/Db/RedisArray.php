@@ -6,11 +6,9 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Iterator;
 use Amp\Redis\Redis as RedisRedis;
-use Amp\Success;
 use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
-use Generator;
 use Throwable;
 
 /**
@@ -31,9 +29,6 @@ class RedisArray extends DriverArray
     {
         return $this->initConnection($this->dbSettings);
     }
-    /**
-     * @psalm-return Generator<int, Success<null>, mixed, void>
-     */
     protected function prepareTable(): void
     {
     }

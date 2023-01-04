@@ -24,6 +24,7 @@ use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use Revolt\EventLoop;
+use Throwable;
 
 use function Amp\async;
 use function ord;
@@ -67,12 +68,7 @@ class CheckLoop extends ResumableSignalLoop
                 $full_message_ids = $connection->getPendingCalls();
                 foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
                     $deferred = new DeferredFuture();
-                    $deferred->getFuture()->onResolve(function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend): void {
-                        if ($e) {
-                            $API->logger("Got exception in check loop for DC {$datacenter}");
-                            $API->logger((string) $e);
-                            return;
-                        }
+                    $deferred->getFuture()->map(function ($result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend): void {
                         $reply = [];
                         foreach (\str_split($result['info']) as $key => $chr) {
                             $message_id = $message_ids[$key];
@@ -127,6 +123,9 @@ class CheckLoop extends ResumableSignalLoop
                             async($connection->objectCall(...), 'msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]);
                         }*/
                         $connection->flush();
+                    })->catch(function (Throwable $e) use ($API, $datacenter): void {
+                        $API->logger("Got exception in check loop for DC {$datacenter}");
+                        $API->logger((string) $e);
                     });
                     $list = '';
                     // Don't edit this here pls

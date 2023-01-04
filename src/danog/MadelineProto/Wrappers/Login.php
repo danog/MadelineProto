@@ -28,7 +28,6 @@ use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
-use Generator;
 
 /**
  * Manages logging in and out.
@@ -53,7 +52,7 @@ trait Login
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token)
+    public function botLogin(string $token): void
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             return;
@@ -206,9 +205,9 @@ trait Login
     /**
      * Export authorization.
      *
-     * @psalm-return Generator<mixed, (array|bool), mixed, array{0: (int|string), 1: string}>
+     * @return array{0: (int|string), 1: string}
      */
-    public function exportAuthorization()
+    public function exportAuthorization(): array
     {
         if ($this->authorized !== MTProto::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['not_loggedIn']);

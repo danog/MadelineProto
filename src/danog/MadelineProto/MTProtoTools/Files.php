@@ -42,7 +42,6 @@ use Generator;
 use Throwable;
 
 use const LOCK_EX;
-
 use function Amp\async;
 use function Amp\File\exists;
 use function Amp\File\getSize;
@@ -50,6 +49,7 @@ use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\all;
 use function Amp\Future\await;
+
 use function end;
 
 /**
@@ -448,9 +448,8 @@ trait Files
      * Get info about file.
      *
      * @param mixed $constructor File ID
-     * @return Generator<array>
      */
-    public function getFileInfo($constructor)
+    public function getFileInfo($constructor): array
     {
         if (\is_string($constructor)) {
             $constructor = $this->unpackFileId($constructor);
@@ -482,10 +481,8 @@ trait Files
      * `$info['name']` - The file name, without the extension
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
-     *
-     * @return Generator<array>
      */
-    public function getPropicInfo($data)
+    public function getPropicInfo($data): array
     {
         return $this->getDownloadInfo($this->chats[$this->getInfo($data, MTProto::INFO_TYPE_ID)]);
     }
@@ -523,9 +520,8 @@ trait Files
      * `$info['size']` - The file size
      *
      * @param mixed $messageMedia File ID
-     * @return Generator<array>
      */
-    public function getDownloadInfo($messageMedia)
+    public function getDownloadInfo($messageMedia): array
     {
         if (\is_string($messageMedia)) {
             $messageMedia = $this->unpackFileId($messageMedia);
@@ -775,9 +771,8 @@ trait Files
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @return Generator Downloaded file path
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<(callable|null)>|Promise<mixed>|array|bool|mixed), mixed, (false|string)>
      */
-    public function downloadToFile($messageMedia, $file, callable $cb = null)
+    public function downloadToFile($messageMedia, $file, callable $cb = null): false|string
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;

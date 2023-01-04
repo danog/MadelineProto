@@ -188,7 +188,6 @@ class OutgoingMessage extends Message
     }
     /**
      * Set reply to message.
-     *
      */
     public function reply($result): void
     {

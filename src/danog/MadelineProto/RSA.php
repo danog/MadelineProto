@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\TL;
 use danog\Serializable;
-use Generator;
 use phpseclib3\Math\BigInteger;
 
 use const STR_PAD_LEFT;
@@ -56,9 +55,8 @@ class RSA
      *
      * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
-     * @psalm-return Generator<(int|mixed), (array|mixed), mixed, self>
      */
-    public static function load(TL $TL, string $rsa_key)
+    public static function load(TL $TL, string $rsa_key): self
     {
         $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $instance = new self;
