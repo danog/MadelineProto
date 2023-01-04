@@ -91,7 +91,7 @@ class Settings extends SettingsAbstract
      * @internal
      * @param SettingsAbstract|array $settings Settings
      */
-    public static function parseFromLegacy($settings): SettingsAbstract
+    public static function parseFromLegacy(SettingsAbstract|array $settings): SettingsAbstract
     {
         if (\is_array($settings)) {
             if (empty($settings)) {
@@ -109,7 +109,7 @@ class Settings extends SettingsAbstract
      * @internal
      * @param SettingsAbstract|array $settings Settings
      */
-    public static function parseFromLegacyFull($settings): Settings
+    public static function parseFromLegacyFull(SettingsAbstract|array $settings): Settings
     {
         $settings = self::parseFromLegacy($settings);
         if (!$settings instanceof Settings) {

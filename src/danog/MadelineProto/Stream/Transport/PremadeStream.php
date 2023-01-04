@@ -74,7 +74,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     public function write(string $data): void
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->write($data);
     }
@@ -108,6 +108,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

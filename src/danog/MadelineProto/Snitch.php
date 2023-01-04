@@ -67,7 +67,7 @@ class Snitch
     private function die(): void
     {
         Shutdown::removeCallback('restarter');
-        $message = "Please do not remove madeline.phar or madeline.php, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup";
+        $message = 'Please do not remove madeline.phar or madeline.php, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup';
         Logger::log($message, Logger::FATAL_ERROR);
         \file_put_contents(Magic::$cwd.DIRECTORY_SEPARATOR.'DO_NOT_REMOVE_MADELINEPROTO_LOG_SESSION', $message);
         die("$message\n");

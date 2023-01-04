@@ -40,8 +40,9 @@ abstract class EventHandler extends InternalDoc
      * API instance.
      */
     protected MTProto $API;
-    public function __construct($API) // BC
+    public function __construct($API)
     {
+        // BC
     }
 
     /**
@@ -113,9 +114,8 @@ abstract class EventHandler extends InternalDoc
     /**
      * Get peers where to send error reports.
      *
-     * @return array|string|int
      */
-    public function getReportPeers()
+    public function getReportPeers(): array|string|int
     {
         return [];
     }

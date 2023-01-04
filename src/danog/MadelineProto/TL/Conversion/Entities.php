@@ -28,7 +28,7 @@ final class Entities
      * setOffset
      * setOffset for text.
      */
-    private function setOffset(string $start, mixed $end = "</a>"): void
+    private function setOffset(string $start, mixed $end = '</a>'): void
     {
         $this->setOffset[$this->offset][] = $start;
         $this->setOffset2[$this->offset + $this->length][] = $end;
@@ -44,36 +44,36 @@ final class Entities
             $entity = (array) $entity;
         }
         if (\is_array($entity)) {
-            if (!isset($entity["offset"])) {
+            if (!isset($entity['offset'])) {
                 throw new Exception('Can\'t find field "offset"');
             }
-            if (!isset($entity["length"])) {
+            if (!isset($entity['length'])) {
                 throw new Exception('Can\'t find field "length"');
             }
-            if (!isset($entity["_"])) {
+            if (!isset($entity['_'])) {
                 throw new Exception('Can\'t find field "type"');
             }
-            if (\is_array($entity["_"]) || \is_object($entity["_"])) {
+            if (\is_array($entity['_']) || \is_object($entity['_'])) {
                 throw new Exception('Field "type" must be of type String');
             }
-            if (\is_array($entity["offset"]) ||
-                \is_object($entity["offset"]) ||
-                (string) (int) $entity["offset"] !== (string) $entity["offset"]
+            if (\is_array($entity['offset']) ||
+                \is_object($entity['offset']) ||
+                (string) (int) $entity['offset'] !== (string) $entity['offset']
             ) {
                 throw new Exception('Field "offset" must be of type Integer');
             }
-            if (\is_array($entity["length"]) ||
-                \is_object($entity["length"]) ||
-                (string) (int) $entity["length"] !== (string) $entity["length"]
+            if (\is_array($entity['length']) ||
+                \is_object($entity['length']) ||
+                (string) (int) $entity['length'] !== (string) $entity['length']
             ) {
                 throw new Exception('Field "length" must be of type Integer');
             }
-            $this->offset = (int) $entity["offset"];
-            $this->length = (int) $entity["length"];
-            $type = $this->getEntityCode($entity["_"]);
+            $this->offset = (int) $entity['offset'];
+            $this->length = (int) $entity['length'];
+            $type = $this->getEntityCode($entity['_']);
             return $entity;
         }
-        throw new Exception("expected an Object");
+        throw new Exception('expected an Object');
     }
 
     /**
@@ -91,36 +91,36 @@ final class Entities
         foreach ($entities as $entity) {
             $entity = $this->checkEntity($entity, $type);
             if ($type == CODE) {
-                $this->setOffset("<code>", "</code>");
-            } elseif ($type == TEXTURL && isset($entity["url"])) {
-                $this->setOffset('<a href="' . $entity["url"] . '">');
+                $this->setOffset('<code>', '</code>');
+            } elseif ($type == TEXTURL && isset($entity['url'])) {
+                $this->setOffset('<a href="' . $entity['url'] . '">');
             } elseif ($type == TEXTMENTION) {
                 $this->setOffset(
                     '<a href="tg://user?id=' .
-                        ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
+                        ($entity['user']['id'] ?? ($entity['user_id'] ?? 0)) .
                         '">',
                 );
             } elseif ($type == PRE) {
-                if (isset($entity["language"])) {
+                if (isset($entity['language'])) {
                     $this->setOffset(
                         '<pre><code class="language-' .
-                            $entity["language"] .
+                            $entity['language'] .
                             '">',
-                        "</code></pre>",
+                        '</code></pre>',
                     );
                 } else {
-                    $this->setOffset("<pre>", "</pre>");
+                    $this->setOffset('<pre>', '</pre>');
                 }
             } elseif ($type == BOLD) {
-                $this->setOffset("<b>", "</b>");
+                $this->setOffset('<b>', '</b>');
             } elseif ($type == SPOILER) {
-                $this->setOffset("<span class=\"tg-spoiler\">", "</span>");
+                $this->setOffset('<span class="tg-spoiler">', '</span>');
             } elseif ($type == ITALIC) {
-                $this->setOffset("<i>", "</i>");
+                $this->setOffset('<i>', '</i>');
             } elseif ($type == STRIKE) {
-                $this->setOffset("<s>", "</s>");
+                $this->setOffset('<s>', '</s>');
             } elseif ($type == UNDERLINE) {
-                $this->setOffset("<u>", "</u>");
+                $this->setOffset('<u>', '</u>');
             }
         }
         foreach ($this->setOffset2 as $key => $value) {
@@ -132,11 +132,11 @@ final class Entities
                 $this->setOffset[$key],
             );
         }
-        $htmlext = "";
+        $htmlext = '';
         $deltag = [
-            "&" . "\0" . "a" . "\0" . "m" . "\0" . "p" . "\0" . ";" . "\0" . "",
-            "&" . "\0" . "l" . "\0" . "t" . "\0" . ";" . "\0" . "",
-            "&" . "\0" . "g" . "\0" . "t" . "\0" . ";" . "\0" . "",
+            '&' . "\0" . 'a' . "\0" . 'm' . "\0" . 'p' . "\0" . ';' . "\0" . '',
+            '&' . "\0" . 'l' . "\0" . 't' . "\0" . ';' . "\0" . '',
+            '&' . "\0" . 'g' . "\0" . 't' . "\0" . ';' . "\0" . '',
         ];
         $deltag2 = [
             '/&\\000/',
@@ -177,26 +177,26 @@ final class Entities
         foreach ($entities as $entity) {
             $entity = $this->checkEntity($entity, $type);
             if ($type == CODE) {
-                $this->setOffset("`", "`");
-            } elseif ($type == TEXTURL && isset($entity["url"])) {
-                $this->setOffset("[", "](" . $entity["url"] . ")");
+                $this->setOffset('`', '`');
+            } elseif ($type == TEXTURL && isset($entity['url'])) {
+                $this->setOffset('[', '](' . $entity['url'] . ')');
             } elseif ($type == TEXTMENTION) {
                 $this->setOffset(
-                    "[",
-                    "](tg://user?id=" .
-                        ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
-                        ")",
+                    '[',
+                    '](tg://user?id=' .
+                        ($entity['user']['id'] ?? ($entity['user_id'] ?? 0)) .
+                        ')',
                 );
             } elseif ($type == PRE) {
-                if (isset($entity["language"])) {
-                    $this->setOffset("```" . $entity["language"] . "\n", "```");
+                if (isset($entity['language'])) {
+                    $this->setOffset('```' . $entity['language'] . "\n", '```');
                 } else {
-                    $this->setOffset("```", "```");
+                    $this->setOffset('```', '```');
                 }
             } elseif ($type == BOLD) {
-                $this->setOffset("*", "*");
+                $this->setOffset('*', '*');
             } elseif ($type == ITALIC) {
-                $this->setOffset("_", "_");
+                $this->setOffset('_', '_');
             }
         }
         foreach ($this->setOffset2 as $key => $value) {
@@ -208,12 +208,12 @@ final class Entities
                 $this->setOffset[$key],
             );
         }
-        $htmlext = "";
+        $htmlext = '';
         $deltag = [
-            "\\" . "\0" . "_" . "\0" . "",
-            "\\" . "\0" . "*" . "\0" . "",
-            "\\" . "\0" . "`" . "\0" . "",
-            "\\" . "\0" . "[" . "\0" . "",
+            '\\' . "\0" . '_' . "\0" . '',
+            '\\' . "\0" . '*' . "\0" . '',
+            '\\' . "\0" . '`' . "\0" . '',
+            '\\' . "\0" . '[' . "\0" . '',
         ];
         $deltag2 = [
             '/_\\000/',
@@ -254,32 +254,32 @@ final class Entities
         foreach ($entities as $entity) {
             $entity = $this->checkEntity($entity, $type);
             if ($type == CODE) {
-                $this->setOffset("`", "`");
-            } elseif ($type == TEXTURL && isset($entity["url"])) {
-                $this->setOffset("[", "](" . $entity["url"] . ")");
+                $this->setOffset('`', '`');
+            } elseif ($type == TEXTURL && isset($entity['url'])) {
+                $this->setOffset('[', '](' . $entity['url'] . ')');
             } elseif ($type == TEXTMENTION) {
                 $this->setOffset(
-                    "[",
-                    "](tg://user?id=" .
-                        ($entity["user"]["id"] ?? ($entity["user_id"] ?? 0)) .
-                        ")",
+                    '[',
+                    '](tg://user?id=' .
+                        ($entity['user']['id'] ?? ($entity['user_id'] ?? 0)) .
+                        ')',
                 );
             } elseif ($type == PRE) {
-                if (isset($entity["language"])) {
-                    $this->setOffset("```" . $entity["language"] . "\n", "```");
+                if (isset($entity['language'])) {
+                    $this->setOffset('```' . $entity['language'] . "\n", '```');
                 } else {
-                    $this->setOffset("```", "```");
+                    $this->setOffset('```', '```');
                 }
             } elseif ($type == SPOILER) {
-                $this->setOffset("||", "||");
+                $this->setOffset('||', '||');
             } elseif ($type == BOLD) {
-                $this->setOffset("**", "**");
+                $this->setOffset('**', '**');
             } elseif ($type == ITALIC) {
-                $this->setOffset("__", "__");
+                $this->setOffset('__', '__');
             } elseif ($type == STRIKE) {
-                $this->setOffset("~~", "~~");
+                $this->setOffset('~~', '~~');
             } elseif ($type == UNDERLINE) {
-                $this->setOffset("_", "_");
+                $this->setOffset('_', '_');
             }
         }
         foreach ($this->setOffset2 as $key => $value) {
@@ -291,26 +291,26 @@ final class Entities
                 $this->setOffset[$key],
             );
         }
-        $htmlext = "";
+        $htmlext = '';
         $deltag = [
-            "\\" . "\0" . "_" . "\0" . "",
-            "\\" . "\0" . "*" . "\0" . "",
-            "\\" . "\0" . "[" . "\0" . "",
-            "\\" . "\0" . "]" . "\0" . "",
-            "\\" . "\0" . "(" . "\0" . "",
-            "\\" . "\0" . ")" . "\0" . "",
-            "\\" . "\0" . "~" . "\0" . "",
-            "\\" . "\0" . "" . "\0" . "",
-            "\\" . "\0" . ">" . "\0" . "",
-            "\\" . "\0" . "#" . "\0" . "",
-            "\\" . "\0" . "+" . "\0" . "",
-            "\\" . "\0" . "-" . "\0" . "",
-            "\\" . "\0" . "=" . "\0" . "",
-            "\\" . "\0" . "|" . "\0" . "",
-            "\\" . "\0" . "{" . "\0" . "",
-            "\\" . "\0" . "}" . "\0" . "",
-            "\\" . "\0" . "." . "\0" . "",
-            "\\" . "\0" . "!" . "\0" . "",
+            '\\' . "\0" . '_' . "\0" . '',
+            '\\' . "\0" . '*' . "\0" . '',
+            '\\' . "\0" . '[' . "\0" . '',
+            '\\' . "\0" . ']' . "\0" . '',
+            '\\' . "\0" . '(' . "\0" . '',
+            '\\' . "\0" . ')' . "\0" . '',
+            '\\' . "\0" . '~' . "\0" . '',
+            '\\' . "\0" . '' . "\0" . '',
+            '\\' . "\0" . '>' . "\0" . '',
+            '\\' . "\0" . '#' . "\0" . '',
+            '\\' . "\0" . '+' . "\0" . '',
+            '\\' . "\0" . '-' . "\0" . '',
+            '\\' . "\0" . '=' . "\0" . '',
+            '\\' . "\0" . '|' . "\0" . '',
+            '\\' . "\0" . '{' . "\0" . '',
+            '\\' . "\0" . '}' . "\0" . '',
+            '\\' . "\0" . '.' . "\0" . '',
+            '\\' . "\0" . '!' . "\0" . '',
         ];
 
         $deltag2 = [
@@ -357,9 +357,9 @@ final class Entities
      */
     public function markdownV1ToHtml(string $str): string
     {
-        $str = \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
+        $str = \str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $str);
         $len = \mb_strlen($str);
-        $backslash = ["_", "*", "`", "["];
+        $backslash = ['_', '*', '`', '['];
         $marks = [];
         $marksi = -1;
 
@@ -369,11 +369,11 @@ final class Entities
         };
         $find = function ($str, $find, &$i) use ($backslash) {
             $findlen = \mb_strlen($find);
-            $newstr = "";
+            $newstr = '';
             for ($i = 0; $i < \mb_strlen($str); $i++) {
                 $curchar = \mb_substr($str, $i, 1);
 
-                if ($curchar == "\\" &&
+                if ($curchar == '\\' &&
                     \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
                     $newstr .= \mb_substr($str, $i + 1, 1);
@@ -386,7 +386,7 @@ final class Entities
             }
             return false;
         };
-        $html = "";
+        $html = '';
         $htmli = 0;
         $setstr = function ($starttag) use (&$html, &$htmli): void {
             $html .= $starttag;
@@ -436,35 +436,35 @@ final class Entities
         };
         for ($i = 0; $i < $len; $i++) {
             $curchar = \mb_substr($str, $i, 1);
-            if ($curchar == "\\" &&
+            if ($curchar == '\\' &&
                 \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
                 $setstr(\mb_substr($str, $i + 1, 1));
                 $i++;
-            } elseif ($curchar == "*") {
-                if ($setmark("*", $currentmarki)) {
-                    $setstr("<b>");
+            } elseif ($curchar == '*') {
+                if ($setmark('*', $currentmarki)) {
+                    $setstr('<b>');
                 } else {
-                    $setstr2("</b>", 3);
+                    $setstr2('</b>', 3);
                 }
-            } elseif ($curchar == "_") {
+            } elseif ($curchar == '_') {
                 if ($setmark($curchar, $currentmarki)) {
-                    $setstr("<i>");
+                    $setstr('<i>');
                 } else {
-                    $setstr2("</i>", 3);
+                    $setstr2('</i>', 3);
                 }
-            } elseif ($curchar == "[") {
-                $setmark("[", $currentmarki, "]");
-            } elseif ($curchar == "]") {
-                if (!$setmark("]", $currentmarki, false) && $is("](")) {
+            } elseif ($curchar == '[') {
+                $setmark('[', $currentmarki, ']');
+            } elseif ($curchar == ']') {
+                if (!$setmark(']', $currentmarki, false) && $is('](')) {
                     $txt = \mb_substr(
                         $html,
                         $currentmarki,
                         $htmli - $currentmarki,
                     );
-                    if ($txt !== "") {
+                    if ($txt !== '') {
                         $i++;
-                        $strfind = $find(\mb_substr($str, $i + 1), ")", $pos);
+                        $strfind = $find(\mb_substr($str, $i + 1), ')', $pos);
                         if ($strfind !== false) {
                             $i += $pos + 1;
                             $html =
@@ -473,24 +473,24 @@ final class Entities
                                 $strfind .
                                 '">' .
                                 $txt .
-                                "</a>";
+                                '</a>';
                             $htmli = \mb_strlen($html);
                         }
                     }
                 }
-            } elseif ($curchar == "`") {
-                if ($is("```")) {
+            } elseif ($curchar == '`') {
+                if ($is('```')) {
                     $i += 2;
-                    $strfind = $find(\mb_substr($str, $i + 1), "```", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), '```', $pos);
                     if ($strfind !== false) {
                         $i += $pos + 3;
-                        if ($strfind !== "") {
-                            $lang = "";
+                        if ($strfind !== '') {
+                            $lang = '';
                             $ex = \explode("\n", $f, 2);
                             if (isset($ex[1])) {
-                                $exx = \explode(" ", $ex[0], 2);
+                                $exx = \explode(' ', $ex[0], 2);
                                 if (isset($exx[1])) {
-                                    $ex[1] = " " . $exx[1];
+                                    $ex[1] = ' ' . $exx[1];
                                 }
                                 $lang = \trim($exx[0]);
                                 $strfind = $ex[1];
@@ -498,17 +498,17 @@ final class Entities
 
                             if ($lang) {
                                 $strfind = \trim($f);
-                                if ($strfind !== "") {
+                                if ($strfind !== '') {
                                     $setstr(
                                         '<pre><code class="language-' .
                                             $lang .
                                             '">' .
                                             $strfind .
-                                            "</code></pre>",
+                                            '</code></pre>',
                                     );
                                 }
                             } else {
-                                $setstr("<pre>" . $strfind . "</pre>");
+                                $setstr('<pre>' . $strfind . '</pre>');
                             }
                         }
                     } else {
@@ -517,10 +517,10 @@ final class Entities
                         );
                     }
                 } else {
-                    $strfind = $find(\mb_substr($str, $i + 1), "`", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), '`', $pos);
                     if ($strfind !== false) {
-                        if ($strfind !== "") {
-                            $setstr("<code>" . $strfind . "</code>");
+                        if ($strfind !== '') {
+                            $setstr('<code>' . $strfind . '</code>');
                         }
                         $i += $pos + 1;
                     } else {
@@ -540,14 +540,14 @@ final class Entities
         }
         foreach ($marks as $mark) {
             $ar = [
-                "*" => "Bold",
-                "_" => "Italic",
-                "]" => "TextUrl",
+                '*' => 'Bold',
+                '_' => 'Italic',
+                ']' => 'TextUrl',
             ];
             throw new Exception(
                 'Can\'t find end of ' .
                     ($ar[$mark[0]] ?? $mark[0]) .
-                    " entity at byte offset " .
+                    ' entity at byte offset ' .
                     $mark[2],
             );
         }
@@ -560,27 +560,27 @@ final class Entities
      */
     public function markdownToHtml(string $str): string
     {
-        $str = \str_replace(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"], $str);
+        $str = \str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $str);
         $len = \mb_strlen($str);
         $backslash = [
-            "_",
-            "*",
-            "[",
-            "]",
-            "(",
-            ")",
-            "~",
-            "`",
-            ">",
-            "#",
-            "+",
-            "-",
-            "=",
-            "|",
-            "{",
-            "}",
-            ".",
-            "!",
+            '_',
+            '*',
+            '[',
+            ']',
+            '(',
+            ')',
+            '~',
+            '`',
+            '>',
+            '#',
+            '+',
+            '-',
+            '=',
+            '|',
+            '{',
+            '}',
+            '.',
+            '!',
         ];
         $marks = [];
         $marksi = -1;
@@ -591,11 +591,11 @@ final class Entities
         };
         $find = function ($str, $find, &$i) use ($backslash) {
             $findlen = \mb_strlen($find);
-            $newstr = "";
+            $newstr = '';
             for ($i = 0; $i < \mb_strlen($str); $i++) {
                 $curchar = \mb_substr($str, $i, 1);
 
-                if ($curchar == "\\" &&
+                if ($curchar == '\\' &&
                     \in_array(\mb_substr($str, $i + 1, 1), $backslash)
                 ) {
                     $newstr .= \mb_substr($str, $i + 1, 1);
@@ -608,7 +608,7 @@ final class Entities
             }
             return false;
         };
-        $html = "";
+        $html = '';
         $htmli = 0;
         $setstr = function ($starttag) use (&$html, &$htmli): void {
             $html .= $starttag;
@@ -658,18 +658,18 @@ final class Entities
         };
         for ($i = 0; $i < $len; $i++) {
             $curchar = \mb_substr($str, $i, 1);
-            if ($curchar == "\\" &&
+            if ($curchar == '\\' &&
                 \in_array(\mb_substr($str, $i + 1, 1), $backslash)
             ) {
                 $setstr(\mb_substr($str, $i + 1, 1));
                 $i++;
-            } elseif ($curchar == "*") {
-                $tag = "i";
+            } elseif ($curchar == '*') {
+                $tag = 'i';
                 if (($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
-                    $is("**")
+                    $is('**')
                 ) {
-                    $curchar = "**";
-                    $tag = "b";
+                    $curchar = '**';
+                    $tag = 'b';
                     $i++;
                 }
                 if ($setmark($curchar, $currentmarki)) {
@@ -677,13 +677,13 @@ final class Entities
                 } else {
                     $setstr2("</$tag>", 3);
                 }
-            } elseif ($curchar == "_") {
-                $tag = "u";
+            } elseif ($curchar == '_') {
+                $tag = 'u';
                 if (($marksi === -1 || $marks[$marksi][0] !== $curchar) &&
-                    $is("__")
+                    $is('__')
                 ) {
-                    $curchar = "__";
-                    $tag = "i";
+                    $curchar = '__';
+                    $tag = 'i';
                     $i++;
                 }
                 if ($setmark($curchar, $currentmarki)) {
@@ -691,32 +691,32 @@ final class Entities
                 } else {
                     $setstr2("</$tag>", 3);
                 }
-            } elseif ($curchar == "~" && $is("~~")) {
-                if ($setmark("~~", $currentmarki)) {
-                    $setstr("<s>");
+            } elseif ($curchar == '~' && $is('~~')) {
+                if ($setmark('~~', $currentmarki)) {
+                    $setstr('<s>');
                 } else {
-                    $setstr2("</s>", 3);
+                    $setstr2('</s>', 3);
                 }
                 $i++;
-            } elseif ($curchar == "|" && $is("||")) {
-                if ($setmark("||", $currentmarki)) {
+            } elseif ($curchar == '|' && $is('||')) {
+                if ($setmark('||', $currentmarki)) {
                     $setstr('<span class="tg-spoiler">');
                 } else {
-                    $setstr2("</span>", 25);
+                    $setstr2('</span>', 25);
                 }
                 $i++;
-            } elseif ($curchar == "[") {
-                $setmark("[", $currentmarki, "]");
-            } elseif ($curchar == "]") {
-                if (!$setmark("]", $currentmarki, false) && $is("](")) {
+            } elseif ($curchar == '[') {
+                $setmark('[', $currentmarki, ']');
+            } elseif ($curchar == ']') {
+                if (!$setmark(']', $currentmarki, false) && $is('](')) {
                     $txt = \mb_substr(
                         $html,
                         $currentmarki,
                         $htmli - $currentmarki,
                     );
-                    if ($txt !== "") {
+                    if ($txt !== '') {
                         $i++;
-                        $strfind = $find(\mb_substr($str, $i + 1), ")", $pos);
+                        $strfind = $find(\mb_substr($str, $i + 1), ')', $pos);
                         if ($strfind !== false) {
                             $i += $pos + 1;
                             $html =
@@ -725,24 +725,24 @@ final class Entities
                                 $strfind .
                                 '">' .
                                 $txt .
-                                "</a>";
+                                '</a>';
                             $htmli = \mb_strlen($html);
                         }
                     }
                 }
-            } elseif ($curchar == "`") {
-                if ($is("```")) {
+            } elseif ($curchar == '`') {
+                if ($is('```')) {
                     $i += 2;
-                    $strfind = $find(\mb_substr($str, $i + 1), "```", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), '```', $pos);
                     if ($strfind !== false) {
                         $i += $pos + 3;
-                        if ($strfind !== "") {
-                            $lang = "";
+                        if ($strfind !== '') {
+                            $lang = '';
                             $ex = \explode("\n", $f, 2);
                             if (isset($ex[1])) {
-                                $exx = \explode(" ", $ex[0], 2);
+                                $exx = \explode(' ', $ex[0], 2);
                                 if (isset($exx[1])) {
-                                    $ex[1] = " " . $exx[1];
+                                    $ex[1] = ' ' . $exx[1];
                                 }
                                 $lang = \trim($exx[0]);
                                 $strfind = $ex[1];
@@ -750,17 +750,17 @@ final class Entities
 
                             if ($lang) {
                                 $strfind = \trim($f);
-                                if ($strfind !== "") {
+                                if ($strfind !== '') {
                                     $setstr(
                                         '<pre><code class="language-' .
                                             $lang .
                                             '">' .
                                             $strfind .
-                                            "</code></pre>",
+                                            '</code></pre>',
                                     );
                                 }
                             } else {
-                                $setstr("<pre>" . $strfind . "</pre>");
+                                $setstr('<pre>' . $strfind . '</pre>');
                             }
                         }
                     } else {
@@ -769,10 +769,10 @@ final class Entities
                         );
                     }
                 } else {
-                    $strfind = $find(\mb_substr($str, $i + 1), "`", $pos);
+                    $strfind = $find(\mb_substr($str, $i + 1), '`', $pos);
                     if ($strfind !== false) {
-                        if ($strfind !== "") {
-                            $setstr("<code>" . $strfind . "</code>");
+                        if ($strfind !== '') {
+                            $setstr('<code>' . $strfind . '</code>');
                         }
                         $i += $pos + 1;
                     } else {
@@ -792,18 +792,18 @@ final class Entities
         }
         foreach ($marks as $mark) {
             $ar = [
-                "**" => "Bold",
-                "__" => "Italic",
-                "*" => "Italic",
-                "_" => "Underline",
-                "~~" => "Strikethrough",
-                "]" => "TextUrl",
-                "||" => "Spoiler",
+                '**' => 'Bold',
+                '__' => 'Italic',
+                '*' => 'Italic',
+                '_' => 'Underline',
+                '~~' => 'Strikethrough',
+                ']' => 'TextUrl',
+                '||' => 'Spoiler',
             ];
             throw new Exception(
                 'Can\'t find end of ' .
                     ($ar[$mark[0]] ?? $mark[0]) .
-                    " entity at byte offset " .
+                    ' entity at byte offset ' .
                     $mark[2],
             );
         }
@@ -889,7 +889,7 @@ final class Entities
      * @param non-empty-string $text
      * @param "html"|"markdown"|"markdownv1"|"markdownv2"|"markdownhtml"|"markdownv2html"|"markdownv1html" $mode
      */
-    public function parseText(string $text, string $mode = "html"): DOMEntities
+    public function parseText(string $text, string $mode = 'html'): DOMEntities
     {
         return match ($mode) {
             'html' => $this->htmlToEntities($text),
@@ -897,7 +897,7 @@ final class Entities
             'markdownv1' => $this->markdownV1ToEntities($text),
             'markdownhtml', 'markdownv2html' => $this->markdownhtmlToEntities($text),
             'markdownv1html' => $this->markdownV1htmlToEntities($text),
-            default => throw new Exception("unsupported mode")
+            default => throw new Exception('unsupported mode')
         };
     }
 }

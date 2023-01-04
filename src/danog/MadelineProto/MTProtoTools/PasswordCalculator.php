@@ -42,33 +42,28 @@ class PasswordCalculator
     /**
      * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object).
      *
-     * @var array
      */
-    private $new_algo;
+    private array $new_algo;
     /**
      * A secure random string that can be used to compute the password.
      *
-     * @var string
      */
-    private $secure_random = '';
+    private string $secure_random = '';
     /**
      * The algorithm to use for calculatuing the hash of the current password (a PasswordKdfAlgo object).
      *
-     * @var array
      */
-    private $current_algo;
+    private array $current_algo;
     /**
      * SRP b parameter.
      *
-     * @var BigInteger
      */
-    private $srp_B;
+    private BigInteger $srp_B;
     /**
      * SRP b parameter for hashing.
      *
-     * @var string
      */
-    private $srp_BForHash;
+    private string $srp_BForHash;
     /**
      * SRP ID.
      *
@@ -78,9 +73,8 @@ class PasswordCalculator
     /**
      * Logger.
      *
-     * @var Logger
      */
-    public $logger;
+    public Logger $logger;
     /**
      * Initialize logger.
      */

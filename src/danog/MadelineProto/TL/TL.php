@@ -43,57 +43,49 @@ class TL
     /**
      * Highest available secret chat layer version.
      *
-     * @var integer
      */
-    private $secretLayer = -1;
+    private int $secretLayer = -1;
     /**
      * Constructors.
      *
-     * @var TLConstructors
      */
-    private $constructors;
+    private TLConstructors $constructors;
     /**
      * Methods.
      *
-     * @var TLMethods
      */
-    private $methods;
+    private TLMethods $methods;
     /**
      * TD Constructors.
      *
-     * @var TLConstructors
      */
-    private $tdConstructors;
+    private TLConstructors $tdConstructors;
     /**
      * TD Methods.
      *
-     * @var TLMethods
      */
-    private $tdMethods;
+    private TLMethods $tdMethods;
     /**
      * Descriptions.
      *
-     * @var array
      */
-    private $tdDescriptions;
+    private array $tdDescriptions;
     /**
      * TL callbacks.
      *
-     * @var array
      */
-    private $callbacks = [];
+    private array $callbacks = [];
     /**
      * API instance.
      *
-     * @var MTProto
      */
-    private $API;
+    private MTProto $API;
     /**
      * Constructor function.
      *
      * @param MTProto $API API instance
      */
-    public function __construct(MTProto $API = null)
+    public function __construct(?MTProto $API = null)
     {
         $this->API = $API;
     }
@@ -129,7 +121,7 @@ class TL
      * Initialize TL parser.
      *
      * @param TLSchema     $files   Scheme files
-     * @param TLCallback[] $objects TL Callback objects
+     * @param array<TLCallback> $objects TL Callback objects
      */
     public function init(TLSchema $files, array $objects = []): void
     {
@@ -345,13 +337,13 @@ class TL
     /**
      * Update TL callbacks.
      *
-     * @param TLCallback[] $objects TL callbacks
+     * @param array<TLCallback> $objects TL callbacks
      */
     public function updateCallbacks(array $objects): void
     {
         $this->callbacks = [];
         foreach ($objects as $object) {
-            if (!isset(\class_implements(\get_class($object))[TLCallback::class])) {
+            if (!isset(\class_implements($object::class)[TLCallback::class])) {
                 throw new Exception('Invalid callback object provided!');
             }
             $new = [TLCallback::METHOD_BEFORE_CALLBACK => $object->getMethodBeforeCallbacks(), TLCallback::METHOD_CALLBACK => $object->getMethodCallbacks(), TLCallback::CONSTRUCTOR_BEFORE_CALLBACK => $object->getConstructorBeforeCallbacks(), TLCallback::CONSTRUCTOR_CALLBACK => $object->getConstructorCallbacks(), TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK => $object->getConstructorSerializeCallbacks(), TLCallback::TYPE_MISMATCH_CALLBACK => $object->getTypeMismatchCallbacks()];
@@ -390,7 +382,7 @@ class TL
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
      */
-    public function serializeObject(array $type, $object, string $ctx, int $layer = -1)
+    public function serializeObject(array $type, mixed $object, string $ctx, int $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
@@ -566,7 +558,7 @@ class TL
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
      */
-    public function serializeMethod(string $method, $arguments)
+    public function serializeMethod(string $method, mixed $arguments)
     {
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
@@ -679,7 +671,7 @@ class TL
                         $arguments[$current_argument['name']] = null;
                         break;
                     default:
-                        throw new Exception("Missing required parameter ".$current_argument['name']);
+                        throw new Exception('Missing required parameter '.$current_argument['name']);
                 }
             }
             if (\in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
@@ -733,7 +725,7 @@ class TL
      *
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
-     * @psalm-return array{0: mixed, 1: Future[]}
+     * @psalm-return array{0: mixed, 1: array<Future>}
      */
     public function deserialize($stream, array $type = ['type' => '']): array
     {
@@ -749,7 +741,7 @@ class TL
      * Deserialize TL object.
      *
      * @param string|resource $stream    Stream
-     * @param Promise[]       &$promises Promise array
+     * @param array<Promise> $promises Promise array
      * @param array           $type      Type identifier
      */
     private function deserializeInternal($stream, array &$promises, array $type)

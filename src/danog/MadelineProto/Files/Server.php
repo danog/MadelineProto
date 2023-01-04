@@ -34,7 +34,7 @@ class Server
     public function __construct()
     {
         if (!\class_exists(HttpServer::class)) {
-            throw new Exception("Please install https://github.com/amphp/http-server to use this module (composer require amphp/http-server)");
+            throw new Exception('Please install https://github.com/amphp/http-server to use this module (composer require amphp/http-server)');
         }
     }
 }

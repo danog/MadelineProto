@@ -48,15 +48,13 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Websocket message.
      *
-     * @var Message
      */
-    private $message;
+    private Message $message;
     /**
      * Websocket Connector.
      *
-     * @var Connector
      */
-    private $connector;
+    private Connector $connector;
     /**
      * Connect to stream.
      *
@@ -126,6 +124,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

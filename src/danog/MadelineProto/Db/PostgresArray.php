@@ -73,7 +73,7 @@ class PostgresArray extends SqlArray
      */
     public function initConnection(DatabasePostgres $settings): void
     {
-        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
+        $config = ConnectionConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
         $this->pdo = new PDO(

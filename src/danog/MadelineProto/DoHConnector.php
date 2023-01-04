@@ -20,16 +20,18 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\CancellationToken;
+use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
-use Amp\Future;
-use Amp\NullCancellationToken;
+use Amp\NullCancellation;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
-use Amp\Socket\Connector;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\ResourceSocket;
+use Amp\Socket\SocketAddress;
+use Amp\Socket\SocketConnector;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Stream\ConnectionContext;
 use Revolt\EventLoop;
 
@@ -38,7 +40,7 @@ use const STREAM_CLIENT_ASYNC_CONNECT;
 use const STREAM_CLIENT_CONNECT;
 use function Amp\Socket\Internal\parseUri;
 
-class DoHConnector implements Connector
+class DoHConnector implements SocketConnector
 {
     /**
      * Datacenter instance.
@@ -49,18 +51,20 @@ class DoHConnector implements Connector
     /**
      * Connection context.
      *
-     * @var ConnectionContext
      */
-    private $ctx;
+    private ConnectionContext $ctx;
     public function __construct(DataCenter $dataCenter, ConnectionContext $ctx)
     {
         $this->dataCenter = $dataCenter;
         $this->ctx = $ctx;
     }
-    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Future
-    {
+    public function connect(
+        SocketAddress|string $uri,
+        ?ConnectContext $context = null,
+        ?Cancellation $cancellation = null
+    ): EncryptableSocket {
         $socketContext = $context ?? new ConnectContext();
-        $token ??= new NullCancellationToken();
+        $token ??= new NullCancellation();
         $attempt = 0;
         $uris = [];
         $failures = [];
@@ -75,23 +79,23 @@ class DoHConnector implements Connector
             // Host is not an IP address, so resolve the domain name.
             // When we're connecting to a host, we may need to resolve the domain name, first.
             // The resolution is usually done using DNS over HTTPS.
-                //
+            //
             // The DNS over HTTPS resolver needs to resolve the domain name of the DOH server:
             // this is handled internally by the DNS over HTTPS client,
             // by redirecting the resolution request to the plain DNS client.
-                //
+            //
             // However, if the DoH connection is proxied with a proxy that has a domain name itself,
             // we cannot resolve it with the DoH resolver, since this will cause an infinite loop
-                //
+            //
             // resolve host.com => (DoH resolver) => resolve dohserver.com => (simple resolver) => OK
-                //
-                //                                     |> resolve dohserver.com => (simple resolver) => OK
+            //
+            //                                     |> resolve dohserver.com => (simple resolver) => OK
             // resolve host.com => (DoH resolver) =|
-                //                                     |> resolve proxy.com => (non-proxied resolver) => OK
-                //
-                //
+            //                                     |> resolve proxy.com => (non-proxied resolver) => OK
+            //
+            //
             // This means that we must detect if the domain name we're trying to resolve is a proxy domain name.
-                //
+            //
             // Here, we simply check if the connection URI has changed since we first set it:
             // this would indicate that a proxy class has changed the connection URI to the proxy URI.
             if ($this->ctx->isDns()) {
@@ -106,9 +110,9 @@ class DoHConnector implements Connector
             foreach ($records as $record) {
                 /** @var Record $record */
                 if ($record->getType() === Record::AAAA) {
-                    $uris[] = \sprintf("%s://[%s]:%d", $scheme, $record->getValue(), $port);
+                    $uris[] = \sprintf('%s://[%s]:%d', $scheme, $record->getValue(), $port);
                 } else {
-                    $uris[] = \sprintf("%s://%s:%d", $scheme, $record->getValue(), $port);
+                    $uris[] = \sprintf('%s://%s:%d', $scheme, $record->getValue(), $port);
                 }
             }
         }
@@ -125,10 +129,10 @@ class DoHConnector implements Connector
                 \stream_set_blocking($socket, false);
                 $deferred = new DeferredFuture();
                 /** @psalm-suppress InvalidArgument */
-                $watcher = EventLoop::onWritable($socket, [$deferred, 'resolve']);
-                $id = $token->subscribe([$deferred, 'fail']);
+                $watcher = EventLoop::onWritable($socket, $deferred->complete(...));
+                $id = $token->subscribe($deferred->error(...));
                 try {
-                    Promise\timeout($deferred->getFuture(), $timeout);
+                    $deferred->getFuture()->await(new TimeoutCancellation($timeout));
                 } catch (TimeoutException $e) {
                     throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                     // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno

@@ -55,7 +55,6 @@ class FeedLoop extends ResumableSignalLoop
     /**
      * Update loop.
      *
-     * @var UpdateLoop
      */
     private ?UpdateLoop $updater = null;
     /**

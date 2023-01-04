@@ -31,15 +31,13 @@ class VoIPServerConfig
     /**
      * The configuration.
      *
-     * @var array
      */
-    private static $_config = [];
+    private static array $_config = [];
     /**
      * The default configuration.
      *
-     * @var array
      */
-    private static $_configDefault = [];
+    private static array $_configDefault = [];
     /**
      * Update shared call settings.
      *

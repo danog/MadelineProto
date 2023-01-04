@@ -17,7 +17,7 @@ use const PHP_URL_PATH;
 final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */
-    private static $runPath;
+    private static ?string $runPath = null;
 
     /**
      * Resources.
@@ -66,9 +66,9 @@ final class WebRunner extends RunnerAbstract
                 self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
             } else {
                 $contents = \file_get_contents(self::SCRIPT_PATH);
-                $contents = \str_replace("__DIR__", \var_export($absoluteRootDir, true), $contents);
+                $contents = \str_replace('__DIR__', \var_export($absoluteRootDir, true), $contents);
                 $suffix = \bin2hex(\random_bytes(10));
-                $runPath = $absoluteRootDir."/madeline-ipc-".$suffix.".php";
+                $runPath = $absoluteRootDir.'/madeline-ipc-'.$suffix.'.php';
                 \file_put_contents($runPath, $contents);
 
                 self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
@@ -100,7 +100,7 @@ final class WebRunner extends RunnerAbstract
             }
         }
         if (!isset($res)) {
-            throw new Exception("Could not connect to ourselves, please check the server configuration!");
+            throw new Exception('Could not connect to ourselves, please check the server configuration!');
         }
 
         $uri = self::$runPath.'?'.$params;

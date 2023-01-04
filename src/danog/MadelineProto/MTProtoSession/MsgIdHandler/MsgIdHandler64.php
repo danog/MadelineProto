@@ -33,15 +33,13 @@ class MsgIdHandler64 extends MsgIdHandler
     /**
      * Maximum incoming ID.
      *
-     * @var int
      */
-    private $maxIncomingId = 0;
+    private int $maxIncomingId = 0;
     /**
      * Maximum outgoing ID.
      *
-     * @var int
      */
-    private $maxOutgoingId = 0;
+    private int $maxOutgoingId = 0;
     /**
      * Check validity of given message ID.
      *

@@ -37,7 +37,7 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages($peer)
+    public function getSponsoredMessages(int|array $peer)
     {
         $peer = ($this->getInfo($peer))['bot_api_id'];
         $cache = $this->sponsoredMessages[$peer];
@@ -54,7 +54,7 @@ trait Ads
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      */
-    public function viewSponsoredMessage($peer, $message): bool
+    public function viewSponsoredMessage(int|array $peer, string|array $message): bool
     {
         if (\is_array($message)) {
             $message = $message['random_id'];

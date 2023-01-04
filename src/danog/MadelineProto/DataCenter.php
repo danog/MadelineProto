@@ -20,12 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Dns\Config;
-use Amp\Dns\ConfigLoader;
+use Amp\Dns\DnsConfig;
+use Amp\Dns\DnsConfigLoader;
 use Amp\Dns\Resolver;
 use Amp\Dns\Rfc1035StubResolver;
-use Amp\Dns\UnixConfigLoader;
-use Amp\Dns\WindowsConfigLoader;
+use Amp\Dns\UnixDnsConfigLoader;
+use Amp\Dns\WindowsDnsConfigLoader;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
@@ -38,8 +38,9 @@ use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
-use Amp\Socket\DnsConnector;
+use Amp\Socket\DnsSocketConnector;
 use Amp\Websocket\Client\Handshake;
+use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -74,61 +75,51 @@ class DataCenter
      *
      * @var array<string|int, DataCenterConnection>
      */
-    public $sockets = [];
+    public array $sockets = [];
     /**
      * Current DC ID.
      *
-     * @var string|int
      */
-    public $curdc = 0;
+    public string|int $curdc = 0;
     /**
      * Main instance.
      *
-     * @var MTProto
      */
-    private $API;
+    private MTProto $API;
     /**
      * DC list.
      *
-     * @var array
      */
-    private $dclist = [];
+    private array $dclist = [];
     /**
      * Settings.
      *
-     * @var ConnectionSettings
      */
-    private $settings;
+    private ConnectionSettings $settings;
     /**
      * HTTP client.
      *
-     * @var HttpClient
      */
-    private $HTTPClient;
+    private HttpClient $HTTPClient;
     /**
      * DNS over HTTPS client.
      *
-     * @var Rfc8484StubResolver|Rfc1035StubResolver
      */
-    private $DoHClient;
+    private Rfc8484StubResolver|Rfc1035StubResolver $DoHClient;
     /**
      * Non-proxied DNS over HTTPS client.
      *
-     * @var Rfc8484StubResolver|Rfc1035StubResolver
      */
-    private $nonProxiedDoHClient;
+    private Rfc8484StubResolver|Rfc1035StubResolver $nonProxiedDoHClient;
     /**
      * Cookie jar.
      *
-     * @var CookieJar
      */
-    private $CookieJar;
+    private CookieJar $CookieJar;
     /**
      * DNS connector.
-     *
-     * @var DNSConnector
      */
-    private $dnsConnector;
+    private DnsSocketConnector $dnsConnector;
     /**
      * DoH connector.
      */
@@ -204,7 +195,7 @@ class DataCenter
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
      */
-    public function __magic_construct(MTProto $API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null): void
+    public function __magic_construct(MTProto $API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, ?CookieJar $jar = null): void
     {
         $this->API = $API;
         $changed = [];
@@ -225,7 +216,7 @@ class DataCenter
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
                 if ($reconnectAll || isset($changed[$id])) {
-                    $this->API->logger->logger("Disconnecting all before reconnect!");
+                    $this->API->logger->logger('Disconnecting all before reconnect!');
                     $socket->needReconnect(true);
                     $socket->setExtra($this->API);
                     $socket->disconnect();
@@ -235,14 +226,14 @@ class DataCenter
             }
         }
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
-            $configProvider = new class implements ConfigLoader {
-                public function loadConfig()
+            $configProvider = new class implements DnsConfigLoader {
+                public function loadConfig(): DnsConfig
                 {
-                    $loader = \stripos(PHP_OS, "win") === 0 ? new WindowsConfigLoader() : new UnixConfigLoader();
+                    $loader = \stripos(PHP_OS, 'win') === 0 ? new WindowsDnsConfigLoader() : new UnixDnsConfigLoader();
                     try {
                         return $loader->loadConfig();
                     } catch (Throwable) {
-                        return new Config([
+                        return new DnsConfig([
                             '1.1.1.1',
                             '1.0.0.1',
                             '[2606:4700:4700::1111]',
@@ -264,18 +255,13 @@ class DataCenter
                 ? new Rfc1035StubResolver(null, $configProvider)
                 : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
-            $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver(null, $configProvider));
-            $this->webSocketConnector = new Rfc6455Connector($this->HTTPClient);
+            $this->dnsConnector = new DnsSocketConnector(new Rfc1035StubResolver(null, $configProvider));
+            $this->webSocketConnector = new Rfc6455Connector(
+                new Rfc6455ConnectionFactory(),
+                $this->HTTPClient
+            );
         }
         $this->settings->applyChanges();
-    }
-    /**
-     * Set VoIP endpoints.
-     *
-     * @param array $endpoints Endpoints
-     */
-    public function setVoIPEndpoints(array $endpoints): void
-    {
     }
     /**
      * Connect to specified DC.
@@ -312,7 +298,7 @@ class DataCenter
                 $this->API->logger->logger('OK!', Logger::WARNING);
                 return true;
             } catch (Throwable $e) {
-                if (\defined("MADELINEPROTO_TEST") && \constant("MADELINEPROTO_TEST") === 'pony') {
+                if (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), Logger::ERROR);
@@ -326,9 +312,9 @@ class DataCenter
      * @param integer        $dc_number DC ID to generate contexts for
      * @param string         $uri       URI
      * @param ConnectContext $context   Connection context
-     * @return ConnectionContext[]
+     * @return array<ConnectionContext>
      */
-    public function generateContexts(int $dc_number = 0, string $uri = '', ConnectContext $context = null): array
+    public function generateContexts(int $dc_number = 0, string $uri = '', ?ConnectContext $context = null): array
     {
         $ctxs = [];
         $combos = [];
@@ -523,7 +509,7 @@ class DataCenter
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
             $this->API->logger->logger("No info for DC {$dc_number}", Logger::ERROR);
-        } elseif (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
+        } elseif (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
             return [$ctxs[0]];
         }
         return $ctxs;

@@ -43,63 +43,58 @@ trait Session
     /**
      * Incoming message array.
      *
-     * @var IncomingMessage[]
+     * @var array<IncomingMessage>
      */
-    public $incoming_messages = [];
+    public array $incoming_messages = [];
     /**
      * Outgoing message array.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $outgoing_messages = [];
+    public array $outgoing_messages = [];
     /**
      * New incoming message ID array.
      *
-     * @var IncomingMessage[]
+     * @var array<IncomingMessage>
      */
-    public $new_incoming = [];
+    public array $new_incoming = [];
     /**
      * New outgoing message array.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $new_outgoing = [];
+    public array $new_outgoing = [];
     /**
      * Pending outgoing messages.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $pendingOutgoing = [];
+    public array $pendingOutgoing = [];
     /**
      * Pending outgoing key.
      *
-     * @var string
      */
-    public $pendingOutgoingKey = 'a';
+    public string $pendingOutgoingKey = 'a';
     /**
      * Time delta with server.
      *
-     * @var integer
      */
-    public $time_delta = 0;
+    public int $time_delta = 0;
     /**
      * Call queue.
      *
-     * @var array
      */
-    public $call_queue = [];
+    public array $call_queue = [];
     /**
      * Ack queue.
      *
-     * @var array
      */
-    public $ack_queue = [];
+    public array $ack_queue = [];
     /**
      * Message ID handler.
      *
-     * @var MsgIdHandler
      */
-    public $msgIdHandler;
+    public MsgIdHandler $msgIdHandler;
     /**
      * Reset MTProto session.
      */
@@ -173,7 +168,7 @@ trait Session
     /**
      * Backup eventual unsent messages before session deletion.
      *
-     * @return OutgoingMessage[]
+     * @return array<OutgoingMessage>
      */
     public function backupSession(): array
     {

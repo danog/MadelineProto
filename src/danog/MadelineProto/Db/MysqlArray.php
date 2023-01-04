@@ -73,7 +73,7 @@ class MysqlArray extends SqlArray
      */
     public function initConnection(DatabaseMysql $settings): void
     {
-        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
+        $config = ConnectionConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
         $this->pdo = new PDO(

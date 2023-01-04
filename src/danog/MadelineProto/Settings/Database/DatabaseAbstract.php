@@ -65,7 +65,7 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      *
      * @param int|string $cacheTtl For how long to keep records in memory after last read, for cached backends.
      */
-    public function setCacheTtl($cacheTtl): self
+    public function setCacheTtl(int|string $cacheTtl): self
     {
         $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : \strtotime($cacheTtl) - \time();
 
@@ -95,9 +95,8 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get database name/ID.
      *
-     * @return string|int
      */
-    abstract public function getDatabase();
+    abstract public function getDatabase(): string|int;
     /**
      * Get database URI.
      */
@@ -106,9 +105,8 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Set database name/ID.
      *
-     * @param int|string $database
      */
-    abstract public function setDatabase($database): self;
+    abstract public function setDatabase(int|string $database): self;
     /**
      * Set database URI.
      */

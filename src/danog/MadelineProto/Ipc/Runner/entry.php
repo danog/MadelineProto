@@ -46,7 +46,7 @@ use danog\MadelineProto\Tools;
             $arguments = $_GET['argv'];
         }
         if (count($arguments) < 2) {
-            trigger_error("Not enough arguments!", E_USER_ERROR);
+            trigger_error('Not enough arguments!', E_USER_ERROR);
             exit(1);
         }
         define('MADELINE_WORKER_TYPE', array_shift($arguments));
@@ -61,8 +61,8 @@ use danog\MadelineProto\Tools;
     }
     if (!class_exists(API::class)) {
         $paths = [
-            dirname(__DIR__, 7)."/autoload.php",
-            dirname(__DIR__, 5)."/vendor/autoload.php",
+            dirname(__DIR__, 7).'/autoload.php',
+            dirname(__DIR__, 5).'/vendor/autoload.php',
         ];
 
         foreach ($paths as $path) {
@@ -73,7 +73,7 @@ use danog\MadelineProto\Tools;
         }
 
         if (!isset($autoloadPath)) {
-            trigger_error("Could not locate autoload.php in any of the following files: ".implode(", ", $paths), E_USER_ERROR);
+            trigger_error('Could not locate autoload.php in any of the following files: '.implode(', ', $paths), E_USER_ERROR);
             exit(1);
         }
 
@@ -119,17 +119,17 @@ use danog\MadelineProto\Tools;
             }
         } catch (Throwable $e) {
             echo "$e";
-            echo "Got exception in IPC server, exiting...";
+            echo 'Got exception in IPC server, exiting...';
 
             Logger::log("$e", Logger::FATAL_ERROR);
-            Logger::log("Got exception in IPC server, exiting...", Logger::FATAL_ERROR);
+            Logger::log('Got exception in IPC server, exiting...', Logger::FATAL_ERROR);
             $ipc = Tools::wait($session->getIpcState());
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())) {
-                Logger::log("Reporting error!");
+                Logger::log('Reporting error!');
                 Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
-                Logger::log("Reported error!");
+                Logger::log('Reported error!');
             } else {
-                Logger::log("Not reporting error!");
+                Logger::log('Not reporting error!');
             }
         }
     }

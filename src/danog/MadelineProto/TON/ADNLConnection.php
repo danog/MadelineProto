@@ -50,21 +50,18 @@ class ADNLConnection
     /**
      * TL serializer instance.
      *
-     * @var TL
      */
-    private $TL;
+    private TL $TL;
     /**
      * ADNL stream instance.
      *
-     * @var StreamInterface
      */
-    private $stream;
+    private StreamInterface $stream;
     /**
      * Request list.
      *
-     * @var array
      */
-    private $requests = [];
+    private array $requests = [];
     /**
      * Construct class.
      *
@@ -104,7 +101,7 @@ class ADNLConnection
         $key = $endpoint['id']['key'];
         $key[31] = $key[31] & \chr(127);
         $curve = new Curve25519();
-        $modulo = Tools::getVar($curve, "modulo");
+        $modulo = Tools::getVar($curve, 'modulo');
         $y = new BigInteger(\strrev($key), 256);
         $y2 = clone $y;
         $y = $y->add(Magic::$one);

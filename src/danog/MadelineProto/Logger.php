@@ -64,9 +64,8 @@ class Logger
     /**
      * Logging mode.
      *
-     * @var integer
      */
-    public $mode = 0;
+    public int $mode = 0;
     /**
      * Optional logger parameter.
      *
@@ -76,45 +75,38 @@ class Logger
     /**
      * Logger prefix.
      *
-     * @var string
      */
-    public $prefix = '';
+    public string $prefix = '';
     /**
      * Logging level.
      *
-     * @var integer
      */
-    public $level = self::NOTICE;
+    public int $level = self::NOTICE;
     /**
      * Logging colors.
      *
-     * @var array
      */
-    public $colors = [];
+    public array $colors = [];
     /**
      * Newline.
      *
-     * @var string
      */
-    public $newline = "\n";
+    public string $newline = "\n";
     /**
      * Logfile.
      *
-     * @var ResourceOutputStream
      */
-    public $stdout;
+    public ResourceOutputStream $stdout;
     /**
      * Default logger instance.
      *
-     * @var self
      */
-    public static $default;
+    public static self $default;
     /**
      * Whether the AGPL notice was printed.
      *
-     * @var boolean
      */
-    public static $printed = false;
+    public static bool $printed = false;
     /**
      * Log rotation loop ID.
      */
@@ -313,7 +305,7 @@ class Logger
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 \error_reporting(E_ALL);
-                \ini_set('log_errors', "1");
+                \ini_set('log_errors', '1');
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
@@ -337,7 +329,7 @@ class Logger
      * @param mixed $param Message
      * @param int   $level Logging level
      */
-    public static function log($param, int $level = self::NOTICE): void
+    public static function log(mixed $param, int $level = self::NOTICE): void
     {
         if (!\is_null(self::$default)) {
             self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
@@ -352,7 +344,7 @@ class Logger
      * @param int    $level Logging level
      * @param string $file  File that originated the message
      */
-    public function logger($param, int $level = self::NOTICE, string $file = ''): void
+    public function logger(mixed $param, int $level = self::NOTICE, string $file = ''): void
     {
         if ($level > $this->level) {
             return;

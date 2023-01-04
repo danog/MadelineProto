@@ -294,7 +294,6 @@ interface dht
      * * `dht.node` **node** -.
      *
      * @param array $params Parameters
-     * @return true
      */
     public function query(array $params): bool;
 }
@@ -315,7 +314,6 @@ interface overlay
      * * `int256` **overlay** -.
      *
      * @param array $params Parameters
-     * @return true
      */
     public function query(array $params): bool;
 
@@ -721,7 +719,7 @@ class InternalDoc extends APIFactory
          * @param Generator|Promise $b Promise B
      * @psalm-suppress InvalidScope
      */
-    public function after($a, $b): Future
+    public function after(Generator|Promise $a, Generator|Promise $b): Future
     {
         return Tools::after($a, $b);
     }
@@ -749,7 +747,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed ...$params Params
      */
-    public function arr(...$params): array
+    public function arr(mixed ...$params): array
     {
         return Tools::arr(...$params);
     }
@@ -783,12 +781,11 @@ class InternalDoc extends APIFactory
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @param Generator|Promise|mixed $promise
      * @template TReturn
      * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      * @psalm-return Promise<TReturn>
      */
-    public function call($promise): Future
+    public function call(mixed $promise): Future
     {
         return Tools::call($promise);
     }
@@ -799,9 +796,8 @@ class InternalDoc extends APIFactory
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      * @psalm-suppress InvalidScope
-     * @return Promise|mixed
      */
-    public function callFork($promise, $actual = null, string $file = '')
+    public function callFork(Generator|Promise $promise, $actual = null, string $file = ''): mixed
     {
         return Tools::callFork($promise, $actual, $file);
     }
@@ -810,7 +806,7 @@ class InternalDoc extends APIFactory
      *
      * @param Generator|Promise $promise Promise to resolve
      */
-    public function callForkDefer($promise): void
+    public function callForkDefer(Generator|Promise $promise): void
     {
         Tools::callForkDefer($promise);
     }
@@ -891,7 +887,7 @@ class InternalDoc extends APIFactory
      * @param mixed  $location File location
      * @param string $default  Default extension
      */
-    public function getExtensionFromLocation($location, string $default): string
+    public function getExtensionFromLocation(mixed $location, string $default): string
     {
         return Extension::getExtensionFromLocation($location, $default);
     }
@@ -987,7 +983,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $var Value to check
      */
-    public function isArrayOrAlike($var): bool
+    public function isArrayOrAlike(mixed $var): bool
     {
         return Tools::isArrayOrAlike($var);
     }
@@ -1157,7 +1153,7 @@ class InternalDoc extends APIFactory
      * @psalm-suppress InvalidScope
      * @access public
      */
-    public function setVar(object $obj, string $var, &$val): void
+    public function setVar(object $obj, string $var, mixed &$val): void
     {
         Tools::setVar($obj, $var, $val);
     }
@@ -1166,7 +1162,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|float $time Number of seconds to sleep for
      */
-    public function sleep($time): Future
+    public function sleep(int|float $time): Future
     {
         return Tools::sleep($time);
     }
@@ -1183,9 +1179,8 @@ class InternalDoc extends APIFactory
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
-     * @param Generator|Promise $promise
      */
-    public function timeout($promise, int $timeout): Future
+    public function timeout(Generator|Promise $promise, int $timeout): Future
     {
         return Tools::timeout($promise, $timeout);
     }
@@ -1206,7 +1201,7 @@ class InternalDoc extends APIFactory
      * @return Promise<TReturn>|Promise<TReturnAlt>
      * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
-    public function timeoutWithDefault($promise, int $timeout, $default = null): Future
+    public function timeoutWithDefault(Promise|Generator $promise, int $timeout, $default = null): Future
     {
         return Tools::timeoutWithDefault($promise, $timeout, $default);
     }
@@ -1269,7 +1264,7 @@ class InternalDoc extends APIFactory
      *
      * @param string|int|array $value base256 long
      */
-    public function unpackSignedLongString($value): string
+    public function unpackSignedLongString(string|int|array $value): string
     {
         return Tools::unpackSignedLongString($value);
     }
@@ -1279,7 +1274,7 @@ class InternalDoc extends APIFactory
      * @param Generator|Promise $promise The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
      */
-    public function wait($promise, bool $ignoreSignal = false)
+    public function wait(Generator|Promise $promise, bool $ignoreSignal = false)
     {
         return Tools::wait($promise, $ignoreSignal);
     }

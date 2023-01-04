@@ -43,9 +43,8 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * Stream.
      *
-     * @var RawStreamInterface
      */
-    protected $stream;
+    protected RawStreamInterface $stream;
     private $code;
     private $ctx;
     private $header = '';
@@ -180,6 +179,6 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

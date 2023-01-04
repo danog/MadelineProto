@@ -68,11 +68,11 @@ trait Loop
                 $needs_restart = true;
             }
             if (isset($_REQUEST['MadelineSelfRestart'])) {
-                $this->logger->logger("Self-restarted, restart token ".$_REQUEST['MadelineSelfRestart']);
+                $this->logger->logger('Self-restarted, restart token '.$_REQUEST['MadelineSelfRestart']);
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
             if ($needs_restart) {
-                $this->logger->logger("Adding restart callback!");
+                $this->logger->logger('Adding restart callback!');
                 $logger = $this->logger;
                 $id = Shutdown::addCallback(static function () use (&$logger): void {
                     $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
@@ -86,18 +86,18 @@ trait Loop
                     $payload = $_SERVER['REQUEST_METHOD'].' '.$uri." HTTP/1.1\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
                     $logger->logger("Connecting to {$address}:{$port}");
                     $a = \fsockopen($address, $port);
-                    $logger->logger("Sending self-restart payload");
+                    $logger->logger('Sending self-restart payload');
                     $logger->logger($payload);
                     \fwrite($a, $payload);
                     $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
                     // Keep around resource for a bit more
                     $GLOBALS['MadelineShutdown'] = $a;
-                    $logger->logger("Shutdown of self-restart callback");
+                    $logger->logger('Shutdown of self-restart callback');
                 }, 'restarter');
                 $this->logger->logger("Added restart callback with ID $id!");
             }
-            $this->logger->logger("Done webhost init process!");
-            Tools::closeConnection($this->getWebMessage("The bot was started!"));
+            $this->logger->logger('Done webhost init process!');
+            Tools::closeConnection($this->getWebMessage('The bot was started!'));
             $inited = true;
         } elseif (PHP_SAPI === 'cli') {
             try {

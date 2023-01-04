@@ -299,7 +299,7 @@ class Connection extends SettingsAbstract
     public function setProtocol(string $protocol): self
     {
         if (!isset(\class_implements($protocol)[MTProtoBufferInterface::class])) {
-            throw new Exception("An invalid protocol was specified!");
+            throw new Exception('An invalid protocol was specified!');
         }
         $this->protocol = $protocol;
 
@@ -457,7 +457,7 @@ class Connection extends SettingsAbstract
     public function addProxy(string $proxy, array $extra = []): self
     {
         if (!isset(\class_implements($proxy)[StreamInterface::class])) {
-            throw new Exception("An invalid proxy class was specified!");
+            throw new Exception('An invalid proxy class was specified!');
         }
         if (!isset($this->proxy[$proxy])) {
             $this->proxy[$proxy] = [];
@@ -567,7 +567,7 @@ class Connection extends SettingsAbstract
     public function setTransport(string $transport): self
     {
         if (!isset(\class_implements($transport)[RawStreamInterface::class])) {
-            throw new Exception("An invalid transport was specified!");
+            throw new Exception('An invalid transport was specified!');
         }
         $this->transport = $transport;
 

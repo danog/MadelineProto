@@ -61,7 +61,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function read(): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->read();
     }
@@ -73,7 +73,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function write(string $data): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->write($data);
     }
@@ -99,7 +99,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function getReadBuffer(int &$length): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -136,7 +136,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function bufferRead(int $length): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -214,6 +214,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      */
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

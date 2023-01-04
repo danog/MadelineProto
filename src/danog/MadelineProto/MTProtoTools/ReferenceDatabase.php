@@ -68,9 +68,8 @@ class ReferenceDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var DbArray
      */
-    private $db;
+    private DbArray $db;
     private $cache = [];
     private $cacheContexts = [];
     private $refreshed = [];
@@ -509,7 +508,7 @@ class ReferenceDatabase implements TLCallback
                 $local_id = Tools::packSignedInt($location['local_id']);
                 return $locationType.$dc_id.$volume_id.$local_id;
         }
-        throw new Exception("Invalid location type specified!");
+        throw new Exception('Invalid location type specified!');
     }
     public function __debugInfo()
     {

@@ -44,9 +44,8 @@ class UpdatesState
     /**
      * Channel ID.
      *
-     * @var int
      */
-    private $channelId;
+    private int $channelId;
     /**
      * Is busy?
      */

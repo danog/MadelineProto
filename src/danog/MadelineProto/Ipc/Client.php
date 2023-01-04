@@ -139,7 +139,7 @@ class Client extends ClientAbstract
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false)
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -164,7 +164,7 @@ class Client extends ClientAbstract
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -183,7 +183,7 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false)
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -237,7 +237,7 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      */
-    public function downloadToDir($messageMedia, $dir, callable $cb = null)
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
@@ -255,7 +255,7 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      */
-    public function downloadToFile($messageMedia, $file, callable $cb = null)
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -280,7 +280,7 @@ class Client extends ClientAbstract
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
      */
-    public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null)
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
     {
         $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
@@ -298,17 +298,17 @@ class Client extends ClientAbstract
      *
      * @param mixed ...$params Params
      */
-    public function setEventHandler(...$params): void
+    public function setEventHandler(mixed ...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
+        throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
     /**
      * Placeholder.
      *
      * @param mixed ...$params Params
      */
-    public function getEventHandler(...$params): void
+    public function getEventHandler(mixed ...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
+        throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
 }

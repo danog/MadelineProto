@@ -43,15 +43,13 @@ trait AuthKeyHandler
     /**
      * Temporary requested secret chats.
      *
-     * @var array
      */
-    protected $temp_requested_secret_chats = [];
+    protected array $temp_requested_secret_chats = [];
     /**
      * Secret chats.
      *
-     * @var array
      */
-    protected $secret_chats = [];
+    protected array $secret_chats = [];
     /**
      * Accept secret chat.
      *
@@ -113,7 +111,7 @@ trait AuthKeyHandler
      *
      * @param mixed $user User to start secret chat with
      */
-    public function requestSecretChat($user)
+    public function requestSecretChat(mixed $user)
     {
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser'])) {
@@ -172,9 +170,8 @@ trait AuthKeyHandler
     /**
      * Temporary rekeyed secret chats.
      *
-     * @var array
      */
-    protected $temp_rekeyed_secret_chats = [];
+    protected array $temp_rekeyed_secret_chats = [];
     /**
      * Rekey secret chat.
      *
@@ -316,7 +313,7 @@ trait AuthKeyHandler
      *
      * @param array|int $chat Secret chat ID
      */
-    public function getSecretChat($chat): array
+    public function getSecretChat(array|int $chat): array
     {
         return $this->secret_chats[\is_array($chat) ? $chat['chat_id'] : $chat];
     }
@@ -325,7 +322,7 @@ trait AuthKeyHandler
      *
      * @param array|int $chat Secret chat ID
      */
-    public function hasSecretChat($chat): bool
+    public function hasSecretChat(array|int $chat): bool
     {
         return isset($this->secret_chats[\is_array($chat) ? $chat['chat_id'] : $chat]);
     }

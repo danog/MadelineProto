@@ -34,13 +34,13 @@ class Wrapper extends ClientAbstract
     /**
      * Callbacks.
      *
-     * @var callable[]
+     * @var array<callable>
      */
     private array $callbacks = [];
     /**
      * Callbacks IDs.
      *
-     * @var (int|array{0: class-string<Obj>, array<string, int>})[]
+     * @var array<(int|array{0: class-string<Obj>, array<string, int>})>
      */
     private array $callbackIds = [];
     /**
@@ -56,16 +56,16 @@ class Wrapper extends ClientAbstract
      *
      * @param mixed        $data Payload data
      */
-    public static function create(&$data, SessionPaths $session, Logger $logger): self
+    public static function create(mixed &$data, SessionPaths $session, Logger $logger): self
     {
         $instance = new self;
         $instance->data = &$data;
         $instance->logger = $logger;
         $instance->run = false;
 
-        $logger->logger("Connecting to callback IPC server...");
+        $logger->logger('Connecting to callback IPC server...');
         $instance->server = connect($session->getIpcCallbackPath());
-        $logger->logger("Connected to callback IPC server!");
+        $logger->logger('Connected to callback IPC server!');
 
         $instance->remoteId = $instance->server->receive();
         $logger->logger("Got ID {$instance->remoteId} from callback IPC server!");
@@ -87,7 +87,7 @@ class Wrapper extends ClientAbstract
      * @param bool            $wrapObjects Whether to wrap object methods, too
      * @param-out int $callback Callback ID
      */
-    public function wrap(&$callback, bool $wrapObjects = true): void
+    public function wrap(object|callable &$callback, bool $wrapObjects = true): void
     {
         if (\is_object($callback) && $wrapObjects) {
             $ids = [];

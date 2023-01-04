@@ -256,7 +256,7 @@ class AnnotationsBuilder
                         $doc[\strlen($doc)-1] = ' ';
                     }
                 } else {
-                    Logger::log($name.'.'.$param->getName()." has no type!", Logger::WARNING);
+                    Logger::log($name.'.'.$param->getName().' has no type!', Logger::WARNING);
                 }
                 if ($param->isVariadic()) {
                     $doc .= '...';
@@ -292,7 +292,7 @@ class AnnotationsBuilder
             }
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
-            $doc .= ")";
+            $doc .= ')';
             $async = true;
             if ($hasReturnValue && $static) {
                 $doc .= ': ';
@@ -319,7 +319,7 @@ class AnnotationsBuilder
             } elseif (!$static) {
                 $doc .= "    {$ret} \$this->API->{$name}({$paramList});\n";
             } else {
-                $doc .= "    {$ret} \\".$method->getDeclaringClass()->getName()."::".$name."({$paramList});\n";
+                $doc .= "    {$ret} \\".$method->getDeclaringClass()->getName().'::'.$name."({$paramList});\n";
             }
             if (!$ret && $type->getName() === 'self') {
                 $doc .= "    return \$this;\n";
@@ -340,11 +340,11 @@ class AnnotationsBuilder
                     $phpdoc = \str_replace('*/', ' * @return '.$type."\n     */", $phpdoc);
                 }
             }
-            $phpdoc = \str_replace("@return \\Generator", "@return $promise", $phpdoc);
-            $phpdoc = \str_replace("@return \\Promise", "@return $promise", $phpdoc);
-            $phpdoc = \str_replace("@return Generator", "@return $promise", $phpdoc);
-            $phpdoc = \str_replace("@return Promise", "@return $promise", $phpdoc);
-            if ($hasReturnValue && $async && \preg_match("/@return (.*)/", $phpdoc, $matches)) {
+            $phpdoc = \str_replace('@return \\Generator', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return \\Promise', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return Generator', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return Promise', "@return $promise", $phpdoc);
+            if ($hasReturnValue && $async && \preg_match('/@return (.*)/', $phpdoc, $matches)) {
                 $ret = $matches[1];
                 $new = $ret;
                 if ($type && !\str_contains($ret, '<')) {
@@ -368,13 +368,13 @@ class AnnotationsBuilder
                         $new = \substr($new, 0, -1);
                     }
                 }
-                $phpdoc = \str_replace("@return ".$ret, "@return mixed", $phpdoc);
+                $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
                 if (!\str_contains($phpdoc, '@psalm-return')) {
-                    $phpdoc = \str_replace("@return ", "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
+                    $phpdoc = \str_replace('@return ', "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
                 }
             }
             $phpdoc = \preg_replace(
-                "/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/",
+                '/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/',
                 "@psalm-return $promise<$1>",
                 $phpdoc,
             );

@@ -40,28 +40,24 @@ class MinDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var DbArray
      */
-    private $db;
+    private DbArray $db;
     /**
      * Temporary cache during deserialization.
      *
-     * @var array
      */
-    private $cache = [];
+    private array $cache = [];
     /**
      * Instance of MTProto.
      *
-     * @var MTProto
      */
-    private $API;
+    private MTProto $API;
 
     /**
      * Whether we cleaned up old database information.
      *
-     * @var boolean
      */
-    private $clean = false;
+    private bool $clean = false;
 
     /**
      * List of properties stored in database (memory or external).
@@ -220,7 +216,7 @@ class MinDatabase implements TLCallback
      *
      * @param float|int $id Peer ID
      */
-    public function hasPeer($id): bool
+    public function hasPeer(float|int $id): bool
     {
         return $this->db->isset($id);
     }

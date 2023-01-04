@@ -59,7 +59,6 @@ trait DbPropertiesTrait
         }
 
         $className = \explode('\\', static::class);
-        $result .= '_'.\end($className);
-        return $result;
+        return $result . '_'.\end($className);
     }
 }

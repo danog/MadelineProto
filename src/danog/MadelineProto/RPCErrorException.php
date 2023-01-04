@@ -48,7 +48,7 @@ class RPCErrorException extends \Exception
         if (!$method || !$code || !$error) {
             return $error;
         }
-        $error = \preg_replace('/\\d+$/', "X", $error);
+        $error = \preg_replace('/\\d+$/', 'X', $error);
         $description = self::$descriptions[$error] ?? '';
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error])) {
             async(function () use ($method, $code, $error): void {
@@ -98,7 +98,7 @@ class RPCErrorException extends \Exception
     {
         $this->localized = $localization;
     }
-    public function __construct($message = null, $code = 0, $caller = '', Exception $previous = null)
+    public function __construct($message = null, $code = 0, $caller = '', ?Exception $previous = null)
     {
         $this->rpc = $message;
         parent::__construct($message, $code, $previous);

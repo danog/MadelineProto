@@ -183,7 +183,7 @@ trait PeerHandler
             return;
         }
         if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
-            throw new InvalidArgumentException("Invalid chat type ".$chat['_']);
+            throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
         }
         $bot_api_id = $this->toSupergroup($chat['id']);
         $existingChat = $this->chats[$bot_api_id];
@@ -280,7 +280,7 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      */
-    public function peerIsset($id): bool
+    public function peerIsset(mixed $id): bool
     {
         try {
             return $this->chats->isset($this->getId($id, MTProto::INFO_TYPE_ID));
@@ -342,7 +342,7 @@ trait PeerHandler
      *
      * @param mixed $id Object
      */
-    public static function getFolderId($id): ?int
+    public static function getFolderId(mixed $id): ?int
     {
         if (!\is_array($id)) {
             return null;
@@ -357,7 +357,7 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      */
-    public function getId($id): ?int
+    public function getId(mixed $id): ?int
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -504,7 +504,7 @@ trait PeerHandler
      * @internal
      * @param mixed $id Peer
      */
-    public function getInputPeer($id)
+    public function getInputPeer(mixed $id)
     {
         return $this->getInfo($id, MTProto::INFO_TYPE_PEER);
     }
@@ -514,7 +514,7 @@ trait PeerHandler
      * @internal
      * @param mixed $id Peer
      */
-    public function getInputConstructor($id)
+    public function getInputConstructor(mixed $id)
     {
         return $this->getInfo($id, MTProto::INFO_TYPE_CONSTRUCTOR);
     }
@@ -529,7 +529,7 @@ trait PeerHandler
      * @see https://docs.madelineproto.xyz/Info.html
      * @template TConstructor
      * @psalm-param array{_: TConstructor}|mixed $id
-     * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
+     * @return array|int<(array|int<(array|int<(mixed|string)>|mixed|string)>|int|mixed|string)>
      * @psalm-return array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -547,7 +547,7 @@ trait PeerHandler
      *      type: string
      * }|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
-    public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL): array|int
+    public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -666,7 +666,7 @@ trait PeerHandler
      * @template TConstructor
      * @psalm-param array{_: TConstructor} $constructor
      * @psalm-param bool|null $type
-     * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
+     * @return array<(array<(array<(mixed|string)>|mixed|string)>|int|mixed|string)>
      * @psalm-return array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -783,7 +783,7 @@ trait PeerHandler
      *
      * @param mixed $id The peer to refresh
      */
-    public function refreshPeerCache($id): void
+    public function refreshPeerCache(mixed $id): void
     {
         $id = ($this->getInfo($id))['bot_api_id'];
         if ($this->isSupergroup($id)) {
@@ -799,7 +799,7 @@ trait PeerHandler
      *
      * @param mixed $id The peer to refresh
      */
-    public function refreshFullPeerCache($id): void
+    public function refreshFullPeerCache(mixed $id): void
     {
         $this->full_chats->unset(($this->getFullInfo($id))['bot_api_id']);
         $this->getFullInfo($id);
@@ -809,7 +809,7 @@ trait PeerHandler
      *
      * @param mixed $id Chat ID
      */
-    public function fullChatLastUpdated($id): int
+    public function fullChatLastUpdated(mixed $id): int
     {
         return ($this->full_chats[$id])['last_update'] ?? 0;
     }
@@ -819,7 +819,7 @@ trait PeerHandler
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/FullInfo.html
      */
-    public function getFullInfo($id): array
+    public function getFullInfo(mixed $id): array
     {
         $partial = ($this->getInfo($id));
         if (\time() - ($this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
@@ -860,7 +860,7 @@ trait PeerHandler
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/Chat.html
      */
-    public function getPwrChat($id, bool $fullfetch = true): array
+    public function getPwrChat(mixed $id, bool $fullfetch = true): array
     {
         $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];

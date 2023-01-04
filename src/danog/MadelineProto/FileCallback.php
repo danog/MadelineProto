@@ -41,7 +41,7 @@ class FileCallback implements FileCallbackInterface
      * @param mixed    $file     File to download/upload
      * @param callable $callback Callback
      */
-    public function __construct($file, callable $callback)
+    public function __construct(mixed $file, callable $callback)
     {
         $this->file = $file;
         $this->callback = $callback;

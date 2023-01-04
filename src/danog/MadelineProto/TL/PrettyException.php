@@ -31,21 +31,18 @@ trait PrettyException
     /**
      * TL trace.
      *
-     * @var string
      */
-    public $tlTrace = '';
+    public string $tlTrace = '';
     /**
      * Method name.
      *
-     * @var string
      */
-    private $method = '';
+    private string $method = '';
     /**
      * Whether the TL trace was updated.
      *
-     * @var boolean
      */
-    private $updated = false;
+    private bool $updated = false;
     /**
      * Update TL trace.
      */
@@ -78,7 +75,7 @@ trait PrettyException
      * @param string $init  Method name
      * @param array  $trace Async trace
      */
-    public function prettifyTL(string $init = '', array $trace = null): void
+    public function prettifyTL(string $init = '', ?array $trace = null): void
     {
         $this->method = $init;
         $previous_trace = $this->tlTrace;

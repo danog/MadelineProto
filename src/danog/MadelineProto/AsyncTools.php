@@ -54,7 +54,7 @@ abstract class AsyncTools extends StrTools
      * @deprecated Coroutines are deprecated since amp v3
      * @param Generator|Future $promise The promise to wait for
      */
-    public static function wait($promise)
+    public static function wait(Generator|Future $promise)
     {
         if ($promise instanceof Generator) {
             return self::call($promise)->await();
@@ -121,10 +121,9 @@ abstract class AsyncTools extends StrTools
      * Create an artificial timeout for any \Generator or Promise.
      *
      * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise
      * @param int $timeout In milliseconds
      */
-    public static function timeout($promise, int $timeout): mixed
+    public static function timeout(Generator|Future $promise, int $timeout): mixed
     {
         return self::call($promise)->await(new TimeoutCancellation($timeout/1000));
     }
@@ -157,12 +156,11 @@ abstract class AsyncTools extends StrTools
      * Convert generator, promise or any other value to a promise.
      *
      * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future|mixed $promise
      * @template TReturn
      * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Future<TReturn>|TReturn $promise
      * @psalm-return Future<TReturn>
      */
-    public static function call($promise): Future
+    public static function call(mixed $promise): Future
     {
         if ($promise instanceof Generator) {
             $promise = async(function () use ($promise) {
@@ -202,9 +200,8 @@ abstract class AsyncTools extends StrTools
      * @param ?\Generator|Future $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      * @psalm-suppress InvalidScope
-     * @return Future|mixed
      */
-    public static function callFork($promise, $actual = null, string $file = '')
+    public static function callFork(Generator|Future $promise, $actual = null, string $file = ''): mixed
     {
         if ($actual) {
             $promise = $actual;
@@ -220,7 +217,7 @@ abstract class AsyncTools extends StrTools
      * @deprecated Coroutines are deprecated since amp v3
      * @param Generator|Future $promise Promise to resolve
      */
-    public static function callForkDefer($promise): void
+    public static function callForkDefer(Generator|Future $promise): void
     {
         EventLoop::defer(fn () => self::callFork($promise));
     }
@@ -232,7 +229,7 @@ abstract class AsyncTools extends StrTools
      * @param Generator|Future $b Promise B
      * @psalm-suppress InvalidScope
      */
-    public static function after($a, $b): Future
+    public static function after(Generator|Future $a, Generator|Future $b): Future
     {
         return async(function () use ($a, $b) {
             self::call($a)->await();

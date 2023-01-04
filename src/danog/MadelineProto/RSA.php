@@ -35,21 +35,18 @@ class RSA
     /**
      * Exponent.
      *
-     * @var BigInteger
      */
-    public $e;
+    public BigInteger $e;
     /**
      * Modulus.
      *
-     * @var BigInteger
      */
-    public $n;
+    public BigInteger $n;
     /**
      * Fingerprint.
      *
-     * @var string
      */
-    public $fp;
+    public string $fp;
     /**
      * Load RSA key.
      *

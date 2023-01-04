@@ -92,6 +92,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

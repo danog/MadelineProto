@@ -88,9 +88,8 @@ class OutgoingMessage extends Message
     /**
      * Message body.
      *
-     * @var array|null
      */
-    private $body;
+    private ?array $body = null;
 
     /**
      * Serialized body.

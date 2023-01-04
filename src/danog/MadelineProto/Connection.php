@@ -52,63 +52,53 @@ class Connection
     /**
      * Writer loop.
      *
-     * @var WriteLoop
      */
-    protected $writer;
+    protected WriteLoop $writer;
     /**
      * Reader loop.
      *
-     * @var ReadLoop
      */
-    protected $reader;
+    protected ReadLoop $reader;
     /**
      * Checker loop.
      *
-     * @var CheckLoop
      */
-    protected $checker;
+    protected CheckLoop $checker;
     /**
      * Waiter loop.
      *
-     * @var HttpWaitLoop
      */
-    protected $waiter;
+    protected HttpWaitLoop $waiter;
     /**
      * Ping loop.
      *
-     * @var PingLoop
      */
-    protected $pinger;
+    protected PingLoop $pinger;
     /**
      * Cleanup loop.
      *
-     * @var CleanupLoop
      */
-    protected $cleanup;
+    protected CleanupLoop $cleanup;
     /**
      * The actual socket.
      *
-     * @var StreamInterface
      */
-    public $stream;
+    public StreamInterface $stream;
     /**
      * Connection context.
      *
-     * @var ConnectionContext
      */
-    private $ctx;
+    private ConnectionContext $ctx;
     /**
      * HTTP request count.
      *
-     * @var integer
      */
-    private $httpReqCount = 0;
+    private int $httpReqCount = 0;
     /**
      * HTTP response count.
      *
-     * @var integer
      */
-    private $httpResCount = 0;
+    private int $httpResCount = 0;
     /**
      * Date of last chunk received.
      */
@@ -116,33 +106,28 @@ class Connection
     /**
      * Logger instance.
      *
-     * @var Logger
      */
-    protected $logger;
+    protected Logger $logger;
     /**
      * Main instance.
      *
-     * @var MTProto
      */
-    public $API;
+    public MTProto $API;
     /**
      * Shared connection instance.
      *
-     * @var DataCenterConnection
      */
-    protected $shared;
+    protected DataCenterConnection $shared;
     /**
      * DC ID.
      *
-     * @var string
      */
-    protected $datacenter;
+    protected string $datacenter;
     /**
      * Connection ID.
      *
-     * @var int
      */
-    private $id = 0;
+    private int $id = 0;
     /**
      * DC ID and connection ID concatenated.
      */
@@ -150,9 +135,8 @@ class Connection
     /**
      * Whether this socket has to be reconnected.
      *
-     * @var boolean
      */
-    private $needsReconnect = false;
+    private bool $needsReconnect = false;
     /**
      * Indicate if this socket needs to be reconnected.
      *
@@ -558,6 +542,6 @@ class Connection
      */
     public function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

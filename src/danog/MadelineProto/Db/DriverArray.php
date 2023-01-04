@@ -13,7 +13,7 @@ use Throwable;
 
 /**
  * Array caching trait.
- * 
+ *
  * @impleme
  */
 abstract class DriverArray implements DbArray
@@ -72,10 +72,7 @@ abstract class DriverArray implements DbArray
         return $this->offsetGet($key) !== null;
     }
 
-    /**
-     * @param DbArray|array|null $previous
-     */
-    public static function getInstance(string $table, $previous, $settings): static
+    public static function getInstance(string $table, DbArray|array|null $previous, $settings): static
     {
         $instance = new static();
         $instance->setTable($table);
@@ -108,7 +105,7 @@ abstract class DriverArray implements DbArray
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
      */
-    protected static function renameTmpTable(self $new, $old): void
+    protected static function renameTmpTable(self $new, DbArray|array|null $old): void
     {
         if ($old instanceof SqlArray && $old->getTable()) {
             if ($old->getTable() !== $new->getTable() &&
@@ -122,16 +119,15 @@ abstract class DriverArray implements DbArray
     }
 
     /**
-     * @param DbArray|array|null $old
      * @throws Throwable
      */
-    protected static function migrateDataToDb(self $new, $old): void
+    protected static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {
                 $old = MemoryArray::getInstance('', $old, new Memory);
             }
-            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
+            Logger::log('Converting '.$old::class.' to '.$new::class, Logger::ERROR);
 
             $counter = 0;
             $total = $old->count();
@@ -207,6 +203,6 @@ abstract class DriverArray implements DbArray
         } elseif (\is_array($instance)) {
             return 'Array';
         }
-        return \str_replace('NullCache\\', '', \get_class($instance));
+        return \str_replace('NullCache\\', '', $instance::class);
     }
 }

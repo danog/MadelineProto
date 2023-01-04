@@ -36,9 +36,9 @@ trait MessageHandler
     /**
      * Secret queue.
      *
-     * @var Promise[]
+     * @var array<Promise>
      */
-    private $secretQueue = [];
+    private array $secretQueue = [];
     /**
      * Encrypt secret chat message.
      *
@@ -153,10 +153,8 @@ trait MessageHandler
         $this->handleDecryptedUpdate($message);
         return true;
     }
-    /**
-     * @return false|string
-     */
-    private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
+
+    private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data): false|string
     {
         [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
@@ -176,10 +174,8 @@ trait MessageHandler
         }
         return $message_data;
     }
-    /**
-     * @return false|string
-     */
-    private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
+
+    private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data): false|string
     {
         [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);

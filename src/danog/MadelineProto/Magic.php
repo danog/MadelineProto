@@ -53,27 +53,23 @@ class Magic
     /**
      * Static storage.
      *
-     * @var array
      */
-    public static $storage = [];
+    public static array $storage = [];
     /**
      * Whether this system is bigendian.
      *
-     * @var boolean
      */
-    public static $BIG_ENDIAN = false;
+    public static bool $BIG_ENDIAN = false;
     /**
      * Whether this is a TTY console.
      *
-     * @var boolean
      */
-    public static $isatty = false;
+    public static bool $isatty = false;
     /**
      * Whether we're in a fork.
      *
-     * @var boolean
      */
-    public static $isFork = false;
+    public static bool $isFork = false;
     /**
      * Whether this is an IPC worker.
      */
@@ -81,147 +77,123 @@ class Magic
     /**
      * Whether we can get our PID.
      *
-     * @var boolean
      */
-    public static $can_getmypid = true;
+    public static bool $can_getmypid = true;
     /**
      * Whether we can amphp/parallel.
      *
-     * @var boolean
      */
-    public static $can_parallel = false;
+    public static bool $can_parallel = false;
     /**
      * Whether we can get our CWD.
      *
-     * @var boolean
      */
-    public static $can_getcwd = false;
+    public static bool $can_getcwd = false;
     /**
      * Whether we've processed forks.
      *
-     * @var boolean
      */
-    public static $processed_fork = false;
+    public static bool $processed_fork = false;
     /**
      * Whether we can use ipv6.
      *
-     * @var bool
      */
-    public static $ipv6 = false;
+    public static bool $ipv6 = false;
     /**
      * Our PID.
      *
-     * @var int
      */
-    public static $pid;
+    public static int $pid;
     /**
      * Whether we've inited all light constants.
      *
-     * @var boolean
      */
-    private static $initedLight = false;
+    private static bool $initedLight = false;
     /**
      * Whether we've inited all static constants.
      *
-     * @var boolean
      */
-    private static $inited = false;
+    private static bool $inited = false;
     /**
      * Whether we've inited the ipv6 property.
      *
-     * @var boolean
      */
-    private static $initedIpv6 = false;
+    private static bool $initedIpv6 = false;
     /**
      * Bigint zero.
      *
-     * @var BigInteger
      */
-    public static $zero;
+    public static BigInteger $zero;
     /**
      * Bigint one.
      *
-     * @var BigInteger
      */
-    public static $one;
+    public static BigInteger $one;
     /**
      * Bigint two.
      *
-     * @var BigInteger
      */
-    public static $two;
+    public static BigInteger $two;
     /**
      * Bigint 2^1984.
      *
-     * @var BigInteger
      */
-    public static $twoe1984;
+    public static BigInteger $twoe1984;
     /**
      * Bigint 2^2047.
      *
-     * @var BigInteger
      */
-    public static $twoe2047;
+    public static BigInteger $twoe2047;
     /**
      * Bigint 2^2048.
      *
-     * @var BigInteger
      */
-    public static $twoe2048;
+    public static BigInteger $twoe2048;
     /**
      * Decoded UTF8 emojis for call fingerprint.
      *
-     * @var array
      */
-    public static $emojis;
+    public static array $emojis;
     /**
      * MadelineProto revision.
      *
-     * @var string
      */
-    public static $revision;
+    public static string $revision;
     /**
      * MadelineProto version (clean).
      *
-     * @var string
      */
-    public static $version;
+    public static string $version;
     /**
      * Latest MadelineProto version.
      *
-     * @var string
      */
-    public static $version_latest;
+    public static string $version_latest;
     /**
      * Our CWD.
      *
-     * @var string
      */
-    public static $cwd;
+    public static string $cwd;
     /**
      * Caller script CWD.
      *
-     * @var string
      */
-    public static $script_cwd;
+    public static string $script_cwd;
     /**
      * Whether we're running on altervista.
      *
-     * @var boolean
      */
-    public static $altervista = false;
+    public static bool $altervista = false;
     /**
      * Wether we're running on 000webhost (yuck).
      *
-     * @var boolean
      */
-    public static $zerowebhost = false;
+    public static bool $zerowebhost = false;
     /**
      * Whether a signal was sent to the processand the system must shut down.
      *
-     * @var boolean
      */
-    public static $signaled = false;
+    public static bool $signaled = false;
     /**
      * Whether to suspend certain stdout log printing, when reading input.
      */
@@ -231,11 +203,10 @@ class Magic
      *
      * @var array<string, string>
      */
-    public static $allMimes = [];
+    public static array $allMimes = [];
     /**
      * Whether the openssl extension is loaded.
      *
-     * @var boolean
      */
     public static bool $hasOpenssl = false;
     /**
@@ -358,7 +329,7 @@ class Magic
             }
             if (self::$version_latest !== self::$version) {
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
-            };
+            }
         }
         self::$can_parallel = false;
         if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !(\class_exists(Phar::class) && Phar::running())) {

@@ -43,9 +43,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * Stream.
      *
-     * @var RawStreamInterface
      */
-    protected $stream;
+    protected RawStreamInterface $stream;
     private $extra;
     /**
      * Connect to stream.
@@ -199,6 +198,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

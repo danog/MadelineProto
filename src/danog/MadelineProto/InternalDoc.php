@@ -5489,7 +5489,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTd(&$params, array $extra = []): Future
+    public function MTProtoToTd(mixed &$params, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
@@ -5498,7 +5498,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTdcli($params, array $extra = []): Future
+    public function MTProtoToTdcli(mixed $params, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
@@ -5544,7 +5544,7 @@ class InternalDoc extends APIFactory
      * @param Generator|Promise $b Promise B
      * @psalm-suppress InvalidScope
      */
-    public static function after($a, $b): Amp\Future
+    public static function after(Generator|Promise $a, Generator|Promise $b): Amp\Future
     {
         return Tools::after($a, $b);
     }
@@ -5572,7 +5572,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed ...$params Params
      */
-    public static function arr(...$params): array
+    public static function arr(mixed ...$params): array
     {
         return Tools::arr(...$params);
     }
@@ -5616,12 +5616,11 @@ class InternalDoc extends APIFactory
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @param Generator|Promise|mixed $promise
      * @template TReturn
      * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      * @psalm-return Promise<TReturn>
       */
-    public static function call($promise): Amp\Future
+    public static function call(mixed $promise): Amp\Future
     {
         return Tools::call($promise);
     }
@@ -5632,9 +5631,8 @@ class InternalDoc extends APIFactory
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      * @psalm-suppress InvalidScope
-     * @return Promise|mixed
      */
-    public static function callFork($promise, $actual = null, string $file = '')
+    public static function callFork(Generator|Promise $promise, $actual = null, string $file = ''): mixed
     {
         return Tools::callFork($promise, $actual, $file);
     }
@@ -5643,7 +5641,7 @@ class InternalDoc extends APIFactory
      *
      * @param Generator|Promise $promise Promise to resolve
      */
-    public static function callForkDefer($promise): void
+    public static function callForkDefer(Generator|Promise $promise): void
     {
         Tools::callForkDefer($promise);
     }
@@ -5778,7 +5776,7 @@ class InternalDoc extends APIFactory
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, array $extra = []): Future
+    public function downloadToBrowser(array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $name, $mime, $extra]);
     }
@@ -5797,7 +5795,7 @@ class InternalDoc extends APIFactory
      * @param int                            $part_size     Size of each chunk
      * @psalm-return Promise<true>
       */
-    public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = []): Future
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
     }
@@ -5809,7 +5807,7 @@ class InternalDoc extends APIFactory
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @psalm-return Promise<(false|string)>
       */
-    public function downloadToDir($messageMedia, $dir, callable $cb = null, array $extra = []): Future
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $dir, $cb, $extra]);
     }
@@ -5822,7 +5820,7 @@ class InternalDoc extends APIFactory
      * @return Promise Downloaded file path
      * @psalm-return Promise<(false|string)>
      */
-    public function downloadToFile($messageMedia, $file, callable $cb = null, array $extra = []): Future
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $file, $cb, $extra]);
     }
@@ -5840,7 +5838,7 @@ class InternalDoc extends APIFactory
      * @return Promise Returned response
      * @psalm-return Promise<Response>
      */
-    public function downloadToResponse($messageMedia, Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, array $extra = []): Future
+    public function downloadToResponse(array|string $messageMedia, Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $size, $mime, $name, $extra]);
     }
@@ -5854,7 +5852,7 @@ class InternalDoc extends APIFactory
      * @param int                         $end           Offset where to end download
      * @psalm-return Promise<mixed>
       */
-    public function downloadToStream($messageMedia, $stream, callable $cb = null, int $offset = 0, int $end = -1, array $extra = []): Future
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $stream, $cb, $offset, $end, $extra]);
     }
@@ -5971,7 +5969,7 @@ class InternalDoc extends APIFactory
      * @param mixed $id Chat ID
      * @return Promise<integer>
      */
-    public function fullChatLastUpdated($id, array $extra = []): Future
+    public function fullChatLastUpdated(mixed $id, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -6073,9 +6071,8 @@ class InternalDoc extends APIFactory
     /**
      * Get main DC ID.
      *
-     * @return int|string
      */
-    public function getDataCenterId(array $extra = [])
+    public function getDataCenterId(array $extra = []): int|string
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -6110,7 +6107,7 @@ class InternalDoc extends APIFactory
      * @param mixed $messageMedia File ID
      * @return Promise<array>
      */
-    public function getDownloadInfo($messageMedia, array $extra = []): Future
+    public function getDownloadInfo(mixed $messageMedia, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $extra]);
     }
@@ -6129,7 +6126,7 @@ class InternalDoc extends APIFactory
      * @param mixed  $location File location
      * @param string $default  Default extension
      */
-    public static function getExtensionFromLocation($location, string $default): string
+    public static function getExtensionFromLocation(mixed $location, string $default): string
     {
         return Extension::getExtensionFromLocation($location, $default);
     }
@@ -6148,7 +6145,7 @@ class InternalDoc extends APIFactory
      * @param mixed $constructor File ID
      * @return Promise<array>
      */
-    public function getFileInfo($constructor, array $extra = []): Future
+    public function getFileInfo(mixed $constructor, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$constructor, $extra]);
     }
@@ -6157,7 +6154,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id Object
      */
-    public static function getFolderId($id): ?int
+    public static function getFolderId(mixed $id): ?int
     {
         return MTProto::getFolderId($id);
     }
@@ -6178,7 +6175,7 @@ class InternalDoc extends APIFactory
      * @return Promise FullInfo object
      * @psalm-return Promise<array>
      */
-    public function getFullInfo($id, array $extra = []): Future
+    public function getFullInfo(mixed $id, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -6206,7 +6203,7 @@ class InternalDoc extends APIFactory
      * @param mixed $id Peer
       * @psalm-return ??int|\Amp\Future<??int>
      */
-    public function getId($id)
+    public function getId(mixed $id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
@@ -6219,7 +6216,7 @@ class InternalDoc extends APIFactory
      * @return Promise Info object
      * @template TConstructor
      * @psalm-param array{_: TConstructor}|mixed $id
-     * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
+     * @return Future<(array<(Future<(mixed|string)>|mixed|string)>|int|mixed|string)>
      * @psalm-return \Generator<int|mixed, \Amp\Future|\Amp\Future<string>|array, mixed, array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -6237,7 +6234,7 @@ class InternalDoc extends APIFactory
      *      type: string
      * }>|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
-    public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL, array $extra = []): Future
+    public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $type, $extra]);
     }
@@ -6327,7 +6324,7 @@ class InternalDoc extends APIFactory
      * @see https://docs.madelineproto.xyz/Chat.html
      * @return Promise Chat object
      */
-    public function getPwrChat($id, bool $fullfetch = true, array $extra = []): Future
+    public function getPwrChat(mixed $id, bool $fullfetch = true, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $fullfetch, $extra]);
     }
@@ -6337,7 +6334,7 @@ class InternalDoc extends APIFactory
      * @param array|int $chat Secret chat ID
      * @psalm-return array|Promise<array>
      */
-    public function getSecretChat($chat)
+    public function getSecretChat(array|int $chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
@@ -6369,7 +6366,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
       */
-    public function getSponsoredMessages($peer, array $extra = []): Future
+    public function getSponsoredMessages(int|array $peer, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$peer, $extra]);
     }
@@ -6445,7 +6442,7 @@ class InternalDoc extends APIFactory
      * @param array|int $chat Secret chat ID
      * @psalm-return bool|Promise<bool>
      */
-    public function hasSecretChat($chat)
+    public function hasSecretChat(array|int $chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
@@ -6502,7 +6499,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $var Value to check
      */
-    public static function isArrayOrAlike($var): bool
+    public static function isArrayOrAlike(mixed $var): bool
     {
         return Tools::isArrayOrAlike($var);
     }
@@ -6601,9 +6598,8 @@ class InternalDoc extends APIFactory
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
-     * @return float|int
      */
-    public static function mbStrlen(string $text)
+    public static function mbStrlen(string $text): float|int
     {
         return StrTools::mbStrlen($text);
     }
@@ -6628,7 +6624,7 @@ class InternalDoc extends APIFactory
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCall(string $method, $args = [
+    public function methodCall(string $method, array|Generator $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = []): Future
@@ -6643,7 +6639,7 @@ class InternalDoc extends APIFactory
      * @param array             $aargs  Additional arguments
      * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallWrite(string $method, $args = [
+    public function methodCallWrite(string $method, array|Generator $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = []): Future
@@ -6701,7 +6697,7 @@ class InternalDoc extends APIFactory
      * @param mixed $id Peer
      * @psalm-return Promise<bool>
       */
-    public function peerIsset($id, array $extra = []): Future
+    public function peerIsset(mixed $id, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -6761,7 +6757,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id The peer to refresh
       */
-    public function refreshFullPeerCache($id, array $extra = []): Future
+    public function refreshFullPeerCache(mixed $id, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -6770,7 +6766,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id The peer to refresh
       */
-    public function refreshPeerCache($id, array $extra = []): Future
+    public function refreshPeerCache(mixed $id, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -6798,7 +6794,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $user User
      */
-    public function requestCall($user, array $extra = []): Future
+    public function requestCall(mixed $user, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
     }
@@ -6807,7 +6803,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $user User to start secret chat with
      */
-    public function requestSecretChat($user, array $extra = []): Future
+    public function requestSecretChat(mixed $user, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
     }
@@ -6910,7 +6906,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
      */
-    public function setReportPeers($userOrId, array $extra = []): Future
+    public function setReportPeers(int|string $userOrId, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$userOrId, $extra]);
     }
@@ -6923,7 +6919,7 @@ class InternalDoc extends APIFactory
      * @psalm-suppress InvalidScope
      * @access public
      */
-    public static function setVar(object $obj, string $var, &$val): void
+    public static function setVar(object $obj, string $var, mixed &$val): void
     {
         Tools::setVar($obj, $var, $val);
     }
@@ -6962,7 +6958,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|float $time Number of seconds to sleep for
      */
-    public static function sleep($time): Amp\Future
+    public static function sleep(int|float $time): Amp\Future
     {
         return Tools::sleep($time);
     }
@@ -7007,7 +7003,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Parameters
      */
-    public function tdToTdcli($params, array $extra = [])
+    public function tdToTdcli(mixed $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
@@ -7018,16 +7014,15 @@ class InternalDoc extends APIFactory
      * @param array $key    Key
      * @psalm-return array|Promise<array>
      */
-    public function tdcliToTd(array &$params, array $key = null)
+    public function tdcliToTd(array &$params, ?array $key = null)
     {
         return $this->__call(__FUNCTION__, [$params, $key]);
     }
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
-     * @param Generator|Promise $promise
      */
-    public static function timeout($promise, int $timeout): Amp\Future
+    public static function timeout(Generator|Promise $promise, int $timeout): Amp\Future
     {
         return Tools::timeout($promise, $timeout);
     }
@@ -7048,7 +7043,7 @@ class InternalDoc extends APIFactory
      * @return Promise<TReturn>|Promise<TReturnAlt>
      * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
-    public static function timeoutWithDefault($promise, int $timeout, $default = null): Future
+    public static function timeoutWithDefault(Promise|Generator $promise, int $timeout, $default = null): Future
     {
         return Tools::timeoutWithDefault($promise, $timeout, $default);
     }
@@ -7130,7 +7125,7 @@ class InternalDoc extends APIFactory
      *
      * @param string|int|array $value base256 long
      */
-    public static function unpackSignedLongString($value): string
+    public static function unpackSignedLongString(string|int|array $value): string
     {
         return Tools::unpackSignedLongString($value);
     }
@@ -7173,7 +7168,7 @@ class InternalDoc extends APIFactory
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      * @psalm-return Promise<mixed>
       */
-    public function upload($file, string $fileName = '', callable $cb = null, bool $encrypted = false, array $extra = []): Future
+    public function upload(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $encrypted, $extra]);
     }
@@ -7185,7 +7180,7 @@ class InternalDoc extends APIFactory
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @psalm-return Promise<mixed>
       */
-    public function uploadEncrypted($file, string $fileName = '', callable $cb = null, array $extra = []): Future
+    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $extra]);
     }
@@ -7204,7 +7199,7 @@ class InternalDoc extends APIFactory
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      * @psalm-return Promise<array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
       */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = []): Future
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $extra]);
     }
@@ -7219,7 +7214,7 @@ class InternalDoc extends APIFactory
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      * @psalm-return Promise<mixed>
       */
-    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', callable $cb = null, bool $encrypted = false, array $extra = []): Future
+    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$stream, $size, $mime, $fileName, $cb, $encrypted, $extra]);
     }
@@ -7231,7 +7226,7 @@ class InternalDoc extends APIFactory
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      * @psalm-return Promise<mixed>
       */
-    public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false, array $extra = []): Future
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
     }
@@ -7245,7 +7240,7 @@ class InternalDoc extends APIFactory
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      * @psalm-return Promise<mixed>
       */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false, array $extra = []): Future
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
     }
@@ -7256,7 +7251,7 @@ class InternalDoc extends APIFactory
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      * @return Promise Bool
      */
-    public function viewSponsoredMessage($peer, $message, array $extra = []): Future
+    public function viewSponsoredMessage(int|array $peer, string|array $message, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$peer, $message, $extra]);
     }
@@ -7266,7 +7261,7 @@ class InternalDoc extends APIFactory
      * @param Generator|Promise $promise The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
      */
-    public static function wait($promise, bool $ignoreSignal = false)
+    public static function wait(Generator|Promise $promise, bool $ignoreSignal = false)
     {
         return Tools::wait($promise, $ignoreSignal);
     }

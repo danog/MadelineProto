@@ -43,7 +43,6 @@ abstract class Tools extends AsyncTools
     /**
      * Boolean to avoid problems with exceptions thrown by forked strands, see tools.
      *
-     * @var boolean
      */
     public bool $destructing = false;
     /**
@@ -156,7 +155,7 @@ abstract class Tools extends AsyncTools
      *
      * @param string|int|array $value base256 long
      */
-    public static function unpackSignedLongString($value): string
+    public static function unpackSignedLongString(string|int|array $value): string
     {
         if (\is_int($value)) {
             return (string) $value;
@@ -239,7 +238,7 @@ abstract class Tools extends AsyncTools
      *
      * @param mixed $var Value to check
      */
-    public static function isArrayOrAlike($var): bool
+    public static function isArrayOrAlike(mixed $var): bool
     {
         return \is_array($var) || $var instanceof ArrayAccess && $var instanceof Traversable && $var instanceof Countable;
     }
@@ -248,7 +247,7 @@ abstract class Tools extends AsyncTools
      *
      * @param mixed ...$params Params
      */
-    public static function arr(...$params): array
+    public static function arr(mixed ...$params): array
     {
         return $params;
     }
@@ -449,7 +448,7 @@ abstract class Tools extends AsyncTools
         return Closure::bind(
             fn () => isset($this->{$var}),
             $obj,
-            \get_class($obj),
+            $obj::class,
         )->__invoke();
     }
     /**
@@ -465,7 +464,7 @@ abstract class Tools extends AsyncTools
         return Closure::bind(
             fn &() => $this->{$var},
             $obj,
-            \get_class($obj),
+            $obj::class,
         )->__invoke();
     }
     /**
@@ -477,14 +476,14 @@ abstract class Tools extends AsyncTools
      * @psalm-suppress InvalidScope
      * @access public
      */
-    public static function setVar(object $obj, string $var, &$val): void
+    public static function setVar(object $obj, string $var, mixed &$val): void
     {
         Closure::bind(
             function () use ($var, &$val): void {
                 $this->{$var} =& $val;
             },
             $obj,
-            \get_class($obj),
+            $obj::class,
         )->__invoke();
     }
     /**

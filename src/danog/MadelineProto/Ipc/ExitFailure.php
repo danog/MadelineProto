@@ -13,30 +13,24 @@ use function Amp\Parallel\Sync\flattenThrowableBacktrace;
 
 final class ExitFailure
 {
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var string */
-    private $message;
+    private string $message;
 
-    /** @var int|string */
-    private $code;
+    private int|string $code;
 
-    /** @var string[] */
-    private $trace;
+    /** @var array<string> */
+    private array $trace;
 
-    /** @var string */
-    private $tlTrace;
+    private string $tlTrace;
 
-    /** @var self|null */
-    private $previous;
+    private ?self $previous = null;
 
-    /** @var string|null */
-    private $localized;
+    private ?string $localized = null;
 
     public function __construct(Throwable $exception)
     {
-        $this->type = \get_class($exception);
+        $this->type = $exception::class;
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
         $this->trace = flattenThrowableBacktrace($exception);

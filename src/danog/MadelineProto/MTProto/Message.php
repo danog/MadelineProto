@@ -95,7 +95,7 @@ abstract class Message
      *
      * @param mixed $msgId My message ID
      */
-    public function setMsgId($msgId): self
+    public function setMsgId(mixed $msgId): self
     {
         $this->msgId = $msgId;
 

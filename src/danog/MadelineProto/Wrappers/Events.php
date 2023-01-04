@@ -42,15 +42,14 @@ trait Events
     /**
      * Event handler instance.
      *
-     * @var EventHandler|null
      */
-    private $event_handler_instance;
+    private ?EventHandler $event_handler_instance = null;
     /**
      * Event handler method list.
      *
      * @var array<string, callable>
      */
-    private $eventHandlerMethods = [];
+    private array $eventHandlerMethods = [];
     /**
      * Initialize event handler.
      *

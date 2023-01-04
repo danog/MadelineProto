@@ -60,17 +60,17 @@ trait Start
             $prepare .= PHP_EOL;
             $stdout->write($prepare);
             if (\strpos(Tools::readLine(Lang::$current_lang['apiChoosePrompt']), 'm') !== false) {
-                $stdout->write("1) ".Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
-                $stdout->write("2) ".Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
-                $stdout->write("3) ");
+                $stdout->write('1) '.Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
+                $stdout->write('2) '.Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
+                $stdout->write('3) ');
                 foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
                     $stdout->write($k ? "    $key: " : "$key: ");
                     $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
                 }
-                $stdout->write("4) ".Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
+                $stdout->write('4) '.Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
 
-                $app['api_id'] = Tools::readLine("5) ".Lang::$current_lang['apiManualPrompt0']);
-                $app['api_hash'] = Tools::readLine("6) ".Lang::$current_lang['apiManualPrompt1']);
+                $app['api_id'] = Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']);
+                $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1']);
                 return $app;
             }
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
@@ -152,8 +152,7 @@ trait Start
         try {
             $params = $_POST;
             unset($params['creating_app']);
-            $app = ($this->myTelegramOrgWrapper->createApp($params));
-            return $app;
+            return ($this->myTelegramOrgWrapper->createApp($params));
         } catch (RPCErrorException $e) {
             $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         } catch (Exception $e) {

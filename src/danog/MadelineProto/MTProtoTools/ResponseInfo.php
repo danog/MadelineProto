@@ -138,10 +138,10 @@ class ResponseInfo
         $reason = Status::getReason($this->code);
         $body = "<html><body><h1>{$this->code} $reason</h1><br>";
         if ($this->code === Status::RANGE_NOT_SATISFIABLE) {
-            $body .= "<p>Could not use selected range.</p>";
+            $body .= '<p>Could not use selected range.</p>';
         }
         $body .= self::POWERED_BY;
-        $body .= "</body></html>";
+        $body .= '</body></html>';
         return $body;
     }
 

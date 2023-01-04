@@ -96,7 +96,7 @@ abstract class Crypt
         if (Magic::$hasOpenssl) {
             $iv_part_1 = \substr($iv, 0, 16);
             $iv_part_2 = \substr($iv, 16);
-            $ciphertext = "";
+            $ciphertext = '';
             for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
                 $plain = \substr($plaintext, $i, 16);
 
@@ -125,7 +125,7 @@ abstract class Crypt
         if (Magic::$hasOpenssl) {
             $iv_part_1 = \substr($iv, 0, 16);
             $iv_part_2 = \substr($iv, 16);
-            $plaintext = "";
+            $plaintext = '';
             for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
                 $cipher = \substr($ciphertext, $i, 16);
 

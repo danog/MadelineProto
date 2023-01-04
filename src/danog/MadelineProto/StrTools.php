@@ -33,9 +33,8 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
-     * @return float|int
      */
-    public static function mbStrlen(string $text)
+    public static function mbStrlen(string $text): float|int
     {
         $length = 0;
         $textlength = \strlen($text);

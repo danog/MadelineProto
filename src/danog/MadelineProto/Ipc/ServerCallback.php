@@ -80,7 +80,7 @@ class ServerCallback extends Server
     {
         $id = $wrapper->getRemoteId();
         if (!isset($this->socketList[$id])) {
-            throw new Exception("IPC timeout, could not find callback socket!");
+            throw new Exception('IPC timeout, could not find callback socket!');
         }
         $socket = $this->socketList[$id];
         EventLoop::cancel($this->watcherList[$id]);

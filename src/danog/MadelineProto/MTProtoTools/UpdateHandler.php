@@ -157,9 +157,9 @@ trait UpdateHandler
      * @param ?int  $channelId Channel ID
      * @param array $init      Init
      * @internal
-     * @return UpdatesState|UpdatesState[]
+     * @return UpdatesState|array<UpdatesState>
      */
-    public function loadChannelState(?int $channelId = null, array $init = [])
+    public function loadChannelState(?int $channelId = null, array $init = []): UpdatesState|array
     {
         return $this->channels_state->get($channelId, $init);
     }
@@ -199,13 +199,13 @@ trait UpdateHandler
         foreach (($this->extractUpdates($updates)) as $update) {
             if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage'])) {
                 if ($result !== null) {
-                    throw new Exception("Found more than one update of type message, use extractUpdates to extract all updates");
+                    throw new Exception('Found more than one update of type message, use extractUpdates to extract all updates');
                 }
                 $result = $update;
             }
         }
         if ($result === null) {
-            throw new Exception("Could not find any message in the updates!");
+            throw new Exception('Could not find any message in the updates!');
         }
         return $result;
     }
@@ -265,7 +265,7 @@ trait UpdateHandler
      * @param array $actual_updates Actual updates for deferred
      * @internal
      */
-    public function handleUpdates(array $updates, array $actual_updates = null): void
+    public function handleUpdates(array $updates, ?array $actual_updates = null): void
     {
         if ($actual_updates) {
             $updates = $actual_updates;

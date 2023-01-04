@@ -41,13 +41,13 @@ abstract class ClientAbstract
     /**
      * Requests promise array.
      *
-     * @var Deferred[]
+     * @var array<Deferred>
      */
     private array $requests = [];
     /**
      * Wrappers array.
      *
-     * @var Wrapper[]
+     * @var array<Wrapper>
      */
     private array $wrappers = [];
     /**
@@ -111,7 +111,7 @@ abstract class ClientAbstract
                 }
             }
             if ($this->run) {
-                $this->logger("Reconnecting to IPC server!");
+                $this->logger('Reconnecting to IPC server!');
                 try {
                     $this->server->disconnect();
                 } catch (Throwable $e) {
@@ -146,7 +146,7 @@ abstract class ClientAbstract
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
      */
-    public function __call($function, $arguments)
+    public function __call(string|int $function, array|Wrapper $arguments)
     {
         $this->requests []= $deferred = new DeferredFuture;
         if ($arguments instanceof Wrapper) {

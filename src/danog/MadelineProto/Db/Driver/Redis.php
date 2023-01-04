@@ -19,7 +19,7 @@ use Throwable;
  */
 class Redis
 {
-    /** @var RedisRedis[] */
+    /** @var array<RedisRedis> */
     private static array $connections = [];
 
     /**

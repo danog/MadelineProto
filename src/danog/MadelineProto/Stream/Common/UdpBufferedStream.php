@@ -67,7 +67,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     public function getReadBuffer(int &$length)
     {
         if (!$this->stream) {
-            return new Failure(new ClosedException("MadelineProto stream was disconnected"));
+            return new Failure(new ClosedException('MadelineProto stream was disconnected'));
         }
         $chunk = $this->read();
         if ($chunk === null) {
@@ -176,6 +176,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

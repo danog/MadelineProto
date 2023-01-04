@@ -28,9 +28,8 @@ class PermAuthKey extends AuthKey
     /**
      * Whether this auth key is authorized (as in associated to an account on Telegram).
      *
-     * @var boolean
      */
-    private $authorized = false;
+    private bool $authorized = false;
     /**
      * Constructor function.
      *

@@ -118,7 +118,7 @@ class MTProto implements TLCallback
         "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n".
         "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n".
         "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n".
-        "-----END RSA PUBLIC KEY-----",
+        '-----END RSA PUBLIC KEY-----',
     ];
     private const TEST_RSA_KEYS = [
         "-----BEGIN RSA PUBLIC KEY-----\n".
@@ -128,7 +128,7 @@ class MTProto implements TLCallback
         "j25sIWeYPHYeOrFp/eXaqhISP6G+q2IeTaWTXpwZj4LzXq5YOpk4bYEQ6mvRq7D1\n".
         "aHWfYmlEGepfaYR8Q0YqvvhYtMte3ITnuSJs171+GDqpdKcSwHnd6FudwGO4pcCO\n".
         "j4WcDuXc2CTHgH8gFTNhp/Y8/SpDOhvn9QIDAQAB\n".
-        "-----END RSA PUBLIC KEY-----",
+        '-----END RSA PUBLIC KEY-----',
     ];
     /**
      * Internal version of MadelineProto.
@@ -262,167 +262,147 @@ class MTProto implements TLCallback
      *
      * To avoid this, we store each MTProto instance in here (unreferencing on shutdown in unreference()), and call serialize() on all instances before calling die; in Magic.
      *
-     * @var self[]
+     * @var array<self>
      */
     public static array $references = [];
     /**
      * Instance of wrapper API.
      *
-     * @var APIWrapper
      */
-    public $wrapper;
+    public APIWrapper $wrapper;
     /**
      * PWRTelegram webhook URL.
      *
-     * @var boolean|string
      */
-    public $hook_url = false;
+    public bool|string $hook_url = false;
     /**
      * Settings object.
      *
-     * @var Settings
      */
-    public $settings;
+    public Settings $settings;
     /**
      * Config array.
      *
-     * @var array
      */
-    private $config = ['expires' => -1];
+    private array $config = ['expires' => -1];
     /**
      * TOS info.
      *
-     * @var array
      */
-    private $tos = ['expires' => 0, 'accepted' => true];
+    private array $tos = ['expires' => 0, 'accepted' => true];
     /**
      * Whether we're initing authorization.
      *
-     * @var boolean
      */
-    private $initing_authorization = false;
+    private bool $initing_authorization = false;
     /**
      * Authorization info (User).
      *
-     * @var array|null
      */
-    public $authorization = null;
+    public ?array $authorization = null;
     /**
      * Whether we're authorized.
      *
-     * @var int
      * @psalm-var self::NOT_LOGGED_IN|self::WAITING_*|self::LOGGED_IN
      */
-    public $authorized = self::NOT_LOGGED_IN;
+    public int $authorized = self::NOT_LOGGED_IN;
     /**
      * Main authorized DC ID.
      *
-     * @var integer
      */
-    public $authorized_dc = -1;
+    public int $authorized_dc = -1;
     /**
      * RSA keys.
      *
      * @var array<RSA>
      */
-    private $rsa_keys = [];
+    private array $rsa_keys = [];
     /**
      * RSA keys.
      *
      * @var array<RSA>
      */
-    private $test_rsa_keys = [];
+    private array $test_rsa_keys = [];
     /**
      * CDN RSA keys.
      *
-     * @var array
      */
-    private $cdn_rsa_keys = [];
+    private array $cdn_rsa_keys = [];
     /**
      * Diffie-hellman config.
      *
-     * @var array
      */
-    private $dh_config = ['version' => 0];
+    private array $dh_config = ['version' => 0];
     /**
      * Internal peer database.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray|array<Promise>
      */
-    public $chats;
+    public DbArray|array $chats;
 
     /**
      * Cache of usernames for chats.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray|array<Promise>
      */
-    public $usernames;
+    public DbArray|array $usernames;
     /**
      * Cached parameters for fetching channel participants.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray|array<Promise>
      */
-    public $channelParticipants;
+    public DbArray|array $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
      *
-     * @var integer
      */
-    public $last_stored = 0;
+    public int $last_stored = 0;
     /**
      * Temporary array of data to be sent to remote peer database.
      *
-     * @var array
      */
-    public $qres = [];
+    public array $qres = [];
     /**
      * Full chat info database.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray|array<Promise>
      */
-    public $full_chats;
+    public DbArray|array $full_chats;
     /**
      * Sponsored message database.
      *
-     * @var DbArray
      */
-    public $sponsoredMessages;
+    public DbArray $sponsoredMessages;
     /**
      * Latest chat message ID map for update handling.
      *
-     * @var array
      */
-    private $msg_ids = [];
+    private array $msg_ids = [];
     /**
      * Version integer for upgrades.
      *
-     * @var integer
      */
-    private $v = 0;
+    private int $v = 0;
     /**
      * Cached getdialogs params.
      *
-     * @var array
      */
-    private $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
+    private array $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
     /**
      * Support user ID.
      *
-     * @var integer
      */
-    private $supportUser = 0;
+    private int $supportUser = 0;
     /**
      * File reference database.
      *
-     * @var ReferenceDatabase
      */
-    public $referenceDatabase;
+    public ReferenceDatabase $referenceDatabase;
     /**
      * min database.
      *
-     * @var MinDatabase
      */
-    public $minDatabase;
+    public MinDatabase $minDatabase;
     /**
      * TOS check loop.
      */
@@ -456,37 +436,34 @@ class MTProto implements TLCallback
      *
      * @var array<FeedLoop>
      */
-    public $feeders = [];
+    public array $feeders = [];
     /**
      * Secret chat feeder loops.
      *
      * @var array<SecretFeedLoop>
      */
-    public $secretFeeders = [];
+    public array $secretFeeders = [];
     /**
      * Updater loops.
      *
      * @var array<UpdateLoop>
      */
-    public $updaters = [];
+    public array $updaters = [];
     /**
      * DataCenter instance.
      *
-     * @var DataCenter
      */
-    public $datacenter;
+    public DataCenter $datacenter;
     /**
      * Logger instance.
      *
-     * @var Logger
      */
-    public $logger;
+    public Logger $logger;
     /**
      * TL serializer.
      *
-     * @var TL
      */
-    private $TL;
+    private TL $TL;
 
     /**
      * Snitch.
@@ -548,9 +525,9 @@ class MTProto implements TLCallback
     /**
      * Nullcache array for storing main session file to DB.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray|array<Promise>
      */
-    public $session;
+    public DbArray|array $session;
 
     /**
      * List of properties stored in database (memory or external).
@@ -920,9 +897,8 @@ class MTProto implements TLCallback
     /**
      * Get main DC ID.
      *
-     * @return int|string
      */
-    public function getDataCenterId()
+    public function getDataCenterId(): int|string
     {
         return $this->datacenter->curdc;
     }
@@ -1058,7 +1034,7 @@ class MTProto implements TLCallback
             if ($this->chats->isset(0)) {
                 return;
             }
-            $this->logger("Cleaning up peer database...");
+            $this->logger('Cleaning up peer database...');
             $k = 0;
             $total = $this->chats->count();
             $iterator = $this->chats->getIterator();
@@ -1079,7 +1055,7 @@ class MTProto implements TLCallback
                 }
             }
             $this->chats->set(0, []);
-            $this->logger("Cleaned up peer database!");
+            $this->logger('Cleaned up peer database!');
         } elseif ($this->chats->isset(0)) {
             $this->chats->unset(0);
         }
@@ -1301,7 +1277,7 @@ class MTProto implements TLCallback
         if (!isset($this->logger)) {
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
-        $this->logger->logger("Will unreference instance");
+        $this->logger->logger('Will unreference instance');
         if (isset(self::$references[\spl_object_hash($this)])) {
             unset(self::$references[\spl_object_hash($this)]);
         }
@@ -1330,7 +1306,7 @@ class MTProto implements TLCallback
                 $datacenter->disconnect();
             }
         }
-        $this->logger->logger("Unreferenced instance");
+        $this->logger->logger('Unreferenced instance');
     }
     /**
      * Destructor.
@@ -1339,7 +1315,7 @@ class MTProto implements TLCallback
     {
         $this->logger('Shutting down MadelineProto (MTProto)');
         $this->unreference();
-        $this->logger("Successfully destroyed MadelineProto");
+        $this->logger('Successfully destroyed MadelineProto');
     }
     /**
      * Restart IPC server instance.
@@ -1479,7 +1455,7 @@ class MTProto implements TLCallback
     public function hasAllAuth(): bool
     {
         if ($this->isInitingAuthorization()) {
-            $this->logger("Initing auth");
+            $this->logger('Initing auth');
             return false;
         }
         foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
@@ -1623,10 +1599,10 @@ class MTProto implements TLCallback
     public function startUpdateSystem(bool $anyway = false): void
     {
         if (!$this->inited() && !$anyway) {
-            $this->logger("Not starting update system");
+            $this->logger('Not starting update system');
             return;
         }
-        $this->logger("Starting update system");
+        $this->logger('Starting update system');
         foreach ($this->secret_chats as $id => $chat) {
             if (!isset($this->secretFeeders[$id])) {
                 $this->secretFeeders[$id] = new SecretFeedLoop($this, $id);
@@ -1680,7 +1656,7 @@ class MTProto implements TLCallback
      * @param mixed $watcherId Watcher ID
      * @internal
      */
-    public function getPhoneConfig($watcherId = null): void
+    public function getPhoneConfig(mixed $watcherId = null): void
     {
         if ($this->authorized === self::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
@@ -1822,16 +1798,16 @@ class MTProto implements TLCallback
     public function getHint(): string
     {
         if ($this->authorized !== self::WAITING_PASSWORD) {
-            throw new Exception("Not waiting for the password!");
+            throw new Exception('Not waiting for the password!');
         }
         return $this->authorization['hint'];
     }
     /**
      * IDs of peers where to report errors.
      *
-     * @var int[]
+     * @var array<int>
      */
-    private $reportDest = [];
+    private array $reportDest = [];
     /**
      * Check if has report peers.
      */
@@ -1848,7 +1824,7 @@ class MTProto implements TLCallback
 
         $warning = '';
         if (!$this->hasReportPeers() && $this->hasEventHandler()) {
-            Logger::log("!!! Warning: no report peers are set, please add the following method to your event handler !!!", Logger::FATAL_ERROR);
+            Logger::log('!!! Warning: no report peers are set, please add the following method to your event handler !!!', Logger::FATAL_ERROR);
             Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
             $warning .= "<h2 style='color:red;'>Warning: no report peers are set, please add the following method to your event handler:</h2>";
             $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
@@ -1864,7 +1840,7 @@ class MTProto implements TLCallback
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
      */
-    public function setReportPeers($userOrId): void
+    public function setReportPeers(int|string $userOrId): void
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
@@ -1880,7 +1856,7 @@ class MTProto implements TLCallback
                 $this->logger("Could not obtain info about report peer $peer: $e", Logger::FATAL_ERROR);
             }
         }
-        /** @var int[] $userOrId */
+        /** @var array<int> $userOrId */
         $this->reportDest = $userOrId;
     }
     /**
@@ -1931,7 +1907,7 @@ class MTProto implements TLCallback
         }
         if ($sent && $file) {
             \ftruncate($this->logger->stdout->getResource(), 0);
-            $this->logger->logger("Reported!");
+            $this->logger->logger('Reported!');
         }
     }
     /**

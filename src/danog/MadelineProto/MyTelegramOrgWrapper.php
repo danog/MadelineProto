@@ -47,9 +47,8 @@ class MyTelegramOrgWrapper
     /**
      * Settings.
      *
-     * @var Settings
      */
-    private $settings;
+    private Settings $settings;
     /**
      * Async setting.
      */
@@ -61,9 +60,8 @@ class MyTelegramOrgWrapper
     /**
      * Cooke jar.
      *
-     * @var LocalCookieJar
      */
-    private $jar;
+    private LocalCookieJar $jar;
     /**
      * Endpoint.
      */
@@ -78,9 +76,8 @@ class MyTelegramOrgWrapper
     /**
      * Constructor.
      *
-     * @param array|Settings $settings
      */
-    public function __construct($settings)
+    public function __construct(array|Settings $settings)
     {
         $this->settings = Settings::parseFromLegacy($settings);
         if (!$this->settings instanceof Settings) {

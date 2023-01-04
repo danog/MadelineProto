@@ -31,21 +31,18 @@ abstract class AuthKey implements JsonSerializable
     /**
      * Auth key.
      *
-     * @var ?string
      */
-    protected $authKey;
+    protected ?string $authKey = null;
     /**
      * Auth key ID.
      *
-     * @var ?string
      */
-    protected $id;
+    protected ?string $id = null;
     /**
      * Server salt.
      *
-     * @var ?string
      */
-    protected $serverSalt;
+    protected ?string $serverSalt = null;
     /**
      * Constructor function.
      *

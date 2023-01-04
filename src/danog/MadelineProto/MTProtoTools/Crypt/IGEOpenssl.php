@@ -37,7 +37,7 @@ final class IGEOpenssl extends IGE
     }
     public function encrypt(string $plaintext): string
     {
-        $ciphertext = "";
+        $ciphertext = '';
         for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
             $plain = \substr($plaintext, $i, 16);
 
@@ -53,7 +53,7 @@ final class IGEOpenssl extends IGE
     }
     public function decrypt(string $ciphertext): string
     {
-        $plaintext = "";
+        $plaintext = '';
         for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
             $cipher = \substr($ciphertext, $i, 16);
 

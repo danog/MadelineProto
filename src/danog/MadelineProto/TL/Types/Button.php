@@ -43,9 +43,8 @@ class Button implements JsonSerializable, ArrayAccess
     /**
      * MTProto instance.
      *
-     * @var MTProto|Client|null
      */
-    private $API = null;
+    private MTProto|Client|null $API = null;
     /**
      * Message ID.
      */
@@ -53,9 +52,8 @@ class Button implements JsonSerializable, ArrayAccess
     /**
      * Peer ID.
      *
-     * @var array|int
      */
-    private $peer;
+    private array|int $peer;
     /**
      * Constructor function.
      *

@@ -98,16 +98,14 @@ class API extends InternalDoc
      * Session paths.
      *
      * @internal
-     * @var SessionPaths
      */
-    public $session;
+    public SessionPaths $session;
 
     /**
      * Instance of MadelineProto.
      *
-     * @var null|MTProto|Client
      */
-    public $API;
+    public MTProto|Client|null $API = null;
 
     /**
      * Storage for externally set properties to be serialized.
@@ -118,7 +116,6 @@ class API extends InternalDoc
      * Whether we're getting our API ID.
      *
      * @internal
-     * @var boolean
      */
     private bool $gettingApiId = false;
 
@@ -126,29 +123,25 @@ class API extends InternalDoc
      * my.telegram.org API wrapper.
      *
      * @internal
-     * @var null|MyTelegramOrgWrapper
      */
-    private $myTelegramOrgWrapper;
+    private ?MyTelegramOrgWrapper $myTelegramOrgWrapper = null;
 
     /**
      * Whether this is an old instance.
      *
-     * @var boolean
      */
     private bool $oldInstance = false;
     /**
      * Whether we're destructing.
      *
-     * @var boolean
      */
     private bool $destructing = false;
 
     /**
      * API wrapper (to avoid circular references).
      *
-     * @var APIWrapper
      */
-    private $wrapper;
+    private APIWrapper $wrapper;
 
     /**
      * Unlock callback.
@@ -163,7 +156,7 @@ class API extends InternalDoc
      * @param string         $session  Session name
      * @param array|Settings $settings Settings
      */
-    public function __magic_construct(string $session, $settings = []): void
+    public function __magic_construct(string $session, array|Settings $settings = []): void
     {
         Magic::start(true);
         $settings = Settings::parseFromLegacy($settings);
@@ -214,43 +207,43 @@ class API extends InternalDoc
     protected function reconnectFull()
     {
         if ($this->API instanceof Client) {
-            $this->logger->logger("Restarting to full instance...");
+            $this->logger->logger('Restarting to full instance...');
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && (($this->hasEventHandler()) || !($this->isIpcWorker()))) {
-                    $this->logger->logger("Restarting to full instance: the bot is already running!");
-                    Tools::closeConnection($this->getWebMessage("The bot is already running!"));
+                    $this->logger->logger('Restarting to full instance: the bot is already running!');
+                    Tools::closeConnection($this->getWebMessage('The bot is already running!'));
                     return false;
                 }
-                $this->logger->logger("Restarting to full instance: stopping IPC server...");
+                $this->logger->logger('Restarting to full instance: stopping IPC server...');
                 $this->API->stopIpcServer();
-                $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
+                $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
                 $this->API->disconnect();
             } catch (SecurityException $e) {
                 throw $e;
             } catch (Throwable $e) {
                 $this->logger->logger("Restarting to full instance: error $e");
             }
-            $this->logger->logger("Restarting to full instance: reconnecting...");
+            $this->logger->logger('Restarting to full instance: reconnecting...');
             $cancel = new DeferredFuture;
             $cb = function () use ($cancel, &$cb): void {
                 [$result] = Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
                 if ($result instanceof ChannelledSocket) {
                     try {
                         if (!$this->API instanceof Client) {
-                            $this->logger->logger("Restarting to full instance (again): the bot is already running!");
+                            $this->logger->logger('Restarting to full instance (again): the bot is already running!');
                             $result->disconnect();
                             return;
                         }
                         $API = new Client($result, $this->session, Logger::$default, $this->async);
                         if (($API->hasEventHandler()) || !($API->isIpcWorker())) {
-                            $this->logger->logger("Restarting to full instance (again): the bot is already running!");
+                            $this->logger->logger('Restarting to full instance (again): the bot is already running!');
                             $API->disconnect();
                             $API->unreference();
                             return;
                         }
-                        $this->logger->logger("Restarting to full instance: stopping another IPC server...");
+                        $this->logger->logger('Restarting to full instance: stopping another IPC server...');
                         $API->stopIpcServer();
-                        $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
+                        $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
                         $API->disconnect();
                         $API->unreference();
                     } catch (SecurityException $e) {
@@ -290,11 +283,11 @@ class API extends InternalDoc
 
         if ($unserialized === 0) {
             // Timeout
-            Logger::log("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!", Logger::FATAL_ERROR);
-            if (!$tryReconnect || (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'testing')) {
+            Logger::log('!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!', Logger::FATAL_ERROR);
+            if (!$tryReconnect || (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'testing')) {
                 throw new Exception('Could not connect to MadelineProto, please check the MadelineProto.log file to debug!');
             }
-            Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
+            Logger::log('!!! Reconnecting using slower method. !!!', Logger::FATAL_ERROR);
             // IPC server error, try fetching full session
             return $this->connectToMadelineProto($settings, true, false);
         } elseif ($unserialized instanceof Throwable) {
@@ -410,7 +403,7 @@ class API extends InternalDoc
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
                 if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
-                    $this->logger->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
@@ -422,10 +415,10 @@ class API extends InternalDoc
     /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
      *
-     * @param API[]           $instances    Instances of madeline
-     * @param string[]|string $eventHandler Event handler(s)
+     * @param array<API> $instances Instances of madeline
+     * @param array<string>|string $eventHandler Event handler(s)
      */
-    public static function startAndLoopMulti(array $instances, $eventHandler): void
+    public static function startAndLoopMulti(array $instances, array|string $eventHandler): void
     {
         if (\is_string($eventHandler)) {
             $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
@@ -450,7 +443,7 @@ class API extends InternalDoc
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
                 if ($errors[$t] > 10 && \array_sum($started) !== \count($eventHandler)) {
-                    $instanceOne->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    $instanceOne->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
@@ -502,7 +495,7 @@ class API extends InternalDoc
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
                 if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
-                    $this->logger->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
@@ -534,7 +527,7 @@ class API extends InternalDoc
      * @param mixed  $value Value
      * @internal
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, mixed $value)
     {
         return $this->storage[$name] = $value;
     }

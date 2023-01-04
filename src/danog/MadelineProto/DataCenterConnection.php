@@ -49,63 +49,55 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Promise for connection.
      *
-     * @var Promise
      */
-    private $connectionsPromise;
+    private Promise $connectionsPromise;
     /**
      * Deferred for connection.
      *
-     * @var Deferred
      */
-    private $connectionsDeferred;
+    private Deferred $connectionsDeferred;
     /**
      * Temporary auth key.
      *
-     * @var TempAuthKey|null
      */
-    private $tempAuthKey;
+    private ?TempAuthKey $tempAuthKey = null;
     /**
      * Permanent auth key.
      *
-     * @var PermAuthKey|null
      */
-    private $permAuthKey;
+    private ?PermAuthKey $permAuthKey = null;
     /**
      * Connections open to a certain DC.
      *
      * @var array<int, Connection>
      */
-    private $connections = [];
+    private array $connections = [];
     /**
      * Connection weights.
      *
      * @var array<int, int>
      */
-    private $availableConnections = [];
+    private array $availableConnections = [];
     /**
      * Main API instance.
      *
-     * @var MTProto
      */
-    private $API;
+    private MTProto $API;
     /**
      * Connection context.
      *
-     * @var ConnectionContext
      */
-    private $ctx;
+    private ConnectionContext $ctx;
     /**
      * DC ID.
      *
-     * @var string
      */
-    private $datacenter;
+    private string $datacenter;
     /**
      * Linked DC ID.
      *
-     * @var string
      */
-    private $linked;
+    private string $linked;
     /**
      * Loop to keep weights at sane value.
      */
@@ -113,27 +105,23 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Decrement roundrobin weight by this value if busy reading.
      *
-     * @var integer
      */
-    private $decRead = 1;
+    private int $decRead = 1;
     /**
      * Decrement roundrobin weight by this value if busy writing.
      *
-     * @var integer
      */
-    private $decWrite = 10;
+    private int $decWrite = 10;
     /**
      * Backed up messages.
      *
-     * @var array
      */
-    private $backup = [];
+    private array $backup = [];
     /**
      * Whether this socket has to be reconnected.
      *
-     * @var boolean
      */
-    private $needsReconnect = false;
+    private bool $needsReconnect = false;
     /**
      * Indicate if this socket needs to be reconnected.
      *
@@ -217,7 +205,6 @@ class DataCenterConnection implements JsonSerializable
      * Bind temporary and permanent auth keys.
      *
      * @internal
-     * @return true
      */
     public function bindTempAuthKey(): bool
     {
@@ -482,7 +469,7 @@ class DataCenterConnection implements JsonSerializable
         $this->decWrite = self::WRITE_WEIGHT;
         if ($id === -1 || !isset($this->connections[$id])) {
             if ($this->connections) {
-                $this->API->logger->logger("Already connected!", Logger::WARNING);
+                $this->API->logger->logger('Already connected!', Logger::WARNING);
                 return;
             }
             $this->connectMore($count);
@@ -605,9 +592,8 @@ class DataCenterConnection implements JsonSerializable
      * Check if any connection is available.
      *
      * @param integer $id Connection ID
-     * @return bool|int
      */
-    public function hasConnection(int $id = -1)
+    public function hasConnection(int $id = -1): bool|int
     {
         return $id < 0 ? \count($this->connections) : isset($this->connections[$id]);
     }

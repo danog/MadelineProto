@@ -12,7 +12,7 @@ use danog\MadelineProto\Settings\Database\Memory;
 
 /**
  * Memory database backend.
- * 
+ *
  * @implements DbArray<Memory>
  */
 class MemoryArray extends ArrayIterator implements DbArray
@@ -28,7 +28,7 @@ class MemoryArray extends ArrayIterator implements DbArray
             return $previous;
         }
         if ($previous instanceof DbArray) {
-            Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
+            Logger::log('Loading database to memory. Please wait.', Logger::WARNING);
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }

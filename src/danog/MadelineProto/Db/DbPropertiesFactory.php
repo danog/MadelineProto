@@ -55,7 +55,7 @@ abstract class DbPropertiesFactory
                 $class .= '\\Redis';
                 break;
             default:
-                throw new InvalidArgumentException("Unknown dbType: ".\get_class($dbSettings));
+                throw new InvalidArgumentException('Unknown dbType: '.$dbSettings::class);
         }
 
         /** @var DbType $class */

@@ -92,6 +92,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

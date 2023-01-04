@@ -176,7 +176,7 @@ class ReadLoop extends SignalLoop
                 */
                 $session_id = \substr($decrypted_data, 8, 8);
                 if ($session_id !== $connection->session_id) {
-                    $API->logger->logger("Session ID mismatch", Logger::FATAL_ERROR);
+                    $API->logger->logger('Session ID mismatch', Logger::FATAL_ERROR);
                     $connection->resetSession();
                     throw new NothingInTheSocketException();
                 }

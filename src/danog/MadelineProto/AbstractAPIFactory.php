@@ -105,7 +105,7 @@ abstract class AbstractAPIFactory
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             if (isset($args[0]) && !isset($args['multiple'])) {
-                throw new InvalidArgumentException("Parameter names must be provided!");
+                throw new InvalidArgumentException('Parameter names must be provided!');
             }
             return $this->mainAPI->API->methodCallAsyncRead($name, $args, $aargs);
         }
@@ -114,8 +114,7 @@ abstract class AbstractAPIFactory
         ) {
             $this->mainAPI->reconnectFull();
         }
-        $res = $this->methods[$lower_name](...$arguments);
-        return $res;
+        return $this->methods[$lower_name](...$arguments);
     }
     /**
      * Info to dump.
@@ -144,9 +143,9 @@ abstract class AbstractAPIFactory
      * @param API|MTProto|Client $value Value
      * @param string             $class Custom class name
      */
-    protected static function getInternalMethodList($value, string $class = null): array
+    protected static function getInternalMethodList(API|MTProto|Client $value, ?string $class = null): array
     {
-        return \array_map(fn ($method) => [$value, $method], self::getInternalMethodListClass($class ?? \get_class($value)));
+        return \array_map(fn ($method) => [$value, $method], self::getInternalMethodListClass($class ?? $value::class));
     }
     /**
      * Get fully resolved method list for object, including snake_case and camelCase variants.

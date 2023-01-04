@@ -105,7 +105,7 @@ trait Reliable
      * @param array      $msg_ids    Message IDs to send info about
      * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
      */
-    public function sendMsgsStateInfo(array $msg_ids, $req_msg_id): void
+    public function sendMsgsStateInfo(array $msg_ids, string|int $req_msg_id): void
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';

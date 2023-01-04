@@ -26,7 +26,7 @@ final class IpcState
     /**
      * Construct.
      */
-    public function __construct(int $startupId, Throwable $exception = null)
+    public function __construct(int $startupId, ?Throwable $exception = null)
     {
         $this->startupTime = \microtime(true);
         $this->startupId = $startupId;

@@ -27,7 +27,7 @@ trait AuthKeyHandler
     {
         $this->auth_mutex ??= new LocalMutex;
         $lock = $this->auth_mutex->acquire();
-        $this->logger("Initing authorization...");
+        $this->logger('Initing authorization...');
         $this->initing_authorization = true;
         try {
             $main = [];
@@ -49,7 +49,7 @@ trait AuthKeyHandler
             await(\array_map(async(...), $media));
         } finally {
             $lock->release();
-            $this->logger("Done initing authorization!");
+            $this->logger('Done initing authorization!');
             $this->initing_authorization = false;
         }
         $this->startUpdateSystem(true);

@@ -120,7 +120,7 @@ class IncomingMessage extends Message
      *
      * @param int|string $dc DC ID
      */
-    public function log($dc): string
+    public function log(int|string $dc): string
     {
         if ($this->fromContainer) {
             return "Inside of container, received {$this->content['_']} from DC $dc";

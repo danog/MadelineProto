@@ -72,7 +72,7 @@ trait AuthKeyHandler
 
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
-                $this->logger->logger("Requesting pq...", Logger::VERBOSE);
+                $this->logger->logger('Requesting pq...', Logger::VERBOSE);
                 /**
                  * ***********************************************************************
                  * Make pq request, DH exchange initiation.
@@ -108,7 +108,7 @@ trait AuthKeyHandler
                 }
                 if (!isset($key)) {
                     if ($cdn) {
-                        $this->logger->logger("Could not find required CDN public key, postponing CDN handshake...");
+                        $this->logger->logger('Could not find required CDN public key, postponing CDN handshake...');
                         return;
                     }
                     throw new SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
@@ -129,7 +129,7 @@ trait AuthKeyHandler
                 ] as $method) {
                     $this->logger->logger("Factorizing with $method (please wait, might take a while)");
                     if ($method !== 'native_single_cpp') {
-                        $this->logger->logger("Install https://prime.madelineproto.xyz and the FFI extension to speed this up!");
+                        $this->logger->logger('Install https://prime.madelineproto.xyz and the FFI extension to speed this up!');
                     }
 
                     $p = 0;
@@ -416,7 +416,7 @@ trait AuthKeyHandler
      *
      * @param string|integer $what Number to factorize
      */
-    private function wolframSingle($what): false|int
+    private function wolframSingle(string|int $what): false|int
     {
         $code = ($this->API->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
         $query = 'Do prime factorization of '.$what;
@@ -431,7 +431,7 @@ trait AuthKeyHandler
         $fres = false;
         foreach ($res['queryresult']['pods'] as $cur) {
             if ($cur['id'] === 'Divisors') {
-                $fres = \explode(', ', \preg_replace(["/{\\d+, /", "/, \\d+}\$/"], '', $cur['subpods'][0]['moutput']));
+                $fres = \explode(', ', \preg_replace(['/{\\d+, /', '/, \\d+}$/'], '', $cur['subpods'][0]['moutput']));
                 break;
             }
         }

@@ -33,9 +33,8 @@ class Conversion
      * Prepare API instance.
      *
      * @param array<int, string> $authorization Authorization info
-     * @param SettingsAbstract|array $settings
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings): API
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, SettingsAbstract|array $settings): API
     {
         $settings = Settings::parseFromLegacyFull($settings);
         $settings->getIpc()->setSlow(true);
@@ -43,7 +42,7 @@ class Conversion
         $settings->getAuth()->setPfs(true);
         $MadelineProto = new API($session, $settings);
         $MadelineProto->help->getConfig();
-        $MadelineProto->logger("About to import auth!", Logger::FATAL_ERROR);
+        $MadelineProto->logger('About to import auth!', Logger::FATAL_ERROR);
         $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;
     }
@@ -311,7 +310,7 @@ class Conversion
 
             $salt = self::tdesktop_read_bytearray($data, true);
             if (\strlen($salt) !== 32) {
-                throw new Exception("Length of salt is wrong!");
+                throw new Exception('Length of salt is wrong!');
             }
 
             $encryptedKey = self::tdesktop_read_bytearray($data);

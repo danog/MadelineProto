@@ -138,7 +138,7 @@ class Server extends SignalLoop
                     Logger::log("IPC server got exception $e");
                     return $e;
                 }
-                Logger::log("IPC server started successfully!");
+                Logger::log('IPC server started successfully!');
                 return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!");
@@ -148,7 +148,7 @@ class Server extends SignalLoop
                 $cancelConnect = (new DeferredFuture)->getFuture();
             } catch (Throwable $e) {
                 Logger::log("$e");
-                Logger::log("Could not start IPC server, please check the logs for more details!");
+                Logger::log('Could not start IPC server, please check the logs for more details!');
                 return $e;
             }
             $count++;
@@ -199,7 +199,7 @@ class Server extends SignalLoop
      */
     protected function clientLoop(ChannelledSocket $socket): void
     {
-        $this->API->logger("Accepted IPC client connection!");
+        $this->API->logger('Accepted IPC client connection!');
 
         $id = 0;
         $payload = null;
@@ -261,7 +261,7 @@ class Server extends SignalLoop
      */
     public function __toString(): string
     {
-        return "IPC server";
+        return 'IPC server';
     }
 
     /**

@@ -52,7 +52,7 @@ trait FilesLogic
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -113,7 +113,7 @@ trait FilesLogic
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
-    public function downloadToStream($messageMedia, $stream, callable $cb = null, int $offset = 0, int $end = -1)
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1)
     {
         $messageMedia = $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
@@ -125,7 +125,7 @@ trait FilesLogic
             $stream = new ResourceOutputStream($stream);
         }
         if (!$stream instanceof OutputStream) {
-            throw new Exception("Invalid stream provided");
+            throw new Exception('Invalid stream provided');
         }
         $seekable = false;
         if (\method_exists($stream, 'seek')) {
@@ -166,7 +166,7 @@ trait FilesLogic
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse($messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): ClientResponse
+    public function downloadToResponse(array|string $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): ClientResponse
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -225,7 +225,7 @@ trait FilesLogic
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      */
-    public function uploadEncrypted($file, string $fileName = '', callable $cb = null)
+    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null)
     {
         return $this->upload($file, $fileName, $cb, true);
     }
@@ -238,7 +238,7 @@ trait FilesLogic
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      */
-    public function upload($file, string $fileName = '', callable $cb = null, bool $encrypted = false)
+    public function upload(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -289,7 +289,7 @@ trait FilesLogic
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -300,7 +300,7 @@ trait FilesLogic
             $stream = new ResourceInputStream($stream);
         }
         if (!$stream instanceof InputStream) {
-            throw new Exception("Invalid stream provided");
+            throw new Exception('Invalid stream provided');
         }
         $seekable = false;
         if (\method_exists($stream, 'seek')) {
@@ -349,10 +349,10 @@ trait FilesLogic
             $size = $stream->tell();
             $stream->seek(0);
         } elseif (!$size) {
-            $this->logger->logger("No content length for stream, caching first");
+            $this->logger->logger('No content length for stream, caching first');
             $body = $stream;
             $stream = new BlockingFile(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
-            while (null !== ($chunk = $body->read())) {
+            while (($chunk = $body->read()) !== null) {
                 $stream->write($chunk);
             }
             $size = $stream->tell();

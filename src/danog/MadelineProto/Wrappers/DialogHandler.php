@@ -75,7 +75,7 @@ trait DialogHandler
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $dialogs = [];
-        $this->logger->logger("Getting dialogs...");
+        $this->logger->logger('Getting dialogs...');
         while ($this->dialog_params['count'] < $res['count']) {
             $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $last_peer = 0;

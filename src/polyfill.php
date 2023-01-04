@@ -31,6 +31,6 @@ foreach ([
 ] as $old => $new) {
     $ampFilePolyfill .= "function $old(...\$args) { return $new(...\$args); }";
 }
-$ampFilePolyfill .= "}";
+$ampFilePolyfill .= '}';
 eval($ampFilePolyfill);
 unset($ampFilePolyfill);

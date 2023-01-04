@@ -30,7 +30,7 @@ trait TD
      * @param array $params Params
      * @param array $key    Key
      */
-    public function tdcliToTd(array &$params, array $key = null): array
+    public function tdcliToTd(array &$params, ?array $key = null): array
     {
         if (!\is_array($params)) {
             return $params;
@@ -89,7 +89,7 @@ trait TD
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTdcli($params)
+    public function MTProtoToTdcli(mixed $params)
     {
         return $this->tdToTdcli($this->MTProtoToTd($params));
     }
@@ -98,7 +98,7 @@ trait TD
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTd(&$params)
+    public function MTProtoToTd(mixed &$params)
     {
         if (!\is_array($params)) {
             return $params;
@@ -183,7 +183,7 @@ trait TD
      *
      * @param mixed $params Parameters
      */
-    public function tdToTdcli($params)
+    public function tdToTdcli(mixed $params)
     {
         if (!\is_array($params)) {
             return $params;

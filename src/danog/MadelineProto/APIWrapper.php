@@ -29,9 +29,8 @@ final class APIWrapper
     /**
      * MTProto instance.
      *
-     * @var MTProto|null|Client
      */
-    private $API = null;
+    private MTProto|Client|null $API = null;
 
     /**
      * Session path.
@@ -51,28 +50,24 @@ final class APIWrapper
     /**
      * My.telegram.org wrapper.
      *
-     * @var ?MyTelegramOrgWrapper
      */
-    private $myTelegramOrgWrapper;
+    private ?MyTelegramOrgWrapper $myTelegramOrgWrapper = null;
 
     /**
      * Serialization date.
      *
-     * @var integer
      */
     private int $serialized = 0;
     /**
      * Whether lua is being used.
      *
      * @internal
-     * @var boolean
      */
     private bool $lua = false;
     /**
      * Whether async is enabled.
      *
      * @internal
-     * @var boolean
      */
     private bool $async = false;
 
@@ -103,7 +98,7 @@ final class APIWrapper
      * @param API|APIWrapper $a Instance to which link
      * @param API|APIWrapper $b Instance from which link
      */
-    public static function link($a, $b): void
+    public static function link(API|APIWrapper $a, API|APIWrapper $b): void
     {
         foreach (self::properties() as $var) {
             Tools::setVar($a, $var, Tools::getVar($b, $var));
@@ -130,9 +125,8 @@ final class APIWrapper
     /**
      * Get MTProto instance.
      *
-     * @return Client|MTProto|null
      */
-    public function &getAPI()
+    public function &getAPI(): Client|MTProto|null
     {
         return $this->API;
     }

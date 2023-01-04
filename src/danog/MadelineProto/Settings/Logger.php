@@ -153,9 +153,8 @@ class Logger extends SettingsAbstract
     /**
      * Get extra parameter for logger.
      *
-     * @return null|callable|string
      */
-    public function getExtra()
+    public function getExtra(): callable|string|null
     {
         return $this->type === MadelineProtoLogger::FILE_LOGGER
             ? Tools::absolute($this->extra)
@@ -167,7 +166,7 @@ class Logger extends SettingsAbstract
      *
      * @param null|callable|string $extra Extra parameter for logger.
      */
-    public function setExtra($extra): self
+    public function setExtra(callable|string|null $extra): self
     {
         if ($this->type === MadelineProtoLogger::CALLABLE_LOGGER && !\is_callable($extra)) {
             $this->setType((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')

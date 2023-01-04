@@ -104,7 +104,7 @@ trait ArrayCacheTrait
 
         Logger::log(
             \sprintf(
-                "cache for table: %s; keys left: %s; keys removed: %s",
+                'cache for table: %s; keys left: %s; keys removed: %s',
                 (string) $this,
                 \count($this->cache),
                 $oldCount,

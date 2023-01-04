@@ -100,6 +100,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

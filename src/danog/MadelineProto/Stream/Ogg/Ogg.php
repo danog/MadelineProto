@@ -244,7 +244,7 @@ class Ogg
                 return false; // EOF
             }
             if (\substr($init, 0, 4) !== self::CAPTURE_PATTERN) {
-                throw new Exception("Bad capture pattern");
+                throw new Exception('Bad capture pattern');
             }
 
             /*$headers = \unpack(
@@ -285,7 +285,7 @@ class Ogg
                         $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         if (\substr($content, 0, 8) !== 'OpusHead') {
-                            throw new RuntimeException("This is not an OPUS stream!");
+                            throw new RuntimeException('This is not an OPUS stream!');
                         }
                         $opus_head = \unpack('Cversion/Cchannel_count/vpre_skip/Vsample_rate/voutput_gain/Cchannel_mapping_family/', \substr($content, 8));
                         if ($opus_head['channel_mapping_family']) {

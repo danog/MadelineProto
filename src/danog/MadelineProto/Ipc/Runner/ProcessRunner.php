@@ -28,27 +28,27 @@ use function Amp\async;
 final class ProcessRunner extends RunnerAbstract
 {
     private const CGI_VARS = [
-        "AUTH_TYPE",
-        "CONTENT_LENGTH",
-        "CONTENT_TYPE",
-        "GATEWAY_INTERFACE",
-        "PATH_INFO",
-        "PATH_TRANSLATED",
-        "QUERY_STRING",
-        "REMOTE_ADDR",
-        "REMOTE_HOST",
-        "REMOTE_IDENT",
-        "REMOTE_USER",
-        "REQUEST_METHOD",
-        "SCRIPT_NAME",
-        "SERVER_NAME",
-        "SERVER_PORT",
-        "SERVER_PROTOCOL",
-        "SERVER_SOFTWARE",
+        'AUTH_TYPE',
+        'CONTENT_LENGTH',
+        'CONTENT_TYPE',
+        'GATEWAY_INTERFACE',
+        'PATH_INFO',
+        'PATH_TRANSLATED',
+        'QUERY_STRING',
+        'REMOTE_ADDR',
+        'REMOTE_HOST',
+        'REMOTE_IDENT',
+        'REMOTE_USER',
+        'REQUEST_METHOD',
+        'SCRIPT_NAME',
+        'SERVER_NAME',
+        'SERVER_PORT',
+        'SERVER_PROTOCOL',
+        'SERVER_SOFTWARE',
     ];
 
     /** @var string|null Cached path to located PHP binary. */
-    private static $binaryPath;
+    private static ?string $binaryPath = null;
 
     /**
      * Runner.
@@ -58,16 +58,16 @@ final class ProcessRunner extends RunnerAbstract
      */
     public static function start(string $session, int $startupId): boool
     {
-        if (PHP_SAPI === "cli") {
+        if (PHP_SAPI === 'cli') {
             $binary = PHP_BINARY;
         } else {
             $binary = self::$binaryPath ?? self::locateBinary();
         }
 
         $options = [
-            "html_errors" => "0",
-            "display_errors" => "0",
-            "log_errors" => "1",
+            'html_errors' => '0',
+            'display_errors' => '0',
+            'log_errors' => '1',
         ];
 
         $runner = self::getScriptPath();
@@ -80,7 +80,7 @@ final class ProcessRunner extends RunnerAbstract
             $session,
             $startupId,
         ];
-        $command = \implode(" ", \array_map('Amp\\Process\\escapeArguments', $command));
+        $command = \implode(' ', \array_map('Amp\\Process\\escapeArguments', $command));
         Logger::log("Starting process with $command");
 
         $params = [
@@ -142,9 +142,9 @@ final class ProcessRunner extends RunnerAbstract
     }
     private static function locateBinary(): string
     {
-        $executable = \strncasecmp(PHP_OS, "WIN", 3) === 0 ? "php.exe" : "php";
+        $executable = \strncasecmp(PHP_OS, 'WIN', 3) === 0 ? 'php.exe' : 'php';
 
-        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv("PATH")));
+        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv('PATH')));
         $paths[] = PHP_BINDIR;
         $paths = \array_unique($paths);
 
@@ -155,7 +155,7 @@ final class ProcessRunner extends RunnerAbstract
             }
         }
 
-        throw new Error("Could not locate PHP executable binary");
+        throw new Error('Could not locate PHP executable binary');
     }
 
     /**
@@ -168,7 +168,7 @@ final class ProcessRunner extends RunnerAbstract
         $result = [];
 
         foreach ($options as $option => $value) {
-            $result[] = \sprintf("-d%s=%s", $option, $value);
+            $result[] = \sprintf('-d%s=%s', $option, $value);
         }
 
         return $result;

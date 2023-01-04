@@ -30,19 +30,17 @@ class Shutdown
      *
      * @var array<callable>
      */
-    private static $callbacks = [];
+    private static array $callbacks = [];
     /**
      * Whether the main shutdown was registered.
      *
-     * @var boolean
      */
-    private static $registered = false;
+    private static bool $registered = false;
     /**
      * Incremental ID for new callback.
      *
-     * @var integer
      */
-    private static $id = 0;
+    private static int $id = 0;
     /**
      * Function to be called on shutdown.
      */
@@ -61,7 +59,7 @@ class Shutdown
      * @param null|string $id The optional callback ID
      * @return int|string The callback ID
      */
-    public static function addCallback(callable $callback, ?string $id = null)
+    public static function addCallback(callable $callback, ?string $id = null): int|string
     {
         if (!$id) {
             $id = self::$id++;
@@ -79,7 +77,7 @@ class Shutdown
      * @param null|string|int $id The optional callback ID
      * @return bool true if the callback was removed correctly, false otherwise
      */
-    public static function removeCallback($id): bool
+    public static function removeCallback(string|int|null $id): bool
     {
         if (isset(self::$callbacks[$id])) {
             unset(self::$callbacks[$id]);

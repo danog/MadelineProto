@@ -79,7 +79,7 @@ trait AuthKeyHandler
      *
      * @param mixed $user User
      */
-    public function requestCall($user)
+    public function requestCall(mixed $user)
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
@@ -89,7 +89,7 @@ trait AuthKeyHandler
             throw new Exception(Lang::$current_lang['peer_not_in_db']);
         }
         $user = $user['InputUser'];
-        $this->logger->logger(\sprintf("Calling %s...", $user['user_id']), Logger::VERBOSE);
+        $this->logger->logger(\sprintf('Calling %s...', $user['user_id']), Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
         $this->logger->logger(Lang::$current_lang['generating_a'], Logger::VERBOSE);
         $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
@@ -186,8 +186,7 @@ trait AuthKeyHandler
         $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($res['connections'], $this->calls[$params['id']]->configuration['endpoints']);
         $this->calls[$params['id']]->configuration = \array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => \substr(\sha1($key, true), -8), 'call_id' => \substr(\hash('sha256', $key, true), -16), 'network_type' => VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-        $res = $this->calls[$params['id']]->startTheMagic();
-        return $res;
+        return $this->calls[$params['id']]->startTheMagic();
     }
     /**
      * Complete call handshake.
@@ -297,7 +296,7 @@ trait AuthKeyHandler
     {
         \array_walk($this->calls, function ($controller, $id): void {
             if ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
-                $this->logger("Discarding ended call...");
+                $this->logger('Discarding ended call...');
                 $controller->discard();
                 unset($this->calls[$id]);
             }

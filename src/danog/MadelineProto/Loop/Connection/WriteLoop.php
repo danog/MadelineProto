@@ -269,7 +269,7 @@ class WriteLoop extends ResumableSignalLoop
 
             $acks = \array_slice($connection->ack_queue, 0, self::MAX_COUNT);
             if ($ackCount = \count($acks)) {
-                $API->logger->logger("Adding msgs_ack", Logger::ULTRA_VERBOSE);
+                $API->logger->logger('Adding msgs_ack', Logger::ULTRA_VERBOSE);
 
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack', 'msg_ids' => $acks], 'msgs_ack');
                 $messages []= [
@@ -283,7 +283,7 @@ class WriteLoop extends ResumableSignalLoop
                 unset($acks, $body);
             }
             if ($shared->isHttp() && !$has_http_wait) {
-                $API->logger->logger("Adding http_wait", Logger::ULTRA_VERBOSE);
+                $API->logger->logger('Adding http_wait', Logger::ULTRA_VERBOSE);
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait');
                 $messages []= [
                     '_' => 'MTmessage',

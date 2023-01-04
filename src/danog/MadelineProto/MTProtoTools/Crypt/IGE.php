@@ -32,15 +32,13 @@ abstract class IGE
     /**
      * IV part 1.
      *
-     * @var string
      */
-    protected $iv_part_1;
+    protected string $iv_part_1;
     /**
      * IV part 2.
      *
-     * @var string
      */
-    protected $iv_part_2;
+    protected string $iv_part_2;
     /**
      * Instantiate appropriate handler.
      */

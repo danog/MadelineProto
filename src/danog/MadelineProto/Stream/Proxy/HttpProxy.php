@@ -42,9 +42,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * Stream.
      *
-     * @var RawStreamInterface
      */
-    protected $stream;
+    protected RawStreamInterface $stream;
     private $extra;
     /**
      * Connect to stream.
@@ -199,6 +198,6 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

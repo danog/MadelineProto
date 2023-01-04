@@ -65,7 +65,7 @@ final class GarbageCollector
                 $latest = $client->request($request);
                 Magic::$version_latest = $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
-                    Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
+                    Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
                     self::$cleanupLoop->signal(true);
                     if (Magic::$isIpcWorker) {
                         die;
@@ -75,7 +75,7 @@ final class GarbageCollector
 
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
                     $base = \basename($path);
-                    if ($base === "madeline-".Magic::$version.".phar") {
+                    if ($base === 'madeline-'.Magic::$version.'.phar') {
                         continue;
                     }
                     $f = \fopen("$path.lock", 'c');
@@ -90,7 +90,7 @@ final class GarbageCollector
             } catch (Throwable $e) {
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
-        }, "Phar cleanup loop", 60*1000);
+        }, 'Phar cleanup loop', 60*1000);
         self::$cleanupLoop->start();
     }
 

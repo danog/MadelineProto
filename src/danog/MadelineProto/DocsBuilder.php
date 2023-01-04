@@ -72,16 +72,15 @@ class DocsBuilder
         \chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
 
-        foreach (\glob($this->settings['template']."/*") as $template) {
+        foreach (\glob($this->settings['template'].'/*') as $template) {
             $this->templates[\basename($template, '.md')] = \file_get_contents($template);
         }
     }
     /**
      * Documentation templates.
      *
-     * @var array
      */
-    protected $templates = [];
+    protected array $templates = [];
 
     public $types = [];
     public $any = '*';

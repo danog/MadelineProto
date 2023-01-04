@@ -18,7 +18,7 @@ class SecretChats extends SettingsAbstract
      *
      * @var bool|array<int>
      */
-    protected $accept = true;
+    protected bool|array $accept = true;
 
     public function mergeArray(array $settings): void
     {
@@ -31,7 +31,7 @@ class SecretChats extends SettingsAbstract
      *
      * @return bool|array<int>
      */
-    public function getAccept()
+    public function getAccept(): bool|array
     {
         return $this->accept;
     }
@@ -41,7 +41,7 @@ class SecretChats extends SettingsAbstract
      *
      * @param bool|array<int> $accept Boolean or array of IDs
      */
-    public function setAccept($accept): self
+    public function setAccept(bool|array $accept): self
     {
         $this->accept = $accept;
 

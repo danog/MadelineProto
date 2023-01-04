@@ -57,7 +57,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     public function read(): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->read();
     }
@@ -69,7 +69,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     public function write(string $data): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->write($data);
     }
@@ -79,7 +79,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     public function end(string $finalData = ''): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this->stream->end($finalData);
     }
@@ -100,7 +100,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     public function getReadBuffer(int &$length): Future
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
         return $this;
     }
@@ -172,6 +172,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      */
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

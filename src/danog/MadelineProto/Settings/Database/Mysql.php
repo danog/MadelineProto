@@ -15,7 +15,7 @@ class Mysql extends SqlAbstract
     {
         $settings = $settings['db']['mysql'] ?? [];
         if (isset($settings['host'])) {
-            $this->setUri("tcp://".($settings['host']).(isset($settings['port']) ? ':'.($settings['port']) : ''));
+            $this->setUri('tcp://'.($settings['host']).(isset($settings['port']) ? ':'.($settings['port']) : ''));
         }
         parent::mergeArray($settings);
     }

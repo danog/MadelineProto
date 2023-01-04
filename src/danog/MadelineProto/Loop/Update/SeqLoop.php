@@ -114,7 +114,7 @@ class SeqLoop extends ResumableSignalLoop
         }
     }
     /**
-     * @param (array|mixed)[] $updates
+     * @param array<(array|mixed)> $updates
      */
     public function feed(array $updates): void
     {
@@ -129,7 +129,7 @@ class SeqLoop extends ResumableSignalLoop
         $this->pendingWakeups += ($this->feeder->feed($updates['updates']));
     }
     /**
-     * @param true[] $wakeups
+     * @param array<true> $wakeups
      */
     public function addPendingWakeups(array $wakeups): void
     {

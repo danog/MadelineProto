@@ -30,10 +30,7 @@ trait SeqNoHandler
 {
     public $session_out_seq_no = 0;
     public $session_in_seq_no = 0;
-    /**
-     * @var ?string
-     */
-    public $session_id;
+    public ?string $session_id = null;
     public function generateOutSeqNo($contentRelated)
     {
         $in = $contentRelated ? 1 : 0;

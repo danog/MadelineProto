@@ -38,9 +38,8 @@ class Lite
     /**
      * Lite client config.
      *
-     * @var array
      */
-    private $config;
+    private array $config;
     /**
      * Misc settings.
      */
@@ -48,21 +47,19 @@ class Lite
     /**
      * TL serializer instance.
      *
-     * @var TL
      */
-    private $TL;
+    private TL $TL;
     /**
      * Logger instance.
      *
-     * @var Logger
      */
-    public $logger;
+    public Logger $logger;
     /**
      * Liteserver connections.
      *
-     * @var ADNLConnection[]
+     * @var array<ADNLConnection>
      */
-    private $connections = [];
+    private array $connections = [];
     /**
      * Construct settings.
      */

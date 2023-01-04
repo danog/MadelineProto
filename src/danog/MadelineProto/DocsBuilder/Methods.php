@@ -87,7 +87,7 @@ trait Methods
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
-                $params .= $param['name'].": ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
+                $params .= $param['name'].': '.(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             if (!isset($this->tdDescriptions['methods'][$method])) {
                 $this->addToLang('method_'.$method);
@@ -180,7 +180,7 @@ trait Methods
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
                 $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
-                $params .= $param['name'].": ";
+                $params .= $param['name'].': ';
                 $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
                 $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";

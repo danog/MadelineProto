@@ -149,7 +149,7 @@ class VoIP
     private int $peerVersion = 0;
 
     /**
-     * @var Endpoint[]
+     * @var array<Endpoint>
      */
     private array $sockets = [];
 
@@ -161,21 +161,18 @@ class VoIP
     /**
      * Last incoming timestamp.
      *
-     * @var float
      */
-    private $lastIncomingTimestamp = 0.0;
+    private float $lastIncomingTimestamp = 0.0;
     /**
      * The outgoing timestamp.
      *
-     * @var int
      */
-    private $timestamp = 0;
+    private int $timestamp = 0;
     /**
      * Packet queue.
      *
-     * @var SplQueue
      */
-    private $packetQueue;
+    private SplQueue $packetQueue;
     /**
      * Temporary holdfile array.
      */
@@ -264,9 +261,8 @@ class VoIP
     /**
      * Discard call.
      *
-     * @return self|false
      */
-    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = [], bool $debug = false)
+    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = [], bool $debug = false): self|false
     {
         if (($this->callState ?? self::CALL_STATE_ENDED) === self::CALL_STATE_ENDED || empty($this->configuration)) {
             return false;
@@ -293,9 +289,8 @@ class VoIP
     /**
      * Accept call.
      *
-     * @return self|false
      */
-    public function accept()
+    public function accept(): self|false
     {
         if ($this->callState !== self::CALL_STATE_INCOMING) {
             return false;
@@ -528,9 +523,8 @@ class VoIP
     /**
      * Get call ID.
      *
-     * @return string|int
      */
-    public function getCallID()
+    public function getCallID(): string|int
     {
         return $this->callID;
     }
@@ -538,9 +532,8 @@ class VoIP
     /**
      * Get creation date.
      *
-     * @return int|bool
      */
-    public function whenCreated()
+    public function whenCreated(): int|bool
     {
         return $this->internalStorage['created'] ?? false;
     }

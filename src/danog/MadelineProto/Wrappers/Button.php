@@ -31,7 +31,7 @@ trait Button
      * @internal
      * @return array|true
      */
-    public function clickInternal(bool $donotwait, string $method, array $parameters)
+    public function clickInternal(bool $donotwait, string $method, array $parameters): array|bool
     {
         if ($donotwait) {
             $this->methodCallAsyncWrite($method, $parameters);

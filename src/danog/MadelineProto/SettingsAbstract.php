@@ -12,9 +12,8 @@ abstract class SettingsAbstract
     /**
      * Whether this setting was changed.
      *
-     * @var boolean
      */
-    protected $changed = true;
+    protected bool $changed = true;
     /**
      * Merge legacy settings array.
      *

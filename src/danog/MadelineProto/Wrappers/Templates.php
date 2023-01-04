@@ -81,9 +81,8 @@ trait Templates
     /**
      * Web template.
      *
-     * @var string
      */
-    private $webTemplate = 'legacy';
+    private string $webTemplate = 'legacy';
     /**
      * Format message according to template.
      *

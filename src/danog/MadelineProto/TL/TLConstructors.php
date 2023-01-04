@@ -91,9 +91,8 @@ class TLConstructors
      * Find constructor by ID.
      *
      * @param string $id Constructor ID
-     * @return array|false
      */
-    public function findById(string $id)
+    public function findById(string $id): array|false
     {
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];

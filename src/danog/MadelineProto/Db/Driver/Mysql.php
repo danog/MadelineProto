@@ -21,7 +21,7 @@ use function Amp\Mysql\Pool;
  */
 class Mysql
 {
-    /** @var Pool[] */
+    /** @var array<Pool> */
     private static array $connections = [];
 
     /**
@@ -33,7 +33,7 @@ class Mysql
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+            $config = ConnectionConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
                 ->withUser($settings->getUsername())
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());

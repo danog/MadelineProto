@@ -41,63 +41,53 @@ class ConnectionContext
     /**
      * Whether to use a secure socket.
      *
-     * @var bool
      */
-    private $secure = false;
+    private bool $secure = false;
     /**
      * Whether to use test servers.
      *
-     * @var bool
      */
-    private $test = false;
+    private bool $test = false;
     /**
      * Whether to use media servers.
      *
-     * @var bool
      */
-    private $media = false;
+    private bool $media = false;
     /**
      * Whether to use CDN servers.
      *
-     * @var bool
      */
-    private $cdn = false;
+    private bool $cdn = false;
     /**
      * The connection URI.
      *
-     * @var UriInterface
      */
-    private $uri;
+    private UriInterface $uri;
     /**
      * Whether this connection context will be used by the DNS client.
      *
-     * @var bool
      */
-    private $isDns = false;
+    private bool $isDns = false;
     /**
      * Socket context.
      *
-     * @var ConnectContext
      */
-    private $socketContext;
+    private ConnectContext $socketContext;
     /**
      * Cancellation token.
      *
-     * @var CancellationToken
      */
-    private $cancellationToken;
+    private CancellationToken $cancellationToken;
     /**
      * The telegram DC ID.
      *
-     * @var int
      */
-    private $dc = 0;
+    private int $dc = 0;
     /**
      * Whether to use IPv6.
      *
-     * @var bool
      */
-    private $ipv6 = false;
+    private bool $ipv6 = false;
     /**
      * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
      *
@@ -107,9 +97,8 @@ class ConnectionContext
     /**
      * The current stream key.
      *
-     * @var int
      */
-    private $key = 0;
+    private int $key = 0;
     /**
      * Read callback.
      *
@@ -134,9 +123,8 @@ class ConnectionContext
     /**
      * Set the connection URI.
      *
-     * @param string|UriInterface $uri
      */
-    public function setUri($uri): self
+    public function setUri(string|UriInterface $uri): self
     {
         $this->uri = $uri instanceof UriInterface ? $uri : Http::createFromString($uri);
         return $this;
@@ -239,9 +227,8 @@ class ConnectionContext
     /**
      * Set the DC ID.
      *
-     * @param string|int $dc
      */
-    public function setDc($dc): self
+    public function setDc(string|int $dc): self
     {
         $int = \intval($dc);
         if (!(1 <= $int && $int <= 1000)) {
@@ -255,18 +242,16 @@ class ConnectionContext
     /**
      * Get the DC ID.
      *
-     * @return string|int
      */
-    public function getDc()
+    public function getDc(): string|int
     {
         return $this->dc;
     }
     /**
      * Get the int DC ID.
      *
-     * @return string|int
      */
-    public function getIntDc()
+    public function getIntDc(): string|int
     {
         $dc = \intval($this->dc);
         if ($this->test) {

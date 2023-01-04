@@ -53,9 +53,9 @@ class CombinedUpdatesState
      *
      * @param int   $channel Channel to get info about (optional, if not provided returns the entire info array)
      * @param array $init    Parameters to update
-     * @return UpdatesState|UpdatesState[]
+     * @return UpdatesState|array<UpdatesState>
      */
-    public function get(int $channel = null, array $init = [])
+    public function get(?int $channel = null, array $init = []): UpdatesState|array
     {
         if ($channel === null) {
             return $this->states;

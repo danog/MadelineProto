@@ -56,7 +56,7 @@ abstract class Extension
      * @param mixed  $location File location
      * @param string $default  Default extension
      */
-    public static function getExtensionFromLocation($location, string $default): string
+    public static function getExtensionFromLocation(mixed $location, string $default): string
     {
         return $default;
     }

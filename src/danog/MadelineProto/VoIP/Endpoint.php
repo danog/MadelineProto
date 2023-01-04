@@ -103,7 +103,7 @@ class Endpoint
             if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
                 $hasPeerTag = true;
                 if (\stream_get_contents($payload, 16) !== $this->peerTag) {
-                    Logger::log("Received packet has wrong peer tag", Logger::ERROR);
+                    Logger::log('Received packet has wrong peer tag', Logger::ERROR);
                     continue;
                 }
             }
@@ -117,13 +117,13 @@ class Endpoint
                 $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
                 if ($message_key != \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
-                    Logger::log("msg_key mismatch!", Logger::ERROR);
+                    Logger::log('msg_key mismatch!', Logger::ERROR);
                     return false;
                 }
 
                 $innerLen = \unpack('v', \substr($packet, 0, 2))[1];
                 if ($innerLen > \strlen($packet)) {
-                    Logger::log("Received packet has wrong inner length!", Logger::ERROR);
+                    Logger::log('Received packet has wrong inner length!', Logger::ERROR);
                     return false;
                 }
                 $packet = \substr($packet, 2);

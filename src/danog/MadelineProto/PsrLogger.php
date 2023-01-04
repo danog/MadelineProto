@@ -38,7 +38,7 @@ class PsrLogger extends AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed[] $context
+     * @param array<mixed> $context
      * @throws InvalidArgumentException
      */
     public function log($level, Stringable|string $message, array $context = []): void

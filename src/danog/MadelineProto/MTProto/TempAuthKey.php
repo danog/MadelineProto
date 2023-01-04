@@ -30,21 +30,18 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     /**
      * Bound auth key instance.
      *
-     * @var PermAuthKey|null
      */
-    private $bound;
+    private ?PermAuthKey $bound = null;
     /**
      * Expiration date.
      *
-     * @var int
      */
-    private $expires = 0;
+    private int $expires = 0;
     /**
      * Whether the connection is inited for this auth key.
      *
-     * @var boolean
      */
-    protected $inited = false;
+    protected bool $inited = false;
     /**
      * Constructor function.
      *
