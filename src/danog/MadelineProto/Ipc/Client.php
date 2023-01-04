@@ -29,7 +29,6 @@ use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\Wrappers\Start;
 use danog\MadelineProto\Wrappers\Templates;
-use Generator;
 use Throwable;
 
 use function Amp\async;
@@ -201,11 +200,10 @@ class Client extends ClientAbstract
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|Generator $args Arguments
+     * @param array $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
-    public function methodCallAsyncRead(string $method, $args, array $aargs)
+    public function methodCallAsyncRead(string $method, array $args, array $aargs)
     {
         if (\is_array($args)) {
             if (($method === 'messages.editInlineBotMessage' ||

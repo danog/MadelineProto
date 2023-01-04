@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
-use Generator;
 use Revolt\EventLoop;
 
 use function time;
@@ -89,7 +88,7 @@ class OutgoingMessage extends Message
     /**
      * Message body.
      *
-     * @var Generator|array|null
+     * @var array|null
      */
     private $body;
 
@@ -140,13 +139,13 @@ class OutgoingMessage extends Message
     /**
      * Create outgoing message.
      *
-     * @param Generator|array $body Body
+     * @param array $body Body
      * @param string            $constructor Constructor name
      * @param string            $type        Constructor type
      * @param boolean           $method      Is this a method?
      * @param boolean           $unencrypted Is this an unencrypted message?
      */
-    public function __construct($body, string $constructor, string $type, bool $method, bool $unencrypted)
+    public function __construct(array $body, string $constructor, string $type, bool $method, bool $unencrypted)
     {
         $this->body = $body;
         $this->constructor = $constructor;
@@ -227,7 +226,7 @@ class OutgoingMessage extends Message
      */
     public function getBody()
     {
-        return $this->body instanceof Generator ? $this->body : $this->body;
+        return $this->body;
     }
 
     /**

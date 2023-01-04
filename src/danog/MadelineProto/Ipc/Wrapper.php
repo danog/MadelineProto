@@ -17,7 +17,6 @@ use danog\MadelineProto\Ipc\Wrapper\SeekableInputStream;
 use danog\MadelineProto\Ipc\Wrapper\SeekableOutputStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
-use Generator;
 use Throwable;
 
 use function Amp\async;
@@ -147,7 +146,6 @@ class Wrapper extends ClientAbstract
     {
         try {
             $result = $this->callbacks[$payload[0]](...$payload[1]);
-            $result = $result instanceof Generator ? $result : $result;
         } catch (Throwable $e) {
             $this->logger->logger("Got error while calling reverse IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);

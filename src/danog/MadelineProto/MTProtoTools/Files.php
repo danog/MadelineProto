@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
-use Amp\File\File;
 use Amp\Future;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\Exception;

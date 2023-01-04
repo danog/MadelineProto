@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Settings;
-use Generator;
 
 /**
  * Manages method and object calls.
