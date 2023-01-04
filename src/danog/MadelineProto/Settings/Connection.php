@@ -84,7 +84,7 @@ class Connection extends SettingsAbstract
     /**
      * Connection timeout.
      */
-    protected int $timeout = 2;
+    protected float $timeout = 2.0;
     /**
      * Ping interval.
      */
@@ -437,7 +437,7 @@ class Connection extends SettingsAbstract
     /**
      * Get proxy identifiers.
      *
-     * @psalm-return array<class-string<StreamInterface>, array>
+     * @return array<class-string<StreamInterface>, array>
      */
     public function getProxies(): array
     {
@@ -597,7 +597,7 @@ class Connection extends SettingsAbstract
     /**
      * Get connection timeout.
      */
-    public function getTimeout(): int
+    public function getTimeout(): float
     {
         return $this->timeout;
     }
@@ -605,9 +605,9 @@ class Connection extends SettingsAbstract
     /**
      * Set connection timeout.
      *
-     * @param int $timeout Connection timeout.
+     * @param float $timeout Connection timeout.
      */
-    public function setTimeout(int $timeout): self
+    public function setTimeout(float $timeout): self
     {
         $this->timeout = $timeout;
 

@@ -213,7 +213,7 @@ class OutgoingMessage extends Message
     /**
      * Get state of message.
      *
-     * @psalm-return self::STATE_*
+     * @return self::STATE_*
      */
     public function getState(): int
     {

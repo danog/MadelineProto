@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\CancellationToken;
+use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -77,7 +77,7 @@ class ConnectionContext
      * Cancellation token.
      *
      */
-    private CancellationToken $cancellationToken;
+    private Cancellation $cancellationToken;
     /**
      * The telegram DC ID.
      *
@@ -146,7 +146,7 @@ class ConnectionContext
     /**
      * Set the cancellation token.
      */
-    public function setCancellationToken(CancellationToken $cancellationToken): self
+    public function setCancellation(Cancellation $cancellationToken): self
     {
         $this->cancellationToken = $cancellationToken;
         return $this;
@@ -154,7 +154,7 @@ class ConnectionContext
     /**
      * Get the cancellation token.
      */
-    public function getCancellationToken(): CancellationToken
+    public function getCancellation(): Cancellation
     {
         return $this->cancellationToken;
     }
@@ -280,7 +280,7 @@ class ConnectionContext
     /**
      * Add a stream to the stream chain.
      *
-     * @psalm-param class-string $streamName
+     * @param class-string $streamName
      */
     public function addStream(string $streamName, $extra = null): self
     {

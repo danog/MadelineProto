@@ -141,7 +141,7 @@ trait UpdateHandler
      * Get channel state.
      *
      * @internal
-     * @psalm-return <mixed, mixed, mixed, UpdatesState>
+     * @return <mixed, mixed, mixed, UpdatesState>
      */
     public function loadUpdateState()
     {

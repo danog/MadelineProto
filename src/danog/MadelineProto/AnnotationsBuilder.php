@@ -369,13 +369,13 @@ class AnnotationsBuilder
                     }
                 }
                 $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
-                if (!\str_contains($phpdoc, '@psalm-return')) {
-                    $phpdoc = \str_replace('@return ', "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
+                if (!\str_contains($phpdoc, '@return')) {
+                    $phpdoc = \str_replace('@return ', "@return $new|$promise<$new>\n     * @return ", $phpdoc);
                 }
             }
             $phpdoc = \preg_replace(
-                '/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/',
-                "@psalm-return $promise<$1>",
+                '/@return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/',
+                "@return $promise<$1>",
                 $phpdoc,
             );
             $internalDoc['InternalDoc'][$name]['method'] = $phpdoc;

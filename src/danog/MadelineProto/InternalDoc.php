@@ -5598,7 +5598,7 @@ class InternalDoc extends APIFactory
      * Convert bot API parameters to MTProto parameters.
      *
      * @param array $arguments Arguments
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function botAPIToMTProto(array $arguments)
     {
@@ -5617,8 +5617,8 @@ class InternalDoc extends APIFactory
      * Convert generator, promise or any other value to a promise.
      *
      * @template TReturn
-     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     * @psalm-return Promise<TReturn>
+     * @param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
+     * @return Promise<TReturn>
       */
     public static function call(mixed $promise): Amp\Future
     {
@@ -5649,7 +5649,7 @@ class InternalDoc extends APIFactory
      * Get call status.
      *
      * @param int $id Call ID
-     * @psalm-return int|Promise<int>
+     * @return int|Promise<int>
      */
     public function callStatus(int $id)
     {
@@ -5793,7 +5793,7 @@ class InternalDoc extends APIFactory
      * @param int                            $offset        Offset where to start downloading
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
-     * @psalm-return Promise<true>
+     * @return Promise<true>
       */
     public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = []): Future
     {
@@ -5805,7 +5805,7 @@ class InternalDoc extends APIFactory
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @psalm-return Promise<(false|string)>
+     * @return Promise<(false|string)>
       */
     public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null, array $extra = []): Future
     {
@@ -5818,7 +5818,7 @@ class InternalDoc extends APIFactory
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @return Promise Downloaded file path
-     * @psalm-return Promise<(false|string)>
+     * @return Promise<(false|string)>
      */
     public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null, array $extra = []): Future
     {
@@ -5836,7 +5836,7 @@ class InternalDoc extends APIFactory
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
      * @return Promise Returned response
-     * @psalm-return Promise<Response>
+     * @return Promise<Response>
      */
     public function downloadToResponse(array|string $messageMedia, Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, array $extra = []): Future
     {
@@ -5850,7 +5850,7 @@ class InternalDoc extends APIFactory
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1, array $extra = []): Future
     {
@@ -5877,7 +5877,7 @@ class InternalDoc extends APIFactory
     /**
      * Export authorization.
      *
-     * @psalm-return Promise<array{0: (int|string), 1: string}>
+     * @return Promise<array{0: (int|string), 1: string}>
       */
     public function exportAuthorization(array $extra = []): Future
     {
@@ -5896,7 +5896,7 @@ class InternalDoc extends APIFactory
     /**
      * Extract a message constructor from an Updates constructor.
      *
-     * @psalm-return Promise<array>
+     * @return Promise<array>
       */
     public function extractMessage(array $updates, array $extra = []): Future
     {
@@ -5905,7 +5905,7 @@ class InternalDoc extends APIFactory
     /**
      * Extract an update message constructor from an Updates constructor.
      *
-     * @psalm-return Promise<array>
+     * @return Promise<array>
       */
     public function extractMessageUpdate(array $updates, array $extra = []): Future
     {
@@ -5914,7 +5914,7 @@ class InternalDoc extends APIFactory
     /**
      * Extract Update constructors from an Updates constructor.
      *
-     * @psalm-return Promise<array<array>>
+     * @return Promise<array<array>>
       */
     public function extractUpdates(array $updates, array $extra = []): Future
     {
@@ -5924,7 +5924,7 @@ class InternalDoc extends APIFactory
      * Get contents of remote file asynchronously.
      *
      * @param string $url URL
-     * @psalm-return Promise<string>
+     * @return Promise<string>
       */
     public function fileGetContents(string $url, array $extra = []): Future
     {
@@ -5995,7 +5995,7 @@ class InternalDoc extends APIFactory
     /**
      * Get full list of MTProto and API methods.
      *
-      * @psalm-return array|Promise<array>
+      * @return array|Promise<array>
      */
     public function getAllMethods()
     {
@@ -6004,7 +6004,7 @@ class InternalDoc extends APIFactory
     /**
      * Get authorization info.
      *
-      * @psalm-return int|Promise<int>
+      * @return int|Promise<int>
      */
     public function getAuthorization()
     {
@@ -6013,7 +6013,7 @@ class InternalDoc extends APIFactory
     /**
      * Get cached server-side config.
      *
-      * @psalm-return array|Promise<array>
+      * @return array|Promise<array>
      */
     public function getCachedConfig()
     {
@@ -6023,7 +6023,7 @@ class InternalDoc extends APIFactory
      * Get call info.
      *
      * @param int $call Call ID
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function getCall(int $call)
     {
@@ -6053,7 +6053,7 @@ class InternalDoc extends APIFactory
     /**
      * Get async DNS client.
      *
-      * @psalm-return Resolver|Promise<Resolver>
+      * @return Resolver|Promise<Resolver>
      */
     public function getDNSClient()
     {
@@ -6062,7 +6062,7 @@ class InternalDoc extends APIFactory
     /**
      * Get all datacenter connections.
      *
-     * @psalm-return array<DataCenterConnection>|Promise<array<DataCenterConnection>>
+     * @return array<DataCenterConnection>|Promise<array<DataCenterConnection>>
      */
     public function getDataCenterConnections()
     {
@@ -6089,7 +6089,7 @@ class InternalDoc extends APIFactory
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     * @psalm-return Promise<list<mixed>>
+     * @return Promise<list<mixed>>
       */
     public function getDialogs(bool $force = true, array $extra = []): Future
     {
@@ -6114,7 +6114,7 @@ class InternalDoc extends APIFactory
     /**
      * Get event handler.
      *
-      * @psalm-return EventHandler|Promise<EventHandler>
+      * @return EventHandler|Promise<EventHandler>
      */
     public function getEventHandler()
     {
@@ -6173,7 +6173,7 @@ class InternalDoc extends APIFactory
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/FullInfo.html
      * @return Promise FullInfo object
-     * @psalm-return Promise<array>
+     * @return Promise<array>
      */
     public function getFullInfo(mixed $id, array $extra = []): Future
     {
@@ -6182,7 +6182,7 @@ class InternalDoc extends APIFactory
     /**
      * Get async HTTP client.
      *
-      * @psalm-return HttpClient|Promise<HttpClient>
+      * @return HttpClient|Promise<HttpClient>
      */
     public function getHTTPClient()
     {
@@ -6191,7 +6191,7 @@ class InternalDoc extends APIFactory
     /**
      * Get current password hint.
      *
-      * @psalm-return string|Promise<string>
+      * @return string|Promise<string>
      */
     public function getHint()
     {
@@ -6201,7 +6201,7 @@ class InternalDoc extends APIFactory
      * Get bot API ID from peer object.
      *
      * @param mixed $id Peer
-      * @psalm-return ??int|\Amp\Future<??int>
+      * @return ??int|\Amp\Future<??int>
      */
     public function getId(mixed $id)
     {
@@ -6215,9 +6215,9 @@ class InternalDoc extends APIFactory
      * @see https://docs.madelineproto.xyz/Info.html
      * @return Promise Info object
      * @template TConstructor
-     * @psalm-param array{_: TConstructor}|mixed $id
+     * @param array{_: TConstructor}|mixed $id
      * @return Future<(array<(Future<(mixed|string)>|mixed|string)>|int|mixed|string)>
-     * @psalm-return \Generator<int|mixed, \Amp\Future|\Amp\Future<string>|array, mixed, array{
+     * @return \Generator<int|mixed, \Amp\Future|\Amp\Future<string>|array, mixed, array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -6241,7 +6241,7 @@ class InternalDoc extends APIFactory
     /**
      * Get logger.
      *
-     * @psalm-return Logger|Promise<Logger>
+     * @return Logger|Promise<Logger>
      */
     public function getLogger()
     {
@@ -6250,7 +6250,7 @@ class InternalDoc extends APIFactory
     /**
      * Get TL namespaces.
      *
-      * @psalm-return array|Promise<array>
+      * @return array|Promise<array>
      */
     public function getMethodNamespaces()
     {
@@ -6259,7 +6259,7 @@ class InternalDoc extends APIFactory
     /**
      * Get namespaced methods (method => namespace).
      *
-      * @psalm-return array|Promise<array>
+      * @return array|Promise<array>
      */
     public function getMethodsNamespaced()
     {
@@ -6311,7 +6311,7 @@ class InternalDoc extends APIFactory
     /**
      * Get PSR logger.
      *
-     * @psalm-return LoggerInterface|Promise<LoggerInterface>
+     * @return LoggerInterface|Promise<LoggerInterface>
      */
     public function getPsrLogger()
     {
@@ -6332,7 +6332,7 @@ class InternalDoc extends APIFactory
      * Get secret chat.
      *
      * @param array|int $chat Secret chat ID
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function getSecretChat(array|int $chat)
     {
@@ -6343,7 +6343,7 @@ class InternalDoc extends APIFactory
      *
      * Use fullGetSelf to bypass the cache.
      *
-      * @psalm-return array|false|Promise<(array|false)>
+      * @return array|false|Promise<(array|false)>
      */
     public function getSelf()
     {
@@ -6352,7 +6352,7 @@ class InternalDoc extends APIFactory
     /**
      * Return current settings.
      *
-      * @psalm-return Settings|Promise<Settings>
+      * @return Settings|Promise<Settings>
      */
     public function getSettings()
     {
@@ -6373,7 +6373,7 @@ class InternalDoc extends APIFactory
     /**
      * Get TL serializer.
      *
-      * @psalm-return TL|Promise<TL>
+      * @return TL|Promise<TL>
      */
     public function getTL()
     {
@@ -6394,7 +6394,7 @@ class InternalDoc extends APIFactory
     /**
      * Get a message to show to the user when starting the bot.
      *
-      * @psalm-return string|Promise<string>
+      * @return string|Promise<string>
      */
     public function getWebMessage(string $message)
     {
@@ -6403,7 +6403,7 @@ class InternalDoc extends APIFactory
     /**
      * Get web template.
      *
-      * @psalm-return string|Promise<string>
+      * @return string|Promise<string>
      */
     public function getWebTemplate()
     {
@@ -6412,7 +6412,7 @@ class InternalDoc extends APIFactory
     /**
      * Checks whether all datacenters are authorized.
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function hasAllAuth()
     {
@@ -6421,7 +6421,7 @@ class InternalDoc extends APIFactory
     /**
      * Check if an event handler instance is present.
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function hasEventHandler()
     {
@@ -6430,7 +6430,7 @@ class InternalDoc extends APIFactory
     /**
      * Check if has report peers.
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function hasReportPeers()
     {
@@ -6440,7 +6440,7 @@ class InternalDoc extends APIFactory
      * Check whether secret chat exists.
      *
      * @param array|int $chat Secret chat ID
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function hasSecretChat(array|int $chat)
     {
@@ -6481,7 +6481,7 @@ class InternalDoc extends APIFactory
     /**
      * Initialize self-restart hack.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function initSelfRestart(): void
     {
@@ -6506,7 +6506,7 @@ class InternalDoc extends APIFactory
     /**
      * Whether we're an IPC client instance.
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function isIpc()
     {
@@ -6515,7 +6515,7 @@ class InternalDoc extends APIFactory
     /**
      * Whether we're an IPC server process (as opposed to an event handler).
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function isIpcWorker()
     {
@@ -6524,7 +6524,7 @@ class InternalDoc extends APIFactory
     /**
      * Returns whether the current user is a premium user, cached.
      *
-     * @psalm-return bool|Promise<bool>
+     * @return bool|Promise<bool>
      */
     public function isPremium()
     {
@@ -6545,7 +6545,7 @@ class InternalDoc extends APIFactory
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
@@ -6622,7 +6622,7 @@ class InternalDoc extends APIFactory
      * @param string            $method Method name
      * @param array|Generator $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
+     * @param array|Generator<mixed, mixed, mixed, array> $args
      */
     public function methodCall(string $method, array|Generator $args = [
     ], array $aargs = [
@@ -6637,7 +6637,7 @@ class InternalDoc extends APIFactory
      * @param string            $method Method name
      * @param array|Generator $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
+     * @param array|Generator<mixed, mixed, mixed, array> $args
      */
     public function methodCallWrite(string $method, array|Generator $args = [
     ], array $aargs = [
@@ -6695,7 +6695,7 @@ class InternalDoc extends APIFactory
      * Check if peer is present in internal peer database.
      *
      * @param mixed $id Peer
-     * @psalm-return Promise<bool>
+     * @return Promise<bool>
       */
     public function peerIsset(mixed $id, array $extra = []): Future
     {
@@ -6810,7 +6810,7 @@ class InternalDoc extends APIFactory
     /**
      * Reset the update state and fetch all updates from the beginning.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function resetUpdateState(): void
     {
@@ -6819,7 +6819,7 @@ class InternalDoc extends APIFactory
     /**
      * Restart update loop.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function restart(): void
     {
@@ -6858,7 +6858,7 @@ class InternalDoc extends APIFactory
      * Get secret chat status.
      *
      * @param int $chat Chat ID
-     * @psalm-return int|Promise<int>
+     * @return int|Promise<int>
      */
     public function secretChatStatus(int $chat)
     {
@@ -6877,7 +6877,7 @@ class InternalDoc extends APIFactory
      * Set update handling callback.
      *
      * @param callable $callback Callback
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function setCallback(callable $callback): void
     {
@@ -6895,7 +6895,7 @@ class InternalDoc extends APIFactory
     /**
      * Set NOOP update handler, ignoring all updates.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function setNoop(): void
     {
@@ -6927,7 +6927,7 @@ class InternalDoc extends APIFactory
      * Set web template.
      *
      * @param string $template Template
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function setWebTemplate(string $template): void
     {
@@ -6938,7 +6938,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $hook_url Webhook URL
      * @param string $pem_path PEM path for self-signed certificate
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function setWebhook(string $hook_url, string $pem_path = ''): void
     {
@@ -6947,7 +6947,7 @@ class InternalDoc extends APIFactory
     /**
      * Setup logger.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function setupLogger(): void
     {
@@ -6982,7 +6982,7 @@ class InternalDoc extends APIFactory
     /**
      * Stop update loop.
      *
-      * @psalm-return void|Promise<void>
+      * @return void|Promise<void>
      */
     public function stop(): void
     {
@@ -7012,7 +7012,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params Params
      * @param array $key    Key
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function tdcliToTd(array &$params, ?array $key = null)
     {
@@ -7038,8 +7038,8 @@ class InternalDoc extends APIFactory
      * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $default
+     * @param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @param TReturnAlt $default
      * @return Promise<TReturn>|Promise<TReturnAlt>
      * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
@@ -7096,7 +7096,7 @@ class InternalDoc extends APIFactory
      * Unpack bot API file ID.
      *
      * @param string $fileId Bot API file ID
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function unpackFileId(string $fileId)
     {
@@ -7133,7 +7133,7 @@ class InternalDoc extends APIFactory
      * Unset event handler.
      *
      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function unsetEventHandler(bool $disableUpdateHandling = false): void
     {
@@ -7166,7 +7166,7 @@ class InternalDoc extends APIFactory
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function upload(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
@@ -7178,7 +7178,7 @@ class InternalDoc extends APIFactory
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null, array $extra = []): Future
     {
@@ -7197,7 +7197,7 @@ class InternalDoc extends APIFactory
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Promise<array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
+     * @return Promise<array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
       */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = []): Future
     {
@@ -7212,7 +7212,7 @@ class InternalDoc extends APIFactory
      * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
@@ -7224,7 +7224,7 @@ class InternalDoc extends APIFactory
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {
@@ -7238,7 +7238,7 @@ class InternalDoc extends APIFactory
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Promise<mixed>
+     * @return Promise<mixed>
       */
     public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false, array $extra = []): Future
     {

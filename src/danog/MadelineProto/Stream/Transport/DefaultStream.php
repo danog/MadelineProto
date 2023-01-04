@@ -72,7 +72,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $this->stream = (($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken()));
+        $this->stream = (($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
         if ($secure) {
             $this->stream->setupTls();
         }

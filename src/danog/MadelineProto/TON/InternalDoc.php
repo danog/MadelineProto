@@ -782,8 +782,8 @@ class InternalDoc extends APIFactory
      * Convert generator, promise or any other value to a promise.
      *
      * @template TReturn
-     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
-     * @psalm-return Promise<TReturn>
+     * @param Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
+     * @return Promise<TReturn>
      */
     public function call(mixed $promise): Future
     {
@@ -903,7 +903,7 @@ class InternalDoc extends APIFactory
     /**
      * Get TL method namespaces.
      *
-     * @psalm-return array|Promise<array>
+     * @return array|Promise<array>
      */
     public function getMethodNamespaces()
     {
@@ -993,7 +993,7 @@ class InternalDoc extends APIFactory
      * @param string $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     * @psalm-return void|Promise<void>
+     * @return void|Promise<void>
      */
     public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
     {
@@ -1196,8 +1196,8 @@ class InternalDoc extends APIFactory
      * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
      * @param Promise|Generator $promise Promise to which the timeout is applied.
      * @param int               $timeout Timeout in milliseconds.
-     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $default
+     * @param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @param TReturnAlt $default
      * @return Promise<TReturn>|Promise<TReturnAlt>
      * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */

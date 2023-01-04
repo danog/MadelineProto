@@ -39,7 +39,7 @@ trait BotAPI
     }
     /**
      * @return array<array<(array<array<(bool|mixed|string)>>|string)>>
-     * @psalm-return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
+     * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
      */
     private function parseButtons($rows): array
     {
@@ -496,7 +496,7 @@ trait BotAPI
     }
     /**
      * @return array<string>
-     * @psalm-return list<string>
+     * @return list<string>
      */
     private function multipleExplodeKeepDelimiters($delimiters, $string): array
     {
@@ -514,7 +514,7 @@ trait BotAPI
     }
     /**
      * @return array<(array<array<(array|string)>>|string)>
-     * @psalm-return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
+     * @return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
      */
     private function buildRows($button_list): array
     {

@@ -42,21 +42,8 @@ use function Amp\Socket\Internal\parseUri;
 
 class DoHConnector implements SocketConnector
 {
-    /**
-     * Datacenter instance.
-     *
-     * @property DataCenter $dataCenter
-     */
-    private $dataCenter;
-    /**
-     * Connection context.
-     *
-     */
-    private ConnectionContext $ctx;
-    public function __construct(DataCenter $dataCenter, ConnectionContext $ctx)
+    public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)
     {
-        $this->dataCenter = $dataCenter;
-        $this->ctx = $ctx;
     }
     public function connect(
         SocketAddress|string $uri,
@@ -99,9 +86,9 @@ class DoHConnector implements SocketConnector
             // Here, we simply check if the connection URI has changed since we first set it:
             // this would indicate that a proxy class has changed the connection URI to the proxy URI.
             if ($this->ctx->isDns()) {
-                $records = $this->dataCenter->getNonProxiedDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+                $records = $this->dataCenter->nonProxiedDoHClient->complete($host, $socketContext->getDnsTypeRestriction());
             } else {
-                $records = $this->dataCenter->getDNSClient()->complete($host, $socketContext->getDnsTypeRestriction());
+                $records = $this->dataCenter->DoHClient->complete($host, $socketContext->getDnsTypeRestriction());
             }
             \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
             if ($this->ctx->getIpv6()) {

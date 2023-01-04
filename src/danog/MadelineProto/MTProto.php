@@ -81,7 +81,7 @@ use function time;
  *
  * @internal
  */
-class MTProto implements TLCallback
+class MTProto implements TLCallback, LoggerGetter
 {
     use Serializable;
     use AuthKeyHandler;

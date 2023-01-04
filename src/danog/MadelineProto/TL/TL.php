@@ -725,7 +725,7 @@ class TL
      *
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
-     * @psalm-return array{0: mixed, 1: array<Future>}
+     * @return array{0: mixed, 1: array<Future>}
      */
     public function deserialize($stream, array $type = ['type' => '']): array
     {

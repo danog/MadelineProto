@@ -31,7 +31,7 @@ interface BufferedStreamInterface extends StreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     * @psalm-return Promise<BufferInterface>
+     * @return Promise<BufferInterface>
      */
     public function getReadBuffer(int &$length): void;
     /**

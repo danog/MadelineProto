@@ -157,8 +157,8 @@ abstract class AsyncTools extends StrTools
      *
      * @deprecated Coroutines are deprecated since amp v3
      * @template TReturn
-     * @psalm-param Generator<mixed, mixed, mixed, TReturn>|Future<TReturn>|TReturn $promise
-     * @psalm-return Future<TReturn>
+     * @param Generator<mixed, mixed, mixed, TReturn>|Future<TReturn>|TReturn $promise
+     * @return Future<TReturn>
      */
     public static function call(mixed $promise): Future
     {

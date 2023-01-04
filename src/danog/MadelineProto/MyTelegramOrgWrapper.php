@@ -56,7 +56,7 @@ class MyTelegramOrgWrapper
     /**
      * Datacenter instance.
      */
-    private DataCenter $datacenter;
+    private DoHWrapper $datacenter;
     /**
      * Cooke jar.
      *
@@ -105,17 +105,19 @@ class MyTelegramOrgWrapper
         if (!$this->jar || !$this->jar instanceof LocalCookieJar) {
             $this->jar = new LocalCookieJar();
         }
-        $this->datacenter = new DataCenter(new class(new Logger($this->settings->getLogger())) {
-            public Logger $logger;
-            public function __construct(Logger $logger)
-            {
-                $this->logger = $logger;
-            }
-            public function getLogger(): Logger
-            {
-                return $this->logger;
-            }
-        }, [], $this->settings->getConnection(), true, $this->jar);
+        $this->datacenter = new DoHWrapper(
+            $this->settings->getConnection(),
+            new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
+                public function __construct(private Logger $logger)
+                {
+                }
+                public function getLogger(): Logger
+                {
+                    return $this->logger;
+                }
+            },
+            $this->jar
+        );
     }
     /**
      * Login.

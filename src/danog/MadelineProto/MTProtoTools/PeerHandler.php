@@ -529,9 +529,9 @@ trait PeerHandler
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
      * @template TConstructor
-     * @psalm-param array{_: TConstructor}|mixed $id
+     * @param array{_: TConstructor}|mixed $id
      * @return array|int<(array|int<(array|int<(mixed|string)>|mixed|string)>|int|mixed|string)>
-     * @psalm-return array{
+     * @return array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -665,10 +665,10 @@ trait PeerHandler
     }
     /**
      * @template TConstructor
-     * @psalm-param array{_: TConstructor} $constructor
-     * @psalm-param bool|null $type
+     * @param array{_: TConstructor} $constructor
+     * @param bool|null $type
      * @return array<(array<(array<(mixed|string)>|mixed|string)>|int|mixed|string)>
-     * @psalm-return array{
+     * @return array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
