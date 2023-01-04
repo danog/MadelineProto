@@ -243,7 +243,7 @@ trait PeerHandler
             return;
         }
         foreach ($this->getUsernames($chat) as $username) {
-            $this->usernames->offsetSet($username, $id);
+            $this->usernames[$username] = $id;
         }
     }
     private function decacheChatUsername(int $id, ?array $chat): void
@@ -252,8 +252,8 @@ trait PeerHandler
             return;
         }
         foreach ($this->getUsernames($chat) as $username) {
-            if (($this->usernames->offsetGet($username)) === $id) {
-                $this->usernames->unset($username);
+            if ($this->usernames[$username] === $id) {
+                unset($this->usernames[$username]);
             }
         }
     }
@@ -283,7 +283,7 @@ trait PeerHandler
     public function peerIsset(mixed $id): bool
     {
         try {
-            return $this->chats->isset($this->getId($id, MTProto::INFO_TYPE_ID));
+            return isset($this->chats[$this->getId($id, MTProto::INFO_TYPE_ID)]);
         } catch (Exception $e) {
             return false;
         } catch (RPCErrorException $e) {
@@ -628,7 +628,7 @@ trait PeerHandler
                 return $this->genAll($chat, $folder_id, $type);
             } catch (Exception $e) {
                 if ($e->getMessage() === 'This peer is not present in the internal peer database') {
-                    $this->chats->unset($id);/** @uses DbArray::offsetUnset() */
+                    unset($this->chats[$id]);
                 }
                 throw $e;
             }
@@ -802,7 +802,7 @@ trait PeerHandler
      */
     public function refreshFullPeerCache(mixed $id): void
     {
-        $this->full_chats->unset(($this->getFullInfo($id))['bot_api_id']);
+        unset($this->full_chats[$this->getInfo($id)['bot_api_id']]);
         $this->getFullInfo($id);
     }
     /**
@@ -847,13 +847,10 @@ trait PeerHandler
      */
     public function addFullChat(array $full): void
     {
-        $this->full_chats->offsetSet(
-            $this->getId($full),
-            [
-                'full' => $full,
-                'last_update' => \time(),
-            ],
-        );
+        $this->full_chats[$this->getId($full)] = [
+            'full' => $full,
+            'last_update' => \time(),
+        ];
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.

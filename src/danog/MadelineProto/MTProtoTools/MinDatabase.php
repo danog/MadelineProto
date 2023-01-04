@@ -90,7 +90,7 @@ class MinDatabase implements TLCallback
             while ($iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                    $this->db->unset($id);
+                    unset($this->db[$id]);
                 }
             }
             $this->clean = true;
@@ -214,11 +214,11 @@ class MinDatabase implements TLCallback
     /**
      * Check if location info is available for peer.
      *
-     * @param float|int $id Peer ID
+     * @param int $id Peer ID
      */
-    public function hasPeer(float|int $id): bool
+    public function hasPeer(int $id): bool
     {
-        return $this->db->isset($id);
+        return isset($this->db[$id]);
     }
     public function __debugInfo()
     {

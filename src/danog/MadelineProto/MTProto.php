@@ -1025,7 +1025,7 @@ class MTProto implements TLCallback, LoggerGetter
             $this->full_chats->clear();
         }
         if (!$this->settings->getDb()->getEnablePeerInfoDb()) {
-            if ($this->chats->isset(0)) {
+            if (isset($this->chats[0])) {
                 return;
             }
             $this->logger('Cleaning up peer database...');
@@ -1050,8 +1050,8 @@ class MTProto implements TLCallback, LoggerGetter
             }
             $this->chats->set(0, []);
             $this->logger('Cleaned up peer database!');
-        } elseif ($this->chats->isset(0)) {
-            $this->chats->unset(0);
+        } elseif (isset($this->chats[0])) {
+            unset($this->chats[0]);
         }
     }
 
