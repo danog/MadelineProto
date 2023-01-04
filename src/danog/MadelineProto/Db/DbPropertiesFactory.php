@@ -32,7 +32,7 @@ abstract class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DriverArray $value = null): Future
+    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DbType $value = null)
     {
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;

@@ -41,7 +41,7 @@ trait DbPropertiesTrait
                 unset($this->{$property});
             } else {
                 $table = "{$prefix}_{$property}";
-                $promises[$property] = async(DbPropertiesFactory::get(...), $dbSettings, $table, $type, $this->{$property});
+                $promises[$property] = async(DbPropertiesFactory::get(...), $dbSettings, $table, $type, $this->{$property} ?? null);
             }
         }
         $promises = await($promises);

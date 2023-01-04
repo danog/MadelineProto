@@ -28,6 +28,8 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
 
+use function Amp\async;
+
 /**
  * Update loop.
  *
@@ -63,19 +65,19 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): void
+    public function loop(): ?bool
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
         if ($this->waitForAuthOrSignal()) {
-            return;
+            return null;
         }
         $this->state = $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = 10;
         $first = true;
         while (true) {
             if ($this->waitForAuthOrSignal(false)) {
-                return;
+                return null;
             }
             $result = [];
             $toPts = $this->toPts;
@@ -206,9 +208,9 @@ class UpdateLoop extends ResumableSignalLoop
             $API->signalUpdate();
             $API->logger->logger("Finished signaling updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
             $first = false;
-            if ($this->waitSignal($this->pause($timeout * 1000))) {
+            if ($this->waitSignal(async($this->pause(...), $timeout*1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");
-                return;
+                return null;
             }
         }
     }

@@ -72,7 +72,7 @@ trait Files
         }
         /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
-        $request->setTransferTimeout(10 * 1000 * 3600);
+        $request->setTransferTimeout(10 * 3600);
         $request->setBodySizeLimit(512 * 1024 * 8000);
         $response = $this->datacenter->getHTTPClient()->request($request);
         if (($status = $response->getStatus()) !== 200) {

@@ -184,7 +184,7 @@ class Server extends SignalLoop
      */
     public function loop(): void
     {
-        while ($socket = $this->waitSignal($this->server->accept())) {
+        while ($socket = $this->waitSignal(async($this->server->accept(...)))) {
             async($this->clientLoop(...), $socket);
         }
         $this->server->close();

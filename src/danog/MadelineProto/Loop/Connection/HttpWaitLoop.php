@@ -23,6 +23,8 @@ namespace danog\MadelineProto\Loop\Connection;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 
+use function Amp\async;
+
 /**
  * HttpWait loop.
  *
@@ -44,14 +46,14 @@ class HttpWaitLoop extends ResumableSignalLoop
             return;
         }
         while (true) {
-            if ($this->waitSignal($this->pause())) {
+            if ($this->waitSignal(async($this->pause(...)))) {
                 return;
             }
             if (!$connection->isHttp()) {
                 return;
             }
             while (!$shared->hasTempAuthKey()) {
-                if ($this->waitSignal($this->pause())) {
+                if ($this->waitSignal(async($this->pause(...)))) {
                     return;
                 }
             }

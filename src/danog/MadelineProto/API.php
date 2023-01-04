@@ -190,7 +190,6 @@ class API extends InternalDoc
         if (!$appInfo->hasApiInfo()) {
             $app = $this->APIStart($settings);
             if (!$app) {
-                $this->forceInit(true);
                 die();
             }
             $appInfo->setApiId($app['api_id']);
@@ -276,7 +275,7 @@ class API extends InternalDoc
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 
         [$unserialized, $this->unlock] = Tools::timeoutWithDefault(
-            Serialization::unserialize($this->session, $settings, $forceFull),
+            async(Serialization::unserialize(...), $this->session, $settings, $forceFull),
             30000,
             [0, null],
         );

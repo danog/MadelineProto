@@ -336,22 +336,22 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Internal peer database.
      *
-     * @var DbArray|array<Promise>
+     * @var DbArray
      */
-    public DbArray|array $chats;
+    public DbArray $chats;
 
     /**
      * Cache of usernames for chats.
      *
-     * @var DbArray|array<Promise>
+     * @var DbArray
      */
-    public DbArray|array $usernames;
+    public DbArray $usernames;
     /**
      * Cached parameters for fetching channel participants.
      *
-     * @var DbArray|array<Promise>
+     * @var DbArray
      */
-    public DbArray|array $channelParticipants;
+    public DbArray $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
      *
@@ -365,9 +365,9 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Full chat info database.
      *
-     * @var DbArray|array<Promise>
+     * @var DbArray
      */
-    public DbArray|array $full_chats;
+    public DbArray $full_chats;
     /**
      * Sponsored message database.
      *
@@ -524,10 +524,8 @@ class MTProto implements TLCallback, LoggerGetter
 
     /**
      * Nullcache array for storing main session file to DB.
-     *
-     * @var DbArray|array<Promise>
      */
-    public DbArray|array $session;
+    public DbArray $session;
 
     /**
      * List of properties stored in database (memory or external).
@@ -1023,7 +1021,7 @@ class MTProto implements TLCallback, LoggerGetter
             $this->TL->init($this->settings->getSchema(), $callbacks);
         }
 
-        $db []= $this->initDb($this);
+        $db []= async($this->initDb(...), $this);
         await($db);
         $this->fillUsernamesCache();
 
@@ -1199,8 +1197,6 @@ class MTProto implements TLCallback, LoggerGetter
                 $controller->setMadeline($this);
             }
         }
-
-        $this->forceInit(false);
 
         // Setup one-time stuffs
         Magic::start();

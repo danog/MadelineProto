@@ -36,6 +36,8 @@ use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use Revolt\EventLoop;
 
+use function Amp\async;
+
 /**
  * Manages updates.
  *
@@ -69,7 +71,7 @@ trait UpdateHandler
         $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
         if (empty($this->updates)) {
             $params['timeout'] *= 1000;
-            Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
+            Tools::timeoutWithDefault(async($this->waitUpdate(...)), $params['timeout'] ?: 100000);
         }
         if (empty($this->updates)) {
             return $this->updates;

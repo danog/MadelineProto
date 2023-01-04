@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 
+use function Amp\async;
 use function strlen;
 
 /**
@@ -62,7 +63,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 $please_wait = false;
                 $API->logger->logger("Waiting in {$this}", Logger::ULTRA_VERBOSE);
-                if ($this->waitSignal($this->pause())) {
+                if ($this->waitSignal(async($this->pause(...)))) {
                     $API->logger->logger("Exiting {$this}", Logger::ULTRA_VERBOSE);
                     return;
                 }

@@ -52,12 +52,12 @@ class CheckLoop extends ResumableSignalLoop
         // Typically 25 seconds, good enough
         while (true) {
             while (empty($connection->new_outgoing)) {
-                if ($this->waitSignal($this->pause())) {
+                if ($this->waitSignal(async($this->pause(...)))) {
                     return;
                 }
             }
             if (!$connection->hasPendingCalls()) {
-                if ($this->waitSignal($this->pause($timeoutMs))) {
+                if ($this->waitSignal(async($this->pause(...), $timeoutMs))) {
                     return;
                 }
                 continue;
@@ -147,7 +147,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
                 $connection->flush();
             }
-            if ($this->waitSignal($this->pause($timeoutMs))) {
+            if ($this->waitSignal(async($this->pause(...), $timeoutMs))) {
                 return;
             }
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {

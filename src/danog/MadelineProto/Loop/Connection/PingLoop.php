@@ -24,6 +24,8 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use Throwable;
 
+use function Amp\async;
+
 /**
  * Ping loop.
  *
@@ -47,7 +49,7 @@ class PingLoop extends ResumableSignalLoop
         while (true) {
             while (!$shared->hasTempAuthKey()) {
                 $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
-                if ($this->waitSignal($this->pause())) {
+                if ($this->waitSignal(async($this->pause(...)))) {
                     $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
                     return;
                 }
@@ -59,7 +61,7 @@ class PingLoop extends ResumableSignalLoop
                 $API->logger->logger("Error while pinging DC {$datacenter}");
                 $API->logger->logger((string) $e);
             }
-            if ($this->waitSignal($this->pause($timeoutMs))) {
+            if ($this->waitSignal(async($this->pause(...), $timeoutMs))) {
                 $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
                 return;
             }
