@@ -76,7 +76,7 @@ trait Templates
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
-        return getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
+        getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
     }
     /**
      * Web template.

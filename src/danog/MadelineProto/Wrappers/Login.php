@@ -52,10 +52,10 @@ trait Login
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token): void
+    public function botLogin(string $token): ?array
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
-            return;
+            return null;
         }
         $callbacks = [$this, $this->referenceDatabase];
         $this->TL->updateCallbacks($callbacks);

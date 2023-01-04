@@ -180,10 +180,10 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat to rekey
      */
-    public function rekey(int $chat): void
+    public function rekey(int $chat): string
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
-            return;
+            return null;
         }
         $this->logger->logger('Rekeying secret chat '.$chat.'...', Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
@@ -275,10 +275,10 @@ trait AuthKeyHandler
      * @param int   $chat   Chat
      * @param array $params Parameters
      */
-    private function completeRekey(int $chat, array $params): void
+    private function completeRekey(int $chat, array $params): bool
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'])) {
-            return;
+            return false;
         }
         if ($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'] !== $params['key_fingerprint']) {
             $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);

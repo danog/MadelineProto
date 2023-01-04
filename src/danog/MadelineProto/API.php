@@ -494,7 +494,7 @@ class API extends InternalDoc
                 $this->setEventHandler($eventHandler);
                 $started = true;
                 /** @var API $this->API */
-                return $this->API->loop();
+                $this->API->loop();
             } catch (SecurityException $e) {
                 throw $e;
             } catch (Throwable $e) {

@@ -392,7 +392,8 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    return;
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
@@ -403,19 +404,19 @@ trait UpdateHandler
                 }
                 if ($update['qts'] < $cur_state->qts()) {
                     $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
-                    return false;
+                    return;
                 }
                 if ($update['qts'] > $cur_state->qts() + 1) {
                     $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
                     $this->updaters[UpdateLoop::GENERIC]->resumeDefer();
-                    return false;
+                    return;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
                 $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
             }
             if (!isset($this->secret_chats[$update['message']['chat_id']])) {
                 $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
-                return false;
+                return;
             }
             $this->secretFeeders[$update['message']['chat_id']]->feed($update);
             $this->secretFeeders[$update['message']['chat_id']]->resume();
