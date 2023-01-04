@@ -9,11 +9,12 @@ use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
 use ReflectionClass;
-use RuntimeException;
 use Throwable;
 
 /**
  * Array caching trait.
+ * 
+ * @impleme
  */
 abstract class DriverArray implements DbArray
 {
@@ -74,7 +75,7 @@ abstract class DriverArray implements DbArray
     /**
      * @param DbArray|array|null $previous
      */
-    public static function getInstance(string $table, $previous, DatabaseAbstract $settings): static
+    public static function getInstance(string $table, $previous, $settings): static
     {
         $instance = new static();
         $instance->setTable($table);
@@ -186,7 +187,7 @@ abstract class DriverArray implements DbArray
     }
     final public function offsetExists($index): bool
     {
-        throw new RuntimeException('Native isset not support promises. Use isset method');
+        return $this->isset($index);
     }
 
     final public function offsetSet(mixed $index, mixed $value): void

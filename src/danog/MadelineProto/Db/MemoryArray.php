@@ -9,10 +9,11 @@ use Amp\Producer;
 use ArrayIterator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
-use RuntimeException;
 
 /**
  * Memory database backend.
+ * 
+ * @implements DbArray<Memory>
  */
 class MemoryArray extends ArrayIterator implements DbArray
 {
@@ -21,7 +22,7 @@ class MemoryArray extends ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
-    public static function getInstance(string $table, $previous, Memory $settings): static
+    public static function getInstance(string $table, $previous, $settings): static
     {
         if ($previous instanceof MemoryArray) {
             return $previous;
@@ -53,7 +54,7 @@ class MemoryArray extends ArrayIterator implements DbArray
 
     public function offsetExists(mixed $offset): bool
     {
-        throw new RuntimeException('Native isset not support promises. Use isset method');
+        return parent::offsetExists($offset);
     }
 
     public function offsetGet(mixed $offset): mixed

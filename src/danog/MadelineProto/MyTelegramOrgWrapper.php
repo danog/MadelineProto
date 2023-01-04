@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Http\Client\Cookie\InMemoryCookieJar;
+use Amp\Http\Client\Cookie\LocalCookieJar;
 use Amp\Http\Client\Request;
 
 /**
@@ -61,7 +61,7 @@ class MyTelegramOrgWrapper
     /**
      * Cooke jar.
      *
-     * @var InMemoryCookieJar
+     * @var LocalCookieJar
      */
     private $jar;
     /**
@@ -105,8 +105,8 @@ class MyTelegramOrgWrapper
                 $this->settings = $settings;
             }
         }
-        if (!$this->jar || !$this->jar instanceof InMemoryCookieJar) {
-            $this->jar = new InMemoryCookieJar();
+        if (!$this->jar || !$this->jar instanceof LocalCookieJar) {
+            $this->jar = new LocalCookieJar();
         }
         $this->datacenter = new DataCenter(new class(new Logger($this->settings->getLogger())) {
             public Logger $logger;

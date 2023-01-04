@@ -33,7 +33,6 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
-use Generator;
 use Throwable;
 
 use function Amp\async;
@@ -235,11 +234,6 @@ class Server extends SignalLoop
                 $payload[1] = $this->callback->unwrap($wrapper);
             }
             $result = $this->API->{$payload[0]}(...$payload[1]);
-            $result = $result instanceof Generator
-                ? $result
-                : ($result instanceof Promise
-                    ? $result
-                    : $result);
         } catch (Throwable $e) {
             $this->API->logger("Got error while calling IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);

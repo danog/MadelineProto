@@ -11,7 +11,8 @@ use Countable;
 /**
  * DB array interface.
  *
- * @template T as mixed
+ * @template TTSettings as DatabaseAbstract
+ * @extends DbType<TTSettings>
  */
 interface DbArray extends DbType, ArrayAccess, Countable
 {
@@ -31,36 +32,26 @@ interface DbArray extends DbType, ArrayAccess, Countable
     public function unset(string|int $key): void;
     /**
      * Set element.
-     *
-     * @psalm-param T $value
      */
     public function set(string|int $key, mixed $value): void;
     /**
      * Get element.
      *
      * @param string|int $index
-     * @psalm-return Promise<T>
      */
     public function offsetGet(mixed $index): mixed;
     /**
      * Set element.
      *
      * @param string|int $index
-     * @psalm-param T $value
      */
     public function offsetSet(mixed $index, mixed $value): void;
     /**
-     * @deprecated
-     * @internal
-     * @see DbArray::unset();
-     *
      * Unset element.
      * @param string|int $index Offset
      */
     public function offsetUnset(mixed $index): void;
     /**
-     * @deprecated
-     * @internal
      * @see DbArray::isset();
      */
     public function offsetExists(mixed $index): bool;
@@ -71,7 +62,7 @@ interface DbArray extends DbType, ArrayAccess, Countable
     /**
      * Get iterator.
      *
-     * @return Iterator<array{0: string|int, 1: T}>
+     * @return Iterator<array{0: string|int, 1: mixed}>
      */
     public function getIterator(): Iterator;
 }

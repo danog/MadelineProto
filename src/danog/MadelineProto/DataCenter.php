@@ -33,7 +33,7 @@ use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\Cookie\CookieInterceptor;
 use Amp\Http\Client\Cookie\CookieJar;
-use Amp\Http\Client\Cookie\InMemoryCookieJar;
+use Amp\Http\Client\Cookie\LocalCookieJar;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
@@ -252,7 +252,7 @@ class DataCenter
                 }
             };
 
-            $this->CookieJar = $jar ?? new InMemoryCookieJar();
+            $this->CookieJar = $jar ?? new LocalCookieJar();
             $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this))))->build();
             $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, true))))->build();
             $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
