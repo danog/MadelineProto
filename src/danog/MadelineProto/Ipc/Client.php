@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -164,7 +164,6 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
@@ -184,7 +183,6 @@ class Client extends ClientAbstract
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
     public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false)
     {
@@ -240,7 +238,6 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @return Generator Downloaded file path
      */
     public function downloadToDir($messageMedia, $dir, callable $cb = null)
     {
@@ -259,7 +256,6 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @return Generator Downloaded file path
      */
     public function downloadToFile($messageMedia, $file, callable $cb = null)
     {
@@ -285,7 +281,6 @@ class Client extends ClientAbstract
      * @param int                            $offset       Offset where to start downloading
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, mixed>
      */
     public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null)
     {

@@ -13,27 +13,23 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
 
-use Amp\File\File;
 use Amp\Future;
-use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
-use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use const STR_PAD_LEFT;
 
@@ -393,7 +389,6 @@ class TL
      * @param mixed   $object Object to serialize
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
-     * @psalm-return Generator<(int|mixed), (array|mixed), mixed, (false|mixed|null|string)>
      */
     public function serializeObject(array $type, $object, string $ctx, int $layer = -1)
     {
@@ -570,7 +565,6 @@ class TL
      *
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|Promise<string>|StreamInterface|array|int|mixed), mixed, string>
      */
     public function serializeMethod(string $method, $arguments)
     {
@@ -587,7 +581,6 @@ class TL
      * @param array   $arguments Arguments
      * @param string  $ctx       Context
      * @param integer $layer     Layer
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, string>
      */
     private function serializeParams(array $tl, array $arguments, string $ctx, int $layer, $promise)
     {

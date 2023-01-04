@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -24,7 +24,6 @@ use Amp\ByteStream\ClosedException;
 use Amp\Failure;
 use Amp\Future;
 use Amp\Socket\EncryptableSocket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\Async\BufferedStream;
@@ -35,7 +34,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\WriteBufferInterface;
-use Generator;
 
 /**
  * UDP stream wrapper.
@@ -65,7 +63,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     * @psalm-return Generator<int, Promise, mixed, (Failure<mixed>|Success<object>)>
      */
     public function getReadBuffer(int &$length)
     {

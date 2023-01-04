@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -34,7 +34,6 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
-use Generator;
 use Revolt\EventLoop;
 
 /**
@@ -62,7 +61,7 @@ trait UpdateHandler
      *
      * @param array $params Params
      * @internal
-     * @psalm-return Generator<int, Promise<(mixed|null)>, mixed, (list<array{update_id: mixed, update: mixed}>|mixed)>
+     * @return list<array{update_id: mixed, update: mixed}>
      */
     public function getUpdates(array $params = [])
     {
@@ -186,19 +185,15 @@ trait UpdateHandler
     }
     /**
      * Extract a message constructor from an Updates constructor.
-     *
-     * @psalm-return Generator<mixed, mixed, mixed, array>
      */
-    public function extractMessage(array $updates)
+    public function extractMessage(array $updates): array
     {
         return ($this->extractMessageUpdate($updates))['message'];
     }
     /**
      * Extract an update message constructor from an Updates constructor.
-     *
-     * @psalm-return Generator<mixed, mixed, mixed, array>
      */
-    public function extractMessageUpdate(array $updates)
+    public function extractMessageUpdate(array $updates): array
     {
         $result = null;
         foreach (($this->extractUpdates($updates)) as $update) {
@@ -217,9 +212,9 @@ trait UpdateHandler
     /**
      * Extract Update constructors from an Updates constructor.
      *
-     * @psalm-return Generator<mixed, mixed, mixed, array<array>>
+     * @return array<array>
      */
-    public function extractUpdates(array $updates)
+    public function extractUpdates(array $updates): array
     {
         switch ($updates['_']) {
             case 'updates':

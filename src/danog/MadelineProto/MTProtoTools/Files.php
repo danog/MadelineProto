@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -25,8 +25,6 @@ use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
 use Amp\Future;
 use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
-use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
@@ -36,9 +34,7 @@ use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Tools;
-use Generator;
 use Throwable;
 
 use const LOCK_EX;
@@ -68,7 +64,6 @@ trait Files
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<Response>|Promise<int>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', callable $cb = null, bool $encrypted = false)
     {
@@ -115,7 +110,6 @@ trait Files
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<int, (Promise|Promise<array>), mixed, array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
@@ -233,7 +227,6 @@ trait Files
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<(int|mixed), (Promise|array), mixed, mixed>
      */
     public function uploadFromTgfile($media, callable $cb = null, bool $encrypted = false)
     {
@@ -753,7 +746,6 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<(callable|null)>|Promise<mixed>|array|bool|mixed), mixed, (false|string)>
      */
     public function downloadToDir($messageMedia, $dir, callable $cb = null)
     {
@@ -770,7 +762,6 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @return Generator Downloaded file path
      */
     public function downloadToFile($messageMedia, $file, callable $cb = null): false|string
     {
@@ -811,7 +802,6 @@ trait Files
      * @param int                            $offset        Offset where to start downloading
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
-     * @psalm-return Generator<(int|mixed), (Promise|array), mixed, true>
      */
     public function downloadToCallable($messageMedia, callable $callable, callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null)
     {

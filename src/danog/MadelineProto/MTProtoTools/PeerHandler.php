@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -32,7 +32,6 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
-use Generator;
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
@@ -158,7 +157,6 @@ trait PeerHandler
      *
      * @param array $chat Chat
      * @internal
-     * @psalm-return Generator<int, (Promise|null), mixed, void>
      */
     public function addChat(array $chat): void
     {
@@ -281,9 +279,8 @@ trait PeerHandler
      * Check if peer is present in internal peer database.
      *
      * @param mixed $id Peer
-     * @psalm-return Generator<(int|mixed), (Promise|array), mixed, bool>
      */
-    public function peerIsset($id)
+    public function peerIsset($id): bool
     {
         try {
             return $this->chats->isset($this->getId($id, MTProto::INFO_TYPE_ID));
@@ -530,11 +527,10 @@ trait PeerHandler
      * @param mixed                $id        Peer
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
-     * @return Generator Info object
      * @template TConstructor
      * @psalm-param array{_: TConstructor}|mixed $id
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
-     * @psalm-return \Generator<int|mixed, \Amp\Future|\Amp\Future<string>|array, mixed, array{
+     * @psalm-return array{
      *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
@@ -549,7 +545,7 @@ trait PeerHandler
      *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
      *      type: string
-     * }>|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
+     * }|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
     public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {

@@ -9,7 +9,6 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
-use Generator;
 use RuntimeException;
 
 use function count;
@@ -73,9 +72,8 @@ class Ogg
      *
      * @param BufferedStreamInterface $stream        The stream
      * @param int                     $frameDuration Required frame duration, microseconds
-     * @psalm-return Generator<mixed, mixed, mixed, self>
      */
-    public static function init(BufferedStreamInterface $stream, int $frameDuration)
+    public static function init(BufferedStreamInterface $stream, int $frameDuration): self
     {
         $self = new self;
         $self->frameDuration = $frameDuration;

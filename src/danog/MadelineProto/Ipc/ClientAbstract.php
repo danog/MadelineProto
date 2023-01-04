@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Ipc;
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Logger;
-use Generator;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -132,8 +131,6 @@ abstract class ClientAbstract
     }
     /**
      * Disconnect cleanly from main instance.
-     *
-     * @psalm-return Generator<int, Promise, mixed, void>
      */
     public function disconnect(): void
     {

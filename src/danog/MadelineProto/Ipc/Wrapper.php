@@ -56,9 +56,8 @@ class Wrapper extends ClientAbstract
      * Constructor.
      *
      * @param mixed        $data Payload data
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>), mixed, Wrapper>
      */
-    public static function create(&$data, SessionPaths $session, Logger $logger)
+    public static function create(&$data, SessionPaths $session, Logger $logger): self
     {
         $instance = new self;
         $instance->data = &$data;

@@ -16,7 +16,6 @@ use Amp\Http\Client\Response as ClientResponse;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
-use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Producer;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
@@ -29,11 +28,9 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
-use Generator;
 
 use const FILTER_VALIDATE_URL;
 use const SEEK_END;
@@ -115,7 +112,6 @@ trait FilesLogic
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
-     * @psalm-return Generator<int, (Promise<ChannelledSocket>|Promise<mixed>|mixed), mixed, mixed>
      */
     public function downloadToStream($messageMedia, $stream, callable $cb = null, int $offset = 0, int $end = -1)
     {
@@ -228,7 +224,6 @@ trait FilesLogic
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
     public function uploadEncrypted($file, string $fileName = '', callable $cb = null)
     {
@@ -242,7 +237,6 @@ trait FilesLogic
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<File>|Promise<ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
     public function upload($file, string $fileName = '', callable $cb = null, bool $encrypted = false)
     {
@@ -294,7 +288,6 @@ trait FilesLogic
      * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @psalm-return Generator<(int|mixed), (Promise|Promise<int>|Promise<(null|string)>|StreamInterface|array|int|mixed), mixed, mixed>
      */
     public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', callable $cb = null, bool $encrypted = false)
     {

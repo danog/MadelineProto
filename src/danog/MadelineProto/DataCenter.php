@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -58,7 +58,6 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\Serializable;
-use Generator;
 use Throwable;
 
 use const PHP_OS;
@@ -595,9 +594,8 @@ class DataCenter
      * Get Connection instance asynchronously.
      *
      * @param string $dc DC ID
-     * @psalm-return Generator<int, Promise, mixed, Connection>
      */
-    public function waitGetConnection(string $dc)
+    public function waitGetConnection(string $dc): Connection
     {
         return $this->sockets[$dc]->waitGetConnection();
     }

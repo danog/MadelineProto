@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -33,7 +33,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use danog\PrimeModule;
-use Generator;
 use phpseclib3\Math\BigInteger;
 use Throwable;
 
@@ -58,9 +57,9 @@ trait AuthKeyHandler
     /**
      * Create authorization key.
      *
-     * @psalm-return Generator<mixed, (mixed|string), mixed, (($temp is false ? PermAuthKey : TempAuthKey)|null)>
+     * @return ($temp is false ? PermAuthKey : TempAuthKey)|null
      */
-    public function createAuthKey(bool $temp): void
+    public function createAuthKey(bool $temp): PermAuthKey|TempAuthKey|null
     {
         $expires_in = $temp ? $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn() : -1;
         $cdn = $this->isCDN();
@@ -416,9 +415,8 @@ trait AuthKeyHandler
      * Factorize number asynchronously using the wolfram API.
      *
      * @param string|integer $what Number to factorize
-     * @psalm-return Generator<int, Promise<string>, mixed, (false|int|string)>
      */
-    private function wolframSingle($what)
+    private function wolframSingle($what): false|int
     {
         $code = ($this->API->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
         $query = 'Do prime factorization of '.$what;

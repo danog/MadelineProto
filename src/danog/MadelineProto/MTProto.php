@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -65,7 +65,6 @@ use danog\MadelineProto\Wrappers\Templates;
 use danog\MadelineProto\Wrappers\TOS;
 use danog\MadelineProto\Wrappers\Webhook;
 use danog\Serializable;
-use Generator;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -904,9 +903,8 @@ class MTProto implements TLCallback
      * Get contents of remote file asynchronously.
      *
      * @param string $url URL
-     * @psalm-return Generator<int, Promise<string>, mixed, string>
      */
-    public function fileGetContents(string $url)
+    public function fileGetContents(string $url): string
     {
         return $this->datacenter->fileGetContents($url);
     }
@@ -1008,7 +1006,6 @@ class MTProto implements TLCallback
      * Clean up properties from previous versions of MadelineProto.
      *
      * @internal
-     * @psalm-return Generator<mixed, mixed, mixed, void>
      */
     private function cleanupProperties(): void
     {

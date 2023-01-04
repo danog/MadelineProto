@@ -13,7 +13,7 @@ declare(strict_types=1);
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
@@ -38,7 +38,6 @@ trait CallHandler
      * @param string            $method Method name
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
@@ -50,7 +49,6 @@ trait CallHandler
      * @param string            $method Method name
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @psalm-param array|Generator<mixed, mixed, mixed, array> $args
      */
     public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
