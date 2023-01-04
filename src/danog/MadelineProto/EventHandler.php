@@ -114,8 +114,9 @@ abstract class EventHandler extends InternalDoc
     /**
      * Get peers where to send error reports.
      *
+     * @return string|int|array<string|int>
      */
-    public function getReportPeers(): array|string|int
+    public function getReportPeers()
     {
         return [];
     }

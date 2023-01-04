@@ -167,7 +167,7 @@ class API extends InternalDoc
             if (\in_array($key, ['namespace', 'API', 'asyncAPIPromise', 'methods'])) {
                 continue;
             }
-            if (!$this->{$key}) {
+            if (!isset($this->{$key})) {
                 $this->{$key} = $this->exportNamespace($key);
             }
         }

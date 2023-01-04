@@ -20,7 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\ByteStream\ResourceOutputStream;
+use Amp\ByteStream\WritableResourceStream;
+use Amp\ByteStream\WritableStream;
 use Amp\Failure;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
@@ -96,12 +97,12 @@ class Logger
      * Logfile.
      *
      */
-    public ResourceOutputStream $stdout;
+    public WritableStream $stdout;
     /**
      * Default logger instance.
      *
      */
-    public static self $default;
+    public static ?self $default = null;
     /**
      * Whether the AGPL notice was printed.
      *
@@ -274,7 +275,7 @@ class Logger
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
+            $this->stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
                 $optional = &$this->optional;
                 $stdout = &$this->stdout;
@@ -295,7 +296,7 @@ class Logger
             if ($result === 'syslog') {
                 $this->stdout = getStderr();
             } elseif ($result) {
-                $this->stdout = new ResourceOutputStream(\fopen($result, 'a+'));
+                $this->stdout = new WritableResourceStream(\fopen($result, 'a+'));
             } else {
                 $this->stdout = getStderr();
             }

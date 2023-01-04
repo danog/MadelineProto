@@ -6,10 +6,10 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\ByteStream\InputStream;
 use Amp\ByteStream\IteratorStream;
-use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceInputStream;
-use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
+use Amp\ByteStream\WritableResourceStream;
+use Amp\ByteStream\WritableStream;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
 use Amp\Http\Client\Response as ClientResponse;
@@ -120,11 +120,10 @@ trait FilesLogic
             $cb = $stream;
             $stream = $stream->getFile();
         }
-        /** @var $stream \Amp\ByteStream\OutputStream */
         if (!\is_object($stream)) {
-            $stream = new ResourceOutputStream($stream);
+            $stream = new WritableResourceStream($stream);
         }
-        if (!$stream instanceof OutputStream) {
+        if (!$stream instanceof WritableStream) {
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;

@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Wrappers;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 
 use function Amp\async;
 
@@ -93,7 +94,7 @@ trait Events
                 }
             }
         }
-        $this->setReportPeers($this->event_handler_instance->getReportPeers());
+        $this->setReportPeers(Tools::call($this->event_handler_instance->getReportPeers())->await());
         async(fn () => $this->event_handler_instance->startInternal());
         $this->updateHandler = [$this, 'eventUpdateHandler'];
         if ($this->inited()) {
