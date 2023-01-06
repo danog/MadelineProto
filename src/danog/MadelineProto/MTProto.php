@@ -112,7 +112,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 161;
+    const V = 162;
     /**
      * Release version.
      *
