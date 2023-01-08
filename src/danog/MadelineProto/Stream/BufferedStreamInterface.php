@@ -32,7 +32,7 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface;
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface;
     /**
      * Get write buffer asynchronously.
      *

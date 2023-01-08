@@ -97,25 +97,25 @@ class MinDatabase implements TLCallback
             $this->clean = true;
         });
     }
-    public function getMethodCallbacks(): array
+    public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    public function getMethodBeforeCallbacks(): array
+    public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    public function getConstructorCallbacks(): array
+    public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [[$this, 'addPeer']]), \array_fill_keys(self::ORIGINS, [[$this, 'addOrigin']]));
+        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), \array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
     }
-    public function getConstructorBeforeCallbacks(): array
+    public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return \array_fill_keys(self::ORIGINS, [[$this, 'addOriginContext']]);
+        return \array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
     }
-    public function getConstructorSerializeCallbacks(): array
+    public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return \array_fill_keys(self::SWITCH_CONSTRUCTORS, [$this, 'populateFrom']);
+        return \array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
     }
     public function getTypeMismatchCallbacks(): array
     {

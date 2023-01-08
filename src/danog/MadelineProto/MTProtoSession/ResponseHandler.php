@@ -133,7 +133,7 @@ trait ResponseHandler
                     $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
                     if ($response_type == 'Updates') {
                         if (!$this->isCdn()) {
-                            EventLoop::defer(fn () => async($this->API->handleUpdates($message->read())));
+                            async($this->API->handleUpdates($message->read()));
                         }
                         break;
                     }
@@ -248,7 +248,7 @@ trait ResponseHandler
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
             unset($body);
-            EventLoop::defer(fn () => async($this->API->handleUpdates($response)));
+            async($this->API->handleUpdates($response));
         }
         $this->gotResponseForOutgoingMessage($request);
 

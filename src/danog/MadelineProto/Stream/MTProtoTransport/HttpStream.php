@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -96,7 +95,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
         $headers = '';

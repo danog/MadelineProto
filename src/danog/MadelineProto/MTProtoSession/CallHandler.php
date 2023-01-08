@@ -101,9 +101,11 @@ trait CallHandler
             return null;
         }
         if (\is_array($readDeferred)) {
-            return await($readDeferred);
+            return await(
+                \array_map(await($readDeferred), fn (?DeferredFuture $f) => $f->getFuture())
+            );
         }
-        return $readDeferred->await();
+        return $readDeferred->await()->getFuture()->await();
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
@@ -151,7 +153,7 @@ trait CallHandler
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return array_merge(...await($promises));
+                return \array_merge(...await($promises));
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {

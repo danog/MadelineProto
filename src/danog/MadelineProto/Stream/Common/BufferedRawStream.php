@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
-use Amp\Future;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
@@ -94,7 +93,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');

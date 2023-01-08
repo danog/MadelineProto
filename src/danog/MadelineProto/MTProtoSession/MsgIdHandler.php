@@ -70,10 +70,10 @@ final class MsgIdHandler
     /**
      * Check validity of given message ID.
      *
-     * @param string $newMessageId New message ID
+     * @param int|string $newMessageId New message ID
      * @param array  $aargs        Params
      */
-    public function checkMessageId(string $newMessageId, array $aargs): void
+    public function checkMessageId(int|string $newMessageId, array $aargs): void
     {
         $newMessageId = \is_integer($newMessageId) ? $newMessageId : Tools::unpackSignedLong($newMessageId);
         $minMessageId = (\time() + $this->session->time_delta - 300) << 32;

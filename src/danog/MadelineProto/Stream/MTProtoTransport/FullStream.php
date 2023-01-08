@@ -77,7 +77,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->stream->startReadHash();
         $buffer = $this->stream->getReadBuffer($l);

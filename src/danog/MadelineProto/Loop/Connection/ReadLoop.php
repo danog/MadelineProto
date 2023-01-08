@@ -61,11 +61,11 @@ class ReadLoop extends SignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                EventLoop::defer(fn () => async(function () use ($API, $connection, $datacenter, $e): void {
+                async(function () use ($API, $connection, $datacenter, $e): void {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();
-                }));
+                });
                 return;
             } catch (SecurityException $e) {
                 $connection->resetSession();
@@ -75,7 +75,7 @@ class ReadLoop extends SignalLoop
             }
             if (\is_int($error)) {
                 //$this->exitedLoop();
-                EventLoop::defer(fn () => async(function () use ($error, $shared, $connection, $datacenter, $API): void {
+                async(function () use ($error, $shared, $connection, $datacenter, $API): void {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
@@ -103,7 +103,7 @@ class ReadLoop extends SignalLoop
                         $connection->reconnect();
                         throw new RPCErrorException($error, $error);
                     }
-                }));
+                });
                 return;
             }
             $connection->httpReceived();

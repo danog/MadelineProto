@@ -38,7 +38,7 @@ use function Amp\async;
 /**
  * TL serialization.
  */
-class TL
+final class TL
 {
     /**
      * Highest available secret chat layer version.
@@ -70,11 +70,23 @@ class TL
      *
      */
     private array $tdDescriptions;
-    /**
-     * TL callbacks.
-     *
-     */
-    private array $callbacks = [];
+
+    /** @var array<string, list<TBeforeMethodResponseDeserialization>> */
+    private array $beforeMethodResponseDeserialization;
+    
+    /** @var array<string, list<TAfterMethodSerialization>> */
+    private array $afterMethodResponseDeserialization;
+    
+    /** @var array<string, TBeforeConstructorSerialization> */
+    private array $beforeConstructorSerialization;
+    /** @var array<string, list<TBeforeConstructorDeserialization>> */
+    private array $beforeConstructorDeserialization;
+    /** @var array<string, list<TAfterConstructorDeserialization>> */
+    private array $afterConstructorDeserialization;
+    
+    /** @var array<string, TTypeMismatch> */
+    private array $typeMismatch;
+
     /**
      * API instance.
      *
@@ -121,7 +133,7 @@ class TL
      * Initialize TL parser.
      *
      * @param TLSchema     $files   Scheme files
-     * @param array<TLCallback> $objects TL Callback objects
+     * @param list<TLCallback> $objects TL Callback objects
      */
     public function init(TLSchema $files, array $objects = []): void
     {
@@ -337,29 +349,30 @@ class TL
     /**
      * Update TL callbacks.
      *
-     * @param array<TLCallback> $objects TL callbacks
+     * @param list<TLCallback> $callbacks TL callbacks
      */
-    public function updateCallbacks(array $objects): void
+    public function updateCallbacks(array $callbacks): void
     {
-        $this->callbacks = [];
-        foreach ($objects as $object) {
-            if (!isset(\class_implements($object::class)[TLCallback::class])) {
-                throw new Exception('Invalid callback object provided!');
-            }
-            $new = [TLCallback::METHOD_BEFORE_CALLBACK => $object->getMethodBeforeCallbacks(), TLCallback::METHOD_CALLBACK => $object->getMethodCallbacks(), TLCallback::CONSTRUCTOR_BEFORE_CALLBACK => $object->getConstructorBeforeCallbacks(), TLCallback::CONSTRUCTOR_CALLBACK => $object->getConstructorCallbacks(), TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK => $object->getConstructorSerializeCallbacks(), TLCallback::TYPE_MISMATCH_CALLBACK => $object->getTypeMismatchCallbacks()];
-            foreach ($new as $type => $values) {
-                foreach ($values as $match => $callback) {
-                    if (!isset($this->callbacks[$type][$match])) {
-                        $this->callbacks[$type][$match] = [];
-                    }
-                    if (\in_array($type, [TLCallback::TYPE_MISMATCH_CALLBACK, TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK])) {
-                        $this->callbacks[$type][$match] = $callback;
-                    } else {
-                        $this->callbacks[$type][$match] = \array_merge($callback, $this->callbacks[$type][$match]);
-                    }
-                }
-            }
-        }
+        $this->beforeMethodResponseDeserialization = array_merge_recursive(...array_map(
+            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(), $callbacks
+        ));
+        $this->afterMethodResponseDeserialization = array_merge_recursive(...array_map(
+            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(), $callbacks
+        ));
+
+        $this->beforeConstructorSerialization = [...array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(), $callbacks
+        )];
+        $this->beforeConstructorDeserialization = array_merge_recursive(...array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(), $callbacks
+        ));
+        $this->afterConstructorDeserialization = array_merge_recursive(...array_map(
+            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(), $callbacks
+        ));
+        
+        $this->typeMismatch = [...array_map(
+            fn (TLCallback $t) => $t->getTypeMismatchCallbacks(), $callbacks
+        )];
     }
     /**
      * Deserialize bool.
@@ -382,7 +395,7 @@ class TL
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
      */
-    public function serializeObject(array $type, mixed $object, string $ctx, int $layer = -1)
+    public function serializeObject(array $type, mixed $object, string|int $ctx, int $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
@@ -514,8 +527,8 @@ class TL
         }
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
+        } elseif (isset($this->typeMismatch[$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
+            $object = $this->typeMismatch[$type['type']]($object);
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
                     throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
@@ -531,8 +544,8 @@ class TL
             $auto = true;
             $object['_'] = $constructorData['predicate'];
         }
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
-            $object = $this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+        if (isset($this->beforeConstructorSerialization[$object['_']])) {
+            $object = $this->beforeConstructorSerialization[$object['_']]($object);
         }
         $predicate = $object['_'];
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
@@ -574,7 +587,7 @@ class TL
      * @param string  $ctx       Context
      * @param integer $layer     Layer
      */
-    private function serializeParams(array $tl, array $arguments, string $ctx, int $layer, $promise)
+    private function serializeParams(array $tl, array $arguments, string|int $ctx, int $layer, $promise)
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
@@ -812,7 +825,7 @@ class TL
                     case 'gzip_packed':
                         return $this->deserializeInternal(
                             \gzdecode(
-                                $this->deserializeInternal(
+                                (string) $this->deserializeInternal(
                                     $stream,
                                     $promises,
                                     ['type' => 'bytes', 'connection' => $type['connection']],
@@ -863,7 +876,7 @@ class TL
             }
             return $this->deserializeInternal(
                 \gzdecode(
-                    $this->deserializeInternal(
+                    (string) $this->deserializeInternal(
                         $stream,
                         $promises,
                         ['type' => 'bytes'],
@@ -886,8 +899,8 @@ class TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
-            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) {
+        if (isset($this->beforeConstructorDeserialization[$x['_']])) {
+            foreach ($this->beforeConstructorDeserialization[$x['_']] as $callback) {
                 $callback($x['_']);
             }
         }
@@ -921,7 +934,7 @@ class TL
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
                 /** @var OutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
-                foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$message->getConstructor()] ?? [] as $callback) {
+                foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
                     $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
                 }
                 if ($message->getType() && \stripos($message->getType(), '<') !== false) {
@@ -957,8 +970,8 @@ class TL
         } elseif ($x['_'] === 'photoStrippedSize') {
             $x['inflated'] = new Types\Bytes(Tools::inflateStripped($x['bytes']));
         }
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
-            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
+        if (isset($this->afterConstructorDeserialization[$x['_']])) {
+            foreach ($this->afterConstructorDeserialization[$x['_']] as $callback) {
                 $promise = async($callback, $x);
                 if ($promise instanceof Future) {
                     $promises []= $promise;
@@ -966,8 +979,8 @@ class TL
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']])
-            && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
-            foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
+            && isset($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
+            foreach ($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
                 $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }

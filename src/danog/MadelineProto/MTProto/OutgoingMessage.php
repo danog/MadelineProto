@@ -182,7 +182,7 @@ class OutgoingMessage extends Message
         if (isset($this->sendPromise)) {
             $sendPromise = $this->sendPromise;
             $this->sendPromise = null;
-            $sendPromise->complete($this->promise ?? true);
+            $sendPromise->complete($this->promise ?? null);
         }
     }
     /**
@@ -202,8 +202,8 @@ class OutgoingMessage extends Message
             $this->promise = null;
             EventLoop::defer(
                 fn () => $result instanceof Throwable
-                ? $promise->error($result)
-                : $promise->complete($result)
+                    ? $promise->error($result)
+                    : $promise->complete($result)
             );
         }
     }

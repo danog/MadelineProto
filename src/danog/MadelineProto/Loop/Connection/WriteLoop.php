@@ -28,7 +28,6 @@ use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
-use Revolt\EventLoop;
 
 use function Amp\async;
 use function strlen;
@@ -80,11 +79,11 @@ class WriteLoop extends ResumableSignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                EventLoop::defer(fn () => async(function () use ($API, $connection, $datacenter, $e): void {
+                async(function () use ($API, $connection, $datacenter, $e): void {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();
-                }));
+                });
                 return;
             } finally {
                 $connection->writing(false);
@@ -102,7 +101,7 @@ class WriteLoop extends ResumableSignalLoop
             $skipped_all = true;
             foreach ($connection->pendingOutgoing as $k => $message) {
                 if ($shared->hasTempAuthKey()) {
-                    return null;
+                    return false;
                 }
                 if ($message->isEncrypted()) {
                     continue;
@@ -135,8 +134,9 @@ class WriteLoop extends ResumableSignalLoop
                 return true;
             }
         }
+        return false;
     }
-    public function encryptedWriteLoop(): ?bool
+    public function encryptedWriteLoop(): bool
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -144,10 +144,10 @@ class WriteLoop extends ResumableSignalLoop
         $shared = $this->datacenterConnection;
         do {
             if (!$shared->hasTempAuthKey()) {
-                return null;
+                return false;
             }
             if ($shared->isHttp() && empty($connection->pendingOutgoing)) {
-                return null;
+                return false;
             }
 
             \ksort($connection->pendingOutgoing);

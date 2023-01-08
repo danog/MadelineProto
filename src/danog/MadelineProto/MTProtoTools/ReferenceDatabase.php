@@ -103,25 +103,29 @@ class ReferenceDatabase implements TLCallback
         //Clear table every day
         //Loop::repeat(24*1000*3600, fn () =>$this->db->clear());
     }
-    public function getMethodCallbacks(): array
+    public function getMethodAfterResponseDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethod']]);
+        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
     }
-    public function getMethodBeforeCallbacks(): array
+    public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethodContext']]);
+        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
     }
-    public function getConstructorCallbacks(): array
+    public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(['document', 'photo', 'fileLocation'], [[$this, 'addReference']]), \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOrigin']]), ['document' => [[$this, 'addReference'], [$this, 'addOrigin']]]);
+        return \array_merge(
+            \array_fill_keys(['document', 'photo', 'fileLocation'], [$this->addReference(...)]),
+            \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOrigin(...)]),
+            ['document' => [$this->addReference(...), $this->addOrigin(...)]]
+        );
     }
-    public function getConstructorBeforeCallbacks(): array
+    public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOriginContext']]);
+        return \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
     }
-    public function getConstructorSerializeCallbacks(): array
+    public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::LOCATION_CONTEXT), [$this, 'populateReference']);
+        return \array_fill_keys(\array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
     }
     public function getTypeMismatchCallbacks(): array
     {

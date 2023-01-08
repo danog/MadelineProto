@@ -42,7 +42,6 @@ use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
-use function Amp\Future\all;
 use function Amp\Future\await;
 
 use function end;
@@ -203,8 +202,8 @@ trait Files
                 $this->logger->logger("Partial upload speed: {$speed} mbps");
             }
         }
-        all($promises);
-        all($resPromises);
+        await($promises);
+        await($resPromises);
         $time = \microtime(true) - $start;
         $speed = (int) ($size * 8 / $time) / 1000000;
         $this->logger->logger("Total upload time: {$time}");

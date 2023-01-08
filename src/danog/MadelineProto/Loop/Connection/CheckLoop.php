@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
-use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\async;
@@ -47,7 +46,7 @@ class CheckLoop extends ResumableSignalLoop
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
         $timeout = $shared->getSettings()->getTimeout();
-        $timeoutMs = $timeout * 1000;
+        $timeoutMs = (int) ($timeout * 1000);
         $timeoutResend = $timeout * $timeout;
         // Typically 25 seconds, good enough
         while (true) {
@@ -153,7 +152,7 @@ class CheckLoop extends ResumableSignalLoop
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                 $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
                 //$this->exitedLoop();
-                EventLoop::defer(fn () => async($connection->reconnect(...)));
+                async($connection->reconnect(...));
                 return;
             }
         }

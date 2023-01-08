@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\ByteStream\ReadableStream;
-use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 
 /**

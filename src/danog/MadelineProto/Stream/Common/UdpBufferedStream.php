@@ -60,7 +60,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');

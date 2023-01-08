@@ -56,7 +56,7 @@ class DataCenterConnection implements JsonSerializable
      * Deferred for connection.
      *
      */
-    private DeferredFuture $connectionsDeferred;
+    private ?DeferredFuture $connectionsDeferred = null;
     /**
      * Temporary auth key.
      *

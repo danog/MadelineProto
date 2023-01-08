@@ -1490,7 +1490,9 @@ class MTProto implements TLCallback, LoggerGetter
         $this->datacenter->__construct($this, $this->dcList, $this->settings->getConnection(), $reconnectAll);
         $dcs = [];
         foreach ($this->datacenter->getDcs() as $new_dc) {
-            if (!is_int($new_dc)) continue;
+            if (!\is_int($new_dc)) {
+                continue;
+            }
             $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
         await($dcs);
@@ -1498,7 +1500,9 @@ class MTProto implements TLCallback, LoggerGetter
         $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
-            if (!is_int($new_dc)) continue;
+            if (!\is_int($new_dc)) {
+                continue;
+            }
             $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
         await($dcs);
@@ -1917,61 +1921,32 @@ class MTProto implements TLCallback, LoggerGetter
         }
         return \array_merge($methods, \get_class_methods(InternalDoc::class));
     }
-    /**
-     * Called right before serialization of method starts.
-     *
-     * Pass the method name
-     */
-    public function getMethodCallbacks(): array
+    public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    /**
-     * Called right before serialization of method starts.
-     *
-     * Pass the method name
-     */
-    public function getMethodBeforeCallbacks(): array
+    public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    /**
-     * Called right after deserialization of object, passing the final object.
-     */
-    public function getConstructorCallbacks(): array
+    public function getConstructorAfterDeserializationCallbacks(): array
     {
         return \array_merge(
-            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'addChat']]),
-            \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]),
-            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [[$this, 'addFullChat']]),
-            ['help.support' => [[$this, 'addSupport']]],
-            ['config' => [[$this, 'addConfig']]],
+            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
+            \array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
+            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
+            ['help.support' => [$this->addSupport(...)]],
+            ['config' => [$this->addConfig(...)]],
         );
     }
-    /**
-     * Called right before deserialization of object.
-     *
-     * Pass only the constructor name
-     */
-    public function getConstructorBeforeCallbacks(): array
+    public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return [];
     }
-    /**
-     * Called right before serialization of constructor.
-     *
-     * Passed the object, will return a modified version.
-     */
-    public function getConstructorSerializeCallbacks(): array
+    public function getConstructorBeforeSerializationCallbacks(): array
     {
         return [];
     }
-    /**
-     * Called if objects of the specified type cannot be serialized.
-     *
-     * Passed the unserializable object,
-     * will try to convert it to an object of the proper type.
-     */
     public function getTypeMismatchCallbacks(): array
     {
         return \array_merge(
@@ -1979,14 +1954,14 @@ class MTProto implements TLCallback, LoggerGetter
                 [
                     'InputPeer',
                 ],
-                [$this, 'getInputPeer'],
+                $this->getInputPeer(...),
             ),
             \array_fill_keys(
                 [
                     'InputUser',
                     'InputChannel',
                 ],
-                [$this, 'getInputConstructor'],
+                $this->getInputConstructor(...),
             ),
             \array_fill_keys(
                 [
@@ -1996,7 +1971,7 @@ class MTProto implements TLCallback, LoggerGetter
                     'InputDialogPeer',
                     'InputNotifyPeer',
                 ],
-                [$this, 'getInfo'],
+                $this->getInfo(...),
             ),
             \array_fill_keys(
                 [
@@ -2004,11 +1979,11 @@ class MTProto implements TLCallback, LoggerGetter
                     'InputDocument',
                     'InputPhoto',
                 ],
-                [$this, 'getFileInfo'],
+                $this->getFileInfo(...),
             ),
             \array_fill_keys(
                 ['InputFileLocation'],
-                [$this, 'getDownloadInfo'],
+                $this->getDownloadInfo(...),
             ),
         );
     }

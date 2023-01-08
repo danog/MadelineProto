@@ -25,7 +25,6 @@ use Amp\Future;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use Generator;
-use Revolt\EventLoop;
 use Throwable;
 use TypeError;
 
@@ -219,7 +218,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function callForkDefer(Generator|Future $promise): void
     {
-        EventLoop::defer(fn () => self::callFork($promise));
+        self::callFork($promise);
     }
     /**
      * Call promise $b after promise $a.

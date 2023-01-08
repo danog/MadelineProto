@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
@@ -90,7 +89,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
