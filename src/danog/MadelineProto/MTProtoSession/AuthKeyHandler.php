@@ -105,7 +105,7 @@ trait AuthKeyHandler
                 if (!isset($key)) {
                     if ($cdn) {
                         $this->logger->logger('Could not find required CDN public key, postponing CDN handshake...');
-                        return;
+                        return null;
                     }
                     throw new SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
                 }

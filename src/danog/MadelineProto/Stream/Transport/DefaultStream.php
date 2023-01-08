@@ -58,7 +58,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     private SocketConnector $connector;
     public function setupTls(?Cancellation $cancellationToken = null): void
     {
-        return $this->stream->setupTls($cancellationToken);
+        $this->stream->setupTls($cancellationToken);
     }
     public function getStream(): EncryptableSocket
     {

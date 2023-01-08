@@ -41,7 +41,12 @@ use Amp\Socket\DnsSocketConnector;
 use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\Settings\Connection;
+use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
 use Throwable;
 
 /**

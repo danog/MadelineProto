@@ -76,7 +76,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     /**
      * Async close.

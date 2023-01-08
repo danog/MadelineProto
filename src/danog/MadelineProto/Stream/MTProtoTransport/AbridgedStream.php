@@ -50,7 +50,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

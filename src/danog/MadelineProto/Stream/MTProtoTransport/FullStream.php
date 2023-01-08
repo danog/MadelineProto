@@ -51,14 +51,14 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->out_seq_no = -1;
         $this->stream = new HashedBufferedStream();
         $this->stream->setExtra('crc32b_rev');
-        return $this->stream->connect($ctx, $header);
+        $this->stream->connect($ctx, $header);
     }
     /**
      * Async close.
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

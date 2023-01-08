@@ -145,7 +145,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

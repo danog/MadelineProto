@@ -51,7 +51,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

@@ -156,7 +156,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get read buffer asynchronously.
@@ -221,7 +221,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function bufferWrite(string $data): void
     {
         if ($this->write_hash === null) {
-            return $this->write_buffer->bufferWrite($data);
+            $this->write_buffer->bufferWrite($data);
+            return;
         }
         $length = \strlen($data);
         if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
@@ -229,7 +230,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
                 throw new Exception('Too much out of frame data was sent, cannot check hash');
             }
             \hash_update($this->write_hash, $data);
-            return $this->write_buffer->bufferWrite($data.$this->getWriteHash());
+            $this->write_buffer->bufferWrite($data.$this->getWriteHash());
+            return;
         }
         if ($this->write_check_after) {
             $this->write_check_pos += $length;
@@ -237,7 +239,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         if ($this->write_hash) {
             \hash_update($this->write_hash, $data);
         }
-        return $this->write_buffer->bufferWrite($data);
+        $this->write_buffer->bufferWrite($data);
     }
     /**
      * {@inheritdoc}

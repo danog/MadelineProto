@@ -533,6 +533,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function disconnect(): void
     {
+        if (!isset($this->ctx)) {
+            return;
+        }
         $this->connectionsDeferred = new DeferredFuture();
         $this->connectionsPromise = $this->connectionsDeferred->getFuture();
         $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");

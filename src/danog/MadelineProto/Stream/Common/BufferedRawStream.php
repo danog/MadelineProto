@@ -53,7 +53,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     {
         $this->stream = $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
-        return true;
     }
     /**
      * Async chunked read.

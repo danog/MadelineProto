@@ -88,7 +88,7 @@ class RedisArray extends DriverArray
     public function set(string|int $index, mixed $value): void
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
-            return null;
+            return;
         }
 
         $this->setCache($index, $value);

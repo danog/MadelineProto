@@ -52,7 +52,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

@@ -70,7 +70,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      */
     public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.

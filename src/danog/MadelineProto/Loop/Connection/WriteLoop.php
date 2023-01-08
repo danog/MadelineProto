@@ -92,7 +92,7 @@ class WriteLoop extends ResumableSignalLoop
             //$connection->waiter->resume();
         }
     }
-    public function unencryptedWriteLoop(): void
+    public function unencryptedWriteLoop(): ?bool
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -102,7 +102,7 @@ class WriteLoop extends ResumableSignalLoop
             $skipped_all = true;
             foreach ($connection->pendingOutgoing as $k => $message) {
                 if ($shared->hasTempAuthKey()) {
-                    return;
+                    return null;
                 }
                 if ($message->isEncrypted()) {
                     continue;
@@ -136,7 +136,7 @@ class WriteLoop extends ResumableSignalLoop
             }
         }
     }
-    public function encryptedWriteLoop(): void
+    public function encryptedWriteLoop(): ?bool
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -144,10 +144,10 @@ class WriteLoop extends ResumableSignalLoop
         $shared = $this->datacenterConnection;
         do {
             if (!$shared->hasTempAuthKey()) {
-                return;
+                return null;
             }
             if ($shared->isHttp() && empty($connection->pendingOutgoing)) {
-                return;
+                return null;
             }
 
             \ksort($connection->pendingOutgoing);

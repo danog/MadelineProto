@@ -26,7 +26,19 @@ use Amp\Socket\ConnectContext;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
+use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\Serializable;
 use Throwable;
 
@@ -97,7 +109,7 @@ class DataCenter
     {
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
-        return $this->dclist[$test][$ipv6][$dc]['cdn'];
+        return $this->dclist[$test][$ipv6][$dc]['cdn'] ?? false;
     }
     public function __wakeup(): void
     {
@@ -262,31 +274,22 @@ class DataCenter
         $combos = [];
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
-        switch ($this->settings->getProtocol()) {
-            case AbridgedStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]];
-                break;
-            case IntermediateStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediateStream::class, []]];
-                break;
-            case IntermediatePaddedStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediatePaddedStream::class, []]];
-                break;
-            case FullStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [FullStream::class, []]];
-                break;
-            case HttpStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpStream::class, []]];
-                break;
-            case HttpsStream::class:
-                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
-                break;
-            case UdpBufferedStream::class:
-                $default = [[DefaultStream::class, []], [UdpBufferedStream::class, []]];
-                break;
-            default:
-                throw new Exception(Lang::$current_lang['protocol_invalid']);
-        }
+        $default = match ($this->settings->getProtocol()) {
+            AbridgedStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]],
+            IntermediateStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediateStream::class, []]],
+            IntermediatePaddedStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediatePaddedStream::class, []]],
+            FullStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [FullStream::class, []]],
+            HttpStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpStream::class, []]],
+            HttpsStream::class =>
+                [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]],
+            UdpBufferedStream::class =>
+                [[DefaultStream::class, []], [UdpBufferedStream::class, []]],
+        };
         if ($this->settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
         }
