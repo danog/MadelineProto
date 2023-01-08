@@ -540,6 +540,8 @@ class MTProto implements TLCallback, LoggerGetter
         ],
     ];
 
+    private bool $inited = false;
+
     /**
      * Serialize session, returning object to serialize to db.
      */
@@ -903,7 +905,7 @@ class MTProto implements TLCallback, LoggerGetter
      */
     public function serialize(): void
     {
-        if ($this->wrapper && $this->inited()) {
+        if ($this->wrapper && $this->isInited()) {
             $this->wrapper->serialize();
         }
     }
@@ -1258,6 +1260,8 @@ class MTProto implements TLCallback, LoggerGetter
         $this->updaters[UpdateLoop::GENERIC]->start();
 
         GarbageCollector::start();
+
+        $this->inited = true;
     }
     /**
      * Unreference instance, allowing destruction.
@@ -1308,6 +1312,13 @@ class MTProto implements TLCallback, LoggerGetter
         $this->logger('Shutting down MadelineProto (MTProto)');
         $this->unreference();
         $this->logger('Successfully destroyed MadelineProto');
+    }
+    /**
+     * @internal
+     */
+    public function isInited(): bool
+    {
+        return $this->inited;
     }
     /**
      * Restart IPC server instance.
@@ -1596,7 +1607,7 @@ class MTProto implements TLCallback, LoggerGetter
      */
     public function startUpdateSystem(bool $anyway = false): void
     {
-        if (!$this->inited() && !$anyway) {
+        if (!$this->isInited() && !$anyway) {
             $this->logger('Not starting update system');
             return;
         }

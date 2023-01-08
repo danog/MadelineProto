@@ -365,7 +365,7 @@ class API extends InternalDoc
      */
     private function APIFactory(): void
     {
-        if ($this->API && $this->API->inited()) {
+        if ($this->API && $this->API->isInited()) {
             if ($this->API instanceof MTProto) {
                 foreach ($this->API->getMethodNamespaces() as $namespace) {
                     if (!$this->{$namespace}) {
@@ -401,7 +401,7 @@ class API extends InternalDoc
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
+                if ($errors[$t] > 10 && (!$this->API->isInited() || !$started)) {
                     $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
@@ -493,7 +493,7 @@ class API extends InternalDoc
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
+                if ($errors[$t] > 10 && (!$this->API->isInited() || !$started)) {
                     $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }

@@ -73,17 +73,17 @@ final class TL
 
     /** @var array<string, list<TBeforeMethodResponseDeserialization>> */
     private array $beforeMethodResponseDeserialization;
-    
+
     /** @var array<string, list<TAfterMethodSerialization>> */
     private array $afterMethodResponseDeserialization;
-    
+
     /** @var array<string, TBeforeConstructorSerialization> */
     private array $beforeConstructorSerialization;
     /** @var array<string, list<TBeforeConstructorDeserialization>> */
     private array $beforeConstructorDeserialization;
     /** @var array<string, list<TAfterConstructorDeserialization>> */
     private array $afterConstructorDeserialization;
-    
+
     /** @var array<string, TTypeMismatch> */
     private array $typeMismatch;
 
@@ -353,25 +353,31 @@ final class TL
      */
     public function updateCallbacks(array $callbacks): void
     {
-        $this->beforeMethodResponseDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(), $callbacks
+        $this->beforeMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
+            $callbacks
         ));
-        $this->afterMethodResponseDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(), $callbacks
+        $this->afterMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
+            $callbacks
         ));
 
-        $this->beforeConstructorSerialization = [...array_map(
-            fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(), $callbacks
+        $this->beforeConstructorSerialization = [...\array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
+            $callbacks
         )];
-        $this->beforeConstructorDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(), $callbacks
+        $this->beforeConstructorDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
+            $callbacks
         ));
-        $this->afterConstructorDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(), $callbacks
+        $this->afterConstructorDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
+            $callbacks
         ));
-        
-        $this->typeMismatch = [...array_map(
-            fn (TLCallback $t) => $t->getTypeMismatchCallbacks(), $callbacks
+
+        $this->typeMismatch = [...\array_map(
+            fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
+            $callbacks
         )];
     }
     /**
@@ -541,7 +547,6 @@ final class TL
             if ($constructorData === false) {
                 throw new Exception(Lang::$current_lang['predicate_not_set']);
             }
-            $auto = true;
             $object['_'] = $constructorData['predicate'];
         }
         if (isset($this->beforeConstructorSerialization[$object['_']])) {

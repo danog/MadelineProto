@@ -97,9 +97,7 @@ trait Events
         $this->setReportPeers(Tools::call($this->event_handler_instance->getReportPeers())->await());
         async(fn () => $this->event_handler_instance->startInternal());
         $this->updateHandler = [$this, 'eventUpdateHandler'];
-        if ($this->inited()) {
-            $this->startUpdateSystem();
-        }
+        $this->startUpdateSystem();
     }
     /**
      * Unset event handler.
