@@ -252,18 +252,10 @@ trait ResponseHandler
         }
         $this->gotResponseForOutgoingMessage($request);
 
-        if ($side = $message->getSideEffects($response)) {
-            if ($botAPI) {
-                async(fn () => $request->reply($this->API->MTProtoToBotAPI($side->await())));
-            } else {
-                async(fn () => $request->reply($side->await()));
-            }
+        if ($botAPI) {
+            async(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
         } else {
-            if ($botAPI) {
-                async(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
-            } else {
-                $request->reply($response);
-            }
+            $request->reply($response);
         }
     }
     public function handleRpcError(OutgoingMessage $request, array $response): ?Throwable

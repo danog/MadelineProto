@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
-use Amp\Future;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -32,8 +31,6 @@ use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
 
 use const STR_PAD_LEFT;
-
-use function Amp\async;
 
 /**
  * TL serialization.
@@ -364,32 +361,51 @@ final class TL
      */
     public function updateCallbacks(array $callbacks): void
     {
-        $this->beforeMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+        $this->beforeMethodResponseDeserialization = self::mergeCallbacks(\array_map(
             fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+        $this->afterMethodResponseDeserialization = self::mergeCallbacks(\array_map(
             fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
             $callbacks
         ));
 
-        $this->beforeConstructorSerialization = array_merge(...\array_map(
+        $this->beforeConstructorSerialization = \array_merge(...\array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
         ));
-        $this->beforeConstructorDeserialization = \array_merge_recursive(...\array_map(
+        $this->beforeConstructorDeserialization = self::mergeCallbacks(\array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterConstructorDeserialization = \array_merge_recursive(...\array_map(
+        $this->afterConstructorDeserialization = self::mergeCallbacks(\array_map(
             fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
             $callbacks
         ));
 
-        $this->typeMismatch = array_merge(...\array_map(
+        $this->typeMismatch = \array_merge(...\array_map(
             fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
             $callbacks
         ));
+    }
+    /**
+     * @template T
+     *
+     * @param list<array<string, list<T>>> $callbacks
+     * @return array<string, list<T>>
+     */
+    private static function mergeCallbacks(array $callbacks): array
+    {
+        $result = [];
+        foreach ($callbacks as $map) {
+            foreach ($map as $k => $list) {
+                $result[$k] = [
+                    ...$result[$k] ?? [],
+                    ...$list
+                ];
+            }
+        }
+        return $result;
     }
     /**
      * Deserialize bool.
@@ -745,35 +761,16 @@ final class TL
         } elseif (!\is_resource($stream)) {
             throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
-        $promises = [];
-        $this->deserializeInternal($stream, $promises, $type);
+        $this->deserialize($stream, $type);
         return \ftell($stream);
     }
     /**
      * Deserialize TL object.
      *
-     * @param string|resource $stream Stream
-     * @param array           $type   Type identifier
-     * @return array{0: mixed, 1: array<Future>}
-     */
-    public function deserialize($stream, array $type = ['type' => '']): array
-    {
-        $promises = [];
-        $result = $this->deserializeInternal($stream, $promises, $type);
-        return [
-            $result,
-            $promises,
-        ];
-    }
-
-    /**
-     * Deserialize TL object.
-     *
      * @param string|resource $stream    Stream
-     * @param array<Promise> $promises Promise array
      * @param array           $type      Type identifier
      */
-    private function deserializeInternal($stream, array &$promises, array $type)
+    public function deserialize($stream, array $type)
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -839,15 +836,13 @@ final class TL
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserializeInternal(
+                        return $this->deserialize(
                             \gzdecode(
-                                (string) $this->deserializeInternal(
+                                (string) $this->deserialize(
                                     $stream,
-                                    $promises,
                                     ['type' => 'bytes', 'connection' => $type['connection']],
                                 ),
                             ),
-                            $promises,
                             ['type' => '', 'connection' => $type['connection']],
                         );
                     case 'Vector t':
@@ -862,7 +857,7 @@ final class TL
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserializeInternal($stream, $promises, $type);
+                    $result[] = $this->deserialize($stream, $type);
                 }
                 return $result;
         }
@@ -890,15 +885,13 @@ final class TL
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';
             }
-            return $this->deserializeInternal(
+            return $this->deserialize(
                 \gzdecode(
-                    (string) $this->deserializeInternal(
+                    (string) $this->deserialize(
                         $stream,
-                        $promises,
                         ['type' => 'bytes'],
                     ),
                 ),
-                $promises,
                 ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']],
             );
         }
@@ -906,7 +899,7 @@ final class TL
             $constructorData['connection'] = $type['connection'];
             $constructorData['subtype'] = $type['subtype'] ?? '';
             $constructorData['type'] = 'vector';
-            return $this->deserializeInternal($stream, $promises, $constructorData);
+            return $this->deserialize($stream, $constructorData);
         }
         if ($constructorData['predicate'] === 'boolTrue') {
             return true;
@@ -960,7 +953,7 @@ final class TL
             if (isset($type['connection'])) {
                 $arg['connection'] = $type['connection'];
             }
-            $x[$arg['name']] = $this->deserializeInternal($stream, $promises, $arg);
+            $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'random_bytes') {
                 if (\strlen($x[$arg['name']]) < 15) {
                     throw new SecurityException(Lang::$current_lang['rand_bytes_too_small']);
@@ -984,14 +977,11 @@ final class TL
                     return $x['value'];
             }
         } elseif ($x['_'] === 'photoStrippedSize') {
-            $x['inflated'] = new Types\Bytes(Tools::inflateStripped($x['bytes']));
+            $x['inflated'] = new Types\Bytes(Tools::inflateStripped((string) $x['bytes']));
         }
         if (isset($this->afterConstructorDeserialization[$x['_']])) {
             foreach ($this->afterConstructorDeserialization[$x['_']] as $callback) {
-                $promise = async($callback, $x);
-                if ($promise instanceof Future) {
-                    $promises []= $promise;
-                }
+                $callback($x);
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']])

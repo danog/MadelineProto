@@ -38,7 +38,6 @@ trait CallHandler
     /**
      * Recall method.
      *
-     * @param string $watcherId Watcher ID for defer
      * @param array  $args      Args
      */
     public function methodRecall(array $args): void

@@ -74,7 +74,6 @@ class ReadLoop extends SignalLoop
                 throw $e;
             }
             if (\is_int($error)) {
-                //$this->exitedLoop();
                 async(function () use ($error, $shared, $connection, $datacenter, $API): void {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
@@ -107,10 +106,10 @@ class ReadLoop extends SignalLoop
                 return;
             }
             $connection->httpReceived();
-            EventLoop::defer($connection->handleMessages(...));
             if ($shared->isHttp()) {
                 EventLoop::defer($connection->pingHttpWaiter(...));
             }
+            EventLoop::defer($connection->handleMessages(...));
         }
     }
     public function readMessage()
@@ -141,6 +140,7 @@ class ReadLoop extends SignalLoop
         }
         $connection->reading(true);
         try {
+            $seq_no = null;
             $auth_key_id = $buffer->bufferRead(8);
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
                 $message_id = $buffer->bufferRead(8);
@@ -204,7 +204,9 @@ class ReadLoop extends SignalLoop
                 $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
             }
-            [$deserialized, $sideEffects] = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
+            $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
+
+            $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
             if (isset($API->referenceDatabase)) {
                 $API->referenceDatabase->reset();
             }
@@ -212,11 +214,7 @@ class ReadLoop extends SignalLoop
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }
-            if ($sideEffects) {
-                $message->setSideEffects($sideEffects);
-            }
             $connection->new_incoming[$message_id] = $connection->incoming_messages[$message_id] = $message;
-            $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
         } finally {
             $connection->reading(false);
         }

@@ -132,7 +132,7 @@ class ADNLConnection
                 $buffer = $this->stream->getReadBuffer($length);
                 if ($length) {
                     $data = $buffer->bufferRead($length);
-                    $data = $this->TL->deserialize($data)[0];
+                    $data = $this->TL->deserialize($data);
                     if ($data['_'] !== 'adnl.message.answer') {
                         throw new Exception('Wrong answer type: '.$data['_']);
                     }

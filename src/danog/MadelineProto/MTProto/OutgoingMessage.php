@@ -231,7 +231,7 @@ class OutgoingMessage extends Message
      */
     public function getBody()
     {
-        return is_callable($this->body) ? ($this->body)() : $this->body;
+        return \is_callable($this->body) ? ($this->body)() : $this->body;
     }
 
     /**

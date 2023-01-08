@@ -1071,7 +1071,7 @@ class MTProto implements TLCallback, LoggerGetter
         }
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-            if ($this->authorized === self::LOGGED_IN && is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
+            if ($this->authorized === self::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
                 $socket->bind();
                 $socket->authorized(true);
             }
@@ -1858,9 +1858,9 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Set peer(s) where to send errors occurred in the event loop.
      *
-     * @param int|string $userOrId Username(s) or peer ID(s)
+     * @param int|string|array<int|string> $userOrId Username(s) or peer ID(s)
      */
-    public function setReportPeers(int|string $userOrId): void
+    public function setReportPeers(int|string|array $userOrId): void
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];

@@ -20,11 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
-use Amp\Future;
-
-use function Amp\async;
-use function Amp\Future\await;
-
 /**
  * Incoming message.
  *
@@ -72,13 +67,6 @@ class IncomingMessage extends Message
      * Was present in container.
      */
     private bool $fromContainer;
-
-    /**
-     * DB side effects to be resolved before using the content.
-     *
-     * @var list<Future>
-     */
-    private array $sideEffects = [];
 
     /**
      * Constructor.
@@ -183,38 +171,6 @@ class IncomingMessage extends Message
     public function getState(): int
     {
         return $this->state;
-    }
-
-    /**
-     * Set DB side effects to be resolved before using the content.
-     *
-     * @param list<Future> $sideEffects DB side effects to be resolved before using the content
-     */
-    public function setSideEffects(array $sideEffects): self
-    {
-        $this->sideEffects = $sideEffects;
-
-        return $this;
-    }
-
-    /**
-     * Get DB side effects to be resolved before using the specified content.
-     *
-     * @template T
-     * @param T $return
-     * @return ?Future<T>
-     */
-    public function getSideEffects(mixed $return): ?Future
-    {
-        if (!$this->sideEffects) {
-            return null;
-        }
-        $sideEffects = $this->sideEffects;
-        $this->sideEffects = [];
-        return async(static function () use ($sideEffects, $return) {
-            await($sideEffects);
-            return $return;
-        });
     }
 
     /**
