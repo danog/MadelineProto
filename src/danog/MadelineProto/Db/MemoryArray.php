@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Iterator;
-use Amp\Producer;
 use ArrayIterator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
@@ -82,12 +80,8 @@ class MemoryArray extends ArrayIterator implements DbArray
         parent::__construct([], parent::getFlags());
     }
 
-    public function getIterator(): Iterator
+    public function getIterator(): \Traversable
     {
-        return new Producer(function (callable $emit): void {
-            foreach ($this as $key => $value) {
-                $emit([$key, $value]);
-            }
-        });
+        return $this;
     }
 }

@@ -795,9 +795,7 @@ class MTProto implements TLCallback, LoggerGetter
         }
         if (!$this->usernames->count()) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
-            $iterator = $this->chats->getIterator();
-            while ($iterator->advance()) {
-                [$id, $chat] = $iterator->getCurrent();
+            foreach ($this->chats as $id => $chat) {
                 if (isset($chat['username'])) {
                     $this->usernames[\strtolower($chat['username'])] = $id;
                 }
@@ -1032,10 +1030,8 @@ class MTProto implements TLCallback, LoggerGetter
             }
             $this->logger('Cleaning up peer database...');
             $k = 0;
-            $total = $this->chats->count();
-            $iterator = $this->chats->getIterator();
-            while ($iterator->advance()) {
-                [$key, $value] = $iterator->getCurrent();
+            $total = count($this->chats);
+            foreach ($this->chats as $key => $value) {
                 $value = [
                     '_' => $value['_'],
                     'id' => $value['id'],
@@ -1083,9 +1079,7 @@ class MTProto implements TLCallback, LoggerGetter
         if (!isset($this->secret_chats)) {
             $this->secret_chats = [];
         }
-        $iterator = $this->full_chats->getIterator();
-        while ($iterator->advance()) {
-            [$id, $full] = $iterator->getCurrent();
+        foreach ($this->full_chats as $id => $full) {
             if (isset($full['full'], $full['last_update'])) {
                 $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
             }
@@ -1108,9 +1102,7 @@ class MTProto implements TLCallback, LoggerGetter
             } else {
                 self::$dbProperties['channel_participants'] = 'array';
                 $this->initDb($this);
-                $iterator = $this->channel_participants->getIterator();
-                while ($iterator->advance()) {
-                    [$channelId, $filters] = $iterator->getCurrent();
+                foreach ($this->channel_participants as $channelId => $filters) {
                     foreach ($filters as $filter => $qs) {
                         foreach ($qs as $q => $offsets) {
                             foreach ($offsets as $offset => $limits) {

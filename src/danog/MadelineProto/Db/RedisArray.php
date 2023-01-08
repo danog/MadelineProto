@@ -127,23 +127,16 @@ class RedisArray extends DriverArray
      */
     public function getArrayCopy(): array
     {
-        $iterator = $this->getIterator();
-        $result = [];
-        while ($iterator->advance()) {
-            [$key, $value] = $iterator->getCurrent();
-            $result[$key] = $value;
-        }
-        return $result;
+        return \iterator_to_array($this->getIterator());
     }
 
-    public function getIterator(): Iterator
+    public function getIterator(): \Traversable
     {
         $request = $this->db->scan($this->itKey());
 
         $len = \strlen($this->rKey(''));
-        while ($request->advance()) {
-            $key = $request->getCurrent();
-            $emit([\substr($key, $len), \unserialize($this->db->get($key))]);
+        foreach ($request as $key) {
+            yield \substr($key, $len) => \unserialize($this->db->get($key));
         }
     }
 

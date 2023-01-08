@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Iterator;
-use Amp\Producer;
 use Amp\Sql\CommandResult;
 use Amp\Sql\Pool;
 use Amp\Sql\Result;
@@ -76,29 +74,16 @@ abstract class SqlArray extends DriverArray
     }
 
     /**
-     * @return Iterator<array{0: string, 1: mixed}>
+     * @return \Traversable<array<string, mixed>>
      */
-    public function getIterator(): Iterator
+    public function getIterator(): \Traversable
     {
-        return new Producer(function (callable $emit): void {
-            $request = $this->execute($this->queries[self::SQL_ITERATE]);
-
-            while ($request->advance()) {
-                $row = $request->getCurrent();
-                $emit([$row['key'], $this->getValue($row['value'])]);
-            }
-        });
+        return $this->execute($this->queries[self::SQL_ITERATE]);
     }
 
     public function getArrayCopy(): array
     {
-        $iterator = $this->getIterator();
-        $result = [];
-        while ($iterator->advance()) {
-            [$key, $value] = $iterator->getCurrent();
-            $result[$key] = $value;
-        }
-        return $result;
+        return \iterator_to_array($this->getIterator());
     }
 
     public function offsetGet(mixed $key): mixed
@@ -176,8 +161,6 @@ abstract class SqlArray extends DriverArray
 
     /**
      * Clear all elements.
-     *
-     * @return Promise<CommandResult>
      */
     public function clear(): void
     {
@@ -189,7 +172,7 @@ abstract class SqlArray extends DriverArray
      * Perform async request to db.
      *
      * @psalm-param self::STATEMENT_* $stmt
-     * @return Promise<CommandResult|ResultSet>
+     * @return CommandResult|ResultSet
      * @throws Throwable
      */
     protected function execute(string $sql, array $params = []): Result

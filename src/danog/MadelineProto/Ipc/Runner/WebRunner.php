@@ -28,7 +28,6 @@ final class WebRunner extends RunnerAbstract
      * Start.
      *
      * @param string $session Session path
-     * @return Promise<bool>
      */
     public static function start(string $session, int $startupId): bool
     {

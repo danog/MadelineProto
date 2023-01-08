@@ -130,9 +130,7 @@ class MyEventHandler extends EventHandler
         $this->logger("Count: ".(yield $this->dataStoredOnDb->count()));
 
         // You can even use an async iterator to iterate over the data
-        $iterator = $this->dataStoredOnDb->getIterator();
-        while (yield $iterator->advance()) {
-            [$key, $value] = $iterator->getCurrent();
+        foreach ($this->dataStoredOnDb as $key => $value) {
             $this->logger($key);
             $this->logger($value);
         }

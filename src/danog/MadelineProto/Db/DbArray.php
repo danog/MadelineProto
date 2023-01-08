@@ -7,6 +7,7 @@ namespace danog\MadelineProto\Db;
 use Amp\Iterator;
 use ArrayAccess;
 use Countable;
+use IteratorAggregate;
 
 /**
  * DB array interface.
@@ -62,7 +63,7 @@ interface DbArray extends DbType, ArrayAccess, Countable
     /**
      * Get iterator.
      *
-     * @return Iterator<array{0: string|int, 1: mixed}>
+     * @return \Traversable<array<string, mixed>>
      */
-    public function getIterator(): Iterator;
+    public function getIterator(): \Traversable;
 }

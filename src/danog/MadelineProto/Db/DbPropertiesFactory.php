@@ -24,7 +24,7 @@ abstract class DbPropertiesFactory
     const TYPE_ARRAY = 'array';
     /**
      * @param self::TYPE_*|array $propertyType
-     * @return Promise<DbType>
+     * @return DbType
      * @internal
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray

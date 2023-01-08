@@ -7,15 +7,18 @@ namespace danog\MadelineProto\Db;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
+use IteratorAggregate;
 use ReflectionClass;
 use Throwable;
+
+use function Amp\async;
 
 /**
  * Array caching trait.
  *
  * @impleme
  */
-abstract class DriverArray implements DbArray
+abstract class DriverArray implements DbArray, IteratorAggregate
 {
     protected string $table;
 
@@ -126,14 +129,13 @@ abstract class DriverArray implements DbArray
 
             $counter = 0;
             $total = $old->count();
-            $iterator = $old->getIterator();
-            while ($iterator->advance()) {
+            foreach ($old as $key => $value) {
                 $counter++;
                 if ($counter % 500 === 0 || $counter === $total) {
-                    $new->set(...$iterator->getCurrent());
+                    $new->set($key, $value);
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
                 } else {
-                    $new->set(...$iterator->getCurrent());
+                    async($new->set(...), $key, $value);
                 }
                 $new->clearCache();
             }

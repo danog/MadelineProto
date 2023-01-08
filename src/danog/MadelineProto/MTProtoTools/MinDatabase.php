@@ -87,9 +87,7 @@ class MinDatabase implements TLCallback
             return;
         }
         EventLoop::defer(function (): void {
-            $iterator = $this->db->getIterator();
-            while ($iterator->advance()) {
-                [$id, $origin] = $iterator->getCurrent();
+            foreach ($this->db as $id => $origin) {
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
                     unset($this->db[$id]);
                 }
