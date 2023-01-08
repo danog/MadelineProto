@@ -125,8 +125,8 @@ trait Files
             };
         }
         $datacenter = $this->settings->getDefaultDc();
-        if ($this->datacenter->has($datacenter.'_media')) {
-            $datacenter .= '_media';
+        if ($this->datacenter->has(-$datacenter)) {
+            $datacenter = -$datacenter;
         }
         $part_size = 512 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
@@ -821,8 +821,8 @@ trait Files
         $part_size = $part_size ?? 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
         $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings->getDefaultDc();
-        if ($this->datacenter->has($datacenter.'_media')) {
-            $datacenter .= '_media';
+        if ($this->datacenter->has(-$datacenter)) {
+            $datacenter = -$datacenter;
         }
         if (isset($messageMedia['key'])) {
             $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
@@ -973,7 +973,7 @@ trait Files
                 $messageMedia['cdn_key'] = $res['encryption_key'];
                 $messageMedia['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
-                $datacenter = $res['dc_id'].'_cdn';
+                $datacenter = $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
                     $this->getConfig([]);

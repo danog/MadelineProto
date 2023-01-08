@@ -164,7 +164,7 @@ trait ResponseHandler
     public function handleReject(OutgoingMessage $message, Throwable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
-        $message->reply(new Failure($data));
+        $message->reply($data);
     }
 
     /**
@@ -303,9 +303,9 @@ trait ResponseHandler
                 }
                 return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
-                $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                if ($request->isFileRelated() && $this->API->datacenter->has($datacenter . '_media')) {
-                    $datacenter .= '_media';
+                $this->API->datacenter->currentDatacenter = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                if ($request->isFileRelated() && $this->API->datacenter->has(-$datacenter)) {
+                    $datacenter = -$datacenter;
                 }
                 if ($request->isUserRelated()) {
                     $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);

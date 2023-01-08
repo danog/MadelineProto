@@ -26,6 +26,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
+use Revolt\EventLoop;
 
 /**
  * Manages min peers.

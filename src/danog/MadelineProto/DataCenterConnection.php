@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
@@ -50,12 +51,12 @@ class DataCenterConnection implements JsonSerializable
      * Promise for connection.
      *
      */
-    private Promise $connectionsPromise;
+    private Future $connectionsPromise;
     /**
      * Deferred for connection.
      *
      */
-    private Deferred $connectionsDeferred;
+    private DeferredFuture $connectionsDeferred;
     /**
      * Temporary auth key.
      *

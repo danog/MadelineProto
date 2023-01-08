@@ -25,6 +25,7 @@ use Amp\Future;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Revolt\EventLoop;
+use Throwable;
 
 use function time;
 
@@ -199,7 +200,10 @@ class OutgoingMessage extends Message
         if ($this->promise) { // Sometimes can get an RPC error for constructors
             $promise = $this->promise;
             $this->promise = null;
-            EventLoop::defer(fn () => $promise->complete($result));
+            EventLoop::defer(fn () => $result instanceof Throwable
+                ? $promise->error($result)
+                : $promise->complete($result)
+            );
         }
     }
 

@@ -292,7 +292,7 @@ class Connection
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->isUnencrypted()) {
                 if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                    $message->reply(new Failure(new Exception('Restart because we were reconnected')));
+                    $message->reply(new Exception('Restart because we were reconnected'));
                 }
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }

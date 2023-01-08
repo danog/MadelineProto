@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
+use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
@@ -91,12 +92,11 @@ class ConnectionContext
     /**
      * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
      *
-     * @var array<0: class-string, 1: mixed>[]
+     * @var list<array{0: class-string, 1: mixed}>
      */
-    private $nextStreams = [];
+    private array $nextStreams = [];
     /**
      * The current stream key.
-     *
      */
     private int $key = 0;
     /**
@@ -166,11 +166,11 @@ class ConnectionContext
         return clone $this;
     }
     /**
-     * Set the test boolean.
+     * Set the CDN boolean.
      */
-    public function setTest(bool $test): self
+    public function setCDN(bool $cdn): self
     {
-        $this->test = $test;
+        $this->cdn = $cdn;
         return $this;
     }
     /**
@@ -228,39 +228,19 @@ class ConnectionContext
      * Set the DC ID.
      *
      */
-    public function setDc(string|int $dc): self
+    public function setDc(int $dc): self
     {
-        $int = \intval($dc);
-        if (!(1 <= $int && $int <= 1000)) {
-            throw new Exception("Invalid DC id provided: {$dc}");
-        }
         $this->dc = $dc;
-        $this->media = \strpos($dc, '_media') !== false;
-        $this->cdn = \strpos($dc, '_cdn') !== false;
+        $this->media = DataCenter::isMedia($dc);
+        $this->test = DataCenter::isTest($dc);
         return $this;
     }
     /**
-     * Get the DC ID.
-     *
+     * Get the int DC ID.
      */
-    public function getDc(): string|int
+    public function getDc(): int
     {
         return $this->dc;
-    }
-    /**
-     * Get the int DC ID.
-     *
-     */
-    public function getIntDc(): string|int
-    {
-        $dc = \intval($this->dc);
-        if ($this->test) {
-            $dc += 10000;
-        }
-        if ($this->media) {
-            $dc = -$dc;
-        }
-        return $dc;
     }
     /**
      * Whether to use ipv6.

@@ -31,7 +31,26 @@ use danog\Serializable;
 use Throwable;
 
 /**
- * Manages datacenters.
+ * @psalm-type TDcOption=array{
+ *      _: 'dcOption',
+ *      cdn: bool,
+ *      this_port_only: bool,
+ *      tcpo_only: bool,
+ *      ip_address: string,
+ *      port: int,
+ *      secret?: string
+ * }
+ * @psalm-type TDcList=array{
+ *      test: array{
+ *          ipv4: non-empty-array<int, TDcOption>,
+ *          ipv6: non-empty-array<int, TDcOption>,
+ *      },
+ *      main: array{
+ *          ipv4: non-empty-array<int, TDcOption>,
+ *          ipv6: non-empty-array<int, TDcOption>,
+ *      },
+ * }
+ * @internal Manages datacenters.
  */
 class DataCenter
 {
@@ -39,34 +58,43 @@ class DataCenter
     /**
      * All socket connections to DCs.
      *
-     * @var array<string|int, DataCenterConnection>
+     * @var array<int, DataCenterConnection>
      */
     public array $sockets = [];
     /**
      * Current DC ID.
-     *
      */
-    public string|int $curdc = 0;
+    public int $currentDatacenter = 1;
     /**
      * Main instance.
-     *
      */
     private MTProto $API;
     /**
      * DC list.
-     *
+     * 
+     * @param TDcList
      */
     private array $dclist = [];
     /**
      * Settings.
-     *
      */
     private ConnectionSettings $settings;
     private DoHWrapper $dohWrapper;
 
     public function __sleep()
     {
-        return ['sockets', 'curdc', 'dclist', 'settings'];
+        return ['sockets', 'currentDatacenter', 'dclist', 'settings'];
+    }
+    public static function isTest(int $dc): bool {
+        return abs($dc) > 10000;
+    }
+    public static function isMedia(int $dc): bool {
+        return $dc < 0;
+    }
+    public function isCdn(int $dc): bool {
+        $test = $this->settings->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
+        return $this->dclist[$test][$ipv6][$dc]['cdn'];
     }
     public function __wakeup(): void
     {
@@ -87,6 +115,9 @@ class DataCenter
                     $array[$id]['permAuthKey']['authorized'] = $socket->authorized;
                 }
                 $array[$id] = [];
+            }
+            if (!is_int($id)) {
+                unset($this->sockets[$id]);
             }
         }
         $this->setDataCenterConnections($array);
@@ -129,7 +160,7 @@ class DataCenter
      * Constructor function.
      *
      * @param MTProto     $API          Main MTProto instance
-     * @param array       $dclist       DC IP list
+     * @param TDcList     $dclist       DC IP list
      * @param ConnectionSettings $settings     Settings
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
@@ -153,7 +184,7 @@ class DataCenter
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
-            if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
+            if ($socket instanceof DataCenterConnection && is_int($key)) {
                 if ($reconnectAll || isset($changed[$id])) {
                     $this->API->logger->logger('Disconnecting all before reconnect!');
                     $socket->needReconnect(true);
@@ -176,10 +207,10 @@ class DataCenter
     /**
      * Connect to specified DC.
      *
-     * @param string  $dc_number DC to connect to
+     * @param int     $dc_number DC to connect to
      * @param integer $id        Connection ID to re-establish (optional)
      */
-    public function dcConnect(string $dc_number, int $id = -1): bool
+    public function dcConnect(int $dc_number, int $id = -1): bool
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
         if (isset($this->sockets[$dc_number]) && !$old) {
@@ -259,43 +290,43 @@ class DataCenter
     /**
      * Get Connection instance for authorization.
      *
-     * @param string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function getAuthConnection(string $dc): Connection
+    public function getAuthConnection(int $dc): Connection
     {
         return $this->sockets[$dc]->getAuthConnection();
     }
     /**
      * Get Connection instance.
      *
-     * @param string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function getConnection(string $dc): Connection
+    public function getConnection(int $dc): Connection
     {
         return $this->sockets[$dc]->getConnection();
     }
     /**
      * Get Connection instance asynchronously.
      *
-     * @param string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function waitGetConnection(string $dc): Connection
+    public function waitGetConnection(int $dc): Connection
     {
         return $this->sockets[$dc]->waitGetConnection();
     }
     /**
      * Get DataCenterConnection instance.
      *
-     * @param string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function getDataCenterConnection(string $dc): DataCenterConnection
+    public function getDataCenterConnection(int $dc): DataCenterConnection
     {
         return $this->sockets[$dc];
     }
     /**
      * Get all DataCenterConnection instances.
      *
-     * @return array<int|string, DataCenterConnection>
+     * @return array<int, DataCenterConnection>
      */
     public function getDataCenterConnections(): array
     {
@@ -304,27 +335,27 @@ class DataCenter
     /**
      * Check if a DC is present.
      *
-     * @param string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function has(string $dc): bool
+    public function has(int $dc): bool
     {
         return isset($this->sockets[$dc]);
     }
     /**
      * Check if connected to datacenter using HTTP.
      *
-     * @param string $datacenter DC ID
+     * @param int $datacenter DC ID
      */
-    public function isHttp(string $datacenter): bool
+    public function isHttp(int $datacenter): bool
     {
         return $this->sockets[$datacenter]->isHttp();
     }
     /**
      * Check if connected to datacenter directly using IP address.
      *
-     * @param string $datacenter DC ID
+     * @param int $datacenter DC ID
      */
-    public function byIPAddress(string $datacenter): bool
+    public function byIPAddress(int $datacenter): bool
     {
         return $this->sockets[$datacenter]->byIPAddress();
     }
@@ -337,6 +368,6 @@ class DataCenter
     {
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
-        return $all ? \array_keys((array) $this->dclist[$test][$ipv6]) : \array_keys((array) $this->sockets);
+        return $all ? \array_keys($this->dclist[$test][$ipv6]) : \array_keys($this->sockets);
     }
 }

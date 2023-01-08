@@ -645,13 +645,13 @@ class MTProto implements TLCallback, LoggerGetter
         $this->TL->init($this->settings->getSchema(), $callbacks);
         $this->connectToAllDcs();
         $this->startLoops();
-        $this->datacenter->curdc = 2;
+        $this->datacenter->currentDatacenter= 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
                 $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                    $this->settings->setDefaultDc($this->datacenter->curdc = (int) $nearest_dc['nearest_dc']);
+                    $this->settings->setDefaultDc($this->datacenter->currentDatacenter= (int) $nearest_dc['nearest_dc']);
                 }
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'BOT_METHOD_INVALID') {
@@ -1723,30 +1723,32 @@ class MTProto implements TLCallback, LoggerGetter
      */
     private function parseDcOptions(array $dc_options): void
     {
-        $previous = $this->dcList;
+        $new = [];
         foreach ($dc_options as $dc) {
-            $test = $this->config['test_mode'] ? 'test' : 'main';
-            $id = $dc['id'];
             if ($dc['static']) {
                 continue;
             }
-            if ($dc['cdn']) {
-                $id .= '_cdn';
+
+            $test = $this->config['test_mode'] ? 'test' : 'main';
+            $id = $dc['id'];
+            if ($this->config['test_mode']) {
+                $id += 10000;
             }
-            $id .= $dc['media_only'] ? '_media' : '';
+            if ($dc['media_only']) {
+                $id = -$id;
+            }
             $ipv6 = $dc['ipv6'] ? 'ipv6' : 'ipv4';
-            if (\is_numeric($id)) {
-                $id = (int) $id;
-            }
-            unset($dc['cdn'], $dc['media_only'], $dc['id'], $dc['ipv6']);
-            $this->dcList[$test][$ipv6][$id] = $dc;
+            unset($dc['media_only'], $dc['id'], $dc['ipv6']);
+            $new[$test][$ipv6][$id] = $dc;
         }
-        $curdc = $this->datacenter->curdc;
-        if ($previous !== $this->dcList && (!$this->datacenter->has($curdc) || $this->datacenter->getDataCenterConnection($curdc)->byIPAddress())) {
+        $previous = $this->dcList;
+        $this->dcList = $new;
+        $currentDatacenter = $this->datacenter->currentDatacenter;
+        if ($previous !== $this->dcList && (!$this->datacenter->has($currentDatacenter) || $this->datacenter->getDataCenterConnection($currentDatacenter)->byIPAddress())) {
             $this->logger->logger('Got new DC options, reconnecting');
             $this->connectToAllDcs(false);
         }
-        $this->datacenter->curdc = $curdc;
+        $this->datacenter->currentDatacenter = $currentDatacenter;
     }
     /**
      * Get info about the logged-in user, cached.

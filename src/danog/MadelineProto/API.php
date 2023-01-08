@@ -255,7 +255,7 @@ class API extends InternalDoc
             };
             async($cb);
             $this->connectToMadelineProto(new SettingsEmpty, true);
-            $cancel->complete(new Exception('Connected!'));
+            $cancel->error(new Exception('Connected!'));
         }
         return true;
     }

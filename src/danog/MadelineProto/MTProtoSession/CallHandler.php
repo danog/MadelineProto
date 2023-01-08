@@ -118,9 +118,9 @@ trait CallHandler
             $aargs['datacenter'] = $args['id']['dc_id'];
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
-        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
+        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
             $this->logger->logger('Using media DC');
-            $aargs['datacenter'] = $this->datacenter.'_media';
+            $aargs['datacenter'] = -$this->datacenter;
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
