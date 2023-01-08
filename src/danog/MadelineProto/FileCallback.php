@@ -49,20 +49,13 @@ class FileCallback implements FileCallbackInterface
     /**
      * Get file.
      */
-    public function getFile()
+    public function getFile(): mixed
     {
         return $this->file;
     }
-    /**
-     * Invoke callback.
-     *
-     * @param int $percent Percent
-     * @param int $speed   Speed in mbps
-     * @param int $time    Time
-     */
-    public function __invoke(int $percent, int $speed, int $time)
+    public function __invoke(float $percent, float $speed, float $time): void
     {
         $callback = $this->callback;
-        return $callback($percent, $speed, $time);
+        $callback($percent, $speed, $time);
     }
 }

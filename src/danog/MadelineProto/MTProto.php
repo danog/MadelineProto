@@ -812,11 +812,11 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Logger.
      *
-     * @param string $param Parameter
+     * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      */
-    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');

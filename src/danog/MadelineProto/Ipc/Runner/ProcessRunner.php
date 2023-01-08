@@ -54,9 +54,8 @@ final class ProcessRunner extends RunnerAbstract
      * Runner.
      *
      * @param string $session Session path
-     * @return Promise<true>
      */
-    public static function start(string $session, int $startupId): boool
+    public static function start(string $session, int $startupId): bool
     {
         if (PHP_SAPI === 'cli') {
             $binary = PHP_BINARY;

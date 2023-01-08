@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
 use ReflectionClass;
@@ -22,10 +21,6 @@ abstract class DriverArray implements DbArray
 
     use ArrayCacheTrait;
 
-    /**
-     * Initialize connection.
-     */
-    abstract public function initConnection(DatabaseAbstract $settings): void;
     /**
      * Initialize on startup.
      */
@@ -72,7 +67,7 @@ abstract class DriverArray implements DbArray
         return $this->offsetGet($key) !== null;
     }
 
-    public static function getInstance(string $table, DbArray|array|null $previous, $settings): static
+    public static function getInstance(string $table, DbType|array|null $previous, $settings): static
     {
         $instance = new static();
         $instance->setTable($table);

@@ -159,8 +159,6 @@ final class APIWrapper
 
     /**
      * Serialize session.
-     *
-     * @return Promise<bool>
      */
     public function serialize(): bool
     {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\ConnectionConfig;
-use Amp\Sql\Result;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -91,10 +90,10 @@ class MysqlArray extends SqlArray
      *
      * @throws Throwable
      */
-    protected function prepareTable(): Result
+    protected function prepareTable(): void
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-        return $this->db->query("
+        $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,

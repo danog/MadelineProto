@@ -87,7 +87,7 @@ final class TL
     /**
      * API instance.
      */
-    private MTProto $API;
+    private ?MTProto $API = null;
     public function __sleep()
     {
         return [
@@ -107,7 +107,9 @@ final class TL
      */
     public function __construct(?MTProto $API = null)
     {
-        $this->API = $API;
+        if ($API) {
+            $this->API = $API;
+        }
     }
     /**
      * Get secret chat layer version.
@@ -145,7 +147,7 @@ final class TL
      */
     public function init(TLSchema $files, array $objects = []): void
     {
-        $this->API->logger->logger(Lang::$current_lang['TL_loading'], Logger::VERBOSE);
+        $this->API?->logger?->logger(Lang::$current_lang['TL_loading'], Logger::VERBOSE);
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
@@ -158,7 +160,7 @@ final class TL
             'secret' => $files->getSecretSchema(),
             ...$files->getOther(),
         ]) as $scheme_type => $file) {
-            $this->API->logger->logger(\sprintf(Lang::$current_lang['file_parsing'], \basename($file)), Logger::VERBOSE);
+            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['file_parsing'], \basename($file)), Logger::VERBOSE);
             $filec = \file_get_contents(Tools::absolute($file));
             $TL_dict = \json_decode($filec, true);
             if ($TL_dict === null) {
@@ -248,7 +250,7 @@ final class TL
                     if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', STR_PAD_LEFT);
                         if ($id !== $nid) {
-                            $this->API->logger->logger(\sprintf(Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), Logger::ERROR);
+                            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), Logger::ERROR);
                         }
                         $id = $nid;
                     }
@@ -293,14 +295,14 @@ final class TL
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception(Lang::$current_lang['src_file_invalid'].$file);
             }
-            $this->API->logger->logger(Lang::$current_lang['translating_obj'], Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger(Lang::$current_lang['translating_obj'], Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
                 $this->{$scheme_type === 'td' ? 'tdConstructors' : 'constructors'}->add($elem, $scheme_type);
             }
-            $this->API->logger->logger(Lang::$current_lang['translating_methods'], Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger(Lang::$current_lang['translating_methods'], Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{$scheme_type === 'td' ? 'tdMethods' : 'methods'}->add($elem);
                 if ($scheme_type === 'secret') {

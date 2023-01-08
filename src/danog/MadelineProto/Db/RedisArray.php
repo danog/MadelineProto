@@ -25,9 +25,9 @@ class RedisArray extends DriverArray
     /**
      * Initialize on startup.
      */
-    public function initStartup()
+    public function initStartup(): void
     {
-        return $this->initConnection($this->dbSettings);
+        $this->initConnection($this->dbSettings);
     }
     protected function prepareTable(): void
     {
@@ -151,7 +151,7 @@ class RedisArray extends DriverArray
      * Count elements.
      *
      * @link https://php.net/manual/en/arrayiterator.count.php
-     * @return Promise<int> The number of elements or public properties in the associated
+     * @return int The number of elements or public properties in the associated
      * array or object, respectively.
      * @throws Throwable
      */

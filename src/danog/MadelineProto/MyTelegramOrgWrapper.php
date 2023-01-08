@@ -50,10 +50,6 @@ class MyTelegramOrgWrapper
      */
     private Settings $settings;
     /**
-     * Async setting.
-     */
-    private bool $async = true;
-    /**
      * Datacenter instance.
      */
     private DoHWrapper $datacenter;
@@ -306,15 +302,6 @@ class MyTelegramOrgWrapper
         return $final_headers;
     }
     /**
-     * Enable or disable async.
-     *
-     * @param boolean $async Async
-     */
-    public function async(bool $async): void
-    {
-        $this->async = $async;
-    }
-    /**
      * Run specified callable synchronously.
      *
      * @param callable $callable Callable
@@ -322,20 +309,5 @@ class MyTelegramOrgWrapper
     public function loop(callable $callable)
     {
         return Tools::wait($callable());
-    }
-    /**
-     * Call function.
-     *
-     * @param string $name      Function name
-     * @param array  $arguments Arguments
-     */
-    public function __call(string $name, array $arguments)
-    {
-        $name .= '_async';
-        $async = \is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : $this->async;
-        if (!\method_exists($this, $name)) {
-            throw new Exception("{$name} does not exist!");
-        }
-        return $async ? $this->{$name}(...$arguments) : Tools::wait($this->{$name}(...$arguments));
     }
 }

@@ -28,7 +28,7 @@ interface FileCallbackInterface
     /**
      * Get file.
      */
-    public function getFile(): void;
+    public function getFile(): mixed;
     /**
      * Invoke callback.
      *

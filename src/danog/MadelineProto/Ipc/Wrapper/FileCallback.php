@@ -11,7 +11,7 @@ class FileCallback extends Obj implements FileCallbackInterface
     /**
      * Get file.
      */
-    public function getFile()
+    public function getFile(): mixed
     {
         return $this->__call('getFile');
     }
@@ -21,10 +21,9 @@ class FileCallback extends Obj implements FileCallbackInterface
      * @param float $percent Percent
      * @param float $speed   Speed in mbps
      * @param float $time    Time
-     * @psalm-suppress MethodSignatureMismatch
      */
-    public function __invoke(float $percent, float $speed, float $time)
+    public function __invoke(float $percent, float $speed, float $time): void
     {
-        return $this->__call('__invoke', [$percent, $speed, $time]);
+        $this->__call('__invoke', [$percent, $speed, $time]);
     }
 }

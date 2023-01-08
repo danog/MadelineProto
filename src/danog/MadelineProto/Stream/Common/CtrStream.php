@@ -120,7 +120,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-        return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
+        $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
     }
     /**
      * Set obfuscation keys/IVs.

@@ -144,7 +144,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-        return $this->write($data);
+        $this->write($data);
     }
     /**
      * Set file handle.

@@ -990,12 +990,12 @@ class InternalDoc extends APIFactory
     /**
      * Logger.
      *
-     * @param string $param Parameter
+     * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      * @return void|Promise<void>
      */
-    public function logger(string $param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         $this->__call(__FUNCTION__, [$param, $level, $file]);
     }

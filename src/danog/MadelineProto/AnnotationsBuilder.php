@@ -28,6 +28,7 @@ use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionType;
 use ReflectionUnionType;
 
 class AnnotationsBuilder
@@ -62,13 +63,7 @@ class AnnotationsBuilder
         $this->logger = $logger;
         $this->namespace = $namespace;
         /** @psalm-suppress InvalidArgument */
-        $this->TL = new TL(new class($logger) {
-            public Logger $logger;
-            public function __construct(Logger $logger)
-            {
-                $this->logger = $logger;
-            }
-        });
+        $this->TL = new TL();
         $tlSchema = new TLSchema;
         $tlSchema->mergeArray($settings);
         $this->TL->init($tlSchema);
@@ -178,15 +173,15 @@ class AnnotationsBuilder
         $methods = \array_merge($methods, $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
-            if ($method == 'methodCallAsyncRead') {
+            if ($name == 'methodCallAsyncRead') {
                 unset($methods[\array_search('methodCall', $methods)]);
             } elseif (\strpos($name, '__') === 0) {
                 unset($methods[$key]);
             } elseif (\stripos($name, 'async') !== false) {
                 if (\strpos($name, '_async') !== false) {
-                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
+                    unset($methods[\array_search(\str_ireplace('_async', '', $name), $methods)]);
                 } else {
-                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
+                    unset($methods[\array_search(\str_ireplace('async', '', $name), $methods)]);
                 }
             }
         }
@@ -236,25 +231,7 @@ class AnnotationsBuilder
             $hasVariadic = false;
             foreach ($method->getParameters() as $param) {
                 if ($type = $param->getType()) {
-                    if ($type instanceof ReflectionNamedType) {
-                        if ($type->allowsNull()) {
-                            $doc .= '?';
-                        }
-                        if (!$type->isBuiltin()) {
-                            $doc .= '\\';
-                        }
-                        $doc .= $type->getName();
-                        $doc .= ' ';
-                    } elseif ($type instanceof ReflectionUnionType) {
-                        foreach ($type->getTypes() as $t) {
-                            if (!$t->isBuiltin()) {
-                                $doc .= '\\';
-                            }
-                            $doc .= $t->getName();
-                            $doc .= '|';
-                        }
-                        $doc[\strlen($doc)-1] = ' ';
-                    }
+                    $doc .= $this->typeToStr($type).' ';
                 } else {
                     Logger::log($name.'.'.$param->getName().' has no type!', Logger::WARNING);
                 }
@@ -296,13 +273,7 @@ class AnnotationsBuilder
             $async = true;
             if ($hasReturnValue && $static) {
                 $doc .= ': ';
-                if ($type->allowsNull()) {
-                    $doc .= '?';
-                }
-                if (!$type->isBuiltin()) {
-                    $doc .= '\\';
-                }
-                $doc .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
+                $doc .= $this->typeToStr($type);
                 $async = false;
             }
             if ($method->getDeclaringClass()->getName() == Tools::class) {
@@ -348,25 +319,7 @@ class AnnotationsBuilder
                 $ret = $matches[1];
                 $new = $ret;
                 if ($type && !\str_contains($ret, '<')) {
-                    $new = '';
-                    if ($type instanceof ReflectionNamedType) {
-                        if ($type->allowsNull()) {
-                            $new .= '?';
-                        }
-                        if (!$type->isBuiltin()) {
-                            $new .= '\\';
-                        }
-                        $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type;
-                    } elseif ($type instanceof ReflectionUnionType) {
-                        foreach ($type->getTypes() as $t) {
-                            if (!$t->isBuiltin()) {
-                                $new .= '\\';
-                            }
-                            $new .= $t->getName() === 'self' ? $this->reflectionClasses['API'] : $t;
-                            $new .= '|';
-                        }
-                        $new = \substr($new, 0, -1);
-                    }
+                    $new = $this->typeToStr($type);
                 }
                 $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
                 if (!\str_contains($phpdoc, '@return')) {
@@ -432,5 +385,22 @@ class AnnotationsBuilder
             \fwrite($handle, "}\n");
         }
         \fclose($handle);
+    }
+
+    private function typeToStr(ReflectionType $type): string
+    {
+        $new = '';
+        if ($type instanceof ReflectionNamedType) {
+            if ($type->allowsNull() && $type->getName() !== 'mixed') {
+                $new .= '?';
+            }
+            if (!$type->isBuiltin()) {
+                $new .= '\\';
+            }
+            $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
+        } elseif ($type instanceof ReflectionUnionType) {
+            return \implode('|', \array_map($this->typeToStr(...), $type->getTypes()));
+        }
+        return $new;
     }
 }

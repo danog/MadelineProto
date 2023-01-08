@@ -206,6 +206,7 @@ class ReadLoop extends SignalLoop
             }
             $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
 
+            // TODO: A correct solution for side effects should be devised here...
             $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
             if (isset($API->referenceDatabase)) {
                 $API->referenceDatabase->reset();

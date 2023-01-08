@@ -103,11 +103,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     abstract public function getUri(): string;
 
     /**
-     * Set database name/ID.
-     *
-     */
-    abstract public function setDatabase(int|string $database): self;
-    /**
      * Set database URI.
      */
     abstract public function setUri(string $uri): self;

@@ -53,12 +53,7 @@ class DocsBuilder
         $this->logger = $logger;
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         /** @psalm-suppress InvalidArgument */
-        $this->TL = new TL(new class($logger) {
-            public function __construct($logger)
-            {
-                $this->logger = $logger;
-            }
-        });
+        $this->TL = new TL(null);
         $new = new TLSchema;
         $new->mergeArray($settings);
         $this->TL->init($new);

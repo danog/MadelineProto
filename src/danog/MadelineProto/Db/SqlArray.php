@@ -145,7 +145,6 @@ abstract class SqlArray extends DriverArray
      * Unset value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
-     * @return Promise<array>
      * @throws Throwable
      */
     public function unset(string|int $key): void
@@ -163,7 +162,7 @@ abstract class SqlArray extends DriverArray
      * Count elements.
      *
      * @link https://php.net/manual/en/arrayiterator.count.php
-     * @return Promise<int> The number of elements or public properties in the associated
+     * @return int The number of elements or public properties in the associated
      * array or object, respectively.
      * @throws Throwable
      */
