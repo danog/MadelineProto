@@ -1434,10 +1434,10 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Check if connected to datacenter using HTTP.
      *
-     * @param string $datacenter DC ID
+     * @param int $datacenter DC ID
      * @internal
      */
-    public function isHttp(string $datacenter): bool
+    public function isHttp(int $datacenter): bool
     {
         return $this->datacenter->isHttp($datacenter);
     }
@@ -1661,9 +1661,9 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Store RSA keys for CDN datacenters.
      *
-     * @param string $datacenter DC ID
+     * @param int $datacenter DC ID
      */
-    public function getCdnConfig(string $datacenter): void
+    public function getCdnConfig(int $datacenter): void
     {
         try {
             foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {

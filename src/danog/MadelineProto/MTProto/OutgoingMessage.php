@@ -200,7 +200,8 @@ class OutgoingMessage extends Message
         if ($this->promise) { // Sometimes can get an RPC error for constructors
             $promise = $this->promise;
             $this->promise = null;
-            EventLoop::defer(fn () => $result instanceof Throwable
+            EventLoop::defer(
+                fn () => $result instanceof Throwable
                 ? $promise->error($result)
                 : $promise->complete($result)
             );

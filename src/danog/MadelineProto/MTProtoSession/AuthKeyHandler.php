@@ -48,7 +48,7 @@ use function time;
  * https://core.telegram.org/mtproto/samples-auth_key
  *
  * @property DataCenterConnection $shared
- * @property string $datacenter
+ * @property int $datacenter
  * @property MTProto $API
  * @property Logger $logger
  */
@@ -65,10 +65,6 @@ trait AuthKeyHandler
         $cdn = $this->isCDN();
         $media = $this->isMedia();
         $test = $this->API->settings->getConnection()->getTestMode();
-        $datacenter_id = \preg_replace('|_.*|', '', $this->datacenter) + ($this->API->settings->getConnection()->getTestMode() ? 10000 : 0);
-        if ($media) {
-            $datacenter_id = -$datacenter_id;
-        }
 
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
@@ -166,7 +162,7 @@ trait AuthKeyHandler
                 $p_bytes = \strrev(Tools::packUnsignedInt($p));
                 $q_bytes = \strrev(Tools::packUnsignedInt($q));
                 $new_nonce = Tools::random(32);
-                $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp').'_dc', 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => $datacenter_id];
+                $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp').'_dc', 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => $this->datacenter];
                 $p_q_inner_data = ($this->API->getTL()->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
                 /*
                  * ***********************************************************************

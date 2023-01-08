@@ -41,7 +41,7 @@ trait Common
     /**
      * DC ID.
      */
-    protected string $datacenter;
+    protected int $datacenter;
     /**
      * DataCenterConnection instance.
      */

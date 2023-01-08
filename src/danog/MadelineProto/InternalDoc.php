@@ -6032,9 +6032,9 @@ class InternalDoc extends APIFactory
     /**
      * Store RSA keys for CDN datacenters.
      *
-     * @param string $datacenter DC ID
+     * @param int $datacenter DC ID
      */
-    public function getCdnConfig(string $datacenter, array $extra = []): Future
+    public function getCdnConfig(int $datacenter, array $extra = []): Future
     {
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }

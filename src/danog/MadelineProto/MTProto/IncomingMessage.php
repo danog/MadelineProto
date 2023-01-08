@@ -118,9 +118,9 @@ class IncomingMessage extends Message
     /**
      * Get log line.
      *
-     * @param int|string $dc DC ID
+     * @param int $dc DC ID
      */
-    public function log(int|string $dc): string
+    public function log(int $dc): string
     {
         if ($this->fromContainer) {
             return "Inside of container, received {$this->content['_']} from DC $dc";

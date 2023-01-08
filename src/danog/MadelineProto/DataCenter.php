@@ -71,7 +71,7 @@ class DataCenter
     private MTProto $API;
     /**
      * DC list.
-     * 
+     *
      * @param TDcList
      */
     private array $dclist = [];
@@ -85,13 +85,16 @@ class DataCenter
     {
         return ['sockets', 'currentDatacenter', 'dclist', 'settings'];
     }
-    public static function isTest(int $dc): bool {
-        return abs($dc) > 10000;
+    public static function isTest(int $dc): bool
+    {
+        return \abs($dc) > 10000;
     }
-    public static function isMedia(int $dc): bool {
+    public static function isMedia(int $dc): bool
+    {
         return $dc < 0;
     }
-    public function isCdn(int $dc): bool {
+    public function isCdn(int $dc): bool
+    {
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
         return $this->dclist[$test][$ipv6][$dc]['cdn'];
@@ -116,7 +119,7 @@ class DataCenter
                 }
                 $array[$id] = [];
             }
-            if (!is_int($id)) {
+            if (!\is_int($id)) {
                 unset($this->sockets[$id]);
             }
         }
@@ -160,7 +163,6 @@ class DataCenter
      * Constructor function.
      *
      * @param MTProto     $API          Main MTProto instance
-     * @param TDcList     $dclist       DC IP list
      * @param ConnectionSettings $settings     Settings
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
@@ -173,7 +175,7 @@ class DataCenter
         if (!$reconnectAll) {
             $changed = [];
             $test = $API->getCachedConfig()['test_mode'] ?? false ? 'test' : 'main';
-            foreach ($dclist[$test] as $ipv6 => $dcs) {
+            foreach ($this->dclist[$test] as $ipv6 => $dcs) {
                 foreach ($dcs as $id => $dc) {
                     if ($dc !== ($this->dclist[$test][$ipv6][$id] ?? [])) {
                         $changed[$id] = true;
@@ -181,10 +183,10 @@ class DataCenter
                 }
             }
         }
-        $this->dclist = $dclist;
+        $this->dclist = $this->dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
-            if ($socket instanceof DataCenterConnection && is_int($key)) {
+            if ($socket instanceof DataCenterConnection && \is_int($key)) {
                 if ($reconnectAll || isset($changed[$id])) {
                     $this->API->logger->logger('Disconnecting all before reconnect!');
                     $socket->needReconnect(true);
@@ -251,18 +253,180 @@ class DataCenter
      * Generate contexts.
      *
      * @param integer        $dc_number DC ID to generate contexts for
-     * @param string         $uri       URI
      * @param ConnectContext $context   Connection context
      * @return array<ConnectionContext>
      */
-    public function generateContexts(int $dc_number = 0, string $uri = '', ?ConnectContext $context = null): array
+    public function generateContexts(int $dc_number, ?ConnectContext $context = null): array
     {
-        $ctxs = $this->dohWrapper->generateContexts(
-            $this->dclist,
-            $dc_number,
-            $uri,
-            $context
-        );
+        $ctxs = [];
+        $combos = [];
+        $test = $this->settings->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
+        switch ($this->settings->getProtocol()) {
+            case AbridgedStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]];
+                break;
+            case IntermediateStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediateStream::class, []]];
+                break;
+            case IntermediatePaddedStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediatePaddedStream::class, []]];
+                break;
+            case FullStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [FullStream::class, []]];
+                break;
+            case HttpStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpStream::class, []]];
+                break;
+            case HttpsStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
+                break;
+            case UdpBufferedStream::class:
+                $default = [[DefaultStream::class, []], [UdpBufferedStream::class, []]];
+                break;
+            default:
+                throw new Exception(Lang::$current_lang['protocol_invalid']);
+        }
+        if ($this->settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+            $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+        }
+        if ($this->settings->getTransport() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+            switch ($this->settings->getTransport()) {
+                case DefaultStream::class:
+                    if ($this->settings->getObfuscated()) {
+                        $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                    }
+                    break;
+                case WssStream::class:
+                    $default = [[DefaultStream::class, []], [WssStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                    break;
+                case WsStream::class:
+                    $default = [[DefaultStream::class, []], [WsStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                    break;
+            }
+        }
+        $combos[] = $default;
+        if ($this->settings->getRetry()) {
+            $only = $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'];
+            if ($only || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
+                $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
+                $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
+                if ($only) {
+                    \array_unshift($combos, $combo);
+                } else {
+                    $combos []= $combo;
+                }
+            }
+            $proxyCombos = [];
+            foreach ($this->settings->getProxies() as $proxy => $extras) {
+                foreach ($extras as $extra) {
+                    if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34])) {
+                        $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                    }
+                    foreach ($combos as $orig) {
+                        $combo = [];
+                        if ($proxy === ObfuscatedStream::class) {
+                            $combo = $orig;
+                            if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
+                                $combo[\count($combo) - 2][1] = $extra;
+                            } else {
+                                $mtproto = \end($combo);
+                                $combo[\count($combo) - 1] = [$proxy, $extra];
+                                $combo[] = $mtproto;
+                            }
+                        } else {
+                            if ($orig[1][0] === BufferedRawStream::class) {
+                                [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
+                                $first[] = [$proxy, $extra];
+                                $combo = \array_merge($first, $second);
+                            } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class])) {
+                                [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
+                                $first[] = [BufferedRawStream::class, []];
+                                $first[] = [$proxy, $extra];
+                                $combo = \array_merge($first, $second);
+                            }
+                        }
+                        $proxyCombos []= $combo;
+                    }
+                }
+            }
+            $combos = \array_merge($proxyCombos, $combos);
+            $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
+            $combos = \array_unique($combos, SORT_REGULAR);
+        }
+        $context = $context ?? (new ConnectContext())->withConnectTimeout($this->settings->getTimeout())->withBindTo($this->settings->getBindTo());
+        foreach ($combos as $combo) {
+            foreach ([true, false] as $useDoH) {
+                $ipv6Combos = [
+                    $this->settings->getIpv6() ? 'ipv6' : 'ipv4',
+                    $this->settings->getIpv6() ? 'ipv4' : 'ipv6'
+                ];
+                foreach ($ipv6Combos as $ipv6) {
+                    if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
+                        continue;
+                    }
+                    $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+                    if ($ipv6 === 'ipv6') {
+                        $address = "[$address]";
+                    }
+                    $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
+                    foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
+                        $stream = \end($combo)[0];
+                        if ($stream === HttpsStream::class) {
+                            $subdomain = $this->settings->getSslSubdomains()[$dc_number] ?? null;
+                            if (!$subdomain) {
+                                continue;
+                            }
+                            if (DataCenter::isMedia($dc_number)) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings->getTestMode() ? 'apiw_test1' : 'apiw1';
+                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        } elseif ($stream === HttpStream::class) {
+                            $uri = 'tcp://'.$address.':'.$port.'/api';
+                        } else {
+                            $uri = 'tcp://'.$address.':'.$port;
+                        }
+                        if ($combo[1][0] === WssStream::class) {
+                            $subdomain = $this->settings->getSslSubdomains()[$dc_number] ?? null;
+                            if (!$subdomain) {
+                                continue;
+                            }
+                            if (DataCenter::isMedia($dc_number)) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
+                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        } elseif ($combo[1][0] === WsStream::class) {
+                            $subdomain = $this->settings->getSslSubdomains()[$dc_number];
+                            if (DataCenter::isMedia($dc_number)) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
+                            //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                            $uri = 'tcp://'.$address.':'.$port.'/'.$path;
+                        }
+                        $ctx = (new ConnectionContext())
+                            ->setDc($dc_number)
+                            ->setCdn($this->isCdn($dc_number))
+                            ->setSocketContext($context)
+                            ->setUri($uri)
+                            ->setIpv6($ipv6 === 'ipv6');
+                        foreach ($combo as $stream) {
+                            if ($stream[0] === DefaultStream::class && $stream[1] === []) {
+                                $stream[1] = $useDoH ? new DoHConnector($this->dohWrapper, $ctx) : $this->dohWrapper->dnsConnector;
+                            }
+                            if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
+                                $stream[1] = $this->dohWrapper->webSocketConnector;
+                            }
+                            /** @var array{0: class-string, 1: mixed} $stream */
+                            $ctx->addStream(...$stream);
+                        }
+                        $ctxs[] = $ctx;
+                    }
+                }
+            }
+        }
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
             $this->API->logger->logger("No info for DC {$dc_number}", Logger::ERROR);

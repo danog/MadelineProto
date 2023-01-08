@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Failure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;

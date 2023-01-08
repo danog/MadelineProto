@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
-use Amp\Failure;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -122,7 +121,7 @@ class Connection
      * DC ID.
      *
      */
-    protected string $datacenter;
+    protected int $datacenter;
     /**
      * Connection ID.
      *

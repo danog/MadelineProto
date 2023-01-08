@@ -91,9 +91,8 @@ class DataCenterConnection implements JsonSerializable
     private ConnectionContext $ctx;
     /**
      * DC ID.
-     *
      */
-    private string $datacenter;
+    private int $datacenter;
     /**
      * Linked DC ID.
      *
@@ -265,8 +264,8 @@ class DataCenterConnection implements JsonSerializable
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
-                        $exported_authorization = $this->API->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $this->datacenter)], ['datacenter' => $authorized_dc_id]);
-                        $authorization = $socket->methodCallAsyncRead('auth.importAuthorization', $exported_authorization);
+                        $exported_authorization = $this->API->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => $this->datacenter], ['datacenter' => $authorized_dc_id]);
+                        $socket->methodCallAsyncRead('auth.importAuthorization', $exported_authorization);
                         $this->authorized(true);
                         break;
                     } catch (Exception $e) {
@@ -398,9 +397,9 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Link permanent authorization info of main DC to media DC.
      *
-     * @param string $dc Main DC ID
+     * @param int $dc Main DC ID
      */
-    public function link(string $dc): void
+    public function link(int $dc): void
     {
         $this->linked = $dc;
         $this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey;
