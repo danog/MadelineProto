@@ -193,6 +193,16 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $this->unset($index);
     }
 
+    /**
+     * Get array copy.
+     *
+     * @throws Throwable
+     */
+    public function getArrayCopy(): array
+    {
+        return \iterator_to_array($this->getIterator());
+    }
+    
     protected static function getClassName($instance): ?string
     {
         if ($instance === null) {

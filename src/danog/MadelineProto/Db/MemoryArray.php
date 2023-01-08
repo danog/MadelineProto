@@ -70,11 +70,6 @@ class MemoryArray extends ArrayIterator implements DbArray
         return parent::count();
     }
 
-    public function getArrayCopy(): array
-    {
-        return parent::getArrayCopy();
-    }
-
     public function clear(): void
     {
         parent::__construct([], parent::getFlags());

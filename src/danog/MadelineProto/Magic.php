@@ -413,7 +413,7 @@ class Magic
         if (\defined('STDIN')) {
             getStdin()->unreference();
         }
-        if ($code !== 0) {
+        /*if ($code !== 0) {
             $driver = EventLoop::get();
             $reflectionClass = new ReflectionClass(Driver::class);
             $reflectionProperty = $reflectionClass->getProperty('watchers');
@@ -421,9 +421,9 @@ class Magic
             foreach (\array_keys($reflectionProperty->getValue($driver)) as $key) {
                 $driver->unreference($key);
             }
-        }
+        }*/
         MTProto::serializeAll();
-        EventLoop::stop();
+        //EventLoop::stop();
         if (\class_exists(Installer::class)) {
             Installer::unlock();
         }

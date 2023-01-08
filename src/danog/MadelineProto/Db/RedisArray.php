@@ -120,16 +120,6 @@ class RedisArray extends DriverArray
         $this->db->delete($this->rkey($key));
     }
 
-    /**
-     * Get array copy.
-     *
-     * @throws Throwable
-     */
-    public function getArrayCopy(): array
-    {
-        return \iterator_to_array($this->getIterator());
-    }
-
     public function getIterator(): \Traversable
     {
         $request = $this->db->scan($this->itKey());

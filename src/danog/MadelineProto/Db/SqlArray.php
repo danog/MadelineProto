@@ -73,17 +73,11 @@ abstract class SqlArray extends DriverArray
         return \serialize($value);
     }
 
-    /**
-     * @return \Traversable<array<string, mixed>>
-     */
     public function getIterator(): \Traversable
     {
-        return $this->execute($this->queries[self::SQL_ITERATE]);
-    }
-
-    public function getArrayCopy(): array
-    {
-        return \iterator_to_array($this->getIterator());
+        foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['index' => $key, 'value' => $value]) {
+            yield $key => $this->getValue($value);
+        }
     }
 
     public function offsetGet(mixed $key): mixed
