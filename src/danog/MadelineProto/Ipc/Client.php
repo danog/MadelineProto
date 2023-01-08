@@ -199,9 +199,9 @@ class Client extends ClientAbstract
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string            $method Method name
-     * @param array $args Arguments
-     * @param array             $aargs  Additional arguments
+     * @param string              $method Method name
+     * @param array|(callable(): array) $args Arguments
+     * @param array               $aargs  Additional arguments
      */
     public function methodCallAsyncRead(string $method, array $args, array $aargs)
     {

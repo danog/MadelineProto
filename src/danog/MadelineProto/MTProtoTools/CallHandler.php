@@ -35,7 +35,7 @@ trait CallHandler
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array             $args Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
@@ -46,7 +46,7 @@ trait CallHandler
      * Call method and make sure it is asynchronously sent.
      *
      * @param string            $method Method name
-     * @param array             $args Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
     public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null])

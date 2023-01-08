@@ -1071,7 +1071,7 @@ class MTProto implements TLCallback, LoggerGetter
         }
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-            if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
+            if ($this->authorized === self::LOGGED_IN && is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
                 $socket->bind();
                 $socket->authorized(true);
             }
@@ -1170,6 +1170,15 @@ class MTProto implements TLCallback, LoggerGetter
         if (!isset($this->snitch)) {
             $this->snitch = new Snitch;
         }
+        // Re-set TL closures
+        $callbacks = [$this];
+        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+            $callbacks []= $this->referenceDatabase;
+        }
+        if (!($this->authorization['user']['bot'] ?? false) && $this->settings->getDb()->getEnableMinDb()) {
+            $callbacks[] = $this->minDatabase;
+        }
+        $this->TL->updateCallbacks($callbacks);
         // Convert old array settings to new settings object
         if (\is_array($this->settings)) {
             if (($this->settings['updates']['callback'] ?? '') === 'getUpdatesUpdateHandler') {

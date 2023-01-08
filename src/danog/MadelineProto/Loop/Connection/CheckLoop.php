@@ -93,13 +93,13 @@ class CheckLoop extends ResumableSignalLoop
                                         break;
                                     }
                                     $API->logger->logger("Message $message not received by server, resending...", Logger::ERROR);
-                                    $connection->methodRecall('watcherId', ['message_id' => $message_id, 'postpone' => true]);
+                                    $connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
                                     break;
                                 case 4:
                                     if ($chr & 32) {
                                         if ($message->getSent() + $timeoutResend < \time()) {
                                             $API->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                            $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
+                                            $connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
                                         } else {
                                             $API->logger->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         }
@@ -141,7 +141,7 @@ class CheckLoop extends ResumableSignalLoop
                         && $message->isUnencrypted()
                     ) {
                         $API->logger->logger("Still missing $message on DC $datacenter, resending", Logger::ERROR);
-                        $connection->methodRecall('', ['message_id' => $message->getMsgId(), 'postpone' => true]);
+                        $connection->methodRecall(['message_id' => $message->getMsgId(), 'postpone' => true]);
                     }
                 }
                 $connection->flush();

@@ -207,12 +207,12 @@ trait ResponseHandler
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 20:
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 16:
                 case 17:
@@ -222,7 +222,7 @@ trait ResponseHandler
                     $this->shared->setTempAuthKey(null);
                     async(function () use ($requestId): void {
                         $this->API->initAuthorization();
-                        $this->methodRecall('', ['message_id' => $requestId]);
+                        $this->methodRecall(['message_id' => $requestId]);
                     });
                     return;
             }
@@ -284,7 +284,7 @@ trait ResponseHandler
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
-            $this->methodRecall('', ['message_id' => $msgId, 'postpone' => true]);
+            $this->methodRecall(['message_id' => $msgId, 'postpone' => true]);
             return null;
         }
 
@@ -293,7 +293,7 @@ trait ResponseHandler
             case -500:
                 if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                     $this->call_queue[$request->getQueueId()] = [];
-                    $this->methodRecall('', ['message_id' => $request->getMsgId(), 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $request->getMsgId(), 'postpone' => true]);
                     return null;
                 }
                 if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
@@ -310,7 +310,7 @@ trait ResponseHandler
                     $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->currentDatacenter);
                 }
                 EventLoop::defer(fn () => $this->methodRecall(['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]));
-                //$this->API->methodRecall('', ['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
+                //$this->API->methodRecall(['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
                 return null;
             case 401:
                 switch ($response['error_message']) {
@@ -356,7 +356,7 @@ trait ResponseHandler
                         }
                         async(function () use ($request): void {
                             $this->API->initAuthorization();
-                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
+                            $this->methodRecall(['message_id' => $request->getMsgId()]);
                         });
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
@@ -364,7 +364,7 @@ trait ResponseHandler
                         $this->shared->setTempAuthKey(null);
                         async(function () use ($request): void {
                             $this->API->initAuthorization();
-                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
+                            $this->methodRecall(['message_id' => $request->getMsgId()]);
                         });
                         return null;
                 }

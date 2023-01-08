@@ -89,8 +89,9 @@ class OutgoingMessage extends Message
     /**
      * Message body.
      *
+     * @var array|(callable(): array)|null
      */
-    private ?array $body = null;
+    private $body = null;
 
     /**
      * Serialized body.
@@ -139,13 +140,13 @@ class OutgoingMessage extends Message
     /**
      * Create outgoing message.
      *
-     * @param array $body Body
-     * @param string            $constructor Constructor name
-     * @param string            $type        Constructor type
-     * @param boolean           $method      Is this a method?
-     * @param boolean           $unencrypted Is this an unencrypted message?
+     * @param array|callable(): array $body Body
+     * @param string                  $constructor Constructor name
+     * @param string                  $type        Constructor type
+     * @param boolean                 $method      Is this a method?
+     * @param boolean                 $unencrypted Is this an unencrypted message?
      */
-    public function __construct(array $body, string $constructor, string $type, bool $method, bool $unencrypted)
+    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted)
     {
         $this->body = $body;
         $this->constructor = $constructor;
@@ -230,7 +231,7 @@ class OutgoingMessage extends Message
      */
     public function getBody()
     {
-        return $this->body;
+        return is_callable($this->body) ? ($this->body)() : $this->body;
     }
 
     /**

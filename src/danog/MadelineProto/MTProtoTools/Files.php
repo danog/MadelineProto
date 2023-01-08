@@ -167,7 +167,7 @@ trait Files
         $exception = null;
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $resa = $callable($part_num);
+            $resa = fn () => $callable($part_num);
             $writePromise = $this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
             if (!$seekable) {
                 $writePromise->await();

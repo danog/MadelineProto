@@ -89,9 +89,20 @@ final class TL
 
     /**
      * API instance.
-     *
      */
     private MTProto $API;
+    public function __sleep()
+    {
+        return [
+            'secretLayer',
+            'constructors',
+            'methods',
+            'tdConstructors',
+            'tdMethods',
+            'tdDescriptions',
+            'API',
+        ];
+    }
     /**
      * Constructor function.
      *
@@ -362,10 +373,10 @@ final class TL
             $callbacks
         ));
 
-        $this->beforeConstructorSerialization = [...\array_map(
+        $this->beforeConstructorSerialization = array_merge(...\array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
-        )];
+        ));
         $this->beforeConstructorDeserialization = \array_merge_recursive(...\array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
             $callbacks
@@ -375,10 +386,10 @@ final class TL
             $callbacks
         ));
 
-        $this->typeMismatch = [...\array_map(
+        $this->typeMismatch = array_merge(...\array_map(
             fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
             $callbacks
-        )];
+        ));
     }
     /**
      * Deserialize bool.
