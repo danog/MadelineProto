@@ -77,7 +77,7 @@ class ConnectionContext
      * Cancellation token.
      *
      */
-    private Cancellation $cancellationToken;
+    private ?Cancellation $cancellationToken = null;
     /**
      * The telegram DC ID.
      *
@@ -153,7 +153,7 @@ class ConnectionContext
     /**
      * Get the cancellation token.
      */
-    public function getCancellation(): Cancellation
+    public function getCancellation(): ?Cancellation
     {
         return $this->cancellationToken;
     }

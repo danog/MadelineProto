@@ -97,7 +97,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Future
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
@@ -109,7 +109,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Future
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         if (\strlen($append)) {
             $this->append = $append;
@@ -131,7 +131,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      */
-    public function bufferWrite(string $data): Future
+    public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);

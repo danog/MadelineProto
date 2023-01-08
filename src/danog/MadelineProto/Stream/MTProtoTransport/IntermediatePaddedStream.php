@@ -58,7 +58,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $padding_length = Tools::randomInt($modulus = 16);
         $buffer = $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
@@ -70,7 +70,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
         $length = \unpack('V', $buffer->bufferRead(4))[1];

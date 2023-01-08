@@ -69,8 +69,8 @@ trait Login
             ],
         );
         $this->authorized = MTProto::LOGGED_IN;
-        $this->authorized_dc = $this->datacenter->curdc;
-        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
+        $this->authorized_dc = $this->datacenter->currentDatacenter;
+        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
         $this->updates = [];
         $this->updates_key = 0;
         $this->initAuthorization();
@@ -102,7 +102,7 @@ trait Login
                 'lang_code' => $this->settings->getAppInfo()->getLangCode(),
             ],
         );
-        $this->authorized_dc = $this->datacenter->curdc;
+        $this->authorized_dc = $this->datacenter->currentDatacenter;
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
         $this->authorized = MTProto::WAITING_CODE;
@@ -152,7 +152,7 @@ trait Login
         }
         $this->authorized = MTProto::LOGGED_IN;
         $this->authorization = $authorization;
-        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
+        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
         $this->initAuthorization();
         $this->getPhoneConfig();
         $this->startUpdateSystem();
@@ -213,8 +213,8 @@ trait Login
             throw new Exception(Lang::$current_lang['not_loggedIn']);
         }
         $this->fullGetSelf();
-        $this->authorized_dc = $this->datacenter->curdc;
-        return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
+        $this->authorized_dc = $this->datacenter->currentDatacenter;
+        return [$this->datacenter->currentDatacenter, $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->getPermAuthKey()->getAuthKey()];
     }
     /**
      * Complete signup to Telegram.
@@ -231,7 +231,7 @@ trait Login
         $this->logger->logger(Lang::$current_lang['signing_up'], Logger::NOTICE);
         $this->authorization = $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]);
         $this->authorized = MTProto::LOGGED_IN;
-        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
+        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
         $this->initAuthorization();
         $this->getPhoneConfig();
         $this->logger->logger(Lang::$current_lang['signup_ok'], Logger::NOTICE);
@@ -254,7 +254,7 @@ trait Login
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         $this->authorization = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
         $this->authorized = MTProto::LOGGED_IN;
-        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
+        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
         $this->initAuthorization();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         $this->getPhoneConfig();

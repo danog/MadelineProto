@@ -66,7 +66,7 @@ final class MsgIdHandler
      *
      */
     private int $maxOutgoingId = 0;
-    
+
     /**
      * Check validity of given message ID.
      *

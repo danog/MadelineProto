@@ -73,7 +73,7 @@ trait DialogHandler
             $this->dialog_params['hash'] = 0;
         }
         $res = ['dialogs' => [0], 'count' => 1];
-        $datacenter = $this->datacenter->curdc;
+        $datacenter = $this->datacenter->currentDatacenter;
         $dialogs = [];
         $this->logger->logger('Getting dialogs...');
         while ($this->dialog_params['count'] < $res['count']) {

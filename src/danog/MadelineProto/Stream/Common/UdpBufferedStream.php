@@ -21,11 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -41,7 +39,6 @@ use danog\MadelineProto\Stream\WriteBufferInterface;
  */
 class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     /**
      * Connect to stream.
      *
@@ -63,7 +60,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
@@ -115,7 +112,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Future
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         return new class($length, $append, $this) implements WriteBufferInterface {
             private int $length;
@@ -140,7 +137,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              *
              * @param string $data Data to write
              */
-            public function bufferWrite(string $data): int
+            public function bufferWrite(string $data): void
             {
                 $this->data .= $data;
                 if ($this->append_after) {
@@ -148,14 +145,13 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
                     if ($this->append_after === 0) {
                         $this->data .= $this->append;
                         $this->append = '';
-                        return $this->stream->write($this->data);
+                        $this->stream->write($this->data);
                     } elseif ($this->append_after < 0) {
                         $this->append_after = 0;
                         $this->append = '';
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
                 }
-                return \strlen($data);
             }
         };
     }

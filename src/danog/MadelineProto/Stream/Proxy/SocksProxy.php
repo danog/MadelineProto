@@ -25,7 +25,6 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
@@ -39,7 +38,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
     private const REPS = [0 => 'succeeded', 1 => 'general SOCKS server failure', 2 => 'connection not allowed by ruleset', 3 => 'Network unreachable', 4 => 'Host unreachable', 5 => 'Connection refused', 6 => 'TTL expired', 7 => 'Command not supported', 8 => 'Address type not supported'];
-    use RawStream;
     /**
      * Stream.
      *
@@ -152,7 +150,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = ''): Future
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         return $this->stream->getWriteBuffer($length, $append);
     }
@@ -161,7 +159,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length): Future
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         return $this->stream->getReadBuffer($length);
     }

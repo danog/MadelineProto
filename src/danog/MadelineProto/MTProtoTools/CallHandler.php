@@ -40,7 +40,7 @@ trait CallHandler
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
-        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -51,6 +51,6 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null])
     {
-        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args, $aargs);
     }
 }

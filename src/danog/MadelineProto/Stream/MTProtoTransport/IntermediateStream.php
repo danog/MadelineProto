@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Socket\EncryptableSocket;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -36,7 +35,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  */
 class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     private $stream;
     /**
      * Connect to stream.
@@ -59,7 +57,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $buffer = $this->stream->getWriteBuffer($length + 4, $append);
         $buffer->bufferWrite(\pack('V', $length));
@@ -70,7 +68,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
         $length = \unpack('V', $buffer->bufferRead(4))[1];

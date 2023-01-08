@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
@@ -100,9 +101,9 @@ trait CallHandler
             return null;
         }
         if (\is_array($readDeferred)) {
-            return await(\array_map(fn (DeferredFuture $value) => $value->getFuture(), $readDeferred));
+            return await($readDeferred);
         }
-        return $readDeferred->getFuture()->await();
+        return $readDeferred->await();
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
@@ -110,9 +111,9 @@ trait CallHandler
      * @param string            $method Method name
      * @param array             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @return list<DeferredFuture>|DeferredFuture
+     * @return list<Future>|Future
      */
-    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null]): DeferredFuture|array
+    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null]): Future|array
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
@@ -145,12 +146,12 @@ trait CallHandler
                 }
                 $promises = [];
                 foreach ($args as $single_args) {
-                    $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
+                    $promises[] = async(fn () => [$this->methodCallAsyncWrite($method, $single_args, $new_aargs)]);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return await($promises);
+                return array_merge(...await($promises));
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {

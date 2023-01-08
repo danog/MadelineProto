@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
+use Amp\Future;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -421,7 +422,7 @@ class Connection
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true)
+    public function sendMessage(OutgoingMessage $message, bool $flush = true): Future
     {
         $message->trySend();
         $promise = $message->getSendPromise();

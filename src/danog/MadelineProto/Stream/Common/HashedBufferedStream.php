@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -35,7 +34,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  */
 class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    use BufferedStream;
     private $hash_name;
     private $read_hash;
     private $write_hash;
@@ -163,7 +161,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         //if ($this->read_hash) {
         $this->read_buffer = $this->stream->getReadBuffer($length);
@@ -176,7 +174,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         //if ($this->write_hash) {
         $this->write_buffer = $this->stream->getWriteBuffer($length, $append);

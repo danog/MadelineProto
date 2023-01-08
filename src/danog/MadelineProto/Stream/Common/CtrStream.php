@@ -39,7 +39,6 @@ use phpseclib3\Crypt\AES;
  */
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    use Buffer;
     private $encrypt;
     private $decrypt;
     private $stream;
@@ -77,7 +76,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $this->write_buffer = $this->stream->getWriteBuffer($length);
         if (\strlen($append)) {
@@ -91,7 +90,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
@@ -109,7 +108,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * @param string $data Bytes to write.
      * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Future
+    public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);

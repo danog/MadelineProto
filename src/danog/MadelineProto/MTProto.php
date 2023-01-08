@@ -646,7 +646,7 @@ class MTProto implements TLCallback, LoggerGetter
         $this->connectToAllDcs();
         $this->startLoops();
         $this->datacenter->currentDatacenter= 2;
-        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
+        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->hasTempAuthKey()) {
             try {
                 $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
@@ -894,7 +894,7 @@ class MTProto implements TLCallback, LoggerGetter
      */
     public function getDataCenterId(): int|string
     {
-        return $this->datacenter->curdc;
+        return $this->datacenter->currentDatacenter;
     }
     /**
      * Prompt serialization of instance.
@@ -1232,7 +1232,7 @@ class MTProto implements TLCallback, LoggerGetter
             $this->authorized = self::LOGGED_IN;
             $this->setupLogger();
             $this->startLoops();
-            $this->getCdnConfig($this->datacenter->curdc);
+            $this->getCdnConfig($this->datacenter->currentDatacenter);
             $this->initAuthorization();
         } else {
             $this->startLoops();
@@ -1490,6 +1490,7 @@ class MTProto implements TLCallback, LoggerGetter
         $this->datacenter->__construct($this, $this->dcList, $this->settings->getConnection(), $reconnectAll);
         $dcs = [];
         foreach ($this->datacenter->getDcs() as $new_dc) {
+            if (!is_int($new_dc)) continue;
             $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
         await($dcs);
@@ -1497,6 +1498,7 @@ class MTProto implements TLCallback, LoggerGetter
         $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
+            if (!is_int($new_dc)) continue;
             $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
         }
         await($dcs);

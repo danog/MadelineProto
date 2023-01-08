@@ -24,7 +24,6 @@ use Amp\Future;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -39,7 +38,6 @@ use Psr\Http\Message\UriInterface;
  */
 class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 {
-    use BufferedStream;
     /**
      * Stream.
      *
@@ -86,7 +84,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
         $buffer = $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
@@ -98,7 +96,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
         $headers = '';
@@ -159,7 +157,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         return $buffer;
     }
-    public function bufferRead(int $length): Future
+    public function bufferRead(int $length): string
     {
         return $this->code;
     }

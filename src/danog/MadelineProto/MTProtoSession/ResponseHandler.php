@@ -79,7 +79,7 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
+                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
                         $this->API->updaters[UpdateLoop::GENERIC]->resumeDefer();
                     }
                     break;
@@ -307,7 +307,7 @@ trait ResponseHandler
                     $datacenter = -$datacenter;
                 }
                 if ($request->isUserRelated()) {
-                    $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
+                    $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->currentDatacenter);
                 }
                 EventLoop::defer(fn () => $this->methodRecall(['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]));
                 //$this->API->methodRecall('', ['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);

@@ -477,7 +477,7 @@ class DataCenterConnection implements JsonSerializable
             $f = new DeferredFuture;
             $f->complete();
             $this->connectionsPromise = $f->getFuture();
-            if ($this->connectionsDeferred) {
+            if (isset($this->connectionsDeferred)) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
                 $connectionsDeferred->complete();

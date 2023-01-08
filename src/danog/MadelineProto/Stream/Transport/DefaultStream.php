@@ -27,7 +27,6 @@ use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketConnector;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -44,7 +43,6 @@ use function Amp\Socket\connector;
  */
 class DefaultStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
     /**
      * Socket.
      *

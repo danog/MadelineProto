@@ -25,7 +25,6 @@ use Amp\Cancellation;
 use Amp\Future;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -40,7 +39,6 @@ use Throwable;
  */
 class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
     private $stream;
     public function __construct()
     {

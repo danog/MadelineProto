@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -38,7 +37,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  */
 class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     private $stream;
     private $in_seq_no = -1;
     private $out_seq_no = -1;
@@ -65,7 +63,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
-    public function getWriteBuffer(int $length, string $append = '')
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);
@@ -79,7 +77,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
-    public function getReadBuffer(int &$length)
+    public function getReadBuffer(int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->stream->startReadHash();
         $buffer = $this->stream->getReadBuffer($l);
