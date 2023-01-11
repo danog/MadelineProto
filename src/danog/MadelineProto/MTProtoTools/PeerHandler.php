@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Future;
 use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
@@ -1134,7 +1133,7 @@ trait PeerHandler
     {
         return "$channelId'$filter'$q'$offset'$limit";
     }
-    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit): Future
+    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
     {
         return $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)];
     }

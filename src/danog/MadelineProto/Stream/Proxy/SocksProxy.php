@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Proxy;
 
-use Amp\Future;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
@@ -163,13 +162,13 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->getReadBuffer($length);
     }
-    public function read(): Future
+    public function read(): ?string
     {
         return $this->stream->read();
     }
-    public function write(string $data): Future
+    public function write(string $data): void
     {
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     /**
      * Sets proxy data.

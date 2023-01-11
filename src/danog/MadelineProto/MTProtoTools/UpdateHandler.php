@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -32,7 +34,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use Revolt\EventLoop;
 
@@ -70,8 +71,13 @@ trait UpdateHandler
         $this->updateHandler = MTProto::GETUPDATES_HANDLER;
         $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
         if (empty($this->updates)) {
-            $params['timeout'] *= 1000;
-            Tools::timeoutWithDefault(async($this->waitUpdate(...)), $params['timeout'] ?: 100000);
+            try {
+                async($this->waitUpdate(...))->await(new TimeoutCancellation($params['timeout'] ?: 100000.0));
+            } catch (TimeoutException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
+            }
         }
         if (empty($this->updates)) {
             return $this->updates;

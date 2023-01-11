@@ -117,7 +117,7 @@ trait Loop
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
-            return async(fn () => $callback());
+            return Tools::call($callback())->await();
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);

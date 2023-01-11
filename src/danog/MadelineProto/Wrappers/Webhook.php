@@ -24,6 +24,7 @@ use Amp\Http\Client\Request;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use function Amp\async;
 
@@ -55,11 +56,7 @@ trait Webhook
     private function pwrWebhook(array $update): void
     {
         $payload = \json_encode($update);
-        if ($payload === '') {
-            $this->logger->logger($update, $payload, \json_last_error_msg());
-            $this->logger->logger('EMPTY UPDATE');
-            return;
-        }
+        Assert::notEmpty($payload);
         async(function () use ($payload): void {
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');

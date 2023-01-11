@@ -42,8 +42,7 @@ class RedisArray extends DriverArray
         $request = $this->db->scan($from.'*');
 
         $lenK = \strlen($from);
-        while ($request->advance()) {
-            $oldKey = $request->getCurrent();
+        foreach ($request as $oldKey) {
             $newKey = $to.\substr($oldKey, $lenK);
             $value = $this->db->get($oldKey);
             $this->db->set($newKey, $value);
@@ -56,9 +55,7 @@ class RedisArray extends DriverArray
      */
     public function initConnection(DatabaseRedis $settings): void
     {
-        if (!isset($this->db)) {
-            $this->db = Redis::getConnection($settings);
-        }
+        $this->db ??= Redis::getConnection($settings);
     }
 
     /**
@@ -140,14 +137,7 @@ class RedisArray extends DriverArray
      */
     public function count(): int
     {
-        $request = $this->db->scan($this->itKey());
-        $count = 0;
-
-        while ($request->advance()) {
-            $count++;
-        }
-
-        return $count;
+        return \iterator_count($this->db->scan($this->itKey()));
     }
 
     /**
@@ -159,16 +149,14 @@ class RedisArray extends DriverArray
         $request = $this->db->scan($this->itKey());
 
         $keys = [];
-        $k = 0;
-        while ($request->advance()) {
-            $keys[$k++] = $request->getCurrent();
-            if ($k === 10) {
+        foreach ($request as $key) {
+            $keys[] = $key;
+            if (\count($keys) === 10) {
                 $this->db->delete(...$keys);
                 $keys = [];
-                $k = 0;
             }
         }
-        if (!empty($keys)) {
+        if ($keys) {
             $this->db->delete(...$keys);
         }
     }

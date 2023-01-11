@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Proxy;
 
-use Amp\Future;
+use Amp\Cancellation;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
@@ -158,13 +158,13 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         return $this->stream->getReadBuffer($length);
     }
-    public function read(): Future
+    public function read(?Cancellation $cancellation): ?string
     {
-        return $this->stream->read();
+        return $this->stream->read($cancellation);
     }
-    public function write(string $data): Future
+    public function write(string $data): void
     {
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     private function getProxyAuthHeader(): string
     {

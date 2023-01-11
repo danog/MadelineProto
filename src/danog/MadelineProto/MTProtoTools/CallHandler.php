@@ -38,7 +38,7 @@ trait CallHandler
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
         return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args, $aargs);
     }
@@ -49,7 +49,7 @@ trait CallHandler
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
         return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args, $aargs);
     }

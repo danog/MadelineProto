@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
+use Amp\DeferredFuture;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;

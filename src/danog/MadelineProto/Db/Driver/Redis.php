@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db\Driver;
 
-use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
+use Amp\Redis\RedisConfig;
 use Amp\Redis\RemoteExecutorFactory;
 use Amp\Sql\ConnectionException;
 use Amp\Sql\FailureException;
@@ -31,7 +31,7 @@ class Redis
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
-            $config = Config::fromUri($settings->getUri())
+            $config = RedisConfig::fromUri($settings->getUri())
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
 

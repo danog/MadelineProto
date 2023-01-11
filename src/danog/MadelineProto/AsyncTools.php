@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\TimeoutCancellation;
@@ -147,7 +149,10 @@ abstract class AsyncTools extends StrTools
     {
         try {
             return self::timeout($promise, $timeout);
-        } catch (TimeoutException) {
+        } catch (CancelledException $e) {
+            if (!$e->getPrevious() instanceof TimeoutException) {
+                throw $e;
+            }
             return $default;
         }
     }
@@ -242,11 +247,11 @@ abstract class AsyncTools extends StrTools
      * @param string    $file      File to lock
      * @param integer   $operation Locking mode
      * @param float     $polling   Polling interval
-     * @param ?Future   $token     Cancellation token
+     * @param ?Cancelation $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      * @return $token is null ? (callable(): void) : ((callable(): void)|null)
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1, ?Future $token = null, ?callable $failureCb = null): ?callable
+    public static function flock(string $file, int $operation, float $polling = 0.1, ?Cancellation $token = null, ?callable $failureCb = null): ?callable
     {
         if (!exists($file)) {
             touchAsync($file);
@@ -261,7 +266,9 @@ abstract class AsyncTools extends StrTools
                     $failureCb = null;
                 }
                 if ($token) {
-                    if (self::timeoutWithDefault($token, (int) ($polling*1000), false)) {
+                    try {
+                        delay($polling, true, $token);
+                    } catch (CancelledException) {
                         return null;
                     }
                 } else {

@@ -92,7 +92,7 @@ final class WebRunner extends RunnerAbstract
             try {
                 $address = $proto.'://'.$_SERVER['SERVER_NAME'];
                 $port = $_SERVER['SERVER_PORT'];
-                $res = \fsockopen($address, $port);
+                $res = \fsockopen($address, (int) $port);
                 break;
             } catch (Throwable $e) {
                 Logger::log("Error while connecting to ourselves: $e");

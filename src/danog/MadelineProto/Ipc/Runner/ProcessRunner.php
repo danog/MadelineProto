@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\DeferredFuture;
+use Amp\ByteStream\ReadableResourceStream;
+use Amp\NullCancellation;
+use Amp\Process\Internal\Posix\PosixRunner;
 use Amp\Process\Internal\Posix\Runner;
-use Amp\Process\Internal\Windows\Runner as WindowsRunner;
-use Amp\Process\ProcessInputStream;
+use Amp\Process\Internal\Windows\WindowsRunner as WindowsWindowsRunner;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -24,6 +25,7 @@ use const PHP_BINDIR;
 use const PHP_OS;
 use const PHP_SAPI;
 use function Amp\async;
+use function Amp\Process\escapeArgument;
 
 final class ProcessRunner extends RunnerAbstract
 {
@@ -79,7 +81,7 @@ final class ProcessRunner extends RunnerAbstract
             $session,
             $startupId,
         ];
-        $command = \implode(' ', \array_map('Amp\\Process\\escapeArguments', $command));
+        $command = \implode(' ', \array_map(escapeArgument(...), $command));
         Logger::log("Starting process with $command");
 
         $params = [
@@ -91,36 +93,27 @@ final class ProcessRunner extends RunnerAbstract
             ['QUERY_STRING' => \http_build_query($params)],
         );
 
-        $resDeferred = new DeferredFuture;
-
-        $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
-        $handle = $runner->start($command, null, $envVars);
-        $handle->pidDeferred->getFuture()->onResolve(function (?Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
-            if ($e) {
-                Logger::log("Got exception while starting process worker: $e");
-                $resDeferred->complete($e);
-                return;
-            }
-            async(self::readUnref(...), $handle->stdout);
-            async(self::readUnref(...), $handle->stderr);
-
-            $runner->join($handle)->onResolve(function (?Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
-                $runner->destroy($handle);
-                if ($e) {
-                    Logger::log("Got exception from process worker: $e");
-                    $resDeferred->fail($e);
-                } else {
-                    Logger::log("Process worker exited with $res!");
-                    $resDeferred->fail(new Exception("Process worker exited with $res!"));
-                }
-            });
+        $runner = IS_WINDOWS ? new WindowsWindowsRunner : new PosixRunner;
+        try {
+            $handle = $runner->start($command, new NullCancellation, null, $envVars);
+        } catch (\Throwable $e) {
+            Logger::log("Got exception while starting process worker: $e");
+            throw $e;
+        }
+        async(self::readUnref(...), $handle->streams->stdout);
+        async(self::readUnref(...), $handle->streams->stderr);
+        async(function () use ($runner, $handle): void {
+            $res = $runner->join($handle->handle);
+            $runner->destroy($handle->handle);
+            Logger::log("Process worker exited with $res!");
+            throw new Exception("Process worker exited with $res!");
         });
-        return $resDeferred->getFuture();
+        return true;
     }
     /**
      * Unreference and read data from fd, logging results.
      */
-    private static function readUnref(ProcessInputStream $stream): void
+    private static function readUnref(ReadableResourceStream $stream): void
     {
         $stream->unreference();
         $lastLine = '';

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\ByteStream\InputStream;
-use Amp\ByteStream\IteratorStream;
-use Amp\ByteStream\ResourceInputStream;
+use Amp\ByteStream\Pipe;
+use Amp\ByteStream\ReadableResourceStream;
+use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
@@ -16,7 +16,6 @@ use Amp\Http\Client\Response as ClientResponse;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
-use Amp\Producer;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
@@ -34,6 +33,8 @@ use danog\MadelineProto\Tools;
 
 use const FILTER_VALIDATE_URL;
 use const SEEK_END;
+
+use function Amp\async;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -108,7 +109,7 @@ trait FilesLogic
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download
-     * @param mixed|FileCallbackInterface $stream        Stream where to download file
+     * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
@@ -191,17 +192,9 @@ trait FilesLogic
 
         $body = null;
         if ($result->shouldServe()) {
-            $body = new IteratorStream(
-                new Producer(
-                    function (callable $emit) use (&$messageMedia, &$cb, &$result): void {
-                        $emit = static function (string $payload) use ($emit) {
-                            $emit($payload);
-                            return \strlen($payload);
-                        };
-                        $this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result->getServeRange());
-                    },
-                ),
-            );
+            $pipe = new Pipe(1024 * 1024);
+            async($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
+            $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
             $body = $result->getCodeExplanation();
         }
@@ -250,7 +243,7 @@ trait FilesLogic
         } elseif (\is_array($file)) {
             return $this->uploadFromTgfile($file, $cb, $encrypted);
         }
-        if (\is_resource($file) || (\is_object($file) && $file instanceof InputStream)) {
+        if (\is_resource($file) || (\is_object($file) && $file instanceof ReadableStream)) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
         /** @var Settings */
@@ -294,11 +287,10 @@ trait FilesLogic
             $cb = $stream;
             $stream = $stream->getFile();
         }
-        /* @var $stream \Amp\ByteStream\OutputStream */
         if (!\is_object($stream)) {
-            $stream = new ResourceInputStream($stream);
+            $stream = new ReadableResourceStream($stream);
         }
-        if (!$stream instanceof InputStream) {
+        if (!$stream instanceof ReadableStream) {
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;
@@ -321,7 +313,7 @@ trait FilesLogic
                             $stream->seek($offset);
                         }
                     }
-                    return $stream->read($size);
+                    return $stream->read(null, $size);
                 } finally {
                     $l->release();
                 }

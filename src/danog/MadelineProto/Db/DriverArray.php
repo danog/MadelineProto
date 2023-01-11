@@ -202,7 +202,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     {
         return \iterator_to_array($this->getIterator());
     }
-    
+
     protected static function getClassName($instance): ?string
     {
         if ($instance === null) {

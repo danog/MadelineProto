@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\ByteStream\InputStream as ByteStreamInputStream;
-use Amp\ByteStream\OutputStream as ByteStreamOutputStream;
+use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
+use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Parallel\Sync\ExitFailure;
+use Amp\Parallel\Context\Internal\ExitFailure;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
-use danog\MadelineProto\Ipc\Wrapper\InputStream;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
-use danog\MadelineProto\Ipc\Wrapper\OutputStream;
-use danog\MadelineProto\Ipc\Wrapper\SeekableInputStream;
-use danog\MadelineProto\Ipc\Wrapper\SeekableOutputStream;
+use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
+use danog\MadelineProto\Ipc\Wrapper\SeekableReadableStream;
+use danog\MadelineProto\Ipc\Wrapper\SeekableWritableStream;
+use danog\MadelineProto\Ipc\Wrapper\WritableStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
 use Throwable;
@@ -83,11 +83,11 @@ class Wrapper extends ClientAbstract
     /**
      * Wrap a certain callback object.
      *
-     * @param object|callable $callback    Callback to wrap
+     * @param mixed           $callback    Callback to wrap
      * @param bool            $wrapObjects Whether to wrap object methods, too
      * @param-out int $callback Callback ID
      */
-    public function wrap(object|callable &$callback, bool $wrapObjects = true): void
+    public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
         if (\is_object($callback) && $wrapObjects) {
             $ids = [];
@@ -97,10 +97,10 @@ class Wrapper extends ClientAbstract
                 $ids[$method] = $id;
             }
             $class = Obj::class;
-            if ($callback instanceof ByteStreamInputStream) {
-                $class = \method_exists($callback, 'seek') ? InputStream::class : SeekableInputStream::class;
-            } elseif ($callback instanceof ByteStreamOutputStream) {
-                $class = \method_exists($callback, 'seek') ? OutputStream::class : SeekableOutputStream::class;
+            if ($callback instanceof ByteStreamWritableStream) {
+                $class = \method_exists($callback, 'seek') ? WritableStream::class : SeekableWritableStream::class;
+            } elseif ($callback instanceof ByteStreamReadableStream) {
+                $class = \method_exists($callback, 'seek') ? ReadableStream::class : SeekableReadableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
             }

@@ -106,8 +106,8 @@ final class DoHWrapper
         };
 
         $this->CookieJar = $jar ?? new LocalCookieJar();
-        $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($settings, $loggerGetter))))->build();
-        $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($settings, $loggerGetter, true))))->build();
+        $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter))))->build();
+        $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter, true))))->build();
         $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
         $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
         $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
@@ -175,7 +175,6 @@ final class DoHWrapper
                         if ($stream[0] === DefaultStream::class && $stream[1] === []) {
                             $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                         }
-                        /** @var array{0: class-string, 1: mixed} $stream */
                         $ctx->addStream(...$stream);
                     }
                     $ctxs[] = $ctx;

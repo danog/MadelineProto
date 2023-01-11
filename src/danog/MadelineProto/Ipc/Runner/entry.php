@@ -26,7 +26,7 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
-use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
 
 (static function (): void {
     if (defined('MADELINE_ENTRY')) {
@@ -97,6 +97,8 @@ use danog\MadelineProto\Tools;
         define('MADELINE_WORKER', 1);
 
         $runnerId = MADELINE_WORKER_ARGS[1];
+        Assert::numeric($runnerId);
+        $runnerId = (int) $runnerId;
         $session = new SessionPaths($ipcPath);
 
         try {
@@ -104,13 +106,13 @@ use danog\MadelineProto\Tools;
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
             $API = new API($ipcPath, (new Ipc)->setSlow(true));
-            $API->init();
             $API->initSelfRestart();
             while (true) {
                 try {
                     $session->storeIpcState(new IpcState($runnerId));
                     Server::waitShutdown();
                     Shutdown::removeCallback('restarter');
+                    Logger::log('A restart was triggered!', Logger::FATAL_ERROR);
                     return;
                 } catch (Throwable $e) {
                     Logger::log((string) $e, Logger::FATAL_ERROR);
@@ -123,10 +125,10 @@ use danog\MadelineProto\Tools;
 
             Logger::log("$e", Logger::FATAL_ERROR);
             Logger::log('Got exception in IPC server, exiting...', Logger::FATAL_ERROR);
-            $ipc = Tools::wait($session->getIpcState());
+            $ipc = $session->getIpcState();
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())) {
                 Logger::log('Reporting error!');
-                Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
+                $session->storeIpcState(new IpcState($runnerId, $e));
                 Logger::log('Reported error!');
             } else {
                 Logger::log('Not reporting error!');

@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Dns\Resolver;
 use Amp\Http\Client\Cookie\CookieJar;
+use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -195,7 +197,7 @@ class DataCenter
                 }
             }
         }
-        $this->dclist = $this->dclist;
+        $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && \is_int($key)) {
@@ -261,6 +263,16 @@ class DataCenter
         }
         throw new Exception("Could not connect to DC {$dc_number}");
     }
+    public function getHTTPClient(): HttpClient
+    {
+        return $this->dohWrapper->HTTPClient;
+    }
+
+    public function getDNSClient(): Resolver
+    {
+        return $this->dohWrapper->DoHClient;
+    }
+
     /**
      * Generate contexts.
      *

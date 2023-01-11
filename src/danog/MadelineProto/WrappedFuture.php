@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * TON API module.
+ * Wrapped future class.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,30 +18,40 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\TON;
+namespace danog\MadelineProto;
 
-use danog\MadelineProto\Magic;
-use danog\MadelineProto\Settings\Logger;
+use Amp\Cancellation;
+use Amp\Future;
 
 /**
- * TON API.
+ * @template T
  */
-class API extends InternalDoc
+final class WrappedFuture
 {
     /**
-     * Construct API.
-     *
-     * @param Logger $settings Settings
+     * @param Future<T> $f
      */
-    public function __construct(Logger $settings)
+    public function __construct(public readonly Future $f)
     {
-        Magic::start();
-        $this->API = new Lite($settings);
-        foreach (\get_class_methods($this->API) as $method) {
-            $this->methods[$method] = [$this->API, \strtolower($method)];
-        }
-        foreach ($this->API->getMethodNamespaces() as $namespace) {
-            $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
-        }
+    }
+
+    /**
+     * @return bool True if the operation has completed.
+     */
+    public function isComplete(): bool
+    {
+        return $this->f->isComplete();
+    }
+
+    /**
+     * Awaits the operation to complete.
+     *
+     * Throws an exception if the operation fails.
+     *
+     * @return T
+     */
+    public function await(?Cancellation $cancellation = null): mixed
+    {
+        return $this->f->await($cancellation);
     }
 }

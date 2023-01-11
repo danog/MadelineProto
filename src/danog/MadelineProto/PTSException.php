@@ -30,7 +30,7 @@ use const PHP_EOL;
 class PTSException extends Exception
 {
     use TL\PrettyException;
-    public function __toString()
+    public function __toString(): string
     {
         return static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
     }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
@@ -12,27 +10,17 @@ use danog\MadelineProto\Ipc\Wrapper;
 class Obj
 {
     /**
-     * Method list.
-     *
-     * @var array<string, int>
-     */
-    private array $methods = [];
-    /**
-     * Wrapper.
-     */
-    private Wrapper $wrapper;
-    /**
      * Constructor.
+     *
+     * @param array<string, int> $methods
      */
-    public function __construct(Wrapper $wrapper, array $methods)
+    public function __construct(private Wrapper $wrapper, private array $methods)
     {
-        $this->wrapper = $wrapper;
-        $this->methods = $methods;
     }
     /**
      * Call method.
      */
-    public function __call(string $name, array $arguments = [])
+    public function __call(string $name, array $arguments = []): mixed
     {
         return $this->wrapper->__call($this->methods[$name], $arguments);
     }

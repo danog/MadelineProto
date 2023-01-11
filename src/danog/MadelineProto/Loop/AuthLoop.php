@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Exception module.
+ * Internal loop trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,31 +18,32 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\TL\Conversion;
+namespace danog\MadelineProto\Loop;
 
-use danog\MadelineProto\Magic;
-use danog\MadelineProto\TL\PrettyException;
+use danog\MadelineProto\Logger;
 
-use const PHP_EOL;
-use const PHP_SAPI;
+use function Amp\async;
 
-/**
- * TL conversion exception.
- */
-class Exception extends \Exception
+trait AuthLoop
 {
-    use PrettyException;
-    public function __toString(): string
+    private function waitForAuthOrSignal(bool $waitAfter = true): bool
     {
-        $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
-        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+        $API = $this->API;
+        while (!$API->hasAllAuth()) {
+            $waitAfter = false;
+            $API->logger->logger("Waiting for auth in {$this}");
+            if ($this->waitSignal(async($this->pause(...)))) {
+                $API->logger->logger("Exiting in {$this} while waiting for auth (init)!", Logger::LEVEL_ULTRA_VERBOSE);
+                return true;
+            }
         }
-        return $result;
-    }
-    public function __construct($message, $file = '')
-    {
-        parent::__construct($message);
-        $this->prettifyTL($file);
+        if (!$waitAfter) {
+            return false;
+        }
+        if ($this->waitSignal(async($this->pause(...)))) {
+            $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
+            return true;
+        }
+        return false;
     }
 }

@@ -9,7 +9,7 @@ use RuntimeException;
 use Throwable;
 use TypeError;
 
-use function Amp\Parallel\Sync\flattenThrowableBacktrace;
+use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThrowableBacktrace;
 
 final class ExitFailure
 {
@@ -22,7 +22,7 @@ final class ExitFailure
     /** @var array<string> */
     private array $trace;
 
-    private string $tlTrace;
+    private ?string $tlTrace = null;
 
     private ?self $previous = null;
 
@@ -33,7 +33,7 @@ final class ExitFailure
         $this->type = $exception::class;
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
-        $this->trace = flattenThrowableBacktrace($exception);
+        $this->trace = ContextFlattenThrowableBacktrace($exception);
         if (\method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
         }

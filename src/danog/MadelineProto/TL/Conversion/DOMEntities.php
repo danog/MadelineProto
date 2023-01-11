@@ -12,15 +12,15 @@ use DOMText;
 final class DOMEntities
 {
     /**
-     * @readonly
+     * @readonly-allow-private-mutation
      */
     public array $entities = [];
     /**
-     * @readonly
+     * @readonly-allow-private-mutation
      */
     public array $buttons = [];
     /**
-     * @readonly
+     * @readonly-allow-private-mutation
      */
     public string $message = '';
     public function __construct(string $html)

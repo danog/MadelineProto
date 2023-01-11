@@ -169,7 +169,7 @@ final class APIWrapper
             return false;
         }
         if ($this->API) {
-            $this->API->init();
+            $this->API->waitForInit();
         }
 
         $this->session->serialize(

@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WrappedFuture;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -93,18 +93,13 @@ trait CallHandler
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, array $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
-        $readDeferred = $this->methodCallAsyncWrite($method, $args, $aargs);
+        $readFuture = $this->methodCallAsyncWrite($method, $args, $aargs);
         if ($aargs['noResponse'] ?? false) {
             return null;
         }
-        if (\is_array($readDeferred)) {
-            return await(
-                \array_map(await($readDeferred), fn (?DeferredFuture $f) => $f->getFuture())
-            );
-        }
-        return $readDeferred->await()->getFuture()->await();
+        return $readFuture->await();
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
@@ -112,9 +107,8 @@ trait CallHandler
      * @param string            $method Method name
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
-     * @return list<Future>|Future
      */
-    public function methodCallAsyncWrite(string $method, array $args = [], array $aargs = ['msg_id' => null]): Future|array
+    public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null]): WrappedFuture
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
@@ -147,12 +141,15 @@ trait CallHandler
                 }
                 $promises = [];
                 foreach ($args as $single_args) {
-                    $promises[] = async(fn () => [$this->methodCallAsyncWrite($method, $single_args, $new_aargs)]);
+                    $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return \array_merge(...await($promises));
+                return new WrappedFuture(async(fn () => \array_map(
+                    fn (WrappedFuture $f) => $f->await(),
+                    await($promises)
+                )));
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
@@ -163,12 +160,14 @@ trait CallHandler
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
         }
+        $response = new DeferredFuture;
         $message = new OutgoingMessage(
             $args,
             $method,
             $methodInfo['type'],
             true,
             !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect',
+            $response
         );
         if (isset($aargs['queue'])) {
             $message->setQueueId($aargs['queue']);
@@ -189,9 +188,9 @@ trait CallHandler
             $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }
         $aargs['postpone'] ??= false;
-        $deferred = $this->sendMessage($message, !$aargs['postpone']);
+        $this->sendMessage($message, !$aargs['postpone']);
         $this->checker->resume();
-        return $deferred;
+        return new WrappedFuture($response->getFuture());
     }
     /**
      * Send object and make sure it is asynchronously sent (generator).
@@ -200,7 +199,7 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      */
-    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null])
+    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): void
     {
         $message = new OutgoingMessage(
             $args,
@@ -208,11 +207,9 @@ trait CallHandler
             '',
             false,
             !$this->shared->hasTempAuthKey(),
+            $aargs['promise'] ?? null
         );
-        if (isset($aargs['promise'])) {
-            $message->setPromise($aargs['promise']);
-        }
         $aargs['postpone'] ??= false;
-        return $this->sendMessage($message, !$aargs['postpone']);
+        $this->sendMessage($message, !$aargs['postpone'])->await();
     }
 }

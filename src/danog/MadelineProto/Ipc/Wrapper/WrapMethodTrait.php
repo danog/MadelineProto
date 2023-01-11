@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
@@ -8,7 +6,7 @@ use danog\MadelineProto\Ipc\Wrapper;
 
 trait WrapMethodTrait
 {
-    abstract public function __call($name, $args): void;
+    abstract public function __call($name, $args);
     public function wrap(...$args)
     {
         $new = Wrapper::create($args, $this->session->getIpcCallbackPath(), $this->logger);

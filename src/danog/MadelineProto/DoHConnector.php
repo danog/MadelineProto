@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
@@ -32,6 +33,7 @@ use Amp\Socket\ResourceSocket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
 use Amp\TimeoutCancellation;
+use AssertionError;
 use danog\MadelineProto\Stream\ConnectionContext;
 use Revolt\EventLoop;
 
@@ -48,7 +50,7 @@ class DoHConnector implements SocketConnector
     public function connect(
         SocketAddress|string $uri,
         ?ConnectContext $context = null,
-        ?Cancellation $cancellation = null
+        ?Cancellation $token = null
     ): EncryptableSocket {
         $socketContext = $context ?? new ConnectContext();
         $token ??= new NullCancellation();
@@ -86,9 +88,9 @@ class DoHConnector implements SocketConnector
             // Here, we simply check if the connection URI has changed since we first set it:
             // this would indicate that a proxy class has changed the connection URI to the proxy URI.
             if ($this->ctx->isDns()) {
-                $records = $this->dataCenter->nonProxiedDoHClient->complete($host, $socketContext->getDnsTypeRestriction());
+                $records = $this->dataCenter->nonProxiedDoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
             } else {
-                $records = $this->dataCenter->DoHClient->complete($host, $socketContext->getDnsTypeRestriction());
+                $records = $this->dataCenter->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
             }
             \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
             if ($this->ctx->getIpv6()) {
@@ -120,7 +122,11 @@ class DoHConnector implements SocketConnector
                 $id = $token->subscribe($deferred->error(...));
                 try {
                     $deferred->getFuture()->await(new TimeoutCancellation($timeout));
-                } catch (TimeoutException $e) {
+                } catch (CancelledException $e) {
+                    if (!$e->getPrevious() instanceof TimeoutException) {
+                        throw $e;
+                    }
+
                     throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                     // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
                 } finally {
@@ -150,9 +156,9 @@ class DoHConnector implements SocketConnector
         }
 
         // This is reached if either all URIs failed or the maximum number of attempts is reached.
-        /** @noinspection PhpUndefinedVariableInspection */
         if ($e) {
             throw $e;
         }
+        throw new AssertionError("Unreachable!");
     }
 }

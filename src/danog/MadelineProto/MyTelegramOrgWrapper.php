@@ -57,7 +57,7 @@ class MyTelegramOrgWrapper
      * Cooke jar.
      *
      */
-    private LocalCookieJar $jar;
+    private ?LocalCookieJar $jar = null;
     /**
      * Endpoint.
      */
@@ -126,7 +126,7 @@ class MyTelegramOrgWrapper
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
         $request->setBody(\http_build_query(['phone' => $number]));
         $request->setHeaders($this->getHeaders('origin'));
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         $resulta = \json_decode($result, true);
         if (!isset($resulta['random_hash'])) {
@@ -148,7 +148,7 @@ class MyTelegramOrgWrapper
         $request->setBody(\http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
         $request->setHeaders($this->getHeaders('origin'));
         $request->setHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         switch ($result) {
             case 'true':
@@ -176,7 +176,7 @@ class MyTelegramOrgWrapper
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         $title = \explode('</title>', \explode('<title>', $result)[1])[0];
         switch ($title) {
@@ -199,7 +199,7 @@ class MyTelegramOrgWrapper
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         $cose = \explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
@@ -229,14 +229,14 @@ class MyTelegramOrgWrapper
         $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
         $request->setHeaders($this->getHeaders('app'));
         $request->setBody(\http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         if ($result) {
             throw new Exception(\html_entity_decode($result));
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         $title = \explode('</title>', \explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {

@@ -31,7 +31,7 @@ use const PHP_SAPI;
 class Exception extends \Exception
 {
     use PrettyException;
-    public function __toString()
+    public function __toString(): string
     {
         $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {

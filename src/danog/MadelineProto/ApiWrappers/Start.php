@@ -69,7 +69,7 @@ trait Start
                 }
                 $stdout->write('4) '.Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
 
-                $app['api_id'] = Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']);
+                $app['api_id'] = (int) Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']);
                 $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1']);
                 return $app;
             }

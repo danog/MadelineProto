@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
-use Amp\Future;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -304,7 +303,7 @@ class Connection
         }
         $this->cleanup->start();
         $this->waiter->start();
-        if ($this->pinger) {
+        if (isset($this->pinger)) {
             $this->pinger->start();
         }
     }
@@ -422,7 +421,7 @@ class Connection
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true): Future
+    public function sendMessage(OutgoingMessage $message, bool $flush = true): void
     {
         $message->trySend();
         $promise = $message->getSendPromise();
@@ -452,7 +451,7 @@ class Connection
         if ($flush && isset($this->writer)) {
             $this->writer->resumeDeferOnce();
         }
-        return $promise;
+        $promise->await();
     }
     /**
      * Flush pending packets.

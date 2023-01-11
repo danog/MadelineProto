@@ -63,7 +63,6 @@ trait AuthKeyHandler
     {
         $expires_in = $temp ? $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn() : -1;
         $cdn = $this->isCDN();
-        $media = $this->isMedia();
         $test = $this->API->settings->getConnection()->getTestMode();
 
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {

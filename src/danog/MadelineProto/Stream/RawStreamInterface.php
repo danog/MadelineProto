@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
+use Amp\ByteStream\ClosedException;
+use Amp\ByteStream\PendingReadError;
+use Amp\ByteStream\StreamException;
 use Amp\Cancellation;
 
 /**

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Sql\CommandResult;
 use Amp\Sql\Pool;
 use Amp\Sql\Result;
-use Amp\Sql\ResultSet;
 use PDO;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -88,14 +86,13 @@ abstract class SqlArray extends DriverArray
         }
 
         $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
-        if (!$row->advance()) {
+        if (!$row->getRowCount()) {
             return null;
         }
-        $row = $row->getCurrent();
+        $row = $row->fetchRow();
 
-        if ($value = $this->getValue($row['value'])) {
-            $this->setCache($key, $value);
-        }
+        $value = $this->getValue($row['value']);
+        $this->setCache($key, $value);
 
         return $value;
     }
@@ -147,10 +144,9 @@ abstract class SqlArray extends DriverArray
      */
     public function count(): int
     {
-        /** @var ResultSet */
         $row = $this->execute($this->queries[self::SQL_COUNT]);
-        Assert::true($row->advance());
-        return $row->getCurrent()['count'];
+        Assert::true($row->getRowCount() === 1);
+        return $row->fetchRow()['count'];
     }
 
     /**
@@ -166,7 +162,6 @@ abstract class SqlArray extends DriverArray
      * Perform async request to db.
      *
      * @psalm-param self::STATEMENT_* $stmt
-     * @return CommandResult|ResultSet
      * @throws Throwable
      */
     protected function execute(string $sql, array $params = []): Result

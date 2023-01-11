@@ -42,7 +42,6 @@ use const SIGINT;
 use const SIGTERM;
 use function Amp\ByteStream\getStdin;
 use function Amp\File\read;
-use function Amp\Future\wait;
 use function Amp\Log\hasColorSupport;
 use function define;
 use function function_exists;
@@ -230,8 +229,8 @@ class Magic
         }
         if (!self::$initedLight) {
             // Setup error reporting
-            \set_error_handler([Exception::class, 'ExceptionErrorHandler']);
-            \set_exception_handler([Exception::class, 'ExceptionHandler']);
+            \set_error_handler(Exception::exceptionErrorHandler(...));
+            \set_exception_handler(Exception::exceptionHandler(...));
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             // Important, obtain root relative to caller script
             $backtrace = \debug_backtrace(0);
@@ -289,6 +288,7 @@ class Magic
                 self::$version = null;
                 try {
                     self::$version = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable');
+                    self::$revision = 'Revision: '.self::$version;
                 } catch (Throwable $e) {
                 }
             }
@@ -320,7 +320,6 @@ class Magic
         self::$twoe2047 = new BigInteger('80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
         self::$twoe2048 = new BigInteger('0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
         if (self::$version) {
-            self::$revision = 'Revision: '.self::$version;
             self::$version_latest = null;
             try {
                 $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
@@ -338,19 +337,12 @@ class Magic
                 if (!\defined('AMP_WORKER')) {
                     \define('AMP_WORKER', 1);
                 }
-                $promise = read(\end($back)['file']);
-                do {
-                    try {
-                        if (wait($promise)) {
-                            self::$can_parallel = true;
-                            break;
-                        }
-                    } catch (Throwable $e) {
-                        if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
-                            throw $e;
-                        }
+                /*do {
+                    if (read(\end($back)['file'])) {
+                        self::$can_parallel = true;
+                        break;
                     }
-                } while (true);
+                } while (true);*/
             } catch (Throwable $e) {
             }
         }

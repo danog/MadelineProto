@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
-use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -97,7 +96,7 @@ class DataCenterConnection implements JsonSerializable
      * Linked DC ID.
      *
      */
-    private string $linked;
+    private ?int $linked = null;
     /**
      * Loop to keep weights at sane value.
      */
@@ -163,7 +162,7 @@ class DataCenterConnection implements JsonSerializable
                     $this->setPermAuthKey($connection->createAuthKey(false));
                 }
                 if ($media) {
-                    $this->link(\intval($this->datacenter));
+                    $this->link(-$this->datacenter);
                     if ($this->hasTempAuthKey()) {
                         return;
                     }
@@ -282,60 +281,38 @@ class DataCenterConnection implements JsonSerializable
         }
     }
     /**
-     * Get auth key.
-     *
-     * @param boolean $temp Whether to fetch the temporary auth key
-     */
-    public function getAuthKey(bool $temp = true): AuthKey
-    {
-        if ($this->{$temp ? 'tempAuthKey' : 'permAuthKey'} === null) {
-            throw new NothingInTheSocketException();
-        }
-        return $this->{$temp ? 'tempAuthKey' : 'permAuthKey'};
-    }
-    /**
-     * Check if auth key is present.
-     */
-    public function hasAuthKey(bool $temp = true): bool
-    {
-        return $this->{$temp ? 'tempAuthKey' : 'permAuthKey'} !== null && $this->{$temp ? 'tempAuthKey' : 'permAuthKey'}->hasAuthKey();
-    }
-    /**
-     * Set auth key.
-     *
-     * @param AuthKey|null $key  The auth key
-     */
-    public function setAuthKey(?AuthKey $key, bool $temp = true): void
-    {
-        $this->{$temp ? 'tempAuthKey' : 'permAuthKey'} = $key;
-    }
-    /**
      * Get temporary authorization key.
      */
     public function getTempAuthKey(): TempAuthKey
     {
-        return $this->getAuthKey(true);
+        if (!$this->tempAuthKey) {
+            throw new NothingInTheSocketException();
+        }
+        return $this->tempAuthKey;
     }
     /**
      * Get permanent authorization key.
      */
     public function getPermAuthKey(): PermAuthKey
     {
-        return $this->getAuthKey(false);
+        if (!$this->permAuthKey) {
+            throw new NothingInTheSocketException();
+        }
+        return $this->permAuthKey;
     }
     /**
      * Check if has temporary authorization key.
      */
     public function hasTempAuthKey(): bool
     {
-        return $this->hasAuthKey(true);
+        return $this->tempAuthKey !== null && $this->tempAuthKey->hasAuthKey();
     }
     /**
      * Check if has permanent authorization key.
      */
     public function hasPermAuthKey(): bool
     {
-        return $this->hasAuthKey(false);
+        return $this->permAuthKey !== null && $this->permAuthKey->hasAuthKey();
     }
     /**
      * Set temporary authorization key.
@@ -344,7 +321,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function setTempAuthKey(?TempAuthKey $key): void
     {
-        $this->setAuthKey($key, true);
+        $this->tempAuthKey = $key;
     }
     /**
      * Set permanent authorization key.
@@ -353,7 +330,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function setPermAuthKey(?PermAuthKey $key): void
     {
-        $this->setAuthKey($key, false);
+        $this->permAuthKey = $key;
     }
     /**
      * Bind temporary and permanent auth keys.
@@ -579,7 +556,7 @@ class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                async(fn () => $this->getConnection()->sendMessage($message, false));
+                async($this->getConnection()->sendMessage(...), $message, false);
             }
         }
         $this->flush();

@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\AuthLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 
@@ -33,6 +34,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 class SeqLoop extends ResumableSignalLoop
 {
     use InternalLoop;
+    use AuthLoop;
     /**
      * Incoming updates.
      */

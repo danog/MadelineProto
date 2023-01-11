@@ -78,6 +78,8 @@ class OutgoingMessage extends Message
     private ?DeferredFuture $promise = null;
     /**
      * Send deferred.
+     *
+     * @var ?DeferredFuture<null>
      */
     private ?DeferredFuture $sendPromise = null;
 
@@ -145,16 +147,17 @@ class OutgoingMessage extends Message
      * @param string                  $type        Constructor type
      * @param boolean                 $method      Is this a method?
      * @param boolean                 $unencrypted Is this an unencrypted message?
+     * @param ?DeferredFuture         $deferred    Response deferred
      */
-    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted)
+    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null)
     {
         $this->body = $body;
         $this->constructor = $constructor;
         $this->type = $type;
         $this->method = $method;
         $this->unencrypted = $unencrypted;
-        if ($method) {
-            $this->promise = new DeferredFuture;
+        if ($deferred) {
+            $this->promise = $deferred;
         }
 
         $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$constructor]);
@@ -183,7 +186,7 @@ class OutgoingMessage extends Message
         if (isset($this->sendPromise)) {
             $sendPromise = $this->sendPromise;
             $this->sendPromise = null;
-            $sendPromise->complete($this->promise ?? null);
+            $sendPromise->complete();
         }
     }
     /**
@@ -431,19 +434,9 @@ class OutgoingMessage extends Message
     }
 
     /**
-     * Set resolution deferred.
-     *
-     * @param DeferredFuture $promise Resolution deferred.
-     */
-    public function setPromise(DeferredFuture $promise): self
-    {
-        $this->promise = $promise;
-
-        return $this;
-    }
-
-    /**
      * Wait for message to be sent.
+     *
+     * @return Future<null>
      */
     public function getSendPromise(): Future
     {
@@ -459,14 +452,6 @@ class OutgoingMessage extends Message
     public function hasPromise(): bool
     {
         return $this->promise !== null;
-    }
-
-    /**
-     * Get promise.
-     */
-    public function getPromise(): Future
-    {
-        return $this->promise->getFuture();
     }
 
     /**

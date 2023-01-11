@@ -34,6 +34,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use Generator;
 use Throwable;
 
 use const LOCK_EX;
@@ -43,7 +44,7 @@ use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
-
+use function Amp\Future\awaitFirst;
 use function end;
 
 /**
@@ -122,6 +123,12 @@ trait Files
             $cb = function ($percent): void {
                 $this->logger->logger('Upload status: '.$percent.'%', Logger::NOTICE);
             };
+        } else {
+            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
+                async(function () use ($percent, $speed, $time, $cb): void {
+                    Tools::call($cb($percent, $speed, $time))->await();
+                });
+            };
         }
         $datacenter = $this->settings->getDefaultDc();
         if ($this->datacenter->has(-$datacenter)) {
@@ -153,10 +160,16 @@ trait Files
         $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
             static $cur = 0;
             $cur++;
-            async(fn () => $cb($cur * 100 / $part_total_num, $speed, $time));
+            $cb($cur * 100 / $part_total_num, $speed, $time);
         };
         $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
             $bytes = $callable($part_num * $part_size, $part_size);
+            if ($bytes instanceof Generator) {
+                $bytes = Tools::call($bytes);
+            }
+            if ($bytes instanceof Future) {
+                $bytes = $bytes->await();
+            }
             if ($ige) {
                 $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
             }
@@ -164,38 +177,45 @@ trait Files
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
         $resPromises = [];
-        $exception = null;
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $resa = fn () => $callable($part_num);
-            $writePromise = $this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
+            $writePromise = async(
+                $this->methodCallAsyncWrite(...),
+                $method,
+                fn () => $callable($part_num),
+                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
+            );
             if (!$seekable) {
                 $writePromise->await();
             }
-            async(function () use ($writePromise, $cb, $part_num, &$resPromises, &$exception): void {
-                $readFuture = $writePromise->await()->getFuture();
+            async(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
+                $readFuture = $writePromise->await()->f;
                 $resPromises[] = $readFuture;
                 try {
                     // Wrote chunk!
-                    if (!$readFuture->getFuture()->await()) {
+                    if (!$readFuture->await()) {
                         throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
                     $cb();
                 } catch (Throwable $e) {
                     $this->logger("Got exception while uploading: {$e}");
-                    $exception = $e;
+                    throw $e;
                 }
             });
             $promises[] = $writePromise;
             ++$part_num;
-            if (!($part_num % $parallel_chunks)) {
+            if (\count($promises) === $parallel_chunks) {
                 // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                await($promises);
-                $promises = [];
-                if ($exception) {
-                    throw $exception;
+                awaitFirst($promises);
+                foreach ($promises as $k => $p) {
+                    if ($p->isComplete()) {
+                        unset($promises[$k]);
+                        break;
+                    }
                 }
+            }
+            if (!($part_num % $parallel_chunks)) {
                 $time = \microtime(true) - $start;
                 $speed = (int) ($size * 8 / $time) / 1000000;
                 $this->logger->logger("Partial upload time: {$time}");
@@ -243,7 +263,7 @@ trait Files
             /**
              * Read promises.
              *
-             * @var array<Deferred>
+             * @var array<DeferredFuture>
              */
             private array $read = [];
             /**
@@ -255,7 +275,7 @@ trait Files
             /**
              * Write promises.
              *
-             * @var array<Deferred>
+             * @var array<DeferredFuture>
              */
             private array $write = [];
             /**
@@ -297,10 +317,10 @@ trait Files
              * @param integer $offset Offset
              * @param integer $size   Chunk size
              */
-            public function read(int $offset, int $size): Future
+            public function read(int $offset, int $size): string
             {
                 $offset /= $this->partSize;
-                return $this->write[$offset]->getFuture();
+                return $this->write[$offset]->getFuture()->await();
             }
             /**
              * Write chunk.
@@ -308,31 +328,32 @@ trait Files
              * @param string  $data   Data
              * @param integer $offset Offset
              */
-            public function write(string $data, int $offset): Future
+            public function write(string $data, int $offset): void
             {
                 $offset /= $this->partSize;
                 $this->write[$offset]->complete($data);
-                return $this->read[$offset]->getFuture();
+                $this->read[$offset]->getFuture()->await();
             }
             /**
              * Read callback, called when the chunk is read and fully resent.
              *
              * @param mixed ...$params Params to be passed to cb
              */
-            public function callback(mixed ...$params): void
+            public function callback(mixed ...$params): mixed
             {
                 $offset = $this->offset++;
                 $this->read[$offset]->complete($this->wrote[$offset]);
                 if ($this->cb) {
-                    async(fn () => ($this->cb)(...$params));
+                    return ($this->cb)(...$params);
                 }
+                return null;
             }
         };
-        $reader = [$bridge, 'read'];
-        $writer = [$bridge, 'write'];
-        $cb = [$bridge, 'callback'];
-        $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
-        $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
+        $reader = $bridge->read(...);
+        $writer = $bridge->write(...);
+        $cb = $bridge->callback(...);
+        $read = async($this->uploadFromCallable(...), $reader, $size, $mime, '', $cb, true, $encrypted);
+        $write = async($this->downloadToCallable(...), $media, $writer, null, true, 0, -1, $chunk_size);
         [$res] = await([$read, $write]);
         return $res;
     }
@@ -789,7 +810,6 @@ trait Files
      * Download file to callable.
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
-     * The callable should return the number of written bytes.
      *
      * @param mixed                          $messageMedia File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
@@ -812,6 +832,12 @@ trait Files
         if ($cb === null) {
             $cb = function ($percent): void {
                 $this->logger->logger('Download status: '.$percent.'%', Logger::NOTICE);
+            };
+        } else {
+            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
+                async(function () use ($percent, $speed, $time, $cb): void {
+                    Tools::call($cb($percent, $speed, $time))->await();
+                });
             };
         }
         if ($end === -1 && isset($messageMedia['size'])) {
@@ -863,7 +889,7 @@ trait Files
         $cb = static function () use ($cb, $count, &$time, &$speed): void {
             static $cur = 0;
             $cur++;
-            async(fn () => $cb($cur * 100 / $count, $time, $speed));
+            $cb($cur * 100 / $count, $time, $speed);
         };
         $cdn = false;
         $params[0]['previous_promise'] = true;
@@ -882,21 +908,21 @@ trait Files
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
                 $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable);
-                $previous_promise->map(static function ($e, $res) use (&$size): void {
-                    if ($res) {
-                        $size += $res;
-                    }
+                $previous_promise->map(static function (int $res) use (&$size): void {
+                    $size += $res;
                 });
                 $promises[] = $previous_promise;
-                if (!($key % $parallel_chunks)) {
+                if (\count($promises) === $parallel_chunks) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps
-                    $res = await($promises);
-                    $promises = [];
-                    foreach ($res as $r) {
-                        if (!$r) {
-                            break 2;
+                    awaitFirst($promises);
+                    foreach ($promises as $k => $p) {
+                        if ($p->isComplete()) {
+                            unset($promises[$k]);
+                            break;
                         }
                     }
+                }
+                if (!($key % $parallel_chunks)) {
                     $time = \microtime(true) - $start;
                     $speed = (int) ($size * 8 / $time) / 1000000;
                     $this->logger->logger("Partial download time: {$time}");
@@ -922,10 +948,10 @@ trait Files
     /**
      * Download file part.
      *
-     * @param array    $messageMedia File object
+     * @param array    $messageMedia  File object
      * @param bool     $cdn           Whether this is a CDN file
-     * @param string   $datacenter    DC ID
-     * @param ?string   $old_dc        Previous DC ID
+     * @param int      $datacenter    DC ID
+     * @param ?int     $old_dc       Previous DC ID
      * @param IGE      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
      * @param array    $offset        Offset
@@ -933,7 +959,7 @@ trait Files
      * @param boolean  $seekable      Whether the download file is seekable
      * @param boolean  $postpone      Whether to postpone method call
      */
-    private function downloadPart(array &$messageMedia, bool &$cdn, string &$datacenter, ?string &$old_dc, IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false)
+    private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false): int
     {
         static $method = [
             false => 'upload.getFile',
@@ -1020,9 +1046,16 @@ trait Files
             if (!$seekable) {
                 $offset['previous_promise'];
             }
+            $len = \strlen($res['bytes']);
             $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
+            if ($res instanceof Generator) {
+                $res = Tools::call($res);
+            }
+            if ($res instanceof Future) {
+                $res = $res->await();
+            }
             $cb();
-            return $res;
+            return $len;
         } while (true);
     }
     private $cdn_hashes = [];

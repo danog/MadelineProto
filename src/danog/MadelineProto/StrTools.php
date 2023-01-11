@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
 use Parsedown;
+use Webmozart\Assert\Assert;
 
 /**
  * Some tools.
@@ -34,7 +35,7 @@ abstract class StrTools extends Extension
      *
      * @param string $text Text
      */
-    public static function mbStrlen(string $text): float|int
+    public static function mbStrlen(string $text): int
     {
         $length = 0;
         $textlength = \strlen($text);
@@ -44,6 +45,7 @@ abstract class StrTools extends Extension
                 $length += 1 + ($char >= 0xf0);
             }
         }
+        Assert::integer($length);
         return $length;
     }
     /**

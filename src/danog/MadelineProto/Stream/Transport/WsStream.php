@@ -62,7 +62,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->dc = $ctx->getIntDc();
+        $this->dc = $ctx->getDc();
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
         $handshake = new WebsocketHandshake($uri);

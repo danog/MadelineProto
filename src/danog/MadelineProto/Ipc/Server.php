@@ -20,10 +20,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
@@ -36,7 +39,7 @@ use danog\MadelineProto\Tools;
 use Throwable;
 
 use function Amp\async;
-use function Amp\Future\first;
+use function Amp\Future\awaitAny;
 
 /**
  * IPC server.
@@ -104,28 +107,28 @@ class Server extends SignalLoop
         $promises = [];
         try {
             Logger::log("Starting IPC server $session (process)");
-            $promises []= ProcessRunner::start($session, $id);
+            $promises []= async(ProcessRunner::start(...), (string) $session, $id);
             $started = true;
-            $promises []= WebRunner::start($session, $id);
-            return self::monitor($session, $id, $started, first($promises));
+            $promises []= async(WebRunner::start(...), (string) $session, $id);
+            return async(self::monitor(...), $session, $id, $started, async(awaitAny(...), $promises));
         } catch (Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
-            $promises []= WebRunner::start($session, $id);
+            $promises []= async(WebRunner::start(...), (string) $session, $id);
             $started = true;
         } catch (Throwable $e) {
             Logger::log($e);
         }
-        return self::monitor($session, $id, $started, $promises ? first($promises) : (new DeferredFuture)->getFuture());
+        return async(self::monitor(...), $session, $id, $started, $promises ? async(awaitAny(...), $promises) : (new DeferredFuture)->getFuture());
     }
     /**
      * Monitor session.
      *
-     * @param Promise<bool> $cancelConnect
+     * @param Future<bool> $cancelConnect
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect)
+    private static function monitor(SessionPaths $session, int $id, bool $started, Future $cancelConnect): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -144,7 +147,13 @@ class Server extends SignalLoop
                 return new Exception("We couldn't start the IPC server, please check the logs!");
             }
             try {
-                Tools::timeoutWithDefault($cancelConnect, 500, null);
+                try {
+                    $cancelConnect->await(new TimeoutCancellation(0.5));
+                } catch (CancelledException $e) {
+                    if (!$e->getPrevious() instanceof TimeoutException) {
+                        throw $e;
+                    }
+                }
                 $cancelConnect = (new DeferredFuture)->getFuture();
             } catch (Throwable $e) {
                 Logger::log("$e");
@@ -228,7 +237,7 @@ class Server extends SignalLoop
     private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
     {
         try {
-            $this->API->init();
+            $this->API->waitForInit();
             if ($payload[1] instanceof Wrapper) {
                 $wrapper = $payload[1];
                 $payload[1] = $this->callback->unwrap($wrapper);

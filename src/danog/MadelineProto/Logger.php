@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
-use Amp\Failure;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -351,7 +350,7 @@ class Logger
             return;
         }
         if (Magic::$suspendPeriodicLogging) {
-            Magic::$suspendPeriodicLogging->getFuture()->complete(fn () => $this->logger($param, $level, $file));
+            Magic::$suspendPeriodicLogging->getFuture()->map($this->logger(...), $param, $level, $file);
             return;
         }
         if (!self::$printed) {
@@ -378,13 +377,17 @@ class Logger
         }
         $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         if ($this->mode === self::DEFAULT_LOGGER) {
-            if ($this->stdout->write($param.$this->newline) instanceof Failure) {
+            try {
+                $this->stdout->write($param.$this->newline);
+            } catch (\Throwable) {
                 \error_log($param);
             }
             return;
         }
         $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
-        if ($this->stdout->write($param) instanceof Failure) {
+        try {
+            $this->stdout->write($param);
+        } catch (\Throwable) {
             switch ($this->mode) {
                 case self::ECHO_LOGGER:
                     echo $param;

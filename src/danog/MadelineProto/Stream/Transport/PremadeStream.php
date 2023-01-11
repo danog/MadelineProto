@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
-use Amp\Future;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -43,9 +42,9 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     public function __construct()
     {
     }
-    public function setupTls(?Cancellation $cancellationToken = null): Future
+    public function setupTls(?Cancellation $cancellationToken = null): void
     {
-        return $this->stream->setupTls($cancellationToken);
+        $this->stream->setupTls($cancellationToken);
     }
     public function getStream()
     {

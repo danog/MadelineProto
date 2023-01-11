@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\DeferredFuture;
 use Amp\Dns\Resolver;
+use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Closure;
 use danog\MadelineProto\Db\DbArray;
@@ -138,7 +140,7 @@ class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 161;
+    const V = 162;
     /**
      * Release version.
      *
@@ -540,10 +542,10 @@ class MTProto implements TLCallback, LoggerGetter
         ],
     ];
 
-    private bool $inited = false;
-
     /**
      * Serialize session, returning object to serialize to db.
+     *
+     * @internal
      */
     public function serializeSession(object $data)
     {
@@ -572,6 +574,8 @@ class MTProto implements TLCallback, LoggerGetter
      * Serialize all instances.
      *
      * CALLED ONLY ON SHUTDOWN.
+     *
+     * @internal
      */
     public static function serializeAll(): void
     {
@@ -582,10 +586,12 @@ class MTProto implements TLCallback, LoggerGetter
         $done = true;
         Logger::log('Prompting final serialization (SHUTDOWN)...');
         foreach (self::$references as $instance) {
-            Tools::wait($instance->wrapper->serialize());
+            $instance->wrapper->serialize();
         }
         Logger::log('Done final serialization (SHUTDOWN)!');
     }
+
+    private ?Future $initPromise = null;
 
     /**
      * Constructor function.
@@ -593,7 +599,7 @@ class MTProto implements TLCallback, LoggerGetter
      * @param Settings|SettingsEmpty $settings Settings
      * @param ?APIWrapper            $wrapper  API wrapper
      */
-    public function __magic_construct(SettingsAbstract $settings, ?APIWrapper $wrapper = null): void
+    public function __magic_construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null): void
     {
         if (static::class !== self::class || !$wrapper) {
             return;
@@ -601,6 +607,19 @@ class MTProto implements TLCallback, LoggerGetter
         self::$references[\spl_object_hash($this)] = $this;
         $this->wrapper = $wrapper;
 
+        $initDeferred = new DeferredFuture;
+        $this->initPromise = $initDeferred->getFuture();
+        $this->initialize($settings);
+        $initDeferred->complete();
+    }
+
+    /**
+     * Initialization function.
+     *
+     * @internal
+     */
+    private function initialize(Settings|SettingsEmpty $settings): void
+    {
         // Initialize needed stuffs
         Magic::start();
         // Parse and store settings
@@ -688,12 +707,14 @@ class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Sleep function.
+     *
+     * @internal
      */
     public function __sleep(): array
     {
         $db = $this->settings->getDb();
         if ($db instanceof Memory && $db->getCleanup()) {
-            Tools::wait($this->cleanup());
+            $this->cleanup();
         }
         $res = [
             // Databases
@@ -773,6 +794,8 @@ class MTProto implements TLCallback, LoggerGetter
 
     /**
      * Cleanup memory and session file.
+     *
+     * @internal
      */
     public function cleanup(): void
     {
@@ -980,7 +1003,7 @@ class MTProto implements TLCallback, LoggerGetter
     private function cleanupProperties(): void
     {
         if (!$this->channels_state instanceof CombinedUpdatesState) {
-            $this->channels_state = new CombinedUpdatesState($this->channels_state);
+            $this->channels_state = new CombinedUpdatesState($this->channels_state ?? []);
         }
         if (isset($this->updates_state)) {
             if (!$this->updates_state instanceof UpdatesState) {
@@ -1030,7 +1053,7 @@ class MTProto implements TLCallback, LoggerGetter
             }
             $this->logger('Cleaning up peer database...');
             $k = 0;
-            $total = count($this->chats);
+            $total = \count($this->chats);
             foreach ($this->chats as $key => $value) {
                 $value = [
                     '_' => $value['_'],
@@ -1132,7 +1155,7 @@ class MTProto implements TLCallback, LoggerGetter
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
-        $this->__construct_async($this->settings);
+        $this->initialize($this->settings);
         foreach ($this->secret_chats as $chat => $data) {
             try {
                 if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
@@ -1141,6 +1164,8 @@ class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
+
+        $this->usernames->clear();
     }
     /**
      * Post-deserialization initialization function.
@@ -1159,6 +1184,9 @@ class MTProto implements TLCallback, LoggerGetter
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
+        $deferred = new DeferredFuture;
+        $this->initPromise = $deferred->getFuture();
+
         if (!isset($this->snitch)) {
             $this->snitch = new Snitch;
         }
@@ -1262,7 +1290,7 @@ class MTProto implements TLCallback, LoggerGetter
 
         GarbageCollector::start();
 
-        $this->inited = true;
+        $deferred->complete();
     }
     /**
      * Unreference instance, allowing destruction.
@@ -1319,7 +1347,11 @@ class MTProto implements TLCallback, LoggerGetter
      */
     public function isInited(): bool
     {
-        return $this->inited;
+        return $this->initPromise?->isComplete() ?? false;
+    }
+    public function waitForInit(): void
+    {
+        $this->initPromise?->await();
     }
     /**
      * Restart IPC server instance.
@@ -1368,7 +1400,7 @@ class MTProto implements TLCallback, LoggerGetter
             || $this->settings->getConnection()->hasChanged()
             || $this->settings->getSchema()->hasChanged()
             || $this->settings->getSchema()->needsUpgrade()) {
-            $this->__construct_async($this->settings);
+            $this->initialize($this->settings);
         }
     }
     /**

@@ -56,11 +56,6 @@ class Client extends ClientAbstract
     }
 
     /**
-     * Whether the wrapper API is async.
-     */
-    public bool $async;
-
-    /**
      * Session.
      */
     protected SessionPaths $session;
@@ -69,11 +64,9 @@ class Client extends ClientAbstract
      *
      * @param SessionPaths     $session Session paths
      * @param Logger           $logger  Logger
-     * @param bool             $async   Whether the wrapper API is async
      */
-    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger, bool &$async)
+    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger)
     {
-        $this->async = &$async;
         $this->logger = $logger;
         $this->server = $server;
         $this->session = $session;
@@ -87,7 +80,7 @@ class Client extends ClientAbstract
      */
     public function loop(callable $callback)
     {
-        return $callback();
+        return Tools::call($callback())->await();
     }
     /**
      * Unreference.
@@ -95,7 +88,7 @@ class Client extends ClientAbstract
     public function unreference(): void
     {
         try {
-            Tools::wait($this->disconnect());
+            $this->disconnect();
         } catch (Throwable $e) {
             $this->logger("An error occurred while disconnecting the client: $e");
         }

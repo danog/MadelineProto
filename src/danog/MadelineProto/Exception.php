@@ -32,7 +32,7 @@ use const PHP_SAPI;
 class Exception extends \Exception
 {
     use TL\PrettyException;
-    public function __toString()
+    public function __toString(): string
     {
         return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
     }
@@ -101,7 +101,7 @@ class Exception extends \Exception
      *
      * Error handler
      */
-    public static function exceptionHandler($exception): void
+    public static function exceptionHandler(\Throwable $exception): void
     {
         Logger::log($exception, Logger::FATAL_ERROR);
         Magic::shutdown(1);

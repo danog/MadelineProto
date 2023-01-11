@@ -20,8 +20,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
@@ -31,6 +34,7 @@ use danog\Serializable;
 use Throwable;
 
 use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -154,9 +158,9 @@ class API extends InternalDoc
      * Magic constructor function.
      *
      * @param string         $session  Session name
-     * @param array|Settings $settings Settings
+     * @param array          $settings Settings
      */
-    public function __magic_construct(string $session, array|Settings $settings = []): void
+    public function __magic_construct(string $session, array|SettingsAbstract $settings = []): void
     {
         Magic::start(true);
         $settings = Settings::parseFromLegacy($settings);
@@ -233,7 +237,7 @@ class API extends InternalDoc
                             $result->disconnect();
                             return;
                         }
-                        $API = new Client($result, $this->session, Logger::$default, $this->async);
+                        $API = new Client($result, $this->session, Logger::$default);
                         if (($API->hasEventHandler()) || !($API->isIpcWorker())) {
                             $this->logger->logger('Restarting to full instance (again): the bot is already running!');
                             $API->disconnect();
@@ -265,7 +269,7 @@ class API extends InternalDoc
      * @param SettingsAbstract $settings Settings
      * @param bool $forceFull Whether to force full initialization
      */
-    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true)
+    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): bool
     {
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getSlow();
@@ -274,11 +278,20 @@ class API extends InternalDoc
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 
-        [$unserialized, $this->unlock] = Tools::timeoutWithDefault(
-            async(Serialization::unserialize(...), $this->session, $settings, $forceFull),
-            30000,
-            [0, null],
-        );
+        try {
+            [$unserialized, $this->unlock] = async(
+                Serialization::unserialize(...),
+                $this->session,
+                $settings,
+                $forceFull
+            )->await(new TimeoutCancellation(30.0));
+        } catch (CancelledException $e) {
+            if (!$e->getPrevious() instanceof TimeoutException) {
+                throw $e;
+            }
+
+            [$unserialized, $this->unlock] = [0, null];
+        }
 
         if ($unserialized === 0) {
             // Timeout
@@ -294,7 +307,7 @@ class API extends InternalDoc
             return $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
-            $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
+            $this->API = new Client($unserialized, $this->session, Logger::$default);
             $this->APIFactory();
             return true;
         } elseif ($unserialized) {
@@ -350,7 +363,7 @@ class API extends InternalDoc
             }
             if (isset($this->wrapper) && (!Magic::$signaled || $this->gettingApiId)) {
                 $this->logger->logger('Prompting final serialization...');
-                Tools::wait($this->wrapper->serialize());
+                $this->wrapper->serialize();
                 $this->logger->logger('Done final serialization!');
             }
             if ($this->unlock) {
@@ -390,7 +403,7 @@ class API extends InternalDoc
         $started = false;
         while (true) {
             try {
-                Tools::wait($this->startAndLoopAsyncInternal($eventHandler, $started));
+                $this->startAndLoopAsyncInternal($eventHandler, $started);
                 return;
             } catch (SecurityException $e) {
                 throw $e;
@@ -430,10 +443,10 @@ class API extends InternalDoc
             try {
                 $promises = [];
                 foreach ($instances as $k => $instance) {
-                    $instance->start(['async' => false]);
-                    $promises []= $instance->startAndLoopAsyncInternal($eventHandler[$k], $started[$k]);
+                    $instance->start();
+                    $promises []= async($instance->startAndLoopAsyncInternal(...), $eventHandler[$k], $started[$k]);
                 }
-                Tools::wait(Tools::all($promises));
+                await($promises);
                 return;
             } catch (SecurityException $e) {
                 throw $e;
@@ -473,8 +486,6 @@ class API extends InternalDoc
      */
     private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): void
     {
-        $this->async(true);
-
         $this->start();
         if (!$this->reconnectFull()) {
             return;

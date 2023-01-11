@@ -54,7 +54,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
             $header = \str_repeat($header, 4);
         }
         $random = \substr_replace($random, $header.\substr($random, 56 + \strlen($header)), 56);
-        $random = \substr_replace($random, \pack('s', $ctx->getIntDc()).\substr($random, 60 + 2), 60);
+        $random = \substr_replace($random, \pack('s', $ctx->getDc()).\substr($random, 60 + 2), 60);
         $reversed = \strrev($random);
         $key = \substr($random, 8, 32);
         $keyRev = \substr($reversed, 8, 32);

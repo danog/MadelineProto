@@ -33,6 +33,15 @@ use danog\MadelineProto\Tools;
 use const STR_PAD_LEFT;
 
 /**
+ *
+ * @psalm-import-type TBeforeMethodResponseDeserialization from TLCallback
+ * @psalm-import-type TAfterMethodResponseDeserialization from TLCallback
+ *
+ * @psalm-import-type TBeforeConstructorSerialization from TLCallback
+ * @psalm-import-type TBeforeConstructorDeserialization from TLCallback
+ * @psalm-import-type TAfterConstructorDeserialization from TLCallback
+ * @psalm-import-type TTypeMismatch from TLCallback
+ *
  * TL serialization.
  */
 final class TL
@@ -71,7 +80,7 @@ final class TL
     /** @var array<string, list<TBeforeMethodResponseDeserialization>> */
     private array $beforeMethodResponseDeserialization;
 
-    /** @var array<string, list<TAfterMethodSerialization>> */
+    /** @var array<string, list<TAfterMethodResponseDeserialization>> */
     private array $afterMethodResponseDeserialization;
 
     /** @var array<string, TBeforeConstructorSerialization> */
@@ -437,9 +446,9 @@ final class TL
                 if (!\is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return Tools::packSignedInt($object);
+                return Tools::packSignedInt((int) $object);
             case '#':
-                if (!\is_numeric($object)) {
+                if (!\is_int($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
                 return Tools::packUnsignedInt($object);
@@ -462,7 +471,7 @@ final class TL
                 if (!\is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return Tools::packSignedLong($object);
+                return Tools::packSignedLong((int) $object);
             case 'int128':
                 if (\strlen($object) !== 16) {
                     $object = \base64_decode($object);
@@ -514,6 +523,7 @@ final class TL
                 if (!\is_string($object) && !$object instanceof Bytes) {
                     throw new Exception("You didn't provide a valid string");
                 }
+                $object = (string) $object;
                 $l = \strlen($object);
                 $concat = '';
                 if ($l <= 253) {

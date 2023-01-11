@@ -20,9 +20,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
@@ -138,16 +142,16 @@ abstract class Serialization
         EventLoop::unreference($warningId);
 
         $lightState = null;
-        $cancelFlock = new DeferredFuture;
+        $cancelFlock = new DeferredCancellation;
         $cancelIpc = new DeferredFuture;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getFuture(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
+        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
             $cancelFull = static function () use (&$cancelFlock): void {
                 if ($cancelFlock !== null) {
                     $copy = $cancelFlock;
                     $cancelFlock = null;
-                    $copy->complete(true);
+                    $copy->cancel();
                 }
             };
             $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
@@ -186,7 +190,14 @@ abstract class Serialization
             if (!$class = $lightState->getEventHandler()) {
                 // Unlock and fork
                 $unlock();
-                $cancelIpc->complete(Server::startMe($session));
+                $monitor = Server::startMe($session);
+                async(function () use ($cancelIpc, $monitor): void {
+                    try {
+                        $cancelIpc->complete($monitor->await());
+                    } catch (\Throwable $e) {
+                        $cancelIpc->error($e);
+                    }
+                });
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
             } elseif (!\class_exists($class)) {
                 // Have lock, can't use it
@@ -266,11 +277,17 @@ abstract class Serialization
                     Logger::log("$e while connecting to IPC socket");
                 }
             }
-            if ($res = Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
-                if ($res instanceof Throwable) {
-                    return [$res, null];
+            try {
+                if ($res = $cancelConnect->await(new TimeoutCancellation(1.0))) {
+                    if ($res instanceof Throwable) {
+                        return [$res, null];
+                    }
+                    $cancelConnect = (new DeferredFuture)->getFuture();
                 }
-                $cancelConnect = (new DeferredFuture)->getFuture();
+            } catch (CancelledException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
             }
         }
         return [0, null];

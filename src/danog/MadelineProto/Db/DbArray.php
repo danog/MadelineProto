@@ -7,7 +7,6 @@ namespace danog\MadelineProto\Db;
 use Amp\Iterator;
 use ArrayAccess;
 use Countable;
-use IteratorAggregate;
 
 /**
  * DB array interface.

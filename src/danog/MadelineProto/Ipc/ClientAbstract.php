@@ -41,7 +41,7 @@ abstract class ClientAbstract
     /**
      * Requests promise array.
      *
-     * @var array<Deferred>
+     * @var array<DeferredFuture>
      */
     private array $requests = [];
     /**
@@ -103,7 +103,7 @@ abstract class ClientAbstract
                         unset($this->wrappers[$id]);
                     }
                     if ($payload instanceof ExitFailure) {
-                        $promise->fail($payload->getException());
+                        $promise->error($payload->getException());
                     } else {
                         $promise->complete($payload);
                     }
@@ -118,7 +118,7 @@ abstract class ClientAbstract
                 }
                 if ($this instanceof Client) {
                     try {
-                        Server::startMe($this->session);
+                        Server::startMe($this->session)->await();
                         $this->server = connect($this->session->getIpcPath());
                     } catch (Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
@@ -153,6 +153,6 @@ abstract class ClientAbstract
             $this->wrappers[\count($this->requests) - 1] = $arguments;
         }
         $this->server->send([$function, $arguments]);
-        return $deferred->getFuture();
+        return $deferred->getFuture()->await();
     }
 }

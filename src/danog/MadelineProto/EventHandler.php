@@ -104,7 +104,7 @@ abstract class EventHandler extends InternalDoc
                 $this->internalInitDb($this->API);
             }
             if (\method_exists($this, 'onStart')) {
-                $this->onStart();
+                Tools::call($this->onStart())->await();
             }
             $this->startedInternal = true;
         } finally {

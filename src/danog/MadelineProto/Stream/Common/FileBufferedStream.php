@@ -54,7 +54,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async chunked read.
      */
-    public function read(): Future
+    public function read(): ?string
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
@@ -66,22 +66,22 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param string $data Data to write
      */
-    public function write(string $data): Future
+    public function write(string $data): void
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     /**
      * Async write.
      */
-    public function end(string $finalData = ''): Future
+    public function end(string $finalData = ''): void
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->end($finalData);
+        $this->stream->end($finalData);
     }
     /**
      * Async close.

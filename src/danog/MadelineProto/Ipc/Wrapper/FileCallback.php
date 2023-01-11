@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
@@ -11,7 +9,7 @@ class FileCallback extends Obj implements FileCallbackInterface
     /**
      * Get file.
      */
-    public function getFile(): mixed
+    public function getFile()
     {
         return $this->__call('getFile');
     }
@@ -22,8 +20,8 @@ class FileCallback extends Obj implements FileCallbackInterface
      * @param float $speed   Speed in mbps
      * @param float $time    Time
      */
-    public function __invoke(float $percent, float $speed, float $time): void
+    public function __invoke(float $percent, float $speed, float $time)
     {
-        $this->__call('__invoke', [$percent, $speed, $time]);
+        return $this->__call('__invoke', [$percent, $speed, $time]);
     }
 }

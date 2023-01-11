@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Loop\AuthLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SecurityException;
@@ -35,6 +36,7 @@ class SecretFeedLoop extends ResumableSignalLoop
     use InternalLoop {
         __construct as private init;
     }
+    use AuthLoop;
     /**
      * Incoming secret updates array.
      */

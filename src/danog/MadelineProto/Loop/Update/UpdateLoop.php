@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Loop\Update;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\AuthLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PTSException;
@@ -40,6 +41,7 @@ class UpdateLoop extends ResumableSignalLoop
     use InternalLoop {
         __construct as private init;
     }
+    use AuthLoop;
     /**
      * Main loop ID.
      */

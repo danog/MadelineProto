@@ -21,34 +21,31 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\Cancellation;
-use Amp\MultiReasonException;
 use Amp\NullCancellation;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
-use danog\MadelineProto\Settings\Connection;
 use Throwable;
 
 class ContextConnector implements SocketConnector
 {
-    public function __construct(private Connection $settings, private LoggerGetter $loggerGetter, private bool $fromDns = false)
+    public function __construct(private DoHWrapper $doHWrapper, private LoggerGetter $loggerGetter, private bool $fromDns = false)
     {
     }
-    public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $token = null): EncryptableSocket
+    public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $cancellation = null): EncryptableSocket
     {
         $ctx = $context ?? new ConnectContext();
-        $token ??= new NullCancellation();
-        $ctxs = $this->settings->generateContexts(0, $uri, $ctx);
+        $ctxs = $this->doHWrapper->generateContexts($uri, $ctx);
         if (empty($ctxs)) {
             throw new Exception("No contexts for raw connection to URI {$uri}");
         }
         $logger = $this->loggerGetter->getLogger();
         foreach ($ctxs as $ctx) {
-            /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
             try {
                 $ctx->setIsDns($this->fromDns);
-                $ctx->setCancellation($token);
+                if ($cancellation) 
+                $ctx->setCancellation($cancellation);
                 $result = ($ctx->getStream());
                 $logger->logger('OK!', Logger::WARNING);
                 return $result->getSocket();
@@ -57,11 +54,6 @@ class ContextConnector implements SocketConnector
                     throw $e;
                 }
                 $logger->logger('Connection failed: '.$e, Logger::ERROR);
-                if ($e instanceof MultiReasonException) {
-                    foreach ($e->getReasons() as $reason) {
-                        $logger->logger('Multireason: '.$reason, Logger::ERROR);
-                    }
-                }
             }
         }
         throw new Exception("Could not connect to URI {$uri}");
