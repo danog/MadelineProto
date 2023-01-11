@@ -77,7 +77,7 @@ class MyEventHandler extends EventHandler
     public function onStart()
     {
         $this->logger("The bot was started!");
-        var_dump(yield $this->getFullInfo('davtur19'));
+        var_dump(yield $this->getFullInfo('MadelineProto'));
     }
     /**
      * Handle updates from supergroups and channels.
