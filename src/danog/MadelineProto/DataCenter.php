@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Dns\Resolver;
+use Amp\Dns\DnsResolver;
 use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
@@ -268,7 +268,7 @@ class DataCenter
         return $this->dohWrapper->HTTPClient;
     }
 
-    public function getDNSClient(): Resolver
+    public function getDNSClient(): DnsResolver
     {
         return $this->dohWrapper->DoHClient;
     }

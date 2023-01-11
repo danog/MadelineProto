@@ -480,7 +480,7 @@ trait PeerHandler
         if (\is_string($id)) {
             if (\strpos($id, '#') !== false) {
                 if (\preg_match('/^channel#(\\d*)/', $id, $matches)) {
-                    return $this->toSupergroup($matches[1]);
+                    return $this->toSupergroup((int) $matches[1]);
                 }
                 if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
                     $id = '-'.$matches[1];

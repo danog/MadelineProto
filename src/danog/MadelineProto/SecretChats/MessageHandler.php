@@ -35,7 +35,7 @@ trait MessageHandler
     /**
      * Secret queue.
      *
-     * @var array<Promise>
+     * @var array<Future<null>>
      */
     private array $secretQueue = [];
     /**
@@ -61,7 +61,7 @@ trait MessageHandler
             if (isset($this->secretQueue[$chat_id])) {
                 $promise = $this->secretQueue[$chat_id];
                 $this->secretQueue[$chat_id] = $queuePromise->getFuture();
-                $promise;
+                $promise->await();
             } else {
                 $this->secretQueue[$chat_id] = $queuePromise->getFuture();
             }

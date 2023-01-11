@@ -405,6 +405,7 @@ trait AuthKeyHandler
         if (!$cdn) {
             throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
         }
+        return null;
     }
     /**
      * Factorize number asynchronously using the wolfram API.
@@ -436,7 +437,7 @@ trait AuthKeyHandler
             if (\is_int($newval)) {
                 $fres = $newval;
             }
-            return $fres;
+            return (int) $fres;
         }
         return false;
     }

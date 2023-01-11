@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\Cancellation;
-use Amp\NullCancellation;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketAddress;
@@ -44,8 +43,9 @@ class ContextConnector implements SocketConnector
         foreach ($ctxs as $ctx) {
             try {
                 $ctx->setIsDns($this->fromDns);
-                if ($cancellation) 
-                $ctx->setCancellation($cancellation);
+                if ($cancellation) {
+                    $ctx->setCancellation($cancellation);
+                }
                 $result = ($ctx->getStream());
                 $logger->logger('OK!', Logger::WARNING);
                 return $result->getSocket();

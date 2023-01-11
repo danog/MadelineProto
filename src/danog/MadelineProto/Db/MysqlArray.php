@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Mysql\ConnectionConfig;
+use Amp\Mysql\MysqlConfig;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -72,7 +72,7 @@ class MysqlArray extends SqlArray
      */
     public function initConnection(DatabaseMysql $settings): void
     {
-        $config = ConnectionConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
+        $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
         $this->pdo = new PDO(

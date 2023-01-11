@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Postgres\ConnectionConfig;
+use Amp\Postgres\PostgresConfig;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -73,7 +73,7 @@ class PostgresArray extends SqlArray
      */
     public function initConnection(DatabasePostgres $settings): void
     {
-        $config = ConnectionConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
+        $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
         $this->pdo = new PDO(

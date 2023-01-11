@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
-use Amp\Dns\Resolver;
+use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Closure;
@@ -889,7 +889,7 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Get async DNS client.
      */
-    public function getDNSClient(): Resolver
+    public function getDNSClient(): DnsResolver
     {
         return $this->datacenter->getDNSClient();
     }

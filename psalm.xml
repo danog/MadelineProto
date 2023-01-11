@@ -13,4 +13,7 @@
             <file name="src/danog/MadelineProto/InternalDoc.php" />
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <ParamNameMismatch errorLevel="suppress" />
+    </issueHandlers>
 </psalm>

@@ -961,11 +961,6 @@ trait Files
      */
     private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false): int
     {
-        static $method = [
-            false => 'upload.getFile',
-            // non-cdn
-            true => 'upload.getCdnFile',
-        ];
         do {
             if (!$cdn) {
                 $basic_param = ['location' => $messageMedia['InputFileLocation']];
@@ -975,7 +970,11 @@ trait Files
             //$x = 0;
             while (true) {
                 try {
-                    $res = $this->methodCallAsyncRead($method[$cdn], $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]);
+                    $res = $this->methodCallAsyncRead(
+                        $cdn ? 'upload.getCdnFile' : 'upload.getFile',
+                        $basic_param + $offset,
+                        ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
+                    );
                     break;
                 } catch (RPCErrorException $e) {
                     if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {

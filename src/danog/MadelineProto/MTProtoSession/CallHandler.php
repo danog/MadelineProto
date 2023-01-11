@@ -210,6 +210,6 @@ trait CallHandler
             $aargs['promise'] ?? null
         );
         $aargs['postpone'] ??= false;
-        $this->sendMessage($message, !$aargs['postpone'])->await();
+        $this->sendMessage($message, !$aargs['postpone']);
     }
 }
