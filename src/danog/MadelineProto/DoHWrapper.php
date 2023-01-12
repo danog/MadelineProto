@@ -28,7 +28,7 @@ use Amp\Dns\UnixDnsConfigLoader;
 use Amp\Dns\WindowsDnsConfigLoader;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
-use Amp\DoH\Rfc8484StubResolver;
+use Amp\DoH\Rfc8484StubDoHResolver;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\Cookie\CookieInterceptor;
@@ -112,10 +112,10 @@ final class DoHWrapper
         $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
         $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
             ? new Rfc1035StubDnsResolver(null, $configProvider)
-            : new Rfc8484StubResolver($DoHConfig);
+            : new Rfc8484StubDoHResolver($DoHConfig);
         $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
             ? new Rfc1035StubDnsResolver(null, $configProvider)
-            : new Rfc8484StubResolver($nonProxiedDoHConfig);
+            : new Rfc8484StubDoHResolver($nonProxiedDoHConfig);
 
         $this->dnsConnector = new DnsSocketConnector(new Rfc1035StubDnsResolver(null, $configProvider));
         $this->webSocketConnector = new Rfc6455Connector(
