@@ -392,6 +392,9 @@ trait BotAPI
         }
         return $arguments;
     }
+    private const MAX_ENTITY_LENGTH = 100;
+    private const MAX_ENTITY_SIZE = 8110;
+
     /**
      * Split too long message into chunks.
      *
@@ -402,34 +405,41 @@ trait BotAPI
     public function splitToChunks($args): array
     {
         $args = $this->parseMode($args);
-        if (!isset($args['entities'])) {
-            $args['entities'] = [];
-        }
+        $args['entities'] ??= [];
+
+        var_dump($args);
+        // UTF-8 length, not UTF-16
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
-        $max_entity_length = 100;
-        $max_entity_size = 8110;
-        $text_arr = [];
-        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
-            if (\mb_strlen($word, 'UTF-8') > $max_length) {
-                foreach (StrTools::mbStrSplit($word, $max_length) as $vv) {
-                    $text_arr[] = $vv;
-                }
-            } else {
-                $text_arr[] = $word;
-            }
-        }
+        $cur_len = 0;
+        $cur = '';
         $multiple_args_base = \array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
-        $multiple_args = [$multiple_args_base];
-        $i = 0;
-        foreach ($text_arr as $word) {
-            if (StrTools::mbStrlen($multiple_args[$i]['message'].$word) <= $max_length) {
-                $multiple_args[$i]['message'] .= $word;
-            } else {
-                $i++;
-                $multiple_args[$i] = $multiple_args_base;
-                $multiple_args[$i]['message'] .= $word;
+        $multiple_args = [];
+        foreach (\explode("\n", $args['message']) as $word) {
+            foreach (\mb_str_split($word."\n", $max_length, 'UTF-8') as $vv) {
+                $len = \mb_strlen($vv, 'UTF-8');
+                if ($cur_len + $len <= $max_length) {
+                    $cur .= $vv;
+                    $cur_len += $len;
+                } else {
+                    if (\trim($cur) !== '') {
+                        $multiple_args[] = [
+                            ...$multiple_args_base,
+                            'message' => $cur
+                        ];
+                    }
+                    $cur = $vv;
+                    $cur_len = $len;
+                }
             }
         }
+        if (\trim($cur) !== '') {
+            $multiple_args[] = [
+                ...$multiple_args_base,
+                'message' => $cur
+            ];
+        }
+        var_dump($multiple_args);
+
         $i = 0;
         $offset = 0;
         for ($k = 0; $k < \count($args['entities']); $k++) {
@@ -480,8 +490,8 @@ trait BotAPI
         }
         $total = 0;
         foreach ($multiple_args as $args) {
-            if (\count($args['entities']) > $max_entity_length) {
-                $total += \count($args['entities']) - $max_entity_length;
+            if (\count($args['entities']) > self::MAX_ENTITY_LENGTH) {
+                $total += \count($args['entities']) - self::MAX_ENTITY_LENGTH;
             }
             $c = 0;
             foreach ($args['entities'] as $entity) {
@@ -489,7 +499,7 @@ trait BotAPI
                     $c += \strlen($entity['url']);
                 }
             }
-            if ($c >= $max_entity_size) {
+            if ($c >= self::MAX_ENTITY_SIZE) {
                 $this->logger->logger('Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.', Logger::FATAL_ERROR);
             }
         }
@@ -497,25 +507,6 @@ trait BotAPI
             $this->logger->logger("Too many entities, {$total} entities will be truncated", Logger::FATAL_ERROR);
         }
         return $multiple_args;
-    }
-    /**
-     * @return string[]
-     *
-     * @psalm-return list<string>
-     */
-    private function multipleExplodeKeepDelimiters($delimiters, $string): array
-    {
-        $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
-        $finalArray = [];
-        /** @var int */
-        $delimOffset = 0;
-        foreach ($initialArray as $item) {
-            $delimOffset += StrTools::mbStrlen($item);
-            /** @var int $delimOffset */
-            $finalArray[] = $item.($delimOffset < StrTools::mbStrlen($string) ? $string[$delimOffset] : '');
-            $delimOffset++;
-        }
-        return $finalArray;
     }
     /**
      * @return ((array|string)[][]|string)[]
