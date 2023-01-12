@@ -44,8 +44,14 @@ trait Ads
         if ($cache && $cache[0] > \time()) {
             return $cache[1];
         }
-        $result = ($this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]))['messages'];
-        $this->sponsoredMessages->set($peer, [\time() + 5*60, $result]);
+        $result = $this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]);
+        if (\array_key_exists('messages', $result)) {
+            $result = $result['messages'];
+        } else {
+            $result = null;
+        }
+
+        $this->sponsoredMessages[$peer] = [\time() + 5*60, $result];
         return $result;
     }
     /**

@@ -295,6 +295,9 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
         $MadelineProto->logger($sentMessage, Logger::NOTICE);
 
+        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => str_repeat('a', 4096*4)]);
+        $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
+
         foreach ($media as $type => $inputMedia) {
             if ($type !== 'sticker' && $type !== 'voice') {
                 $MadelineProto->logger("Sending multi $type");
