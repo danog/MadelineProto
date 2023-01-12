@@ -607,7 +607,7 @@ final class TL
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
         $concat = $bare ? '' : $constructorData['id'];
-        return $concat.($this->serializeParams($constructorData, $object, '', $layer, null));
+        return $concat.($this->serializeParams($constructorData, $object, '', $layer));
     }
     /**
      * Serialize method.
@@ -621,7 +621,7 @@ final class TL
         if ($tl === false) {
             throw new Exception(Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'].($this->serializeParams($tl, $arguments, $method, -1, $arguments['queuePromise'] ?? null));
+        return $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
     }
     /**
      * Serialize parameters.
@@ -631,7 +631,7 @@ final class TL
      * @param string  $ctx       Context
      * @param integer $layer     Layer
      */
-    private function serializeParams(array $tl, array $arguments, string|int $ctx, int $layer, $promise)
+    private function serializeParams(array $tl, array $arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
@@ -666,7 +666,7 @@ final class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $promise), 'data');
+                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $arguments['queuePromise']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {

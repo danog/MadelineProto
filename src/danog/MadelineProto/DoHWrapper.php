@@ -22,8 +22,8 @@ namespace danog\MadelineProto;
 
 use Amp\Dns\DnsConfig;
 use Amp\Dns\DnsConfigLoader;
-use Amp\Dns\Resolver;
-use Amp\Dns\Rfc1035StubResolver;
+use Amp\Dns\DnsResolver;
+use Amp\Dns\Rfc1035StubDnsResolver;
 use Amp\Dns\UnixDnsConfigLoader;
 use Amp\Dns\WindowsDnsConfigLoader;
 use Amp\DoH\DoHConfig;
@@ -63,12 +63,12 @@ final class DoHWrapper
      * DNS over HTTPS client.
      *
      */
-    public readonly Resolver $DoHClient;
+    public readonly DnsResolver $DoHClient;
     /**
      * Non-proxied DNS over HTTPS client.
      *
      */
-    public readonly Resolver $nonProxiedDoHClient;
+    public readonly DnsResolver $nonProxiedDoHClient;
     /**
      * Cookie jar.
      *
@@ -111,13 +111,13 @@ final class DoHWrapper
         $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
         $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
         $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
-            ? new Rfc1035StubResolver(null, $configProvider)
+            ? new Rfc1035StubDnsResolver(null, $configProvider)
             : new Rfc8484StubResolver($DoHConfig);
         $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
-            ? new Rfc1035StubResolver(null, $configProvider)
+            ? new Rfc1035StubDnsResolver(null, $configProvider)
             : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
-        $this->dnsConnector = new DnsSocketConnector(new Rfc1035StubResolver(null, $configProvider));
+        $this->dnsConnector = new DnsSocketConnector(new Rfc1035StubDnsResolver(null, $configProvider));
         $this->webSocketConnector = new Rfc6455Connector(
             new Rfc6455ConnectionFactory(),
             $this->HTTPClient

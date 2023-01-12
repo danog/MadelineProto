@@ -43,7 +43,7 @@ trait MessageHandler
      *
      * @param integer  $chat_id      Chat ID
      * @param array    $message      Message to encrypt
-     * @param DeferredFuture $queuePromise Queue promise
+     * @param DeferredFuture<null> $queuePromise Queue promise
      * @internal
      */
     public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise)

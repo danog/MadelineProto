@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
+use Amp\Cancellation;
 use Amp\File\File;
 use Amp\Future;
 use Amp\Socket\Socket;
@@ -54,12 +55,12 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Async chunked read.
      */
-    public function read(): ?string
+    public function read(?Cancellation $token = null): ?string
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->read();
+        return $this->stream->read($token);
     }
     /**
      * Async write.
@@ -122,9 +123,9 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): Future
+    public function bufferRead(int $length): ?string
     {
-        return $this->stream->read($length);
+        return $this->stream->read(null, $length);
     }
     /**
      * Async write.

@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
+use Amp\Dns\DnsRecord;
 use Amp\Dns\Record;
 use Amp\Dns\TimeoutException;
 use Amp\NullCancellation;
@@ -92,13 +93,12 @@ class DoHConnector implements SocketConnector
             } else {
                 $records = $this->dataCenter->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
             }
-            \usort($records, fn (Record $a, Record $b) => $a->getType() - $b->getType());
+            \usort($records, fn (DnsRecord $a, DnsRecord $b) => $a->getType() - $b->getType());
             if ($this->ctx->getIpv6()) {
                 $records = \array_reverse($records);
             }
             foreach ($records as $record) {
-                /** @var Record $record */
-                if ($record->getType() === Record::AAAA) {
+                if ($record->getType() === DnsRecord::AAAA) {
                     $uris[] = \sprintf('%s://[%s]:%d', $scheme, $record->getValue(), $port);
                 } else {
                     $uris[] = \sprintf('%s://%s:%d', $scheme, $record->getValue(), $port);
