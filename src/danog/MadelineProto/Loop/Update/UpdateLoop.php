@@ -74,7 +74,7 @@ class UpdateLoop extends ResumableSignalLoop
         if ($this->waitForAuthOrSignal()) {
             return;
         }
-        $this->state = $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = 10;
         $first = true;
         while (true) {

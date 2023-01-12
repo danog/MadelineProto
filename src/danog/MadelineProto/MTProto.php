@@ -112,6 +112,8 @@ class MTProto implements TLCallback, LoggerGetter
     use Templates;
     use TOS;
     use DbPropertiesTrait;
+    private const MAX_ENTITY_LENGTH = 100;
+    private const MAX_ENTITY_SIZE = 8110;
     private const RSA_KEYS = [
         "-----BEGIN RSA PUBLIC KEY-----\n".
         "MIIBCgKCAQEA6LszBcC1LGzyr992NzE0ieY+BSaOW622Aa9Bd4ZHLl+TuFQ4lo4g\n".

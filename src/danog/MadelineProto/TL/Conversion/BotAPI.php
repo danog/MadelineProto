@@ -389,8 +389,6 @@ trait BotAPI
         }
         return $arguments;
     }
-    private const MAX_ENTITY_LENGTH = 100;
-    private const MAX_ENTITY_SIZE = 8110;
 
     /**
      * Split too long message into chunks.
