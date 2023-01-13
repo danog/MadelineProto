@@ -24,6 +24,10 @@ namespace danog\MadelineProto\Stream;
  * Raw stream proxy interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @template TT
+ *
+ * @implements RawStreamInterface<TT>
  */
 interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
 {

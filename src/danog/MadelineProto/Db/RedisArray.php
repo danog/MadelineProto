@@ -9,7 +9,6 @@ use Amp\Redis\Redis as RedisRedis;
 use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
-use Throwable;
 
 /**
  * Redis database backend.
@@ -80,7 +79,6 @@ class RedisArray extends DriverArray
      * @param string $index <p>
      * The index to set for.
      * </p>
-     * @throws Throwable
      */
     public function set(string|int $index, mixed $value): void
     {
@@ -133,7 +131,6 @@ class RedisArray extends DriverArray
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return int The number of elements or public properties in the associated
      * array or object, respectively.
-     * @throws Throwable
      */
     public function count(): int
     {

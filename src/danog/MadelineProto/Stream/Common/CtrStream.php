@@ -35,6 +35,11 @@ use phpseclib3\Crypt\AES;
  * Manages AES CTR encryption/decryption
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<array{
+ *      encrypt: array{key: string, iv: string},
+ *      decrypt: array{key: string, iv: string},
+ * }>
  */
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {

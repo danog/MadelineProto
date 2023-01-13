@@ -20,15 +20,19 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\Cancellation;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Socket\EncryptableSocket;
 use Amp\Websocket\Client\Connector;
+use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
 use Amp\Websocket\Client\WebsocketConnection;
 use Amp\Websocket\Client\WebsocketConnector;
 use Amp\Websocket\Client\WebsocketHandshake;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
+use Amp\Websocket\WebsocketMessage;
+use AssertionError;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -49,12 +53,12 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * Websocket message.
      *
      */
-    private Message $message;
+    private WebsocketMessage $message;
     /**
      * Websocket Connector.
      *
      */
-    private Connector $connector;
+    private WebsocketConnector $connector;
     /**
      * Connect to stream.
      *
@@ -62,11 +66,10 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->dc = $ctx->getDc();
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
         $handshake = new WebsocketHandshake($uri);
-        $this->stream = ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellation());
+        $this->stream = ($this->connector ?? new Rfc6455Connector(new Rfc6455ConnectionFactory(), HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellation());
         if (\strlen($header)) {
             $this->write($header);
         }
@@ -81,15 +84,15 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         } catch (Throwable $e) {
         }
     }
-    public function read()
+    public function read(?Cancellation $token = null): ?string
     {
         try {
-            if (!$this->message || ($data = $this->message->buffer()) === null) {
-                $this->message = $this->stream->receive();
+            if (!$this->message || ($data = $this->message->buffer($token)) === null) {
+                $this->message = $this->stream->receive($token);
                 if (!$this->message) {
                     return null;
                 }
-                $data = $this->message->buffer();
+                $data = $this->message->buffer($token);
                 $this->message = null;
             }
         } catch (Throwable $e) {
@@ -114,7 +117,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      */
     public function getSocket(): EncryptableSocket
     {
-        return $this->stream->getSocket();
+        throw new AssertionError("Unreachable!");
     }
     public function setExtra($extra): void
     {

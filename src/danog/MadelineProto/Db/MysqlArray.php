@@ -10,7 +10,6 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 use PDO;
-use Throwable;
 
 /**
  * MySQL database backend.
@@ -87,8 +86,6 @@ class MysqlArray extends SqlArray
 
     /**
      * Create table for property.
-     *
-     * @throws Throwable
      */
     protected function prepareTable(): void
     {

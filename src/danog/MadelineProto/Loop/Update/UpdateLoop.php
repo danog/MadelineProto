@@ -47,7 +47,7 @@ class UpdateLoop extends ResumableSignalLoop
      */
     const GENERIC = 0;
 
-    private $toPts;
+    private ?int $toPts = null;
     /**
      * Loop name.
      */

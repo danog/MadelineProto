@@ -401,12 +401,13 @@ trait BotAPI
         $args = $this->parseMode($args);
         $args['entities'] ??= [];
 
-        var_dump($args);
+        \var_dump($args);
         // UTF-8 length, not UTF-16
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $cur_len = 0;
         $cur = '';
         $multiple_args_base = \array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
+        unset($multiple_args_base['message']);
         $multiple_args = [];
         foreach (\explode("\n", $args['message']) as $word) {
             foreach (\mb_str_split($word."\n", $max_length, 'UTF-8') as $vv) {
@@ -432,7 +433,7 @@ trait BotAPI
                 'message' => $cur
             ];
         }
-        var_dump($multiple_args);
+        \var_dump($multiple_args);
 
         $i = 0;
         $offset = 0;

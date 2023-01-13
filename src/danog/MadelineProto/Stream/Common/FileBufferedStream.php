@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream\Common;
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
 use Amp\File\File;
-use Amp\Future;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -37,6 +36,8 @@ use RuntimeException;
  * Buffered raw stream.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<File>
  */
 class FileBufferedStream implements BufferedStreamInterface, BufferInterface, ProxyStreamInterface, RawStreamInterface
 {

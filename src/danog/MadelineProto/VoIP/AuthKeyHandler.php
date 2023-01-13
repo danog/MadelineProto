@@ -49,17 +49,15 @@ trait AuthKeyHandler
      * @param array                     $user     User
      * @internal
      */
-    public function acceptCallFrom(VoIP $instance, array $user)
+    public function acceptCallFrom(VoIP $instance, array $user): ?VoIP
     {
-        if (!$res = $this->acceptCall($user)) {
+        if (!$this->acceptCall($user)) {
             $instance->discard();
-            return false;
+            return null;
         }
         return $instance;
     }
     /**
-     * Undocumented function.
-     *
      * @param VoIP $instance Call instance
      * @param array                     $call       Call info
      * @param array                     $reason     Discard reason
@@ -67,11 +65,9 @@ trait AuthKeyHandler
      * @param boolean                   $need_debug Needs debug?
      * @internal
      */
-    public function discardCallFrom(VoIP $instance, array $call, array $reason, array $rating = [], bool $need_debug = true)
+    public function discardCallFrom(VoIP $instance, array $call, array $reason, array $rating = [], bool $need_debug = true): VoIP
     {
-        if (!$res = $this->discardCall($call, $reason, $rating, $need_debug)) {
-            return false;
-        }
+        $this->discardCall($call, $reason, $rating, $need_debug);
         return $instance;
     }
     /**
@@ -109,7 +105,7 @@ trait AuthKeyHandler
      *
      * @param array $call Call
      */
-    public function acceptCall(array $call)
+    public function acceptCall(array $call): bool
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new Exception();

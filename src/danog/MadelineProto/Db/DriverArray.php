@@ -9,7 +9,6 @@ use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
 use IteratorAggregate;
 use ReflectionClass;
-use Throwable;
 
 use function Amp\async;
 
@@ -31,8 +30,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
 
     /**
      * Create table for property.
-     *
-     * @throws Throwable
      */
     abstract protected function prepareTable(): void;
 
@@ -116,9 +113,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         }
     }
 
-    /**
-     * @throws Throwable
-     */
     protected static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
@@ -195,8 +189,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
 
     /**
      * Get array copy.
-     *
-     * @throws Throwable
      */
     public function getArrayCopy(): array
     {

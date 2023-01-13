@@ -10,7 +10,6 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use PDO;
-use Throwable;
 
 /**
  * Postgres database backend.
@@ -98,8 +97,6 @@ class PostgresArray extends SqlArray
 
     /**
      * Create table for property.
-     *
-     * @throws Throwable
      */
     protected function prepareTable(): void
     {

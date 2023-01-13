@@ -6,8 +6,6 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Postgres\PostgresConfig;
 use Amp\Postgres\PostgresConnectionPool;
-use Amp\Sql\ConnectionException;
-use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use Throwable;
@@ -22,11 +20,6 @@ class Postgres
     /** @var array<PostgresConnectionPool> */
     private static array $connections = [];
 
-    /**
-     * @throws ConnectionException
-     * @throws FailureException
-     * @throws Throwable
-     */
     public static function getConnection(DatabasePostgres $settings): PostgresConnectionPool
     {
         $dbKey = $settings->getKey();
@@ -43,11 +36,6 @@ class Postgres
         return static::$connections[$dbKey];
     }
 
-    /**
-     * @throws ConnectionException
-     * @throws FailureException
-     * @throws Throwable
-     */
     private static function createDb(PostgresConfig $config): void
     {
         try {

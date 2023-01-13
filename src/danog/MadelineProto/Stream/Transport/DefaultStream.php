@@ -33,6 +33,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use Throwable;
 
 use function Amp\Socket\connector;
+use function Amp\Socket\socketConnector;
 
 /**
  * Default stream wrapper.
@@ -50,8 +51,6 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     protected ?EncryptableSocket $stream = null;
     /**
      * Connector.
-     *
-     * @var Connector
      */
     private SocketConnector $connector;
     public function setupTls(?Cancellation $cancellationToken = null): void
@@ -70,7 +69,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $this->stream = (($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
+        $this->stream = (($this->connector ?? socketConnector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
         if ($secure) {
             $this->stream->setupTls();
         }

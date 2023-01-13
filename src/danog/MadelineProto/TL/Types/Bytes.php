@@ -25,6 +25,8 @@ use JsonSerializable;
 
 /**
  * Bytes wrapper.
+ *
+ * @implements ArrayAccess<int, string>
  */
 class Bytes implements JsonSerializable, ArrayAccess
 {

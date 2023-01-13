@@ -24,8 +24,7 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsRecord;
-use Amp\Dns\Record;
-use Amp\Dns\TimeoutException;
+use Amp\Dns\DnsTimeoutException;
 use Amp\NullCancellation;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
@@ -123,7 +122,7 @@ class DoHConnector implements SocketConnector
                 try {
                     $deferred->getFuture()->await(new TimeoutCancellation($timeout));
                 } catch (CancelledException $e) {
-                    if (!$e->getPrevious() instanceof TimeoutException) {
+                    if (!$e->getPrevious() instanceof DnsTimeoutException) {
                         throw $e;
                     }
 

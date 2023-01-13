@@ -24,13 +24,15 @@ namespace danog\MadelineProto\Stream;
  * Stream proxy interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @template T
  */
 interface ProxyStreamInterface
 {
     /**
      * Set extra proxy data.
      *
-     * @param mixed $extra Proxy data
+     * @param T $extra Proxy data
      */
     public function setExtra($extra): void;
 }

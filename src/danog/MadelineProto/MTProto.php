@@ -307,7 +307,7 @@ class MTProto implements TLCallback, LoggerGetter
     /**
      * Whether we're authorized.
      *
-     * @psalm-var self::NOT_LOGGED_IN|self::WAITING_*|self::LOGGED_IN
+     * @var self::NOT_LOGGED_IN|self::WAITING_*|self::LOGGED_IN
      */
     public int $authorized = self::NOT_LOGGED_IN;
     /**

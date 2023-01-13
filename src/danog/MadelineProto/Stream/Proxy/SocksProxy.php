@@ -33,6 +33,8 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * Socks5 stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
 class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {

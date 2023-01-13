@@ -27,7 +27,7 @@ use Amp\Dns\Rfc1035StubDnsResolver;
 use Amp\Dns\UnixDnsConfigLoader;
 use Amp\Dns\WindowsDnsConfigLoader;
 use Amp\DoH\DoHConfig;
-use Amp\DoH\Nameserver;
+use Amp\DoH\DoHNameserver;
 use Amp\DoH\Rfc8484StubDoHResolver;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
@@ -108,8 +108,8 @@ final class DoHWrapper
         $this->CookieJar = $jar ?? new LocalCookieJar();
         $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter))))->build();
         $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter, true))))->build();
-        $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
-        $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
+        $DoHConfig = new DoHConfig([new DoHNameserver('https://mozilla.cloudflare-dns.com/dns-query'), new DoHNameserver('https://dns.google/resolve')], $DoHHTTPClient);
+        $nonProxiedDoHConfig = new DoHConfig([new DoHNameserver('https://mozilla.cloudflare-dns.com/dns-query'), new DoHNameserver('https://dns.google/resolve')]);
         $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
             ? new Rfc1035StubDnsResolver(null, $configProvider)
             : new Rfc8484StubDoHResolver($DoHConfig);

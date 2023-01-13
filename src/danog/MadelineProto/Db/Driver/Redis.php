@@ -7,10 +7,7 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RedisConfig;
 use Amp\Redis\RemoteExecutorFactory;
-use Amp\Sql\ConnectionException;
-use Amp\Sql\FailureException;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
-use Throwable;
 
 /**
  * Redis driver wrapper.
@@ -22,11 +19,6 @@ class Redis
     /** @var array<RedisRedis> */
     private static array $connections = [];
 
-    /**
-     * @throws ConnectionException
-     * @throws FailureException
-     * @throws Throwable
-     */
     public static function getConnection(DatabaseRedis $settings): RedisRedis
     {
         $dbKey = $settings->getKey();

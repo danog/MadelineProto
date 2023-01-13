@@ -25,7 +25,6 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
@@ -35,13 +34,13 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * HTTP proxy stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
 class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
-    use RawStream;
     /**
      * Stream.
-     *
      */
     protected RawStreamInterface $stream;
     private $extra;
@@ -59,14 +58,14 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
-        $this->stream = ($ctx->getStream());
+        $this->stream = $ctx->getStream();
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
-            if (\strlen(\inet_pton($address) === 16)) {
+            if (\strlen(\inet_pton($address)) === 16) {
                 $address = '['.$address.']';
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
         $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
         $buffer = $this->stream->getReadBuffer($l);
@@ -158,7 +157,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         return $this->stream->getReadBuffer($length);
     }
-    public function read(?Cancellation $cancellation): ?string
+    public function read(?Cancellation $cancellation = null): ?string
     {
         return $this->stream->read($cancellation);
     }

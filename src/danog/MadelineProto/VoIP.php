@@ -15,7 +15,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-use Amp\Delayed;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -28,6 +27,7 @@ use SplQueue;
 use Throwable;
 
 use function Amp\async;
+use function Amp\delay;
 use function Amp\File\openFile;
 
 if (\extension_loaded('php-libtgvoip')) {
@@ -279,7 +279,7 @@ class VoIP
         }
         Logger::log("Closed all sockets, discarding $this");
 
-        return Tools::callFork($this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug));
+        return $this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug);
     }
 
     public function __destruct()
@@ -320,7 +320,7 @@ class VoIP
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }
         });
-        Tools::callFork((function (): void {
+        async(function (): void {
             $this->authKey = new PermAuthKey();
             $this->authKey->setAuthKey($this->configuration['auth_key']);
 
@@ -345,7 +345,7 @@ class VoIP
                     Logger::log("Exiting VoIP read loop in $this!");
                 });
             }
-        })());
+        });
         return $this;
     }
     /**
@@ -403,7 +403,7 @@ class VoIP
                 while ($it->advance()) {
                     $this->packetQueue->enqueue($it->getCurrent());
                 }
-                $t = (\microtime(true) / 1000) + 60;
+                $t = \microtime(true) + 0.060;
                 while (!$this->packetQueue->isEmpty()) {
                     if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
@@ -411,13 +411,13 @@ class VoIP
                     }
 
                     //Logger::log("Writing {$this->timestamp} in $this!");
-                    new Delayed((int) ($t - (\microtime(true) / 1000)));
-                    $t = (\microtime(true) / 1000) + 60;
+                    delay($t - \microtime(true));
+                    $t = \microtime(true) + 0.060;
 
                     $this->timestamp += 60;
                 }
             } else {
-                $t = (\microtime(true) / 1000) + 60;
+                $t = \microtime(true) + 0.060;
                 while ($it->advance()) {
                     if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
@@ -425,8 +425,8 @@ class VoIP
                     }
 
                     //Logger::log("Writing {$this->timestamp} in $this!");
-                    new Delayed((int) ($t - (\microtime(true) / 1000)));
-                    $t = (\microtime(true) / 1000) + 60;
+                    delay($t - \microtime(true));
+                    $t = \microtime(true) + 0.060;
 
                     $this->timestamp += 60;
                 }
@@ -443,7 +443,7 @@ class VoIP
         $stream = $ctx->getStream();
         $ogg = Ogg::init($stream, 60000);
         $it = $ogg->getEmitter()->iterate();
-        Tools::callFork($ogg->read());
+        async($ogg->read(...));
         return $it;
     }
     /**

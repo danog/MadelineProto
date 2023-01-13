@@ -31,6 +31,8 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * Hash stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<string>
  */
 class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterface
 {

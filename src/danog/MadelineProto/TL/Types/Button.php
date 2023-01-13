@@ -27,13 +27,15 @@ use JsonSerializable;
 
 /**
  * Clickable button.
+ *
+ * @implements ArrayAccess<string, mixed>
  */
 class Button implements JsonSerializable, ArrayAccess
 {
     /**
      * Button data.
      *
-     * @psalm-var array<array-key, mixed>
+     * @var array<string, mixed>
      */
     private array $button = [];
     /**

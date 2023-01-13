@@ -56,7 +56,7 @@ class OutgoingMessage extends Message
     /**
      * State of message.
      *
-     * @psalm-var self::STATE_*
+     * @var self::STATE_*
      */
     private int $state = self::STATE_PENDING;
     /**

@@ -7,7 +7,6 @@ namespace danog\MadelineProto\Db;
 use Amp\Sql\Pool;
 use Amp\Sql\Result;
 use PDO;
-use Throwable;
 use Webmozart\Assert\Assert;
 
 use function serialize;
@@ -121,7 +120,6 @@ abstract class SqlArray extends DriverArray
      * Unset value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
-     * @throws Throwable
      */
     public function unset(string|int $key): void
     {
@@ -140,7 +138,6 @@ abstract class SqlArray extends DriverArray
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return int The number of elements or public properties in the associated
      * array or object, respectively.
-     * @throws Throwable
      */
     public function count(): int
     {
@@ -162,7 +159,6 @@ abstract class SqlArray extends DriverArray
      * Perform async request to db.
      *
      * @psalm-param self::STATEMENT_* $stmt
-     * @throws Throwable
      */
     protected function execute(string $sql, array $params = []): Result
     {

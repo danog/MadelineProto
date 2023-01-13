@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\MTProtoTools\Crypt;
 use PDO;
+use Webmozart\Assert\Assert;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -77,6 +78,8 @@ class Conversion
         $session = Tools::absolute($session);
         $session = \json_decode(\file_get_contents($session), true);
         $session['auth_key'] = \base64_decode(\implode('', $session['auth_key']));
+        Assert::notFalse($session['auth_key']);
+        Assert::integer($session['dc_id']);
 
         $settings['connection_settings']['all']['test_mode'] = $session['test_mode'];
 
@@ -92,6 +95,8 @@ class Conversion
         $dc = $session['dc'];
         $key = \hex2bin($session["dc$dc".'_auth_key']);
 
+        Assert::integer($dc);
+        Assert::string($key);
         return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 

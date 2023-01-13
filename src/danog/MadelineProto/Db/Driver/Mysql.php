@@ -6,8 +6,6 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\MysqlConfig;
 use Amp\Mysql\MysqlConnectionPool;
-use Amp\Sql\ConnectionException;
-use Amp\Sql\FailureException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 use Throwable;
@@ -22,10 +20,6 @@ class Mysql
     /** @var array<MysqlConnectionPool> */
     private static array $connections = [];
 
-    /**
-     * @throws ConnectionException
-     * @throws Throwable
-     */
     public static function getConnection(DatabaseMysql $settings): MysqlConnectionPool
     {
         $dbKey = $settings->getKey();
@@ -42,11 +36,6 @@ class Mysql
         return self::$connections[$dbKey];
     }
 
-    /**
-     * @throws ConnectionException
-     * @throws FailureException
-     * @throws Throwable
-     */
     private static function createDb(MysqlConfig $config): void
     {
         try {

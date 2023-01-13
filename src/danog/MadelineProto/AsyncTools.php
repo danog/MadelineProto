@@ -73,10 +73,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function all(array $promises)
     {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        return await($promises);
+        return await(\array_map(self::call(...), $promises));
     }
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
@@ -86,10 +83,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function any(array $promises)
     {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        return awaitAny($promises);
+        return awaitAny(\array_map(self::call(...), $promises));
     }
     /**
      * Resolves with a two-item array delineating successful and failed Promise results.
@@ -100,10 +94,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function some(array $promises)
     {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        return await($promises);
+        return await(\array_map(self::call(...), $promises));
     }
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
@@ -113,10 +104,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function first(array $promises)
     {
-        foreach ($promises as &$promise) {
-            $promise = self::call($promise);
-        }
-        return awaitFirst($promises);
+        return awaitFirst(\array_map(self::call(...), $promises));
     }
     /**
      * Create an artificial timeout for any \Generator or Promise.
