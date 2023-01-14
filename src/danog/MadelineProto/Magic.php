@@ -323,7 +323,6 @@ class Magic
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
             }
         }
-        \define('AMP_WORKER', 1);
         try {
             $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
         } catch (Throwable $e) {

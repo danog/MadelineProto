@@ -37,6 +37,7 @@ use const JSON_UNESCAPED_SLASHES;
 use const PATHINFO_DIRNAME;
 use const PHP_EOL;
 use const PHP_SAPI;
+
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
 
@@ -313,6 +314,16 @@ class Logger
                 $this->logger('Could not enable PHP logging');
             }
         }
+
+        if (!self::$printed) {
+            self::$printed = true;
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            $this->logger('MadelineProto');
+            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
+            $this->logger('Licensed under AGPLv3');
+            $this->logger('https://github.com/danog/MadelineProto');
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        }
     }
     /**
      * Destructor function.
@@ -353,15 +364,7 @@ class Logger
             Magic::$suspendPeriodicLogging->getFuture()->map(fn () => $this->logger($param, $level, $file));
             return;
         }
-        if (!self::$printed) {
-            self::$printed = true;
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
-            $this->logger('MadelineProto');
-            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
-            $this->logger('Licensed under AGPLv3');
-            $this->logger('https://github.com/danog/MadelineProto');
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
-        }
+
         if ($this->mode === self::CALLABLE_LOGGER) {
             \call_user_func_array($this->optional, [$param, $level]);
             return;
