@@ -132,7 +132,7 @@ class OutgoingMessage extends Message
     /**
      * When was this message sent.
      */
-    private int $sent = 0;
+    private ?int $sent = null;
 
     /**
      * Number of times this message was sent.
@@ -396,7 +396,7 @@ class OutgoingMessage extends Message
     /**
      * Get when was this message sent.
      */
-    public function getSent(): int
+    public function getSent(): ?int
     {
         return $this->sent;
     }

@@ -104,9 +104,7 @@ trait Session
         $this->session_id = Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
-        if (!isset($this->msgIdHandler)) {
-            $this->msgIdHandler = MsgIdHandler::createInstance($this);
-        }
+        $this->msgIdHandler ??= new MsgIdHandler($this);
         foreach ($this->outgoing_messages as &$msg) {
             if ($msg->hasMsgId()) {
                 $msg->setMsgId(null);

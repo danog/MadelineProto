@@ -235,9 +235,9 @@ abstract class AsyncTools extends StrTools
      * @param string    $file      File to lock
      * @param integer   $operation Locking mode
      * @param float     $polling   Polling interval
-     * @param ?Cancelation $token     Cancellation token
+     * @param ?Cancellation $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     * @return $token is null ? (callable(): void) : ((callable(): void)|null)
+     * @return ($token is null ? (callable(): void) : ((callable(): void)|null))
      */
     public static function flock(string $file, int $operation, float $polling = 0.1, ?Cancellation $token = null, ?callable $failureCb = null): ?callable
     {

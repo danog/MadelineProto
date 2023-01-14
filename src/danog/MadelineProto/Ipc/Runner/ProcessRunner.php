@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\ByteStream\ReadableResourceStream;
-use Amp\NullCancellation;
-use Amp\Process\Internal\Posix\PosixRunner;
-use Amp\Process\Internal\Posix\Runner;
-use Amp\Process\Internal\Windows\WindowsRunner as WindowsWindowsRunner;
+use Amp\Process\Process;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use Error;
 use Throwable;
-
-use const Amp\Process\IS_WINDOWS;
 
 use const ARRAY_FILTER_USE_BOTH;
 use const DIRECTORY_SEPARATOR;
@@ -79,10 +74,9 @@ final class ProcessRunner extends RunnerAbstract
             $runner,
             'madeline-ipc',
             $session,
-            $startupId,
+            (string) $startupId,
         ];
-        $command = \implode(' ', \array_map(escapeArgument(...), $command));
-        Logger::log("Starting process with $command");
+        Logger::log("Starting process with ".\implode(' ', \array_map(escapeArgument(...), $command)));
 
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
@@ -93,18 +87,16 @@ final class ProcessRunner extends RunnerAbstract
             ['QUERY_STRING' => \http_build_query($params)],
         );
 
-        $runner = IS_WINDOWS ? new WindowsWindowsRunner : new PosixRunner;
         try {
-            $handle = $runner->start($command, new NullCancellation, null, $envVars);
+            $handle = Process::start($command, null, $envVars);
         } catch (\Throwable $e) {
             Logger::log("Got exception while starting process worker: $e");
             throw $e;
         }
-        async(self::readUnref(...), $handle->streams->stdout);
-        async(self::readUnref(...), $handle->streams->stderr);
-        async(function () use ($runner, $handle): void {
-            $res = $runner->join($handle->handle);
-            $runner->destroy($handle->handle);
+        async(self::readUnref(...), $handle->getStdout());
+        async(self::readUnref(...), $handle->getStderr());
+        async(function () use ($handle): void {
+            $res = $handle->join();
             Logger::log("Process worker exited with $res!");
             throw new Exception("Process worker exited with $res!");
         });

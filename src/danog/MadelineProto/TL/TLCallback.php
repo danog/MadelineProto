@@ -40,7 +40,7 @@ interface TLCallback
      *
      * Pass only the method name, will return void
      *
-     * @return array<string, list<TBeforeMethodResponseDeserialization>
+     * @return array<string, list<TBeforeMethodResponseDeserialization>>
      */
     public function getMethodBeforeResponseDeserializationCallbacks(): array;
     /**

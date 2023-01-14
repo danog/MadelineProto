@@ -18,7 +18,7 @@ abstract class RunnerAbstract
     /** @var string|null PHAR path with a '.phar' extension. */
     protected static ?string $pharCopy = null;
 
-    protected static function getScriptPath(string $alternateTmpDir = '')
+    protected static function getScriptPath(string $alternateTmpDir = ''): string
     {
         /**
          * If using madeline.php, simply return madeline.php path.

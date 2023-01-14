@@ -177,7 +177,7 @@ trait AuthKeyHandler
      *
      * @param int $chat Secret chat to rekey
      */
-    public function rekey(int $chat): string
+    public function rekey(int $chat): ?string
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return null;

@@ -59,27 +59,25 @@ trait TD
     {
         $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
-            if (\is_array($mtproto)) {
-                switch (\end($mtproto)) {
-                    case 'choose_message_content':
-                        switch ($params[$td]['_']) {
-                            case 'inputMessageText':
-                                $params[$td]['_'] = 'messages.sendMessage';
-                                if (isset($params['disable_web_page_preview'])) {
-                                    $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
-                                }
-                                $newparams = \array_merge($params[$td], $newparams);
-                                break;
-                            default:
-                                throw new Exception(Lang::$current_lang['non_text_conversion']);
-                        }
-                        break;
-                    default:
-                        $newparams[$mtproto[0]] = $params[$td] ?? null;
-                        if (\is_array($newparams[$mtproto[0]])) {
-                            $newparams[$mtproto[0]] = ($this->MTProtoToTd($newparams[$mtproto[0]]));
-                        }
-                }
+            switch (\end($mtproto)) {
+                case 'choose_message_content':
+                    switch ($params[$td]['_']) {
+                        case 'inputMessageText':
+                            $params[$td]['_'] = 'messages.sendMessage';
+                            if (isset($params['disable_web_page_preview'])) {
+                                $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
+                            }
+                            $newparams = \array_merge($params[$td], $newparams);
+                            break;
+                        default:
+                            throw new Exception(Lang::$current_lang['non_text_conversion']);
+                    }
+                    break;
+                default:
+                    $newparams[$mtproto[0]] = $params[$td] ?? null;
+                    if (\is_array($newparams[$mtproto[0]])) {
+                        $newparams[$mtproto[0]] = ($this->MTProtoToTd($newparams[$mtproto[0]]));
+                    }
             }
         }
         return $newparams;

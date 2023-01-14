@@ -143,9 +143,8 @@ class API extends InternalDoc
 
     /**
      * API wrapper (to avoid circular references).
-     *
      */
-    private APIWrapper $wrapper;
+    private ?APIWrapper $wrapper = null;
 
     /**
      * Unlock callback.

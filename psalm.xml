@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="6"
+    errorLevel="4"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -16,6 +16,7 @@
     </projectFiles>
     <issueHandlers>
         <ParamNameMismatch errorLevel="suppress" />
+        <StringIncrement errorLevel="suppress" />
         <InvalidTraversableImplementation errorLevel="suppress" />
     </issueHandlers>
 </psalm>

@@ -71,7 +71,7 @@ abstract class ClientAbstract
      */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
-        if ($file === null) {
+        if ($file === '') {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
         isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);

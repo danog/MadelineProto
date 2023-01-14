@@ -38,7 +38,7 @@ class TLConstructors
         if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) {
             return;
         }
-        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
+        $predicate = ($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate'];
         $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];

@@ -163,7 +163,7 @@ trait BotAPIFiles
                         'file_reference' => $fileId->getFileReference(),
                     ],
                 ];
-                if ($res['InputMedia']['id'] === 'inputPhoto') {
+                if ($res['InputMedia']['id']['_'] === 'inputPhoto') {
                     $res['InputMedia']['id']['sizes'] = [
                         [
                             '_' => 'photoSize',

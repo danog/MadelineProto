@@ -114,7 +114,7 @@ trait Events
     /**
      * Get event handler.
      */
-    public function getEventHandler(): EventHandler
+    public function getEventHandler(): ?EventHandler
     {
         return $this->event_handler_instance;
     }

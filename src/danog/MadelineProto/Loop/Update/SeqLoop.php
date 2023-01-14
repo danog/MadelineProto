@@ -124,7 +124,7 @@ class SeqLoop extends ResumableSignalLoop
         $this->incomingUpdates[] = $updates;
     }
     /**
-     * @var array{updates: array} $updates
+     * @param array{updates: array} $updates
      */
     public function save(array $updates): void
     {

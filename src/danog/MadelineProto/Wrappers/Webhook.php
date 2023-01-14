@@ -39,11 +39,9 @@ trait Webhook
      * Set webhook update handler.
      *
      * @param string $hook_url Webhook URL
-     * @param string $pem_path PEM path for self-signed certificate
      */
-    public function setWebhook(string $hook_url, string $pem_path = ''): void
+    public function setWebhook(string $hook_url): void
     {
-        $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;
         $this->updateHandler = [$this, 'pwrWebhook'];
         $this->startUpdateSystem();
@@ -58,6 +56,7 @@ trait Webhook
         $payload = \json_encode($update);
         Assert::notEmpty($payload);
         async(function () use ($payload): void {
+            Assert::string($this->hook_url);
             $request = new Request($this->hook_url, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);

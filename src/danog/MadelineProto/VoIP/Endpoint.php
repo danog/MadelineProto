@@ -138,10 +138,10 @@ class Endpoint
     /**
      * Write data.
      */
-    public function write(string $payload): int
+    public function write(string $payload): void
     {
         if ($this->socket === null) {
-            return 0;
+            return;
         }
         $plaintext = \pack('v', \strlen($payload)).$payload;
         $padding = 16 - (\strlen($plaintext) % 16);

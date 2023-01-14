@@ -42,7 +42,7 @@ abstract class StrTools extends Extension
         for ($x = 0; $x < $textlength; $x++) {
             $char = \ord($text[$x]);
             if (($char & 0xc0) != 0x80) {
-                $length += 1 + ($char >= 0xf0);
+                $length += 1 + ($char >= 0xf0 ? 1 : 0);
             }
         }
         Assert::integer($length);

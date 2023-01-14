@@ -38,7 +38,6 @@ trait BotAPI
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
     /**
-     * @return array<array<(array<array<(bool|mixed|string)>>|string)>>
      * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
      */
     private function parseButtons($rows): array

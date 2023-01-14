@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use Amp\DeferredFuture;
 use Amp\Loop\Driver;
 use danog\MadelineProto\TL\Conversion\Extension;
-use Phar;
 use phpseclib3\Math\BigInteger;
 use ReflectionClass;
 use Revolt\EventLoop;
@@ -41,7 +40,6 @@ use const SIG_DFL;
 use const SIGINT;
 use const SIGTERM;
 use function Amp\ByteStream\getStdin;
-use function Amp\File\read;
 use function Amp\Log\hasColorSupport;
 use function define;
 use function function_exists;
@@ -78,11 +76,6 @@ class Magic
      *
      */
     public static bool $can_getmypid = true;
-    /**
-     * Whether we can amphp/parallel.
-     *
-     */
-    public static bool $can_parallel = false;
     /**
      * Whether we can get our CWD.
      *
@@ -330,25 +323,7 @@ class Magic
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
             }
         }
-        self::$can_parallel = false;
-        if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !(\class_exists(Phar::class) && Phar::running())) {
-            try {
-                $back = \debug_backtrace(0);
-                if (!\defined('AMP_WORKER')) {
-                    \define('AMP_WORKER', 1);
-                }
-                /*do {
-                    if (read(\end($back)['file'])) {
-                        self::$can_parallel = true;
-                        break;
-                    }
-                } while (true);*/
-            } catch (Throwable $e) {
-            }
-        }
-        if (!self::$can_parallel && !\defined('AMP_WORKER')) {
-            \define('AMP_WORKER', 1);
-        }
+        \define('AMP_WORKER', 1);
         try {
             $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
         } catch (Throwable $e) {

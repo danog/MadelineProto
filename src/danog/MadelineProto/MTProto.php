@@ -928,7 +928,7 @@ class MTProto implements TLCallback, LoggerGetter
      */
     public function serialize(): void
     {
-        if ($this->wrapper && $this->isInited()) {
+        if (isset($this->wrapper) && $this->isInited()) {
             $this->wrapper->serialize();
         }
     }
@@ -1945,9 +1945,9 @@ class MTProto implements TLCallback, LoggerGetter
                 if ($file) {
                     $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                 }
-                $sent &= true;
+                $sent = $sent && true;
             } catch (Throwable $e) {
-                $sent &= false;
+                $sent = $sent && false;
                 $this->logger("While reporting to $id: $e", Logger::FATAL_ERROR);
             }
         }

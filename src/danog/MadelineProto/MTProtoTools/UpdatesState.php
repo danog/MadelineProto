@@ -71,16 +71,6 @@ class UpdatesState
         return $this->channelId ? ['pts', 'channelId'] : ['pts', 'qts', 'seq', 'date', 'channelId'];
     }
     /**
-     * Wakeup function.
-     */
-    public function __wakeup(): void
-    {
-        /** @psalm-suppress DocblockTypeContradiction */
-        if ($this->channelId === false) {
-            $this->channelId = 0;
-        }
-    }
-    /**
      * Is this state relative to a channel?
      */
     public function isChannel(): bool

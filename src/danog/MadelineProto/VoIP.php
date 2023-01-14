@@ -132,7 +132,7 @@ class VoIP
     public $storage = [];
     public $internalStorage = [];
     private $signal = 0;
-    private int $callState;
+    private ?int $callState = null;
     private $callID;
     private $creatorID;
     private $otherID;

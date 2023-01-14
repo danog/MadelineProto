@@ -124,7 +124,7 @@ trait Login
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         try {
-            $authorization = $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code]);
+            $authorization = $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $code]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);

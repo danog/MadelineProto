@@ -112,7 +112,7 @@ abstract class SqlArray extends DriverArray
                 'value' => $this->setValue($value),
             ],
         );
-        Assert::greaterThanEq($result->getAffectedRowCount(), 1);
+        Assert::greaterThanEq($result->getRowCount(), 1);
         $this->setCache($key, $value);
     }
 

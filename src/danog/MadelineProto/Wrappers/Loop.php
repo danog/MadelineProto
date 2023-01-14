@@ -59,52 +59,49 @@ trait Loop
     {
         static $inited = false;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && !$inited) {
-            $needs_restart = true;
             try {
                 if (\function_exists('set_time_limit')) {
                     \set_time_limit(-1);
                 }
-            } catch (Exception $e) {
-                $needs_restart = true;
+            } catch (Exception) {
             }
             if (isset($_REQUEST['MadelineSelfRestart'])) {
                 $this->logger->logger('Self-restarted, restart token '.$_REQUEST['MadelineSelfRestart']);
             }
-            $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
-            if ($needs_restart) {
-                $this->logger->logger('Adding restart callback!');
-                $logger = $this->logger;
-                $id = Shutdown::addCallback(static function () use (&$logger): void {
-                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
-                    $port = $_SERVER['SERVER_PORT'];
-                    $uri = $_SERVER['REQUEST_URI'];
-                    $params = $_GET;
-                    $params['MadelineSelfRestart'] = Tools::randomInt();
-                    $url = \explode('?', $uri, 2)[0] ?? '';
-                    $query = \http_build_query($params);
-                    $uri = \implode('?', [$url, $query]);
-                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri." HTTP/1.1\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
-                    $logger->logger("Connecting to {$address}:{$port}");
-                    $a = \fsockopen($address, $port);
-                    $logger->logger('Sending self-restart payload');
-                    $logger->logger($payload);
-                    \fwrite($a, $payload);
-                    $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
-                    // Keep around resource for a bit more
-                    $GLOBALS['MadelineShutdown'] = $a;
-                    $logger->logger('Shutdown of self-restart callback');
-                }, 'restarter');
-                $this->logger->logger("Added restart callback with ID $id!");
-            }
+            $this->logger->logger('Will self-restart');
+            $this->logger->logger('Adding restart callback!');
+            $logger = $this->logger;
+            $id = Shutdown::addCallback(static function () use (&$logger): void {
+                $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
+                $port = $_SERVER['SERVER_PORT'];
+                $uri = $_SERVER['REQUEST_URI'];
+                $params = $_GET;
+                $params['MadelineSelfRestart'] = Tools::randomInt();
+                $url = \explode('?', $uri, 2)[0] ?? '';
+                $query = \http_build_query($params);
+                $uri = \implode('?', [$url, $query]);
+                $payload = $_SERVER['REQUEST_METHOD'].' '.$uri." HTTP/1.1\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
+                $logger->logger("Connecting to {$address}:{$port}");
+                $a = \fsockopen($address, $port);
+                $logger->logger('Sending self-restart payload');
+                $logger->logger($payload);
+                \fwrite($a, $payload);
+                $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
+                // Keep around resource for a bit more
+                $GLOBALS['MadelineShutdown'] = $a;
+                $logger->logger('Shutdown of self-restart callback');
+            }, 'restarter');
+            $this->logger->logger("Added restart callback with ID $id!");
             $this->logger->logger('Done webhost init process!');
             Tools::closeConnection($this->getWebMessage('The bot was started!'));
             $inited = true;
         } elseif (PHP_SAPI === 'cli') {
             try {
                 if (\function_exists('shell_exec') && \file_exists('/data/data/com.termux/files/usr/bin/termux-wake-lock')) {
+                    /** @psalm-suppress ForbiddenCode */
                     \shell_exec('/data/data/com.termux/files/usr/bin/termux-wake-lock');
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable) {
             }
         }
     }
@@ -172,6 +169,7 @@ trait Loop
             }
             $this->waitUpdate();
             $this->logger->logger('Resuming update loop!', Logger::VERBOSE);
+            /** @var bool $this->stopLoop */
         } while (!$this->stopLoop);
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
         $this->stopLoop = false;

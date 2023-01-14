@@ -9,7 +9,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\SettingsEmpty;
-use danog\MadelineProto\Tools;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -109,11 +108,10 @@ final class DataCenterTest extends TestCase
              *
              * @param Settings $settings Logger settings
              */
-            public function initTests(Settings $settings, ?DataCenter &$dataCenter): void
+            public function initTests(Settings $settings): void
             {
                 $this->logger = Logger::constructorFromSettings($settings->getLogger());
                 $this->settings = $settings;
-                $this->datacenter = &$dataCenter;
             }
             /**
              * Get logger.
@@ -143,7 +141,7 @@ final class DataCenterTest extends TestCase
 
         \sleep(1);
         try {
-            Tools::wait($datacenter->dcConnect(2));
+            $datacenter->dcConnect(2);
         } catch (Throwable $e) {
             if (!$test_mode) {
                 throw $e;

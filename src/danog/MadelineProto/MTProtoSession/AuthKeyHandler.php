@@ -130,11 +130,7 @@ trait AuthKeyHandler
                     $p = 0;
                     $q = 0;
                     try {
-                        if ($method === 'wolfram') {
-                            $p = $this->wolframSingle($pq);
-                        } else {
-                            $p = PrimeModule::$method($pq);
-                        }
+                        $p = PrimeModule::$method($pq);
                     } catch (Throwable $e) {
                         $this->logger->logger("While factorizing with $method: $e");
                     }
@@ -406,39 +402,5 @@ trait AuthKeyHandler
             throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
         }
         return null;
-    }
-    /**
-     * Factorize number asynchronously using the wolfram API.
-     *
-     * @param string|integer $what Number to factorize
-     */
-    private function wolframSingle(string|int $what): false|int
-    {
-        $code = ($this->API->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
-        $query = 'Do prime factorization of '.$what;
-        $params = ['async' => true, 'banners' => 'raw', 'debuggingdata' => false, 'format' => 'moutput', 'formattimeout' => 8, 'input' => $query, 'output' => 'JSON', 'proxycode' => \json_decode($code, true)['code']];
-        $url = 'https://www.wolframalpha.com/input/json.jsp?'.\http_build_query($params);
-        $request = new Request($url);
-        $request->setHeader('referer', 'https://www.wolframalpha.com/input/?i='.\urlencode($query));
-        $res = \json_decode(($this->API->datacenter->getHTTPClient()->request($request))->getBody()->buffer(), true);
-        if (!isset($res['queryresult']['pods'])) {
-            return false;
-        }
-        $fres = false;
-        foreach ($res['queryresult']['pods'] as $cur) {
-            if ($cur['id'] === 'Divisors') {
-                $fres = \explode(', ', \preg_replace(['/{\\d+, /', '/, \\d+}$/'], '', $cur['subpods'][0]['moutput']));
-                break;
-            }
-        }
-        if (\is_array($fres)) {
-            $fres = $fres[0];
-            $newval = \intval($fres);
-            if (\is_int($newval)) {
-                $fres = $newval;
-            }
-            return (int) $fres;
-        }
-        return false;
     }
 }

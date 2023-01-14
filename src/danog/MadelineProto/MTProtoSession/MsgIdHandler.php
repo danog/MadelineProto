@@ -41,19 +41,9 @@ final class MsgIdHandler
      *
      * @param Connection $session Session
      */
-    private function __construct(Connection $session)
+    public function __construct(Connection $session)
     {
         $this->session = $session;
-    }
-
-    /**
-     * Create MsgIdHandler instance.
-     *
-     * @param Connection $session Session
-     */
-    public static function createInstance(Connection $session): self
-    {
-        return new self($session);
     }
 
     /**
