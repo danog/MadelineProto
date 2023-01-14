@@ -27,7 +27,7 @@ namespace danog\MadelineProto\Stream;
  *
  * @template TT
  *
- * @implements RawStreamInterface<TT>
+ * @extends ProxyStreamInterface<TT>
  */
 interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
 {

@@ -36,5 +36,5 @@ interface FileCallbackInterface
      * @param float $speed   Speed in mbps
      * @param float $time    Time
      */
-    public function __invoke(float $percent, float $speed, float $time): void;
+    public function __invoke(float $percent, float $speed, float $time);
 }

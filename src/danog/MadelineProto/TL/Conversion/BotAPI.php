@@ -382,9 +382,6 @@ trait BotAPI
             $entities = new DOMEntities($arguments['message']);
             $arguments['message'] = $entities->message;
             $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
-            if ($entities->buttons) {
-                $arguments['reply_markup'] = $this->buildRows($entities->buttons);
-            }
             unset($arguments['parse_mode']);
         }
         return $arguments;
@@ -401,7 +398,6 @@ trait BotAPI
         $args = $this->parseMode($args);
         $args['entities'] ??= [];
 
-        \var_dump($args);
         // UTF-8 length, not UTF-16
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $cur_len = 0;
@@ -433,7 +429,6 @@ trait BotAPI
                 'message' => $cur
             ];
         }
-        \var_dump($multiple_args);
 
         $i = 0;
         $offset = 0;
@@ -502,34 +497,5 @@ trait BotAPI
             $this->logger->logger("Too many entities, {$total} entities will be truncated", Logger::FATAL_ERROR);
         }
         return $multiple_args;
-    }
-    /**
-     * @return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
-     */
-    private function buildRows($button_list): array
-    {
-        $end = false;
-        $rows = [];
-        $buttons = [];
-        $cols = 0;
-        foreach ($button_list as $button) {
-            if (isset($button['new'])) {
-                if (\count($buttons) == 0) {
-                    $buttons[] = $button;
-                } else {
-                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                    $rows[] = $row;
-                    $buttons = [$button];
-                }
-            } else {
-                $buttons[] = $button;
-                $end = true;
-            }
-        }
-        if ($end) {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-            $rows[] = $row;
-        }
-        return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

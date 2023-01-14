@@ -435,6 +435,7 @@ class DataCenter
                                 $stream[1] = $this->dohWrapper->webSocketConnector;
                             }
                             /** @var array{0: class-string, 1: mixed} $stream */
+                            /** @psalm-suppress TooFewArguments Psalm bug */
                             $ctx->addStream(...$stream);
                         }
                         $ctxs[] = $ctx;

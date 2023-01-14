@@ -27,10 +27,10 @@ trait TD
     /**
      * Convert tdcli parameters to tdcli.
      *
-     * @param array $params Params
+     * @param mixed $params Params
      * @param array $key    Key
      */
-    public function tdcliToTd(array &$params, ?array $key = null): array
+    public function tdcliToTd(&$params, ?array $key = null): array
     {
         if (!\is_array($params)) {
             return $params;

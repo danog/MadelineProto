@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="dev-master@">
+  <file src="src/danog/MadelineProto/Conversion.php">
+    <UndefinedDocblockClass occurrences="1">
+      <code>$MadelineProto-&gt;help-&gt;getConfig()</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/danog/MadelineProto/Db/DriverArray.php">
+    <UndefinedMethod occurrences="1">
+      <code>getName</code>
+    </UndefinedMethod>
+  </file>
+  <file src="src/danog/MadelineProto/Db/MemoryArray.php">
+    <MethodSignatureMismatch occurrences="2">
+      <code>MemoryArray</code>
+      <code>MemoryArray</code>
+    </MethodSignatureMismatch>
+  </file>
+  <file src="src/danog/MadelineProto/Stream/Common/UdpBufferedStream.php">
+    <InvalidPropertyAssignmentValue occurrences="1">
+      <code>$ctx-&gt;getStream($header)</code>
+    </InvalidPropertyAssignmentValue>
+    <MethodSignatureMismatch occurrences="1">
+      <code>UdpBufferedStream</code>
+    </MethodSignatureMismatch>
+  </file>
+</files>

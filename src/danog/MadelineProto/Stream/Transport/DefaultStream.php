@@ -41,6 +41,8 @@ use function Amp\Socket\socketConnector;
  * Manages reading data in chunks
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<?SocketConnector>
  */
 class DefaultStream implements RawStreamInterface, ProxyStreamInterface
 {
@@ -52,7 +54,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Connector.
      */
-    private SocketConnector $connector;
+    private ?SocketConnector $connector = null;
     public function setupTls(?Cancellation $cancellationToken = null): void
     {
         $this->stream->setupTls($cancellationToken);

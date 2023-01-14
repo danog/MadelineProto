@@ -19,7 +19,7 @@ use function count;
  * @author Charles-Édouard Coste <contact@ccoste.fr>
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Ogg
+final class Ogg
 {
     private const CAPTURE_PATTERN = "\x4f\x67\x67\x53"; // ASCII encoded "OggS" string
     private const BOS = 2;
@@ -61,8 +61,9 @@ class Ogg
 
     /**
      * OPUS packet emitter.
+     * @param iterable<string>
      */
-    private Emitter $emitter;
+    private iterable $emitter;
 
     private function __construct()
     {
@@ -78,7 +79,7 @@ class Ogg
         $self = new self;
         $self->frameDuration = $frameDuration;
         $self->stream = $stream->getReadBuffer($l);
-        $self->emitter = new Emitter;
+        $self->emitter = $self->read();
         $pack_format = [
             'stream_structure_version' => 'C',
             'header_type_flag'         => 'C',
@@ -114,8 +115,10 @@ class Ogg
     }
     /**
      * OPUS state machine.
+     *
+     * @psalm-suppress InvalidArrayOffset
      */
-    private function opusStateMachine(string $content): void
+    private function opusStateMachine(string $content): \Generator
     {
         $curStream = 0;
         $offset = 0;
@@ -200,9 +203,10 @@ class Ogg
             if (!$selfDelimited && $totalDuration + $this->currentDuration <= $this->frameDuration) {
                 $this->currentDuration += $totalDuration;
                 $sum = \array_sum($sizes);
+                /** @psalm-suppress InvalidArgument */
                 $this->opusPayload .= \substr($content, $preOffset, ($offset - $preOffset) + $sum + $paddingLen);
                 if ($this->currentDuration === $this->frameDuration) {
-                    $this->emitter->emit($this->opusPayload);
+                    yield $this->opusPayload;
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
                 }
@@ -220,7 +224,7 @@ class Ogg
                     if ($this->currentDuration > $this->frameDuration) {
                         Logger::log("Emitting packet with duration {$this->currentDuration} but need {$this->frameDuration}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
                     }
-                    $this->emitter->emit($this->opusPayload);
+                    yield $this->opusPayload;
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
                 }
@@ -231,8 +235,10 @@ class Ogg
 
     /**
      * Read frames.
+     *
+     * @return iterable<string>
      */
-    public function read()
+    private function read(): iterable
     {
         $state = self::STATE_READ_HEADER;
         $content = '';
@@ -240,7 +246,6 @@ class Ogg
         while (true) {
             $init = $this->stream->bufferRead(4+23);
             if (empty($init)) {
-                $this->emitter->complete();
                 return false; // EOF
             }
             if (\substr($init, 0, 4) !== self::CAPTURE_PATTERN) {
@@ -282,7 +287,7 @@ class Ogg
                 if ($segment_size < 255) {
                     $content .= $this->stream->bufferRead($sizeAccumulated);
                     if ($state === self::STATE_STREAMING) {
-                        $this->opusStateMachine($content);
+                        yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         if (\substr($content, 0, 8) !== 'OpusHead') {
                             throw new RuntimeException('This is not an OPUS stream!');
@@ -324,8 +329,10 @@ class Ogg
 
     /**
      * Get OPUS packet emitter.
+     *
+     * @return iterable<string>
      */
-    public function getEmitter(): Emitter
+    public function getEmitter(): iterable
     {
         return $this->emitter;
     }

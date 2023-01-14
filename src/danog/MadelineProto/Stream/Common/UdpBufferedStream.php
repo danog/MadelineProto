@@ -46,7 +46,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = ($ctx->getStream($header));
+        $this->stream = $ctx->getStream($header);
     }
     /**
      * Async close.
@@ -154,20 +154,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
                 }
             }
         };
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public function getSocket(): EncryptableSocket
-    {
-        return $this->getSocket();
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public function getStream(): RawStreamInterface
-    {
-        return $this;
     }
     public static function getName(): string
     {

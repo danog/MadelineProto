@@ -35,6 +35,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * @author Daniil Gentili <daniil@daniil.it>
  *
  * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
+ * @implements BufferedProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
 class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
@@ -177,7 +178,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param array $extra Proxy data
      */
-    public function setExtra(array $extra): void
+    public function setExtra($extra): void
     {
         $this->extra = $extra;
     }

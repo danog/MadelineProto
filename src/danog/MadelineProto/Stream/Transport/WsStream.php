@@ -42,6 +42,8 @@ use Throwable;
  * Websocket stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<?WebsocketConnector>
  */
 class WsStream implements RawStreamInterface, ProxyStreamInterface
 {

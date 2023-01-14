@@ -60,19 +60,19 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): void {
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): bool {
             try {
                 $latest = $client->request($request);
                 Magic::$version_latest = $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
                     Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
-                    self::$cleanupLoop->signal(true);
                     if (Magic::$isIpcWorker) {
                         die;
                     }
-                    return;
+                    return true;
                 }
 
+                /** @psalm-suppress UndefinedConstant */
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
                     $base = \basename($path);
                     if ($base === 'madeline-'.Magic::$version.'.phar') {
@@ -90,6 +90,7 @@ final class GarbageCollector
             } catch (Throwable $e) {
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
+            return false;
         }, 'Phar cleanup loop', 60*1000);
         self::$cleanupLoop->start();
     }

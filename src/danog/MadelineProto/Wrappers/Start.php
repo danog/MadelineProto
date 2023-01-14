@@ -49,6 +49,7 @@ trait Start
             if ($this instanceof Client) {
                 $settings = $this->getSettings();
             } else {
+                /** @psalm-suppress UndefinedThisPropertyFetch Ignore psalm bug */
                 $settings = $this->settings;
             }
             $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());

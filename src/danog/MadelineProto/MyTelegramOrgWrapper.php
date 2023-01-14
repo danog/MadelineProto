@@ -71,16 +71,15 @@ class MyTelegramOrgWrapper
     }
     /**
      * Constructor.
-     *
      */
-    public function __construct(array|Settings $settings)
+    public function __construct(array|SettingsAbstract $settings)
     {
-        $this->settings = Settings::parseFromLegacy($settings);
-        if (!$this->settings instanceof Settings) {
+        $settings = Settings::parseFromLegacy($settings);
+        if (!$settings instanceof Settings) {
             $settings = new Settings;
             $settings->merge($this->settings);
-            $this->settings = $settings;
         }
+        $this->settings = $settings;
         $this->__wakeup();
     }
     /**
@@ -88,16 +87,6 @@ class MyTelegramOrgWrapper
      */
     public function __wakeup(): void
     {
-        if (!$this->settings) {
-            $this->settings = new Settings;
-        } elseif (\is_array($this->settings)) {
-            $this->settings = Settings::parseFromLegacy($this->settings);
-            if (!$this->settings instanceof Settings) {
-                $settings = new Settings;
-                $settings->merge($this->settings);
-                $this->settings = $settings;
-            }
-        }
         if (!$this->jar || !$this->jar instanceof LocalCookieJar) {
             $this->jar = new LocalCookieJar();
         }

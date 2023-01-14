@@ -54,7 +54,6 @@ class DoHConnector implements SocketConnector
     ): EncryptableSocket {
         $socketContext = $context ?? new ConnectContext();
         $token ??= new NullCancellation();
-        $attempt = 0;
         $uris = [];
         $failures = [];
         [$scheme, $host, $port] = parseUri($uri);
@@ -144,12 +143,8 @@ class DoHConnector implements SocketConnector
                 $knownReasons = [110 => 'connection timeout', 111 => 'connection refused'];
                 $code = $e->getCode();
                 $reason = $knownReasons[$code] ?? 'Error #'.$code;
-                if (++$attempt === $socketContext->getMaxAttempts()) {
-                    break;
-                }
                 $failures[] = "{$uri} ({$reason})";
                 continue;
-                // Could not connect to host, try next host in the list.
             }
             return ResourceSocket::fromClientSocket($socket, $socketContext->getTlsContext());
         }

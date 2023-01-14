@@ -11,8 +11,7 @@ use Countable;
 /**
  * DB array interface.
  *
- * @template TTSettings as DatabaseAbstract
- * @extends DbType<TTSettings>
+ * @extends ArrayAccess<array-key, mixed>
  */
 interface DbArray extends DbType, ArrayAccess, Countable
 {

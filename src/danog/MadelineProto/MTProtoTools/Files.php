@@ -504,6 +504,7 @@ trait Files
      */
     public static function extractBotAPIFile(array $info): ?array
     {
+        /** @psalm-suppress UndefinedConstant */
         foreach (TYPES as $type) {
             if (isset($info[$type]) && \is_array($info[$type])) {
                 $method = $type;

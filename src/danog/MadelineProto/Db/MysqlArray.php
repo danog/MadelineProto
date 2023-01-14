@@ -33,7 +33,7 @@ class MysqlArray extends SqlArray
     /**
      * Prepare statements.
      *
-     * @param SqlArray::STATEMENT_* $type
+     * @param SqlArray::SQL_* $type
      */
     protected function getSqlQuery(int $type): string
     {

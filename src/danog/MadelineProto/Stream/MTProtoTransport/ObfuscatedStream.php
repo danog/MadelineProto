@@ -31,6 +31,8 @@ use danog\MadelineProto\Tools;
  * Manages obfuscated2 encryption/decryption
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<array{secret?: string, address?: string, port?: int}>
  */
 class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 {
@@ -71,10 +73,8 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
     }
     /**
      * Set extra.
-     *
-     * @param array $extra Extra
      */
-    public function setExtra(array $extra): void
+    public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
             if (\strlen($extra['secret']) > 17) {

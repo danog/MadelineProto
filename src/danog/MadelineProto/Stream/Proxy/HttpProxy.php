@@ -36,6 +36,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * @author Daniil Gentili <daniil@daniil.it>
  *
  * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
+ * @implements BufferedProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
 class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
@@ -174,10 +175,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     }
     /**
      * Sets proxy data.
-     *
-     * @param array $extra Proxy data
      */
-    public function setExtra(array $extra): void
+    public function setExtra($extra): void
     {
         $this->extra = $extra;
     }

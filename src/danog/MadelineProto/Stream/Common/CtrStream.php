@@ -110,7 +110,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
     public function bufferWrite(string $data): void
     {
@@ -132,7 +131,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param array $data Keys
      */
-    public function setExtra(array $data): void
+    public function setExtra($data): void
     {
         $this->extra = $data;
     }

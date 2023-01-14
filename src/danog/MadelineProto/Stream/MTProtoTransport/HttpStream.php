@@ -24,9 +24,11 @@ use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
+use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Tools;
 use Psr\Http\Message\UriInterface;
 
@@ -34,8 +36,10 @@ use Psr\Http\Message\UriInterface;
  * HTTP stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<array{user?: string, password?: string}>
  */
-class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
+class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface, ReadBufferInterface
 {
     /**
      * Stream.
@@ -65,7 +69,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param array $extra Proxy parameters
      */
-    public function setExtra(array $extra): void
+    public function setExtra($extra): void
     {
         if (isset($extra['user']) && isset($extra['password'])) {
             $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";

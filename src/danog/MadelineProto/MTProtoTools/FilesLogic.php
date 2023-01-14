@@ -12,7 +12,6 @@ use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
-use Amp\Http\Client\Response as ClientResponse;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Http\Status;
@@ -47,13 +46,13 @@ trait FilesLogic
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string $messageMedia File to download
+     * @param array|string|FileCallbackInterface $messageMedia File to download
      * @param ?callable     $cb           Status callback (can also use FileCallback)
      * @param ?int $size Size of file to download, required for bot API file IDs.
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(array|string|FileCallbackInterface $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -159,14 +158,14 @@ trait FilesLogic
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string  $messageMedia File to download
+     * @param array|string|FileCallbackInterface  $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
      * @param ?int          $size         Size of file to download, required for bot API file IDs.
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(array|string $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): ClientResponse
+    public function downloadToResponse(array|string|FileCallbackInterface $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -246,8 +245,9 @@ trait FilesLogic
         if (\is_resource($file) || (\is_object($file) && $file instanceof ReadableStream)) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
-        /** @var Settings */
+        /** @psalm-suppress UndefinedThisPropertyFetch */
         $settings = $this instanceof Client ? $this->getSettings() : $this->settings;
+        /** @var Settings $settings */
         if (!$settings->getFiles()->getAllowAutomaticUpload()) {
             return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }

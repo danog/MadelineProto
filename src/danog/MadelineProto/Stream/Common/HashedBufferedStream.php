@@ -126,7 +126,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param string $hash Algorithm name
      */
-    public function setExtra(string $hash): void
+    public function setExtra($hash): void
     {
         $rev = \strpos($hash, '_rev');
         $this->rev = false;
@@ -186,8 +186,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     }
     /**
      * Reads data from the stream.
-     *
-     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
      */
     public function bufferRead(int $length): ?string
     {

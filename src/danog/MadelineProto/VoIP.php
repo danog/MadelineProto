@@ -442,8 +442,7 @@ class VoIP
         $ctx->addStream(FileBufferedStream::class, openFile($file, 'r'));
         $stream = $ctx->getStream();
         $ogg = Ogg::init($stream, 60000);
-        $it = $ogg->getEmitter()->iterate();
-        async($ogg->read(...));
+        $it = $ogg->getEmitter();
         return $it;
     }
     /**

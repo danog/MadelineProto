@@ -97,6 +97,8 @@ final class APIWrapper
      *
      * @param API|APIWrapper $a Instance to which link
      * @param API|APIWrapper $b Instance from which link
+     *
+     * @psalm-suppress InvalidPassByReference
      */
     public static function link(API|APIWrapper $a, API|APIWrapper $b): void
     {

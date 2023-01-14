@@ -19,7 +19,7 @@ final class ExitFailure
 
     private int|string $code;
 
-    /** @var array<string> */
+    /** @var list<array<non-empty-string, list<scalar>|scalar>> */
     private array $trace;
 
     private ?string $tlTrace = null;

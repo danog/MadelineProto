@@ -321,6 +321,7 @@ class API extends InternalDoc
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
             AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
+            /** @var ?MTProto $this->API */
             if (isset($this->API)) {
                 $this->storage = $this->API->storage ?? $this->storage;
 

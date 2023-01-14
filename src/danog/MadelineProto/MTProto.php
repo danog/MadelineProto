@@ -1468,12 +1468,12 @@ class MTProto implements TLCallback, LoggerGetter
         if (!\is_object($this->datacenter)) {
             throw new Exception(Lang::$current_lang['session_corrupted']);
         }
-        foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
+        foreach ($this->datacenter->getDataCenterConnections() as $socket) {
             if ($de) {
                 $socket->resetSession();
             }
             if ($auth_key) {
-                $socket->setAuthKey(null);
+                $socket->setTempAuthKey(null);
             }
         }
     }

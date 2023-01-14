@@ -26,7 +26,7 @@ namespace danog\MadelineProto\Stream;
  * @author Daniil Gentili <daniil@daniil.it>
  *
  * @template TT
- * @implements ProxyStreamInterface<TT>
+ * @extends ProxyStreamInterface<TT>
  */
 interface BufferedProxyStreamInterface extends BufferedStreamInterface, ProxyStreamInterface
 {

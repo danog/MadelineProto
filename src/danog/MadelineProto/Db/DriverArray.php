@@ -15,7 +15,7 @@ use function Amp\async;
 /**
  * Array caching trait.
  *
- * @impleme
+ * @implements IteratorAggregate<array-key, mixed>
  */
 abstract class DriverArray implements DbArray, IteratorAggregate
 {
@@ -69,6 +69,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
 
     public static function getInstance(string $table, DbType|array|null $previous, $settings): static
     {
+        /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
         $instance->setTable($table);
 

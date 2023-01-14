@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\SecretChats;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -46,7 +47,7 @@ trait MessageHandler
      * @param DeferredFuture<null> $queuePromise Queue promise
      * @internal
      */
-    public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise)
+    public function encryptSecretMessage(int $chat_id, array $message, DeferredFuture $queuePromise): string|false
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $chat_id));
@@ -93,7 +94,7 @@ trait MessageHandler
      *
      * @internal
      */
-    public function handleEncryptedUpdate(array $message)
+    public function handleEncryptedUpdate(array $message): bool
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
@@ -150,7 +151,7 @@ trait MessageHandler
         return true;
     }
 
-    private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data): false|string
+    private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data): string
     {
         [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
@@ -171,7 +172,7 @@ trait MessageHandler
         return $message_data;
     }
 
-    private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data): false|string
+    private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data): string
     {
         [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);

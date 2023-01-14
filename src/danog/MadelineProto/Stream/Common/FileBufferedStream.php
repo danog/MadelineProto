@@ -151,7 +151,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * Set file handle.
      */
-    public function setExtra(File $extra): void
+    public function setExtra($extra): void
     {
         $this->stream = $extra;
     }

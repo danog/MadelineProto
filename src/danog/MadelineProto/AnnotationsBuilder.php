@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
-use Generator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionMethod;
@@ -260,9 +259,6 @@ class AnnotationsBuilder
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;
-            if ($type instanceof ReflectionNamedType && \in_array($type->getName(), [Generator::class, Promise::class])) {
-                $hasReturnValue = false;
-            }
             if (!$hasVariadic && !$static && !$hasReturnValue) {
                 $paramList .= '$extra, ';
                 $doc .= 'array $extra = []';
@@ -302,7 +298,7 @@ class AnnotationsBuilder
             if (!$type) {
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
-            $promise = '\\'.Promise::class;
+            $promise = '\\';
             $phpdoc = $method->getDocComment() ?? '';
             if (!\str_contains($phpdoc, '@return')) {
                 if (!\trim($phpdoc)) {

@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -35,10 +36,12 @@ use Throwable;
  * Manages reading data in chunks
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<EncryptableSocket>
  */
 class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
-    private $stream;
+    private EncryptableSocket $stream;
     public function __construct()
     {
     }

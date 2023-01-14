@@ -78,7 +78,9 @@ abstract class StrTools extends Extension
     {
         $result = [];
         foreach (\str_split(\mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
-            $result []= \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+            $chunk = \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+            Assert::string($chunk);
+            $result []= $chunk;
         }
         return $result;
     }

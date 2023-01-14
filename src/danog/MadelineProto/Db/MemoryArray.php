@@ -11,7 +11,7 @@ use danog\MadelineProto\Settings\Database\Memory;
 /**
  * Memory database backend.
  *
- * @implements DbArray<Memory>
+ * @extends ArrayIterator<array-key, mixed>
  */
 class MemoryArray extends ArrayIterator implements DbArray
 {
@@ -20,6 +20,9 @@ class MemoryArray extends ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
+    /**
+     * @param Memory $settings
+     */
     public static function getInstance(string $table, $previous, $settings): static
     {
         if ($previous instanceof MemoryArray) {

@@ -28,14 +28,14 @@ use JsonSerializable;
 /**
  * Clickable button.
  *
- * @implements ArrayAccess<string, mixed>
+ * @implements ArrayAccess<array-key, mixed>
  */
 class Button implements JsonSerializable, ArrayAccess
 {
     /**
      * Button data.
      *
-     * @var array<string, mixed>
+     * @var array<array-key, mixed>
      */
     private array $button = [];
     /**
