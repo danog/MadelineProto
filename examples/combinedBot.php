@@ -43,6 +43,10 @@ class MyEventHandler extends EventHandler
      * @var int|string Username or ID of bot admin
      */
     const ADMIN = "danogentili"; // Change this
+    public function onStart()
+    {
+        var_dump(yield $this->getSelf());
+    }
     /**
      * Get peer(s) where to report errors.
      *
@@ -57,7 +61,7 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewChannelMessage(array $update): Generator
+    public function onUpdateNewChannelMessage(array $update)
     {
         return $this->onUpdateNewMessage($update);
     }
@@ -66,25 +70,20 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewMessage(array $update): Generator
+    public function onUpdateNewMessage(array $update): void
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
-        $res = json_encode($update, JSON_PRETTY_PRINT);
-
-        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => $update['message']['id'] ?? null, 'parse_mode' => 'HTML']);
-        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
-            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-        }
+        $this->logger($update);
     }
 }
 
 $MadelineProtos = [];
 foreach ([
-    'bot.madeline' => 'Bot Login',
-    'user.madeline' => 'Userbot login',
-    'user2.madeline' => 'Userbot login (2)',
+    'session1.madeline' => 'Bot Login',
+    'session2.madeline' => 'Userbot login',
+    'session3.madeline' => 'Userbot login (2)',
 ] as $session => $message) {
     Logger::log($message, Logger::WARNING);
     $MadelineProtos []= new API($session);

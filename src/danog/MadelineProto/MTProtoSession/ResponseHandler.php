@@ -258,7 +258,7 @@ trait ResponseHandler
             $request->reply($response);
         }
     }
-    public function handleRpcError(OutgoingMessage $request, array $response): ?Throwable
+    private function handleRpcError(OutgoingMessage $request, array $response): ?Throwable
     {
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);

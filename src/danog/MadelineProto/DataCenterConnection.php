@@ -96,7 +96,7 @@ final class DataCenterConnection implements JsonSerializable
      * Linked DC ID.
      *
      */
-    private ?int $linked = null;
+    private ?int $linkedDc = null;
     /**
      * Loop to keep weights at sane value.
      */
@@ -378,7 +378,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function link(int $dc): void
     {
-        $this->linked = $dc;
+        $this->linkedDc = $dc;
         $this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey;
     }
     /**
@@ -720,7 +720,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return $this->linked ? ['linked' => $this->linked, 'tempAuthKey' => $this->tempAuthKey] : ['permAuthKey' => $this->permAuthKey, 'tempAuthKey' => $this->tempAuthKey];
+        return $this->linkedDc ? ['linkedDc' => $this->linkedDc, 'tempAuthKey' => $this->tempAuthKey] : ['permAuthKey' => $this->permAuthKey, 'tempAuthKey' => $this->tempAuthKey];
     }
     /**
      * Sleep function.
@@ -729,6 +729,12 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function __sleep(): array
     {
-        return $this->linked ? ['linked', 'tempAuthKey'] : ['permAuthKey', 'tempAuthKey'];
+        return $this->linkedDc ? ['linkedDc', 'tempAuthKey'] : ['permAuthKey', 'tempAuthKey'];
+    }
+    public function __wakeup(): void
+    {
+        if (\is_int($this->linked)) {
+            $this->linkedDc = $this->linked;
+        }
     }
 }

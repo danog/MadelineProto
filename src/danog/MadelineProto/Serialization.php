@@ -150,7 +150,6 @@ abstract class Serialization
                     $copy->cancel();
                 }
             };
-            $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
             async(function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
                 try {
                     $lightState = $session->getLightState();
@@ -162,6 +161,7 @@ abstract class Serialization
                     $lightState = false;
                 }
             });
+            $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
         });
         EventLoop::cancel($warningId);
 
