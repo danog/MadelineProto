@@ -28,10 +28,11 @@ use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
 use function Amp\File\exists;
-
+use function Amp\File\getStatus;
 use function Amp\File\move;
 use function Amp\File\openFile;
 use function Amp\File\stat;
+use function Amp\File\touch;
 use function Amp\File\write;
 use function serialize;
 
@@ -138,7 +139,8 @@ final class SessionPaths
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
             $file = openFile($path, 'rb');
-            $size = stat($path);
+            touch($path); // Invalidate size cache
+            $size = getStatus($path);
             $size = $size['size'] ?? $headerLen;
 
             $file->seek($headerLen++);
@@ -152,8 +154,7 @@ final class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $d = ($file->read(null, $size - $headerLen)) ?? '';
-            $unserialized = \unserialize($d);
+            $unserialized = \unserialize($file->read(null, $size - $headerLen) ?? '');
             $file->close();
         } finally {
             $unlock();
