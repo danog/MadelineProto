@@ -107,8 +107,7 @@ runTestSimple()
 }
 runTest()
 {
-    echo "m
-$API_ID
+    echo "$API_ID
 $API_HASH
 b
 $BOT_TOKEN
