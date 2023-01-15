@@ -7,6 +7,10 @@ use danog\MadelineProto\Logger;
 
 function logger(...$messages)
 {
+    if(isset($messages[0]) && is_array($messages[0]))
+    {
+        $messages = $messages[0];
+    }
     Logger::log(implode("\n\t", $messages));
 }
 

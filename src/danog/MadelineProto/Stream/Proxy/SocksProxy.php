@@ -133,7 +133,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = \unpack('n', yield $buffer->bufferRead(2))[1];
-        logger(['Connected to '.$ip.':'.$port.' via socks5']);
+        logger('Connected to '.$ip.':'.$port.' via socks5');
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
