@@ -1,7 +1,6 @@
 
 clone:
   git:
-    image: woodpeckerci/plugin-git:v1.5.0
     when:
       event: tag
     settings:
