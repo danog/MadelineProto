@@ -30,7 +30,6 @@ use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
-use danog\Serializable;
 use Throwable;
 
 use function Amp\async;
@@ -95,7 +94,6 @@ final class API extends InternalDoc
      * @var int
      */
     const SECRET_READY = MTProto::SECRET_READY;
-    use Serializable;
     use Start;
     use Templates;
     /**
@@ -109,7 +107,7 @@ final class API extends InternalDoc
      * Instance of MadelineProto.
      *
      */
-    public MTProto|Client|null $API = null;
+    protected MTProto|Client|null $API = null;
 
     /**
      * Storage for externally set properties to be serialized.
@@ -154,7 +152,7 @@ final class API extends InternalDoc
      * @param string         $session  Session name
      * @param array          $settings Settings
      */
-    public function __magic_construct(string $session, array|SettingsAbstract $settings = []): void
+    public function __construct(string $session, array|SettingsAbstract $settings = [])
     {
         Magic::start(true);
         $settings = Settings::parseFromLegacy($settings);

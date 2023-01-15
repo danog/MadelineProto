@@ -41,7 +41,6 @@ use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use danog\Serializable;
 use Throwable;
 
 /**
@@ -68,7 +67,6 @@ use Throwable;
  */
 final class DataCenter
 {
-    use Serializable;
     /**
      * All socket connections to DCs.
      *
@@ -176,7 +174,7 @@ final class DataCenter
      * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
      * @param CookieJar   $jar          Cookie jar
      */
-    public function __magic_construct(MTProto $API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, ?CookieJar $jar = null): void
+    public function __construct(MTProto $API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, ?CookieJar $jar = null)
     {
         $this->API = $API;
         $changed = [];
@@ -225,7 +223,7 @@ final class DataCenter
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
         if (isset($this->sockets[$dc_number]) && !$old) {
-            $this->API->logger("Not reconnecting to DC {$dc_number} ({$id})");
+            $this->API->logger->logger("Not reconnecting to DC {$dc_number} ({$id})");
             return false;
         }
         $ctxs = $this->generateContexts($dc_number);
@@ -383,7 +381,7 @@ final class DataCenter
                     foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
                         $stream = \end($combo)[0];
                         if ($stream === HttpsStream::class) {
-                            $subdomain = $this->settings->getSslSubdomains()[$dc_number] ?? null;
+                            $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
                             if (!$subdomain) {
                                 continue;
                             }
@@ -398,7 +396,7 @@ final class DataCenter
                             $uri = 'tcp://'.$address.':'.$port;
                         }
                         if ($combo[1][0] === WssStream::class) {
-                            $subdomain = $this->settings->getSslSubdomains()[$dc_number] ?? null;
+                            $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
                             if (!$subdomain) {
                                 continue;
                             }
@@ -408,13 +406,15 @@ final class DataCenter
                             $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                         } elseif ($combo[1][0] === WsStream::class) {
-                            $subdomain = $this->settings->getSslSubdomains()[$dc_number];
+                            $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
+                            if (!$subdomain) {
+                                continue;
+                            }
                             if (DataCenter::isMedia($dc_number)) {
                                 $subdomain .= '-1';
                             }
                             $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
-                            //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                            $uri = 'tcp://'.$address.':'.$port.'/'.$path;
+                            $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
                         }
                         $ctx = (new ConnectionContext())
                             ->setDc($dc_number)

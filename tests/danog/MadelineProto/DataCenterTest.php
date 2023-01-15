@@ -4,71 +4,25 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
-use danog\MadelineProto\DataCenter;
+use Amp\PHPUnit\AsyncTestCase;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\SettingsEmpty;
+use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
 use Generator;
-use PHPUnit\Framework\TestCase;
-use Throwable;
 
 \define('MADELINEPROTO_TEST', 'pony');
 
-final class DataCenterTest extends TestCase
+final class DataCenterTest extends AsyncTestCase
 {
-    /**
-     * DC list.
-     */
-    protected array $dcList = [
-        'test' => [
-            // Test datacenters
-            'ipv4' => [
-                // ipv4 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.40',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-            'ipv6' => [
-                // ipv6 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-        ],
-        'main' => [
-            // Main datacenters
-            'ipv4' => [
-                // ipv4 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.51',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-            'ipv6' => [
-                // ipv6 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-        ],
-    ];
-
     /**
      * Protocol connection test.
      *
@@ -81,75 +35,27 @@ final class DataCenterTest extends TestCase
      */
     public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
-        $settings = Settings::parseFromLegacyFull(
-            [
-                'connection_settings' => [
-                    'all' => [
-                        'ipv6'       => $ipv6,
-                        'test_mode'  => $test_mode,
-                        'protocol'   => $protocol,
-                        'obfuscated' => $obfuscated,
-                        'transport'  => $transport,
-                        'do_not_retry' => true,
-                        'timeout' => 10,
-                    ],
-                ],
-                'logger' => [
-                    'logger' => Logger::FILE_LOGGER,
-                    'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE,
-                ],
-            ],
-        );
-        $datacenter = null;
-        $API = new class(new SettingsEmpty) extends MTProto {
-            /**
-             * Constructor.
-             *
-             * @param Settings $settings Logger settings
-             */
-            public function initTests(Settings $settings): void
-            {
-                $this->logger = Logger::constructorFromSettings($settings->getLogger());
-                $this->settings = $settings;
-            }
-            /**
-             * Get logger.
-             */
-            public function getLogger(): Logger
-            {
-                return $this->logger;
-            }
-
-            /**
-             * Get settings.
-             */
-            public function getSettings(): Settings
-            {
-                return $this->settings;
-            }
-        };
-        $API->initTests($settings, $datacenter);
-        $datacenter = new DataCenter(
-            $API,
-            $this->dcList,
-            $settings->getConnection(),
-        );
-        $API->datacenter = $datacenter;
-
+        $settings = new Settings;
+        $settings->getAppInfo()
+            ->setApiHash(\getenv('API_HASH'))
+            ->setApiId((int) \getenv('API_ID'));
+        $settings->getLogger()
+            ->setType(Logger::FILE_LOGGER)
+            ->setExtra(__DIR__.'/../../MadelineProto.log')
+            ->setLevel(Logger::ULTRA_VERBOSE);
+        $settings->getConnection()
+            ->setIpv6($ipv6)
+            ->setTestMode($test_mode)
+            ->setProtocol($protocol)
+            ->setObfuscated($obfuscated)
+            ->setTransport($transport)
+            ->setRetry(false)
+            ->setTimeout(10);
+        $API = new MTProto($settings);
         $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 '));
 
-        \sleep(1);
-        try {
-            $datacenter->dcConnect(2);
-        } catch (Throwable $e) {
-            if (!$test_mode) {
-                throw $e;
-            }
-        } finally {
-            $datacenter->getDataCenterConnection(2)->disconnect();
-        }
-        $this->assertTrue(true);
+        $ping = \random_bytes(8);
+        $this->assertEquals($ping, $API->methodCallAsyncRead('ping', ['ping_id' => $ping])['ping_id']);
     }
 
     public function protocolProvider(): Generator
@@ -160,21 +66,22 @@ final class DataCenterTest extends TestCase
         }
         foreach ([false, true] as $test_mode) {
             foreach ($ipv6Pair as $ipv6) {
-                foreach (['tcp', 'ws', 'wss'] as $transport) {
+                yield [DefaultStream::class, false, HttpsStream::class, $test_mode, $ipv6];
+                yield [DefaultStream::class, false, HttpStream::class, $test_mode, $ipv6];
+
+                foreach ([WssStream::class, DefaultStream::class, WsStream::class] as $transport) {
                     foreach ([true, false] as $obfuscated) {
-                        if ($transport !== 'tcp' && !$obfuscated) {
+                        if ($transport !== DefaultStream::class && !$obfuscated) {
                             continue;
                         }
-                        foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
-                            if ($protocol === 'full' && $obfuscated) {
+                        foreach ([AbridgedStream::class, IntermediateStream::class, IntermediatePaddedStream::class, FullStream::class] as $protocol) {
+                            if ($protocol === FullStream::class && $obfuscated) {
                                 continue;
                             }
                             yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];
                         }
                     }
                 }
-                yield ['tcp', false, 'http', $test_mode, $ipv6];
-                yield ['tcp', false, 'https', $test_mode, $ipv6];
             }
         }
     }

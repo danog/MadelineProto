@@ -51,7 +51,6 @@ use danog\Serializable;
 final class Connection
 {
     use Session;
-    use Serializable;
     /**
      * Writer loop.
      *

@@ -20,11 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
-use danog\Serializable;
-
 final class TLConstructors
 {
-    use Serializable;
     use TLParams;
     public $by_id = [];
     public $by_predicate_and_layer = [];

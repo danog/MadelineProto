@@ -97,11 +97,6 @@ final class ReferenceDatabase implements TLCallback
     public function init(): void
     {
         $this->initDb($this->API);
-
-        //Clear table on each start to fix fatals with invalid references
-        //Loop::defer(fn () =>$this->db->clear());
-        //Clear table every day
-        //Loop::repeat(24*1000*3600, fn () =>$this->db->clear());
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {

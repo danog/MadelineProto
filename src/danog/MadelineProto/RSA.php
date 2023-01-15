@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\TL;
-use danog\Serializable;
 use phpseclib3\Math\BigInteger;
 
 use const STR_PAD_LEFT;
@@ -31,7 +30,6 @@ use const STR_PAD_LEFT;
  */
 final class RSA
 {
-    use Serializable;
     /**
      * Exponent.
      *

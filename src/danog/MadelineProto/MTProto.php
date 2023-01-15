@@ -67,7 +67,6 @@ use danog\MadelineProto\Wrappers\Start;
 use danog\MadelineProto\Wrappers\Templates;
 use danog\MadelineProto\Wrappers\TOS;
 use danog\MadelineProto\Wrappers\Webhook;
-use danog\Serializable;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -87,7 +86,6 @@ use function time;
  */
 final class MTProto implements TLCallback, LoggerGetter
 {
-    use Serializable;
     use AuthKeyHandler;
     use CallHandler;
     use PeerHandler;
@@ -603,13 +601,12 @@ final class MTProto implements TLCallback, LoggerGetter
      * @param Settings|SettingsEmpty $settings Settings
      * @param ?APIWrapper            $wrapper  API wrapper
      */
-    public function __magic_construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null): void
+    public function __construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null)
     {
-        if (static::class !== self::class || !$wrapper) {
-            return;
+        if ($wrapper) {
+            self::$references[\spl_object_hash($this)] = $this;
+            $this->wrapper = $wrapper;
         }
-        self::$references[\spl_object_hash($this)] = $this;
-        $this->wrapper = $wrapper;
 
         $initDeferred = new DeferredFuture;
         $this->initPromise = $initDeferred->getFuture();
@@ -820,8 +817,8 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->usernames->clear();
             return;
         }
-        if (!\count($this->usernames)) {
-            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
+        if (!isset($this->usernames[''])) {
+            $this->logger('Filling database cache. This can take a few minutes.', Logger::WARNING);
             foreach ($this->chats as $id => $chat) {
                 if (isset($chat['username'])) {
                     $this->usernames[\strtolower($chat['username'])] = $id;
@@ -830,6 +827,7 @@ final class MTProto implements TLCallback, LoggerGetter
                     $this->usernames[\strtolower($username)] = $id;
                 }
             }
+            $this->usernames[''] = 0;
             $this->logger('Cache filled.', Logger::WARNING);
         }
     }
