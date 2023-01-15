@@ -21,12 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
-use Amp\Loop\Driver;
-use Amp\SignalCancellation;
 use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
 use phpseclib3\Math\BigInteger;
-use ReflectionClass;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -41,7 +38,6 @@ use const PHP_SAPI;
 use const SIG_DFL;
 use const SIGINT;
 use const SIGTERM;
-use function Amp\ByteStream\getStdin;
 use function Amp\Log\hasColorSupport;
 use function define;
 use function function_exists;

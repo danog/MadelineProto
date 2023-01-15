@@ -110,9 +110,9 @@ use Webmozart\Assert\Assert;
 
             $API = new API($ipcPath, (new Ipc)->setSlow(true));
             $API->initSelfRestart();
+            $session->storeIpcState(new IpcState($runnerId));
             while (true) {
                 try {
-                    $session->storeIpcState(new IpcState($runnerId));
                     Server::waitShutdown();
                     Shutdown::removeCallback('restarter');
                     Logger::log('A restart was triggered!', Logger::FATAL_ERROR);

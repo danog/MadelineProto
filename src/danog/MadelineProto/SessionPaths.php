@@ -31,7 +31,6 @@ use function Amp\File\exists;
 use function Amp\File\getStatus;
 use function Amp\File\move;
 use function Amp\File\openFile;
-use function Amp\File\stat;
 use function Amp\File\touch;
 use function Amp\File\write;
 use function serialize;

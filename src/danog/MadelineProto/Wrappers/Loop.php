@@ -27,7 +27,6 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 use Generator;
-use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_SAPI;
