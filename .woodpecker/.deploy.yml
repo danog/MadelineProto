@@ -3,7 +3,6 @@ clone:
   git:
     image: woodpeckerci/plugin-git:v1.5.0
     when:
-      platform: linux/arm64
       event: tag
     settings:
       depth: 1
@@ -15,7 +14,6 @@ pipeline:
   deploy:
     image: 192.168.69.1:5000/php-ci:latest
     when:
-      platform: linux/arm64
       event: tag
     secrets:
       - GITHUB_TOKEN
