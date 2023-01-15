@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use function Amp\ByteStream\getStdin;
+
 /**
  * Class that controls script shutdown.
  */
@@ -50,7 +52,25 @@ final class Shutdown
             $callback();
         }
         self::$callbacks = [];
-        Magic::shutdown(0);
+
+        if (\defined('STDIN')) {
+            getStdin()->unreference();
+        }
+        API::finalize();
+        MTProto::serializeAll();
+        if (\class_exists(Installer::class)) {
+            Installer::unlock();
+        }
+    }
+    /**
+     * Register shutdown function.
+     */
+    public static function init(): void
+    {
+        if (!self::$registered) {
+            \register_shutdown_function(fn () => self::shutdown());
+            self::$registered = true;
+        }
     }
     /**
      * Add a callback for script shutdown.
@@ -65,10 +85,7 @@ final class Shutdown
             $id = self::$id++;
         }
         self::$callbacks[$id] = $callback;
-        if (!self::$registered) {
-            \register_shutdown_function(fn () => self::shutdown());
-            self::$registered = true;
-        }
+        self::init();
         return $id;
     }
     /**

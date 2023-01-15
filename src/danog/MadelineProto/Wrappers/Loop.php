@@ -153,9 +153,6 @@ trait Loop
         } while (!$this->stopLoop);
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
         $this->stopLoop = false;
-        if (isset($repeat)) {
-            EventLoop::cancel($repeat);
-        }
     }
     /**
      * Stop update loop.

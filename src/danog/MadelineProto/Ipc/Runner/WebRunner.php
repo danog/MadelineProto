@@ -32,7 +32,7 @@ final class WebRunner extends RunnerAbstract
     public static function start(string $session, int $startupId): bool
     {
         if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
-            throw new \Exception("Can't start the web runner!");
+            return false;
         }
 
         if (!self::$runPath) {

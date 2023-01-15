@@ -96,7 +96,7 @@ trait Start
             $this->serialize();
             return $this->fullGetSelf();
         }
-        exit;
+        die;
     }
     private function webPhoneLogin(): void
     {

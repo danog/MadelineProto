@@ -18,14 +18,17 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use Amp\SignalException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Ipc\IpcState;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
+use Revolt\EventLoop\UncaughtThrowable;
 use Webmozart\Assert\Assert;
 
 (static function (): void {
@@ -115,6 +118,12 @@ use Webmozart\Assert\Assert;
                     Logger::log('A restart was triggered!', Logger::FATAL_ERROR);
                     return;
                 } catch (Throwable $e) {
+                    if ($e instanceof UncaughtThrowable) {
+                        $e = $e->getPrevious();
+                    }
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
                     Logger::log((string) $e, Logger::FATAL_ERROR);
                     $API->report("Surfaced: $e");
                 }

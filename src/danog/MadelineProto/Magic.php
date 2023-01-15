@@ -22,6 +22,8 @@ namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
 use Amp\Loop\Driver;
+use Amp\SignalCancellation;
+use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
 use phpseclib3\Math\BigInteger;
 use ReflectionClass;
@@ -182,11 +184,6 @@ final class Magic
      */
     public static bool $zerowebhost = false;
     /**
-     * Whether a signal was sent to the processand the system must shut down.
-     *
-     */
-    public static bool $signaled = false;
-    /**
      * Whether to suspend certain stdout log printing, when reading input.
      */
     public static ?DeferredFuture $suspendPeriodicLogging = null;
@@ -222,6 +219,7 @@ final class Magic
         }
         if (!self::$initedLight) {
             // Setup error reporting
+            Shutdown::init();
             \set_error_handler(Exception::exceptionErrorHandler(...));
             \set_exception_handler(Exception::exceptionHandler(...));
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
@@ -264,12 +262,16 @@ final class Magic
                     \pcntl_signal(SIGINT, fn () => null);
                     \pcntl_signal(SIGINT, SIG_DFL);
                     EventLoop::unreference(EventLoop::onSignal(SIGINT, static function (): void {
-                        Logger::log('Got sigint', Logger::FATAL_ERROR);
-                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
+                        if (self::$suspendPeriodicLogging) {
+                            self::togglePeriodicLogging();
+                        }
+                        throw new SignalException('SIGINT received');
                     }));
                     EventLoop::unreference(EventLoop::onSignal(SIGTERM, static function (): void {
-                        Logger::log('Got sigterm', Logger::FATAL_ERROR);
-                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
+                        if (self::$suspendPeriodicLogging) {
+                            self::togglePeriodicLogging();
+                        }
+                        throw new SignalException('SIGTERM received');
                     }));
                 } catch (Throwable $e) {
                 }
@@ -287,9 +289,6 @@ final class Magic
             }
             self::$initedLight = true;
             if ($light) {
-                if (!\defined('AMP_WORKER')) {
-                    \define('AMP_WORKER', true);
-                }
                 return;
             }
         }
@@ -367,33 +366,6 @@ final class Magic
     public static function getcwd(): string
     {
         return self::$can_getcwd ? \getcwd() : self::$cwd;
-    }
-    /**
-     * Shutdown system.
-     *
-     * @param int $code Exit code
-     */
-    public static function shutdown(int $code = 0): void
-    {
-        self::$signaled = true;
-        if (\defined('STDIN')) {
-            getStdin()->unreference();
-        }
-        /*if ($code !== 0) {
-            $driver = EventLoop::get();
-            $reflectionClass = new ReflectionClass(Driver::class);
-            $reflectionProperty = $reflectionClass->getProperty('watchers');
-            $reflectionProperty->setAccessible(true);
-            foreach (\array_keys($reflectionProperty->getValue($driver)) as $key) {
-                $driver->unreference($key);
-            }
-        }*/
-        MTProto::serializeAll();
-        //EventLoop::stop();
-        if (\class_exists(Installer::class)) {
-            Installer::unlock();
-        }
-        die($code);
     }
     /**
      * Toggle periodic logging.

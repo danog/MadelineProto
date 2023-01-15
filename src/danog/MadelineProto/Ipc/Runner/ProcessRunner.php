@@ -5,17 +5,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\ByteStream\ReadableResourceStream;
-use Amp\NullCancellation;
-use Amp\Process\Internal\Posix\PosixRunner;
 use Amp\Process\Internal\Posix\Runner;
-use Amp\Process\Internal\Windows\WindowsRunner as WindowsWindowsRunner;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use Error;
 use Throwable;
-
-use const Amp\Process\IS_WINDOWS;
 
 use const ARRAY_FILTER_USE_BOTH;
 use const DIRECTORY_SEPARATOR;
@@ -51,6 +45,11 @@ final class ProcessRunner extends RunnerAbstract
 
     /** @var string|null Cached path to located PHP binary. */
     private static ?string $binaryPath = null;
+
+    /**
+     * Resources.
+     */
+    private static array $resources = [];
 
     /**
      * Runner.
@@ -95,21 +94,22 @@ final class ProcessRunner extends RunnerAbstract
             ['QUERY_STRING' => \http_build_query($params)],
         );
 
-        $runner = IS_WINDOWS ? new WindowsWindowsRunner : new PosixRunner;
-        try {
-            $handle = $runner->start($command, new NullCancellation, null, $envVars);
-        } catch (\Throwable $e) {
-            Logger::log("Got exception while starting process worker: $e");
-            throw $e;
-        }
-        async(self::readUnref(...), $handle->streams->stdout);
-        async(self::readUnref(...), $handle->streams->stderr);
-        async(function () use ($runner, $handle): void {
-            $res = $runner->join($handle->handle);
-            $runner->destroy($handle->handle);
-            Logger::log("Process worker exited with $res!");
-            throw new Exception("Process worker exited with $res!");
-        });
+        self::$resources []= \proc_open(
+            $command,
+            [
+                ["pipe", "r"],
+                ["pipe", "w"],
+                ["pipe", "w"],
+            ],
+            $pipes,
+            null,
+            $envVars
+        );
+        $stdout = new ReadableResourceStream($pipes[1]);
+        $stderr = new ReadableResourceStream($pipes[2]);
+
+        async(self::readUnref(...), $stdout);
+        async(self::readUnref(...), $stderr);
         return true;
     }
     /**

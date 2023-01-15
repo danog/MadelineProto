@@ -104,6 +104,6 @@ final class Exception extends \Exception
     public static function exceptionHandler(\Throwable $exception): void
     {
         Logger::log($exception, Logger::FATAL_ERROR);
-        Magic::shutdown(1);
+        die(1);
     }
 }

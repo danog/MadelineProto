@@ -152,7 +152,8 @@ final class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $unserialized = \unserialize(($file->read(null, $size - $headerLen)) ?? '');
+            $d = ($file->read(null, $size - $headerLen)) ?? '';
+            $unserialized = \unserialize($d);
             $file->close();
         } finally {
             $unlock();

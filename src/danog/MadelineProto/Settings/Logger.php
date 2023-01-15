@@ -140,11 +140,6 @@ final class Logger extends SettingsAbstract
      */
     public function setType(int $type): self
     {
-        if ($type === MadelineProtoLogger::NO_LOGGER) {
-            $type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
-                ? MadelineProtoLogger::ECHO_LOGGER
-                : MadelineProtoLogger::FILE_LOGGER;
-        }
         $this->type = $type;
 
         return $this;

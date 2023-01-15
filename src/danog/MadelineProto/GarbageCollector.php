@@ -6,6 +6,7 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\SignalException;
 use danog\Loop\Generic\PeriodicLoop;
 use Revolt\EventLoop;
 use Throwable;
@@ -67,7 +68,7 @@ final class GarbageCollector
                 if (Magic::$version !== Magic::$version_latest) {
                     Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
                     if (Magic::$isIpcWorker) {
-                        die;
+                        throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
                     }
                     return true;
                 }

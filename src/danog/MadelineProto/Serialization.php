@@ -131,10 +131,6 @@ abstract class Serialization
         //Logger::log('Waiting for exclusive session lock...');
         $warningId = EventLoop::delay(1, static function () use (&$warningId): void {
             Logger::log('It seems like the session is busy.');
-            /*if (\defined(\MADELINE_WORKER::class)) {
-                Logger::log("Exiting since we're in a worker");
-                Magic::shutdown(1);
-            }*/
             Logger::log('Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.');
             $warningId = EventLoop::repeat(5, fn () => Logger::log('Still waiting for exclusive session lock...'));
             EventLoop::unreference($warningId);

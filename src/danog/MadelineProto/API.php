@@ -22,7 +22,9 @@ namespace danog\MadelineProto;
 
 use Amp\CancelledException;
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\SignalException;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
@@ -30,6 +32,7 @@ use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use Revolt\EventLoop\UncaughtThrowable;
 use Throwable;
 
 use function Amp\async;
@@ -149,8 +152,8 @@ final class API extends InternalDoc
     /**
      * Magic constructor function.
      *
-     * @param string         $session  Session name
-     * @param array          $settings Settings
+     * @param string                 $session  Session name
+     * @param array|SettingsAbstract $settings Settings
      */
     public function __construct(string $session, array|SettingsAbstract $settings = [])
     {
@@ -213,9 +216,15 @@ final class API extends InternalDoc
                 $this->API->stopIpcServer();
                 $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
                 $this->API->disconnect();
-            } catch (SecurityException $e) {
+            } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
+                if ($e instanceof UncaughtThrowable) {
+                    $e = $e->getPrevious();
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
+                }
                 $this->logger->logger("Restarting to full instance: error $e");
             }
             $this->logger->logger('Restarting to full instance: reconnecting...');
@@ -241,9 +250,15 @@ final class API extends InternalDoc
                         $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
                         $API->disconnect();
                         $API->unreference();
-                    } catch (SecurityException $e) {
+                    } catch (SecurityException|SignalException $e) {
                         throw $e;
                     } catch (Throwable $e) {
+                        if ($e instanceof UncaughtThrowable) {
+                            $e = $e->getPrevious();
+                            if ($e instanceof SecurityException || $e instanceof SignalException) {
+                                throw $e;
+                            }
+                        }
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
                     async($cb);
@@ -338,6 +353,17 @@ final class API extends InternalDoc
         $this->oldInstance = true;
     }
     /**
+     * @var array<Future<null>>
+     */
+    private static array $destructors = [];
+    /**
+     * @internal
+     */
+    public static function finalize(): void
+    {
+        await(self::$destructors);
+    }
+    /**
      * Destruct function.
      *
      * @internal
@@ -345,12 +371,13 @@ final class API extends InternalDoc
     public function __destruct()
     {
         if (!$this->oldInstance) {
-            async(function (): void {
+            $id = \count(self::$destructors);
+            self::$destructors[$id] = async(function () use ($id): void {
                 $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
                 if ($this->API) {
                     $this->API->unreference();
                 }
-                if (isset($this->wrapper) && (!Magic::$signaled || $this->gettingApiId)) {
+                if (isset($this->wrapper)) {
                     $this->logger->logger('Prompting final serialization...');
                     $this->wrapper->serialize();
                     $this->logger->logger('Done final serialization!');
@@ -358,6 +385,7 @@ final class API extends InternalDoc
                 if ($this->unlock) {
                     ($this->unlock)();
                 }
+                unset(self::$destructors[$id]);
             });
         } elseif ($this->logger) {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
@@ -395,9 +423,15 @@ final class API extends InternalDoc
             try {
                 $this->startAndLoopAsyncInternal($eventHandler, $started);
                 return;
-            } catch (SecurityException $e) {
+            } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
+                if ($e instanceof UncaughtThrowable) {
+                    $e = $e->getPrevious();
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
+                }
                 if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
                     throw $e;
                 }
@@ -438,9 +472,15 @@ final class API extends InternalDoc
                 }
                 await($promises);
                 return;
-            } catch (SecurityException $e) {
+            } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
+                if ($e instanceof UncaughtThrowable) {
+                    $e = $e->getPrevious();
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
+                }
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
@@ -488,9 +528,15 @@ final class API extends InternalDoc
                 $started = true;
                 /** @var API $this->API */
                 $this->API->loop();
-            } catch (SecurityException $e) {
+            } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
+                if ($e instanceof UncaughtThrowable) {
+                    $e = $e->getPrevious();
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
+                }
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
