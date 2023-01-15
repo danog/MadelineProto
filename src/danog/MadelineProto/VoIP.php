@@ -285,7 +285,7 @@ final class VoIP
 
     public function __destruct()
     {
-        $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+        async($this->discard(...), ['_' => 'phoneCallDiscardReasonDisconnect']);
     }
     /**
      * Accept call.

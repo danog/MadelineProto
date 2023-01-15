@@ -76,6 +76,8 @@ final class Client extends ClientAbstract
     /**
      * Run the provided async callable.
      *
+     * @deprecated Not needed anymore since MadelineProto v8 and amp v3
+     *
      * @param callable $callback Async callable to run
      */
     public function loop(callable $callback)

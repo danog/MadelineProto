@@ -345,18 +345,20 @@ final class API extends InternalDoc
     public function __destruct()
     {
         if (!$this->oldInstance) {
-            $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
-            if ($this->API) {
-                $this->API->unreference();
-            }
-            if (isset($this->wrapper) && (!Magic::$signaled || $this->gettingApiId)) {
-                $this->logger->logger('Prompting final serialization...');
-                $this->wrapper->serialize();
-                $this->logger->logger('Done final serialization!');
-            }
-            if ($this->unlock) {
-                ($this->unlock)();
-            }
+            async(function (): void {
+                $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
+                if ($this->API) {
+                    $this->API->unreference();
+                }
+                if (isset($this->wrapper) && (!Magic::$signaled || $this->gettingApiId)) {
+                    $this->logger->logger('Prompting final serialization...');
+                    $this->wrapper->serialize();
+                    $this->logger->logger('Done final serialization!');
+                }
+                if ($this->unlock) {
+                    ($this->unlock)();
+                }
+            });
         } elseif ($this->logger) {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }
