@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Socket\EncryptableSocket;
-use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -32,7 +31,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Tools;
 use Psr\Http\Message\UriInterface;
-use Webmozart\Assert\Assert;
 
 /**
  * HTTP stream wrapper.

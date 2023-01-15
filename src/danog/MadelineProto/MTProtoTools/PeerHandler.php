@@ -966,7 +966,7 @@ trait PeerHandler
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= async(function () use ($full, $filter, $total_count, &$res) {
+                $promises []= async(function () use ($full, $filter, $total_count, &$res): void {
                     $this->fetchParticipants($full['InputChannel'], $filter, '', $total_count, $res);
                 });
             }
@@ -976,7 +976,7 @@ trait PeerHandler
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= async(function () use ($full, $filter, $q, $total_count, &$res) {
+                $promises []= async(function () use ($full, $filter, $q, $total_count, &$res): void {
                     $this->recurseAlphabetSearchParticipants($full['InputChannel'], $filter, $q, $total_count, $res, 0);
                 });
             }

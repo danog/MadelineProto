@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
 

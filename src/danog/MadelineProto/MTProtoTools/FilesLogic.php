@@ -19,7 +19,6 @@ use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Settings;

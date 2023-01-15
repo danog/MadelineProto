@@ -820,7 +820,7 @@ class MTProto implements TLCallback, LoggerGetter
             $this->usernames->clear();
             return;
         }
-        if (!count($this->usernames)) {
+        if (!\count($this->usernames)) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
             foreach ($this->chats as $id => $chat) {
                 if (isset($chat['username'])) {
