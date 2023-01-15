@@ -177,7 +177,7 @@ class RedisArray extends DriverArray
             $len = \strlen($this->rKey(''));
             while (yield $request->advance()) {
                 $key = $request->getCurrent();
-                yield $emit([\substr($key, $len), \unserialize(yield $this->db->get($key))]);
+                yield $emit([\substr($key, $len), \unserialize(yield $this->db->get($key)), null]);
             }
         });
     }

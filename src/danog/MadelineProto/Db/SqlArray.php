@@ -75,7 +75,7 @@ abstract class SqlArray extends DriverArray
     }
 
     /**
-     * @return Iterator<array{0: string, 1: mixed}>
+     * @return Iterator<array{0: string, 1: mixed, 2: int}>
      */
     public function getIterator(): Iterator
     {
@@ -84,7 +84,7 @@ abstract class SqlArray extends DriverArray
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
-                yield $emit([$row['key'], $this->getValue($row['value'])]);
+                yield $emit([$row['key'], $this->getValue($row['value']), (int)$row['ts']]);
             }
         });
     }

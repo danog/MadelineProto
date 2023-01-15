@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Delayed;
 use Amp\Dns\Resolver;
 use Amp\Http\Client\HttpClient;
 use Amp\Loop;
@@ -1090,7 +1091,55 @@ class MTProto extends AsyncConstruct implements TLCallback
         } elseif (yield $this->chats->isset(0)) {
             $this->chats->unset(0);
         }
+
+		Loop::defer(function() {
+			yield new Delayed(30 * 1000);
+			while(true) {
+				yield from $this->removeOldCache();
+				yield new Delayed(24 * 60 * 60 * 1000);
+			}
+		});
     }
+
+	private function removeOldCache(): \Generator {
+		$databases = [
+			'usernames' => ['db' => $this->usernames, 'ttl' => '-1 month'],
+			'chats' => ['db' => $this->chats, 'ttl' => '-1 month'],
+			'full_chats' => ['db' => $this->full_chats, 'ttl' => '-1 month'],
+			'minDatabase' => ['db' => $this->minDatabase->db, 'ttl' => '-1 month'],
+
+			'referenceDatabase' => ['db' => $this->referenceDatabase->db, 'ttl' => '-1 week'],
+		];
+
+		foreach ($databases as $table => ['db' => $db, 'ttl' => $tsFrom]) {
+			/**
+			 * @var $db DbArray|Promise
+			 * @var string $tsFrom
+			 */
+			$iterator = $db->getIterator();
+			$counter = 0;
+			$removed = 0;
+			while (yield $iterator->advance()) {
+				[$key, $value, $ts] = $iterator->getCurrent();
+				if (!$ts) {
+					break;
+				}
+				$counter++;
+				if ($ts < strtotime($tsFrom)) {
+					$removed++;
+					if ($removed % 100 === 0) {
+						yield $db->unset($key);
+					} else {
+						$db->unset($key);
+					}
+				}
+				if ($counter % 500 === 0) {
+					$this->logger->logger("Removing old keys from {$table}. Processed: $counter; Removed: $removed", Logger::VERBOSE);
+				}
+			}
+			$this->logger->logger("Removed old keys from {$table}. Processed: $counter; Removed: $removed", Logger::VERBOSE);
+		}
+	}
 
     /**
      * Upgrade MadelineProto instance.

@@ -98,7 +98,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
     {
         return new Producer(function (callable $emit) {
             foreach ($this as $key => $value) {
-                yield $emit([$key, $value]);
+                yield $emit([$key, $value, null]);
             }
         });
     }

@@ -40,7 +40,7 @@ class MinDatabase implements TLCallback
      *
      * @var DbArray
      */
-    private $db;
+    public $db;
     /**
      * Temporary cache during deserialization.
      *

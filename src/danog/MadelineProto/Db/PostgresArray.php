@@ -48,7 +48,7 @@ class PostgresArray extends SqlArray
             ";
             case SqlArray::SQL_ITERATE:
                 return "
-                SELECT key, value FROM \"{$this->table}\"
+                SELECT key, value, null as \"ts\" FROM \"{$this->table}\"
             ";
             case SqlArray::SQL_CLEAR:
                 return "

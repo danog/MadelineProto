@@ -95,7 +95,7 @@ interface DbArray extends DbType, \ArrayAccess
     /**
      * Get iterator.
      *
-     * @return Iterator<array{0: string|int, 1: T}>
+     * @return Iterator<array{0: string|int, 1: T, 2: int|null}>
      */
     public function getIterator(): Iterator;
 }
