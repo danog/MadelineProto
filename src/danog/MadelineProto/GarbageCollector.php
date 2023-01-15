@@ -68,17 +68,6 @@ final class GarbageCollector
         $madelinePhpContents = null;
         self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request, &$madelinePhpContents): bool {
             try {
-                $latest = $client->request($request);
-                Magic::$version_latest = $latest->getBody()->buffer();
-                if (Magic::$version !== Magic::$version_latest) {
-                    Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
-                    write(MADELINE_PHAR_VERSION, '');
-                    if (Magic::$isIpcWorker) {
-                        throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
-                    }
-                    return true;
-                }
-
                 $madelinePhpContents ??= read(MADELINE_PHP);
                 $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
                     ->getBody()
@@ -90,6 +79,17 @@ final class GarbageCollector
                     move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
                     $unlock();
                     $madelinePhpContents = $contents;
+                }
+
+                $latest = $client->request($request);
+                Magic::$version_latest = $latest->getBody()->buffer();
+                if (Magic::$version !== Magic::$version_latest) {
+                    Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
+                    write(MADELINE_PHAR_VERSION, '');
+                    if (Magic::$isIpcWorker) {
+                        throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
+                    }
+                    return true;
                 }
 
                 /** @psalm-suppress UndefinedConstant */

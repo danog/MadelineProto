@@ -65,7 +65,7 @@ class Installer
         }
         $this->version = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
-        \define('MADELINE_PHAR_VERSION', \getcwd().DIRECTORY_SEPARATOR."madeline-{$this->version}.phar.version");
+        \define('MADELINE_PHAR_VERSION', \getcwd().DIRECTORY_SEPARATOR."madeline.version");
         \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
