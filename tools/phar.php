@@ -65,6 +65,7 @@ class Installer
         }
         $this->version = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
+        \define('MADELINE_PHAR_VERSION', \getcwd().DIRECTORY_SEPARATOR."madeline-{$this->version}.phar.version");
         \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
@@ -201,23 +202,22 @@ class Installer
      */
     public function install()
     {
-        $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
-        $madeline_phar = "madeline-$remote_release.phar";
-        $madeline_version = "madeline-{$this->version}.phar.version";
-
-        if (\file_exists($madeline_version)) {
-            $local_release = \file_get_contents($madeline_version) ?: null;
+        if (\file_exists(MADELINE_PHAR_VERSION)) {
+            $local_release = \file_get_contents(MADELINE_PHAR_VERSION) ?: null;
         } else {
-            \touch($madeline_version);
+            \touch(MADELINE_PHAR_VERSION);
             $local_release = null;
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        if (($remote_release === $local_release && \file_exists($madeline_phar)) || $remote_release === null) {
+        if ($local_release !== null) {
             return self::load($local_release);
         }
 
-        if (!$this->lock($madeline_version)) {
+        $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
+        $madeline_phar = "madeline-$remote_release.phar";
+
+        if (!$this->lock(MADELINE_PHAR_VERSION)) {
             \flock($this->lockInstaller, LOCK_EX);
             return $this->install();
         }

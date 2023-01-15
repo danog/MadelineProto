@@ -13,6 +13,10 @@ use Throwable;
 
 use const LOCK_EX;
 use const LOCK_NB;
+use function Amp\File\move;
+
+use function Amp\File\read;
+use function Amp\File\write;
 
 final class GarbageCollector
 {
@@ -61,16 +65,31 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request): bool {
+        $madelinePhpContents = null;
+        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request, &$madelinePhpContents): bool {
             try {
                 $latest = $client->request($request);
                 Magic::$version_latest = $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
                     Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
+                    write(MADELINE_PHAR_VERSION, '');
                     if (Magic::$isIpcWorker) {
                         throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
                     }
                     return true;
+                }
+
+                $madelinePhpContents ??= read(MADELINE_PHP);
+                $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
+                    ->getBody()
+                    ->buffer();
+
+                if ($contents !== $madelinePhpContents) {
+                    $unlock = Tools::flock(MADELINE_PHP.'.lock', LOCK_EX);
+                    write(MADELINE_PHP.'.temp.php', $contents);
+                    move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
+                    $unlock();
+                    $madelinePhpContents = $contents;
                 }
 
                 /** @psalm-suppress UndefinedConstant */

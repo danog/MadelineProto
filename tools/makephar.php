@@ -32,9 +32,6 @@ if (!isset($backtrace[0]["file"]) || !in_array(basename($backtrace[0]["file"]), 
 if (defined("MADELINE_REAL_ROOT")) {
     @chdir(MADELINE_REAL_ROOT);
 }
-if ($contents = file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new".rand(0, PHP_INT_MAX))) {
-    file_put_contents($backtrace[0]["file"], $contents);
-}
 
 Phar::interceptFileFuncs();
 Phar::mapPhar("'.$argv[2].'"); 
