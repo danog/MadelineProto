@@ -65,6 +65,7 @@ echo '{
     "require": {
         "danog/madelineproto": "'$COMPOSER_TAG'"
     },
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Daniil Gentili",
