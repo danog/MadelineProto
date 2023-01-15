@@ -95,7 +95,7 @@ class Magic
      * Our PID.
      *
      */
-    public static int $pid;
+    public static ?int $pid = null;
     /**
      * Whether we've inited all light constants.
      *

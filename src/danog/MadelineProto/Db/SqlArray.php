@@ -70,6 +70,11 @@ abstract class SqlArray extends DriverArray
         return \serialize($value);
     }
 
+    /**
+     * Get iterator.
+     *
+     * @return \Traversable<array-key, mixed>
+     */
     public function getIterator(): \Traversable
     {
         foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['index' => $key, 'value' => $value]) {
@@ -143,6 +148,7 @@ abstract class SqlArray extends DriverArray
     {
         $row = $this->execute($this->queries[self::SQL_COUNT]);
         Assert::true($row->getRowCount() === 1);
+        /** @var int */
         return $row->fetchRow()['count'];
     }
 

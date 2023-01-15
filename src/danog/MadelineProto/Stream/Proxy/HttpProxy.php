@@ -26,9 +26,11 @@ use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * HTTP proxy stream wrapper.
@@ -43,7 +45,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * Stream.
      */
-    protected RawStreamInterface $stream;
+    protected RawStreamInterface&BufferedStreamInterface $stream;
     private $extra;
     /**
      * Connect to stream.
@@ -60,6 +62,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         }
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
         $this->stream = $ctx->getStream();
+        Assert::true($this->stream instanceof BufferedStreamInterface);
+        Assert::true($this->stream instanceof RawStreamInterface);
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
@@ -101,7 +105,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $current_header = \explode(':', $current_header, 2);
             $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
         }
-        $close = $protocol === 'HTTP/1.0';
+        $close = $protocol_version === '1.0';
         if (isset($headers['connection'])) {
             $close = \strtolower($headers['connection']) === 'close';
         }

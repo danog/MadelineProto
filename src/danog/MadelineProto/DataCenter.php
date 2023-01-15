@@ -115,11 +115,6 @@ class DataCenter
     }
     public function __wakeup(): void
     {
-        if (\is_array($this->settings)) {
-            $settings = new ConnectionSettings;
-            $settings->mergeArray(['connection_settings' => $this->settings]);
-            $this->settings = $settings;
-        }
         $array = [];
         foreach ($this->sockets as $id => $socket) {
             if ($socket instanceof Connection) {

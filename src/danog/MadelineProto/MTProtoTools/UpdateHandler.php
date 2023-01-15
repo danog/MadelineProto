@@ -149,7 +149,6 @@ trait UpdateHandler
      * Get channel state.
      *
      * @internal
-     * @return <mixed, mixed, mixed, UpdatesState>
      */
     public function loadUpdateState()
     {

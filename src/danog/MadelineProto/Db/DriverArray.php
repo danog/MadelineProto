@@ -123,7 +123,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             Logger::log('Converting '.$old::class.' to '.$new::class, Logger::ERROR);
 
             $counter = 0;
-            $total = $old->count();
+            $total = count($old);
             foreach ($old as $key => $value) {
                 $counter++;
                 if ($counter % 500 === 0 || $counter === $total) {

@@ -41,7 +41,7 @@ use RuntimeException;
  */
 class FileBufferedStream implements BufferedStreamInterface, BufferInterface, ProxyStreamInterface, RawStreamInterface
 {
-    private File $stream;
+    private ?File $stream = null;
     private int $append_after;
     private string $append;
     /**
@@ -74,16 +74,6 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
             throw new ClosedException('MadelineProto stream was disconnected');
         }
         $this->stream->write($data);
-    }
-    /**
-     * Async write.
-     */
-    public function end(string $finalData = ''): void
-    {
-        if (!$this->stream) {
-            throw new ClosedException('MadelineProto stream was disconnected');
-        }
-        $this->stream->end($finalData);
     }
     /**
      * Async close.

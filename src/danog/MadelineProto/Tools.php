@@ -27,6 +27,7 @@ use Exception;
 use phpseclib3\Crypt\Random;
 use Throwable;
 use Traversable;
+use Webmozart\Assert\Assert;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -40,11 +41,6 @@ use function unpack;
  */
 abstract class Tools extends AsyncTools
 {
-    /**
-     * Boolean to avoid problems with exceptions thrown by forked strands, see tools.
-     *
-     */
-    public bool $destructing = false;
     /**
      * Sanify TL obtained from JSON for TL serialization.
      *
@@ -417,6 +413,7 @@ abstract class Tools extends AsyncTools
                 }
             }
         }
+        Assert::isArray($max);
         return $max;
     }
     /**

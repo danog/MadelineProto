@@ -21,15 +21,18 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Socket\EncryptableSocket;
+use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Tools;
 use Psr\Http\Message\UriInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * HTTP stream wrapper.
@@ -44,7 +47,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      * Stream.
      *
      */
-    protected RawStreamInterface $stream;
+    protected BufferedStreamInterface&RawStreamInterface $stream;
     private $code;
     private $ctx;
     private $header = '';
@@ -132,7 +135,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
             $current_header = \explode(':', $current_header, 2);
             $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
         }
-        $close = $protocol === 'HTTP/1.0';
+        $close = $protocol_version === '1.0';
         if (isset($headers['connection'])) {
             $close = \strtolower($headers['connection']) === 'close';
         }

@@ -31,6 +31,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use function Amp\Socket\connector;
 use function Amp\Socket\socketConnector;
@@ -61,6 +62,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function getStream(): EncryptableSocket
     {
+        Assert::notNull($this->stream);
         return $this->stream;
     }
     public function connect(ConnectionContext $ctx, string $header = ''): void
@@ -122,6 +124,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      */
     public function getSocket(): EncryptableSocket
     {
+        Assert::notNull($this->stream);
         return $this->stream;
     }
     public function setExtra($extra): void

@@ -82,7 +82,7 @@ trait Loop
                 $uri = \implode('?', [$url, $query]);
                 $payload = $_SERVER['REQUEST_METHOD'].' '.$uri." HTTP/1.1\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
                 $logger->logger("Connecting to {$address}:{$port}");
-                $a = \fsockopen($address, $port);
+                $a = \fsockopen($address, (int) $port);
                 $logger->logger('Sending self-restart payload');
                 $logger->logger($payload);
                 \fwrite($a, $payload);
@@ -146,6 +146,7 @@ trait Loop
         do {
             if (!$this->updateHandler) {
                 $this->waitUpdate();
+                /** @psalm-suppress RedundantCondition */
                 if (!$this->updateHandler) {
                     $this->logger->logger('Exiting update loop, no handler!', Logger::NOTICE);
                     continue;

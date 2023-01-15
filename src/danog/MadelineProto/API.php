@@ -135,11 +135,6 @@ class API extends InternalDoc
      *
      */
     private bool $oldInstance = false;
-    /**
-     * Whether we're destructing.
-     *
-     */
-    private bool $destructing = false;
 
     /**
      * API wrapper (to avoid circular references).
@@ -315,7 +310,6 @@ class API extends InternalDoc
                 $this->API->unreference();
                 $this->API = null;
             }
-            $unserialized->storage ??= [];
             $unserialized->session = $this->session;
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
@@ -354,11 +348,7 @@ class API extends InternalDoc
     {
         if (!$this->oldInstance) {
             $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
-            $this->destructing = true;
             if ($this->API) {
-                if ($this->API instanceof Tools) {
-                    $this->API->destructing = true;
-                }
                 $this->API->unreference();
             }
             if (isset($this->wrapper) && (!Magic::$signaled || $this->gettingApiId)) {

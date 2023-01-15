@@ -29,6 +29,7 @@ use const PHP_EOL;
 
 trait Constructors
 {
+    private array $docs_constructors;
     public function mkConstructors(): void
     {
         foreach (\glob('constructors/'.$this->any) as $unlink) {

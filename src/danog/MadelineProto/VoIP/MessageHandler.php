@@ -190,7 +190,7 @@ trait MessageHandler
             }
         }
 
-        if ($this->peerVersion >= 8 || (!$this->peerVersion && true)) {
+        if ($this->peerVersion >= 8 || (!$this->peerVersion)) {
             $payload = \chr($args['_']);
             $payload .= Tools::packUnsignedInt($this->session_in_seq_no);
             $payload .= Tools::packUnsignedInt($this->session_out_seq_no);
@@ -308,7 +308,7 @@ trait MessageHandler
                 $result['peer_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
                 return $result;
             default:
-                if ($this->peerVersion >= 8 || (!$this->peerVersion && true)) {
+                if ($this->peerVersion >= 8 || (!$this->peerVersion)) {
                     \fseek($payload, 0);
                     $result['_'] = \ord(\stream_get_contents($payload, 1));
                     $in_seq_no = \unpack('V', \stream_get_contents($payload, 4))[1];

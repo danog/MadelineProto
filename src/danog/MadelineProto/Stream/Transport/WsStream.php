@@ -55,7 +55,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * Websocket message.
      *
      */
-    private WebsocketMessage $message;
+    private ?WebsocketMessage $message = null;
     /**
      * Websocket Connector.
      *

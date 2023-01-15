@@ -197,7 +197,7 @@ class AnnotationsBuilder
             if (isset($ignoreMethods[$name])) {
                 continue;
             }
-            if (\strpos($method->getDocComment() ?? '', '@internal') !== false) {
+            if (\strpos($method->getDocComment() ?: '', '@internal') !== false) {
                 continue;
             }
             $static = $method->isStatic();
@@ -299,7 +299,7 @@ class AnnotationsBuilder
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
             $promise = '\\';
-            $phpdoc = $method->getDocComment() ?? '';
+            $phpdoc = $method->getDocComment() ?: '';
             if (!\str_contains($phpdoc, '@return')) {
                 if (!\trim($phpdoc)) {
                     $phpdoc = '/** @return '.$type.' */';

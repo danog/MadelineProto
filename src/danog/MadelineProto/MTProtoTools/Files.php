@@ -70,7 +70,6 @@ trait Files
             $cb = $url;
             $url = $url->getFile();
         }
-        /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
         $request->setTransferTimeout(10 * 3600);
         $request->setBodySizeLimit(512 * 1024 * 8000);
@@ -812,7 +811,7 @@ trait Files
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
      *
-     * @param mixed                          $messageMedia File to download
+     * @param mixed                          $messageMedia  File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
      * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
      * @param bool                           $seekable      Whether the callable can be called out of order

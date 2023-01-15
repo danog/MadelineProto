@@ -157,7 +157,7 @@ class Endpoint
             $payload = $this->peerTag.$payload;
         }
 
-        return $this->socket->write($payload);
+        $this->socket->write($payload);
     }
     /**
      * Get peer tag.

@@ -25,9 +25,11 @@ use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * Socks5 stream wrapper.
@@ -44,7 +46,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      * Stream.
      *
      */
-    protected RawStreamInterface $stream;
+    protected RawStreamInterface&BufferedStreamInterface $stream;
     private $extra;
     /**
      * Connect to stream.
@@ -64,7 +66,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= \chr(2);
         }
-        $this->stream = ($ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods));
+        $this->stream = $ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods);
+        Assert::true($this->stream instanceof BufferedStreamInterface);
+        Assert::true($this->stream instanceof RawStreamInterface);
         $l = 2;
         $buffer = $this->stream->getReadBuffer($l);
         $version = \ord($buffer->bufferRead(1));

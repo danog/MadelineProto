@@ -140,6 +140,7 @@ trait FilesLogic
             $l = $lock->acquire();
             try {
                 if ($seekable) {
+                    /** @var File $stream */
                     while ($stream->tell() !== $offset) {
                         $stream->seek($offset);
                     }
@@ -245,8 +246,7 @@ trait FilesLogic
         if (\is_resource($file) || (\is_object($file) && $file instanceof ReadableStream)) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
-        /** @psalm-suppress UndefinedThisPropertyFetch */
-        $settings = $this instanceof Client ? $this->getSettings() : $this->settings;
+        $settings = $this->getSettings();
         /** @var Settings $settings */
         if (!$settings->getFiles()->getAllowAutomaticUpload()) {
             return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);

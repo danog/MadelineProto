@@ -29,6 +29,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * Premade stream wrapper.
@@ -41,7 +42,7 @@ use Throwable;
  */
 class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
-    private EncryptableSocket $stream;
+    private ?EncryptableSocket $stream = null;
     public function __construct()
     {
     }
@@ -100,6 +101,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function getSocket(): Socket
     {
+        Assert::notNull($this->stream);
         return $this->stream;
     }
     public function setExtra(mixed $extra): void

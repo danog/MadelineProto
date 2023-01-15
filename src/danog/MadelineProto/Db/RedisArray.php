@@ -72,14 +72,6 @@ class RedisArray extends DriverArray
     {
         return 'va:'.$this->table.'*';
     }
-    /**
-     * Set value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetset.php
-     * @param string $index <p>
-     * The index to set for.
-     * </p>
-     */
     public function set(string|int $index, mixed $value): void
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
@@ -115,6 +107,11 @@ class RedisArray extends DriverArray
         $this->db->delete($this->rkey($key));
     }
 
+    /**
+     * Get iterator.
+     *
+     * @return \Traversable<array-key, mixed>
+     */
     public function getIterator(): \Traversable
     {
         $request = $this->db->scan($this->itKey());

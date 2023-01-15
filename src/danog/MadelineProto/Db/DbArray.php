@@ -61,7 +61,7 @@ interface DbArray extends DbType, ArrayAccess, Countable
     /**
      * Get iterator.
      *
-     * @return \Traversable<array<string, mixed>>
+     * @return \Traversable<array-key, mixed>
      */
     public function getIterator(): \Traversable;
 }

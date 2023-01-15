@@ -46,12 +46,7 @@ trait Start
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
         if ($this->getWebTemplate() === 'legacy') {
-            if ($this instanceof Client) {
-                $settings = $this->getSettings();
-            } else {
-                /** @psalm-suppress UndefinedThisPropertyFetch Ignore psalm bug */
-                $settings = $this->settings;
-            }
+            $settings = $this->getSettings();
             $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {

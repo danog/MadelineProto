@@ -314,8 +314,7 @@ class ReferenceDatabase implements TLCallback
         $cache = $this->cache[$key];
         unset($this->cache[$key]);
         $origin = [];
-        $body = $data->getBodyOrEmpty();
-        switch ($body ?? '') {
+        switch ($data->getConstructor()) {
             case 'photos.updateProfilePhoto':
                 $origin['max_id'] = $res['photo_id'] ?? 0;
                 $origin['offset'] = -1;
@@ -329,7 +328,7 @@ class ReferenceDatabase implements TLCallback
                 $origin['user_id'] = $this->API->authorization['user']['id'];
                 break;
             case 'photos.getUserPhotos':
-                $origin['user_id'] = $body['user_id'];
+                $origin['user_id'] = $data->getBodyOrEmpty()['user_id'];
                 $origin['offset'] = -1;
                 $origin['limit'] = 1;
                 $count = 0;
@@ -361,7 +360,7 @@ class ReferenceDatabase implements TLCallback
                 $this->API->logger->logger("Added origin {$originType} ($constructor) to {$count} references", Logger::ULTRA_VERBOSE);
                 return;
             case 'messages.getStickers':
-                $origin['emoticon'] = $body['emoticon'];
+                $origin['emoticon'] = $data->getBodyOrEmpty()['emoticon'];
                 break;
             default:
                 throw new Exception("Unknown origin type provided: {$constructor}");
@@ -402,7 +401,7 @@ class ReferenceDatabase implements TLCallback
         } elseif ($this->refreshCount === 0 && !$refresh) {
         } elseif ($refresh) {
             $this->refreshCount++;
-        } elseif (!$refresh) {
+        } else {
             $this->refreshCount--;
         }
     }

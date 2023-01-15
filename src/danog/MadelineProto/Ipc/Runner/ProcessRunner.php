@@ -54,6 +54,8 @@ final class ProcessRunner extends RunnerAbstract
 
     /**
      * Runner.
+     * 
+     * @psalm-suppress InternalMethod, InternalProperty, InternalClass
      *
      * @param string $session Session path
      */

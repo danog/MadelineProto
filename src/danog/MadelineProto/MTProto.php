@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\WritableResourceStream;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
@@ -69,6 +70,7 @@ use danog\MadelineProto\Wrappers\Webhook;
 use danog\Serializable;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use function Amp\async;
@@ -397,7 +399,7 @@ class MTProto implements TLCallback, LoggerGetter
      * File reference database.
      *
      */
-    public ReferenceDatabase $referenceDatabase;
+    public ?ReferenceDatabase $referenceDatabase = null;
     /**
      * min database.
      *
@@ -818,7 +820,7 @@ class MTProto implements TLCallback, LoggerGetter
             $this->usernames->clear();
             return;
         }
-        if (!$this->usernames->count()) {
+        if (!count($this->usernames)) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
             foreach ($this->chats as $id => $chat) {
                 if (isset($chat['username'])) {
@@ -1008,11 +1010,12 @@ class MTProto implements TLCallback, LoggerGetter
             $this->channels_state = new CombinedUpdatesState($this->channels_state ?? []);
         }
         if (isset($this->updates_state)) {
-            if (!$this->updates_state instanceof UpdatesState) {
-                $this->updates_state = new UpdatesState($this->updates_state);
-            }
-            $this->channels_state->__construct([UpdateLoop::GENERIC => $this->updates_state]);
+            $updates_state = $this->updates_state;
             unset($this->updates_state);
+            if (!$updates_state instanceof UpdatesState) {
+                $updates_state = new UpdatesState($updates_state);
+            }
+            $this->channels_state->__construct([UpdateLoop::GENERIC => $updates_state]);
         }
         if (!isset($this->datacenter)) {
             $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
@@ -1101,9 +1104,6 @@ class MTProto implements TLCallback, LoggerGetter
 
         $this->initDb($this);
 
-        if (!isset($this->secret_chats)) {
-            $this->secret_chats = [];
-        }
         foreach ($this->full_chats as $id => $full) {
             if (isset($full['full'], $full['last_update'])) {
                 $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
@@ -1846,6 +1846,7 @@ class MTProto implements TLCallback, LoggerGetter
         if ($this->authorized !== self::WAITING_PASSWORD) {
             throw new Exception('Not waiting for the password!');
         }
+        Assert::string($this->authorization['hint']);
         return $this->authorization['hint'];
     }
     /**
@@ -1938,21 +1939,22 @@ class MTProto implements TLCallback, LoggerGetter
                 );
             }
         }
-        $sent = true;
+        $sent = false;
         foreach ($this->reportDest as $id) {
             try {
                 $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
                 if ($file) {
                     $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                 }
-                $sent = $sent && true;
+                $sent = true;
             } catch (Throwable $e) {
-                $sent = $sent && false;
                 $this->logger("While reporting to $id: $e", Logger::FATAL_ERROR);
             }
         }
         if ($sent && $file) {
-            \ftruncate($this->logger->stdout->getResource(), 0);
+            if ($this->logger->stdout instanceof WritableResourceStream) {
+                \ftruncate($this->logger->stdout->getResource(), 0);
+            }
             $this->logger->logger('Reported!');
         }
     }

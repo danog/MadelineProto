@@ -45,7 +45,6 @@ abstract class StrTools extends Extension
                 $length += 1 + ($char >= 0xf0 ? 1 : 0);
             }
         }
-        Assert::integer($length);
         return $length;
     }
     /**

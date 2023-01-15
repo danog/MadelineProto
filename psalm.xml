@@ -18,5 +18,6 @@
         <ParamNameMismatch errorLevel="suppress" />
         <StringIncrement errorLevel="suppress" />
         <InvalidTraversableImplementation errorLevel="suppress" />
+        <RedundantPropertyInitializationCheck errorLevel="suppress" />
     </issueHandlers>
 </psalm>

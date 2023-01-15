@@ -62,8 +62,7 @@ trait Templates
             $title = Lang::$current_lang['loginUserPassWeb'];
             $hint = \htmlentities(\sprintf(
                 Lang::$current_lang['loginUserPassHint'],
-                /** @psalm-suppress InvalidIterator */
-                $this instanceof Client ? $this->getHint() : $this->getHint(),
+                $this->getHint(),
             ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
         } elseif ($auth === MTProto::WAITING_SIGNUP) {

@@ -29,6 +29,8 @@ use const PHP_EOL;
 
 trait Methods
 {
+    private array $docs_methods;
+    private array $human_docs_methods;
     public function mkMethods(): void
     {
         static $bots;

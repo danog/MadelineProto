@@ -282,7 +282,7 @@ trait PeerHandler
     public function peerIsset(mixed $id): bool
     {
         try {
-            return isset($this->chats[$this->getId($id, MTProto::INFO_TYPE_ID)]);
+            return isset($this->chats[$this->getId($id)]);
         } catch (Exception $e) {
             return false;
         } catch (RPCErrorException $e) {
@@ -527,25 +527,21 @@ trait PeerHandler
      * @param mixed                $id        Peer
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
-     * @template TConstructor
-     * @param array{_: TConstructor}|mixed $id
-     * @return array|int<(array|int<(array|int<(mixed|string)>|mixed|string)>|int|mixed|string)>
-     * @return array{
-     *      TConstructor: array
-     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     * @return ($type is MTProto::INFO_TYPE_ALL ? array{
+     *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
+     *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
+     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
+     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
      *      bot_api_id: int|string,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
-     *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
+     *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * }|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
+     * } : ($type is INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
     public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {
@@ -663,26 +659,23 @@ trait PeerHandler
         throw new Exception('This peer is not present in the internal peer database');
     }
     /**
-     * @template TConstructor
-     * @param array{_: TConstructor} $constructor
-     * @param bool|null $type
-     * @return array<(array<(array<(mixed|string)>|mixed|string)>|int|mixed|string)>
-     * @return array{
-     *      TConstructor: array
-     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      bot_api_id: int|string,
+     * @param array $constructor
+     * @param MTProto::INFO_TYPE_* $type
+     * @return ($type is MTProto::INFO_TYPE_ALL ? array{
+     *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
+     *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
+     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
+     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
+     *      bot_api_id: int,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool},
-     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      InputUser?: {_: string, user_id?: int, access_hash?: int, min?: bool},
+     *      InputChannel?: {_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * }
+     * }&array : array)
      */
     private function genAll($constructor, $folder_id, int $type): array
     {
@@ -973,7 +966,9 @@ trait PeerHandler
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= async($this->fetchParticipants(...), $full['InputChannel'], $filter, '', $total_count, $res);
+                $promises []= async(function () use ($full, $filter, $total_count, &$res) {
+                    $this->fetchParticipants($full['InputChannel'], $filter, '', $total_count, $res);
+                });
             }
             await($promises);
 
@@ -981,7 +976,9 @@ trait PeerHandler
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
             $promises = [];
             foreach ($filters as $filter) {
-                $promises []= async($this->recurseAlphabetSearchParticipants(...), $full['InputChannel'], $filter, $q, $total_count, $res, 0);
+                $promises []= async(function () use ($full, $filter, $q, $total_count, &$res) {
+                    $this->recurseAlphabetSearchParticipants($full['InputChannel'], $filter, $q, $total_count, $res, 0);
+                });
             }
             await($promises);
 

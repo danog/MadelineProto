@@ -156,7 +156,7 @@ class VoIP
     /**
      * Timeout watcher.
      */
-    private string $timeoutWatcher;
+    private ?string $timeoutWatcher = null;
 
     /**
      * Last incoming timestamp.
@@ -262,10 +262,10 @@ class VoIP
      * Discard call.
      *
      */
-    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = [], bool $debug = false): self|false
+    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = [], bool $debug = false): self
     {
         if (($this->callState ?? self::CALL_STATE_ENDED) === self::CALL_STATE_ENDED || empty($this->configuration)) {
-            return false;
+            return $this;
         }
         $this->callState = self::CALL_STATE_ENDED;
         Logger::log("Now closing $this");
@@ -279,7 +279,8 @@ class VoIP
         }
         Logger::log("Closed all sockets, discarding $this");
 
-        return $this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug);
+        $this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug);
+        return $this;
     }
 
     public function __destruct()
