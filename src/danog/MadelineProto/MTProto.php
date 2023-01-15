@@ -1535,7 +1535,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->datacenter->__construct($this, $this->dcList, $this->settings->getConnection(), $reconnectAll);
         $dcs = [];
-        foreach ($this->datacenter->getDcs() as $new_dc) {
+        foreach ($this->datacenter->getDcs(true) as $new_dc) {
             if (!\is_int($new_dc)) {
                 continue;
             }

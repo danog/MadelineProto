@@ -134,14 +134,6 @@ final class APIWrapper
     }
 
     /**
-     * Whether async is being used.
-     */
-    public function isAsync(): bool
-    {
-        return true;
-    }
-
-    /**
      * Get API factory.
      */
     public function getFactory(): AbstractAPIFactory

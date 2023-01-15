@@ -221,7 +221,14 @@ final class DataCenter
      */
     public function dcConnect(int $dc_number, int $id = -1): bool
     {
-        $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
+        $old = isset($this->sockets[$dc_number]) && (
+            $this->sockets[$dc_number]->shouldReconnect()
+                || (
+                    $id !== -1
+                    && $this->sockets[$dc_number]->hasConnection($id)
+                    && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect()
+                )
+        );
         if (isset($this->sockets[$dc_number]) && !$old) {
             $this->API->logger->logger("Not reconnecting to DC {$dc_number} ({$id})");
             return false;
@@ -539,7 +546,7 @@ final class DataCenter
      *
      * @param boolean $all Whether to get all possible DC IDs, or only connected ones
      */
-    public function getDcs(bool $all = true): array
+    public function getDcs(bool $all): array
     {
         $test = $this->settings->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';

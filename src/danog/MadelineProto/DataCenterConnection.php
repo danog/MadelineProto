@@ -432,7 +432,6 @@ final class DataCenterConnection implements JsonSerializable
     public function connect(ConnectionContext $ctx, int $id = -1): void
     {
         $this->API->logger->logger("Trying shared connection via {$ctx} ({$id})");
-        $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $media = $ctx->isMedia() || $ctx->isCDN();
         $count = $media ? $this->API->getSettings()->getConnection()->getMinMediaSocketCount() : 1;
@@ -449,6 +448,7 @@ final class DataCenterConnection implements JsonSerializable
                 $this->API->logger->logger('Already connected!', Logger::WARNING);
                 return;
             }
+            $this->ctx = $ctx->getCtx();
             $this->connectMore($count);
             $this->restoreBackup();
             $f = new DeferredFuture;
@@ -460,6 +460,7 @@ final class DataCenterConnection implements JsonSerializable
                 $connectionsDeferred->complete();
             }
         } else {
+            $this->ctx = $ctx->getCtx();
             $this->availableConnections[$id] = 0;
             $this->connections[$id]->connect($ctx);
         }
