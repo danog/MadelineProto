@@ -10,7 +10,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * IPC server settings.
  */
-class Ipc extends SettingsAbstract
+final class Ipc extends SettingsAbstract
 {
     public function __construct()
     {

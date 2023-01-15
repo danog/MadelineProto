@@ -3,12 +3,15 @@
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\ByteStream\ReadableStream as AmpReadableStream;
+use Amp\ByteStream\ReadableStreamIteratorAggregate;
 use Amp\Cancellation;
+use IteratorAggregate;
 use Webmozart\Assert\Assert;
 
-class ReadableStream extends Obj implements AmpReadableStream
+class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
 {
     use ClosableTrait;
+    use ReadableStreamIteratorAggregate;
 
     public function read(?Cancellation $cancellation = null): ?string
     {

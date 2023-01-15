@@ -23,7 +23,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Stores the state of updates.
  */
-class UpdatesState
+final class UpdatesState
 {
     /**
      * PTS.

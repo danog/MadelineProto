@@ -38,7 +38,7 @@ use function serialize;
 /**
  * Session path information.
  */
-class SessionPaths
+final class SessionPaths
 {
     /**
      * Legacy session path.

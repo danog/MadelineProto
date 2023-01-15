@@ -26,7 +26,7 @@ use danog\MadelineProto\Stream\Transport\WsStream;
 /**
  * Connection settings.
  */
-class Connection extends SettingsAbstract
+final class Connection extends SettingsAbstract
 {
     /**
      * Minimum media socket count.

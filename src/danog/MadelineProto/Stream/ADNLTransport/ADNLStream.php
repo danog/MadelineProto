@@ -34,7 +34,7 @@ use danog\MadelineProto\Tools;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     private $stream;
     /**

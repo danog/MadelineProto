@@ -37,7 +37,7 @@ trait DialogHandler
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      * @return list<array>
      */
-    public function getDialogs(bool $force = true)
+    public function getDialogs(bool $force = true): array
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
@@ -61,7 +61,7 @@ trait DialogHandler
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      */
-    public function getFullDialogs(bool $force = true)
+    public function getFullDialogs(bool $force = true): array
     {
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];

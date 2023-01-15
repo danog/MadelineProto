@@ -25,6 +25,6 @@ use Exception;
 /**
  * Indicates a security error.
  */
-class SecurityException extends Exception
+final class SecurityException extends Exception
 {
 }

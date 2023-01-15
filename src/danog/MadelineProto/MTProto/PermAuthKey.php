@@ -23,7 +23,7 @@ namespace danog\MadelineProto\MTProto;
 /**
  * MTProto permanent auth key.
  */
-class PermAuthKey extends AuthKey
+final class PermAuthKey extends AuthKey
 {
     /**
      * Whether this auth key is authorized (as in associated to an account on Telegram).

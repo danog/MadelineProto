@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Secret chat settings.
  */
-class SecretChats extends SettingsAbstract
+final class SecretChats extends SettingsAbstract
 {
     /**
      * What secret chats to accept.

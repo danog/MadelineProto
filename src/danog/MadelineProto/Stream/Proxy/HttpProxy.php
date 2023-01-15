@@ -40,7 +40,7 @@ use Webmozart\Assert\Assert;
  * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  * @implements BufferedProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
-class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
+final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
     /**
      * Stream.

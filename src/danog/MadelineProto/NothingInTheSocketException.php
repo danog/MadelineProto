@@ -22,6 +22,6 @@ namespace danog\MadelineProto;
 
 use Exception;
 
-class NothingInTheSocketException extends Exception
+final class NothingInTheSocketException extends Exception
 {
 }

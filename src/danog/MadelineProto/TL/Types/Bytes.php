@@ -28,7 +28,7 @@ use JsonSerializable;
  *
  * @implements ArrayAccess<int, string>
  */
-class Bytes implements JsonSerializable, ArrayAccess
+final class Bytes implements JsonSerializable, ArrayAccess
 {
     /**
      * Bytes.

@@ -25,7 +25,7 @@ namespace danog\MadelineProto\MTProto;
  *
  * @internal
  */
-class Container extends OutgoingMessage
+final class Container extends OutgoingMessage
 {
     /**
      * Message IDs.

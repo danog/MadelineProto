@@ -36,7 +36,7 @@ use danog\MadelineProto\Stream\WriteBufferInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     /**
      * Connect to stream.

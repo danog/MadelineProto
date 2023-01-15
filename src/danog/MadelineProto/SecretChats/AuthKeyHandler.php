@@ -55,13 +55,13 @@ trait AuthKeyHandler
      *
      * @param array $params Secret chat ID
      */
-    public function acceptSecretChat(array $params)
+    public function acceptSecretChat(array $params): void
     {
         //$this->logger->logger($params['id'],$this->secretChatStatus($params['id']));
         if ($this->secretChatStatus($params['id']) !== 0) {
             //$this->logger->logger($this->secretChatStatus($params['id']));
             $this->logger->logger("I've already accepted secret chat ".$params['id']);
-            return false;
+            return;
         }
         $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating b...', Logger::VERBOSE);

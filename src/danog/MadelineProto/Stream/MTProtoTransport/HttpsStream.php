@@ -29,7 +29,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpsStream extends HttpStream implements MTProtoBufferInterface
+final class HttpsStream extends HttpStream implements MTProtoBufferInterface
 {
     /**
      * Connect to stream.

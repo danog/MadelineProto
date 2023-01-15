@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Web and CLI template settings for login.
  */
-class Templates extends SettingsAbstract
+final class Templates extends SettingsAbstract
 {
     /**
      * Web template used for querying app information.

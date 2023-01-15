@@ -33,7 +33,7 @@ use function ord;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class CheckLoop extends ResumableSignalLoop
+final class CheckLoop extends ResumableSignalLoop
 {
     use Common;
     /**

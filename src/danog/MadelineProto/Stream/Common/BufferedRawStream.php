@@ -22,7 +22,7 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
-use Amp\Socket\Socket;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -195,7 +195,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }

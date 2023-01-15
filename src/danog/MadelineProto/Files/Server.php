@@ -26,7 +26,7 @@ use danog\MadelineProto\Exception;
 /**
  * MadelineProto fileserver.
  */
-class Server
+final class Server
 {
     /**
      * Constructor function.

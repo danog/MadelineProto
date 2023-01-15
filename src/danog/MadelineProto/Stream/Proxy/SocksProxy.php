@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Proxy;
 
+use Amp\Cancellation;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
@@ -39,7 +40,7 @@ use Webmozart\Assert\Assert;
  * @implements RawProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  * @implements BufferedProxyStreamInterface<array{address: string, port: int, username?: string, password?: string}>
  */
-class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
+final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
     private const REPS = [0 => 'succeeded', 1 => 'general SOCKS server failure', 2 => 'connection not allowed by ruleset', 3 => 'Network unreachable', 4 => 'Host unreachable', 5 => 'Connection refused', 6 => 'TTL expired', 7 => 'Command not supported', 8 => 'Address type not supported'];
     /**
@@ -169,9 +170,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->getReadBuffer($length);
     }
-    public function read(): ?string
+    public function read(?Cancellation $token = null): ?string
     {
-        return $this->stream->read();
+        return $this->stream->read($token);
     }
     public function write(string $data): void
     {

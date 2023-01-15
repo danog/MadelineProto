@@ -9,7 +9,7 @@ namespace danog\MadelineProto\Settings\Database;
  *
  * MariaDb 10.2+ or Mysql 5.6+ required.
  */
-class Mysql extends SqlAbstract
+final class Mysql extends SqlAbstract
 {
     public function mergeArray(array $settings): void
     {

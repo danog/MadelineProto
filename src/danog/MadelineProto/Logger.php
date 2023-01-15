@@ -44,7 +44,7 @@ use function Amp\ByteStream\getStdout;
 /**
  * Logger class.
  */
-class Logger
+final class Logger
 {
     /**
      * @internal ANSI foreground color escapes

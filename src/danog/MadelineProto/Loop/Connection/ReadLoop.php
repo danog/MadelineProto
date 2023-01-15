@@ -42,7 +42,7 @@ use function substr;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ReadLoop extends SignalLoop
+final class ReadLoop extends SignalLoop
 {
     use Common;
     /**

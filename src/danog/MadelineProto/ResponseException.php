@@ -25,6 +25,6 @@ use Exception;
 /**
  * Indicates an error thrown when an unexpected response is received from telegram's servers.
  */
-class ResponseException extends Exception
+final class ResponseException extends Exception
 {
 }

@@ -29,7 +29,7 @@ use const PHP_SAPI;
 /**
  * TL conversion exception.
  */
-class Exception extends \Exception
+final class Exception extends \Exception
 {
     use PrettyException;
     public function __toString(): string

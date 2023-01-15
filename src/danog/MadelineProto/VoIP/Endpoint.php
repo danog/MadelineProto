@@ -13,7 +13,7 @@ use danog\MadelineProto\VoIP;
 
 use function Amp\Socket\connect;
 
-class Endpoint
+final class Endpoint
 {
     /**
      * IP address.

@@ -31,7 +31,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class SeqLoop extends ResumableSignalLoop
+final class SeqLoop extends ResumableSignalLoop
 {
     use InternalLoop;
     use AuthLoop;

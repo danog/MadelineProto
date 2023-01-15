@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * VoIP settings.
  */
-class VoIP extends SettingsAbstract
+final class VoIP extends SettingsAbstract
 {
     /**
      * Whether to preload all songs in memory.

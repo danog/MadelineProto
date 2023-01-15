@@ -36,7 +36,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ConnectionContext
+final class ConnectionContext
 {
     /**
      * Whether to use a secure socket.

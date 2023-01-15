@@ -268,10 +268,10 @@ trait Login
      *
      * @param array $params The params
      */
-    public function update2fa(array $params)
+    public function update2fa(array $params): void
     {
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
-        return $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
+        $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
     }
 }

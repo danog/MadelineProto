@@ -26,6 +26,7 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketConnector;
+use AssertionError;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
@@ -60,10 +61,9 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->stream->setupTls($cancellationToken);
     }
-    public function getStream(): EncryptableSocket
+    public function getStream(): RawStreamInterface
     {
-        Assert::notNull($this->stream);
-        return $this->stream;
+        throw new AssertionError("No underlying stream!");
     }
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {

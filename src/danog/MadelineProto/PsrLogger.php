@@ -12,7 +12,7 @@ use Stringable;
 /**
  * PSR-3 wrapper for MadelineProto's Logger.
  */
-class PsrLogger extends AbstractLogger
+final class PsrLogger extends AbstractLogger
 {
     private const LEVEL_MAP = [
         LogLevel::EMERGENCY => Logger::LEVEL_FATAL,

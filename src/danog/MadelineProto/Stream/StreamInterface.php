@@ -42,8 +42,6 @@ interface StreamInterface
     public function disconnect(): void;
     /**
      * Get underlying AMPHP socket resource.
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): Socket;
+    public function getSocket(): EncryptableSocket;
 }

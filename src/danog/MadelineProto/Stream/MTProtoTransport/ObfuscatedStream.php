@@ -34,7 +34,7 @@ use danog\MadelineProto\Tools;
  *
  * @implements BufferedProxyStreamInterface<array{secret?: string, address?: string, port?: int}>
  */
-class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
+final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 {
     private $stream;
     private $extra;

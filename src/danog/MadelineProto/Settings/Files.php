@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * File management settings.
  */
-class Files extends SettingsAbstract
+final class Files extends SettingsAbstract
 {
     /**
      * Allow automatic upload of files from file paths present in constructors?

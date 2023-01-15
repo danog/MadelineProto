@@ -31,7 +31,7 @@ use danog\MadelineProto\SecurityException;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class SecretFeedLoop extends ResumableSignalLoop
+final class SecretFeedLoop extends ResumableSignalLoop
 {
     use InternalLoop {
         __construct as private init;

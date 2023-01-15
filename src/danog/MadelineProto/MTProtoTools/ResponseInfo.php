@@ -25,7 +25,7 @@ use Amp\Http\Status;
 /**
  * Obtain response information for file to server.
  */
-class ResponseInfo
+final class ResponseInfo
 {
     private const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
     private const NO_CACHE = [

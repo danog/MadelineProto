@@ -39,7 +39,7 @@ use function Amp\Future\await;
 /**
  * Main API wrapper for MadelineProto.
  */
-class API extends InternalDoc
+final class API extends InternalDoc
 {
     /**
      * Release version.

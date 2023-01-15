@@ -23,7 +23,7 @@ namespace danog\MadelineProto;
 /**
  * File callback interface.
  */
-class FileCallback implements FileCallbackInterface
+final class FileCallback implements FileCallbackInterface
 {
     /**
      * File to download/upload.

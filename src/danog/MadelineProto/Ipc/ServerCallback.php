@@ -29,7 +29,7 @@ use Revolt\EventLoop;
 /**
  * IPC callback server.
  */
-class ServerCallback extends Server
+final class ServerCallback extends Server
 {
     /**
      * Timeout watcher list, indexed by socket ID.

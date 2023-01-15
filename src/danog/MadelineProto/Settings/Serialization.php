@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Serialization settings.
  */
-class Serialization extends SettingsAbstract
+final class Serialization extends SettingsAbstract
 {
     /**
      * Serialization interval, in seconds.

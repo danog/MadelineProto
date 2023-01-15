@@ -23,7 +23,7 @@ namespace danog\MadelineProto;
 /**
  * Class that controls script shutdown.
  */
-class Shutdown
+final class Shutdown
 {
     /**
      * Callbacks to call on shutdown.

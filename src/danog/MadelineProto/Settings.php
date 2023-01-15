@@ -26,7 +26,7 @@ use danog\MadelineProto\Settings\VoIP;
 /**
  * Settings class used for configuring MadelineProto.
  */
-class Settings extends SettingsAbstract
+final class Settings extends SettingsAbstract
 {
     /**
      * App information.

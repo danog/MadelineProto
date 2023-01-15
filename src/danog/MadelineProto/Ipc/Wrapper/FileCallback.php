@@ -4,12 +4,12 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\FileCallbackInterface;
 
-class FileCallback extends Obj implements FileCallbackInterface
+final class FileCallback extends Obj implements FileCallbackInterface
 {
     /**
      * Get file.
      */
-    public function getFile()
+    public function getFile(): mixed
     {
         return $this->__call('getFile');
     }

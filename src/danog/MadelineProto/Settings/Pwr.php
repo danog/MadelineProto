@@ -9,6 +9,6 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * PWRTelegram settings.
  */
-class Pwr extends SettingsAbstract
+final class Pwr extends SettingsAbstract
 {
 }

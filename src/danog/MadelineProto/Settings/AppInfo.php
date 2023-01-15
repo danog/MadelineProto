@@ -16,7 +16,7 @@ use const PHP_VERSION;
 /**
  * App information.
  */
-class AppInfo extends SettingsAbstract
+final class AppInfo extends SettingsAbstract
 {
     /**
      * API ID.

@@ -26,7 +26,7 @@ use const HAD_MADELINE_PHAR;
 /**
  * Snitch.
  */
-class Snitch
+final class Snitch
 {
     /**
      * Maximum starts without a phar file.

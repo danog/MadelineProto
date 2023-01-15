@@ -30,7 +30,7 @@ use function Amp\async;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpWaitLoop extends ResumableSignalLoop
+final class HttpWaitLoop extends ResumableSignalLoop
 {
     use Common;
     /**

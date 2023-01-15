@@ -31,7 +31,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     private $stream;
     /**

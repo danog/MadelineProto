@@ -11,7 +11,7 @@ use danog\MadelineProto\Db\PostgresArray as DbPostgresArray;
  *
  * @internal
  */
-class PostgresArray extends DbPostgresArray
+final class PostgresArray extends DbPostgresArray
 {
     use NullCacheTrait;
 }

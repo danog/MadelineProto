@@ -27,7 +27,7 @@ use const PHP_EOL;
 /**
  * Internal error indicating a problem with Telegram's servers.
  */
-class PTSException extends Exception
+final class PTSException extends Exception
 {
     use TL\PrettyException;
     public function __toString(): string

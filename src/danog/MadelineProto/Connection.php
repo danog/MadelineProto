@@ -48,7 +48,7 @@ use danog\Serializable;
  * @internal
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Connection
+final class Connection
 {
     use Session;
     use Serializable;

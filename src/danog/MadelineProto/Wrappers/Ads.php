@@ -35,9 +35,9 @@ trait Ads
      *
      * See [the API documentation](https://core.telegram.org/api/sponsored-messages) for more info on how to handle sponsored messages.
      *
-     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages(int|array $peer)
+    public function getSponsoredMessages(int|string|array $peer): array
     {
         $peer = ($this->getInfo($peer))['bot_api_id'];
         $cache = $this->sponsoredMessages[$peer];

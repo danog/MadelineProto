@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-class Lang
+final class Lang
 {
     public static $lang = [
     'it' =>

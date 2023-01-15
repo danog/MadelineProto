@@ -32,7 +32,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class FeedLoop extends ResumableSignalLoop
+final class FeedLoop extends ResumableSignalLoop
 {
     use InternalLoop {
         __construct as private init;

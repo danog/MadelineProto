@@ -36,7 +36,7 @@ use function Amp\async;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UpdateLoop extends ResumableSignalLoop
+final class UpdateLoop extends ResumableSignalLoop
 {
     use InternalLoop {
         __construct as private init;

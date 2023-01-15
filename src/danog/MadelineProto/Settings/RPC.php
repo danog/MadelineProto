@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * RPC settings.
  */
-class RPC extends SettingsAbstract
+final class RPC extends SettingsAbstract
 {
     /**
      * RPC timeout.

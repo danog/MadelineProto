@@ -22,7 +22,7 @@ namespace danog\MadelineProto\TL;
 
 use danog\Serializable;
 
-class TLMethods
+final class TLMethods
 {
     use Serializable;
     use TLParams;

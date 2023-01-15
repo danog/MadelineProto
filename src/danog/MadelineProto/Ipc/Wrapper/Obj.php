@@ -7,7 +7,7 @@ use danog\MadelineProto\Ipc\Wrapper;
 /**
  * Generic callback wrapper object.
  */
-class Obj
+abstract class Obj
 {
     /**
      * Constructor.

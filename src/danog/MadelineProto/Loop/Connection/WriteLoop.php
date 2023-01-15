@@ -37,7 +37,7 @@ use function strlen;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WriteLoop extends ResumableSignalLoop
+final class WriteLoop extends ResumableSignalLoop
 {
     const MAX_COUNT = 1020;
     private const MAX_SIZE = 1 << 15;

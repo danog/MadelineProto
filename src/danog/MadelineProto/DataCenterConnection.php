@@ -41,7 +41,7 @@ use function count;
 /**
  * Datacenter connection.
  */
-class DataCenterConnection implements JsonSerializable
+final class DataCenterConnection implements JsonSerializable
 {
     const READ_WEIGHT = 1;
     const READ_WEIGHT_MEDIA = 5;

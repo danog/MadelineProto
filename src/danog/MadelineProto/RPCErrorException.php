@@ -32,7 +32,7 @@ use function Amp\async;
 /**
  * Indicates an error returned by Telegram's API.
  */
-class RPCErrorException extends \Exception
+final class RPCErrorException extends \Exception
 {
     use TL\PrettyException;
     /**

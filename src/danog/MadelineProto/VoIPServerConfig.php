@@ -26,7 +26,7 @@ if (\class_exists(VoIPServerConfig::class)) {
 /**
  * Manages storage of VoIP server config.
  */
-class VoIPServerConfig
+final class VoIPServerConfig
 {
     /**
      * The configuration.

@@ -35,7 +35,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     private $stream;
     private $in_seq_no = -1;

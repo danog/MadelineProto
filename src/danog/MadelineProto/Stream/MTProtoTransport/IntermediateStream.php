@@ -33,7 +33,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     private $stream;
     /**

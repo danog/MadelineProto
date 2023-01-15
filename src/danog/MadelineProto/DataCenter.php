@@ -66,7 +66,7 @@ use Throwable;
  * }
  * @internal Manages datacenters.
  */
-class DataCenter
+final class DataCenter
 {
     use Serializable;
     /**

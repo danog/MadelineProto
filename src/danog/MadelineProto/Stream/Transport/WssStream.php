@@ -27,7 +27,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WssStream extends WsStream
+final class WssStream extends WsStream
 {
     /**
      * Connect to stream.

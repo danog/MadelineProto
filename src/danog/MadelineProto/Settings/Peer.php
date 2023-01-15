@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Peer database settings.
  */
-class Peer extends SettingsAbstract
+final class Peer extends SettingsAbstract
 {
     /**
      * Cache time for full peer information (seconds).

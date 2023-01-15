@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream\Transport;
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
 use Amp\Socket\EncryptableSocket;
-use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
@@ -40,7 +39,7 @@ use Webmozart\Assert\Assert;
  *
  * @implements ProxyStreamInterface<EncryptableSocket>
  */
-class PremadeStream implements RawStreamInterface, ProxyStreamInterface
+final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
     private ?EncryptableSocket $stream = null;
     public function __construct()
@@ -99,7 +98,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->disconnect();
     }
-    public function getSocket(): Socket
+    public function getSocket(): EncryptableSocket
     {
         Assert::notNull($this->stream);
         return $this->stream;

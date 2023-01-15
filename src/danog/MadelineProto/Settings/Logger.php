@@ -15,7 +15,7 @@ use const PHP_SAPI;
 /**
  * Logger settings.
  */
-class Logger extends SettingsAbstract
+final class Logger extends SettingsAbstract
 {
     /**
      * Logger type.

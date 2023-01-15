@@ -15,7 +15,7 @@ use Throwable;
  *
  * @internal
  */
-class Mysql
+final class Mysql
 {
     /** @var array<MysqlConnectionPool> */
     private static array $connections = [];

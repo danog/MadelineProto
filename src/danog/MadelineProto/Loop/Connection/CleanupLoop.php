@@ -29,7 +29,7 @@ use function Amp\async;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class CleanupLoop extends ResumableSignalLoop
+final class CleanupLoop extends ResumableSignalLoop
 {
     use Common;
     /**

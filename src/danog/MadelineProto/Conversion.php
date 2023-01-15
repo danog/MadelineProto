@@ -28,7 +28,7 @@ use const DIRECTORY_SEPARATOR;
 
 use function stream_get_contents;
 
-class Conversion
+final class Conversion
 {
     /**
      * Prepare API instance.

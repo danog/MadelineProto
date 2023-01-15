@@ -37,7 +37,7 @@ use function hash;
  * @author Daniil Gentili <daniil@daniil.it>
  * @link   https://docs.madelineproto.xyz MadelineProto documentation
  */
-class PasswordCalculator
+final class PasswordCalculator
 {
     /**
      * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object).

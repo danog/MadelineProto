@@ -14,7 +14,7 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  *
  * @internal
  */
-class Redis
+final class Redis
 {
     /** @var array<RedisRedis> */
     private static array $connections = [];

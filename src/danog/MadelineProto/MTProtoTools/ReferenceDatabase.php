@@ -32,7 +32,7 @@ use danog\MadelineProto\Tools;
 /**
  * Manages upload and download of files.
  */
-class ReferenceDatabase implements TLCallback
+final class ReferenceDatabase implements TLCallback
 {
     use DbPropertiesTrait;
 

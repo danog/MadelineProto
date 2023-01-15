@@ -29,7 +29,7 @@ use const STR_PAD_LEFT;
 /**
  * RSA class.
  */
-class RSA
+final class RSA
 {
     use Serializable;
     /**

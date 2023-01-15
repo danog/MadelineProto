@@ -29,7 +29,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
+final class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
 {
     /**
      * Read data asynchronously.

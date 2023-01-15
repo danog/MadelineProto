@@ -36,7 +36,7 @@ use function Amp\async;
 /**
  * IPC client.
  */
-class Client extends ClientAbstract
+final class Client extends ClientAbstract
 {
     use Start;
     use Templates;

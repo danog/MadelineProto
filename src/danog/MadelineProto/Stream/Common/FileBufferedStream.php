@@ -23,7 +23,7 @@ namespace danog\MadelineProto\Stream\Common;
 use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
 use Amp\File\File;
-use Amp\Socket\Socket;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
@@ -39,7 +39,7 @@ use RuntimeException;
  *
  * @implements ProxyStreamInterface<File>
  */
-class FileBufferedStream implements BufferedStreamInterface, BufferInterface, ProxyStreamInterface, RawStreamInterface
+final class FileBufferedStream implements BufferedStreamInterface, BufferInterface, ProxyStreamInterface, RawStreamInterface
 {
     private ?File $stream = null;
     private int $append_after;
@@ -155,7 +155,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     /**
      * {@inheritDoc}
      */
-    public function getSocket(): Socket
+    public function getSocket(): EncryptableSocket
     {
         throw new RuntimeException("Can't get underlying socket, is a File handle!");
     }

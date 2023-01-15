@@ -26,7 +26,7 @@ use Amp\Http\Client\Request;
 /**
  * Wrapper for my.telegram.org.
  */
-class MyTelegramOrgWrapper
+final class MyTelegramOrgWrapper
 {
     /**
      * Whether we're logged in.

@@ -31,7 +31,7 @@ use Revolt\EventLoop;
 /**
  * Manages min peers.
  */
-class MinDatabase implements TLCallback
+final class MinDatabase implements TLCallback
 {
     use DbPropertiesTrait;
 

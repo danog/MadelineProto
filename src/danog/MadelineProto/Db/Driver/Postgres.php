@@ -15,7 +15,7 @@ use Throwable;
  *
  * @internal
  */
-class Postgres
+final class Postgres
 {
     /** @var array<PostgresConnectionPool> */
     private static array $connections = [];

@@ -25,7 +25,7 @@ namespace danog\MadelineProto\MTProtoTools;
  *
  * @internal
  */
-class CombinedUpdatesState
+final class CombinedUpdatesState
 {
     /**
      * Update states.

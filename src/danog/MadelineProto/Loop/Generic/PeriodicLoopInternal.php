@@ -29,7 +29,7 @@ use danog\MadelineProto\MTProto;
  *
  * @internal For internal use
  */
-class PeriodicLoopInternal extends GenericPeriodicLoop
+final class PeriodicLoopInternal extends GenericPeriodicLoop
 {
     use InternalLoop {
         __construct as private init;

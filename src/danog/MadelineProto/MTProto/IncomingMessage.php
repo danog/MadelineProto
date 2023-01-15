@@ -25,7 +25,7 @@ namespace danog\MadelineProto\MTProto;
  *
  * @internal
  */
-class IncomingMessage extends Message
+final class IncomingMessage extends Message
 {
     /**
      * We have received this message.

@@ -34,7 +34,7 @@ if (\extension_loaded('php-libtgvoip')) {
     return;
 }
 
-class VoIP
+final class VoIP
 {
     use MessageHandler;
     use AckHandler;

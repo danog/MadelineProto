@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Cryptography settings.
  */
-class Auth extends SettingsAbstract
+final class Auth extends SettingsAbstract
 {
     /**
      * Validity period of temporary keys.

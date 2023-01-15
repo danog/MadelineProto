@@ -11,7 +11,7 @@ use danog\MadelineProto\Db\RedisArray as DbRedisArray;
  *
  * @internal
  */
-class RedisArray extends DbRedisArray
+final class RedisArray extends DbRedisArray
 {
     use NullCacheTrait;
 }

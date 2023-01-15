@@ -9,7 +9,7 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 /**
  * Memory backend settings.
  */
-class Memory extends DatabaseAbstract
+final class Memory extends DatabaseAbstract
 {
     /**
      * Whether to cleanup the memory before serializing.

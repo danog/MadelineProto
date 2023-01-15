@@ -30,7 +30,7 @@ use JsonSerializable;
  *
  * @implements ArrayAccess<array-key, mixed>
  */
-class Button implements JsonSerializable, ArrayAccess
+final class Button implements JsonSerializable, ArrayAccess
 {
     /**
      * Button data.

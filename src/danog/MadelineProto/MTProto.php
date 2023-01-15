@@ -85,7 +85,7 @@ use function time;
  *
  * @internal
  */
-class MTProto implements TLCallback, LoggerGetter
+final class MTProto implements TLCallback, LoggerGetter
 {
     use Serializable;
     use AuthKeyHandler;
@@ -1351,6 +1351,9 @@ class MTProto implements TLCallback, LoggerGetter
     {
         return $this->initPromise?->isComplete() ?? false;
     }
+    /**
+     * @internal
+     */
     public function waitForInit(): void
     {
         $this->initPromise?->await();
@@ -1739,7 +1742,7 @@ class MTProto implements TLCallback, LoggerGetter
      * @param array $config  Current config
      * @param array $options Options for method call
      */
-    public function getConfig(array $config = [], array $options = [])
+    public function getConfig(array $config = [], array $options = []): array
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;

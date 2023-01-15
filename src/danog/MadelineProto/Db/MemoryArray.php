@@ -13,7 +13,7 @@ use danog\MadelineProto\Settings\Database\Memory;
  *
  * @extends ArrayIterator<array-key, mixed>
  */
-class MemoryArray extends ArrayIterator implements DbArray
+final class MemoryArray extends ArrayIterator implements DbArray
 {
     public function __construct($array = [], $flags = 0)
     {

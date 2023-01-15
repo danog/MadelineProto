@@ -31,7 +31,7 @@ use function Amp\async;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class PingLoop extends ResumableSignalLoop
+final class PingLoop extends ResumableSignalLoop
 {
     use Common;
     /**

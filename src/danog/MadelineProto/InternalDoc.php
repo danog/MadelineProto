@@ -6267,18 +6267,18 @@ class InternalDoc extends APIFactory
      *
      * @param array $call Call
      */
-    public function acceptCall(array $call, array $extra = [])
+    public function acceptCall(array $call)
     {
-        return $this->__call(__FUNCTION__, [$call, $extra]);
+        return $this->__call(__FUNCTION__, [$call]);
     }
     /**
      * Accept secret chat.
      *
      * @param array $params Secret chat ID
      */
-    public function acceptSecretChat(array $params, array $extra = [])
+    public function acceptSecretChat(array $params): void
     {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
+        $this->__call(__FUNCTION__, [$params]);
     }
     /**
      * Accept terms of service update.
@@ -6430,13 +6430,6 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, []);
     }
     /**
-     * Cleanup memory and session file.
-     */
-    public function cleanup(): void
-    {
-        $this->__call(__FUNCTION__, []);
-    }
-    /**
      * Close connection with client, connected via web.
      *
      * @param string $message Message
@@ -6535,13 +6528,13 @@ class InternalDoc extends APIFactory
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string $messageMedia File to download
+     * @param array|string|FileCallbackInterface $messageMedia File to download
      * @param ?callable     $cb           Status callback (can also use FileCallback)
      * @param ?int $size Size of file to download, required for bot API file IDs.
      * @param ?string $mime MIME type of file to download, required for bot API file IDs.
      * @param ?string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         $this->__call(__FUNCTION__, [$messageMedia, $cb, $size, $name, $mime]);
     }
@@ -6549,9 +6542,8 @@ class InternalDoc extends APIFactory
      * Download file to callable.
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
-     * The callable should return the number of written bytes.
      *
-     * @param mixed                          $messageMedia File to download
+     * @param mixed                          $messageMedia  File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
      * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
      * @param bool                           $seekable      Whether the callable can be called out of order
@@ -6590,14 +6582,14 @@ class InternalDoc extends APIFactory
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string  $messageMedia File to download
+     * @param array|string|FileCallbackInterface  $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
      * @param ?int          $size         Size of file to download, required for bot API file IDs.
      * @param ?string       $name         Name of file to download, required for bot API file IDs.
      * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null)
+    public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null)
     {
         return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $size, $mime, $name]);
     }
@@ -6605,7 +6597,7 @@ class InternalDoc extends APIFactory
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download
-     * @param mixed|FileCallbackInterface $stream        Stream where to download file
+     * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
@@ -6698,11 +6690,11 @@ class InternalDoc extends APIFactory
      * @param string    $file      File to lock
      * @param integer   $operation Locking mode
      * @param float     $polling   Polling interval
-     * @param ?Future   $token     Cancellation token
+     * @param ?Cancellation $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     * @return $token is null ? (callable(): void) : ((callable(): void)|null)
+     * @return ($token is null ? (callable(): void) : ((callable(): void)|null))
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Future $token = null, ?callable $failureCb = null): ?callable
+    public static function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Cancellation $token = null, ?callable $failureCb = null): ?callable
     {
         return \danog\MadelineProto\AsyncTools::flock($file, $operation, $polling, $token, $failureCb);
     }
@@ -6788,9 +6780,9 @@ class InternalDoc extends APIFactory
      */
     public function getConfig(array $config = [
     ], array $options = [
-    ], array $extra = [])
+    ])
     {
-        return $this->__call(__FUNCTION__, [$config, $options, $extra]);
+        return $this->__call(__FUNCTION__, [$config, $options]);
     }
     /**
      * Get async DNS client.
@@ -6826,11 +6818,10 @@ class InternalDoc extends APIFactory
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     * @return list<array>
      */
-    public function getDialogs(bool $force = true, array $extra = [])
+    public function getDialogs(bool $force = true)
     {
-        return $this->__call(__FUNCTION__, [$force, $extra]);
+        return $this->__call(__FUNCTION__, [$force]);
     }
     /**
      * Get download info of file
@@ -6897,9 +6888,9 @@ class InternalDoc extends APIFactory
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      */
-    public function getFullDialogs(bool $force = true, array $extra = [])
+    public function getFullDialogs(bool $force = true)
     {
-        return $this->__call(__FUNCTION__, [$force, $extra]);
+        return $this->__call(__FUNCTION__, [$force]);
     }
     /**
      * Get full info about peer, returns an FullInfo object.
@@ -6940,24 +6931,21 @@ class InternalDoc extends APIFactory
      * @param mixed                $id        Peer
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
-     * @template TConstructor
-     * @param array{_: TConstructor}|mixed $id
-     * @return array{
-     *      TConstructor: array
-     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
-     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
-     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     * @return mixed
+     *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
+     *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
+     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
+     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
+     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
      *      bot_api_id: int|string,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
-     *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
+     *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * }|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
+     * } : ($type is INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
     public function getInfo(mixed $id, int $type = \danog\MadelineProto\MTProto::INFO_TYPE_ALL)
     {
@@ -7073,11 +7061,11 @@ class InternalDoc extends APIFactory
      *
      * See [the API documentation](https://core.telegram.org/api/sponsored-messages) for more info on how to handle sponsored messages.
      *
-     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages(array|int $peer, array $extra = [])
+    public function getSponsoredMessages(array|string|int $peer)
     {
-        return $this->__call(__FUNCTION__, [$peer, $extra]);
+        return $this->__call(__FUNCTION__, [$peer]);
     }
     /**
      * Get TL serializer.
@@ -7230,7 +7218,7 @@ class InternalDoc extends APIFactory
     /**
      * Logger.
      *
-     * @param mixed $param Parameter
+     * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      */
@@ -7286,7 +7274,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $text Text
      */
-    public static function mbStrlen(string $text): int|float
+    public static function mbStrlen(string $text): int
     {
         return \danog\MadelineProto\StrTools::mbStrlen($text);
     }
@@ -7310,7 +7298,7 @@ class InternalDoc extends APIFactory
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCall(string $method, array $args = [
+    public function methodCall(string $method, callable|array $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = [])
@@ -7324,7 +7312,7 @@ class InternalDoc extends APIFactory
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
      */
-    public function methodCallWrite(string $method, array $args = [
+    public function methodCallWrite(string $method, callable|array $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = [])
@@ -7532,15 +7520,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$chat]);
     }
     /**
-     * Serialize all instances.
-     *
-     * CALLED ONLY ON SHUTDOWN.
-     */
-    public static function serializeAll(): void
-    {
-        \danog\MadelineProto\MTProto::serializeAll();
-    }
-    /**
      * Set update handling callback.
      *
      * @param callable $callback Callback
@@ -7600,11 +7579,10 @@ class InternalDoc extends APIFactory
      * Set webhook update handler.
      *
      * @param string $hook_url Webhook URL
-     * @param string $pem_path PEM path for self-signed certificate
      */
-    public function setWebhook(string $hook_url, string $pem_path = ''): void
+    public function setWebhook(string $hook_url): void
     {
-        $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
+        $this->__call(__FUNCTION__, [$hook_url]);
     }
     /**
      * Setup logger.
@@ -7668,10 +7646,10 @@ class InternalDoc extends APIFactory
     /**
      * Convert tdcli parameters to tdcli.
      *
-     * @param array $params Params
+     * @param mixed $params Params
      * @param array $key    Key
      */
-    public function tdcliToTd(array &$params, ?array $key = null)
+    public function tdcliToTd(&$params, ?array $key = null)
     {
         return $this->__call(__FUNCTION__, [$params, $key]);
     }
@@ -7803,9 +7781,9 @@ class InternalDoc extends APIFactory
      *
      * @param array $params The params
      */
-    public function update2fa(array $params, array $extra = [])
+    public function update2fa(array $params): void
     {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
+        $this->__call(__FUNCTION__, [$params]);
     }
     /**
      * Parse, update and store settings.

@@ -34,7 +34,7 @@ use danog\MadelineProto\Tools;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     private $stream;
     /**

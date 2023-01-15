@@ -9,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * TL schema settings.
  */
-class TLSchema extends SettingsAbstract
+final class TLSchema extends SettingsAbstract
 {
     /**
      * TL layer version.

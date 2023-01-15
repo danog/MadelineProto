@@ -30,7 +30,7 @@ use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
-class AnnotationsBuilder
+final class AnnotationsBuilder
 {
     /**
      * Reflection classes.

@@ -22,6 +22,6 @@ namespace danog\MadelineProto;
 
 use Exception;
 
-class Bug74586Exception extends Exception
+final class Bug74586Exception extends Exception
 {
 }
