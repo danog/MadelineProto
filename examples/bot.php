@@ -147,4 +147,4 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-MyEventHandler::startAndLoop('uwu.madeline', $settings);
+MyEventHandler::startAndLoop('uwua.madeline', $settings);

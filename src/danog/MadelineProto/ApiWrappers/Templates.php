@@ -63,81 +63,22 @@ trait Templates
     private function webAPIEcho(string $message = ''): void
     {
         $message = \htmlentities($message);
-        if (!isset($this->myTelegramOrgWrapper)) {
-            if (isset($_POST['type'])) {
-                if ($_POST['type'] === 'manual') {
-                    $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
-                    $title .= "<br><b>$message</b>";
-                    $title .= '<ol>';
-                    $title .= '<li>'.\str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', \htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
-                    $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions1']).'</li>';
-                    $title .= '<li><ul>';
-                    foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
-                        $title .= "<li>$key: ";
-                        $title .= \htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
-                        $title .= '</li>';
-                    }
-                    $title .= '</li></ul>';
-                    $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
-                    $title .= '</ol>';
-                    $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
-                    $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
-                } else {
-                    $title = Lang::$current_lang['apiAutoWeb'];
-                    $title .= "<br><b>$message</b>";
-                    $phone = \htmlentities(Lang::$current_lang['loginUserPhoneWeb']);
-                    $form = "<input type='text' name='phone_number' placeholder='$phone' required/>";
-                }
-            } else {
-                if ($message) {
-                    $message = '<br><br>'.$message;
-                }
-                $title = \htmlentities(Lang::$current_lang['apiChooseManualAutoWeb']);
-                $title .= '<br>';
-                $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
-                $title .= "<b>$message</b>";
-
-                $automatically = \htmlentities(Lang::$current_lang['apiChooseAutomaticallyWeb']);
-                $manually = \htmlentities(Lang::$current_lang['apiChooseManuallyWeb']);
-
-                $form = "<select name='type'><option value='automatic'>$automatically</option><option value='manual'>$manually</option></select>";
-            }
-        } else {
-            if (!$this->myTelegramOrgWrapper->loggedIn()) {
-                $title = \htmlentities(Lang::$current_lang['loginUserCode']);
-                $title .= "<br><b>$message</b>";
-
-                $code = \htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
-                $form = "<input type='text' name='code' placeholder='$code' required/>";
-            } else {
-                $title = \htmlentities(Lang::$current_lang['apiAppWeb']);
-                $title .= "<br><b>$message</b>";
-
-                $form = '<input type="hidden" name="creating_app" value="yes" required/>';
-                foreach (['app_title', 'app_shortname', 'app_url', 'app_platform', 'app_desc'] as $k => $field) {
-                    $desc = \htmlentities(Lang::$current_lang["apiAppInstructionsAuto$k"]);
-                    if ($field == 'app_platform') {
-                        $form .= "$desc<br>";
-                        foreach ([
-                            'android' => 'Android',
-                            'ios' => 'iOS',
-                            'wp' => 'Windows Phone',
-                            'bb' => 'BlackBerry',
-                            'desktop' => 'Desktop',
-                            'web' => 'Web',
-                            'ubp' => 'Ubuntu phone',
-                            'other' => \htmlentities(Lang::$current_lang['apiAppInstructionsAutoTypeOther']),
-                        ] as $key => $desc) {
-                            $form .= "<label><input type='radio' name='app_platform' value='$key' checked> $desc</label>";
-                        }
-                    } elseif ($field === 'app_desc') {
-                        $form .= "$desc<br><textarea name='$field' required></textarea><br><br>";
-                    } else {
-                        $form .= "$desc<br><input type='text' name='$field' required/><br><br>";
-                    }
-                }
-            }
+        $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
+        $title .= "<br><b>$message</b>";
+        $title .= '<ol>';
+        $title .= '<li>'.\str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', \htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
+        $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions1']).'</li>';
+        $title .= '<li><ul>';
+        foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
+            $title .= "<li>$key: ";
+            $title .= \htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
+            $title .= '</li>';
         }
+        $title .= '</li></ul>';
+        $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
+        $title .= '</ol>';
+        $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
+        $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
         getOutputBufferStream()->write($this->webAPIEchoTemplate($title, $form));
     }
 }

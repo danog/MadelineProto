@@ -175,13 +175,9 @@ final class Lang
     'en' =>
     [
     'go' => 'Go',
-    'apiChooseManualAuto' => 'Do you want to enter the API id and the API hash manually or automatically? (m/a)',
-    'apiChooseManualAutoWeb' => 'Do you want to enter the API id and the API hash manually or automatically?',
-    'apiChooseManualAutoTip' => 'Note that you can also provide them directly in the code using the settings: %s',
-    'apiChooseManualAutoTipWeb' => 'Note that you can also provide them directly in the code using the <a target="_blank" href="%s">settings</a>.',
+    'apiChooseManualAutoTip' => 'Note that you can also provide the API ID/hash directly in the code using the settings: %s',
+    'apiChooseManualAutoTipWeb' => 'Note that you can also provide the API ID/hash directly in the code using the <a target="_blank" href="%s">settings</a>.',
     'apiChoosePrompt' => 'Your choice (m/a): ',
-    'apiChooseAutomaticallyWeb' => 'Automatically',
-    'apiChooseManuallyWeb' => 'Manually',
     'apiManualInstructions0' => 'Login to https://my.telegram.org',
     'apiManualInstructions1' => 'Go to API development tools',
     'apiManualInstructions2' => 'Click on create application',
@@ -326,12 +322,8 @@ final class Lang
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = [
     'go' => 'Go',
-    'apiChooseManualAuto' => 'Do you want to enter the API id and the API hash manually or automatically? (m/a)',
-    'apiChooseManualAutoWeb' => 'Do you want to enter the API id and the API hash manually or automatically?',
     'apiChooseManualAutoTip' => 'Note that you can also provide them directly in the code using the settings: %s',
     'apiChooseManualAutoTipWeb' => 'Note that you can also provide them directly in the code using the <a href="%s">settings</a>.',
-    'apiChoosePrompt' => 'Your choice (m/a): ',
-    'apiChooseAutomaticallyWeb' => 'Automatically',
     'apiChooseManuallyWeb' => 'Manually',
     'apiManualInstructions0' => 'Login to https://my.telegram.org',
     'apiManualInstructions1' => 'Go to API development tools',
