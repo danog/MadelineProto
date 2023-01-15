@@ -28,6 +28,8 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
+use function danog\MadelineProto\logger;
+
 /**
  * Socks5 stream wrapper.
  *
@@ -131,7 +133,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = \unpack('n', yield $buffer->bufferRead(2))[1];
-        \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
+        logger(['Connected to '.$ip.':'.$port.' via socks5']);
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }

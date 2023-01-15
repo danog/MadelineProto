@@ -9,6 +9,8 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
+use function danog\MadelineProto\warning;
+
 /**
  * MySQL database backend.
  */
@@ -96,7 +98,7 @@ class MysqlArray extends SqlArray
      */
     protected function prepareTable(): \Generator
     {
-        Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
+        warning("Creating/checking table {$this->table}");
         return yield $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
@@ -113,7 +115,7 @@ class MysqlArray extends SqlArray
 
     protected function renameTable(string $from, string $to): \Generator
     {
-        Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
+        warning("Moving data from {$from} to {$to}");
 
         yield $this->db->query("
             REPLACE INTO `{$to}`

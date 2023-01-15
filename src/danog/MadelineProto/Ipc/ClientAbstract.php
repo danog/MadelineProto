@@ -24,6 +24,7 @@ use Amp\Promise;
 use danog\MadelineProto\Logger;
 
 use function Amp\Ipc\connect;
+use function danog\MadelineProto\logger;
 
 /**
  * IPC client.
@@ -85,14 +86,14 @@ abstract class ClientAbstract
                 try {
                     $payload = yield $this->server->receive();
                 } catch (\Throwable $e) {
-                    Logger::log("Got exception while receiving in IPC client: $e");
+                    logger("Got exception while receiving in IPC client: $e");
                 }
                 if (!$payload) {
                     break;
                 }
                 [$id, $payload] = $payload;
                 if (!isset($this->requests[$id])) {
-                    Logger::log("Got response for non-existing ID $id!");
+                    logger("Got response for non-existing ID $id!");
                 } else {
                     $promise = $this->requests[$id];
                     unset($this->requests[$id]);
@@ -119,7 +120,7 @@ abstract class ClientAbstract
                         yield Server::startMe($this->session);
                         $this->server = yield connect($this->session->getIpcPath());
                     } catch (\Throwable $e) {
-                        Logger::log("Got exception while reconnecting in IPC client: $e");
+                        logger("Got exception while reconnecting in IPC client: $e");
                     }
                 } else {
                     return;

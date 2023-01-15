@@ -16,6 +16,8 @@ namespace danog\MadelineProto\VoIP;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 
+use function danog\MadelineProto\error;
+
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
  */
@@ -249,7 +251,7 @@ trait MessageHandler
                 $result['_'] = $flags >> 24;
                 if ($flags & 4) {
                     if (\stream_get_contents($payload, 16) !== $this->configuration['call_id']) {
-                        \danog\MadelineProto\Logger::log('Call ID mismatch', \danog\MadelineProto\Logger::ERROR);
+                        error('Call ID mismatch');
                         return false;
                     }
                 }
@@ -262,7 +264,7 @@ trait MessageHandler
                 }
                 if ($flags & 8) {
                     if (\stream_get_contents($payload, 4) !== \danog\MadelineProto\VoIP::PROTO_ID) {
-                        \danog\MadelineProto\Logger::log('Protocol mismatch', \danog\MadelineProto\Logger::ERROR);
+                        error('Protocol mismatch');
                         return false;
                     }
                 }
@@ -323,7 +325,7 @@ trait MessageHandler
                     \fwrite($message, \stream_get_contents($payload));
                     \fseek($message, 0);
                 } else {
-                    \danog\MadelineProto\Logger::log('Unknown packet received: '.\bin2hex($crc), \danog\MadelineProto\Logger::ERROR);
+                    error('Unknown packet received: '.\bin2hex($crc));
                     return false;
                 }
         }

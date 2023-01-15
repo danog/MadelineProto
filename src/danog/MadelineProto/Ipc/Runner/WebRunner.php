@@ -10,6 +10,8 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 
+use function danog\MadelineProto\logger;
+
 final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */
@@ -93,7 +95,7 @@ final class WebRunner extends RunnerAbstract
                 $res = \fsockopen($address, $port);
                 break;
             } catch (\Throwable $e) {
-                Logger::log("Error while connecting to ourselves: $e");
+                logger("Error while connecting to ourselves: $e");
             }
         }
         if (!isset($res)) {

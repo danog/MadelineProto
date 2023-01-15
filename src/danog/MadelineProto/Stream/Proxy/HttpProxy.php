@@ -28,6 +28,8 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
+use function danog\MadelineProto\logger;
+
 /**
  * HTTP proxy stream wrapper.
  *
@@ -113,7 +115,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
                 $this->disconnect();
                 yield $this->connect($ctx);
             }
-            \danog\MadelineProto\Logger::log(\trim($read));
+            logger(\trim($read));
             throw new \danog\MadelineProto\Exception($description, $code);
         }
         if ($close) {
@@ -127,7 +129,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
-        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
+        logger('Connected to '.$address.':'.$port.' via http');
         if (\strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }

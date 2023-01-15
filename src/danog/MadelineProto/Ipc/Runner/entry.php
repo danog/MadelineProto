@@ -26,6 +26,9 @@ use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 
+use function danog\MadelineProto\fatal;
+use function danog\MadelineProto\logger;
+
 (static function (): void {
     if (defined('MADELINE_ENTRY')) {
         // Already called
@@ -111,7 +114,7 @@ use danog\MadelineProto\Tools;
                     Shutdown::removeCallback('restarter');
                     return;
                 } catch (\Throwable $e) {
-                    Logger::log((string) $e, Logger::FATAL_ERROR);
+                    fatal((string) $e);
                     Tools::wait($API->report("Surfaced: $e"));
                 }
             }
@@ -119,15 +122,15 @@ use danog\MadelineProto\Tools;
             echo "$e";
             echo "Got exception in IPC server, exiting...";
 
-            Logger::log("$e", Logger::FATAL_ERROR);
-            Logger::log("Got exception in IPC server, exiting...", Logger::FATAL_ERROR);
+            fatal("$e");
+            fatal("Got exception in IPC server, exiting...");
             $ipc = Tools::wait($session->getIpcState());
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())) {
-                Logger::log("Reporting error!");
+                logger("Reporting error!");
                 Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
-                Logger::log("Reported error!");
+                logger("Reported error!");
             } else {
-                Logger::log("Not reporting error!");
+                logger("Not reporting error!");
             }
         }
     }

@@ -10,6 +10,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\VoIP;
 
 use function Amp\Socket\connect;
+use function danog\MadelineProto\error;
 
 class Endpoint
 {
@@ -107,7 +108,7 @@ class Endpoint
             if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
                 $hasPeerTag = true;
                 if (\stream_get_contents($payload, 16) !== $this->peerTag) {
-                    \danog\MadelineProto\Logger::log("Received packet has wrong peer tag", \danog\MadelineProto\Logger::ERROR);
+                    error("Received packet has wrong peer tag");
                     continue;
                 }
             }
@@ -121,13 +122,13 @@ class Endpoint
                 $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
                 if ($message_key != \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
-                    \danog\MadelineProto\Logger::log("msg_key mismatch!", \danog\MadelineProto\Logger::ERROR);
+                    error("msg_key mismatch!");
                     return false;
                 }
 
                 $innerLen = \unpack('v', \substr($packet, 0, 2))[1];
                 if ($innerLen > \strlen($packet)) {
-                    \danog\MadelineProto\Logger::log("Received packet has wrong inner length!", \danog\MadelineProto\Logger::ERROR);
+                    error("Received packet has wrong inner length!");
                     return false;
                 }
                 $packet = \substr($packet, 2);

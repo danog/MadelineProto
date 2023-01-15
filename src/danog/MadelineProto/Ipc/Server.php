@@ -34,6 +34,7 @@ use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
 
 use function Amp\Promise\first;
+use function danog\MadelineProto\logger;
 
 /**
  * IPC server.
@@ -102,20 +103,20 @@ class Server extends SignalLoop
         $started = false;
         $promises = [];
         try {
-            Logger::log("Starting IPC server $session (process)");
+            logger("Starting IPC server $session (process)");
             $promises []= ProcessRunner::start($session, $id);
             $started = true;
             $promises []= WebRunner::start($session, $id);
             return Tools::call(self::monitor($session, $id, $started, first($promises)));
         } catch (\Throwable $e) {
-            Logger::log($e);
+            logger($e);
         }
         try {
-            Logger::log("Starting IPC server $session (web)");
+            logger("Starting IPC server $session (web)");
             $promises []= WebRunner::start($session, $id);
             $started = true;
         } catch (\Throwable $e) {
-            Logger::log($e);
+            logger($e);
         }
         return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new Deferred)->promise()));
     }
@@ -128,17 +129,17 @@ class Server extends SignalLoop
     private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): \Generator
     {
         if (!$started) {
-            Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
+            logger("It looks like the server couldn't be started, trying to connect anyway...");
         }
         $count = 0;
         while (true) {
             $state = yield $session->getIpcState();
             if ($state && $state->getStartupId() === $id) {
                 if ($e = $state->getException()) {
-                    Logger::log("IPC server got exception $e");
+                    logger("IPC server got exception $e");
                     return $e;
                 }
-                Logger::log("IPC server started successfully!");
+                logger("IPC server started successfully!");
                 return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!");
@@ -147,8 +148,8 @@ class Server extends SignalLoop
                 yield Tools::timeoutWithDefault($cancelConnect, 500, null);
                 $cancelConnect = (new Deferred)->promise();
             } catch (\Throwable $e) {
-                Logger::log("$e");
-                Logger::log("Could not start IPC server, please check the logs for more details!");
+                logger("$e");
+                logger("Could not start IPC server, please check the logs for more details!");
                 return $e;
             }
             $count++;
@@ -213,7 +214,7 @@ class Server extends SignalLoop
                 Tools::callFork($this->clientRequest($socket, $id++, $payload));
             }
         } catch (\Throwable $e) {
-            Logger::log("Exception in IPC connection: $e");
+            logger("Exception in IPC connection: $e");
         } finally {
             try {
                 yield $socket->disconnect();

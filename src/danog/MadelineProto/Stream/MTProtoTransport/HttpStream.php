@@ -29,6 +29,8 @@ use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use Psr\Http\Message\UriInterface;
 
+use function danog\MadelineProto\logger;
+
 /**
  * HTTP stream wrapper.
  *
@@ -148,7 +150,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
                 $this->disconnect();
                 yield from $this->connect($this->ctx);
             }
-            \danog\MadelineProto\Logger::log($read);
+            logger($read);
             $this->code = \danog\MadelineProto\Tools::packSignedInt(-$code);
             $length = 4;
             return $this;

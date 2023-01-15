@@ -8,6 +8,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
 use function Amp\Mysql\Pool;
+use function danog\MadelineProto\error;
 
 /**
  * MySQL driver wrapper.
@@ -63,7 +64,7 @@ class Mysql
                 ");
             $connection->close();
         } catch (\Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
+            error($e->getMessage());
         }
     }
 }

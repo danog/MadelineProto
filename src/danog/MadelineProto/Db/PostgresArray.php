@@ -9,6 +9,8 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
+use function danog\MadelineProto\warning;
+
 /**
  * Postgres database backend.
  */
@@ -107,7 +109,7 @@ class PostgresArray extends SqlArray
      */
     protected function prepareTable(): \Generator
     {
-        Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
+        warning("Creating/checking table {$this->table}");
 
         yield $this->db->query("
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
@@ -120,7 +122,7 @@ class PostgresArray extends SqlArray
 
     protected function renameTable(string $from, string $to): \Generator
     {
-        Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
+        warning("Moving data from {$from} to {$to}");
 
         yield $this->db->query(/** @lang PostgreSQL */ "
             ALTER TABLE \"$from\" RENAME TO \"$to\";

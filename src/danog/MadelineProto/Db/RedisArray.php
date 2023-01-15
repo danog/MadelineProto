@@ -13,6 +13,7 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 use Generator;
 
 use function Amp\call;
+use function danog\MadelineProto\warning;
 
 /**
  * Redis database backend.
@@ -44,7 +45,7 @@ class RedisArray extends DriverArray
 
     protected function renameTable(string $from, string $to): \Generator
     {
-        Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
+        warning("Moving data from {$from} to {$to}");
         $from = "va:$from";
         $to = "va:$to";
 

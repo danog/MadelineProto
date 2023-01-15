@@ -8,6 +8,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 
+use function danog\MadelineProto\warning;
+
 /**
  * Async OGG stream reader.
  *
@@ -219,7 +221,7 @@ class Ogg
                 $this->currentDuration += $frameDuration;
                 if ($this->currentDuration >= $this->frameDuration) {
                     if ($this->currentDuration > $this->frameDuration) {
-                        Logger::log("Emitting packet with duration {$this->currentDuration} but need {$this->frameDuration}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
+                        warning("Emitting packet with duration {$this->currentDuration} but need {$this->frameDuration}, please reconvert the OGG file with a proper frame size.");
                     }
                     yield $this->emitter->emit($this->opusPayload);
                     $this->opusPayload = '';

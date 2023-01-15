@@ -23,6 +23,8 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 
+use function danog\MadelineProto\warning;
+
 /*
  * Various ways to load MadelineProto
  */
@@ -89,7 +91,7 @@ foreach ([
     'user.madeline' => 'Userbot login',
     'user2.madeline' => 'Userbot login (2)'
 ] as $session => $message) {
-    Logger::log($message, Logger::WARNING);
+    warning($message);
     $MadelineProtos []= new API($session);
 }
 

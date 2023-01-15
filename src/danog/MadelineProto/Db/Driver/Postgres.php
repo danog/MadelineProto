@@ -8,6 +8,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
 use function Amp\Postgres\Pool;
+use function danog\MadelineProto\error;
 
 /**
  * Postgres driver wrapper.
@@ -84,7 +85,7 @@ class Postgres
                 ");
             $connection->close();
         } catch (\Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
+            error($e->getMessage());
         }
     }
 }

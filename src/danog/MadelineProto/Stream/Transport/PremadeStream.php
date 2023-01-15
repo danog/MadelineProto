@@ -29,6 +29,8 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
+use function danog\MadelineProto\logger;
+
 /**
  * Premade stream wrapper.
  *
@@ -91,7 +93,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+            logger('Got exception while closing stream: '.$e->getMessage());
         }
         return new Success();
     }

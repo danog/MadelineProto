@@ -12,6 +12,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tools;
 
+use function danog\MadelineProto\logger;
+
 use const Amp\Process\IS_WINDOWS;
 
 final class ProcessRunner extends RunnerAbstract
@@ -71,7 +73,7 @@ final class ProcessRunner extends RunnerAbstract
             $startupId
         ];
         $command = \implode(" ", \array_map('Amp\\Process\\escapeArguments', $command));
-        Logger::log("Starting process with $command");
+        logger("Starting process with $command");
 
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
@@ -88,7 +90,7 @@ final class ProcessRunner extends RunnerAbstract
         $handle = $runner->start($command, null, $envVars);
         $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred): void {
             if ($e) {
-                Logger::log("Got exception while starting process worker: $e");
+                logger("Got exception while starting process worker: $e");
                 $resDeferred->resolve($e);
                 return;
             }
@@ -98,10 +100,10 @@ final class ProcessRunner extends RunnerAbstract
             $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) use ($runner, $handle, $resDeferred): void {
                 $runner->destroy($handle);
                 if ($e) {
-                    Logger::log("Got exception from process worker: $e");
+                    logger("Got exception from process worker: $e");
                     $resDeferred->fail($e);
                 } else {
-                    Logger::log("Process worker exited with $res!");
+                    logger("Process worker exited with $res!");
                     $resDeferred->fail(new Exception("Process worker exited with $res!"));
                 }
             });
@@ -121,14 +123,14 @@ final class ProcessRunner extends RunnerAbstract
                 $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
                 $lastLine .= \array_shift($chunk);
                 while ($chunk) {
-                    Logger::log("Got message from worker: $lastLine");
+                    logger("Got message from worker: $lastLine");
                     $lastLine = \array_shift($chunk);
                 }
             }
         } catch (\Throwable $e) {
-            Logger::log("An error occurred while reading the process status: $e");
+            logger("An error occurred while reading the process status: $e");
         } finally {
-            Logger::log("Got final message from worker: $lastLine");
+            logger("Got final message from worker: $lastLine");
         }
     }
     private static function locateBinary(): string
