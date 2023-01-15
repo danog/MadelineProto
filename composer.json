@@ -47,7 +47,6 @@
         "danog/dns-over-https": "^1",
         "amphp/http-client-cookies": "^2",
         "danog/tg-file-decoder": "^0.1",
-        "danog/magicalserializer": "^1.0",
         "league/uri": "^6",
         "danog/ipc": "^1",
         "amphp/log": "^2",
