@@ -5,6 +5,7 @@ matrix:
 clone:
   git:
     when:
+      platform: linux/arm64
       event:
         - tag
         - push
@@ -20,6 +21,7 @@ pipeline:
     group: build
     image: 192.168.69.1:5000/php-ci:latest
     when:
+      platform: linux/arm64
       event:
         - tag
         - push
