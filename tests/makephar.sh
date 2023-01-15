@@ -101,9 +101,19 @@ cycledb()
     db memory
 }
 
-runTest()
+runTestSimple()
 {
     tests/testing.php
+}
+runTest()
+{
+    {
+        echo "b
+$BOT_TOKEN
+n
+n
+n
+"; } | $p tests/testing.php
 }
 
 reset()
@@ -130,7 +140,7 @@ cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
 echo -n "$COMMIT-81" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
-runTest
+runTestSimple
 cycledb
 k
 
@@ -141,12 +151,12 @@ runTest
 
 echo "Testing with new version (reload)"
 reset
-runTest
+runTestSimple
 k
 
 echo "Testing with new version (kill+reload)"
 reset
-runTest
+runTestSimple
 k
 
 echo "Checking syntax of madeline.php"
