@@ -273,7 +273,7 @@ abstract class Tools extends StrTools
         $resolved = false;
         do {
             try {
-                //Logger::log("Starting event loop...");
+                //logger("Starting event loop...");
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise): void {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception): void {
                         Loop::stop();
@@ -283,8 +283,7 @@ abstract class Tools extends StrTools
                     });
                 });
             } catch (\Throwable $throwable) {
-                Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
-                Logger::log((string) $throwable, Logger::FATAL_ERROR);
+                fatal('Loop exceptionally stopped without resolving the promise',(string) $throwable);
                 throw $throwable;
             }
         } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));

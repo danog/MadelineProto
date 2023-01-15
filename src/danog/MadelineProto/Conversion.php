@@ -118,12 +118,12 @@ class Conversion
         }
         foreach ($totry as $fp) {
             if (\stream_get_contents($fp, 4) !== 'TDF$') {
-                \danog\MadelineProto\Logger::log('Wrong magic', Logger::ERROR);
+                error('Wrong magic');
                 continue;
             }
             $versionBytes = \stream_get_contents($fp, 4);
             $version = Tools::unpackSignedInt($versionBytes);
-            \danog\MadelineProto\Logger::log("TDesktop version: $version");
+            logger("TDesktop version: $version");
             $data = \stream_get_contents($fp);
             $md5 = \substr($data, -16);
             $data = \substr($data, 0, -16);
@@ -132,7 +132,7 @@ class Conversion
             $length = \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($length) : $length;
 
             if (\md5($data.$length.$versionBytes.'TDF$', true) !== $md5) {
-                \danog\MadelineProto\Logger::log('Wrong MD5', Logger::ERROR);
+                error('Wrong MD5');
             }
 
             $res = \fopen('php://memory', 'rw+b');
@@ -323,7 +323,7 @@ class Conversion
             self::$tdesktop_key = $key;
 
             $count = Tools::unpackSignedInt(\strrev(\stream_get_contents($info, 4)));
-            Logger::log("Number of accounts: $count");
+            logger("Number of accounts: $count");
             for ($i = 0; $i != $count; $i++) {
                 $idx = Tools::unpackSignedInt(\strrev(\stream_get_contents($info, 4)));
                 if ($idx >= 0) {

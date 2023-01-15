@@ -304,11 +304,11 @@ class API extends InternalDoc
 
         if ($unserialized === 0) {
             // Timeout
-            Logger::log("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!", Logger::FATAL_ERROR);
+            fatal("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!");
             if (!$tryReconnect || (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'testing')) {
                 throw new Exception('Could not connect to MadelineProto, please check the MadelineProto.log file to debug!');
             }
-            Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
+            fatal("!!! Reconnecting using slower method. !!!");
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true, false);
         } elseif ($unserialized instanceof \Throwable) {

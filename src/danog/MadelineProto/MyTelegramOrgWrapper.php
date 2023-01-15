@@ -161,7 +161,7 @@ class MyTelegramOrgWrapper
         $result = yield $response->getBody()->buffer();
         switch ($result) {
             case 'true':
-                //Logger::log(['Login OK'], Logger::VERBOSE);
+                //verbose('Login OK');
                 break;
             default:
                 throw new Exception($result);

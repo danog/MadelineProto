@@ -50,7 +50,7 @@ final class GarbageCollector
                 self::$memoryConsumption = self::getMemoryConsumption();
                 $cleanedMemory = $currentMemory - self::$memoryConsumption;
                 if (!Magic::$suspendPeriodicLogging) {
-                    Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
+                    verbose("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb");
                 }
             }
         });
@@ -65,7 +65,7 @@ final class GarbageCollector
                 $latest = yield $client->request($request);
                 Magic::$version_latest = yield $latest->getBody()->buffer();
                 if (Magic::$version !== Magic::$version_latest) {
-                    Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
+                    fatal("!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!");
                     self::$cleanupLoop->signal(true);
                     if (Magic::$isIpcWorker) {
                         die;
@@ -88,7 +88,7 @@ final class GarbageCollector
                     }
                 }
             } catch (\Throwable $e) {
-                Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
+                fatal("An error occurred in the phar cleanup loop: $e");
             }
         }, "Phar cleanup loop", 60*1000);
         self::$cleanupLoop->start();
@@ -98,7 +98,7 @@ final class GarbageCollector
     {
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
-            Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
+            ultraVebose("Memory consumption: $memory Mb");
         }
         return (int) $memory;
     }

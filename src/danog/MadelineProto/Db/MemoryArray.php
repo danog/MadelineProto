@@ -10,6 +10,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
 
 use function Amp\call;
+use function danog\MadelineProto\warning;
 
 /**
  * Memory database backend.
@@ -34,7 +35,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
                 return $previous;
             }
             if ($previous instanceof DbArray) {
-                Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
+                warning("Loading database to memory. Please wait.");
                 if ($previous instanceof DriverArray) {
                     yield from $previous->initStartup();
                 }

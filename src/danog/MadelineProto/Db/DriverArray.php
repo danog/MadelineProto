@@ -10,6 +10,8 @@ use danog\MadelineProto\SettingsAbstract;
 use ReflectionClass;
 
 use function Amp\call;
+use function danog\MadelineProto\error;
+use function danog\MadelineProto\warning;
 
 /**
  * Array caching trait.
@@ -147,7 +149,7 @@ abstract class DriverArray implements DbArray
             if (!$old instanceof DbArray) {
                 $old = yield MemoryArray::getInstance('', $old, new Memory);
             }
-            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
+            error('Converting '.\get_class($old).' to '.\get_class($new));
 
             $counter = 0;
             $total = yield $old->count();
@@ -156,14 +158,14 @@ abstract class DriverArray implements DbArray
                 $counter++;
                 if ($counter % 500 === 0 || $counter === $total) {
                     yield $new->set(...$iterator->getCurrent());
-                    Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
+                    warning("Loading data to table {$new}: $counter/$total");
                 } else {
                     $new->set(...$iterator->getCurrent());
                 }
                 $new->clearCache();
             }
             yield $old->clear();
-            Logger::log('Converting database done.', Logger::ERROR);
+            error('Converting database done.');
         }
     }
 

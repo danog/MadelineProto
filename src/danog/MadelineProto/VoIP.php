@@ -280,16 +280,16 @@ class VoIP
             return false;
         }
         $this->callState = self::CALL_STATE_ENDED;
-        Logger::log("Now closing $this");
+        logger("Now closing $this");
         if (isset($this->timeoutWatcher)) {
             Loop::cancel($this->timeoutWatcher);
         }
 
-        Logger::log("Closing all sockets in $this");
+        logger("Closing all sockets in $this");
         foreach ($this->sockets as $socket) {
             $socket->disconnect();
         }
-        Logger::log("Closed all sockets, discarding $this");
+        logger("Closed all sockets, discarding $this");
 
         return Tools::callFork($this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug));
     }
@@ -355,7 +355,7 @@ class VoIP
                         $this->lastIncomingTimestamp = \microtime(true);
                         Tools::callFork($this->handlePacket($socket, $payload));
                     }
-                    Logger::log("Exiting VoIP read loop in $this!");
+                    logger("Exiting VoIP read loop in $this!");
                 })());
             }
         })());
@@ -420,11 +420,11 @@ class VoIP
                 $t = (\microtime(true) / 1000) + 60;
                 while (!$this->packetQueue->isEmpty()) {
                     if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
-                        Logger::log("Exiting VoIP write loop in $this!");
+                        logger("Exiting VoIP write loop in $this!");
                         return;
                     }
 
-                    //Logger::log("Writing {$this->timestamp} in $this!");
+                    //logger("Writing {$this->timestamp} in $this!");
                     yield new Delayed((int) ($t - (\microtime(true) / 1000)));
                     $t = (\microtime(true) / 1000) + 60;
 
@@ -434,11 +434,11 @@ class VoIP
                 $t = (\microtime(true) / 1000) + 60;
                 while (yield $it->advance()) {
                     if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
-                        Logger::log("Exiting VoIP write loop in $this!");
+                        logger("Exiting VoIP write loop in $this!");
                         return;
                     }
 
-                    //Logger::log("Writing {$this->timestamp} in $this!");
+                    //logger("Writing {$this->timestamp} in $this!");
                     yield new Delayed((int) ($t - (\microtime(true) / 1000)));
                     $t = (\microtime(true) / 1000) + 60;
 

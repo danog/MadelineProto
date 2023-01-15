@@ -42,7 +42,7 @@ class Exception extends \Exception
         if (\strpos($message, 'socket_accept') === false
             && !\in_array(\basename($this->file), ['PKCS8.php', 'PSS.php'])
         ) {
-            \danog\MadelineProto\Logger::log($message.' in '.\basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+            fatal($message . ' in ' . \basename($this->file) . ':' . $this->line);
         }
     }
     /**
@@ -99,7 +99,7 @@ class Exception extends \Exception
      */
     public static function exceptionHandler($exception): void
     {
-        Logger::log($exception, Logger::FATAL_ERROR);
+        fatal($exception);
         Magic::shutdown(1);
     }
 }

@@ -5,6 +5,8 @@ namespace danog\MadelineProto\Db;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
 
+use function danog\MadelineProto\verbose;
+
 /**
  * Array caching trait.
  */
@@ -102,14 +104,13 @@ trait ArrayCacheTrait
         $this->ttl = $newTtl;
         $this->cache = $newValues;
 
-        Logger::log(
+        verbose(
             \sprintf(
                 "cache for table: %s; keys left: %s; keys removed: %s",
                 (string) $this,
                 \count($this->cache),
                 $oldCount
-            ),
-            Logger::VERBOSE
+            )
         );
     }
 }

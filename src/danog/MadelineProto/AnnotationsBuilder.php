@@ -74,7 +74,7 @@ class AnnotationsBuilder
     }
     public function mkAnnotations(): void
     {
-        \danog\MadelineProto\Logger::log('Generating annotations...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating annotations...');
         $this->setProperties();
         $this->createInternalClasses();
     }
@@ -86,7 +86,7 @@ class AnnotationsBuilder
      */
     private function setProperties(): void
     {
-        \danog\MadelineProto\Logger::log('Generating properties...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating properties...');
         $fixture = DocBlockFactory::createInstance();
         $class = new \ReflectionClass($this->reflectionClasses['APIFactory']);
         $content = \file_get_contents($filename = $class->getFileName());
@@ -109,7 +109,7 @@ class AnnotationsBuilder
      */
     private function createInternalClasses(): void
     {
-        \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Creating internal classes...');
         $handle = \fopen($this->output, 'w');
         \fwrite($handle, "<?php namespace {$this->namespace}; class InternalDoc extends APIFactory {}");
         $class = new \ReflectionClass($this->reflectionClasses['API']);
@@ -210,7 +210,7 @@ class AnnotationsBuilder
                 $code = \file_get_contents($method->getFileName());
                 $code = \implode("\n", \array_slice(\explode("\n", $code), $method->getStartLine(), $method->getEndLine() - $method->getStartLine()));
                 if (\strpos($code, '$this') === false) {
-                    Logger::log("{$name} should be STATIC!", Logger::FATAL_ERROR);
+                    fatal("{$name} should be STATIC!");
                 }
             }
             if ($name == 'methodCallAsyncRead') {
@@ -255,7 +255,7 @@ class AnnotationsBuilder
                         $doc[\strlen($doc)-1] = ' ';
                     }
                 } else {
-                    Logger::log($name.'.'.$param->getName()." has no type!", Logger::WARNING);
+                    warning($name . '.' . $param->getName() . " has no type!");
                 }
                 if ($param->isVariadic()) {
                     $doc .= '...';
@@ -325,10 +325,10 @@ class AnnotationsBuilder
             }
             $doc .= "}\n";
             if (!$method->getDocComment()) {
-                Logger::log("{$name} has no PHPDOC!", Logger::FATAL_ERROR);
+                fatal("{$name} has no PHPDOC!");
             }
             if (!$type) {
-                Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
+                fatal("{$name} has no return type!");
             }
             $promise = '\\'.Promise::class;
             $phpdoc = $method->getDocComment() ?? '';

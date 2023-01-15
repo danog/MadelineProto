@@ -206,7 +206,7 @@ final class APIWrapper
             yield (yield openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
             if (!Magic::$suspendPeriodicLogging) {
-                Logger::log('Saved session!');
+                logger('Saved session!');
             }
             return true;
         })());

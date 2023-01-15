@@ -84,7 +84,7 @@ class DocsBuilder
     public $any = '*';
     public function mkDocs(): void
     {
-        \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating documentation index...');
         \file_put_contents($this->index, $this->template('index', $this->settings['description']));
 
         $this->mkMethods();
@@ -98,7 +98,7 @@ class DocsBuilder
         \mkdir('types');
         \ksort($this->types);
         $index = '';
-        \danog\MadelineProto\Logger::log('Generating types documentation...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating types documentation...');
         foreach ($this->types as $otype => $keys) {
             $type = StrTools::typeEscape($otype);
             $index .= '['.StrTools::markdownEscape($type).'](/API_docs/types/'.$type.'.md)<a name="'.$type.'"></a>  
@@ -140,17 +140,17 @@ class DocsBuilder
             );
             \file_put_contents('types/'.$type.'.md', $header);
         }
-        \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating types index...');
         \file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);
 
-        \danog\MadelineProto\Logger::log('Generating additional types...', \danog\MadelineProto\Logger::NOTICE);
+        notice('Generating additional types...');
         foreach (['string', 'bytes', 'int', 'int53', 'long', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON', '!X'] as $type) {
             \file_put_contents("types/$type.md", $this->templates[$type]);
         }
         foreach (['boolFalse', 'boolTrue', 'null', 'photoStrippedSize'] as $constructor) {
             \file_put_contents("constructors/$constructor.md", $this->templates[$constructor]);
         }
-        \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
+        notice('Done!');
     }
     public static function addToLang(string $key, string $value = '', bool $force = false): void
     {

@@ -121,15 +121,15 @@ abstract class Serialization
             return [null, yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1)];
         }
 
-        //Logger::log('Waiting for exclusive session lock...');
+        //logger('Waiting for exclusive session lock...');
         $warningId = Loop::delay(1000, static function () use (&$warningId): void {
-            Logger::log("It seems like the session is busy.");
+            logger("It seems like the session is busy.");
             /*if (\defined(\MADELINE_WORKER::class)) {
-                Logger::log("Exiting since we're in a worker");
+                logger("Exiting since we're in a worker");
                 Magic::shutdown(1);
             }*/
-            Logger::log("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
-            $warningId = Loop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
+            logger("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
+            $warningId = Loop::repeat(5000, fn () => logger('Still waiting for exclusive session lock...'));
             Loop::unreference($warningId);
         });
         Loop::unreference($warningId);
@@ -166,9 +166,7 @@ abstract class Serialization
             return $ipcSocket;
         }
         if (!$canContinue) { // Have lock, can't use it
-            Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
-            Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
-            Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
+            error("Session has event handler, but it's not started." ,"We don't have access to the event handler class, so we can't start it." ,"Please start the event handler or unset it to use the IPC server.");
             $unlock();
             return $ipcSocket;
         }
@@ -188,24 +186,22 @@ abstract class Serialization
             } elseif (!\class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
-                Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
-                Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
-                Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
+                fatal("Session has event handler, but it's not started.", "We don't have access to the event handler class, so we can't start it.", "Please start the event handler or unset it to use the IPC server.");
                 return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
             }
         }
 
         $tempId = Shutdown::addCallback($unlock = static function () use ($unlock): void {
-            Logger::log("Unlocking exclusive session lock!");
+            logger("Unlocking exclusive session lock!");
             $unlock();
-            Logger::log("Unlocked exclusive session lock!");
+            logger("Unlocked exclusive session lock!");
         });
-        Logger::log("Got exclusive session lock!");
+        logger("Got exclusive session lock!");
 
         if ($isNew) {
             $unserialized = yield from $session->unserialize();
             if ($unserialized instanceof DriverArray) {
-                Logger::log("Extracting session from database...");
+                logger("Extracting session from database...");
                 if ($settings instanceof Settings) {
                     $settings = $settings->getDb();
                 }
@@ -251,11 +247,11 @@ abstract class Serialization
     public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?callable $cancelFull = null): \Generator
     {
         for ($x = 0; $x < 60; $x++) {
-            Logger::log("MadelineProto is starting, please wait...");
+            logger("MadelineProto is starting, please wait...");
             try {
                 \clearstatcache(true, $ipcPath);
                 $socket = yield connect($ipcPath);
-                Logger::log("Connected to IPC socket!");
+                logger("Connected to IPC socket!");
                 if ($cancelFull) {
                     $cancelFull();
                 }
@@ -263,7 +259,7 @@ abstract class Serialization
             } catch (\Throwable $e) {
                 $e = $e->getMessage();
                 if ($e !== 'The endpoint does not exist!') {
-                    Logger::log("$e while connecting to IPC socket");
+                    logger("$e while connecting to IPC socket");
                 }
             }
             if ($res = yield Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
@@ -306,21 +302,21 @@ abstract class Serialization
             }
             $changed = false;
             if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
-                Logger::log("SUBBING BUTTONS!");
+                logger("SUBBING BUTTONS!");
                 $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                 $changed = true;
             }
             if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
-                Logger::log("SUBBING BIGINTEGOR!");
+                logger("SUBBING BIGINTEGOR!");
                 $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
                 $changed = true;
             }
             if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger"') !== false) {
-                Logger::log("SUBBING TGSECLIB old!");
+                logger("SUBBING TGSECLIB old!");
                 $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
                 $changed = true;
             }
-            Logger::log((string) $e, Logger::ERROR);
+            error((string) $e, Logger::ERROR);
             if (!$changed) {
                 throw $e;
             }
@@ -330,7 +326,7 @@ abstract class Serialization
                 $unserialized = \unserialize($tounserialize);
             }
         } catch (\Throwable $e) {
-            Logger::log((string) $e, Logger::ERROR);
+            error((string) $e, Logger::ERROR);
             throw $e;
         }
         if ($unserialized instanceof \danog\PlaceHolder) {

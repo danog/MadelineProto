@@ -286,11 +286,11 @@ class Magic
                     \pcntl_signal(SIGINT, fn () => null);
                     \pcntl_signal(SIGINT, SIG_DFL);
                     Loop::unreference(Loop::onSignal(SIGINT, static function (): void {
-                        Logger::log('Got sigint', Logger::FATAL_ERROR);
+                        fatal('Got sigint');
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
                     Loop::unreference(Loop::onSignal(SIGTERM, static function (): void {
-                        Logger::log('Got sigterm', Logger::FATAL_ERROR);
+                        fatal('Got sigterm');
                         Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
                 } catch (\Throwable $e) {

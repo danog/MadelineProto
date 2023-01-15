@@ -87,7 +87,8 @@
         },
         "files": [
             "src/BigIntegor.php",
-            "src/polyfill.php"
+            "src/polyfill.php",
+            "src/functions.php"
         ]
     },
     "autoload-dev": {

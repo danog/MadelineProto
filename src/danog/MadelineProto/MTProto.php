@@ -586,11 +586,11 @@ class MTProto extends AsyncConstruct implements TLCallback
             return;
         }
         $done = true;
-        Logger::log('Prompting final serialization (SHUTDOWN)...');
+        logger('Prompting final serialization (SHUTDOWN)...');
         foreach (self::$references as $instance) {
             Tools::wait($instance->wrapper->serialize());
         }
-        Logger::log('Done final serialization (SHUTDOWN)!');
+        logger('Done final serialization (SHUTDOWN)!');
     }
 
     /**
@@ -1905,12 +1905,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function getWebMessage(string $message): string
     {
-        Logger::log($message);
+        logger($message);
 
         $warning = '';
         if (!$this->hasReportPeers() && $this->hasEventHandler()) {
-            Logger::log("!!! Warning: no report peers are set, please add the following method to your event handler !!!", Logger::FATAL_ERROR);
-            Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
+            fatal("!!! Warning: no report peers are set, please add the following method to your event handler !!!" ,"!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!");
             $warning .= "<h2 style='color:red;'>Warning: no report peers are set, please add the following method to your event handler:</h2>";
             $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
         }
