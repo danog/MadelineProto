@@ -66,18 +66,6 @@ if ($loader) {
     }
 }
 
-/*
- * Load .env for settings
- */
-if (file_exists('.env') && class_exists(Dotenv\Dotenv::class)) {
-    echo 'Loading .env...'.PHP_EOL;
-    $dotenv = Dotenv\Dotenv::create(getcwd());
-    $dotenv->load();
-    if (getenv('TEST_SECRET_CHAT') == '') {
-        echo('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
-        die(1);
-    }
-}
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 

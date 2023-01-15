@@ -67,7 +67,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
-            if (\strlen(\inet_pton($address)) === 16) {
+            if (\strlen(\inet_pton($address) ?: '') === 16) {
                 $address = '['.$address.']';
             }
         } catch (Exception) {

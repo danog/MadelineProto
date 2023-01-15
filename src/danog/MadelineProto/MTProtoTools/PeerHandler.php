@@ -675,9 +675,9 @@ trait PeerHandler
      *      InputUser?: {_: string, user_id?: int, access_hash?: int, min?: bool},
      *      InputChannel?: {_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * }&array : array)
+     * }&array : array|int)
      */
-    private function genAll($constructor, $folder_id, int $type): array
+    private function genAll($constructor, $folder_id, int $type): array|int
     {
         if ($type === MTProto::INFO_TYPE_CONSTRUCTOR) {
             if ($constructor['_'] === 'user') {
