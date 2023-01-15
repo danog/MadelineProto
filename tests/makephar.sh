@@ -101,22 +101,9 @@ cycledb()
     db memory
 }
 
-runTestSimple()
-{
-    tests/testing.php
-}
 runTest()
 {
-    {
-        if [ "$1" == "m" ]; then echo m; fi
-        echo "$API_ID
-$API_HASH
-b
-$BOT_TOKEN
-n
-n
-n
-"; } | $p tests/testing.php
+    tests/testing.php
 }
 
 reset()
@@ -133,7 +120,7 @@ tail -F MadelineProto.log &
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
-runTest m
+runTest
 db mysql
 k
 
@@ -143,7 +130,7 @@ cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
 echo -n "$COMMIT-81" > "madeline-$php.phar.version"
 export ACTIONS_PHAR=1
 reset
-runTestSimple
+runTest
 cycledb
 k
 
@@ -154,12 +141,12 @@ runTest
 
 echo "Testing with new version (reload)"
 reset
-runTestSimple
+runTest
 k
 
 echo "Testing with new version (kill+reload)"
 reset
-runTestSimple
+runTest
 k
 
 echo "Checking syntax of madeline.php"

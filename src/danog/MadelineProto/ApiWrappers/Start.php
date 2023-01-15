@@ -66,11 +66,9 @@ trait Start
             $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1']);
             return $app;
         }
-        $this->gettingApiId = true;
         if (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
             $app['api_id'] = (int) $_POST['api_id'];
             $app['api_hash'] = $_POST['api_hash'];
-            $this->gettingApiId = false;
             return $app;
         }
         $this->webAPIEcho();

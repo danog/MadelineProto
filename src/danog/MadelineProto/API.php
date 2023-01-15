@@ -118,20 +118,6 @@ final class API extends InternalDoc
     protected array $storage = [];
 
     /**
-     * Whether we're getting our API ID.
-     *
-     * @internal
-     */
-    private bool $gettingApiId = false;
-
-    /**
-     * my.telegram.org API wrapper.
-     *
-     * @internal
-     */
-    private ?MyTelegramOrgWrapper $myTelegramOrgWrapper = null;
-
-    /**
      * Whether this is an old instance.
      *
      */

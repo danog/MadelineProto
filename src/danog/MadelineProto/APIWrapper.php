@@ -38,38 +38,9 @@ final class APIWrapper
     public SessionPaths $session;
 
     /**
-     * Getting API ID flag.
-     */
-    private bool $gettingApiId = false;
-
-    /**
      * Web API template.
      */
     private string $webApiTemplate = '';
-
-    /**
-     * My.telegram.org wrapper.
-     *
-     */
-    private ?MyTelegramOrgWrapper $myTelegramOrgWrapper = null;
-
-    /**
-     * Serialization date.
-     *
-     */
-    private int $serialized = 0;
-    /**
-     * Whether lua is being used.
-     *
-     * @internal
-     */
-    private bool $lua = false;
-    /**
-     * Whether async is enabled.
-     *
-     * @internal
-     */
-    private bool $async = false;
 
     /**
      * AbstractAPIFactory instance.
@@ -113,7 +84,7 @@ final class APIWrapper
      */
     public static function properties(): array
     {
-        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage'];
+        return ['API', 'webApiTemplate', 'storage'];
     }
 
     /**
@@ -156,7 +127,7 @@ final class APIWrapper
      */
     public function serialize(): bool
     {
-        if ($this->API === null && !$this->gettingApiId) {
+        if ($this->API === null) {
             return false;
         }
         if ($this->API instanceof Client) {
