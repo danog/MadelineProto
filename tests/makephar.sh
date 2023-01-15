@@ -107,14 +107,16 @@ runTestSimple()
 }
 runTest()
 {
-    echo "$API_ID
+    {
+        if [ "$1" == "m" ]; then echo m; fi
+        echo "$API_ID
 $API_HASH
 b
 $BOT_TOKEN
 n
 n
 n
-" | $p tests/testing.php
+"; } | $p tests/testing.php
 }
 
 reset()
@@ -131,7 +133,7 @@ tail -F MadelineProto.log &
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
-runTest
+runTest m
 db mysql
 k
 
