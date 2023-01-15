@@ -58,7 +58,7 @@ trait FilesLogic
             $messageMedia = $messageMedia->getFile();
         }
         if (\is_string($messageMedia) && ($size === null || $mime === null || $name === null)) {
-            throw new Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
+            throw new Exception('downloadToBrowser only supports bot file IDs if the file size, file name and MIME type are also specified in the third, fourth and fifth parameters of the method.');
         }
 
         $headers = [];
@@ -173,7 +173,7 @@ trait FilesLogic
         }
 
         if (\is_string($messageMedia) && ($size === null || $mime === null || $name === null)) {
-            throw new Exception('downloadToBrowser only supports bot file IDs if the file size and MIME type are also specified in the third and fourth parameters of the method.');
+            throw new Exception('downloadToResponse only supports bot file IDs if the file size, file name and MIME type are also specified in the fourth, fifth and sixth parameters of the method.');
         }
 
         $messageMedia = $this->getDownloadInfo($messageMedia);
