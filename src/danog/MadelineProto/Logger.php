@@ -154,13 +154,6 @@ final class Logger
     const FATAL_ERROR = 0;
 
     /**
-     * Disable logger (DEPRECATED).
-     *
-     * @internal
-     * @deprecated
-     */
-    const NO_LOGGER = 0;
-    /**
      * Default logger (syslog).
      *
      * @internal

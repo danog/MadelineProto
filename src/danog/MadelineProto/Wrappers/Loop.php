@@ -42,13 +42,6 @@ use function Amp\async;
 trait Loop
 {
     /**
-     * Loop callback.
-     *
-     * @deprecated
-     * @var callable()
-     */
-    private $loop_callback;
-    /**
      * Whether to stop the loop.
      */
     private bool $stopLoop = false;
@@ -125,24 +118,10 @@ trait Loop
             return false;
         }
         $this->logger->logger('Starting event loop');
-        if (!\is_callable($this->loop_callback)) {
-            $this->loop_callback = null;
-        }
         $this->initSelfRestart();
         $this->startUpdateSystem();
         $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopLoop = false;
-        if ($this->loop_callback !== null) {
-            $repeat = EventLoop::repeat(1, fn () => async(function (): void {
-                $r = ($this->loop_callback)();
-                if ($r instanceof Generator) {
-                    $r = Tools::call($r);
-                }
-                if ($r instanceof Future) {
-                    $r->await();
-                }
-            }));
-        }
         do {
             if (!$this->updateHandler) {
                 $this->waitUpdate();

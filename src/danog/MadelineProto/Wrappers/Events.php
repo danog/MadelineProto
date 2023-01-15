@@ -77,11 +77,8 @@ trait Events
         }
         $this->initEventHandler($eventHandler);
         $this->eventHandlerMethods = [];
-        $this->loop_callback = null;
         foreach (\get_class_methods($this->event_handler) as $method) {
-            if ($method === 'onLoop') {
-                $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
-            } elseif ($method === 'onAny') {
+            if ($method === 'onAny') {
                 foreach ($this->getTL()->getConstructors()->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
                         $this->eventHandlerMethods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];

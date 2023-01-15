@@ -739,7 +739,6 @@ final class MTProto implements TLCallback, LoggerGetter
             // Event handler
             'event_handler',
             'event_handler_instance',
-            'loop_callback',
             'updates',
             'updates_key',
             'hook_url',

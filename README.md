@@ -4,7 +4,7 @@ Created by <a href="https://daniil.it" target="_blank" rel="noopener">Daniil Gen
 
 `#StandWithUkraine 🇺🇦`
 
-[![status-badge](https://ci.daniil.it/api/badges/danog/MadelineProto/status.svg)](https://ci.daniil.it/danog/MadelineProto) 
+[![status-badge](https://ci.daniil.it/api/badges/danog/MadelineProto/status.svg?branch=stable)](https://ci.daniil.it/danog/MadelineProto/branches/stable)
 
 Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
 

@@ -230,9 +230,7 @@ final class WriteLoop extends ResumableSignalLoop
                         }
                     } elseif ($message->hasQueue()) {
                         $queueId = $message->getQueueId();
-                        if (!isset($connection->call_queue[$queueId])) {
-                            $connection->call_queue[$queueId] = [];
-                        }
+                        $connection->call_queue[$queueId] ??= [];
                         $MTmessage['body'] = ($API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$queueId], 'query' => $MTmessage['body']]));
                         $connection->call_queue[$queueId][$message_id] = $message_id;
                         if (\count($connection->call_queue[$queueId]) > $API->settings->getRpc()->getLimitCallQueue()) {
