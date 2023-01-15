@@ -64,6 +64,8 @@ trait Templates
     {
         $message = \htmlentities($message);
         $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
+        $title .= "<br>";
+        $title .= \htmlentities(sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html'));
         $title .= "<br><b>$message</b>";
         $title .= '<ol>';
         $title .= '<li>'.\str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', \htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
