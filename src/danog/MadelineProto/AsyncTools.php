@@ -26,6 +26,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use Closure;
 use Generator;
 use Throwable;
 use TypeError;
@@ -236,10 +237,10 @@ abstract class AsyncTools extends StrTools
      * @param integer   $operation Locking mode
      * @param float     $polling   Polling interval
      * @param ?Cancellation $token     Cancellation token
-     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
-     * @return ($token is null ? (callable(): void) : ((callable(): void)|null))
+     * @param ?Closure $failureCb Failure callback, called only once if the first locking attempt fails.
+     * @return ($token is null ? (Closure(): void) : ((Closure(): void)|null))
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1, ?Cancellation $token = null, ?callable $failureCb = null): ?callable
+    public static function flock(string $file, int $operation, float $polling = 0.1, ?Cancellation $token = null, ?Closure $failureCb = null): ?Closure
     {
         if (!exists($file)) {
             touchAsync($file);
@@ -250,10 +251,13 @@ abstract class AsyncTools extends StrTools
             $result = \flock($res, $operation);
             if (!$result) {
                 if ($failureCb) {
-                    $failureCb();
+                    async($failureCb);
                     $failureCb = null;
                 }
                 if ($token) {
+                    if ($token->isRequested()) {
+                        return null;
+                    }
                     try {
                         delay($polling, true, $token);
                     } catch (CancelledException) {

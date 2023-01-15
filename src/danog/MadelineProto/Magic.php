@@ -213,6 +213,9 @@ final class Magic
         if (PHP_INT_SIZE < 8) {
             throw new Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.', 0, null, 'MadelineProto', 1);
         }
+        if (!\defined('AMP_WORKER')) {
+            \define('AMP_WORKER', 1);
+        }
         if (!self::$initedLight) {
             // Setup error reporting
             Shutdown::init();

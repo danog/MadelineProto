@@ -142,7 +142,7 @@ abstract class Serialization
         $cancelIpc = new DeferredFuture;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
+        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $forceFull ? null : static function () use ($session, &$cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
             $cancelFull = static function () use (&$cancelFlock): void {
                 if ($cancelFlock !== null) {
                     $copy = $cancelFlock;
@@ -179,7 +179,7 @@ abstract class Serialization
         try {
             /** @var LightState */
             $lightState ??= $session->getLightState();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
         }
 
         if ($lightState && !$forceFull) {

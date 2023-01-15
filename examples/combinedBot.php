@@ -43,10 +43,6 @@ class MyEventHandler extends EventHandler
      * @var int|string Username or ID of bot admin
      */
     const ADMIN = "danogentili"; // Change this
-    public function onStart()
-    {
-        var_dump(yield $this->getSelf());
-    }
     /**
      * Get peer(s) where to report errors.
      *

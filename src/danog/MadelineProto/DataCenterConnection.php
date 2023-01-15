@@ -733,7 +733,7 @@ final class DataCenterConnection implements JsonSerializable
     }
     public function __wakeup(): void
     {
-        if (\is_int($this->linked)) {
+        if (isset($this->linked) && \is_int($this->linked)) {
             $this->linkedDc = $this->linked;
         }
     }
