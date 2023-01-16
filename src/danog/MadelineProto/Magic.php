@@ -278,8 +278,8 @@ final class Magic
             self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
+            self::$version = null;
             if (\file_exists(__DIR__.'/../../../.git/refs/heads/stable')) {
-                self::$version = null;
                 try {
                     self::$version = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable');
                     self::$revision = 'Revision: '.self::$version;
