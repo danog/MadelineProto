@@ -282,10 +282,10 @@ final class Magic
             if (\file_exists(__DIR__.'/../../../.git/refs/heads/stable')) {
                 try {
                     self::$version = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable');
-                    self::$revision = 'Revision: '.self::$version;
                 } catch (Throwable $e) {
                 }
             }
+            self::$revision = 'Revision: '.self::$version;
             self::$initedLight = true;
             if ($light) {
                 return;
