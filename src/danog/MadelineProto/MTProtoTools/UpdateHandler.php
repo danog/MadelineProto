@@ -343,6 +343,34 @@ trait UpdateHandler
         }
     }
     /**
+     * Subscribe to event handler updates for a channel/supergroup we're not a member of.
+     *
+     * @return bool False if we were already subscribed
+     */
+    public function subscribeToUpdates(mixed $channel): bool
+    {
+        $channelId = $this->getInfo($channel, MTProto::INFO_TYPE_ID);
+        if (!MTProto::isSupergroup($channelId)) {
+            throw new Exception("You can only subscribe to channels or supergroups!");
+        }
+        $channelId = MTProto::fromSupergroup($channelId);
+        if (!$this->getChannelStates()->has($channelId)) {
+            $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
+            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
+            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
+            $this->feeders[$channelId]->start();
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->resume();
+            }
+            $this->updaters[$channelId]->start();
+            if (isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->resume();
+            }
+            return true;
+        }
+        return false;
+    }
+    /**
      * Save update.
      *
      * @param array $update Update to save

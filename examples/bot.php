@@ -74,20 +74,19 @@ class MyEventHandler extends EventHandler
     /**
      * Initialization logic.
      */
-    public function onStart()
+    public function onStart(): void
     {
         $this->logger("The bot was started!");
-        var_dump(yield $this->getFullInfo('MadelineProto'));
+        $this->logger($this->getFullInfo('MadelineProto'));
     }
     /**
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update
-     * @return void
      */
-    public function onUpdateNewChannelMessage(array $update): Generator
+    public function onUpdateNewChannelMessage(array $update): void
     {
-        return $this->onUpdateNewMessage($update);
+        $this->onUpdateNewMessage($update);
     }
 
     /**
@@ -95,7 +94,7 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewMessage(array $update): Generator
+    public function onUpdateNewMessage(array $update): void
     {
         $this->logger($update);
 
@@ -106,9 +105,9 @@ class MyEventHandler extends EventHandler
         /*
         // Example code to json-dump all incoming updates (be wary of enabling it in chats)
         $res = \json_encode($update, JSON_PRETTY_PRINT);
-        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
+        $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame' && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
+            $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
         */
 
@@ -117,17 +116,16 @@ class MyEventHandler extends EventHandler
         // Can be anything serializable, an array, an int, an object
         $myData = [];
 
-        // Use the isset method to check whether some data exists in the database
-        if (yield $this->dataStoredOnDb->isset('yourKey')) {
-            // Always yield when fetching data
-            $myData = yield $this->dataStoredOnDb['yourKey'];
+        if (isset($this->dataStoredOnDb['yourKey'])) {
+            // Always when fetching data
+            $myData = $this->dataStoredOnDb['yourKey'];
         }
         $this->dataStoredOnDb['yourKey'] = $myData + ['moreStuff' => 'yay'];
 
         $this->dataStoredOnDb['otherKey'] = 0;
         unset($this->dataStoredOnDb['otherKey']);
 
-        $this->logger("Count: ".(yield $this->dataStoredOnDb->count()));
+        $this->logger("Count: ".count($this->dataStoredOnDb));
 
         // You can even use an async iterator to iterate over the data
         foreach ($this->dataStoredOnDb as $key => $value) {
@@ -147,4 +145,4 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-MyEventHandler::startAndLoop('uwua.madeline', $settings);
+MyEventHandler::startAndLoop('uwu.madeline', $settings);

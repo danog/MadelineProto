@@ -7626,6 +7626,14 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, []);
     }
     /**
+     * Subscribe to event handler updates for a channel/supergroup we're not a member of.
+     *
+     */
+    public function subscribeToUpdates(mixed $channel)
+    {
+        return $this->__call(__FUNCTION__, [$channel]);
+    }
+    /**
      * Convert TD to MTProto parameters.
      *
      * @param array $params Parameters
