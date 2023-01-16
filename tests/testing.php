@@ -70,11 +70,9 @@ if ($loader) {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 $settings = Settings::parseFromLegacyFull($settings);
-if (getenv('API_ID')) {
-    $settings->getAppInfo()
-        ->setApiId((int) getenv('API_ID'))
-        ->setApiHash(getenv('API_HASH'));
-}
+$settings->getAppInfo()
+    ->setApiId((int) getenv('API_ID'))
+    ->setApiHash(getenv('API_HASH'));
 
 /*
  * Load MadelineProto
