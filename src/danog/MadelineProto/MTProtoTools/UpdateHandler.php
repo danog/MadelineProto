@@ -382,12 +382,19 @@ trait UpdateHandler
             $this->config['expires'] = 0;
             $this->getConfig();
         }
-        if (\in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink']) && $this->getSettings()->getDb()->getEnableFullPeerDb()) {
-            $id = $this->getId($update);
-            $chat = $this->full_chats[$id];
-            $chat['last_update'] = 0;
-            $this->full_chats[$id] = $chat;
-            $this->getFullInfo($id);
+        if (
+            \in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])
+            || (
+                $update['_'] === 'updateNewChannelMessage'
+                && isset($update['message']['action']['_'])
+                && \in_array($update['message']['action']['_'], ['messageActionChatEditTitle', 'messageActionChatEditPhoto', 'messageActionChatDeletePhoto', 'messageActionChatMigrateTo', 'messageActionChannelMigrateFrom', 'messageActionGroupCall'])
+            )
+        ) {
+            if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
+                $this->refreshFullPeerCache($update);
+            } else {
+                $this->refreshPeerCache($update);
+            }
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', Logger::VERBOSE);

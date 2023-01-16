@@ -778,7 +778,7 @@ trait PeerHandler
      */
     public function refreshPeerCache(mixed $id): void
     {
-        $id = ($this->getInfo($id))['bot_api_id'];
+        $id = $this->getInfo($id, MTProto::INFO_TYPE_ID);
         if ($this->isSupergroup($id)) {
             $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
         } elseif ($id < 0) {
@@ -794,7 +794,7 @@ trait PeerHandler
      */
     public function refreshFullPeerCache(mixed $id): void
     {
-        unset($this->full_chats[$this->getInfo($id)['bot_api_id']]);
+        unset($this->full_chats[$this->getInfo($id, MTProto::INFO_TYPE_ID)]);
         $this->getFullInfo($id);
     }
     /**
