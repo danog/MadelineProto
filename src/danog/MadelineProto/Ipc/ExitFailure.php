@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\TL\Exception;
 use RuntimeException;
 use Throwable;
 
@@ -51,8 +52,12 @@ final class ExitFailure
         $previous = $this->previous ? $this->previous->getException() : null;
 
         try {
-            $exception = new $this->type($this->message, $this->code, $previous);
-        } catch (Throwable) {
+            if ($this->type === Exception::class) {
+                $exception = new $this->type($this->message);
+            } else {
+                $exception = new $this->type($this->message, $this->code, $previous);
+            }
+        } catch (Throwable $e) {
             $exception = new RuntimeException($this->message, $this->code, $previous);
         }
 
