@@ -554,7 +554,7 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!isset($this->session) || !$this->session || $this->session instanceof MemoryArray) {
             return $data;
         }
-        $this->session->set('data', $data);
+        $this->session['data'] = $data;
         return $this->session;
     }
 

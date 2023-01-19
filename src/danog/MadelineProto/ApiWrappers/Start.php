@@ -49,7 +49,7 @@ trait Start
         if ($this->getWebAPITemplate() === 'legacy') {
             $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
         }
-        $app = null;
+        $app = [];
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
             $stdout->write(\sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);

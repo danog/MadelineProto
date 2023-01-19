@@ -79,9 +79,7 @@ class MysqlArray extends SqlArray
             $settings->getUsername(),
             $settings->getPassword(),
         );
-        if (!isset($this->db)) {
-            $this->db = Mysql::getConnection($settings);
-        }
+        $this->db ??= Mysql::getConnection($settings);
     }
 
     /**

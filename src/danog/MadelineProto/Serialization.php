@@ -31,14 +31,12 @@ use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\DatabaseAbstract;
-use danog\PlaceHolder;
 use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
 use function Amp\async;
 use function Amp\File\exists;
-use function Amp\File\read;
 use function Amp\Ipc\connect;
 
 use function unserialize;
@@ -117,13 +115,7 @@ abstract class Serialization
      */
     public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): array
     {
-        if (exists($session->getSessionPath())) {
-            // Is new session
-            $isNew = true;
-        } elseif (exists($session->getLegacySessionPath())) {
-            // Is old session
-            $isNew = false;
-        } else {
+        if (!exists($session->getSessionPath())) {
             // No session exists yet, lock for when we create it
             return [null, Tools::flock($session->getLockPath(), LOCK_EX, 1)];
         }
@@ -212,31 +204,27 @@ abstract class Serialization
         });
         Logger::log('Got exclusive session lock!');
 
-        if ($isNew) {
-            $unserialized = $session->unserialize();
-            if ($unserialized instanceof DriverArray) {
-                Logger::log('Extracting session from database...');
-                if ($settings instanceof Settings) {
-                    $settings = $settings->getDb();
-                }
-                if ($settings instanceof DatabaseAbstract) {
-                    $tableName = (string) $unserialized;
-                    $unserialized = DbPropertiesFactory::get(
-                        $settings,
-                        $tableName,
-                        DbPropertiesFactory::TYPE_ARRAY,
-                        $unserialized,
-                    );
-                } else {
-                    $unserialized->initStartup();
-                }
-                $unserialized = $unserialized['data'];
-                if (!$unserialized) {
-                    throw new Exception('Could not extract session from database!');
-                }
+        $unserialized = $session->unserialize();
+        if ($unserialized instanceof DriverArray) {
+            Logger::log('Extracting session from database...');
+            if ($settings instanceof Settings) {
+                $settings = $settings->getDb();
             }
-        } else {
-            $unserialized = self::legacyUnserialize($session->getLegacySessionPath());
+            if ($settings instanceof DatabaseAbstract) {
+                $tableName = (string) $unserialized;
+                $unserialized = DbPropertiesFactory::get(
+                    $settings,
+                    $tableName,
+                    DbPropertiesFactory::TYPE_ARRAY,
+                    $unserialized,
+                );
+            } else {
+                $unserialized->initStartup();
+            }
+            $unserialized = $unserialized['data'];
+            if (!$unserialized) {
+                throw new Exception('Could not extract session from database!');
+            }
         }
 
         if ($unserialized === false) {
@@ -287,68 +275,5 @@ abstract class Serialization
             }
         }
         return [0, null];
-    }
-
-    /**
-     * Deserialize legacy session.
-     */
-    private static function legacyUnserialize(string $session)
-    {
-        $tounserialize = read($session);
-
-        try {
-            $unserialized = \unserialize($tounserialize);
-        } catch (Bug74586Exception $e) {
-            \class_exists('\\Volatile');
-            $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
-            foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                \class_exists('\\danog\\MadelineProto\\'.$class);
-            }
-            $unserialized = \danog\Serialization::unserialize($tounserialize);
-        } catch (Exception $e) {
-            if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
-                throw $e;
-            }
-            if (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
-                throw $e;
-            }
-            \class_exists('\\Volatile');
-            foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                \class_exists('\\danog\\MadelineProto\\'.$class);
-            }
-            $changed = false;
-            if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
-                Logger::log('SUBBING BUTTONS!');
-                $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
-                $changed = true;
-            }
-            if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
-                Logger::log('SUBBING BIGINTEGOR!');
-                $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
-                $changed = true;
-            }
-            if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger"') !== false) {
-                Logger::log('SUBBING TGSECLIB old!');
-                $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
-                $changed = true;
-            }
-            Logger::log((string) $e, Logger::ERROR);
-            if (!$changed) {
-                throw $e;
-            }
-            try {
-                $unserialized = \danog\Serialization::unserialize($tounserialize);
-            } catch (Throwable $e) {
-                $unserialized = \unserialize($tounserialize);
-            }
-        } catch (Throwable $e) {
-            Logger::log((string) $e, Logger::ERROR);
-            throw $e;
-        }
-        if ($unserialized instanceof PlaceHolder) {
-            $unserialized = \danog\Serialization::unserialize($tounserialize);
-        }
-
-        return $unserialized;
     }
 }

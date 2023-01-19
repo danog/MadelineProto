@@ -45,7 +45,8 @@ final class Postgres
 
             $result = $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
 
-            if (!$result->getRowCount()) {
+            // Replace with getRowCount once it gets fixed
+            if (!iterator_to_array($result)) {
                 $connection->query("
                     CREATE DATABASE {$db}
                     OWNER {$user}

@@ -83,13 +83,13 @@ use Webmozart\Assert\Assert;
         include $autoloadPath;
     }
     if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
-        $ipcPath = MADELINE_WORKER_ARGS[0];
-        if (!file_exists($ipcPath)) {
-            trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
+        $session = new SessionPaths(MADELINE_WORKER_ARGS[0]);
+        if (!file_exists($session->getSessionPath())) {
+            trigger_error("IPC session $session does not exist!", E_USER_ERROR);
             exit(1);
         }
         if (function_exists('cli_set_process_title')) {
-            @cli_set_process_title("MadelineProto worker $ipcPath");
+            @cli_set_process_title("MadelineProto worker $session");
         }
         if (function_exists('posix_setsid')) {
             @posix_setsid();
@@ -102,13 +102,12 @@ use Webmozart\Assert\Assert;
         $runnerId = MADELINE_WORKER_ARGS[1];
         Assert::numeric($runnerId);
         $runnerId = (int) $runnerId;
-        $session = new SessionPaths($ipcPath);
 
         try {
             Magic::start();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
-            $API = new API($ipcPath, (new Ipc)->setSlow(true));
+            $API = new API((string) $session, (new Ipc)->setSlow(true));
             $API->initSelfRestart();
             $session->storeIpcState(new IpcState($runnerId));
             while (true) {

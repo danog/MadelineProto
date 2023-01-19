@@ -89,7 +89,6 @@
             "danog\\MadelineProto\\": "src/danog/MadelineProto"
         },
         "files": [
-            "src/BigIntegor.php",
             "src/polyfill.php"
         ]
     },

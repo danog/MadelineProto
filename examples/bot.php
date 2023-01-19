@@ -22,6 +22,7 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Database\Mysql;
 
 /*
  * Various ways to load MadelineProto
@@ -96,12 +97,11 @@ class MyEventHandler extends EventHandler
      */
     public function onUpdateNewMessage(array $update): void
     {
-        $this->logger($update);
-
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
 
+        $this->logger($update);
         /*
         // Example code to json-dump all incoming updates (be wary of enabling it in chats)
         $res = \json_encode($update, JSON_PRETTY_PRINT);
@@ -127,7 +127,7 @@ class MyEventHandler extends EventHandler
 
         $this->logger("Count: ".count($this->dataStoredOnDb));
 
-        // You can even use an async iterator to iterate over the data
+        // You can even iterate over the data
         foreach ($this->dataStoredOnDb as $key => $value) {
             $this->logger($key);
             $this->logger($value);

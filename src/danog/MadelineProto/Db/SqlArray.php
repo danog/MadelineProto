@@ -77,7 +77,7 @@ abstract class SqlArray extends DriverArray
      */
     public function getIterator(): \Traversable
     {
-        foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['index' => $key, 'value' => $value]) {
+        foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['key' => $key, 'value' => $value]) {
             yield $key => $this->getValue($value);
         }
     }
@@ -90,10 +90,13 @@ abstract class SqlArray extends DriverArray
         }
 
         $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
-        if (!$row->getRowCount()) {
+        /*if (!$row->getRowCount()) {
+            return null;
+        }*/
+        $row = $row->fetchRow();
+        if ($row === null) {
             return null;
         }
-        $row = $row->fetchRow();
 
         $value = $this->getValue($row['value']);
         $this->setCache($key, $value);
@@ -117,7 +120,7 @@ abstract class SqlArray extends DriverArray
                 'value' => $this->setValue($value),
             ],
         );
-        Assert::greaterThanEq($result->getRowCount(), 1);
+        //Assert::greaterThanEq($result->getRowCount(), 1);
         $this->setCache($key, $value);
     }
 
@@ -147,7 +150,6 @@ abstract class SqlArray extends DriverArray
     public function count(): int
     {
         $row = $this->execute($this->queries[self::SQL_COUNT]);
-        Assert::true($row->getRowCount() === 1);
         /** @var int */
         return $row->fetchRow()['count'];
     }

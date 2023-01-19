@@ -138,16 +138,13 @@ final class APIWrapper
         }
 
         $this->session->serialize(
-            $this->API ? $this->API->serializeSession($this) : $this,
+            $this->API->serializeSession($this),
             $this->session->getSessionPath(),
         );
 
         if ($this->API) {
             $this->session->storeLightState($this->API);
         }
-
-        // Truncate legacy session
-        (openFile($this->session->getLegacySessionPath(), 'w'))->close();
 
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log('Saved session!');
