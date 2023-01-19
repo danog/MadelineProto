@@ -97,11 +97,11 @@ final class ReferenceDatabase implements TLCallback
     }
     public function init(): void
     {
+        $this->initDb($this->API);
         if ($this->v === 0) {
             $this->db->clear();
             $this->v = self::V;
         }
-        $this->initDb($this->API);
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
