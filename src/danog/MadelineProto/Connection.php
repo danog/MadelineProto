@@ -35,8 +35,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
-use danog\MadelineProto\Stream\StreamInterface;
-use danog\Serializable;
 
 /**
  * Connection class.
@@ -44,7 +42,7 @@ use danog\Serializable;
  * Manages connection to Telegram datacenters
  *
  * @psalm-suppress RedundantPropertyInitializationCheck
- * 
+ *
  * @internal
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -83,9 +81,9 @@ final class Connection
     protected CleanupLoop $cleanup;
     /**
      * The actual socket.
-     *
+     * @var (MTProtoBufferInterface&BufferedStreamInterface)|null
      */
-    public (MTProtoBufferInterface&BufferedStreamInterface)|null $stream = null;
+    public MTProtoBufferInterface|null $stream = null;
     /**
      * Connection context.
      *
@@ -255,7 +253,7 @@ final class Connection
     }
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
-     * 
+     *
      * @param ConnectionContext $ctx Connection context
      */
     public function connect(ConnectionContext $ctx): void
