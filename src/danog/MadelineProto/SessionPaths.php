@@ -27,8 +27,12 @@ use const LOCK_SH;
 use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
+
+use function Amp\File\createDirectory;
 use function Amp\File\exists;
 use function Amp\File\getStatus;
+use function Amp\File\isDirectory;
+use function Amp\File\isFile;
 use function Amp\File\move;
 use function Amp\File\openFile;
 use function Amp\File\touch;
@@ -43,7 +47,7 @@ final class SessionPaths
     /**
      * Legacy session path.
      */
-    private string $legacySessionPath;
+    private string $sessionDirectoryPath;
     /**
      * Session path.
      */
@@ -81,13 +85,29 @@ final class SessionPaths
     public function __construct(string $session)
     {
         $session = Tools::absolute($session);
-        $this->legacySessionPath = $session;
-        $this->sessionPath = "$session.safe.php";
-        $this->lightStatePath = "$session.lightState.php";
-        $this->lockPath = "$session.lock";
-        $this->ipcPath = "$session.ipc";
-        $this->ipcCallbackPath = "$session.callback.ipc";
-        $this->ipcStatePath = "$session.ipcState.php";
+        $this->sessionDirectoryPath = $session;
+        $this->sessionPath = "$session/safe.php";
+        $this->lightStatePath = "$session/lightState.php";
+        $this->lockPath = "$session/lock";
+        $this->ipcPath = "$session/ipc";
+        $this->ipcCallbackPath = "$session/callback.ipc";
+        $this->ipcStatePath = "$session/ipcState.php";
+        if (!exists($session)) {
+            createDirectory($session);
+            return;
+        }
+        if (!isDirectory($session) && isFile("$session.safe.php")) {
+            \unlink($session);
+            createDirectory($session);
+            foreach (['safe.php', 'lightState.php', 'lock', 'ipc', 'callback.ipc', 'ipcState.php'] as $part) {
+                if (exists("$session.$part")) {
+                    move("$session.$part", "$session/$part");
+                }
+                if (exists("$session.$part.lock")) {
+                    move("$session.$part.lock", "$session/$part.lock");
+                }
+            }
+        }
     }
     /**
      * Serialize object to file.
@@ -166,15 +186,15 @@ final class SessionPaths
      */
     public function __toString(): string
     {
-        return $this->legacySessionPath;
+        return $this->sessionDirectoryPath;
     }
 
     /**
      * Get legacy session path.
      */
-    public function getLegacySessionPath(): string
+    public function getSessionDirectoryPath(): string
     {
-        return $this->legacySessionPath;
+        return $this->sessionDirectoryPath;
     }
 
     /**

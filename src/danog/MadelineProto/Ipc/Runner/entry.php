@@ -83,8 +83,8 @@ use Webmozart\Assert\Assert;
         include $autoloadPath;
     }
     if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
-        $session = new SessionPaths(MADELINE_WORKER_ARGS[0]);
-        if (!file_exists($session->getSessionPath())) {
+        $session = MADELINE_WORKER_ARGS[0];
+        if (!file_exists($session)) {
             trigger_error("IPC session $session does not exist!", E_USER_ERROR);
             exit(1);
         }
@@ -102,6 +102,7 @@ use Webmozart\Assert\Assert;
         $runnerId = MADELINE_WORKER_ARGS[1];
         Assert::numeric($runnerId);
         $runnerId = (int) $runnerId;
+        $session = new SessionPaths($session);
 
         try {
             Magic::start();

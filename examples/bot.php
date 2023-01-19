@@ -23,6 +23,8 @@ use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
+use danog\MadelineProto\Settings\Database\Postgres;
+use danog\MadelineProto\Settings\Database\Redis;
 
 /*
  * Various ways to load MadelineProto
@@ -61,7 +63,7 @@ class MyEventHandler extends EventHandler
     /**
      * @var DbArray<array>
      */
-    protected $dataStoredOnDb;
+    protected DbArray $dataStoredOnDb;
 
     /**
      * Get peer(s) where to report errors.

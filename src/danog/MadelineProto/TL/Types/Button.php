@@ -78,7 +78,7 @@ final class Button implements JsonSerializable, ArrayAccess
         $this->button = $button;
         $this->id = $message['id'];
         $this->API = $API;
-        $this->session = $API->getWrapper()->getSession()->getLegacySessionPath();
+        $this->session = $API->getWrapper()->getSession()->getSessionDirectoryPath();
     }
     /**
      * Sleep function.

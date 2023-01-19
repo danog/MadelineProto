@@ -70,7 +70,7 @@ final class Client extends ClientAbstract
         $this->logger = $logger;
         $this->server = $server;
         $this->session = $session;
-        self::$instances[$session->getLegacySessionPath()] = $this;
+        self::$instances[$session->getSessionDirectoryPath()] = $this;
         async($this->loopInternal(...));
     }
     /**
@@ -94,8 +94,8 @@ final class Client extends ClientAbstract
         } catch (Throwable $e) {
             $this->logger("An error occurred while disconnecting the client: $e");
         }
-        if (isset(self::$instances[$this->session->getLegacySessionPath()])) {
-            unset(self::$instances[$this->session->getLegacySessionPath()]);
+        if (isset(self::$instances[$this->session->getSessionDirectoryPath()])) {
+            unset(self::$instances[$this->session->getSessionDirectoryPath()]);
         }
     }
     /**
