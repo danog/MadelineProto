@@ -170,12 +170,6 @@ abstract class SqlArray extends DriverArray
      */
     protected function execute(string $sql, array $params = []): Result
     {
-        if (isset($params['index'])
-            && !\mb_check_encoding($params['index'], 'UTF-8')
-        ) {
-            $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
-        }
-
         foreach ($params as $key => $value) {
             $value = $this->pdo->quote($value);
             $sql = \str_replace(":$key", $value, $sql);

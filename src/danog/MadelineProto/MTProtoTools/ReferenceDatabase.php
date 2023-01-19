@@ -65,17 +65,18 @@ final class ReferenceDatabase implements TLCallback
     ];
     const METHOD_CONTEXT = ['photos.updateProfilePhoto' => self::USER_PHOTO_ORIGIN, 'photos.getUserPhotos' => self::USER_PHOTO_ORIGIN, 'photos.uploadProfilePhoto' => self::USER_PHOTO_ORIGIN, 'messages.getStickers' => self::STICKER_SET_EMOTICON_ORIGIN];
     const CONSTRUCTOR_CONTEXT = ['message' => self::MESSAGE_ORIGIN, 'messageService' => self::MESSAGE_ORIGIN, 'chatFull' => self::PEER_PHOTO_ORIGIN, 'channelFull' => self::PEER_PHOTO_ORIGIN, 'chat' => self::PEER_PHOTO_ORIGIN, 'channel' => self::PEER_PHOTO_ORIGIN, 'updateUserPhoto' => self::USER_PHOTO_ORIGIN, 'user' => self::USER_PHOTO_ORIGIN, 'userFull' => self::USER_PHOTO_ORIGIN, 'wallPaper' => self::WALLPAPER_ORIGIN, 'messages.savedGifs' => self::SAVED_GIFS_ORIGIN, 'messages.recentStickers' => self::STICKER_SET_RECENT_ORIGIN, 'messages.favedStickers' => self::STICKER_SET_FAVED_ORIGIN, 'messages.stickerSet' => self::STICKER_SET_ID_ORIGIN, 'document' => self::STICKER_SET_ID_ORIGIN];
+
+    private const V = 1;
     /**
      * References indexed by location.
-     *
      */
     private DbArray $db;
-    private $cache = [];
-    private $cacheContexts = [];
-    private $refreshed = [];
-    private $API;
-    private $refresh = false;
-    private $refreshCount = 0;
+    private array $cache = [];
+    private array $cacheContexts = [];
+    private array $refreshed = [];
+    private bool $refresh = false;
+    private int $refreshCount = 0;
+    private int $v = 0;
 
     /**
      * List of properties stored in database (memory or external).
@@ -86,16 +87,20 @@ final class ReferenceDatabase implements TLCallback
         'db' => 'array',
     ];
 
-    public function __construct(MTProto $API)
+    public function __construct(private MTProto $API)
     {
-        $this->API = $API;
+        $this->v = self::V;
     }
     public function __sleep()
     {
-        return ['db', 'API'];
+        return ['db', 'API', 'v'];
     }
     public function init(): void
     {
+        if ($this->v === 0) {
+            $this->db->clear();
+            $this->v = self::V;
+        }
         $this->initDb($this->API);
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
@@ -492,19 +497,19 @@ final class ReferenceDatabase implements TLCallback
         if ($this->refresh) {
             return $this->refreshReferenceInternal($locationString);
         }
-        return ($this->db[$locationString])['reference'];
+        return $this->db[$locationString]['reference'];
     }
     private static function serializeLocation(int $locationType, array $location): string
     {
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.(\is_int($location['id']) ? Tools::packSignedLong($location['id']) : $location['id']);
+                return $locationType.\bin2hex(Tools::packSignedLong($location['id']));
             case self::PHOTO_LOCATION_LOCATION:
                 $dc_id = Tools::packSignedInt($location['dc_id']);
-                $volume_id = \is_int($location['volume_id']) ? Tools::packSignedLong($location['volume_id']) : $location['volume_id'];
+                $volume_id = Tools::packSignedLong($location['volume_id']);
                 $local_id = Tools::packSignedInt($location['local_id']);
-                return $locationType.$dc_id.$volume_id.$local_id;
+                return $locationType.\bin2hex($dc_id.$volume_id.$local_id);
         }
         throw new Exception('Invalid location type specified!');
     }
