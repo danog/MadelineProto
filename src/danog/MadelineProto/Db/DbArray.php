@@ -11,7 +11,10 @@ use Countable;
 /**
  * DB array interface.
  *
- * @extends ArrayAccess<array-key, mixed>
+ * @template TKey as array-key
+ * @template TValue
+ *
+ * @extends ArrayAccess<TKey, TValue>
  */
 interface DbArray extends DbType, ArrayAccess, Countable
 {

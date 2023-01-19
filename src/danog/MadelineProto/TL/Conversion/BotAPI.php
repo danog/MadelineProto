@@ -324,7 +324,7 @@ trait BotAPI
                 $fileId = new FileId;
                 $fileId->setId($data['document']['id']);
                 $fileId->setAccessHash($data['document']['access_hash']);
-                $fileId->setFileReference($data['document']['file_reference'] ?? '');
+                $fileId->setFileReference((string) ($data['document']['file_reference'] ?? ''));
                 $fileId->setDcId($data['document']['dc_id']);
                 $fileId->setType(TYPES_IDS[$type_name]);
 

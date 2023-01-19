@@ -58,12 +58,17 @@ class MyEventHandler extends EventHandler
      */
     protected static array $dbProperties = [
         'dataStoredOnDb' => 'array',
+        'notifiedChats' => 'array',
     ];
 
     /**
-     * @var DbArray<array>
+     * @var DbArray<array-key, array>
      */
     protected DbArray $dataStoredOnDb;
+    /**
+     * @var DbArray<int, bool>
+     */
+    protected DbArray $notifiedChats;
 
     /**
      * Get peer(s) where to report errors.
@@ -104,18 +109,37 @@ class MyEventHandler extends EventHandler
         }
 
         $this->logger($update);
-        /*
-        // Example code to json-dump all incoming updates (be wary of enabling it in chats)
-        $res = \json_encode($update, JSON_PRETTY_PRINT);
-        $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
-        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame' && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-            $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-        }
-        */
+
+        // Chat id
+        $id = $this->getId($update);
 
         // You can also use the built-in MadelineProto MySQL async driver!
+        if (!isset($this->notifiedChats[$id])) {
+            $this->messages->sendMessage(
+                peer: $update,
+                message: "This userbot is powered by [MadelineProto](https://t.me/MadelineProto)!",
+                reply_to_msg_id: $update['message']['id'] ?? null,
+                parse_mode: 'Markdown'
+            );
 
-        // Can be anything serializable, an array, an int, an object
+            if (isset($update['message']['media'])
+                && !in_array($update['message']['media']['_'], [
+                    'messageMediaGame',
+                    'messageMediaWebPage',
+                    'messageMediaPoll'
+                ])
+            ) {
+                $this->messages->sendMedia(
+                    peer: $update,
+                    message: $update['message']['message'],
+                    media: $update
+                );
+            }
+
+            $this->notifiedChats[$id] = true;
+        }
+
+        // Can be anything serializable: an array, an int, an object, ...
         $myData = [];
 
         if (isset($this->dataStoredOnDb['yourKey'])) {

@@ -39,6 +39,7 @@ use Throwable;
 
 use const LOCK_EX;
 use function Amp\async;
+use function Amp\File\deleteFile;
 use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -801,7 +802,7 @@ trait Files
             $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
         } finally {
             $unlock();
-            \unlink("$file.lock");
+            deleteFile("$file.lock");
             $stream->close();
         }
         return $file;

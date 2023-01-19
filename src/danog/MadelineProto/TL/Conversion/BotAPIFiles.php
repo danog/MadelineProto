@@ -47,7 +47,7 @@ trait BotAPIFiles
         $fileId = new FileId;
         $fileId->setId($photo['id'] ?? 0);
         $fileId->setAccessHash($photo['access_hash'] ?? 0);
-        $fileId->setFileReference($photo['file_reference'] ?? '');
+        $fileId->setFileReference((string) ($photo['file_reference'] ?? ''));
         $fileId->setDcId($photo['dc_id'] ?? 0);
 
         if (isset($photoSize['location']['local_id'])) {

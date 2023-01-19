@@ -997,7 +997,7 @@ trait PeerHandler
                 $fileId = new FileId;
                 $fileId->setId($res['photo']['id']);
                 $fileId->setAccessHash($res['photo']['access_hash']);
-                $fileId->setFileReference($res['photo']['file_reference']);
+                $fileId->setFileReference((string) $res['photo']['file_reference']);
                 $fileId->setDcId($res['photo']['dc_id']);
                 $fileId->setType(PROFILE_PHOTO);
 

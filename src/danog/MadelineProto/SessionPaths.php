@@ -29,6 +29,7 @@ use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
 
 use function Amp\File\createDirectory;
+use function Amp\File\deleteFile;
 use function Amp\File\exists;
 use function Amp\File\getStatus;
 use function Amp\File\isDirectory;
@@ -97,7 +98,7 @@ final class SessionPaths
             return;
         }
         if (!isDirectory($session) && isFile("$session.safe.php")) {
-            \unlink($session);
+            deleteFile($session);
             createDirectory($session);
             foreach (['safe.php', 'lightState.php', 'lock', 'ipc', 'callback.ipc', 'ipcState.php'] as $part) {
                 if (exists("$session.$part")) {
