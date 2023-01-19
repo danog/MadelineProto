@@ -100,7 +100,7 @@ trait PrettyException
                 }
                 $this->tlTrace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
                 $this->tlTrace .= isset($frame['function']) ? $frame['function'].'(' : '';
-                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
+                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']) ?: '', 1, -1) : '';
                 $this->tlTrace .= ')';
                 $this->tlTrace .= $eol;
                 $tl = false;
