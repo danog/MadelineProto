@@ -159,7 +159,9 @@ final class SessionPaths
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
             $file = openFile($path, 'rb');
-            touch($path); // Invalidate size cache
+            try {
+                touch($path); // Invalidate size cache
+            } catch (\Throwable) {}
             $size = getStatus($path);
             $size = $size['size'] ?? $headerLen;
 
