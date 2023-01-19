@@ -1453,7 +1453,7 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         $this->logger = new Logger(
             $this->settings->getLogger(),
-            $this->authorization['user']['username'] ?? $this->authorization['user']['id'] ?? '',
+            (string) ($this->authorization['user']['username'] ?? $this->authorization['user']['id'] ?? ''),
         );
     }
     /**
