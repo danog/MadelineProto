@@ -514,6 +514,7 @@ final class API extends InternalDoc
                 $started = true;
                 /** @var API $this->API */
                 $this->API->loop();
+                return;
             } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
