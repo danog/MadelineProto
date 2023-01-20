@@ -74,7 +74,7 @@ trait Session
      * Pending outgoing key.
      *
      */
-    public string $pendingOutgoingKey = 'a';
+    public int $pendingOutgoingKey = 0;
     /**
      * Time delta with server.
      *
