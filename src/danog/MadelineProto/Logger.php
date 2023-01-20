@@ -26,6 +26,7 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use const DIRECTORY_SEPARATOR;
@@ -66,38 +67,46 @@ final class Logger
      * Logging mode.
      *
      */
-    public int $mode = 0;
+    private readonly int $mode;
     /**
      * Optional logger parameter.
      *
      * @var null|string|callable
      */
-    public $optional = null;
+    private readonly mixed $optional;
     /**
      * Logger prefix.
      *
      */
-    public string $prefix = '';
+    private readonly string $prefix;
     /**
      * Logging level.
      *
      */
-    public int $level = self::NOTICE;
+    private readonly int $level;
     /**
      * Logging colors.
      *
      */
-    public array $colors = [];
+    private array $colors;
     /**
      * Newline.
      *
      */
-    public string $newline = "\n";
+    private readonly string $newline;
     /**
      * Logfile.
      *
      */
-    public WritableStream $stdout;
+    private readonly WritableStream $stdout;
+    /**
+     * Log rotation loop ID.
+     */
+    private ?string $rotateId = null;
+    /**
+     * PSR logger.
+     */
+    private readonly PsrLogger $psr;
     /**
      * Default logger instance.
      *
@@ -107,15 +116,7 @@ final class Logger
      * Whether the AGPL notice was printed.
      *
      */
-    public static bool $printed = false;
-    /**
-     * Log rotation loop ID.
-     */
-    private string $rotateId = '';
-    /**
-     * PSR logger.
-     */
-    private PsrLogger $psr;
+    private static bool $printed = false;
     /**
      * Ultra verbose logging.
      *
@@ -270,11 +271,11 @@ final class Logger
         } elseif ($this->mode === self::FILE_LOGGER) {
             $this->stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
-                $optional = &$this->optional;
-                $stdout = &$this->stdout;
+                $optional = $this->optional;
+                $stdout = $this->stdout;
                 $this->rotateId = EventLoop::repeat(
                     10,
-                    static function () use ($maxSize, $optional, &$stdout): void {
+                    static function () use ($maxSize, $optional, $stdout): void {
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
                             \ftruncate($stdout->getResource(), 0);
@@ -303,7 +304,7 @@ final class Logger
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->logger('Could not enable PHP logging');
             }
         }
@@ -316,6 +317,15 @@ final class Logger
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        }
+    }
+    /**
+     * Truncate logfile.
+     */
+    public function truncate(): void {
+        if ($this->mode === self::FILE_LOGGER) {
+            Assert::true($this->stdout instanceof WritableResourceStream);
+            \ftruncate($this->stdout->getResource(), 0);
         }
     }
     /**

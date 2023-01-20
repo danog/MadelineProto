@@ -23,9 +23,9 @@ namespace danog\MadelineProto\TL;
 final class TLConstructors
 {
     use TLParams;
-    public $by_id = [];
-    public $by_predicate_and_layer = [];
-    public $layers = [];
+    public array $by_id = [];
+    public array $by_predicate_and_layer = [];
+    public array $layers = [];
     public function __sleep()
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];

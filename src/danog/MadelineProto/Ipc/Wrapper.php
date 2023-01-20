@@ -30,7 +30,7 @@ final class Wrapper extends ClientAbstract
     /**
      * Payload data.
      */
-    private $data;
+    private mixed $data;
     /**
      * Callbacks.
      *

@@ -41,7 +41,7 @@ use const STR_PAD_LEFT;
  */
 trait AuthKeyHandler
 {
-    private $calls = [];
+    private array $calls = [];
     /**
      * Accept call from VoIP instance.
      *

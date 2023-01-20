@@ -42,7 +42,6 @@ use function Amp\async;
  */
 trait ResponseHandler
 {
-    public $n = 0;
     public function handleMessages(): void
     {
         while ($this->new_incoming) {

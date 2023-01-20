@@ -112,7 +112,7 @@ final class ReadLoop extends SignalLoop
             EventLoop::defer($connection->handleMessages(...));
         }
     }
-    public function readMessage()
+    public function readMessage(): ?int
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -127,7 +127,7 @@ final class ReadLoop extends SignalLoop
         } catch (ClosedException $e) {
             $API->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
-                $payload = -\substr($e->getReason(), 7);
+                $payload = -((int) \substr($e->getReason(), 7));
                 $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ERROR);
                 return $payload;
             }
@@ -219,7 +219,7 @@ final class ReadLoop extends SignalLoop
         } finally {
             $connection->reading(false);
         }
-        return true;
+        return null;
     }
     /**
      * Get loop name.

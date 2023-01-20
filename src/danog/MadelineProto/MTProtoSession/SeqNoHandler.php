@@ -28,8 +28,8 @@ use danog\MadelineProto\MTProto\IncomingMessage;
  */
 trait SeqNoHandler
 {
-    public $session_out_seq_no = 0;
-    public $session_in_seq_no = 0;
+    public int $session_out_seq_no = 0;
+    public int $session_in_seq_no = 0;
     public ?string $session_id = null;
     public function generateOutSeqNo($contentRelated)
     {

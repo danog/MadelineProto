@@ -23,9 +23,9 @@ namespace danog\MadelineProto\TL;
 final class TLMethods
 {
     use TLParams;
-    public $by_id = [];
-    public $by_method = [];
-    public $method_namespace = [];
+    public array $by_id = [];
+    public array $by_method = [];
+    public array $method_namespace = [];
     public function __sleep(): array
     {
         return ['by_id', 'by_method', 'method_namespace'];

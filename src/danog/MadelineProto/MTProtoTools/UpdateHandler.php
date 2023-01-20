@@ -54,10 +54,10 @@ trait UpdateHandler
      * @var ?callable
      */
     private $updateHandler;
-    private $got_state = false;
-    private $channels_state;
-    public $updates = [];
-    public $updates_key = 0;
+    private bool $got_state = false;
+    private CombinedUpdatesState $channels_state;
+    public array $updates = [];
+    public int $updates_key = 0;
 
     /**
      * Get updates.

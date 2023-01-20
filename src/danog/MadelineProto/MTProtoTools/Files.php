@@ -1061,8 +1061,11 @@ trait Files
             return $len;
         } while (true);
     }
-    private $cdn_hashes = [];
-    private function addCdnHashes($file, $hashes): void
+    /**
+     * @var array<int, array{limit: int, hash: string}>
+     */
+    private array $cdn_hashes = [];
+    private function addCdnHashes(string $file, array $hashes): void
     {
         if (!isset($this->cdn_hashes[$file])) {
             $this->cdn_hashes = [];
@@ -1071,7 +1074,7 @@ trait Files
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
-    private function checkCdnHash($file, $offset, $data, &$datacenter)
+    private function checkCdnHash(string $file, int $offset, string $data, int &$datacenter): void
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
@@ -1086,12 +1089,10 @@ trait Files
             $data = \substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
-        return true;
     }
 
-    private function clearCdnHashes($file): bool
+    private function clearCdnHashes(string $file): void
     {
         unset($this->cdn_hashes[$file]);
-        return true;
     }
 }

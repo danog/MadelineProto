@@ -39,7 +39,7 @@ trait Events
      *
      * @var class-string<EventHandler>
      */
-    public $event_handler;
+    public ?string $event_handler = null;
     /**
      * Event handler instance.
      *

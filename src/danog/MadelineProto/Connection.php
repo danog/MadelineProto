@@ -131,7 +131,7 @@ final class Connection
     /**
      * DC ID and connection ID concatenated.
      */
-    private $datacenterId = '';
+    private string $datacenterId = '';
     /**
      * Whether this socket has to be reconnected.
      *

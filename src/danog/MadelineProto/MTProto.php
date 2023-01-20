@@ -1003,17 +1003,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function cleanupProperties(): void
     {
-        if (!$this->channels_state instanceof CombinedUpdatesState) {
-            $this->channels_state = new CombinedUpdatesState($this->channels_state ?? []);
-        }
-        if (isset($this->updates_state)) {
-            $updates_state = $this->updates_state;
-            unset($this->updates_state);
-            if (!$updates_state instanceof UpdatesState) {
-                $updates_state = new UpdatesState($updates_state);
-            }
-            $this->channels_state->__construct([UpdateLoop::GENERIC => $updates_state]);
-        }
         if (!isset($this->datacenter)) {
             $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
         }
@@ -1952,9 +1941,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         if ($sent && $file) {
-            if ($this->logger->stdout instanceof WritableResourceStream) {
-                \ftruncate($this->logger->stdout->getResource(), 0);
-            }
+            $this->logger->truncate();
             $this->logger->logger('Reported!');
         }
     }

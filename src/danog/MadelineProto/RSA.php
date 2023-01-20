@@ -73,14 +73,6 @@ final class RSA
     {
         return ['e', 'n', 'fp'];
     }
-    public function __wakeup(): void
-    {
-        foreach ($this->__sleep() as $bigint) {
-            if ($this->{$bigint} instanceof \tgseclib\Math\BigInteger) {
-                $this->{$bigint} = $this->{$bigint}->real;
-            }
-        }
-    }
     /**
      * Encrypt data.
      *
