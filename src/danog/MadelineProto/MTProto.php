@@ -711,10 +711,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function __sleep(): array
     {
-        $db = $this->settings->getDb();
-        if ($db instanceof Memory && $db->getCleanup()) {
-            $this->cleanup();
-        }
         $res = [
             // Databases
             'chats',
@@ -788,24 +784,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $res[] = 'updateHandler';
         }
         return $res;
-    }
-
-    /**
-     * Cleanup memory and session file.
-     *
-     * @internal
-     */
-    public function cleanup(): void
-    {
-        $this->referenceDatabase = new ReferenceDatabase($this);
-        $callbacks = [$this];
-        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
-            $callbacks[] = $this->referenceDatabase;
-        }
-        if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
-            $callbacks[] = $this->minDatabase;
-        }
-        $this->TL->updateCallbacks($callbacks);
     }
 
     private function fillUsernamesCache(): void
