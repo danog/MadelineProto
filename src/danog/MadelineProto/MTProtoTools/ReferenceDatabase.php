@@ -214,7 +214,7 @@ final class ReferenceDatabase implements TLCallback
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
-            throw new Exception('Trying to add origin with no origin context set');
+            throw new Exception("Trying to add origin to constructor {$data['_']} with no origin context set");
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
@@ -302,10 +302,10 @@ final class ReferenceDatabase implements TLCallback
     public function addOriginMethod(OutgoingMessage $data, array $res): void
     {
         $key = \count($this->cacheContexts) - 1;
-        if ($key === -1) {
-            throw new Exception('Trying to add origin with no origin context set');
-        }
         $constructor = $data->getConstructor();
+        if ($key === -1) {
+            throw new Exception("Trying to add origin to method $constructor with no origin context set");
+        }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             $this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
