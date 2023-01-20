@@ -81,11 +81,11 @@ echo '{
         },
         {
             "type": "vcs",
-            "url": "git@github.com:danog/dns"
+            "url": "https://github.com/danog/dns"
         }
     ]
 }' > composer.json
-php $(which composer) update
+php $(which composer) update --no-cache
 php $(which composer) dumpautoload --optimize
 rm -rf vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 cd ..
