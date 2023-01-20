@@ -1005,19 +1005,15 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
         $this->snitch ??= new Snitch;
 
+        $this->referenceDatabase ??= new ReferenceDatabase($this);
+        $this->minDatabase ??= new MinDatabase($this);
+
         $db = [];
-        if (!isset($this->referenceDatabase)) {
-            $this->referenceDatabase = new ReferenceDatabase($this);
-            $db []= async($this->referenceDatabase->init(...));
-        } else {
-            $db []= async($this->referenceDatabase->init(...));
-        }
-        if (!isset($this->minDatabase)) {
-            $this->minDatabase = new MinDatabase($this);
-            $db []= async($this->minDatabase->init(...));
-        } else {
-            $db []= async($this->minDatabase->init(...));
-        }
+        $db []= async($this->referenceDatabase->init(...));
+        $db []= async($this->minDatabase->init(...));
+        $db []= async($this->initDb(...), $this);
+        await($db);
+
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
             $callbacks = [$this, $this->referenceDatabase];
@@ -1027,8 +1023,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->TL->init($this->settings->getSchema(), $callbacks);
         }
 
-        $db []= async($this->initDb(...), $this);
-        await($db);
         $this->fillUsernamesCache();
 
         if (!$this->settings->getDb()->getEnableFullPeerDb()) {
@@ -1068,9 +1062,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function upgradeMadelineProto(): void
     {
-        if (!isset($this->snitch)) {
-            $this->snitch = new Snitch;
-        }
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
             if ($this->authorized === self::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
@@ -1079,58 +1070,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         $this->settings->setSchema(new TLSchema);
-
-        $this->initDb($this);
-
-        foreach ($this->full_chats as $id => $full) {
-            if (isset($full['full'], $full['last_update'])) {
-                $this->full_chats->set($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
-            }
-        }
-
-        if (isset($this->channel_participants)) {
-            if (\is_array($this->channel_participants)) {
-                foreach ($this->channel_participants as $channelId => $filters) {
-                    foreach ($filters as $filter => $qs) {
-                        foreach ($qs as $q => $offsets) {
-                            foreach ($offsets as $offset => $limits) {
-                                foreach ($limits as $limit => $data) {
-                                    $this->channelParticipants[$this->participantsKey($channelId, $filter, $q, $offset, $limit)] = $data;
-                                }
-                            }
-                        }
-                    }
-                    unset($this->channel_participants[$channelId]);
-                }
-            } else {
-                self::$dbProperties['channel_participants'] = 'array';
-                $this->initDb($this);
-                foreach ($this->channel_participants as $channelId => $filters) {
-                    foreach ($filters as $filter => $qs) {
-                        foreach ($qs as $q => $offsets) {
-                            foreach ($offsets as $offset => $limits) {
-                                foreach ($limits as $limit => $data) {
-                                    $this->channelParticipants[$this->participantsKey($channelId, $filter, $q, $offset, $limit)] = $data;
-                                }
-                            }
-                        }
-                    }
-                    unset($this->channel_participants[$channelId]);
-                }
-            }
-        }
-        foreach ($this->secret_chats as $key => &$chat) {
-            if (!\is_array($chat)) {
-                unset($this->secret_chats[$key]);
-                continue;
-            }
-            if ($chat['layer'] >= 73) {
-                $chat['mtproto'] = 2;
-            } else {
-                $chat['mtproto'] = 1;
-            }
-        }
-        unset($chat);
+        $this->usernames->clear();
 
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
@@ -1144,8 +1084,6 @@ final class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
-
-        $this->usernames->clear();
     }
     /**
      * Post-deserialization initialization function.
@@ -1156,20 +1094,20 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void
     {
+        // Setup one-time stuffs
+        Magic::start();
+
         // Set reference to itself
         self::$references[\spl_object_hash($this)] = $this;
         // Set API wrapper
         $this->wrapper = $wrapper;
-        // BC stuff
-        if ($this->authorized === true) {
-            $this->authorized = self::LOGGED_IN;
-        }
+
         $deferred = new DeferredFuture;
         $this->initPromise = $deferred->getFuture();
 
-        if (!isset($this->snitch)) {
-            $this->snitch = new Snitch;
-        }
+        // Cleanup old properties, init new stuffs
+        $this->cleanupProperties();
+
         // Re-set TL closures
         $callbacks = [$this];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -1178,21 +1116,9 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!($this->authorization['user']['bot'] ?? false) && $this->settings->getDb()->getEnableMinDb()) {
             $callbacks[] = $this->minDatabase;
         }
-        $this->TL->updateCallbacks($callbacks);
-        // Convert old array settings to new settings object
-        if (\is_array($this->settings)) {
-            if (($this->settings['updates']['callback'] ?? '') === 'getUpdatesUpdateHandler') {
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
-                $this->settings['updates']['callback'] = [$this, 'getUpdatesUpdateHandler'];
-            }
-            if (\is_callable($this->settings['updates']['callback'] ?? null)) {
-                $this->updateHandler = $this->settings['updates']['callback'];
-            }
 
-            /** @psalm-suppress InvalidArrayOffset */
-            $this->dcList = $this->settings['connection'] ?? $this->dcList;
-        }
-        $this->settings = Settings::parseFromLegacy($this->settings);
+        $this->TL->updateCallbacks($callbacks);
+
         // Clean up phone call array
         foreach ($this->calls as $id => $controller) {
             if (!\is_object($controller)) {
@@ -1205,8 +1131,6 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
 
-        // Setup one-time stuffs
-        Magic::start();
         $this->settings->getConnection()->init();
         // Setup logger
         $this->setupLogger();
@@ -1227,8 +1151,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->upgradeMadelineProto();
             $forceDialogs = true;
         }
-        // Cleanup old properties, init new stuffs
-        $this->cleanupProperties();
         // Update TL callbacks
         $callbacks = [$this];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
