@@ -510,7 +510,7 @@ final class API extends InternalDoc
         $errors = [];
         while (true) {
             try {
-                $this->setEventHandler($eventHandler);
+                $this->API->setEventHandler($eventHandler);
                 $started = true;
                 /** @var API $this->API */
                 $this->API->loop();

@@ -91,7 +91,6 @@ trait PeerHandler
      * Add user info.
      *
      * @param array $user User info
-     * @throws Exception
      */
     public function addUser(array $user): void
     {
@@ -1115,7 +1114,8 @@ trait PeerHandler
                 });
             }
             await($promises);
-            $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
+            $h = $hash ? 'present' : 'absent';
+            $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$h}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
             $offset += \count($gres['participants']);
         } while (\count($gres['participants']));
         if ($offset === $limit) {

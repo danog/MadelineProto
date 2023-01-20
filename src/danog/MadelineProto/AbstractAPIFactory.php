@@ -109,10 +109,8 @@ abstract class AbstractAPIFactory
             }
             return $this->mainAPI->API->methodCallAsyncRead($name, $args, $aargs);
         }
-        if ($lower_name === 'seteventhandler'
-            || ($lower_name === 'loop' && !isset($arguments[0]))
-        ) {
-            $this->mainAPI->reconnectFull();
+        if ($lower_name === 'seteventhandler') {
+            throw new InvalidArgumentException('Cannot call setEventHandler like this, please use MyEventHandler::startAndLoop("session.madeline", $settings);');
         }
         return $this->methods[$lower_name](...$arguments);
     }

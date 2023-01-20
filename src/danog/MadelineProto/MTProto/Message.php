@@ -129,7 +129,7 @@ abstract class Message
     /**
      * Set sequence number.
      *
-     * @param ?int $seqNo Sequence number
+     * @param null|int $seqNo Sequence number
      */
     public function setSeqNo(?int $seqNo): self
     {

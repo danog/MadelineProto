@@ -598,7 +598,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * Constructor function.
      *
      * @param Settings|SettingsEmpty $settings Settings
-     * @param ?APIWrapper            $wrapper  API wrapper
+     * @param null|APIWrapper            $wrapper  API wrapper
      */
     public function __construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null)
     {
@@ -1068,10 +1068,6 @@ final class MTProto implements TLCallback, LoggerGetter
 
     /**
      * Upgrade MadelineProto instance.
-     *
-     * @throws Exception
-     * @throws RPCErrorException
-     * @throws Throwable
      */
     private function upgradeMadelineProto(): void
     {

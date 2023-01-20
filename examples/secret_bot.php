@@ -19,6 +19,7 @@
  */
 
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 
 use function Amp\async;
@@ -121,5 +122,6 @@ class SecretHandler extends EventHandler
 }
 
 $settings = new Settings;
+$settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
 
 SecretHandler::startAndLoop('secret.madeline', $settings);

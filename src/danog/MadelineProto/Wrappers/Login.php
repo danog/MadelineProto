@@ -52,7 +52,7 @@ trait Login
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token): ?array
+    public function botLogin(string $token): array|null
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             return null;

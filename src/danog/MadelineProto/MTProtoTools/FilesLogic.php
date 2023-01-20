@@ -46,10 +46,10 @@ trait FilesLogic
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface $messageMedia File to download
-     * @param ?callable     $cb           Status callback (can also use FileCallback)
-     * @param ?int $size Size of file to download, required for bot API file IDs.
-     * @param ?string $mime MIME type of file to download, required for bot API file IDs.
-     * @param ?string $name Name of file to download, required for bot API file IDs.
+     * @param null|callable     $cb           Status callback (can also use FileCallback)
+     * @param null|int $size Size of file to download, required for bot API file IDs.
+     * @param null|string $mime MIME type of file to download, required for bot API file IDs.
+     * @param null|string $name Name of file to download, required for bot API file IDs.
      */
     public function downloadToBrowser(array|string|FileCallbackInterface $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
@@ -161,9 +161,9 @@ trait FilesLogic
      * @param array|string|FileCallbackInterface  $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
-     * @param ?int          $size         Size of file to download, required for bot API file IDs.
-     * @param ?string       $name         Name of file to download, required for bot API file IDs.
-     * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
+     * @param null|int          $size         Size of file to download, required for bot API file IDs.
+     * @param null|string       $name         Name of file to download, required for bot API file IDs.
+     * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
      */
     public function downloadToResponse(array|string|FileCallbackInterface $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
     {

@@ -29,7 +29,6 @@ use Amp\TimeoutException;
 use Closure;
 use Generator;
 use Throwable;
-use TypeError;
 
 use const LOCK_NB;
 use const LOCK_UN;
@@ -132,7 +131,6 @@ abstract class AsyncTools extends StrTools
      * @param int                        $timeout Timeout in milliseconds.
      * @param TReturnAlt                 $default
      * @return TReturn|TReturnAlt
-     * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
     public static function timeoutWithDefault($promise, int $timeout, $default = null): mixed
     {

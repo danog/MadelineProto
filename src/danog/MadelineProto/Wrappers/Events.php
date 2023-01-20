@@ -68,6 +68,8 @@ trait Events
     /**
      * Set event handler.
      *
+     * @internal
+     *
      * @param class-string<EventHandler> $eventHandler Event handler
      */
     public function setEventHandler(string $eventHandler): void

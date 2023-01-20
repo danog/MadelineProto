@@ -240,7 +240,7 @@ abstract class Serialization
      *
      * @param string    $ipcPath       IPC path
      * @param Future<(Throwable|null)> $cancelConnect Cancelation token (triggers cancellation of connection)
-     * @param ?callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
+     * @param null|callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
      */
     public static function tryConnect(string $ipcPath, Future $cancelConnect, ?callable $cancelFull = null): array

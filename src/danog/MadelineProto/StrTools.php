@@ -52,7 +52,7 @@ abstract class StrTools extends Extension
      *
      * @param string  $text   Text to substring
      * @param integer $offset Offset
-     * @param ?int    $length Length
+     * @param null|int    $length Length
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {

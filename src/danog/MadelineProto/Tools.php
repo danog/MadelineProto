@@ -502,7 +502,7 @@ abstract class Tools extends AsyncTools
      * @internal
      * @return array{0: bool, 1: string}|null
      */
-    public static function parseLink(string $link): ?array
+    public static function parseLink(string $link): array|null
     {
         if (\preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
             if ($matches[1] !== 'www') {

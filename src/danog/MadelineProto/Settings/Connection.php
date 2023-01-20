@@ -665,7 +665,7 @@ final class Connection extends SettingsAbstract
     /**
      * Set bind on specific address and port.
      *
-     * @param ?string $bindTo Bind on specific address and port.
+     * @param null|string $bindTo Bind on specific address and port.
      */
     public function setBindTo(?string $bindTo): self
     {

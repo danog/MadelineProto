@@ -11,6 +11,7 @@ use IteratorAggregate;
 use ReflectionClass;
 
 use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Array caching trait.
@@ -124,13 +125,14 @@ abstract class DriverArray implements DbArray, IteratorAggregate
 
             $counter = 0;
             $total = \count($old);
+            $promises = [];
             foreach ($old as $key => $value) {
                 $counter++;
+                $promises []= async($new->set(...), $key, $value);
                 if ($counter % 500 === 0 || $counter === $total) {
-                    $new->set($key, $value);
+                    await($promises);
+                    $promises = [];
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
-                } else {
-                    async($new->set(...), $key, $value);
                 }
                 $new->clearCache();
             }

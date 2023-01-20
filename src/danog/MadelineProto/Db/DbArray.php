@@ -21,7 +21,7 @@ interface DbArray extends DbType, ArrayAccess, Countable
     /**
      * Get Array copy.
      *
-     * @return array<string|int, mixed>
+     * @return array<array-key, mixed>
      */
     public function getArrayCopy(): array;
     /**

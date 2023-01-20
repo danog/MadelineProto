@@ -6291,7 +6291,6 @@ class InternalDoc extends APIFactory
      * Add user info.
      *
      * @param array $user User info
-     * @throws Exception
      */
     public function addUser(array $user): void
     {
@@ -6529,10 +6528,10 @@ class InternalDoc extends APIFactory
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface $messageMedia File to download
-     * @param ?callable     $cb           Status callback (can also use FileCallback)
-     * @param ?int $size Size of file to download, required for bot API file IDs.
-     * @param ?string $mime MIME type of file to download, required for bot API file IDs.
-     * @param ?string $name Name of file to download, required for bot API file IDs.
+     * @param null|callable     $cb           Status callback (can also use FileCallback)
+     * @param null|int $size Size of file to download, required for bot API file IDs.
+     * @param null|string $mime MIME type of file to download, required for bot API file IDs.
+     * @param null|string $name Name of file to download, required for bot API file IDs.
      */
     public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
@@ -6585,9 +6584,9 @@ class InternalDoc extends APIFactory
      * @param array|string|FileCallbackInterface  $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
-     * @param ?int          $size         Size of file to download, required for bot API file IDs.
-     * @param ?string       $name         Name of file to download, required for bot API file IDs.
-     * @param ?string       $mime         MIME type of file to download, required for bot API file IDs.
+     * @param null|int          $size         Size of file to download, required for bot API file IDs.
+     * @param null|string       $name         Name of file to download, required for bot API file IDs.
+     * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
      */
     public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null)
     {
@@ -6636,7 +6635,7 @@ class InternalDoc extends APIFactory
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
-     * @return ?array
+      * @return ?array
      */
     public static function extractBotAPIFile(array $info): ?array
     {
@@ -7283,7 +7282,7 @@ class InternalDoc extends APIFactory
      *
      * @param string  $text   Text to substring
      * @param integer $offset Offset
-     * @param ?int    $length Length
+     * @param null|int    $length Length
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
@@ -7529,15 +7528,6 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, [$callback]);
     }
     /**
-     * Set event handler.
-     *
-     * @param class-string<EventHandler> $eventHandler Event handler
-     */
-    public function setEventHandler(string $eventHandler): void
-    {
-        $this->__call(__FUNCTION__, [$eventHandler]);
-    }
-    /**
      * Set NOOP update handler, ignoring all updates.
      */
     public function setNoop(): void
@@ -7686,7 +7676,6 @@ class InternalDoc extends APIFactory
      * @param int                        $timeout Timeout in milliseconds.
      * @param TReturnAlt                 $default
      * @return TReturn|TReturnAlt
-     * @throws TypeError If $promise is not an instance of \Amp\Future, \Generator or \React\Promise\PromiseInterface.
      */
     public static function timeoutWithDefault($promise, int $timeout, $default = null): mixed
     {

@@ -147,7 +147,7 @@ class OutgoingMessage extends Message
      * @param string                  $type        Constructor type
      * @param boolean                 $method      Is this a method?
      * @param boolean                 $unencrypted Is this an unencrypted message?
-     * @param ?DeferredFuture         $deferred    Response deferred
+     * @param null|DeferredFuture         $deferred    Response deferred
      */
     public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null)
     {
@@ -384,7 +384,7 @@ class OutgoingMessage extends Message
     /**
      * Set queue ID.
      *
-     * @param ?string $queueId Queue ID.
+     * @param null|string $queueId Queue ID.
      */
     public function setQueueId(?string $queueId): self
     {
@@ -515,7 +515,7 @@ class OutgoingMessage extends Message
     /**
      * Set custom flood wait limit for this bot.
      *
-     * @param ?int $floodWaitLimit Custom flood wait limit for this bot
+     * @param null|int $floodWaitLimit Custom flood wait limit for this bot
      */
     public function setFloodWaitLimit(?int $floodWaitLimit): self
     {

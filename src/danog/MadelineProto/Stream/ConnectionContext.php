@@ -300,7 +300,7 @@ final class ConnectionContext
      *
      * @return array
      */
-    public function getInputClientProxy(): ?array
+    public function getInputClientProxy(): array|null
     {
         foreach ($this->nextStreams as $couple) {
             [$streamName, $extra] = $couple;

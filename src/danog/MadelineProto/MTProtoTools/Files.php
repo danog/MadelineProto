@@ -302,7 +302,7 @@ trait Files
              *
              * @param integer  $size     Total file size
              * @param integer  $partSize Part size
-             * @param ?callable $cb       Callback
+             * @param null|callable $cb       Callback
              */
             public function __construct(int $size, int $partSize, ?callable $cb)
             {
@@ -503,9 +503,8 @@ trait Files
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
-     * @return ?array
      */
-    public static function extractBotAPIFile(array $info): ?array
+    public static function extractBotAPIFile(array $info): array|null
     {
         /** @psalm-suppress UndefinedConstant */
         foreach (TYPES as $type) {
@@ -955,7 +954,7 @@ trait Files
      * @param array    $messageMedia  File object
      * @param bool     $cdn           Whether this is a CDN file
      * @param int      $datacenter    DC ID
-     * @param ?int     $old_dc       Previous DC ID
+     * @param null|int     $old_dc       Previous DC ID
      * @param IGE      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
      * @param array    $offset        Offset

@@ -86,6 +86,7 @@ final class Exception extends \Exception
         if (\error_reporting() === 0
             || \strpos($errstr, 'headers already sent')
             || \strpos($errstr, 'Creation of dynamic property') !== false
+            || \strpos($errstr, 'Legacy nullable type detected') !== false
             || $errfileReplaced && (
                 \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
                 || \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false

@@ -89,7 +89,7 @@ final class CombinedUpdatesState
      * Are we currently busy?
      *
      * @param int   $channel Channel to get info about
-     * @param ?bool $set     Busy flag to set before returning
+     * @param null|bool $set     Busy flag to set before returning
      */
     public function syncLoading(int $channel, ?bool $set = null): bool
     {

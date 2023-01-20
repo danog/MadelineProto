@@ -161,7 +161,7 @@ trait UpdateHandler
     /**
      * Load channel state.
      *
-     * @param ?int  $channelId Channel ID
+     * @param null|int  $channelId Channel ID
      * @param array $init      Init
      * @internal
      * @return UpdatesState|array<UpdatesState>
