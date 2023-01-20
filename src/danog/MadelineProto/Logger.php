@@ -240,22 +240,24 @@ final class Logger
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
 
         $this->mode = $settings->getType();
-        $this->optional = $settings->getExtra();
         $this->level = $settings->getLevel();
+
+        $optional = $settings->getExtra();
 
         $maxSize = $settings->getMaxSize();
 
         if ($this->mode === self::FILE_LOGGER) {
-            if (!$this->optional || !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
-                $this->optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
+            if (!$optional || !\file_exists(\pathinfo($optional, PATHINFO_DIRNAME))) {
+                $optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
             }
-            if (!\str_ends_with($this->optional, '.log')) {
-                $this->optional .= '.log';
+            if (!\str_ends_with($optional, '.log')) {
+                $optional .= '.log';
             }
-            if ($maxSize !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $maxSize) {
-                \file_put_contents($this->optional, '');
+            if ($maxSize !== -1 && \file_exists($optional) && \filesize($optional) > $maxSize) {
+                \file_put_contents($optional, '');
             }
         }
+        $this->optional = $optional;
         $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
         $this->colors[self::VERBOSE] = \implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
         $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
