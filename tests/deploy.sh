@@ -13,6 +13,7 @@ echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"
 
 gh release edit --prerelease=false "$TAG"
+gh release edit --latest=true "$TAG"
 
 if [ "$DEPLOY_KEY" != "" ]; then
     mkdir -p $HOME/.ssh
