@@ -81,7 +81,7 @@ echo '{
         },
         {
             "type": "vcs",
-            "url": "https://github.com/danog/dns"
+            "url": "git@github.com:danog/dns"
         }
     ]
 }' > composer.json
