@@ -390,10 +390,16 @@ trait UpdateHandler
                 && \in_array($update['message']['action']['_'], ['messageActionChatEditTitle', 'messageActionChatEditPhoto', 'messageActionChatDeletePhoto', 'messageActionChatMigrateTo', 'messageActionChannelMigrateFrom', 'messageActionGroupCall'])
             )
         ) {
-            if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
-                $this->refreshFullPeerCache($update);
-            } else {
-                $this->refreshPeerCache($update);
+            try {
+                if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
+                    $this->refreshFullPeerCache($update);
+                } else {
+                    $this->refreshPeerCache($update);
+                }
+            } catch (RPCErrorException $e) {
+                if ($e->rpc !== 'CHANNEL_PRIVATE') {
+                    throw $e;
+                }
             }
         }
         if ($update['_'] === 'updateDcOptions') {
