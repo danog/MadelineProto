@@ -63,7 +63,8 @@ cd phar
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "'$COMPOSER_TAG'"
+        "danog/madelineproto": "'$COMPOSER_TAG'",
+        "amphp/dns": "^2.0.1"
     },
     "minimum-stability": "dev",
     "authors": [
@@ -77,6 +78,10 @@ echo '{
             "type": "path",
             "url": "'$madelinePath'",
             "options": {"symlink": false}
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danog/dns"
         }
     ]
 }' > composer.json
