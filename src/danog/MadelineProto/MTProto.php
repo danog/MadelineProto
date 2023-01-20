@@ -1002,12 +1002,10 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function cleanupProperties(): void
     {
-        if (!isset($this->datacenter)) {
-            $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
-        }
-        if (!isset($this->snitch)) {
-            $this->snitch = new Snitch;
-        }
+        $this->channels_state ??= new CombinedUpdatesState;
+        $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
+        $this->snitch ??= new Snitch;
+
         $db = [];
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
