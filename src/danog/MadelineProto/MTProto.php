@@ -1414,7 +1414,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
 
         // Setup logger
-        if ($this->settings->getLogger()->hasChanged() || !$this->logger) {
+        if ($this->settings->getLogger()->hasChanged() || !isset($this->logger)) {
             $this->setupLogger();
         }
     }

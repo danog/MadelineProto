@@ -12,8 +12,6 @@ echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"
 
-git remote add hub https://github.com/danog/MadelineProto
-
 gh release edit --prerelease=false "$TAG"
 
 if [ "$DEPLOY_KEY" != "" ]; then
@@ -33,7 +31,7 @@ git clone git@github.com:danog/MadelineProtoPhar.git
 cd MadelineProtoPhar
 
 cp "$input/tools/phar.php" .
-for php in 71 72 73 74 80 81; do
+for php in 81; do
     echo -n "$COMMIT-$php" > release$php
 done
 
