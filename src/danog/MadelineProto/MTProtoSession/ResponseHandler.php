@@ -160,7 +160,10 @@ trait ResponseHandler
             $this->writer->resume();
         }
     }
-    public function handleReject(OutgoingMessage $message, Throwable $data): void
+    /**
+     * @param callable(): \Throwable $data
+     */
+    private function handleReject(OutgoingMessage $message, callable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
         $message->reply($data);
@@ -195,7 +198,7 @@ trait ResponseHandler
             try {
                 $exception = $this->handleRpcError($request, $response);
             } catch (Throwable $e) {
-                $exception = $e;
+                $exception = fn () => $e;
             }
             if ($exception) {
                 $this->handleReject($request, $exception);
@@ -226,7 +229,7 @@ trait ResponseHandler
                     });
                     return;
             }
-            $this->handleReject($request, new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
             return;
         }
 
@@ -258,13 +261,16 @@ trait ResponseHandler
             $request->reply($response);
         }
     }
-    private function handleRpcError(OutgoingMessage $request, array $response): ?Throwable
+    /**
+     * @return (callable(): Throwable)|null
+     */
+    private function handleRpcError(OutgoingMessage $request, array $response): ?callable
     {
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
         if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
-            return new PTSException($response['error_message']);
+            return fn () => new PTSException($response['error_message']);
         }
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
@@ -292,7 +298,7 @@ trait ResponseHandler
                     EventLoop::delay(1.0, fn () => $this->methodRecall(['message_id' => $request->getMsgId()]));
                     return null;
                 }
-                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
                 $this->API->datacenter->currentDatacenter = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($request->isFileRelated() && $this->API->datacenter->has(-$datacenter)) {
@@ -302,7 +308,6 @@ trait ResponseHandler
                     $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->currentDatacenter);
                 }
                 EventLoop::defer(fn () => $this->methodRecall(['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]));
-                //$this->API->methodRecall(['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
                 return null;
             case 401:
                 switch ($response['error_message']) {
@@ -320,14 +325,14 @@ trait ResponseHandler
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                         }
-                        throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                        return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
                             async(function () use ($request, $response): void {
                                 $this->API->initAuthorization();
-                                $this->handleReject($request, new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                                $this->handleReject($request, fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             });
                             return null;
                         }
@@ -344,7 +349,7 @@ trait ResponseHandler
                             $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
-                            throw new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                            return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
                         async(function () use ($request): void {
                             $this->API->initAuthorization();
@@ -360,7 +365,7 @@ trait ResponseHandler
                         });
                         return null;
                 }
-                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 420:
                 $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->getFloodWaitLimit() ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -376,7 +381,7 @@ trait ResponseHandler
                 }
                 // no break
             default:
-                return new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }
     }
 }

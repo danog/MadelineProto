@@ -189,8 +189,9 @@ trait Files
                 $writePromise->await();
             }
             async(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
-                $readFuture = $writePromise->await()->f;
-                $resPromises[] = $readFuture;
+                $readFuture = $writePromise->await();
+                $d = new DeferredFuture;
+                $resPromises[] = $d->getFuture();
                 try {
                     // Wrote chunk!
                     if (!$readFuture->await()) {
@@ -198,8 +199,10 @@ trait Files
                     }
                     // Got OK from server for chunk!
                     $cb();
+                    $d->complete();
                 } catch (Throwable $e) {
                     $this->logger("Got exception while uploading: {$e}");
+                    $d->error($e);
                     throw $e;
                 }
             });

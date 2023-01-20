@@ -191,6 +191,8 @@ class OutgoingMessage extends Message
     }
     /**
      * Set reply to message.
+     *
+     * @param mixed|(callable(): Throwable) $result
      */
     public function reply($result): void
     {
@@ -205,9 +207,7 @@ class OutgoingMessage extends Message
             $promise = $this->promise;
             $this->promise = null;
             EventLoop::defer(
-                fn () => $result instanceof Throwable
-                    ? $promise->error($result)
-                    : $promise->complete($result)
+                fn () => $promise->complete($result)
             );
         }
     }

@@ -24,6 +24,8 @@ use Amp\Cancellation;
 use Amp\Future;
 
 /**
+ * @internal
+ *
  * @template T
  */
 final class WrappedFuture
@@ -31,7 +33,7 @@ final class WrappedFuture
     /**
      * @param Future<T> $f
      */
-    public function __construct(public readonly Future $f)
+    public function __construct(private readonly Future $f)
     {
     }
 
@@ -52,6 +54,10 @@ final class WrappedFuture
      */
     public function await(?Cancellation $cancellation = null): mixed
     {
-        return $this->f->await($cancellation);
+        $result = $this->f->await($cancellation);
+        if (\is_callable($result)) {
+            throw $result();
+        }
+        return $result;
     }
 }
