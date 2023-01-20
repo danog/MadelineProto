@@ -61,7 +61,7 @@ cd phar
 
 # Install
 
-echo "$COMPOSER_TOKEN" > ~/.composer/auth.json
+echo "$composer_token" > ~/.composer/auth.json
 
 echo '{
     "name": "danog/madelineprotophar",
