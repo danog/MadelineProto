@@ -47,6 +47,7 @@ final class GarbageCollector
             return;
         }
         self::$started = true;
+        self::getMemoryConsumption();
 
         EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
