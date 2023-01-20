@@ -100,9 +100,9 @@ final class Connection
      */
     private int $httpResCount = 0;
     /**
-     * Date of last chunk received.
+     * Whether we're currently reading an MTProto packet.
      */
-    private float $lastChunk = 0;
+    private bool $reading = false;
     /**
      * Logger instance.
      *
@@ -165,21 +165,15 @@ final class Connection
      */
     public function reading(bool $reading): void
     {
+        $this->reading = $reading;
         $this->shared->reading($reading, $this->id);
     }
     /**
-     * Tell the class that we have read a chunk of data from the socket.
+     * Whether we're currently reading an MTProto packet.
      */
-    public function haveRead(): void
+    public function isReading(): bool
     {
-        $this->lastChunk = \microtime(true);
-    }
-    /**
-     * Get the receive date of the latest chunk of data from the socket.
-     */
-    public function getLastChunk(): float
-    {
-        return $this->lastChunk;
+        return $this->reading;
     }
     /**
      * Indicate a received HTTP response.
@@ -263,7 +257,6 @@ final class Connection
         $this->datacenterId = $this->datacenter . '.' . $this->id;
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
         $this->createSession();
-        $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = ($ctx->getStream());
         $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
         if ($this->needsReconnect) {

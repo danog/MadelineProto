@@ -122,14 +122,6 @@ final class MsgIdHandler
     }
 
     /**
-     * Get readable representation of message ID.
-     */
-    private static function toStringInternal(string $messageId): string
-    {
-        return (string) Tools::unpackSignedLong($messageId);
-    }
-
-    /**
      * Cleanup incoming and outgoing messages.
      */
     public function cleanup(): void
@@ -146,6 +138,6 @@ final class MsgIdHandler
      */
     public static function toString(string $messageId): string
     {
-        return self::toStringInternal($messageId);
+        return (string) Tools::unpackSignedLong($messageId);
     }
 }

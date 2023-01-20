@@ -322,7 +322,8 @@ final class Logger
     /**
      * Truncate logfile.
      */
-    public function truncate(): void {
+    public function truncate(): void
+    {
         if ($this->mode === self::FILE_LOGGER) {
             Assert::true($this->stdout instanceof WritableResourceStream);
             \ftruncate($this->stdout->getResource(), 0);

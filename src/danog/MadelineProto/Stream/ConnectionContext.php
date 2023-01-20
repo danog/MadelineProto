@@ -99,12 +99,6 @@ final class ConnectionContext
      */
     private int $key = 0;
     /**
-     * Read callback.
-     *
-     * @var callable
-     */
-    private $readCallback;
-    /**
      * Set the socket context.
      */
     public function setSocketContext(ConnectContext $socketContext): self
@@ -266,29 +260,6 @@ final class ConnectionContext
         $this->nextStreams[] = [$streamName, $extra];
         $this->key = \count($this->nextStreams) - 1;
         return $this;
-    }
-    /**
-     * Set read callback, called every time the socket reads at least a byte.
-     *
-     * @param callable $callable Read callback
-     */
-    public function setReadCallback(callable $callable): void
-    {
-        $this->readCallback = $callable;
-    }
-    /**
-     * Check if a read callback is present.
-     */
-    public function hasReadCallback(): bool
-    {
-        return $this->readCallback !== null;
-    }
-    /**
-     * Get read callback.
-     */
-    public function getReadCallback(): callable
-    {
-        return $this->readCallback;
     }
     /**
      * Get the current stream name from the stream chain.

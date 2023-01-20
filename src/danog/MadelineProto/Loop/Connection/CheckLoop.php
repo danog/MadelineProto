@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Throwable;
 
 use function Amp\async;
@@ -62,7 +63,6 @@ final class CheckLoop extends ResumableSignalLoop
                 continue;
             }
             $last_msgid = $connection->msgIdHandler->getMaxId(true);
-            $last_chunk = $connection->getLastChunk();
             if ($shared->hasTempAuthKey()) {
                 $full_message_ids = $connection->getPendingCalls();
                 foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
@@ -72,7 +72,7 @@ final class CheckLoop extends ResumableSignalLoop
                         foreach (\str_split($result['info']) as $key => $chr) {
                             $message_id = $message_ids[$key];
                             if (!isset($connection->outgoing_messages[$message_id])) {
-                                $API->logger->logger('Already got response for and forgot about message ID '.$message_id);
+                                $API->logger->logger('Already got response for and forgot about message ID '.MsgIdHandler::toString($message_id));
                                 continue;
                             }
                             if (!isset($connection->new_outgoing[$message_id])) {
@@ -149,9 +149,8 @@ final class CheckLoop extends ResumableSignalLoop
             if ($this->waitSignal(async($this->pause(...), $timeoutMs))) {
                 return;
             }
-            if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
+            if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && !$connection->isReading()) {
                 $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
-                //$this->exitedLoop();
                 async($connection->reconnect(...));
                 return;
             }

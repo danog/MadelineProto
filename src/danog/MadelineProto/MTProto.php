@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\ByteStream\WritableResourceStream;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
