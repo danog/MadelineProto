@@ -967,7 +967,7 @@ final class TL
             }
             $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'random_bytes') {
-                if (\strlen($x[$arg['name']]) < 15) {
+                if (\strlen((string) $x[$arg['name']]) < 15) {
                     throw new SecurityException(Lang::$current_lang['rand_bytes_too_small']);
                 }
                 unset($x[$arg['name']]);

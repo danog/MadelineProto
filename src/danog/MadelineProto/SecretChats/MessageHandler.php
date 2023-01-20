@@ -100,6 +100,7 @@ trait MessageHandler
             $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
             return false;
         }
+        $message['message']['bytes'] = (string) $message['message']['bytes'];
         $auth_key_id = \substr($message['message']['bytes'], 0, 8);
         $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
