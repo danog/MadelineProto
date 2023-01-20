@@ -61,7 +61,7 @@ cd phar
 
 # Install
 
-echo '{"github-oauth": {"github.com": "'$composer_token'"}}' > ~/.composer/auth.json
+echo '{"github-oauth": {"github.com": "'$GITHUB_TOKEN'"}}' > ~/.composer/auth.json
 
 echo '{
     "name": "danog/madelineprotophar",
