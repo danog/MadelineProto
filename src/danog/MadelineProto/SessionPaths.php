@@ -161,7 +161,8 @@ final class SessionPaths
             $file = openFile($path, 'rb');
             try {
                 touch($path); // Invalidate size cache
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
             $size = getStatus($path);
             $size = $size['size'] ?? $headerLen;
 

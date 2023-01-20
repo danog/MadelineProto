@@ -67,7 +67,9 @@ final class TLConstructors
                         $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                     }
                 } elseif (!isset($chosenid)) {
-                    $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    if (isset($this->by_predicate_and_layer[$predicate.$alayer])) {
+                        $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    }
                 }
             }
             if (!isset($chosenid)) {

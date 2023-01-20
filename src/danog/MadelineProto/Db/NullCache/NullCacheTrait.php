@@ -21,7 +21,7 @@ trait NullCacheTrait
         return false;
     }
 
-    protected function getCache(string $key)
+    protected function getCache(string $key): void
     {
         throw new RuntimeException('Not implemented!');
     }

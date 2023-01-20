@@ -18,9 +18,11 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Settings;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /*
  * Various ways to load MadelineProto
@@ -36,12 +38,7 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
 
 class SecretHandler extends EventHandler
 {
-    private $sent = [-440592694 => true];
-    public function __construct(?APIWrapper $API)
-    {
-        parent::__construct($API);
-        $this->sent = [];
-    }
+    private array $sent = [];
     /**
      * @var int|string Username or ID of bot admin
      */
@@ -60,13 +57,13 @@ class SecretHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewMessage(array $update): Generator
+    public function onUpdateNewMessage(array $update): void
     {
         if ($update['message']['message'] === 'request') {
-            yield $this->requestSecretChat($update);
+            $this->requestSecretChat($update);
         }
         if ($update['message']['message'] === 'ping') {
-            yield $this->messages->sendMessage(['message' => 'lmao', 'peer' => $update]);
+            $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
         }
     }
     /**
@@ -74,10 +71,10 @@ class SecretHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewEncryptedMessage(array $update): Generator
+    public function onUpdateNewEncryptedMessage(array $update): void
     {
         if (isset($update['message']['decrypted_message']['media'])) {
-            $this->logger(yield $this->downloadToDir($update, '.'));
+            $this->logger($this->downloadToDir($update, '.'));
         }
         if (isset($this->sent[$update['message']['chat_id']])) {
             return;
@@ -107,16 +104,17 @@ class SecretHandler extends EventHandler
 
         $secret_media['voice'] = ['peer' => $update, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
+        $promises = [];
         foreach ($secret_media as $type => $smessage) {
-            $promises = $this->messages->sendEncryptedFile($smessage);
+            $promises []= async($this->messages->sendEncryptedFile(...), $smessage);
         }
-        yield $promises;
+        await($promises);
 
         $i = 0;
         while ($i < 10) {
             $this->logger("SENDING MESSAGE $i TO ".$update['message']['chat_id']);
             // You can also use the sendEncrypted parameter for more options in secret chats
-            yield $this->messages->sendMessage(['peer' => $update, 'message' => (string) ($i++)]);
+            $this->messages->sendMessage(['peer' => $update, 'message' => (string) ($i++)]);
         }
         $this->sent[$update['message']['chat_id']] = true;
     }
