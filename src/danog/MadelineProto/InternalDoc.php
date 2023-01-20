@@ -7765,11 +7765,10 @@ class InternalDoc extends APIFactory
     /**
      * Unset event handler.
      *
-     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
      */
-    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    public function unsetEventHandler(): void
     {
-        $this->__call(__FUNCTION__, [$disableUpdateHandling]);
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Update the 2FA password.

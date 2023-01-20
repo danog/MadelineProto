@@ -101,9 +101,8 @@ trait Events
     /**
      * Unset event handler.
      *
-     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
      */
-    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    public function unsetEventHandler(): void
     {
         $this->event_handler = null;
         $this->event_handler_instance = null;

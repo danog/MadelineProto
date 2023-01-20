@@ -106,6 +106,8 @@ final class WebRunner extends RunnerAbstract
 
         $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
 
+        Logger::log("Sending payload: $payload");
+
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
         \fwrite($res, $payload);
