@@ -43,7 +43,7 @@ trait Events
     /**
      * Event handler instance.
      *
-     * Can't make it strictly typed or else the IPC server may file without access to the instance.
+     * Can't make it strictly typed or else the IPC server may fail without access to the instance.
      *
      * @psalm-var ?EventHandler
      */

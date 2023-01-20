@@ -102,12 +102,12 @@ use Webmozart\Assert\Assert;
         $runnerId = MADELINE_WORKER_ARGS[1];
         Assert::numeric($runnerId);
         $runnerId = (int) $runnerId;
-        $session = new SessionPaths($session);
 
         try {
             Magic::start();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
+            $session = new SessionPaths($session);
             $API = new API((string) $session, (new Ipc)->setSlow(true));
             $API->initSelfRestart();
             $session->storeIpcState(new IpcState($runnerId));
