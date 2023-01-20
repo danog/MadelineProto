@@ -75,13 +75,13 @@ class OutgoingMessage extends Message
     /**
      * Resolution deferred.
      */
-    private ?DeferredFuture $promise = null;
+    private ?DeferredFuture $resultDeferred = null;
     /**
      * Send deferred.
      *
      * @var ?DeferredFuture<null>
      */
-    private ?DeferredFuture $sendPromise = null;
+    private ?DeferredFuture $sendDeferred = null;
 
     /**
      * Whether this is an unencrypted message.
@@ -157,7 +157,7 @@ class OutgoingMessage extends Message
         $this->method = $method;
         $this->unencrypted = $unencrypted;
         if ($deferred) {
-            $this->promise = $deferred;
+            $this->resultDeferred = $deferred;
         }
 
         $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$constructor]);
@@ -168,8 +168,8 @@ class OutgoingMessage extends Message
      */
     public function trySend(): void
     {
-        if (!isset($this->sendPromise)) {
-            $this->sendPromise = new DeferredFuture;
+        if (!isset($this->sendDeferred)) {
+            $this->sendDeferred = new DeferredFuture;
         }
         $this->tries++;
     }
@@ -183,10 +183,10 @@ class OutgoingMessage extends Message
         }
         $this->state |= self::STATE_SENT;
         $this->sent = \time();
-        if (isset($this->sendPromise)) {
-            $sendPromise = $this->sendPromise;
-            $this->sendPromise = null;
-            $sendPromise->complete();
+        if (isset($this->sendDeferred)) {
+            $sendDeferred = $this->sendDeferred;
+            $this->sendDeferred = null;
+            $sendDeferred->complete();
         }
     }
     /**
@@ -203,9 +203,9 @@ class OutgoingMessage extends Message
         $this->body = null;
 
         $this->state |= self::STATE_REPLIED;
-        if ($this->promise) { // Sometimes can get an RPC error for constructors
-            $promise = $this->promise;
-            $this->promise = null;
+        if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors
+            $promise = $this->resultDeferred;
+            $this->resultDeferred = null;
             EventLoop::defer(
                 fn () => $promise->complete($result)
             );
@@ -440,10 +440,10 @@ class OutgoingMessage extends Message
      */
     public function getSendPromise(): Future
     {
-        if (!$this->sendPromise) {
+        if (!$this->sendDeferred) {
             throw new Exception("Message was already sent, can't get send promise!");
         }
-        return $this->sendPromise->getFuture();
+        return $this->sendDeferred->getFuture();
     }
 
     /**
@@ -451,7 +451,7 @@ class OutgoingMessage extends Message
      */
     public function hasPromise(): bool
     {
-        return $this->promise !== null;
+        return $this->resultDeferred !== null;
     }
 
     /**

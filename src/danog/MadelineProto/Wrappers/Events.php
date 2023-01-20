@@ -43,8 +43,11 @@ trait Events
     /**
      * Event handler instance.
      *
+     * Can't make it strictly typed or else the IPC server may file without access to the instance.
+     *
+     * @psalm-var ?EventHandler
      */
-    private ?EventHandler $event_handler_instance = null;
+    private $event_handler_instance = null;
     /**
      * Event handler method list.
      *
