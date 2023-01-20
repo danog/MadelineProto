@@ -337,6 +337,7 @@ final class Magic
                 }
             }
         }
+        GarbageCollector::start();
         self::$inited = true;
     }
     /**

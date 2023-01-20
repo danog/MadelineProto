@@ -685,7 +685,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->v = self::V;
 
         $this->settings->applyChanges();
-        GarbageCollector::start();
     }
     /**
      * Set API wrapper needed for triggering serialization functions.
@@ -1268,8 +1267,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->updaters[UpdateLoop::GENERIC]->resume();
         }
         $this->updaters[UpdateLoop::GENERIC]->start();
-
-        GarbageCollector::start();
 
         $deferred->complete();
     }

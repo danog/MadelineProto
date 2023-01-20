@@ -24,7 +24,7 @@ final class GarbageCollector
      * Ensure only one instance of GarbageCollector
      *      when multiple instances of MadelineProto running.
      */
-    public static bool $lock = false;
+    private static bool $started = false;
 
     /**
      * Next cleanup will be triggered when memory consumption will increase by this amount.
@@ -43,10 +43,10 @@ final class GarbageCollector
 
     public static function start(): void
     {
-        if (self::$lock) {
+        if (self::$started) {
             return;
         }
-        self::$lock = true;
+        self::$started = true;
 
         EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
