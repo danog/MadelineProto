@@ -60,6 +60,9 @@ mkdir phar
 cd phar
 
 # Install
+
+echo "$COMPOSER_TOKEN" > ~/.composer/auth.json
+
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
