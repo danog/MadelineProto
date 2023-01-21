@@ -32,6 +32,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
+use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 use Throwable;
@@ -163,6 +164,7 @@ class Server extends SignalLoop
      */
     final public function shutdown(): void
     {
+        Shutdown::removeCallback('restarter');
         $this->signal(null);
         if (self::$shutdownDeferred) {
             self::$shutdownNow = true;

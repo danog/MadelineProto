@@ -163,7 +163,7 @@ trait UpdateHandler
             'offset' => $offset,
             'limit' => $limit,
             'timeout' => $timeout
-        ] = ['offset' => 0, 'limit' => null, 'timeout' => INF] + $params;
+        ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
 
         if (!$this->updates) {
             try {

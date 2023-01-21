@@ -1211,15 +1211,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->initPromise?->await();
     }
     /**
-     * Restart IPC server instance.
-     *
-     * @internal
-     */
-    public function restartIpcServer(): void
-    {
-        // Can only be called from client
-    }
-    /**
      * Whether we're an IPC client instance.
      */
     public function isIpc(): bool

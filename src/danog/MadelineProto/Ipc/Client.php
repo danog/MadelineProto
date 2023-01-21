@@ -119,15 +119,6 @@ final class Client extends ClientAbstract
         $this->server->send(Server::SHUTDOWN);
     }
     /**
-     * Restart IPC server instance.
-     *
-     * @internal
-     */
-    public function restartIpcServer(): void
-    {
-        $this->server->send(Server::SHUTDOWN);
-    }
-    /**
      * Whether we're an IPC client instance.
      */
     public function isIpc(): bool
