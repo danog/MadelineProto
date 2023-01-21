@@ -68,7 +68,7 @@
         "bamarni/composer-bin-plugin": "1.5.0",
         "roave/security-advisories": "dev-latest",
         "symfony/yaml": "^6.0",
-        "amphp/http-server": "v3.x-dev",
+        "amphp/http-server": "^3",
         "dg/bypass-finals": "dev-master"
     },
     "suggest": {

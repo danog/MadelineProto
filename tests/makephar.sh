@@ -66,8 +66,7 @@ echo '{"github-oauth": {"github.com": "'$GITHUB_TOKEN'"}}' > ~/.composer/auth.js
 echo '{
     "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "'$COMPOSER_TAG'",
-        "amphp/dns": "^2.0.1"
+        "danog/madelineproto": "'$COMPOSER_TAG'"
     },
     "minimum-stability": "dev",
     "authors": [
@@ -81,10 +80,6 @@ echo '{
             "type": "path",
             "url": "'$madelinePath'",
             "options": {"symlink": false}
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/danog/dns"
         }
     ]
 }' > composer.json
