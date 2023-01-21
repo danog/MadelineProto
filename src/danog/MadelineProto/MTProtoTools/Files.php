@@ -80,7 +80,7 @@ trait Files
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
         $mime = \trim(\explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
-        $size = $response->getHeader('content-length') ?? $size;
+        $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
         if (!$size) {
             $this->logger->logger("No content length for {$url}, caching first");

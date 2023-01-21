@@ -264,21 +264,11 @@ final class Connection
         }
         $this->httpReqCount = 0;
         $this->httpResCount = 0;
-        if (!isset($this->writer)) {
-            $this->writer = new WriteLoop($this);
-        }
-        if (!isset($this->reader)) {
-            $this->reader = new ReadLoop($this);
-        }
-        if (!isset($this->checker)) {
-            $this->checker = new CheckLoop($this);
-        }
-        if (!isset($this->cleanup)) {
-            $this->cleanup = new CleanupLoop($this);
-        }
-        if (!isset($this->waiter)) {
-            $this->waiter = new HttpWaitLoop($this);
-        }
+        $this->writer ??= new WriteLoop($this);
+        $this->reader ??= new ReadLoop($this);
+        $this->checker ??= new CheckLoop($this);
+        $this->cleanup ??= new CleanupLoop($this);
+        $this->waiter ??= new HttpWaitLoop($this);
         if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN()) {
             $this->pinger = new PingLoop($this);
         }
