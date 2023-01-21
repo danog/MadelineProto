@@ -61,7 +61,7 @@ final class ReadLoop extends SignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                async(function () use ($API, $connection, $datacenter, $e): void {
+                EventLoop::queue(function () use ($API, $connection, $datacenter, $e): void {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();
@@ -74,7 +74,7 @@ final class ReadLoop extends SignalLoop
                 throw $e;
             }
             if (\is_int($error)) {
-                async(function () use ($error, $shared, $connection, $datacenter, $API): void {
+                EventLoop::queue(function () use ($error, $shared, $connection, $datacenter, $API): void {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
@@ -107,9 +107,9 @@ final class ReadLoop extends SignalLoop
             }
             $connection->httpReceived();
             if ($shared->isHttp()) {
-                EventLoop::defer($connection->pingHttpWaiter(...));
+                EventLoop::queue($connection->pingHttpWaiter(...));
             }
-            EventLoop::defer($connection->handleMessages(...));
+            EventLoop::queue($connection->handleMessages(...));
         }
     }
     public function readMessage(): ?int

@@ -28,6 +28,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 
 use const FILTER_VALIDATE_URL;
 use const SEEK_END;
@@ -192,7 +193,7 @@ trait FilesLogic
         $body = null;
         if ($result->shouldServe()) {
             $pipe = new Pipe(1024 * 1024);
-            async($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
+            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
             $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
             $body = $result->getCodeExplanation();

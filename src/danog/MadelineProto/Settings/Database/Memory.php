@@ -11,34 +11,4 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
  */
 final class Memory extends DatabaseAbstract
 {
-    /**
-     * Whether to cleanup the memory before serializing.
-     */
-    protected bool $cleanup = false;
-
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['serialization']['cleanup_before_serialization'])) {
-            $this->setCleanup($settings['serialization']['cleanup_before_serialization']);
-        }
-    }
-    /**
-     * Get whether to cleanup the memory before serializing.
-     */
-    public function getCleanup(): bool
-    {
-        return $this->cleanup;
-    }
-
-    /**
-     * Set whether to cleanup the memory before serializing.
-     *
-     * @param bool $cleanup Whether to cleanup the memory before serializing.
-     */
-    public function setCleanup(bool $cleanup): self
-    {
-        $this->cleanup = $cleanup;
-
-        return $this;
-    }
 }

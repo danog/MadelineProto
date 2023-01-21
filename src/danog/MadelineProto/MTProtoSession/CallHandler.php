@@ -26,6 +26,7 @@ use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
+use Revolt\EventLoop;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -61,7 +62,7 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
-                    async(function () use ($datacenter, $message): void {
+                    EventLoop::queue(function () use ($datacenter, $message): void {
                         $this->API->datacenter->waitGetConnection($datacenter)
                             ->sendMessage($message, false);
                     });
@@ -71,7 +72,7 @@ trait CallHandler
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
-                    async($this->sendMessage(...), $message, false);
+                    EventLoop::queue($this->sendMessage(...), $message, false);
                 }
             } else {
                 $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));

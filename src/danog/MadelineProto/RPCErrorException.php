@@ -22,12 +22,12 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_EOL;
 
 use const PHP_SAPI;
-use function Amp\async;
 
 /**
  * Indicates an error returned by Telegram's API.
@@ -53,7 +53,7 @@ final class RPCErrorException extends \Exception
         $error = \preg_replace('/\\d+$/', 'X', $error);
         $description = self::$descriptions[$error] ?? '';
         if (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error])) {
-            async(function () use ($method, $code, $error): void {
+            EventLoop::queue(function () use ($method, $code, $error): void {
                 try {
                     $res = \json_decode(
                         (
@@ -67,7 +67,7 @@ final class RPCErrorException extends \Exception
                         RPCErrorException::$descriptions[$error] = $description;
                         RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
                     }
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                 }
             });
         }

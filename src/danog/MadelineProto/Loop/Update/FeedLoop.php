@@ -100,7 +100,6 @@ final class FeedLoop extends ResumableSignalLoop
                     $API->saveUpdate($update);
                 }
                 $parsedUpdates = null;
-                $this->API->signalUpdate();
             }
             if ($this->waitForAuthOrSignal()) {
                 return;

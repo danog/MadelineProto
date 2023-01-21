@@ -26,7 +26,6 @@ use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
 
-use function Amp\async;
 use function Amp\delay;
 use function Amp\File\openFile;
 
@@ -285,7 +284,7 @@ final class VoIP
 
     public function __destruct()
     {
-        async($this->discard(...), ['_' => 'phoneCallDiscardReasonDisconnect']);
+        EventLoop::queue($this->discard(...), ['_' => 'phoneCallDiscardReasonDisconnect']);
     }
     /**
      * Accept call.
@@ -321,7 +320,7 @@ final class VoIP
                 $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
             }
         });
-        async(function (): void {
+        EventLoop::queue(function (): void {
             $this->authKey = new PermAuthKey();
             $this->authKey->setAuthKey($this->configuration['auth_key']);
 
@@ -338,10 +337,10 @@ final class VoIP
             }
             foreach ($this->sockets as $socket) {
                 $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
-                async(function () use ($socket): void {
+                EventLoop::queue(function () use ($socket): void {
                     while ($payload = $this->recv_message($socket)) {
                         $this->lastIncomingTimestamp = \microtime(true);
-                        async($this->handlePacket(...), $socket, $payload);
+                        EventLoop::queue($this->handlePacket(...), $socket, $payload);
                     }
                     Logger::log("Exiting VoIP read loop in $this!");
                 });

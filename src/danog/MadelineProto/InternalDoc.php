@@ -6509,9 +6509,9 @@ class InternalDoc extends APIFactory
      * @param boolean $need_debug Need debug?
      */
     public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true): void
+    ], bool $need_debug = true)
     {
-        $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug]);
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug]);
     }
     /**
      * Discard secret chat.
@@ -6645,6 +6645,13 @@ class InternalDoc extends APIFactory
      * Extract a message constructor from an Updates constructor.
      */
     public function extractMessage(array $updates)
+    {
+        return $this->__call(__FUNCTION__, [$updates]);
+    }
+    /**
+     * Extract a message ID from an Updates constructor.
+     */
+    public function extractMessageId(array $updates)
     {
         return $this->__call(__FUNCTION__, [$updates]);
     }
@@ -7074,6 +7081,16 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, []);
     }
     /**
+     * Get updates.
+     *
+     * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     */
+    public function getUpdates(array $params = [
+    ])
+    {
+        return $this->__call(__FUNCTION__, [$params]);
+    }
+    /**
      * Accesses a private variable from an object.
      *
      * @param object $obj Object
@@ -7240,13 +7257,6 @@ class InternalDoc extends APIFactory
     public function loop(?callable $callback = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$callback, $extra]);
-    }
-    /**
-     * Start MadelineProto's update handling loop in background.
-     */
-    public function loopFork()
-    {
-        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Escape string for markdown.
@@ -7519,15 +7529,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$chat]);
     }
     /**
-     * Set update handling callback.
-     *
-     * @param callable $callback Callback
-     */
-    public function setCallback(callable $callback): void
-    {
-        $this->__call(__FUNCTION__, [$callback]);
-    }
-    /**
      * Set NOOP update handler, ignoring all updates.
      */
     public function setNoop(): void
@@ -7568,11 +7569,11 @@ class InternalDoc extends APIFactory
     /**
      * Set webhook update handler.
      *
-     * @param string $hook_url Webhook URL
+     * @param string $webhookUrl Webhook URL
      */
-    public function setWebhook(string $hook_url): void
+    public function setWebhook(string $webhookUrl): void
     {
-        $this->__call(__FUNCTION__, [$hook_url]);
+        $this->__call(__FUNCTION__, [$webhookUrl]);
     }
     /**
      * Setup logger.

@@ -34,8 +34,8 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use JsonSerializable;
+use Revolt\EventLoop;
 
-use function Amp\async;
 use function count;
 
 /**
@@ -557,7 +557,7 @@ final class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                async($this->getConnection()->sendMessage(...), $message, false);
+                EventLoop::queue($this->getConnection()->sendMessage(...), $message, false);
             }
         }
         $this->flush();

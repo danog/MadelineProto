@@ -24,8 +24,7 @@ use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
-
-use function Amp\async;
+use danog\MadelineProto\UpdateHandlerType;
 
 /**
  * Event handler.
@@ -97,8 +96,12 @@ trait Events
             }
         }
         $this->setReportPeers(Tools::call($this->event_handler_instance->getReportPeers())->await());
-        async($this->event_handler_instance->startInternal(...));
-        $this->updateHandler = [$this, 'eventUpdateHandler'];
+        Tools::call($this->event_handler_instance->startInternal())->await();
+
+        $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
+        \array_map($this->handleUpdate(...), $this->updates);
+        $this->updates = [];
+        $this->updates_key = 0;
         $this->startUpdateSystem();
     }
     /**
@@ -125,18 +128,5 @@ trait Events
     public function hasEventHandler(): bool
     {
         return isset($this->event_handler_instance);
-    }
-    /**
-     * Event update handler.
-     *
-     * @param array $update Update
-     * @return void
-     * @internal Internal event handler
-     */
-    public function eventUpdateHandler(array $update)
-    {
-        if (isset($this->eventHandlerMethods[$update['_']])) {
-            return $this->eventHandlerMethods[$update['_']]($update);
-        }
     }
 }

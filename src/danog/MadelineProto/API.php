@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
+use Amp\Future\UnhandledFutureError;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
 use Amp\TimeoutCancellation;
@@ -32,6 +33,7 @@ use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Throwable;
 
@@ -247,10 +249,10 @@ final class API extends InternalDoc
                         }
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
-                    async($cb);
+                    EventLoop::queue($cb);
                 }
             };
-            async($cb);
+            EventLoop::queue($cb);
             $this->connectToMadelineProto(new SettingsEmpty, true);
             $cancel->error(new Exception('Connected!'));
         }
@@ -403,20 +405,15 @@ final class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
-        $errors = [];
         $started = false;
-        while (true) {
-            try {
-                $this->startAndLoopAsyncInternal($eventHandler, $started);
-                return;
-            } catch (SecurityException|SignalException $e) {
-                throw $e;
-            } catch (Throwable $e) {
-                if ($e instanceof UncaughtThrowable) {
+        $errors = [];
+        EventLoop::setErrorHandler(
+            function (\Throwable $e) use (&$errors, &$started): void {
+                if ($e instanceof UnhandledFutureError) {
                     $e = $e->getPrevious();
-                    if ($e instanceof SecurityException || $e instanceof SignalException) {
-                        throw $e;
-                    }
+                }
+                if ($e instanceof SecurityException || $e instanceof SignalException) {
+                    throw $e;
                 }
                 if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
                     throw $e;
@@ -432,13 +429,14 @@ final class API extends InternalDoc
                 $this->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
-        }
+        );
+        $this->startAndLoopAsync($eventHandler, $started);
     }
     /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
      *
      * @param array<API> $instances Instances of madeline
-     * @param array<string>|string $eventHandler Event handler(s)
+     * @param array<class-string<EventHandler>>|class-string<EventHandler> $eventHandler Event handler(s)
      */
     public static function startAndLoopMulti(array $instances, array|string $eventHandler): void
     {
@@ -449,48 +447,39 @@ final class API extends InternalDoc
         $errors = [];
         $started = \array_fill_keys(\array_keys($instances), false);
         $instanceOne = \array_values($instances)[0];
-        while (true) {
-            try {
-                $promises = [];
-                foreach ($instances as $k => $instance) {
-                    $instance->start();
-                    $promises []= async($instance->startAndLoopAsyncInternal(...), $eventHandler[$k], $started[$k]);
-                }
-                await($promises);
-                return;
-            } catch (SecurityException|SignalException $e) {
-                throw $e;
-            } catch (Throwable $e) {
-                if ($e instanceof UncaughtThrowable) {
+
+        EventLoop::setErrorHandler(
+            function (\Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
+                if ($e instanceof UnhandledFutureError) {
                     $e = $e->getPrevious();
-                    if ($e instanceof SecurityException || $e instanceof SignalException) {
-                        throw $e;
-                    }
+                }
+                if ($e instanceof SecurityException || $e instanceof SignalException) {
+                    throw $e;
+                }
+                if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
+                    throw $e;
                 }
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && \array_sum($started) !== \count($eventHandler)) {
-                    $instanceOne->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
+                if ($errors[$t] > 10 && (!$this->API->isInited() || \array_sum($started) !== \count($eventHandler))) {
+                    $instanceOne->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
-                $instanceOne->logger((string) $e, Logger::FATAL_ERROR);
+                $instanceOne->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $instanceOne->report("Surfaced: $e");
             }
+        );
+
+        $promises = [];
+        foreach ($instances as $k => $instance) {
+            $instance->start();
+            $promises []= async(function () use ($k, $instance, $eventHandler, &$started): void {
+                $instance->startAndLoopAsync($eventHandler[$k], $started[$k]);
+            });
         }
-    }
-    /**
-     * Start MadelineProto and the event handler (enables async).
-     *
-     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-     *
-     * @param string $eventHandler Event handler class name
-     */
-    public function startAndLoopAsync(string $eventHandler)
-    {
-        $started = false;
-        return $this->startAndLoopAsyncInternal($eventHandler, $started);
+        await($promises);
     }
 
     /**
@@ -500,42 +489,17 @@ final class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      */
-    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): void
+    private function startAndLoopAsync(string $eventHandler, bool &$started): void
     {
         $this->start();
         if (!$this->reconnectFull()) {
             return;
         }
 
-        $errors = [];
-        while (true) {
-            try {
-                $this->API->setEventHandler($eventHandler);
-                $started = true;
-                /** @var API $this->API */
-                $this->API->loop();
-                return;
-            } catch (SecurityException|SignalException $e) {
-                throw $e;
-            } catch (Throwable $e) {
-                if ($e instanceof UncaughtThrowable) {
-                    $e = $e->getPrevious();
-                    if ($e instanceof SecurityException || $e instanceof SignalException) {
-                        throw $e;
-                    }
-                }
-                $t = \time();
-                $errors = [$t => $errors[$t] ?? 0];
-                $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->API->isInited() || !$started)) {
-                    $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
-                    return;
-                }
-                echo $e;
-                $this->logger->logger((string) $e, Logger::FATAL_ERROR);
-                $this->report("Surfaced: $e");
-            }
-        }
+        $this->API->setEventHandler($eventHandler);
+        $started = true;
+        /** @var API $this->API */
+        $this->API->loop();
     }
     /**
      * Get attribute.

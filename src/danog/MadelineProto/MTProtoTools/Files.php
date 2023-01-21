@@ -35,6 +35,7 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
@@ -125,8 +126,11 @@ trait Files
             };
         } else {
             $cb = function (float $percent, float $speed, float $time) use ($cb): void {
-                async(function () use ($percent, $speed, $time, $cb): void {
-                    Tools::call($cb($percent, $speed, $time))->await();
+                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+                    $r = $cb($percent, $speed, $time);
+                    if ($r instanceof Generator) {
+                        Tools::consumeGenerator($r);
+                    }
                 });
             };
         }
@@ -165,7 +169,7 @@ trait Files
         $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
             $bytes = $callable($part_num * $part_size, $part_size);
             if ($bytes instanceof Generator) {
-                $bytes = Tools::call($bytes);
+                $bytes = Tools::consumeGenerator($bytes);
             }
             if ($bytes instanceof Future) {
                 $bytes = $bytes->await();
@@ -188,7 +192,7 @@ trait Files
             if (!$seekable) {
                 $writePromise->await();
             }
-            async(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
+            EventLoop::queue(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
                 $readFuture = $writePromise->await();
                 $d = new DeferredFuture;
                 $resPromises[] = $d->getFuture();
@@ -838,8 +842,11 @@ trait Files
             };
         } else {
             $cb = function (float $percent, float $speed, float $time) use ($cb): void {
-                async(function () use ($percent, $speed, $time, $cb): void {
-                    Tools::call($cb($percent, $speed, $time))->await();
+                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+                    $r = $cb($percent, $speed, $time);
+                    if ($r instanceof Generator) {
+                        Tools::consumeGenerator($r);
+                    }
                 });
             };
         }
@@ -1051,7 +1058,7 @@ trait Files
             $len = \strlen($res['bytes']);
             $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
             if ($res instanceof Generator) {
-                $res = Tools::call($res);
+                $res = Tools::consumeGenerator($res);
             }
             if ($res instanceof Future) {
                 $res = $res->await();

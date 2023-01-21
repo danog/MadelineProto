@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
-use Closure;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
@@ -56,16 +55,13 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
-use danog\MadelineProto\Wrappers\Callback;
 use danog\MadelineProto\Wrappers\DialogHandler;
 use danog\MadelineProto\Wrappers\Events;
 use danog\MadelineProto\Wrappers\Login;
 use danog\MadelineProto\Wrappers\Loop;
-use danog\MadelineProto\Wrappers\Noop;
 use danog\MadelineProto\Wrappers\Start;
 use danog\MadelineProto\Wrappers\Templates;
 use danog\MadelineProto\Wrappers\TOS;
-use danog\MadelineProto\Wrappers\Webhook;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -102,11 +98,8 @@ final class MTProto implements TLCallback, LoggerGetter
     use Button;
     use DialogHandler;
     use Events;
-    use Webhook;
-    use Callback;
     use Login;
     use Loop;
-    use Noop;
     use Start;
     use Templates;
     use TOS;
@@ -213,10 +206,6 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * @internal
      */
-    const GETUPDATES_HANDLER = 'getUpdates';
-    /**
-     * @internal
-     */
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['peer_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
     /**
      * @internal
@@ -251,10 +240,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
     /**
-     * @internal
-     */
-    const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 100];
-    /**
      * Array of references to all instances of MTProto.
      *
      * This seems like a recipe for memory leaks, but this is actually required to allow saving the session on shutdown.
@@ -273,11 +258,6 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      */
     public APIWrapper $wrapper;
-    /**
-     * PWRTelegram webhook URL.
-     *
-     */
-    public bool|string $hook_url = false;
     /**
      * Settings object.
      *
@@ -711,7 +691,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function __sleep(): array
     {
-        $res = [
+        return [
             // Databases
             'chats',
             'full_chats',
@@ -735,7 +715,9 @@ final class MTProto implements TLCallback, LoggerGetter
             'event_handler_instance',
             'updates',
             'updates_key',
-            'hook_url',
+            'webhookUrl',
+
+            'updateHandlerType',
 
             // Web login template
             'webTemplate',
@@ -780,10 +762,6 @@ final class MTProto implements TLCallback, LoggerGetter
             'calls',
             'snitch',
         ];
-        if (!$this->updateHandler instanceof Closure) {
-            $res[] = 'updateHandler';
-        }
-        return $res;
     }
 
     private function fillUsernamesCache(): void
@@ -1040,6 +1018,10 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function upgradeMadelineProto(): void
     {
+        if (isset($this->hook_url) && \is_string($this->hook_url)) {
+            $this->webhookUrl = $this->hook_url;
+        }
+
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
             if ($this->authorized === self::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
@@ -1151,12 +1133,6 @@ final class MTProto implements TLCallback, LoggerGetter
         // onStart event handler
         if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
             $this->setEventHandler($this->event_handler);
-        } else {
-            if ($this->updateHandler === [$this, 'eventUpdateHandler']) {
-                $this->setNoop();
-            }
-            $this->event_handler = null;
-            $this->event_handler_instance = null;
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {

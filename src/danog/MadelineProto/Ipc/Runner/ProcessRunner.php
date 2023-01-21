@@ -9,6 +9,7 @@ use Amp\Process\Internal\Posix\Runner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use Error;
+use Revolt\EventLoop;
 use Throwable;
 
 use const ARRAY_FILTER_USE_BOTH;
@@ -18,7 +19,6 @@ use const PHP_BINARY;
 use const PHP_BINDIR;
 use const PHP_OS;
 use const PHP_SAPI;
-use function Amp\async;
 use function Amp\Process\escapeArgument;
 
 final class ProcessRunner extends RunnerAbstract
@@ -108,8 +108,8 @@ final class ProcessRunner extends RunnerAbstract
         $stdout = new ReadableResourceStream($pipes[1]);
         $stderr = new ReadableResourceStream($pipes[2]);
 
-        async(self::readUnref(...), $stdout);
-        async(self::readUnref(...), $stderr);
+        EventLoop::queue(self::readUnref(...), $stdout);
+        EventLoop::queue(self::readUnref(...), $stderr);
         return true;
     }
     /**

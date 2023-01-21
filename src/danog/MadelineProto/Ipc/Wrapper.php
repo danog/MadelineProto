@@ -17,9 +17,9 @@ use danog\MadelineProto\Ipc\Wrapper\SeekableWritableStream;
 use danog\MadelineProto\Ipc\Wrapper\WritableStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
+use Revolt\EventLoop;
 use Throwable;
 
-use function Amp\async;
 use function Amp\Ipc\connect;
 
 /**
@@ -70,7 +70,7 @@ final class Wrapper extends ClientAbstract
         $instance->remoteId = $instance->server->receive();
         $logger->logger("Got ID {$instance->remoteId} from callback IPC server!");
 
-        async($instance->receiverLoop(...));
+        EventLoop::queue($instance->receiverLoop(...));
         return $instance;
     }
     /**
@@ -129,7 +129,7 @@ final class Wrapper extends ClientAbstract
         $payload = null;
         try {
             while ($payload = $this->server->receive()) {
-                async($this->clientRequest(...), $id++, $payload);
+                EventLoop::queue($this->clientRequest(...), $id++, $payload);
             }
         } finally {
             $this->server->disconnect();
@@ -180,7 +180,7 @@ final class Wrapper extends ClientAbstract
     public function unwrap(ChannelledSocket $server)
     {
         $this->server = $server;
-        async($this->loopInternal(...));
+        EventLoop::queue($this->loopInternal(...));
 
         foreach ($this->callbackIds as &$id) {
             if (\is_int($id)) {

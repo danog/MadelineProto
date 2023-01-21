@@ -86,7 +86,7 @@ final class MinDatabase implements TLCallback
         if ($this->clean) {
             return;
         }
-        EventLoop::defer(function (): void {
+        EventLoop::queue(function (): void {
             foreach ($this->db as $id => $origin) {
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
                     unset($this->db[$id]);

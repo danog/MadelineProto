@@ -24,10 +24,10 @@ use Amp\DeferredFuture;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
+use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\async;
-use function ord;
 
 /**
  * RPC call status check loop.
@@ -115,12 +115,6 @@ final class CheckLoop extends ResumableSignalLoop
                                     }
                             }
                         }
-                        /*
-                        if ($reply) {
-                            $deferred= new DeferredFuture;
-                            $deferred->getFuture()->onResolve(fn($e, $res) => var_dump(ord($res['info'][0])));
-                            async($connection->objectCall(...), 'msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]);
-                        }*/
                         $connection->flush();
                     })->catch(function (Throwable $e) use ($API, $datacenter): void {
                         $API->logger("Got exception in check loop for DC {$datacenter}");
@@ -151,7 +145,7 @@ final class CheckLoop extends ResumableSignalLoop
             }
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && !$connection->isReading()) {
                 $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
-                async($connection->reconnect(...));
+                EventLoop::queue($connection->reconnect(...));
                 return;
             }
         }

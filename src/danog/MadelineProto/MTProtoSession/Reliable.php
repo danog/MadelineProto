@@ -23,8 +23,7 @@ namespace danog\MadelineProto\MTProtoSession;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use phpseclib3\Math\BigInteger;
-
-use function Amp\async;
+use Revolt\EventLoop;
 
 /**
  * Manages responses.
@@ -39,7 +38,7 @@ trait Reliable
         if (isset($this->incoming_messages[$content['answer_msg_id']])) {
             $this->ackIncomingMessage($this->incoming_messages[$content['answer_msg_id']]);
         } else {
-            async(fn () => $this->objectCall('msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], ['postpone' => true]));
+            EventLoop::queue($this->objectCall(...), 'msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], ['postpone' => true]);
         }
     }
     /**
@@ -129,6 +128,6 @@ trait Reliable
             }
             $info .= \chr($cur_info);
         }
-        async(fn () => $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true]));
+        EventLoop::queue($this->objectCall(...), 'msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true]);
     }
 }

@@ -33,6 +33,7 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\async;
@@ -176,7 +177,7 @@ class Server extends SignalLoop
     public function loop(): void
     {
         while ($socket = $this->waitSignal(async($this->server->accept(...)))) {
-            async($this->clientLoop(...), $socket);
+            EventLoop::queue($this->clientLoop(...), $socket);
         }
         $this->server->close();
         if (isset($this->callback)) {
@@ -196,7 +197,7 @@ class Server extends SignalLoop
         $payload = null;
         try {
             while ($payload = $socket->receive()) {
-                async($this->clientRequest(...), $socket, $id++, $payload);
+                EventLoop::queue($this->clientRequest(...), $socket, $id++, $payload);
             }
         } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");

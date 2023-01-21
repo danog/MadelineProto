@@ -206,9 +206,7 @@ class OutgoingMessage extends Message
         if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors
             $promise = $this->resultDeferred;
             $this->resultDeferred = null;
-            EventLoop::defer(
-                fn () => $promise->complete($result)
-            );
+            EventLoop::queue($promise->complete(...), $result);
         }
     }
 

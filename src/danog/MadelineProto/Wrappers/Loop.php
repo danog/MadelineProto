@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\DeferredFuture;
 use Amp\Future;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -40,10 +41,7 @@ use function Amp\async;
  */
 trait Loop
 {
-    /**
-     * Whether to stop the loop.
-     */
-    private bool $stopLoop = false;
+    private ?DeferredFuture $stopDeferred = null;
     /**
      * Initialize self-restart hack.
      */
@@ -106,52 +104,26 @@ trait Loop
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
-            return Tools::call($callback())->await();
+            $r = $callback();
+            if ($r instanceof Generator) {
+                $r = Tools::consumeGenerator($r);
+            }
+            if ($r instanceof Future) {
+                $r = $r->await();
+            }
+            return $r;
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
-            return false;
-        }
-        if ($this->updateHandler === self::GETUPDATES_HANDLER) {
-            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', Logger::FATAL_ERROR);
             return false;
         }
         $this->logger->logger('Starting event loop');
         $this->initSelfRestart();
         $this->startUpdateSystem();
         $this->logger->logger('Started update loop', Logger::NOTICE);
-        $this->stopLoop = false;
-        do {
-            if (!$this->updateHandler) {
-                $this->waitUpdate();
-                /** @psalm-suppress RedundantCondition */
-                if (!$this->updateHandler) {
-                    $this->logger->logger('Exiting update loop, no handler!', Logger::NOTICE);
-                    continue;
-                }
-            }
-            while ($this->updates) {
-                $updates = $this->updates;
-                $this->updates = [];
-                foreach ($updates as $update) {
-                    async(function () use ($update): void {
-                        $r = ($this->updateHandler)($update);
-                        if ($r instanceof Generator) {
-                            $r = Tools::call($r);
-                        }
-                        if ($r instanceof Future) {
-                            $r->await();
-                        }
-                    });
-                }
-                $updates = [];
-            }
-            $this->waitUpdate();
-            $this->logger->logger('Resuming update loop!', Logger::VERBOSE);
-            /** @var bool $this->stopLoop */
-        } while (!$this->stopLoop);
+        $this->stopDeferred ??= new DeferredFuture;
+        $this->stopDeferred->getFuture()->await();
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
-        $this->stopLoop = false;
     }
     /**
      * Stop update loop.
@@ -166,14 +138,7 @@ trait Loop
      */
     public function restart(): void
     {
-        $this->stopLoop = true;
-        $this->signalUpdate();
-    }
-    /**
-     * Start MadelineProto's update handling loop in background.
-     */
-    public function loopFork(): Future
-    {
-        return async($this->loop(...));
+        $this->stopDeferred ??= new DeferredFuture;
+        $this->stopDeferred->complete();
     }
 }

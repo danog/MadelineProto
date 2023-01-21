@@ -33,8 +33,6 @@ use Throwable;
 
 use const PHP_EOL;
 
-use function Amp\async;
-
 /**
  * Manages responses.
  *
@@ -132,7 +130,7 @@ trait ResponseHandler
                     $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
                     if ($response_type == 'Updates') {
                         if (!$this->isCdn()) {
-                            async($this->API->handleUpdates(...), $message->read());
+                            EventLoop::queue($this->API->handleUpdates(...), $message->read());
                         }
                         break;
                     }
@@ -222,7 +220,7 @@ trait ResponseHandler
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    async(function () use ($requestId): void {
+                    EventLoop::queue(function () use ($requestId): void {
                         $this->API->initAuthorization();
                         $this->methodRecall(['message_id' => $requestId]);
                     });
@@ -250,12 +248,12 @@ trait ResponseHandler
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
             unset($body);
-            async($this->API->handleUpdates(...), $response);
+            EventLoop::queue($this->API->handleUpdates(...), $response);
         }
         $this->gotResponseForOutgoingMessage($request);
 
         if ($botAPI) {
-            async(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
+            EventLoop::queue(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
         } else {
             $request->reply($response);
         }
@@ -306,7 +304,7 @@ trait ResponseHandler
                 if ($request->isUserRelated()) {
                     $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->currentDatacenter);
                 }
-                EventLoop::defer(fn () => $this->methodRecall(['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]));
+                EventLoop::queue($this->methodRecall(...), ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
                 return null;
             case 401:
                 switch ($response['error_message']) {
@@ -329,7 +327,7 @@ trait ResponseHandler
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            async(function () use ($request, $response): void {
+                            EventLoop::queue(function () use ($request, $response): void {
                                 $this->API->initAuthorization();
                                 $this->handleReject($request, fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             });
@@ -350,7 +348,7 @@ trait ResponseHandler
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                             return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        async(function () use ($request): void {
+                        EventLoop::queue(function () use ($request): void {
                             $this->API->initAuthorization();
                             $this->methodRecall(['message_id' => $request->getMsgId()]);
                         });
@@ -358,7 +356,7 @@ trait ResponseHandler
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        async(function () use ($request): void {
+                        EventLoop::queue(function () use ($request): void {
                             $this->API->initAuthorization();
                             $this->methodRecall(['message_id' => $request->getMsgId()]);
                         });

@@ -255,13 +255,13 @@ trait AuthKeyHandler
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      */
-    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): void
+    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): ?VoIP
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw Exception::extension('libtgvoip');
         }
         if (!isset($this->calls[$call['id']])) {
-            return;
+            return null;
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $call['id']), Logger::VERBOSE);
         try {
@@ -279,9 +279,9 @@ trait AuthKeyHandler
             $this->logger->logger(\sprintf(Lang::$current_lang['call_debug_saving'], $call['id']), Logger::VERBOSE);
             $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
         }
-        $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];
-        $this->updates[$this->updates_key++] = $update;
+        $call = $this->calls[$call['id']];
         unset($this->calls[$call['id']]);
+        return $call;
     }
     /**
      * Check state of calls.

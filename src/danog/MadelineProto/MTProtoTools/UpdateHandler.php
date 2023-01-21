@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\CancelledException;
 use Amp\DeferredFuture;
+use Amp\Http\Client\Request;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
@@ -34,10 +36,13 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
+use Generator;
 use Revolt\EventLoop;
-
-use function Amp\async;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages updates.
@@ -48,77 +53,149 @@ use function Amp\async;
  */
 trait UpdateHandler
 {
-    /**
-     * Update handler callback.
-     *
-     * @var ?callable
-     */
-    private $updateHandler;
+    private UpdateHandlerType $updateHandlerType = UpdateHandlerType::NOOP;
+
     private bool $got_state = false;
     private CombinedUpdatesState $channels_state;
-    public array $updates = [];
-    public int $updates_key = 0;
+    private array $updates = [];
+    private int $updates_key = 0;
 
     /**
-     * Get updates.
-     *
-     * @param array $params Params
-     * @internal
-     * @return list<array{update_id: mixed, update: mixed}>
+     * Set NOOP update handler, ignoring all updates.
      */
-    public function getUpdates(array $params = [])
+    public function setNoop(): void
     {
-        $this->updateHandler = MTProto::GETUPDATES_HANDLER;
-        $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
-        if (empty($this->updates)) {
-            try {
-                async($this->waitUpdate(...))->await(new TimeoutCancellation($params['timeout'] ?: 100000.0));
-            } catch (TimeoutException $e) {
-                if (!$e->getPrevious() instanceof TimeoutException) {
-                    throw $e;
-                }
-            }
-        }
-        if (empty($this->updates)) {
-            return $this->updates;
-        }
-        if ($params['offset'] < 0) {
-            $params['offset'] = \array_reverse(\array_keys((array) $this->updates))[\abs($params['offset']) - 1];
-        }
-        $updates = [];
-        foreach ($this->updates as $key => $value) {
-            if ($params['offset'] > $key) {
-                unset($this->updates[$key]);
-            } elseif ($params['limit'] === null || \count($updates) < $params['limit']) {
-                $updates[] = ['update_id' => $key, 'update' => $value];
-            }
-        }
-        $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
-        return $updates;
+        $this->updateHandlerType = UpdateHandlerType::NOOP;
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->startUpdateSystem();
     }
-    private ?DeferredFuture $update_deferred = null;
     /**
-     * Wait for update.
-     *
-     * @internal
+     * PWRTelegram webhook URL.
      */
-    public function waitUpdate(): void
+    private ?string $webhookUrl = null;
+    /**
+     * Set webhook update handler.
+     *
+     * @param string $webhookUrl Webhook URL
+     */
+    public function setWebhook(string $webhookUrl): void
     {
-        $this->update_deferred = new DeferredFuture();
-        $this->update_deferred->getFuture()->await();
+        $this->webhookUrl = $webhookUrl;
+        $this->updateHandlerType = UpdateHandlerType::WEBHOOK;
+        \array_map($this->handleUpdate(...), $this->updates);
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->startUpdateSystem();
     }
+
+    /**
+     * Event update handler.
+     *
+     * @param array $update Update
+     */
+    private function eventUpdateHandler(array $update): void
+    {
+        if (!isset($this->eventHandlerMethods[$update['_']])) {
+            return;
+        }
+        $r = $this->eventHandlerMethods[$update['_']]($update);
+        if ($r instanceof Generator) {
+            Tools::consumeGenerator($r);
+        }
+    }
+
+    /**
+     * Send update to webhook.
+     *
+     * @param array $update Update
+     */
+    private function pwrWebhook(array $update): void
+    {
+        $payload = \json_encode($update);
+        Assert::notEmpty($payload);
+        Assert::notNull($this->webhookUrl);
+        $request = new Request($this->hook_url, 'POST');
+        $request->setHeader('content-type', 'application/json');
+        $request->setBody($payload);
+        $result = ($this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
+        $this->logger->logger('Result of webhook query is '.$result, Logger::NOTICE);
+        $result = \json_decode($result, true);
+        if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
+            try {
+                $this->logger->logger('Reverse webhook command returned', $this->methodCallAsyncRead($result['method'], $result));
+            } catch (Throwable $e) {
+                $this->logger->logger("Reverse webhook command returned: {$e}");
+            }
+        }
+    }
+
+    private ?DeferredFuture $update_deferred = null;
     /**
      * Signal update.
      *
      * @internal
      */
-    public function signalUpdate(): void
+    private function signalUpdate(array $update): void
     {
+        $this->updates[$this->updates_key++] = $update;
         if ($this->update_deferred) {
             $deferred = $this->update_deferred;
             $this->update_deferred = null;
-            EventLoop::defer(fn () => $deferred->complete());
+            $deferred->complete();
         }
+    }
+
+    /**
+     * Get updates.
+     *
+     * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @return list<array{update_id: mixed, update: mixed}>
+     */
+    public function getUpdates(array $params = []): array
+    {
+        $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
+
+        [
+            'offset' => $offset,
+            'limit' => $limit,
+            'timeout' => $timeout
+        ] = ['offset' => 0, 'limit' => null, 'timeout' => INF] + $params;
+
+        if (!$this->updates) {
+            try {
+                $this->update_deferred = new DeferredFuture();
+                $this->update_deferred->getFuture()->await(new TimeoutCancellation($timeout));
+            } catch (CancelledException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
+            }
+        }
+        if (!$this->updates) {
+            return [];
+        }
+        if ($offset < 0) {
+            $offset = $this->updates_key+$offset;
+        }
+        $updates = [];
+        foreach ($this->updates as $key => $value) {
+            if ($offset > $key) {
+                unset($this->updates[$key]);
+                continue;
+            }
+
+            $updates[] = ['update_id' => $key, 'update' => $value];
+
+            if ($limit !== null && \count($updates) === $limit) {
+                break;
+            }
+        }
+        $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
+        return $updates;
     }
     /**
      * Check message ID.
@@ -189,6 +266,13 @@ trait UpdateHandler
         $data = $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
         $this->getCdnConfig($this->settings->getDefaultDc());
         return $data;
+    }
+    /**
+     * Extract a message ID from an Updates constructor.
+     */
+    public function extractMessageId(array $updates): int
+    {
+        return $this->extractMessage($updates)['id'];
     }
     /**
      * Extract a message constructor from an Updates constructor.
@@ -440,8 +524,8 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
-                    return;
+                    $update['phone_call'] = $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    break;
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
@@ -507,9 +591,7 @@ trait UpdateHandler
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
         }
-        //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
-        //}
-        if (!$this->updateHandler) {
+        if ($this->updateHandlerType === UpdateHandlerType::NOOP) {
             return;
         }
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
@@ -532,7 +614,14 @@ trait UpdateHandler
         if (isset($update['message']['peer_id'])) {
             $update['message']['to_id'] = $update['message']['peer_id'];
         }
-        // First save to array, then once the feed loop signals resumal of loop, resume and handle
-        $this->updates[$this->updates_key++] = $update;
+        $this->handleUpdate($update);
+    }
+    private function handleUpdate(array $update): void
+    {
+        EventLoop::queue(match ($this->updateHandlerType) {
+            UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler(...),
+            UpdateHandlerType::WEBHOOK => $this->pwrWebhook(...),
+            UpdateHandlerType::GET_UPDATES => $this->signalUpdate(...),
+        }, $update);
     }
 }

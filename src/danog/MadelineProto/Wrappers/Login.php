@@ -71,8 +71,6 @@ trait Login
         $this->authorized = MTProto::LOGGED_IN;
         $this->authorized_dc = $this->datacenter->currentDatacenter;
         $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
-        $this->updates = [];
-        $this->updates_key = 0;
         $this->initAuthorization();
         $this->startUpdateSystem();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
@@ -106,8 +104,6 @@ trait Login
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
         $this->authorized = MTProto::WAITING_CODE;
-        $this->updates = [];
-        $this->updates_key = 0;
         $this->logger->logger(Lang::$current_lang['login_code_sent'], Logger::NOTICE);
         return $this->authorization;
     }

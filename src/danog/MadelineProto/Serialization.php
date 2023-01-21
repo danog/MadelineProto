@@ -35,7 +35,6 @@ use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
-use function Amp\async;
 use function Amp\File\exists;
 use function Amp\Ipc\connect;
 
@@ -142,7 +141,7 @@ abstract class Serialization
                     $copy->cancel();
                 }
             };
-            async(function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+            EventLoop::queue(function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
                 try {
                     $lightState = $session->getLightState();
                     if (!$lightState->canStartIpc()) {
@@ -179,7 +178,7 @@ abstract class Serialization
                 // Unlock and fork
                 $unlock();
                 $monitor = Server::startMe($session);
-                async(function () use ($cancelIpc, $monitor): void {
+                EventLoop::queue(function () use ($cancelIpc, $monitor): void {
                     try {
                         $cancelIpc->complete($monitor->await());
                     } catch (\Throwable $e) {

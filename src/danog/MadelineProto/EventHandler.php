@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use Generator;
 
 /**
  * Event handler.
@@ -104,7 +106,13 @@ abstract class EventHandler extends InternalDoc
                 $this->internalInitDb($this->API);
             }
             if (\method_exists($this, 'onStart')) {
-                Tools::call($this->onStart())->await();
+                $r = $this->onStart();
+                if ($r instanceof Generator) {
+                    $r = Tools::consumeGenerator($r);
+                }
+                if ($r instanceof Future) {
+                    $r = $r->await();
+                }
             }
             $this->startedInternal = true;
         } finally {

@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 
 use function Amp\async;
 use function strlen;
@@ -79,7 +80,7 @@ final class WriteLoop extends ResumableSignalLoop
                 if ($connection->shouldReconnect()) {
                     return;
                 }
-                async(function () use ($API, $connection, $datacenter, $e): void {
+                EventLoop::queue(function () use ($API, $connection, $datacenter, $e): void {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                     $connection->reconnect();

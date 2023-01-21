@@ -28,6 +28,7 @@ use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use Closure;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_NB;
@@ -154,34 +155,41 @@ abstract class AsyncTools extends StrTools
     public static function call(mixed $promise): Future
     {
         if ($promise instanceof Generator) {
-            $promise = async(function () use ($promise) {
-                $yielded = $promise->current();
-                do {
-                    while (!$yielded instanceof Future) {
-                        if (!$promise->valid()) {
-                            return $promise->getReturn();
-                        }
-                        if ($yielded instanceof Generator) {
-                            $yielded = self::call($yielded);
-                        } else {
-                            $yielded = $promise->send($yielded);
-                        }
-                    }
-                    try {
-                        $result = $yielded->await();
-                    } catch (Throwable $e) {
-                        $yielded = $promise->throw($e);
-                        continue;
-                    }
-                    $yielded = $promise->send($result);
-                } while (true);
-            });
-        } elseif (!$promise instanceof Future) {
+            return async(self::consumeGenerator(...), $promise);
+        }
+        if (!$promise instanceof Future) {
             $f = new DeferredFuture;
             $f->complete($promise);
             return $f->getFuture();
         }
         return $promise;
+    }
+    /**
+     * @internal Consumes generator without creating fiber
+     *
+     */
+    public static function consumeGenerator(\Generator $g): mixed
+    {
+        $yielded = $g->current();
+        do {
+            while (!$yielded instanceof Future) {
+                if (!$g->valid()) {
+                    return $g->getReturn();
+                }
+                if ($yielded instanceof Generator) {
+                    $yielded = self::consumeGenerator($yielded);
+                } else {
+                    $yielded = $g->send($yielded);
+                }
+            }
+            try {
+                $result = $yielded->await();
+            } catch (Throwable $e) {
+                $yielded = $g->throw($e);
+                continue;
+            }
+            $yielded = $g->send($result);
+        } while (true);
     }
     /**
      * Call promise in background.
@@ -249,7 +257,7 @@ abstract class AsyncTools extends StrTools
             $result = \flock($res, $operation);
             if (!$result) {
                 if ($failureCb) {
-                    async($failureCb);
+                    EventLoop::queue($failureCb);
                     $failureCb = null;
                 }
                 if ($token) {
