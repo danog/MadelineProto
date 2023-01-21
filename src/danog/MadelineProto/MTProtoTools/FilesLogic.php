@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\ByteStream\Payload;
 use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableResourceStream;
 use Amp\ByteStream\ReadableStream;

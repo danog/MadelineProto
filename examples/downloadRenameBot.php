@@ -18,10 +18,6 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-if (function_exists('memprof_enable')) {
-    memprof_enable();
-}
-
 use Amp\Http\Server\HttpServer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\APIWrapper;
