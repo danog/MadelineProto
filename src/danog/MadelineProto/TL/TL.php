@@ -942,8 +942,16 @@ final class TL
                 $count = \unpack('V', \stream_get_contents($stream, 4))[1];
                 $result = [];
                 $type['type'] = $type['subtype'];
+                $splitSideEffects = isset($type['splitSideEffects']);
+                if ($splitSideEffects) {
+                    unset($type['splitSideEffects']);
+                }
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserialize($stream, $type);
+                    $v = $this->deserialize($stream, $type);
+                    if ($splitSideEffects) {
+                        $v['sideEffects'] = $this->getSideEffects();
+                    }
+                    $result[] = $v;
                 }
                 return $result;
         }
@@ -1019,11 +1027,9 @@ final class TL
             }
             if (\in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
                 $arg['idstrlong'] = true;
-            }
-            if (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            } elseif (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
-            }
-            if (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
+            } elseif (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
@@ -1035,6 +1041,8 @@ final class TL
                 if ($message->getType() && \stripos($message->getType(), '<') !== false) {
                     $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
                 }
+            } elseif ($x['_'] === 'msg_container' && $arg['name'] === 'messages') {
+                $arg['splitSideEffects'] = true;
             }
             if (isset($type['connection'])) {
                 $arg['connection'] = $type['connection'];

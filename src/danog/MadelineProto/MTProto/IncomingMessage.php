@@ -143,7 +143,7 @@ final class IncomingMessage extends Message
      */
     public function __toString(): string
     {
-        return $this->content['_'];
+        return "incoming message {$this->content['_']}";
     }
 
     /**

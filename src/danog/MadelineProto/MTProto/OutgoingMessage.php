@@ -424,11 +424,17 @@ class OutgoingMessage extends Message
      */
     public function __toString(): string
     {
+        $state = match ($this->state) {
+            self::STATE_PENDING => 'pending',
+            self::STATE_SENT => "sent ".(\time() - $this->sent)." seconds ago",
+            self::STATE_ACKED => 'acked',
+            self::STATE_REPLIED => 'acked (by reply)',
+        };
         if ($this->msgId) {
             $msgId = MsgIdHandler::toString($this->msgId);
-            return "{$this->constructor} with message ID $msgId";
+            return "{$this->constructor} with message ID $msgId $state";
         }
-        return $this->constructor;
+        return "{$this->constructor} $state";
     }
 
     /**

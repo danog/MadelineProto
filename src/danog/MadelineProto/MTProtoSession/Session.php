@@ -143,7 +143,7 @@ trait Session
             } else {
                 $ago = \time() - $message->getSent();
                 if ($ago > 2) {
-                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter} sent $ago seconds ago, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
+                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }
                 $outgoing[$key] = $message;
             }

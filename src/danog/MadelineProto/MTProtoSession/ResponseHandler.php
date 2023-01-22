@@ -81,12 +81,11 @@ trait ResponseHandler
                     }
                     break;
                 case 'msg_container':
-                    $side = $message->consumeSideEffects();
                     foreach ($message->read()['messages'] as $message) {
                         $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
                         $newMessage->setSeqNo($message['seqno']);
-                        $newMessage->setSideEffects($side);
+                        $newMessage->setSideEffects($message['sideEffects']);
                         $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
                     }
                     unset($newMessage, $message);
@@ -386,7 +385,7 @@ trait ResponseHandler
                     $this->logger->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(($request->getSent() ?? \time()) + $seconds);
+                    $request->setSent(\time() + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
