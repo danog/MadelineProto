@@ -41,10 +41,6 @@ final class Connection extends SettingsAbstract
      */
     protected int $robinPeriod = 10;
     /**
-     * Default DC ID.
-     */
-    protected int $defaultDc = 2;
-    /**
      * Protocol identifier.
      *
      * @var class-string<MTProtoBufferInterface>
@@ -398,33 +394,6 @@ final class Connection extends SettingsAbstract
     public function setRobinPeriod(int $robinPeriod): self
     {
         $this->robinPeriod = $robinPeriod;
-
-        return $this;
-    }
-
-    /**
-     * Get default DC ID.
-     */
-    public function getDefaultDc(): int
-    {
-        return $this->defaultDc;
-    }
-    /**
-     * Get default DC params.
-     */
-    public function getDefaultDcParams(): array
-    {
-        return ['datacenter' => $this->defaultDc];
-    }
-
-    /**
-     * Set default DC ID.
-     *
-     * @param int $defaultDc Default DC ID.
-     */
-    public function setDefaultDc(int $defaultDc): self
-    {
-        $this->defaultDc = $defaultDc;
 
         return $this;
     }

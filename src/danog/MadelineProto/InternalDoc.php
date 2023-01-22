@@ -6771,24 +6771,20 @@ class InternalDoc extends APIFactory
     }
     /**
      * Store RSA keys for CDN datacenters.
-     *
-     * @param int $datacenter DC ID
      */
-    public function getCdnConfig(int $datacenter): void
+    public function getCdnConfig(): void
     {
-        $this->__call(__FUNCTION__, [$datacenter]);
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Get cached (or eventually re-fetch) server-side config.
      *
      * @param array $config  Current config
-     * @param array $options Options for method call
      */
     public function getConfig(array $config = [
-    ], array $options = [
     ])
     {
-        return $this->__call(__FUNCTION__, [$config, $options]);
+        return $this->__call(__FUNCTION__, [$config]);
     }
     /**
      * Get async DNS client.
@@ -7241,13 +7237,6 @@ class InternalDoc extends APIFactory
     public function logger(mixed $param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
         $this->__call(__FUNCTION__, [$param, $level, $file]);
-    }
-    /**
-     * Log out currently logged in user.
-     */
-    public function logout(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.

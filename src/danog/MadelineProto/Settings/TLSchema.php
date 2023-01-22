@@ -35,6 +35,10 @@ final class TLSchema extends SettingsAbstract
      * Whether the scheme was upgraded.
      */
     private bool $wasUpgraded = true;
+    public function __sleep()
+    {
+        return \array_merge(['wasUpgraded'], parent::__sleep());
+    }
     public function mergeArray(array $settings): void
     {
         $settings = $settings['tl_schema'] ?? [];

@@ -604,7 +604,7 @@ final class MTProto implements TLCallback, LoggerGetter
         // Initialize needed stuffs
         Magic::start();
         // Parse and store settings
-        $this->updateSettingsInternal($settings);
+        $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
         // Start IPC server
@@ -653,7 +653,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                    $this->settings->setDefaultDc($this->datacenter->currentDatacenter= (int) $nearest_dc['nearest_dc']);
+                    $this->authorized_dc = $this->datacenter->currentDatacenter = (int) $nearest_dc['nearest_dc'];
                 }
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'BOT_METHOD_INVALID') {
@@ -661,7 +661,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 }
             }
         }
-        $this->getConfig([]);
+        $this->getConfig();
         $this->startUpdateSystem(true);
         $this->v = self::V;
 
@@ -1103,7 +1103,7 @@ final class MTProto implements TLCallback, LoggerGetter
         // Reset MTProto session (not related to user session)
         $this->resetMTProtoSession();
         // Update settings from constructor
-        $this->updateSettingsInternal($settings);
+        $this->updateSettings($settings);
         // Session update process for BC
         $forceDialogs = false;
         if (!isset($this->v)
@@ -1233,31 +1233,13 @@ final class MTProto implements TLCallback, LoggerGetter
     public function updateSettings(SettingsAbstract $settings): void
     {
         $this->updateSettingsInternal($settings);
-
-        if ($this->settings->getDb()->hasChanged()) {
-            $this->initDb($this);
-            $this->settings->getDb()->applyChanges();
-        }
-        if ($this->settings->getIpc()->hasChanged()) {
-            $this->ipcServer->setSettings($this->settings->getIpc()->applyChanges());
-        }
-        if ($this->settings->getSerialization()->hasChanged()) {
-            $this->serializeLoop->signal(true);
-            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval() * 1000);
-        }
-        if ($this->settings->getAuth()->hasChanged()
-            || $this->settings->getConnection()->hasChanged()
-            || $this->settings->getSchema()->hasChanged()
-            || $this->settings->getSchema()->needsUpgrade()) {
-            $this->initialize($this->settings);
-        }
     }
     /**
      * Parse, update and store settings.
      *
      * @param SettingsAbstract $settings Settings
      */
-    private function updateSettingsInternal(SettingsAbstract $settings): void
+    private function updateSettingsInternal(SettingsAbstract $settings, bool $recurse = true): void
     {
         if ($settings instanceof SettingsEmpty) {
             if (!isset($this->settings)) {
@@ -1284,6 +1266,33 @@ final class MTProto implements TLCallback, LoggerGetter
         // Setup logger
         if ($this->settings->getLogger()->hasChanged() || !isset($this->logger)) {
             $this->setupLogger();
+        }
+
+        if ($this->settings->getDb()->hasChanged()) {
+            $this->logger->logger("The database settings have changed!", Logger::WARNING);
+            $this->cleanupProperties();
+            $this->settings->getDb()->applyChanges();
+        }
+        if ($this->settings->getIpc()->hasChanged()) {
+            $this->logger->logger("The IPC settings have changed!", Logger::WARNING);
+            if (isset($this->ipcServer)) {
+                $this->ipcServer->setSettings($this->settings->getIpc()->applyChanges());
+            }
+        }
+        if ($this->settings->getSerialization()->hasChanged()) {
+            $this->logger->logger("The serialization settings have changed!", Logger::WARNING);
+            if (isset($this->serializeLoop)) {
+                $this->serializeLoop->signal(true);
+            }
+            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval() * 1000);
+            $this->serializeLoop->start();
+        }
+        if ($recurse && ($this->settings->getAuth()->hasChanged()
+            || $this->settings->getConnection()->hasChanged()
+            || $this->settings->getSchema()->hasChanged()
+            || $this->settings->getSchema()->needsUpgrade())) {
+            $this->logger->logger("Generic settings have changed!", Logger::WARNING);
+            $this->initialize($this->settings);
         }
     }
     /**
@@ -1404,55 +1413,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->getPhoneConfig();
     }
     /**
-     * Clean up MadelineProto session after logout.
-     *
-     * @internal
-     */
-    public function resetSession(): void
-    {
-        if (isset($this->seqUpdater)) {
-            $this->seqUpdater->signal(true);
-            unset($this->seqUpdater);
-        }
-        $channelIds = [];
-        foreach ($this->channels_state->get() as $state) {
-            $channelIds[] = $state->getChannel();
-        }
-        \sort($channelIds);
-        foreach ($channelIds as $channelId) {
-            if (isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId]->signal(true);
-                unset($this->feeders[$channelId]);
-            }
-            if (isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId]->signal(true);
-                unset($this->updaters[$channelId]);
-            }
-        }
-        foreach ($this->datacenter->getDataCenterConnections() as $socket) {
-            $socket->authorized(false);
-        }
-        $this->channels_state = new CombinedUpdatesState();
-        $this->got_state = false;
-        $this->msg_ids = [];
-        $this->authorized = self::NOT_LOGGED_IN;
-        $this->authorized_dc = -1;
-        $this->authorization = null;
-        $this->updates = [];
-        $this->secret_chats = [];
-
-        $this->initDb($this, true);
-
-        $this->tos = ['expires' => 0, 'accepted' => true];
-        $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
-
-        $this->referenceDatabase = new ReferenceDatabase($this);
-        $this->referenceDatabase->init();
-
-        $this->minDatabase = new MinDatabase($this);
-        $this->minDatabase->init();
-    }
-    /**
      * Reset the update state and fetch all updates from the beginning.
      */
     public function resetUpdateState(): void
@@ -1552,20 +1512,18 @@ final class MTProto implements TLCallback, LoggerGetter
         if ($this->authorized === self::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
             && !$this->authorization['user']['bot']
-            && $this->datacenter->getDataCenterConnection($this->settings->getDefaultDc())->hasTempAuthKey()) {
+            && $this->datacenter->getDataCenterConnection($this->authorized_dc)->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
-            VoIPServerConfig::updateDefault($this->methodCallAsyncRead('phone.getCallConfig', [], $this->settings->getDefaultDcParams()));
+            VoIPServerConfig::updateDefault($this->methodCallAsyncRead('phone.getCallConfig', []));
         }
     }
     /**
      * Store RSA keys for CDN datacenters.
-     *
-     * @param int $datacenter DC ID
      */
-    public function getCdnConfig(int $datacenter): void
+    public function getCdnConfig(): void
     {
         try {
-            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
+            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $this->authorized_dc]))['public_keys'] as $curkey) {
                 $curkey = RSA::load($this->TL, $curkey['public_key']);
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
@@ -1584,14 +1542,13 @@ final class MTProto implements TLCallback, LoggerGetter
      * Get cached (or eventually re-fetch) server-side config.
      *
      * @param array $config  Current config
-     * @param array $options Options for method call
      */
-    public function getConfig(array $config = [], array $options = []): array
+    public function getConfig(array $config = []): array
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config, $options ?: $this->settings->getDefaultDcParams()) : $config;
+        $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config) : $config;
         $this->parseConfig();
         $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
         $this->logger->logger($this->config, Logger::NOTICE);

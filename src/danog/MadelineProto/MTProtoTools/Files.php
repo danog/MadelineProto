@@ -134,7 +134,7 @@ trait Files
                 });
             };
         }
-        $datacenter = $this->settings->getDefaultDc();
+        $datacenter = $this->authorized_dc;
         if ($this->datacenter->has(-$datacenter)) {
             $datacenter = -$datacenter;
         }
@@ -855,7 +855,7 @@ trait Files
         }
         $part_size = $part_size ?? 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
-        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings->getDefaultDc();
+        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->authorized_dc;
         if ($this->datacenter->has(-$datacenter)) {
             $datacenter = -$datacenter;
         }
@@ -1010,13 +1010,13 @@ trait Files
                 $datacenter = $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
-                    $this->getConfig([]);
+                    $this->getConfig();
                 }
                 $this->logger->logger(Lang::$current_lang['stored_on_cdn'], Logger::NOTICE);
                 continue;
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(Lang::$current_lang['cdn_reupload'], Logger::NOTICE);
-                $this->getConfig([]);
+                $this->getConfig();
                 try {
                     $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (RPCErrorException $e) {

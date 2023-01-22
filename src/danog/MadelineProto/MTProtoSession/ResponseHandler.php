@@ -302,7 +302,7 @@ trait ResponseHandler
                     $datacenter = -$datacenter;
                 }
                 if ($request->isUserRelated()) {
-                    $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->currentDatacenter);
+                    $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
                 EventLoop::queue($this->methodRecall(...), ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
                 return null;

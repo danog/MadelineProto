@@ -160,7 +160,7 @@ final class UpdateLoop extends ResumableSignalLoop
                     }
                 } else {
                     $API->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
-                    $difference = $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
+                    $difference = $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->authorized_dc]);
                     $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':

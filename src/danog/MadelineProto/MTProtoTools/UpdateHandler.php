@@ -270,7 +270,7 @@ trait UpdateHandler
     public function getUpdatesState()
     {
         $data = $this->methodCallAsyncRead('updates.getState', []);
-        $this->getCdnConfig($this->settings->getDefaultDc());
+        $this->getCdnConfig();
         return $data;
     }
     /**

@@ -248,32 +248,6 @@ final class Settings extends SettingsAbstract
     }
 
     /**
-     * Get default DC ID.
-     */
-    public function getDefaultDc(): int
-    {
-        return $this->connection->getDefaultDc();
-    }
-    /**
-     * Get default DC params.
-     */
-    public function getDefaultDcParams(): array
-    {
-        return $this->connection->getDefaultDcParams();
-    }
-
-    /**
-     * Set default DC ID.
-     *
-     * @param int $dc DC ID
-     */
-    public function setDefaultDc(int $dc): self
-    {
-        $this->connection->setDefaultDc($dc);
-        return $this;
-    }
-
-    /**
      * Get app information.
      */
     public function getAppInfo(): AppInfo

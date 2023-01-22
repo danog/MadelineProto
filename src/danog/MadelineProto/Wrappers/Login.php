@@ -37,17 +37,6 @@ use danog\MadelineProto\Settings;
 trait Login
 {
     /**
-     * Log out currently logged in user.
-     */
-    public function logout()
-    {
-        $this->methodCallAsyncRead('auth.logOut', []);
-        $this->resetSession();
-        $this->logger->logger(Lang::$current_lang['logout_ok'], Logger::NOTICE);
-        $this->startUpdateSystem();
-        return true;
-    }
-    /**
      * Login as bot.
      *
      * @param string $token Bot token
@@ -85,8 +74,7 @@ trait Login
     public function phoneLogin(string $number, int $sms_type = 5)
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
-            $this->logger->logger(Lang::$current_lang['already_loggedIn'], Logger::NOTICE);
-            $this->logout();
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
         $this->logger->logger(Lang::$current_lang['login_code_sending'], Logger::NOTICE);
         $this->authorization = $this->methodCallAsyncRead(
@@ -164,8 +152,7 @@ trait Login
     public function importAuthorization(array $authorization, int $mainDcID)
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
-            $this->logger->logger(Lang::$current_lang['already_loggedIn'], Logger::NOTICE);
-            $this->logout();
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
         $this->logger->logger(Lang::$current_lang['login_auth_key'], Logger::NOTICE);
         foreach ($this->datacenter->getDataCenterConnections() as $connection) {

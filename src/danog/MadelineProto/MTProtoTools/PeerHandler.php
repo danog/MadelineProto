@@ -645,7 +645,7 @@ trait PeerHandler
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
-                $this->methodCallAsyncRead('help.getSupport', [], $this->settings->getDefaultDcParams());
+                $this->methodCallAsyncRead('help.getSupport', []);
             }
             return $this->getInfo($this->supportUser, $type);
         }
