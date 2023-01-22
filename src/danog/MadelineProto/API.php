@@ -31,6 +31,7 @@ use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Revolt\EventLoop;
@@ -202,8 +203,6 @@ final class API extends InternalDoc
                 }
                 $this->logger->logger('Restarting to full instance: stopping IPC server...');
                 $this->API->stopIpcServer();
-                $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
-                $this->API->disconnect();
             } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
@@ -226,18 +225,9 @@ final class API extends InternalDoc
                             $result->disconnect();
                             return;
                         }
-                        $API = new Client($result, $this->session, Logger::$default);
-                        if (($API->hasEventHandler()) || !($API->isIpcWorker())) {
-                            $this->logger->logger('Restarting to full instance (again): the bot is already running!');
-                            $API->disconnect();
-                            $API->unreference();
-                            return;
-                        }
-                        $this->logger->logger('Restarting to full instance: stopping another IPC server...');
-                        $API->stopIpcServer();
-                        $this->logger->logger('Restarting to full instance: disconnecting from IPC server...');
-                        $API->disconnect();
-                        $API->unreference();
+                        $this->logger->logger('Restarting to full instance (again): sending shutdown signal!');
+                        $result->send(Server::SHUTDOWN);
+                        $result->disconnect();
                     } catch (SecurityException|SignalException $e) {
                         throw $e;
                     } catch (Throwable $e) {
