@@ -244,7 +244,7 @@ final class API extends InternalDoc
             };
             EventLoop::queue($cb);
             $this->connectToMadelineProto(new SettingsEmpty, true);
-            $cancel->error(new Exception('Connected!'));
+            $cancel->complete(new Exception('Connected!'));
         }
         return true;
     }
