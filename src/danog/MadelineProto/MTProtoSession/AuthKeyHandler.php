@@ -35,6 +35,7 @@ use danog\MadelineProto\Tools;
 use danog\PrimeModule;
 use phpseclib3\Math\BigInteger;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use const PHP_EOL;
 use function hash;
@@ -247,6 +248,7 @@ trait AuthKeyHandler
                  * ]
                  */
                 $server_DH_inner_data = $this->API->getTL()->deserialize($answer, ['type' => '']);
+                Assert::null($this->API->getTL()->getSideEffects());
                 /*
                  * ***********************************************************************
                  * Do some checks

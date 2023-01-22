@@ -1844,6 +1844,10 @@ final class MTProto implements TLCallback, LoggerGetter
             ),
         );
     }
+    public function areDeserializationCallbacksMutuallyExclusive(): bool
+    {
+        return false;
+    }
     /**
      * Get debug information for var_dump.
      */

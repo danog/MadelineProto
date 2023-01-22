@@ -119,6 +119,10 @@ final class MinDatabase implements TLCallback
     {
         return [];
     }
+    public function areDeserializationCallbacksMutuallyExclusive(): bool
+    {
+        return true;
+    }
     public function reset(): void
     {
         if ($this->cache) {

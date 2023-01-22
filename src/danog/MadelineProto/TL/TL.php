@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+use Amp\Future;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -29,8 +30,12 @@ use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
 
 use const STR_PAD_LEFT;
+
+use function Amp\async;
+use function Amp\Future\awaitAll;
 
 /**
  *
@@ -372,12 +377,20 @@ final class TL
      */
     public function updateCallbacks(array $callbacks): void
     {
-        $this->beforeMethodResponseDeserialization = self::mergeCallbacks(\array_map(
-            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
+        $this->beforeMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getMethodBeforeResponseDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
             $callbacks
         ));
-        $this->afterMethodResponseDeserialization = self::mergeCallbacks(\array_map(
-            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
+        $this->afterMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getMethodAfterResponseDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
             $callbacks
         ));
 
@@ -385,12 +398,20 @@ final class TL
             fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
         ));
-        $this->beforeConstructorDeserialization = self::mergeCallbacks(\array_map(
-            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
+        $this->beforeConstructorDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getConstructorBeforeDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
             $callbacks
         ));
-        $this->afterConstructorDeserialization = self::mergeCallbacks(\array_map(
-            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
+        $this->afterConstructorDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getConstructorAfterDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
             $callbacks
         ));
 
@@ -400,20 +421,44 @@ final class TL
         ));
     }
     /**
+     * @var array<string, list<list{callable(...): void, array}>>
+     */
+    private array $mutexSideEffects = [];
+    /**
+     * @var list<Future>
+     */
+    private array $futureSideEffects = [];
+    /**
      * @template T
      *
-     * @param list<array<string, list<T>>> $callbacks
+     * @param list<array<string, list{list<T>, bool, string}>> $callbacks
      * @return array<string, list<T>>
      */
-    private static function mergeCallbacks(array $callbacks): array
+    private function mergeCallbacks(array $callbacks): array
     {
         $result = [];
-        foreach ($callbacks as $map) {
-            foreach ($map as $k => $list) {
-                $result[$k] = [
-                    ...$result[$k] ?? [],
-                    ...$list
-                ];
+        foreach ($callbacks as [$map, $mutex, $queueId]) {
+            foreach ($map as $constructor => $list) {
+                $this->mutexSideEffects[$queueId] ??= [];
+                if ($mutex) {
+                    $result[$constructor] = [
+                        ...$result[$constructor] ?? [],
+                        function (...$v) use ($list, $queueId): void {
+                            foreach ($list as $cb) {
+                                $this->mutexSideEffects[$queueId][] = [$cb, $v];
+                            }
+                        }
+                    ];
+                } else {
+                    $result[$constructor] = [
+                        ...$result[$constructor] ?? [],
+                        function (...$v) use ($list): void {
+                            foreach ($list as $cb) {
+                                $this->futureSideEffects[] = async($cb, ...$v);
+                            }
+                        }
+                    ];
+                }
             }
         }
         return $result;
@@ -774,7 +819,36 @@ final class TL
             throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
         $this->deserialize($stream, $type);
+        Assert::null($this->getSideEffects());
         return \ftell($stream);
+    }
+
+    /**
+     * @var array<string, Future>
+     */
+    private array $lastMutexSideEffect = [];
+    public function getSideEffects(): ?Future
+    {
+        foreach ($this->mutexSideEffects as $key => $sideEffects) {
+            if (!$sideEffects) {
+                continue;
+            }
+            $this->mutexSideEffects[$key] = [];
+            $lastMutexSideEffect = $this->lastMutexSideEffect[$key] ?? null;
+            $this->lastMutexSideEffect[$key] = async(function () use ($lastMutexSideEffect, $sideEffects): void {
+                $lastMutexSideEffect?->await();
+                foreach ($sideEffects as [$cb, $v]) {
+                    $cb(...$v);
+                }
+            });
+            $this->futureSideEffects []= $this->lastMutexSideEffect[$key];
+        }
+        if (!$this->futureSideEffects) {
+            return null;
+        }
+        $sideEffects = $this->futureSideEffects;
+        $this->futureSideEffects = [];
+        return async(awaitAll(...), $sideEffects);
     }
     /**
      * Deserialize TL object.

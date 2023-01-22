@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+use Amp\Future;
+
 /**
  * Incoming message.
  *
@@ -68,6 +70,8 @@ final class IncomingMessage extends Message
      */
     private bool $fromContainer;
 
+    private ?Future $sideEffects = null;
+
     /**
      * Constructor.
      *
@@ -86,6 +90,16 @@ final class IncomingMessage extends Message
         if (!$this->contentRelated) {
             $this->state |= 16; // message not requiring acknowledgment
         }
+    }
+    public function setSideEffects(?Future $sideEffects): void
+    {
+        $this->sideEffects = $sideEffects;
+    }
+    public function consumeSideEffects(): ?Future
+    {
+        $side = $this->sideEffects;
+        $this->sideEffects = null;
+        return $side;
     }
     /**
      * Get deserialized response content.

@@ -206,14 +206,10 @@ final class ReadLoop extends SignalLoop
             }
             $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
 
-            // TODO: A correct solution for side effects should be devised here...
-            self::$des++;
             $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
-            self::$des--;
-            if (isset($API->referenceDatabase)) {
-                $API->referenceDatabase->reset();
-            }
+            $sideEffects = $API->getTL()->getSideEffects();
             $message = new IncomingMessage($deserialized, $message_id);
+            $message->setSideEffects($sideEffects);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }
@@ -223,7 +219,6 @@ final class ReadLoop extends SignalLoop
         }
         return null;
     }
-    public static int $des = 0;
     /**
      * Get loop name.
      */

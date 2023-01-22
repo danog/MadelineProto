@@ -132,7 +132,11 @@ final class ReferenceDatabase implements TLCallback
     {
         return [];
     }
-    public function reset(): void
+    public function areDeserializationCallbacksMutuallyExclusive(): bool
+    {
+        return true;
+    }
+    public function prepare(): void
     {
         $ctx = \count($this->cacheContexts);
         $cache = \count($this->cache);

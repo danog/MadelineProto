@@ -31,7 +31,7 @@ final class Snitch
     /**
      * Maximum starts without a phar file.
      */
-    const MAX_NO_PHAR_STARTS = 3;
+    const MAX_NO_PHAR_STARTS = 10;
 
     /**
      * Whether madeline.phar was downloaded from scratch.

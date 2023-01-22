@@ -81,10 +81,12 @@ trait ResponseHandler
                     }
                     break;
                 case 'msg_container':
+                    $side = $message->consumeSideEffects();
                     foreach ($message->read()['messages'] as $message) {
                         $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
                         $newMessage->setSeqNo($message['seqno']);
+                        $newMessage->setSideEffects($side);
                         $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
                     }
                     unset($newMessage, $message);
@@ -92,6 +94,7 @@ trait ResponseHandler
                     break;
                 case 'msg_copy':
                     $this->ackIncomingMessage($message);
+                    $side = $message->consumeSideEffects();
                     $content = $message->read();
                     $referencedMsgId = $content['msg_id'];
                     if (isset($this->incoming_messages[$referencedMsgId])) {
@@ -99,6 +102,7 @@ trait ResponseHandler
                     } else {
                         $this->msgIdHandler->checkMessageId($referencedMsgId, ['outgoing' => false, 'container' => true]);
                         $message = new IncomingMessage($content['orig_message'], $referencedMsgId);
+                        $message->setSideEffects($side);
                         $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
                         unset($message);
                     }
@@ -130,7 +134,12 @@ trait ResponseHandler
                     $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
                     if ($response_type == 'Updates') {
                         if (!$this->isCdn()) {
-                            EventLoop::queue($this->API->handleUpdates(...), $message->read());
+                            $side = $message->consumeSideEffects();
+                            $updates = $message->read();
+                            EventLoop::queue(function () use ($side, $updates): void {
+                                $side?->await();
+                                $this->API->handleUpdates($updates);
+                            });
                         }
                         break;
                     }
@@ -233,6 +242,7 @@ trait ResponseHandler
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
+        $side = $message->consumeSideEffects();
         $botAPI = $request->getBotAPI();
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $body = $request->getBodyOrEmpty();
@@ -248,15 +258,21 @@ trait ResponseHandler
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
             unset($body);
-            EventLoop::queue($this->API->handleUpdates(...), $response);
+            EventLoop::queue(function () use ($side, $response): void {
+                $side?->await();
+                $this->API->handleUpdates($response);
+            });
         }
         $this->gotResponseForOutgoingMessage($request);
 
-        if ($botAPI) {
-            EventLoop::queue(fn () => $request->reply($this->API->MTProtoToBotAPI($response)));
-        } else {
-            $request->reply($response);
-        }
+        EventLoop::queue(function () use ($side, $request, $response, $botAPI): void {
+            $side?->await();
+            if ($botAPI) {
+                $request->reply($this->API->MTProtoToBotAPI($response));
+            } else {
+                $request->reply($response);
+            }
+        });
     }
     /**
      * @return (callable(): Throwable)|null
