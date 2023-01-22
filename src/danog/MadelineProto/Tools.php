@@ -63,9 +63,6 @@ abstract class Tools extends AsyncTools
                 break;
             }
         }
-        if ($ok) {
-            return null;
-        }
         return [
             'maxFibers' => $x,
             'realMemoryMb' => (int) (\memory_get_usage(true)/1024/1024),
