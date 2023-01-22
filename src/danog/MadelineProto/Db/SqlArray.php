@@ -7,7 +7,6 @@ namespace danog\MadelineProto\Db;
 use Amp\Sql\Pool;
 use Amp\Sql\Result;
 use PDO;
-use Webmozart\Assert\Assert;
 
 use function serialize;
 

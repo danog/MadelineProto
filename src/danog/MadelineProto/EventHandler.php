@@ -26,8 +26,6 @@ use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use Generator;
 
-use function Amp\delay;
-
 /**
  * Event handler.
  */
@@ -130,7 +128,8 @@ abstract class EventHandler extends InternalDoc
     /**
      * @internal
      */
-    public function waitForStartInternal(): void {
+    public function waitForStartInternal(): void
+    {
         $this->startFuture?->await();
     }
     /**
