@@ -24,6 +24,7 @@ use ArrayAccess;
 use Closure;
 use Countable;
 use Exception;
+use Fiber;
 use phpseclib3\Crypt\Random;
 use Throwable;
 use Traversable;
@@ -41,6 +42,37 @@ use function unpack;
  */
 abstract class Tools extends AsyncTools
 {
+    /**
+     * @internal Test fibers
+     */
+    public static function testFibers(): ?array
+    {
+        \ini_set('memory_limit', -1);
+
+        $f = [];
+        $ok = true;
+        for ($x = 0; $x < 100000; $x++) {
+            try {
+                $f []= $cur = new Fiber(function (): void {
+                    Fiber::suspend();
+                });
+                $cur->start();
+            } catch (\Throwable $e) {
+                $ok = false;
+                echo $e.PHP_EOL.PHP_EOL;
+                break;
+            }
+        }
+        if ($ok) {
+            return null;
+        }
+        return [
+            'maxFibers' => $x,
+            'realMemoryMb' => (int) (\memory_get_usage(true)/1024/1024),
+            'maps' => \substr_count(@\file_get_contents('/proc/self/maps'), "\n")-1,
+            'maxMaps' => (int) @\file_get_contents('/proc/sys/vm/max_map_count'),
+        ];
+    }
     /**
      * Sanify TL obtained from JSON for TL serialization.
      *
