@@ -21,11 +21,11 @@ final class AppInfo extends SettingsAbstract
     /**
      * API ID.
      */
-    protected int $apiId;
+    protected ?int $apiId = null;
     /**
      * API hash.
      */
-    protected string $apiHash;
+    protected ?string $apiHash = null;
     /**
      * Device model.
      */

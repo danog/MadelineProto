@@ -64,7 +64,7 @@ final class TLSchema extends SettingsAbstract
             $this->setAPISchema($new->getAPISchema());
             $this->setMTProtoSchema($new->getMTProtoSchema());
             $this->setSecretSchema($new->getSecretSchema());
-            $this->setLayer($this->getLayer());
+            $this->setLayer($new->getLayer());
             $this->wasUpgraded = true;
         }
     }

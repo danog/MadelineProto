@@ -429,10 +429,10 @@ final class ReferenceDatabase implements TLCallback
                         $origin['peer'] = $this->API->getId($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
-                        $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
+                        $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]]);
                         break;
                     }
-                    $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]]);
                     break;
                     // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
@@ -445,25 +445,25 @@ final class ReferenceDatabase implements TLCallback
                     break;
                     // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
-                    $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin);
                     break;
                 case self::SAVED_GIFS_ORIGIN:
-                    $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin);
                     break;
                 case self::STICKER_SET_ID_ORIGIN:
-                    $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getStickerSet', $origin);
                     break;
                 case self::STICKER_SET_RECENT_ORIGIN:
-                    $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin);
                     break;
                 case self::STICKER_SET_FAVED_ORIGIN:
-                    $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin);
                     break;
                 case self::STICKER_SET_EMOTICON_ORIGIN:
-                    $this->API->methodCallAsyncRead('messages.getStickers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('messages.getStickers', $origin);
                     break;
                 case self::WALLPAPER_ORIGIN:
-                    $this->API->methodCallAsyncRead('account.getWallPapers', $origin, $this->API->getSettings()->getDefaultDcParams());
+                    $this->API->methodCallAsyncRead('account.getWallPapers', $origin);
                     break;
                 default:
                     throw new Exception("Unknown origin type {$originType}");

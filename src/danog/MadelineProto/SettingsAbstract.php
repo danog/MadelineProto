@@ -24,6 +24,14 @@ abstract class SettingsAbstract
     {
     }
 
+    public function __sleep()
+    {
+        $result = [];
+        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
+            $result []= $property->getName();
+        }
+        return $result;
+    }
     /**
      * Merge with other settings instance.
      *

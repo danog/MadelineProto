@@ -14,7 +14,7 @@ final class VoIP extends SettingsAbstract
     /**
      * Whether to preload all songs in memory.
      */
-    private bool $preloadAudio = true;
+    protected bool $preloadAudio = true;
 
     /**
      * Get whether to preload all songs in memory.

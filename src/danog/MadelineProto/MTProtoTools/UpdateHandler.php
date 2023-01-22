@@ -269,7 +269,7 @@ trait UpdateHandler
      */
     public function getUpdatesState()
     {
-        $data = $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
+        $data = $this->methodCallAsyncRead('updates.getState', []);
         $this->getCdnConfig($this->settings->getDefaultDc());
         return $data;
     }
@@ -550,7 +550,7 @@ trait UpdateHandler
                     return;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
-                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
+                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
             }
             if (!isset($this->secret_chats[$update['message']['chat_id']])) {
                 $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));

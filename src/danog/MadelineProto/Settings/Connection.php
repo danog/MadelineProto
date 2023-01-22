@@ -45,10 +45,6 @@ final class Connection extends SettingsAbstract
      */
     protected int $defaultDc = 2;
     /**
-     * Default DC params.
-     */
-    private array $defaultDcParams = ['datacenter' => 2];
-    /**
      * Protocol identifier.
      *
      * @var class-string<MTProtoBufferInterface>
@@ -103,7 +99,7 @@ final class Connection extends SettingsAbstract
     /**
      * Bind on specific address and port.
      */
-    private ?string $bindTo = null;
+    protected ?string $bindTo = null;
 
     /**
      * Subdomains of web.telegram.org for https protocol.
@@ -418,7 +414,7 @@ final class Connection extends SettingsAbstract
      */
     public function getDefaultDcParams(): array
     {
-        return $this->defaultDcParams;
+        return ['datacenter' => $this->defaultDc];
     }
 
     /**
@@ -429,7 +425,6 @@ final class Connection extends SettingsAbstract
     public function setDefaultDc(int $defaultDc): self
     {
         $this->defaultDc = $defaultDc;
-        $this->defaultDcParams = ['datacenter' => $defaultDc];
 
         return $this;
     }
