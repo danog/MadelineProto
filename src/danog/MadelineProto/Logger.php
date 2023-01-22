@@ -240,7 +240,7 @@ final class Logger
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
 
         $this->mode = $settings->getType();
-        $this->level = $settings->getLevel();
+        $this->level = self::LEVEL_ULTRA_VERBOSE;
 
         $optional = $settings->getExtra();
 

@@ -24,6 +24,7 @@ use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
@@ -1752,6 +1753,7 @@ final class MTProto implements TLCallback, LoggerGetter
         /** @var array<int> $userOrId */
         $this->reportDest = $userOrId;
     }
+    private ?LocalMutex $reportMutex = null;
     /**
      * Report an error to the previously set peer.
      *
@@ -1763,43 +1765,49 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!$this->reportDest) {
             return;
         }
-        $file = null;
-        if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
-            && $path = $this->settings->getLogger()->getExtra()) {
-            touchAsync($path);
-            if (!getSize($path)) {
-                $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
-            } else {
-                $file = $this->methodCallAsyncRead(
-                    'messages.uploadMedia',
-                    [
-                        'peer' => $this->reportDest[0],
-                        'media' => [
-                            '_' => 'inputMediaUploadedDocument',
-                            'file' => $path,
-                            'attributes' => [
-                                ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log'],
+        $this->reportMutex ??= new LocalMutex;
+        $lock = $this->reportMutex->acquire();
+        try {
+            $file = null;
+            if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
+                && $path = $this->settings->getLogger()->getExtra()) {
+                touchAsync($path);
+                if (!getSize($path)) {
+                    $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
+                } else {
+                    $file = $this->methodCallAsyncRead(
+                        'messages.uploadMedia',
+                        [
+                            'peer' => $this->reportDest[0],
+                            'media' => [
+                                '_' => 'inputMediaUploadedDocument',
+                                'file' => $path,
+                                'attributes' => [
+                                    ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log'],
+                                ],
                             ],
                         ],
-                    ],
-                );
-            }
-        }
-        $sent = false;
-        foreach ($this->reportDest as $id) {
-            try {
-                $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
-                if ($file) {
-                    $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                    );
                 }
-                $sent = true;
-            } catch (Throwable $e) {
-                $this->logger("While reporting to $id: $e", Logger::FATAL_ERROR);
             }
-        }
-        if ($sent && $file) {
-            $this->logger->truncate();
-            $this->logger->logger('Reported!');
+            $sent = false;
+            foreach ($this->reportDest as $id) {
+                try {
+                    $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
+                    if ($file) {
+                        $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                    }
+                    $sent = true;
+                } catch (Throwable $e) {
+                    $this->logger("While reporting to $id: $e", Logger::FATAL_ERROR);
+                }
+            }
+            if ($sent && $file) {
+                $this->logger->truncate();
+                $this->logger->logger('Reported!');
+            }
+        } finally {
+            $lock->release();
         }
     }
     /**

@@ -27,8 +27,6 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
-use danog\MadelineProto\Shutdown;
-use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Webmozart\Assert\Assert;
 

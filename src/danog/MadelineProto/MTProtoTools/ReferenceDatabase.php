@@ -207,7 +207,7 @@ final class ReferenceDatabase implements TLCallback
             throw new Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::CONSTRUCTOR_CONTEXT[$type];
-        //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
     public function addOrigin(array $data = []): void
@@ -218,7 +218,7 @@ final class ReferenceDatabase implements TLCallback
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            //$this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
