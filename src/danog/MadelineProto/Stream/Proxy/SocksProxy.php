@@ -22,7 +22,7 @@ namespace danog\MadelineProto\Stream\Proxy;
 
 use Amp\Cancellation;
 use Amp\Socket\ClientTlsContext;
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -197,7 +197,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }

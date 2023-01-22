@@ -67,7 +67,7 @@ final class GarbageCollector
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
         $madelinePhpContents = null;
-        self::$cleanupLoop = new PeriodicLoop(function () use ($client, $request, &$madelinePhpContents): bool {
+        $cb = function () use ($client, $request, &$madelinePhpContents): bool {
             try {
                 $madelinePhpContents ??= read(MADELINE_PHP);
                 $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
@@ -83,7 +83,7 @@ final class GarbageCollector
                 }
 
                 $latest = $client->request($request);
-                Magic::$version_latest = $latest->getBody()->buffer();
+                Magic::$version_latest = \trim($latest->getBody()->buffer());
                 if (Magic::$version !== Magic::$version_latest) {
                     Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
                     write(MADELINE_PHAR_VERSION, '');
@@ -112,7 +112,9 @@ final class GarbageCollector
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
             return false;
-        }, 'Phar cleanup loop', 60*1000);
+        };
+        $cb();
+        self::$cleanupLoop = new PeriodicLoop($cb, 'Phar cleanup loop', 60*1000);
         self::$cleanupLoop->start();
     }
 

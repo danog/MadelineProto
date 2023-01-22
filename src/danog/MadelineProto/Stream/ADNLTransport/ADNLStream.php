@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\ADNLTransport;
 
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -86,7 +86,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }

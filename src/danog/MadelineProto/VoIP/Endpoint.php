@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -40,7 +40,7 @@ final class Endpoint
     /**
      * The socket.
      */
-    private ?EncryptableSocket $socket = null;
+    private ?Socket $socket = null;
 
     /**
      * Whether we're the creator.

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\Cookie\LocalCookieJar;
+use Amp\Socket\EncryptableSocket;
+use Amp\Socket\ResourceSocket;
 
 if (PHP_OS_FAMILY === 'Windows') {
     //echo(PHP_EOL.'========='.PHP_EOL.'WARNING: MadelineProto does not support Windows, please use Linux or another UNIX system (WSLv2 on Windows, Mac OS, BSD, etc).'.PHP_EOL.'========='.PHP_EOL.PHP_EOL);
@@ -39,3 +41,4 @@ eval($ampFilePolyfill);
 unset($ampFilePolyfill);
 
 class_alias(LocalCookieJar::class, InMemoryCookieJar::class);
+class_alias(ResourceSocket::class, EncryptableSocket::class);

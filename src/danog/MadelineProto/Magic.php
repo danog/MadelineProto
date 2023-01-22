@@ -281,7 +281,7 @@ final class Magic
             self::$version = null;
             if (\file_exists(__DIR__.'/../../../.git/refs/heads/stable')) {
                 try {
-                    self::$version = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable');
+                    self::$version = \trim(@\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable'));
                 } catch (Throwable $e) {
                 }
             }
@@ -314,7 +314,7 @@ final class Magic
             self::$version_latest = null;
             try {
                 $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-                self::$version_latest = @\file_get_contents("https://phar.madelineproto.xyz/release$php");
+                self::$version_latest = \trim(@\file_get_contents("https://phar.madelineproto.xyz/release$php"));
             } catch (Throwable $e) {
             }
             if (self::$version_latest !== self::$version) {

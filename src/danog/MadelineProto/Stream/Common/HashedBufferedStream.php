@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
@@ -242,7 +242,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }

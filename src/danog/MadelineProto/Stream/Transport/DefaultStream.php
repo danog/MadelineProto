@@ -24,7 +24,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\Cancellation;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use Amp\Socket\SocketConnector;
 use AssertionError;
 use danog\MadelineProto\Logger;
@@ -52,7 +52,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      * Socket.
      *
      */
-    protected ?EncryptableSocket $stream = null;
+    protected ?Socket $stream = null;
     /**
      * Connector.
      */
@@ -122,7 +122,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         Assert::notNull($this->stream);
         return $this->stream;

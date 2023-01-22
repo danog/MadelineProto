@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 
 /**
@@ -43,5 +42,5 @@ interface StreamInterface
     /**
      * Get underlying AMPHP socket resource.
      */
-    public function getSocket(): EncryptableSocket;
+    public function getSocket(): Socket;
 }

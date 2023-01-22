@@ -22,7 +22,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Cancellation;
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
@@ -117,7 +117,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         throw new AssertionError("Unreachable!");
     }

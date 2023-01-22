@@ -24,6 +24,7 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
@@ -133,13 +134,13 @@ final class ReferenceDatabase implements TLCallback
     }
     public function reset(): void
     {
-        if ($this->cacheContexts) {
-            $this->API->logger->logger('Found '.\count($this->cacheContexts).' pending contexts', Logger::ERROR);
-            $this->cacheContexts = [];
-        }
-        if ($this->cache) {
-            $this->API->logger->logger('Found pending locations', Logger::ERROR);
-            $this->cache = [];
+        $ctx = \count($this->cacheContexts);
+        $cache = \count($this->cache);
+        $this->cacheContexts = [];
+        $this->cache = [];
+
+        if ($ctx || $cache) {
+            throw new Exception("Found $ctx pending contexts and $cache pending locations, pending serializations: ".ReadLoop::$des);
         }
     }
     public function addReference(array $location): bool
@@ -405,11 +406,11 @@ final class ReferenceDatabase implements TLCallback
             $this->refreshCount--;
         }
     }
-    public function refreshReference(int $locationType, array $location)
+    public function refreshReference(int $locationType, array $location): string
     {
         return $this->refreshReferenceInternal(self::serializeLocation($locationType, $location));
     }
-    public function refreshReferenceInternal(string $location)
+    private function refreshReferenceInternal(string $location): string
     {
         if (isset($this->refreshed[$location])) {
             $this->API->logger->logger('Reference already refreshed!', Logger::VERBOSE);
@@ -474,15 +475,15 @@ final class ReferenceDatabase implements TLCallback
         }
         throw new Exception('Did not refresh reference');
     }
-    public function populateReference(array $object)
+    private function populateReference(array $object): array
     {
         $object['file_reference'] = $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
         return $object;
     }
-    public function getReference(int $locationType, array $location)
+    public function getReference(int $locationType, array $location): string
     {
         $locationString = self::serializeLocation($locationType, $location);
-        if (!isset(($this->db[$locationString])['reference'])) {
+        if (!isset($this->db[$locationString]['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 return $location['file_reference'];

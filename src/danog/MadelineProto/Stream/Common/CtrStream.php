@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -138,7 +138,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * {@inheritdoc}
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
