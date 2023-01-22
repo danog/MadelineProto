@@ -115,6 +115,8 @@ class MyEventHandler extends EventHandler
 
         // You can also use the built-in MadelineProto MySQL async driver!
         if (!isset($this->notifiedChats[$id])) {
+            $this->notifiedChats[$id] = true;
+
             $this->messages->sendMessage(
                 peer: $update,
                 message: "This userbot is powered by [MadelineProto](https://t.me/MadelineProto)!",
@@ -135,8 +137,6 @@ class MyEventHandler extends EventHandler
                     media: $update
                 );
             }
-
-            $this->notifiedChats[$id] = true;
         }
 
         // Can be anything serializable: an array, an int, an object, ...

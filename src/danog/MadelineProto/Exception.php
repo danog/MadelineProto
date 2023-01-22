@@ -75,7 +75,7 @@ final class Exception extends \Exception
     }
     /**
      * @internal
-     * 
+     *
      * Error handler
      */
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
@@ -98,18 +98,19 @@ final class Exception extends \Exception
     }
     /**
      * @internal
-     * 
+     *
      * ExceptionErrorHandler.
      */
     public static function exceptionHandler(\Throwable $exception): void
     {
-        if (str_contains($exception->getMessage(), 'Fiber stack protect failed')
-            || str_contains($exception->getMessage(), 'Fiber stack allocate failed')
+        if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
+            || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
         ) {
             $maps = "?";
             try {
                 $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
             Logger::log("========= MANUAL SYSTEM ADMIN ACTION REQUIRED =========", Logger::FATAL_ERROR);
             Logger::log("The maximum number of mmap'ed regions was reached ($maps): please increase the vm.max_map_count kernel config to 262144 to fix.");
             Logger::log("To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count");

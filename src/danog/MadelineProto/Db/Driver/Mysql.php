@@ -46,6 +46,13 @@ final class Mysql
                     CHARACTER SET 'utf8mb4' 
                     COLLATE 'utf8mb4_general_ci'
                 ");
+            try {
+                $max = (int) $connection->query("SHOW VARIABLES LIKE 'max_connections'")->fetchRow()['Value'];
+                if ($max < 100000) {
+                    $connection->query("SET GLOBAL max_connections = 100000");
+                }
+            } catch (Throwable) {
+            }
             $connection->close();
         } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
