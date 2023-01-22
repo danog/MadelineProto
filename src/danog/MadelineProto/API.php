@@ -430,7 +430,7 @@ final class API extends InternalDoc
                 $this->report("Surfaced: $e");
             }
         );
-        $this->startAndLoopAsync($eventHandler, $started);
+        $this->startAndLoopInternal($eventHandler, $started);
     }
     /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
@@ -476,7 +476,7 @@ final class API extends InternalDoc
         foreach ($instances as $k => $instance) {
             $instance->start();
             $promises []= async(function () use ($k, $instance, $eventHandler, &$started): void {
-                $instance->startAndLoopAsync($eventHandler[$k], $started[$k]);
+                $instance->startAndLoopInternal($eventHandler[$k], $started[$k]);
             });
         }
         await($promises);
@@ -489,7 +489,7 @@ final class API extends InternalDoc
      *
      * @param string $eventHandler Event handler class name
      */
-    private function startAndLoopAsync(string $eventHandler, bool &$started): void
+    private function startAndLoopInternal(string $eventHandler, bool &$started): void
     {
         $this->start();
         if (!$this->reconnectFull()) {

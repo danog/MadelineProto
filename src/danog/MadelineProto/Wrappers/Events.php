@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use __PHP_Incomplete_Class;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
@@ -118,7 +119,7 @@ trait Events
     /**
      * Get event handler.
      */
-    public function getEventHandler(): ?EventHandler
+    public function getEventHandler(): EventHandler|__PHP_Incomplete_Class|null
     {
         return $this->event_handler_instance;
     }

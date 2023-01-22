@@ -28,6 +28,7 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
+use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Webmozart\Assert\Assert;
 
@@ -114,7 +115,6 @@ use Webmozart\Assert\Assert;
             while (true) {
                 try {
                     Server::waitShutdown();
-                    Shutdown::removeCallback('restarter');
                     Logger::log('A restart was triggered!', Logger::FATAL_ERROR);
                     return;
                 } catch (Throwable $e) {

@@ -68,6 +68,9 @@ trait UpdateHandler
         $this->updateHandlerType = UpdateHandlerType::NOOP;
         $this->updates = [];
         $this->updates_key = 0;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
         $this->startUpdateSystem();
     }
     /**
@@ -86,6 +89,9 @@ trait UpdateHandler
         \array_map($this->handleUpdate(...), $this->updates);
         $this->updates = [];
         $this->updates_key = 0;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
         $this->startUpdateSystem();
     }
 
