@@ -106,13 +106,18 @@ final class Exception extends \Exception
         if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
             || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
         ) {
-            $maps = "?";
+            $maps = "";
             try {
                 $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
+                $pid = \getmypid();
+                $maps = '~'.\substr_count(\file_get_contents("/proc/$pid/maps"), "\n");
             } catch (\Throwable) {
             }
+            if ($maps !== '') {
+                $maps = " ($maps)";
+            }
             Logger::log("========= MANUAL SYSTEM ADMIN ACTION REQUIRED =========", Logger::FATAL_ERROR);
-            Logger::log("The maximum number of mmap'ed regions was reached ($maps): please increase the vm.max_map_count kernel config to 262144 to fix.");
+            Logger::log("The maximum number of mmap'ed regions was reached$maps: please increase the vm.max_map_count kernel config to 262144 to fix.");
             Logger::log("To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count");
             Logger::log("To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf");
             Logger::log("On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.");

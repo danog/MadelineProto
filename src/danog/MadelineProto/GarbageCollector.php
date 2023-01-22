@@ -121,11 +121,6 @@ final class GarbageCollector
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
-            try {
-                $maps = \substr_count(\file_get_contents('/proc/self/maps'), "\n");
-                Logger::log("mmap'ed regions: $maps", Logger::ULTRA_VERBOSE);
-            } catch (\Throwable) {
-            }
         }
         return (int) $memory;
     }
