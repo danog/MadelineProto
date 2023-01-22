@@ -105,6 +105,7 @@ trait UpdateHandler
         if (!isset($this->eventHandlerMethods[$update['_']])) {
             return;
         }
+        $this->event_handler_instance->waitForStartInternal();
         $r = $this->eventHandlerMethods[$update['_']]($update);
         if ($r instanceof Generator) {
             Tools::consumeGenerator($r);
@@ -121,7 +122,7 @@ trait UpdateHandler
         $payload = \json_encode($update);
         Assert::notEmpty($payload);
         Assert::notNull($this->webhookUrl);
-        $request = new Request($this->hook_url, 'POST');
+        $request = new Request($this->webhookUrl, 'POST');
         $request->setHeader('content-type', 'application/json');
         $request->setBody($payload);
         $result = ($this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();

@@ -20,10 +20,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use Generator;
+
+use function Amp\delay;
 
 /**
  * Event handler.
@@ -89,6 +92,7 @@ abstract class EventHandler extends InternalDoc
             $this->{$namespace} = $this->exportNamespace($namespace);
         }
     }
+    private ?Future $startFuture = null;
     /**
      * Start method handler.
      *
@@ -97,6 +101,8 @@ abstract class EventHandler extends InternalDoc
     public function startInternal(): void
     {
         $this->startMutex ??= new LocalMutex;
+        $startDeferred = new DeferredFuture;
+        $this->startFuture = $startDeferred->getFuture();
         $lock = $this->startMutex->acquire();
         try {
             if ($this->startedInternal) {
@@ -116,8 +122,16 @@ abstract class EventHandler extends InternalDoc
             }
             $this->startedInternal = true;
         } finally {
+            $this->startFuture = null;
+            $startDeferred->complete();
             $lock->release();
         }
+    }
+    /**
+     * @internal
+     */
+    public function waitForStartInternal(): void {
+        $this->startFuture?->await();
     }
     /**
      * Get peers where to send error reports.
