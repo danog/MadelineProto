@@ -75,7 +75,6 @@ final class UpdateLoop extends ResumableSignalLoop
             return;
         }
         $state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        $timeout = 10;
         $first = true;
         while (true) {
             if ($this->waitForAuthOrSignal(false)) {
@@ -116,13 +115,13 @@ final class UpdateLoop extends ResumableSignalLoop
                         }
                         throw $e;
                     } catch (PTSException $e) {
+                        $feeder->signal(true);
+                        $API->getChannelStates()->remove($this->channelId);
+                        unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
                         $API->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
                         return;
                     }
-                    if (isset($difference['timeout'])) {
-                        $timeout = $difference['timeout'];
-                    }
-                    $timeout = \min(10, $timeout);
+                    $timeout = min(1, $difference['timeout'] ?? 1);
                     $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
@@ -162,6 +161,7 @@ final class UpdateLoop extends ResumableSignalLoop
                     $API->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
                     $difference = $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->authorized_dc]);
                     $API->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
+                    $timeout = 1;
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':
                             $state->update($difference);
