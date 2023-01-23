@@ -50,7 +50,6 @@ abstract class Tools extends AsyncTools
         \ini_set('memory_limit', -1);
 
         $f = [];
-        $ok = true;
         for ($x = 0; $x < 100000; $x++) {
             try {
                 $f []= $cur = new Fiber(function (): void {
@@ -58,8 +57,6 @@ abstract class Tools extends AsyncTools
                 });
                 $cur->start();
             } catch (\Throwable $e) {
-                $ok = false;
-                echo $e.PHP_EOL.PHP_EOL;
                 break;
             }
         }
