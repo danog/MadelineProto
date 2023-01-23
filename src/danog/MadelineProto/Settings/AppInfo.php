@@ -68,8 +68,8 @@ final class AppInfo extends SettingsAbstract
         } elseif (isset($_SERVER['LANG'])) {
             $this->setLangCode(\explode('_', $_SERVER['LANG'])[0]);
         }
-        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
         $this->init();
+        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
     }
     public function __wakeup(): void
     {
