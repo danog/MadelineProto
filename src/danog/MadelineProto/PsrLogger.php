@@ -7,7 +7,6 @@ namespace danog\MadelineProto;
 use Psr\Log\AbstractLogger;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
-use Stringable;
 
 /**
  * PSR-3 wrapper for MadelineProto's Logger.

@@ -87,12 +87,12 @@ final class SessionPaths
     {
         $session = Tools::absolute($session);
         $this->sessionDirectoryPath = $session;
-        $this->sessionPath = "$session/safe.php";
-        $this->lightStatePath = "$session/lightState.php";
-        $this->lockPath = "$session/lock";
-        $this->ipcPath = "$session/ipc";
-        $this->ipcCallbackPath = "$session/callback.ipc";
-        $this->ipcStatePath = "$session/ipcState.php";
+        $this->sessionPath = $session.DIRECTORY_SEPARATOR."safe.php";
+        $this->lightStatePath = $session.DIRECTORY_SEPARATOR."lightState.php";
+        $this->lockPath = $session.DIRECTORY_SEPARATOR."lock";
+        $this->ipcPath = $session.DIRECTORY_SEPARATOR."ipc";
+        $this->ipcCallbackPath = $session.DIRECTORY_SEPARATOR."callback.ipc";
+        $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
         if (!exists($session)) {
             createDirectory($session);
             return;
@@ -102,10 +102,10 @@ final class SessionPaths
             createDirectory($session);
             foreach (['safe.php', 'lightState.php', 'lock', 'ipc', 'callback.ipc', 'ipcState.php'] as $part) {
                 if (exists("$session.$part")) {
-                    move("$session.$part", "$session/$part");
+                    move("$session.$part", $session.DIRECTORY_SEPARATOR."$part");
                 }
                 if (exists("$session.$part.lock")) {
-                    move("$session.$part.lock", "$session/$part.lock");
+                    move("$session.$part.lock", $session.DIRECTORY_SEPARATOR."$part.lock");
                 }
             }
         }

@@ -21,7 +21,6 @@
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Settings\Database\Mysql;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -124,10 +123,5 @@ class SecretHandler extends EventHandler
 
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
-
-$settings->setDb(
-    (new Mysql)
-        ->setUsername('root')
-);
 
 SecretHandler::startAndLoop('secret.madeline', $settings);
