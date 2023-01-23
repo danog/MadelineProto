@@ -418,7 +418,7 @@ final class ReferenceDatabase implements TLCallback
     {
         if (isset($this->refreshed[$location])) {
             $this->API->logger->logger('Reference already refreshed!', Logger::VERBOSE);
-            return ($this->db[$location])['reference'];
+            return (string) $this->db[$location]['reference'];
         }
         $locationValue = $this->db[$location];
         \ksort($locationValue['origins']);
@@ -474,7 +474,7 @@ final class ReferenceDatabase implements TLCallback
                     throw new Exception("Unknown origin type {$originType}");
             }
             if (isset($this->refreshed[$location])) {
-                return ($this->db[$location])['reference'];
+                return (string) $this->db[$location]['reference'];
             }
         }
         throw new Exception('Did not refresh reference');
@@ -490,7 +490,7 @@ final class ReferenceDatabase implements TLCallback
         if (!isset($this->db[$locationString]['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
-                return $location['file_reference'];
+                return (string) $location['file_reference'];
             }
             if (!$this->refresh) {
                 $this->API->logger->logger("Using null file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
@@ -502,7 +502,7 @@ final class ReferenceDatabase implements TLCallback
         if ($this->refresh) {
             return $this->refreshReferenceInternal($locationString);
         }
-        return $this->db[$locationString]['reference'];
+        return (string) $this->db[$locationString]['reference'];
     }
     private static function serializeLocation(int $locationType, array $location): string
     {

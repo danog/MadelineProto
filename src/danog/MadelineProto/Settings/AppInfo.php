@@ -68,6 +68,7 @@ final class AppInfo extends SettingsAbstract
         } elseif (isset($_SERVER['LANG'])) {
             $this->setLangCode(\explode('_', $_SERVER['LANG'])[0]);
         }
+        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
         $this->init();
     }
     public function __wakeup(): void
@@ -81,7 +82,6 @@ final class AppInfo extends SettingsAbstract
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];
         }
-        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
     }
 
     public function mergeArray(array $settings): void

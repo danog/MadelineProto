@@ -55,7 +55,7 @@ final class Snitch
             if (\count($this->hadInstalled) > self::MAX_NO_PHAR_STARTS) {
                 \array_shift($this->hadInstalled);
                 if (!\array_sum($this->hadInstalled)) { // For three times, MadelineProto was started with no phar file
-                    $this->die();
+                    //$this->die();
                 }
             }
         }
