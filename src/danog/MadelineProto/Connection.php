@@ -287,9 +287,7 @@ final class Connection
         }
         $this->cleanup->start();
         $this->waiter->start();
-        if (isset($this->pinger)) {
-            $this->pinger->start();
-        }
+        $this->pinger?->start();
     }
     /**
      * Apply method abstractions.
@@ -494,12 +492,6 @@ final class Connection
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
-        $this->reader?->stop();
-        $this->writer?->stop();
-        $this->checker?->stop();
-        $this->pinger?->stop();
-        $this->cleanup?->stop();
-
         if ($this->stream) {
             try {
                 $this->stream->disconnect();
@@ -507,6 +499,13 @@ final class Connection
                 $this->API->logger->logger($e);
             }
         }
+
+        $this->reader?->stop();
+        $this->writer?->stop();
+        $this->checker?->stop();
+        $this->cleanup?->stop();
+        $this->pinger?->stop();
+
         if (!$temporary) {
             $this->shared->signalDisconnect($this->id);
         }

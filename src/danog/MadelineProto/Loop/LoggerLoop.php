@@ -58,13 +58,20 @@ trait LoggerLoop
      *
      * @param float $timeout Pause duration, 0 = forever
      */
-    protected function reportPause(?float $timeout): void
+    protected function reportPause(float $timeout): void
     {
         if ($this->logPauses) {
-            $this->logger->logger(
-                "Pausing $this for $timeout",
-                Logger::ULTRA_VERBOSE,
-            );
+            if ($timeout) {
+                $this->logger->logger(
+                    "Pausing $this for $timeout",
+                    Logger::ULTRA_VERBOSE,
+                );
+            } else {
+                $this->logger->logger(
+                    "Pausing $this until resume is called",
+                    Logger::ULTRA_VERBOSE,
+                );
+            }
         }
     }
 

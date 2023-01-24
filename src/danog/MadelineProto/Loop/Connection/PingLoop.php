@@ -47,7 +47,7 @@ final class PingLoop extends Loop
 
         $this->logger->logger("Ping DC {$this->datacenter}");
         try {
-            $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
+            $this->connection->methodCallAsyncWrite('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
         } catch (Throwable $e) {
             $this->logger->logger("Error while pinging DC {$this->datacenter}");
             $this->logger->logger((string) $e);

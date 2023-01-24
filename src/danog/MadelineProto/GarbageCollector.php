@@ -8,8 +8,10 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\SignalException;
 use danog\Loop\PeriodicLoop;
+use ReflectionFiber;
 use Revolt\EventLoop;
 use Throwable;
+use WeakMap;
 
 use const LOCK_EX;
 use const LOCK_NB;
@@ -117,16 +119,26 @@ final class GarbageCollector
         self::$cleanupLoop->start();
     }
 
+    /** @var \WeakMap<\Fiber, true> */
+    public static WeakMap $map;
+    public static function registerFiber(\Fiber $fiber): void
+    {
+        self::$map ??= new WeakMap;
+        self::$map[$fiber] = true;
+    }
     private static function getMemoryConsumption(): int
     {
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
-            try {
-                $maps = \substr_count(\file_get_contents('/proc/self/maps'), "\n");
-                Logger::log("mmap'ed regions: $maps", Logger::ULTRA_VERBOSE);
-            } catch (\Throwable) {
-            }
+            /*$fibers = self::$map->count();
+            Logger::log("Running fibers: $fibers", Logger::ULTRA_VERBOSE);
+            /*foreach (self::$map as $fiber => $_) {
+                if ($fiber->isTerminated()) continue;
+                if (!$fiber->isStarted()) continue;
+                $reflection = new ReflectionFiber($fiber);
+                Logger::log($reflection->getExecutingFile(), Logger::ULTRA_VERBOSE);
+            }*/
         }
         return (int) $memory;
     }

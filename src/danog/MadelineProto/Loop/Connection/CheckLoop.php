@@ -80,7 +80,7 @@ final class CheckLoop extends Loop
                                 break;
                             case 4:
                                 if ($chr & 32) {
-                                    if ($message->getSent() + ($this->timeout*$this->timeout) < \time()) {
+                                    if ($message->getSent() + ($this->timeout*5) < \time()) {
                                         $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
                                         $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
                                     } else {
