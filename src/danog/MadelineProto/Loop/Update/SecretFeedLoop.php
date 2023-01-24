@@ -20,8 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\Loop\ResumableSignalLoop;
-use danog\MadelineProto\Loop\AuthLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SecurityException;
@@ -31,12 +30,11 @@ use danog\MadelineProto\SecurityException;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class SecretFeedLoop extends ResumableSignalLoop
+final class SecretFeedLoop extends Loop
 {
     use InternalLoop {
         __construct as private init;
     }
-    use AuthLoop;
     /**
      * Incoming secret updates array.
      */
@@ -59,36 +57,31 @@ final class SecretFeedLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): void
+    public function loop(): ?float
     {
-        $API = $this->API;
-        if ($this->waitForAuthOrSignal()) {
-            return;
+        if (!$this->API->hasAllAuth()) {
+            return self::PAUSE;
         }
-        while (true) {
-            $API->logger->logger("Resumed {$this}");
-            while ($this->incomingUpdates) {
-                $updates = $this->incomingUpdates;
-                $this->incomingUpdates = [];
-                foreach ($updates as $update) {
-                    try {
-                        if (!$API->handleEncryptedUpdate($update)) {
-                            $API->logger->logger("Secret chat deleted, exiting $this...");
-                            unset($API->secretFeeders[$this->secretId]);
-                            return;
-                        }
-                    } catch (SecurityException $e) {
-                        $API->logger->logger("Secret chat deleted, exiting $this...");
-                        unset($API->secretFeeders[$this->secretId]);
-                        throw $e;
+        $this->logger->logger("Resumed {$this}");
+        while ($this->incomingUpdates) {
+            $updates = $this->incomingUpdates;
+            $this->incomingUpdates = [];
+            foreach ($updates as $update) {
+                try {
+                    if (!$this->API->handleEncryptedUpdate($update)) {
+                        $this->logger->logger("Secret chat deleted, exiting $this...");
+                        unset($this->API->secretFeeders[$this->secretId]);
+                        return self::STOP;
                     }
+                } catch (SecurityException $e) {
+                    $this->logger->logger("Secret chat deleted, exiting $this...");
+                    unset($this->API->secretFeeders[$this->secretId]);
+                    throw $e;
                 }
-                $updates = null;
             }
-            if ($this->waitForAuthOrSignal()) {
-                return;
-            }
+            $updates = null;
         }
+        return self::PAUSE;
     }
     /**
      * Feed incoming update to loop.

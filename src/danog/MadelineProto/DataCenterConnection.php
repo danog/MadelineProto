@@ -437,7 +437,7 @@ final class DataCenterConnection implements JsonSerializable
         $count = $media ? $this->API->getSettings()->getConnection()->getMinMediaSocketCount() : 1;
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoopInternal($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->getSettings()->getConnection()->getRobinPeriod() * 1000);
+                $this->robinLoop = new PeriodicLoopInternal($this->API, $this->even(...), "robin loop DC {$this->datacenter}", $this->API->getSettings()->getConnection()->getRobinPeriod());
             }
             $this->robinLoop->start();
         }
@@ -518,7 +518,7 @@ final class DataCenterConnection implements JsonSerializable
         }
         $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");
         if ($this->robinLoop) {
-            $this->robinLoop->signal(true);
+            $this->robinLoop->stop();
             $this->robinLoop = null;
         }
         $before = \count($this->backup);

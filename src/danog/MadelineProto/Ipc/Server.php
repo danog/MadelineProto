@@ -24,7 +24,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use danog\Loop\SignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
@@ -43,7 +43,7 @@ use function Amp\delay;
 /**
  * IPC server.
  */
-class Server extends SignalLoop
+class Server extends Loop
 {
     use InternalLoop;
     /**
@@ -162,29 +162,33 @@ class Server extends SignalLoop
     /**
      * Shutdown.
      */
-    final public function shutdown(): void
+    final public function stop(): bool
     {
-        Shutdown::removeCallback('restarter');
-        $this->signal(null);
+        $this->server->close();
+        if (!$this instanceof ServerCallback) {
+            $this->callback->server->close();
+        }
         if (self::$shutdownDeferred) {
             self::$shutdownNow = true;
             $deferred = self::$shutdownDeferred;
             self::$shutdownDeferred = null;
             $deferred->complete();
         }
+        return true;
     }
     /**
      * Main loop.
      */
-    public function loop(): void
+    protected function loop(): ?float
     {
-        while ($socket = $this->waitSignal(async($this->server->accept(...)))) {
+        while ($socket = $this->server->accept()) {
             EventLoop::queue($this->clientLoop(...), $socket);
         }
         $this->server->close();
         if (isset($this->callback)) {
-            $this->callback->signal(null);
+            $this->callback->server->close();
         }
+        return self::STOP;
     }
     /**
      * Client handler loop.
@@ -209,7 +213,8 @@ class Server extends SignalLoop
             } catch (Throwable $e) {
             }
             if ($payload === self::SHUTDOWN) {
-                $this->shutdown();
+                Shutdown::removeCallback('restarter');
+                $this->stop();
             }
         }
     }

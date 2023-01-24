@@ -53,32 +53,32 @@ final class Connection
      * Writer loop.
      *
      */
-    protected WriteLoop $writer;
+    protected ?WriteLoop $writer = null;
     /**
      * Reader loop.
      *
      */
-    protected ReadLoop $reader;
+    protected ?ReadLoop $reader = null;
     /**
      * Checker loop.
      *
      */
-    protected CheckLoop $checker;
+    protected ?CheckLoop $checker = null;
     /**
      * Waiter loop.
      *
      */
-    protected HttpWaitLoop $waiter;
+    protected ?HttpWaitLoop $waiter = null;
     /**
      * Ping loop.
      *
      */
-    protected PingLoop $pinger;
+    protected ?PingLoop $pinger = null;
     /**
      * Cleanup loop.
      *
      */
-    protected CleanupLoop $cleanup;
+    protected ?CleanupLoop $cleanup = null;
     /**
      * The actual socket.
      * @var (MTProtoBufferInterface&BufferedStreamInterface)|null
@@ -433,7 +433,7 @@ final class Connection
             $queuePromise->complete();
         }
         if ($flush && isset($this->writer)) {
-            $this->writer->resumeDeferOnce();
+            $this->writer->resume();
         }
         $promise->await();
     }
@@ -443,7 +443,7 @@ final class Connection
     public function flush(): void
     {
         if (isset($this->writer)) {
-            $this->writer->resumeDeferOnce();
+            $this->writer->resume();
         }
     }
     /**
@@ -494,11 +494,12 @@ final class Connection
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
-        foreach (['reader', 'writer', 'checker', 'waiter', 'updater', 'pinger', 'cleanup'] as $loop) {
-            if (isset($this->{$loop}) && $this->{$loop}) {
-                $this->{$loop}->signal($loop === 'reader' ? new NothingInTheSocketException() : true);
-            }
-        }
+        $this->reader?->stop();
+        $this->writer?->stop();
+        $this->checker?->stop();
+        $this->pinger?->stop();
+        $this->cleanup?->stop();
+
         if ($this->stream) {
             try {
                 $this->stream->disconnect();

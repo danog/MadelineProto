@@ -27,6 +27,8 @@ use danog\MadelineProto\Loop\InternalLoop;
 /**
  * RPC call status check loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 trait Common
@@ -37,25 +39,28 @@ trait Common
     /**
      * Connection instance.
      */
-    protected Connection $connection;
+    private Connection $connection;
     /**
      * DC ID.
      */
-    protected string $datacenter;
+    private string $datacenter;
     /**
      * DataCenterConnection instance.
      */
-    protected DataCenterConnection $datacenterConnection;
+    private DataCenterConnection $shared;
+    /**
+     * Network-related timeouts.
+     */
+    private float $timeout;
     /**
      * Constructor function.
-     *
-     * @param Connection $connection Connection
      */
     public function __construct(Connection $connection)
     {
         $this->init($connection->getExtra());
         $this->connection = $connection;
         $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
+        $this->shared = $connection->getShared();
+        $this->timeout = $this->shared->getSettings()->getTimeout();
     }
 }

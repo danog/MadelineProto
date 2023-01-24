@@ -891,18 +891,11 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function startLoops(): void
     {
-        if (!$this->callCheckerLoop) {
-            $this->callCheckerLoop = new PeriodicLoopInternal($this, [$this, 'checkCalls'], 'call check', 10 * 1000);
-        }
-        if (!$this->serializeLoop) {
-            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->getInterval() * 1000);
-        }
-        if (!$this->phoneConfigLoop) {
-            $this->phoneConfigLoop = new PeriodicLoopInternal($this, [$this, 'getPhoneConfig'], 'phone config', 24 * 3600 * 1000);
-        }
-        if (!$this->configLoop) {
-            $this->configLoop = new PeriodicLoopInternal($this, [$this, 'getConfig'], 'config', 24 * 3600 * 1000);
-        }
+        $this->callCheckerLoop ??= new PeriodicLoopInternal($this, $this->checkCalls(...), 'call check', 10);
+        $this->serializeLoop ??= new PeriodicLoopInternal($this, $this->serialize(...), 'serialize', $this->settings->getSerialization()->getInterval());
+        $this->phoneConfigLoop ??= new PeriodicLoopInternal($this, $this->getPhoneConfig(...), 'phone config', 3600);
+        $this->configLoop ??= new PeriodicLoopInternal($this, $this->getConfig(...), 'config', 3600);
+
         if (!$this->ipcServer) {
             try {
                 $this->ipcServer = new Server($this);
@@ -931,23 +924,23 @@ final class MTProto implements TLCallback, LoggerGetter
     private function stopLoops(): void
     {
         if ($this->callCheckerLoop) {
-            $this->callCheckerLoop->signal(true);
+            $this->callCheckerLoop->stop();
             $this->callCheckerLoop = null;
         }
         if ($this->serializeLoop) {
-            $this->serializeLoop->signal(true);
+            $this->serializeLoop->stop();
             $this->serializeLoop = null;
         }
         if ($this->phoneConfigLoop) {
-            $this->phoneConfigLoop->signal(true);
+            $this->phoneConfigLoop->stop();
             $this->phoneConfigLoop = null;
         }
         if ($this->configLoop) {
-            $this->configLoop->signal(true);
+            $this->configLoop->stop();
             $this->configLoop = null;
         }
         if ($this->ipcServer) {
-            $this->ipcServer->signal(null);
+            $this->ipcServer->stop();
             $this->ipcServer = null;
         }
     }
@@ -1163,7 +1156,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->stopLoops();
         if (isset($this->seqUpdater)) {
-            $this->seqUpdater->signal(true);
+            $this->seqUpdater->stop();
         }
         if (isset($this->channels_state)) {
             $channelIds = [];
@@ -1173,10 +1166,10 @@ final class MTProto implements TLCallback, LoggerGetter
             \sort($channelIds);
             foreach ($channelIds as $channelId) {
                 if (isset($this->feeders[$channelId])) {
-                    $this->feeders[$channelId]->signal(true);
+                    $this->feeders[$channelId]->stop();
                 }
                 if (isset($this->updaters[$channelId])) {
-                    $this->updaters[$channelId]->signal(true);
+                    $this->updaters[$channelId]->stop();
                 }
             }
         }
@@ -1282,9 +1275,9 @@ final class MTProto implements TLCallback, LoggerGetter
         if ($this->settings->getSerialization()->hasChanged()) {
             $this->logger->logger("The serialization settings have changed!", Logger::WARNING);
             if (isset($this->serializeLoop)) {
-                $this->serializeLoop->signal(true);
+                $this->serializeLoop->stop();
             }
-            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval() * 1000);
+            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval());
             $this->serializeLoop->start();
         }
         if ($recurse && ($this->settings->getAuth()->hasChanged()
@@ -1418,7 +1411,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function resetUpdateState(): void
     {
         if (isset($this->seqUpdater)) {
-            $this->seqUpdater->signal(true);
+            $this->seqUpdater->stop();
         }
         $channelIds = [];
         $newStates = [];
@@ -1432,10 +1425,10 @@ final class MTProto implements TLCallback, LoggerGetter
         \sort($channelIds);
         foreach ($channelIds as $channelId) {
             if (isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId]->signal(true);
+                $this->feeders[$channelId]->stop();
             }
             if (isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId]->signal(true);
+                $this->updaters[$channelId]->stop();
             }
         }
         $this->channels_state->__construct($newStates);

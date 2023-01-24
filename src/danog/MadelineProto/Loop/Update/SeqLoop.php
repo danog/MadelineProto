@@ -20,21 +20,21 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\AuthLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+
+use function Amp\delay;
 
 /**
  * update feed loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class SeqLoop extends ResumableSignalLoop
+final class SeqLoop extends Loop
 {
     use InternalLoop;
-    use AuthLoop;
     /**
      * Incoming updates.
      */
@@ -54,34 +54,29 @@ final class SeqLoop extends ResumableSignalLoop
     /**
      * Main loop.
      */
-    public function loop(): void
+    public function loop(): ?float
     {
-        $API = $this->API;
-        $this->feeder = $API->feeders[FeedLoop::GENERIC];
-        if ($this->waitForAuthOrSignal()) {
-            return;
+        if (!$this->API->hasAllAuth()) {
+            return self::PAUSE;
         }
-        $this->state = ($API->loadUpdateState());
-        while (true) {
-            $API->logger->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
-            while ($this->incomingUpdates) {
-                $updates = $this->incomingUpdates;
-                $this->incomingUpdates = [];
-                $this->parse($updates);
-                $updates = null;
-            }
-            while ($this->pendingWakeups) {
-                \reset($this->pendingWakeups);
-                $channelId = \key($this->pendingWakeups);
-                unset($this->pendingWakeups[$channelId]);
-                if (isset($this->API->feeders[$channelId])) {
-                    $this->API->feeders[$channelId]->resume();
-                }
-            }
-            if ($this->waitForAuthOrSignal()) {
-                return;
+        $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
+        $this->state = $this->API->loadUpdateState();
+        $this->logger->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
+        while ($this->incomingUpdates) {
+            $updates = $this->incomingUpdates;
+            $this->incomingUpdates = [];
+            $this->parse($updates);
+            $updates = null;
+        }
+        while ($this->pendingWakeups) {
+            \reset($this->pendingWakeups);
+            $channelId = \key($this->pendingWakeups);
+            unset($this->pendingWakeups[$channelId]);
+            if (isset($this->API->feeders[$channelId])) {
+                $this->API->feeders[$channelId]->resume();
             }
         }
+        return self::PAUSE;
     }
     public function parse(array $updates): void
     {
@@ -97,7 +92,7 @@ final class SeqLoop extends ResumableSignalLoop
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
-                $this->pause(1000);
+                delay(1);
                 if (!$this->incomingUpdates) {
                     $this->API->updaters[UpdateLoop::GENERIC]->resume();
                 }

@@ -60,10 +60,10 @@ class SecretHandler extends EventHandler
      */
     public function onUpdateNewMessage(array $update): void
     {
-        if ($update['message']['message'] === 'request') {
+        if (($update['message']['message'] ?? '') === 'request') {
             $this->requestSecretChat($update);
         }
-        if ($update['message']['message'] === 'ping') {
+        if (($update['message']['message'] ?? '') === 'ping') {
             $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
         }
     }

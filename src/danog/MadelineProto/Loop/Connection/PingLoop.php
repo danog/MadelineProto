@@ -20,52 +20,39 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
 use Throwable;
-
-use function Amp\async;
 
 /**
  * Ping loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class PingLoop extends ResumableSignalLoop
+final class PingLoop extends Loop
 {
     use Common;
     /**
      * Main loop.
      */
-    public function loop(): void
+    public function loop(): ?float
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-        $shared = $this->datacenterConnection;
-        $timeout = $shared->getSettings()->getPingInterval();
-        $timeoutMs = (int) ($timeout * 1000);
-        $timeoutDisconnect = $timeout+15;
-        while (true) {
-            while (!$shared->hasTempAuthKey()) {
-                $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
-                if ($this->waitSignal(async($this->pause(...)))) {
-                    $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
-                    return;
-                }
-            }
-            $API->logger->logger("Ping DC {$datacenter}");
-            try {
-                $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
-            } catch (Throwable $e) {
-                $API->logger->logger("Error while pinging DC {$datacenter}");
-                $API->logger->logger((string) $e);
-            }
-            if ($this->waitSignal(async($this->pause(...), $timeoutMs))) {
-                $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
-                return;
-            }
+        if (!$this->shared->hasTempAuthKey()) {
+            $this->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
+            return self::PAUSE;
         }
+
+        $timeout = $this->shared->getSettings()->getPingInterval();
+        $timeoutDisconnect = (int) $timeout+15;
+
+        $this->logger->logger("Ping DC {$this->datacenter}");
+        try {
+            $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
+        } catch (Throwable $e) {
+            $this->logger->logger("Error while pinging DC {$this->datacenter}");
+            $this->logger->logger((string) $e);
+        }
+        return $timeout;
     }
     /**
      * Get loop name.

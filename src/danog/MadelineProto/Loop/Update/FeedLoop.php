@@ -20,9 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\AuthLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
@@ -32,12 +31,11 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class FeedLoop extends ResumableSignalLoop
+final class FeedLoop extends Loop
 {
     use InternalLoop {
         __construct as private init;
     }
-    use AuthLoop;
     /**
      * Main loop ID.
      */
@@ -51,60 +49,47 @@ final class FeedLoop extends ResumableSignalLoop
      */
     private array $parsedUpdates = [];
     /**
-     * Channel ID.
-     */
-    private int $channelId;
-    /**
      * Update loop.
-     *
      */
-    private ?UpdateLoop $updater = null;
+    private UpdateLoop $updater;
     /**
      * Update state.
      */
-    private ?UpdatesState $state = null;
+    private UpdatesState $state;
     /**
      * Constructor.
-     *
-     * @param MTProto $API       API instance
-     * @param integer $channelId Constructor
      */
-    public function __construct(MTProto $API, int $channelId = 0)
+    public function __construct(MTProto $API, private int $channelId = 0)
     {
         $this->init($API);
-        $this->channelId = $channelId;
     }
     /**
      * Main loop.
      */
-    public function loop(): void
+    public function loop(): ?float
     {
-        $API = $this->API;
-        $this->updater = $API->updaters[$this->channelId];
-        if ($this->waitForAuthOrSignal()) {
-            return;
+        if (!$this->API->hasAllAuth()) {
+            return self::PAUSE;
         }
-        $this->state = $this->channelId === self::GENERIC ? $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        while (true) {
-            $API->logger->logger("Resumed {$this}");
-            while ($this->incomingUpdates) {
-                $updates = $this->incomingUpdates;
-                $this->incomingUpdates = [];
-                $this->parse($updates);
-                $updates = null;
-            }
-            while ($this->parsedUpdates) {
-                $parsedUpdates = $this->parsedUpdates;
-                $this->parsedUpdates = [];
-                foreach ($parsedUpdates as $update) {
-                    $API->saveUpdate($update);
-                }
-                $parsedUpdates = null;
-            }
-            if ($this->waitForAuthOrSignal()) {
-                return;
-            }
+        $this->updater = $this->API->updaters[$this->channelId];
+        $this->state = $this->channelId === self::GENERIC ? $this->API->loadUpdateState() : $this->API->loadChannelState($this->channelId);
+
+        $this->API->logger->logger("Resumed {$this}");
+        while ($this->incomingUpdates) {
+            $updates = $this->incomingUpdates;
+            $this->incomingUpdates = [];
+            $this->parse($updates);
+            $updates = null;
         }
+        while ($this->parsedUpdates) {
+            $parsedUpdates = $this->parsedUpdates;
+            $this->parsedUpdates = [];
+            foreach ($parsedUpdates as $update) {
+                $this->API->saveUpdate($update);
+            }
+            $parsedUpdates = null;
+        }
+        return self::PAUSE;
     }
     public function parse(array $updates): void
     {

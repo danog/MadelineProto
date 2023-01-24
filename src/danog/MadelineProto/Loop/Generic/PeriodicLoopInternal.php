@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Generic;
 
-use danog\Loop\Generic\PeriodicLoop as GenericPeriodicLoop;
+use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 
@@ -29,7 +29,7 @@ use danog\MadelineProto\MTProto;
  *
  * @internal For internal use
  */
-final class PeriodicLoopInternal extends GenericPeriodicLoop
+final class PeriodicLoopInternal extends PeriodicLoop
 {
     use InternalLoop {
         __construct as private init;
@@ -45,6 +45,6 @@ final class PeriodicLoopInternal extends GenericPeriodicLoop
     public function __construct(MTProto $API, callable $callable, string $name, ?int $interval)
     {
         $this->init($API);
-        parent::__construct($callable, $name, $interval);
+        parent::__construct(fn () => $callable(), $name, $interval);
     }
 }

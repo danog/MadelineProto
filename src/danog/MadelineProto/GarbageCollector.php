@@ -7,7 +7,7 @@ namespace danog\MadelineProto;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\SignalException;
-use danog\Loop\Generic\PeriodicLoop;
+use danog\Loop\PeriodicLoop;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -122,11 +122,11 @@ final class GarbageCollector
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
-            /*try {
+            try {
                 $maps = \substr_count(\file_get_contents('/proc/self/maps'), "\n");
                 Logger::log("mmap'ed regions: $maps", Logger::ULTRA_VERBOSE);
             } catch (\Throwable) {
-            }*/
+            }
         }
         return (int) $memory;
     }

@@ -23,7 +23,7 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\ByteStream\PendingReadError;
 use Amp\ByteStream\StreamException;
 use Amp\Websocket\ClosedException;
-use danog\Loop\SignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -34,7 +34,6 @@ use danog\MadelineProto\Tools;
 use Error;
 use Revolt\EventLoop;
 
-use function Amp\async;
 use function substr;
 
 /**
@@ -42,122 +41,113 @@ use function substr;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class ReadLoop extends SignalLoop
+final class ReadLoop extends Loop
 {
     use Common;
     /**
      * Main loop.
      */
-    public function loop(): void
+    protected function loop(): ?float
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-        $shared = $this->datacenterConnection;
-        while (true) {
-            try {
-                $error = $this->waitSignal(async($this->readMessage(...)));
-            } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
-                if ($connection->shouldReconnect()) {
-                    return;
-                }
-                EventLoop::queue(function () use ($API, $connection, $datacenter, $e): void {
-                    $API->logger->logger($e);
-                    $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                    $connection->reconnect();
-                });
-                return;
-            } catch (SecurityException $e) {
-                $connection->resetSession();
-                $API->logger->logger("Got security exception in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                $connection->reconnect();
-                throw $e;
+        try {
+            $error = $this->readMessage();
+        } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
+            if ($this->connection->shouldReconnect()) {
+                return self::STOP;
             }
-            if (\is_int($error)) {
-                EventLoop::queue(function () use ($error, $shared, $connection, $datacenter, $API): void {
-                    if ($error === -404) {
-                        if ($shared->hasTempAuthKey()) {
-                            $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
-                            $shared->setTempAuthKey(null);
-                            $shared->resetSession();
-                            foreach ($connection->new_outgoing as $message) {
-                                $message->resetSent();
-                            }
-                            $shared->reconnect();
-                            $API->initAuthorization();
-                        } else {
-                            $connection->reconnect();
-                        }
-                    } elseif ($error === -1) {
-                        $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", Logger::WARNING);
-                        $connection->reconnect();
-                    } elseif ($error === 0) {
-                        $API->logger->logger("Got NOOP from DC {$datacenter}", Logger::WARNING);
-                        $connection->reconnect();
-                    } elseif ($error === -429) {
-                        $API->logger->logger("Got -429 from DC {$datacenter}", Logger::WARNING);
-                        Tools::sleep(3);
-                        $connection->reconnect();
-                    } else {
-                        $connection->reconnect();
-                        throw new RPCErrorException($error, $error);
-                    }
-                });
-                return;
-            }
-            $connection->httpReceived();
-            if ($shared->isHttp()) {
-                EventLoop::queue($connection->pingHttpWaiter(...));
-            }
-            EventLoop::queue($connection->handleMessages(...));
+            EventLoop::queue(function () use ($e): void {
+                $this->logger->logger($e);
+                $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+                $this->connection->reconnect();
+            });
+            return self::STOP;
+        } catch (SecurityException $e) {
+            $this->connection->resetSession();
+            $this->logger->logger("Got security exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+            $this->connection->reconnect();
+            throw $e;
         }
+        if (\is_int($error)) {
+            EventLoop::queue(function () use ($error): void {
+                if ($error === -404) {
+                    if ($this->shared->hasTempAuthKey()) {
+                        $this->logger->logger("WARNING: Resetting auth key in DC {$this->datacenter}...", Logger::WARNING);
+                        $this->shared->setTempAuthKey(null);
+                        $this->shared->resetSession();
+                        foreach ($this->connection->new_outgoing as $message) {
+                            $message->resetSent();
+                        }
+                        $this->shared->reconnect();
+                        $this->API->initAuthorization();
+                    } else {
+                        $this->connection->reconnect();
+                    }
+                } elseif ($error === -1) {
+                    $this->logger->logger("WARNING: Got quick ack from DC {$this->datacenter}", Logger::WARNING);
+                    $this->connection->reconnect();
+                } elseif ($error === 0) {
+                    $this->logger->logger("Got NOOP from DC {$this->datacenter}", Logger::WARNING);
+                    $this->connection->reconnect();
+                } elseif ($error === -429) {
+                    $this->logger->logger("Got -429 from DC {$this->datacenter}", Logger::WARNING);
+                    Tools::sleep(3);
+                    $this->connection->reconnect();
+                } else {
+                    $this->connection->reconnect();
+                    throw new RPCErrorException($error, $error);
+                }
+            });
+            return self::STOP;
+        }
+        $this->connection->httpReceived();
+        if ($this->shared->isHttp()) {
+            EventLoop::queue($this->connection->pingHttpWaiter(...));
+        }
+        EventLoop::queue($this->connection->handleMessages(...));
+        return self::CONTINUE;
     }
     public function readMessage(): ?int
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-        $shared = $this->datacenterConnection;
-        if ($connection->shouldReconnect()) {
-            $API->logger->logger('Not reading because connection is old');
+        if ($this->connection->shouldReconnect()) {
+            $this->logger->logger('Not reading because connection is old');
             throw new NothingInTheSocketException();
         }
         try {
-            $buffer = $connection->stream->getReadBuffer($payload_length);
+            $buffer = $this->connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
-            $API->logger->logger($e->getReason());
+            $this->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
                 $payload = -((int) \substr($e->getReason(), 7));
-                $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ERROR);
+                $this->logger->logger("Received {$payload} from DC ".$this->datacenter, Logger::ERROR);
                 return $payload;
             }
             throw $e;
         }
         if ($payload_length === 4) {
             $payload = Tools::unpackSignedInt($buffer->bufferRead(4));
-            $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ULTRA_VERBOSE);
+            $this->logger->logger("Received {$payload} from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
             return $payload;
         }
-        $connection->reading(true);
+        $this->connection->reading(true);
         try {
             $seq_no = null;
             $auth_key_id = $buffer->bufferRead(8);
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
                 $message_id = $buffer->bufferRead(8);
-                $connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
+                $this->connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
                 $message_length = \unpack('V', $buffer->bufferRead(4))[1];
                 $message_data = $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
                 if ($left) {
-                    $API->logger->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
+                    $this->logger->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
                     if ($left < (-$message_length & 15)) {
-                        $API->logger->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
+                        $this->logger->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
                     }
                     $buffer->bufferRead($left);
                 }
-            } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
+            } elseif ($auth_key_id === $this->shared->getTempAuthKey()->getID()) {
                 $message_key = $buffer->bufferRead(16);
-                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
+                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->shared->getTempAuthKey()->getAuthKey(), false);
                 $payload_length -= 24;
                 $left = $payload_length & 15;
                 $payload_length -= $left;
@@ -165,23 +155,23 @@ final class ReadLoop extends SignalLoop
                 if ($left) {
                     $buffer->bufferRead($left);
                 }
-                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
+                if ($message_key != \substr(\hash('sha256', \substr($this->shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new SecurityException('msg_key mismatch');
                 }
                 /*
                                 $server_salt = substr($decrypted_data, 0, 8);
-                                if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {
-                                $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
+                                if ($server_salt != $this->shared->getTempAuthKey()->getServerSalt()) {
+                                $this->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
                                 }
                 */
                 $session_id = \substr($decrypted_data, 8, 8);
-                if ($session_id !== $connection->session_id) {
-                    $API->logger->logger('Session ID mismatch', Logger::FATAL_ERROR);
-                    $connection->resetSession();
+                if ($session_id !== $this->connection->session_id) {
+                    $this->logger->logger('Session ID mismatch', Logger::FATAL_ERROR);
+                    $this->connection->resetSession();
                     throw new NothingInTheSocketException();
                 }
                 $message_id = \substr($decrypted_data, 16, 8);
-                $connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
+                $this->connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
                 $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
                 $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {
@@ -201,21 +191,21 @@ final class ReadLoop extends SignalLoop
                 }
                 $message_data = \substr($decrypted_data, 32, $message_data_length);
             } else {
-                $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
+                $this->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
             }
-            $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
+            $this->logger->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
 
-            $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
-            $sideEffects = $API->getTL()->getSideEffects();
+            $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
+            $sideEffects = $this->API->getTL()->getSideEffects();
             $message = new IncomingMessage($deserialized, $message_id);
             $message->setSideEffects($sideEffects);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }
-            $connection->new_incoming[$message_id] = $connection->incoming_messages[$message_id] = $message;
+            $this->connection->new_incoming[$message_id] = $this->connection->incoming_messages[$message_id] = $message;
         } finally {
-            $connection->reading(false);
+            $this->connection->reading(false);
         }
         return null;
     }

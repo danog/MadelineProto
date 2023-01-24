@@ -24,18 +24,15 @@ use danog\MadelineProto\Logger;
 
 trait LoggerLoop
 {
-    /**
-     * Logger instance.
-     */
-    protected Logger $logger;
+    private bool $logPauses = true;
+
     /**
      * Constructor.
      *
      * @param Logger $logger Logger instance
      */
-    public function __construct(Logger $logger)
+    public function __construct(private Logger $logger)
     {
-        $this->logger = $logger;
     }
 
     /**
@@ -59,14 +56,16 @@ trait LoggerLoop
     /**
      * Report pause, can be overriden for logging.
      *
-     * @param integer $timeout Pause duration, 0 = forever
+     * @param float $timeout Pause duration, 0 = forever
      */
-    protected function reportPause(int $timeout): void
+    protected function reportPause(?float $timeout): void
     {
-        $this->logger->logger(
-            "Pausing $this for $timeout",
-            Logger::ULTRA_VERBOSE,
-        );
+        if ($this->logPauses) {
+            $this->logger->logger(
+                "Pausing $this for $timeout",
+                Logger::ULTRA_VERBOSE,
+            );
+        }
     }
 
     /**

@@ -547,7 +547,7 @@ trait UpdateHandler
                 }
                 if ($update['qts'] > $cur_state->qts() + 1) {
                     $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
-                    $this->updaters[UpdateLoop::GENERIC]->resumeDefer();
+                    $this->updaters[UpdateLoop::GENERIC]->resume();
                     return;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);

@@ -77,7 +77,7 @@ trait ResponseHandler
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
                     if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
-                        $this->API->updaters[UpdateLoop::GENERIC]->resumeDefer();
+                        $this->API->updaters[UpdateLoop::GENERIC]->resume();
                     }
                     break;
                 case 'msg_container':

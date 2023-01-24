@@ -20,57 +20,42 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\MTProto\OutgoingMessage;
-
-use function Amp\async;
 
 /**
  * HttpWait loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class HttpWaitLoop extends ResumableSignalLoop
+final class HttpWaitLoop extends Loop
 {
     use Common;
     /**
      * Main loop.
      */
-    public function loop(): void
+    protected function loop(): ?float
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-        $shared = $this->datacenterConnection;
-        if (!$shared->isHttp()) {
-            return;
+        if (!$this->shared->isHttp() || !$this->connection->isHttp()) {
+            return self::STOP;
         }
-        while (true) {
-            if ($this->waitSignal(async($this->pause(...)))) {
-                return;
-            }
-            if (!$connection->isHttp()) {
-                return;
-            }
-            while (!$shared->hasTempAuthKey()) {
-                if ($this->waitSignal(async($this->pause(...)))) {
-                    return;
-                }
-            }
-            $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
-            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pendingOutgoing) || !empty($connection->new_outgoing) && !$connection->hasPendingCalls())) {
-                $connection->sendMessage(
-                    new OutgoingMessage(
-                        ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
-                        'http_wait',
-                        '',
-                        false,
-                        false,
-                    ),
-                );
-            }
-            $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
+        if (!$this->shared->hasTempAuthKey()) {
+            return self::PAUSE;
         }
+        $this->logger->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
+        if ($this->connection->countHttpSent() === $this->connection->countHttpReceived() && (!empty($this->connection->pendingOutgoing) || !empty($this->connection->new_outgoing) && !$this->connection->hasPendingCalls())) {
+            $this->connection->sendMessage(
+                new OutgoingMessage(
+                    ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
+                    'http_wait',
+                    '',
+                    false,
+                    false,
+                ),
+            );
+        }
+        $this->logger->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
+        return self::PAUSE;
     }
     /**
      * Loop name.

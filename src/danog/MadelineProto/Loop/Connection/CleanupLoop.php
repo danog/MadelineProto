@@ -20,29 +20,35 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\Loop\ResumableSignalLoop;
-
-use function Amp\async;
+use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 
 /**
  * Message cleanup loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-final class CleanupLoop extends ResumableSignalLoop
+final class CleanupLoop extends Loop
 {
-    use Common;
+    use Common {
+        __construct as initCommon;
+    }
+
+    public function __construct(Connection $connection)
+    {
+        $this->initCommon($connection);
+        $this->logPauses = false;
+    }
+
     /**
      * Main loop.
      */
-    public function loop(): void
+    protected function loop(): ?float
     {
-        $connection = $this->connection;
-        while (!$this->waitSignal(async($this->pause(...), 1000))) {
-            if (isset($connection->msgIdHandler)) {
-                $connection->msgIdHandler->cleanup();
-            }
-        }
+        $this->connection->msgIdHandler?->cleanup();
+        return 1.0;
     }
     /**
      * Loop name.
