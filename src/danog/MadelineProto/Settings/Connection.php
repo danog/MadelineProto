@@ -219,7 +219,7 @@ final class Connection extends SettingsAbstract
     }
     public function init(): void
     {
-        Magic::start(true);
+        Magic::start(light: true);
 
         if (Magic::$altervista) {
             $this->addProxy(HttpProxy::class, ['address' => 'localhost', 'port' => 80]);

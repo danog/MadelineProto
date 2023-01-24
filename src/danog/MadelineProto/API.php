@@ -146,7 +146,7 @@ final class API extends InternalDoc
      */
     public function __construct(string $session, array|SettingsAbstract $settings = [])
     {
-        Magic::start(true);
+        Magic::start(light: true);
         $settings = Settings::parseFromLegacy($settings);
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());

@@ -602,7 +602,7 @@ final class MTProto implements TLCallback, LoggerGetter
     private function initialize(Settings|SettingsEmpty $settings): void
     {
         // Initialize needed stuffs
-        Magic::start();
+        Magic::start(light: false);
         // Parse and store settings
         $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
@@ -1056,7 +1056,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void
     {
         // Setup one-time stuffs
-        Magic::start();
+        Magic::start(light: false);
 
         // Set reference to itself
         self::$references[\spl_object_hash($this)] = $this;

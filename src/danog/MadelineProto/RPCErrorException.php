@@ -78,7 +78,7 @@ final class RPCErrorException extends \Exception
     }
     public function __toString(): string
     {
-        Magic::start(true);
+        Magic::start(light: true);
         $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
         $result = \sprintf(Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {

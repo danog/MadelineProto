@@ -103,7 +103,7 @@ use Webmozart\Assert\Assert;
         $runnerId = (int) $runnerId;
 
         try {
-            Magic::start();
+            Magic::start(light: false);
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
             $session = new SessionPaths($session);

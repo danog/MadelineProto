@@ -14,7 +14,7 @@ final class Ipc extends SettingsAbstract
 {
     public function __construct()
     {
-        Magic::start(true);
+        Magic::start(light: true);
     }
 
     public function mergeArray(array $settings): void

@@ -205,7 +205,7 @@ final class Magic
      *
      * @param bool $light Use lightweight initialization routine
      */
-    public static function start(bool $light = false): void
+    public static function start(bool $light): void
     {
         if (self::$inited || (self::$initedLight && $light)) {
             return;
