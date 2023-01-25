@@ -69,9 +69,7 @@ abstract class AbstractAPIFactory
         $a->methods =& $b->methods;
         if ($b instanceof API) {
             $a->mainAPI = $b;
-            $b->mainAPI = $b;
         } elseif ($a instanceof API) {
-            $a->mainAPI = $a;
             $b->mainAPI = $a;
         } else {
             $a->mainAPI =& $b->mainAPI;
@@ -107,26 +105,12 @@ abstract class AbstractAPIFactory
             if (isset($args[0]) && !isset($args['multiple'])) {
                 throw new InvalidArgumentException('Parameter names must be provided!');
             }
-            return $this->mainAPI->API->methodCallAsyncRead($name, $args, $aargs);
+            return $this->mainAPI->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
         }
         if ($lower_name === 'seteventhandler') {
             throw new InvalidArgumentException('Cannot call setEventHandler like this, please use MyEventHandler::startAndLoop("session.madeline", $settings);');
         }
         return $this->methods[$lower_name](...$arguments);
-    }
-    /**
-     * Info to dump.
-     */
-    public function __debugInfo(): array
-    {
-        $keys = APIWrapper::properties();
-        $res = [];
-        foreach ($keys as $key) {
-            if (Tools::hasVar($this, $key)) {
-                $res[$key] = Tools::getVar($this, $key);
-            }
-        }
-        return $res;
     }
     /**
      * Sleep function.

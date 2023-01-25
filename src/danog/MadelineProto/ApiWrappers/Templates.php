@@ -27,11 +27,6 @@ use function Amp\ByteStream\getOutputBufferStream;
 trait Templates
 {
     /**
-     * API template.
-     *
-     */
-    private string $webApiTemplate = 'legacy';
-    /**
      * Generate page from template.
      *
      * @param string $message Message
@@ -39,22 +34,16 @@ trait Templates
      */
     private function webAPIEchoTemplate(string $message, string $form): string
     {
-        return \sprintf($this->webApiTemplate, $message, $form, Lang::$current_lang['go']);
+        return \sprintf($this->getWebAPITemplate(), $message, $form, Lang::$current_lang['go']);
     }
     /**
      * Get web API login HTML template string.
      */
-    public function getWebAPITemplate(): string
-    {
-        return $this->webApiTemplate;
-    }
+    abstract public function getWebAPITemplate(): string;
     /**
      * Set web API login HTML template string.
      */
-    public function setWebAPITemplate(string $template): void
-    {
-        $this->webApiTemplate = $template;
-    }
+    abstract public function setWebAPITemplate(string $template): void;
     /**
      * Echo to browser.
      *

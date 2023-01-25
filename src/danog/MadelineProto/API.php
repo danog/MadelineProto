@@ -107,18 +107,7 @@ final class API extends InternalDoc
      *
      * @internal
      */
-    public SessionPaths $session;
-
-    /**
-     * Instance of MadelineProto.
-     *
-     */
-    protected MTProto|Client|null $API = null;
-
-    /**
-     * Storage for externally set properties to be serialized.
-     */
-    protected array $storage = [];
+    private SessionPaths $session;
 
     /**
      * Whether this is an old instance.
@@ -129,7 +118,7 @@ final class API extends InternalDoc
     /**
      * API wrapper (to avoid circular references).
      */
-    private ?APIWrapper $wrapper = null;
+    protected ?APIWrapper $wrapper = null;
 
     /**
      * Unlock callback.
@@ -137,6 +126,15 @@ final class API extends InternalDoc
      * @var ?callable
      */
     private $unlock = null;
+
+    public function getWebAPITemplate(): string
+    {
+        return $this->wrapper->getWebApiTemplate();
+    }
+    public function setWebApiTemplate(string $template): void
+    {
+        $this->wrapper->setWebApiTemplate($template);
+    }
 
     /**
      * Magic constructor function.
@@ -149,7 +147,10 @@ final class API extends InternalDoc
         Magic::start(light: true);
         $settings = Settings::parseFromLegacy($settings);
         $this->session = new SessionPaths($session);
-        $this->wrapper = new APIWrapper($this, $this->exportNamespace());
+        $this->wrapper = new APIWrapper(
+            $this->session,
+            $this->exportNamespace()
+        );
 
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
             if (\in_array($key, ['namespace', 'API', 'asyncAPIPromise', 'methods'])) {
@@ -183,9 +184,9 @@ final class API extends InternalDoc
             $appInfo->setApiId($app['api_id']);
             $appInfo->setApiHash($app['api_hash']);
         }
-        $this->API = new MTProto($settings, $this->wrapper);
+        $this->wrapper->setAPI(new MTProto($settings, $this->wrapper));
         $this->APIFactory();
-        $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+        $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
     /**
@@ -193,16 +194,16 @@ final class API extends InternalDoc
      */
     protected function reconnectFull()
     {
-        if ($this->API instanceof Client) {
-            $this->logger->logger('Restarting to full instance...');
+        if ($this->wrapper->getAPI() instanceof Client) {
+            $this->wrapper->logger('Restarting to full instance...');
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && (($this->hasEventHandler()) || !($this->isIpcWorker()))) {
-                    $this->logger->logger('Restarting to full instance: the bot is already running!');
+                    $this->wrapper->logger('Restarting to full instance: the bot is already running!');
                     Tools::closeConnection($this->getWebMessage('The bot is already running!'));
                     return false;
                 }
-                $this->logger->logger('Restarting to full instance: stopping IPC server...');
-                $this->API->stopIpcServer();
+                $this->wrapper->logger('Restarting to full instance: stopping IPC server...');
+                $this->wrapper->getAPI()->stopIpcServer();
             } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
@@ -212,20 +213,20 @@ final class API extends InternalDoc
                         throw $e;
                     }
                 }
-                $this->logger->logger("Restarting to full instance: error $e");
+                $this->wrapper->logger("Restarting to full instance: error $e");
             }
-            $this->logger->logger('Restarting to full instance: reconnecting...');
+            $this->wrapper->logger('Restarting to full instance: reconnecting...');
             $cancel = new DeferredFuture;
             $cb = function () use ($cancel, &$cb): void {
                 [$result] = Serialization::tryConnect($this->session->getIpcPath(), $cancel->getFuture());
                 if ($result instanceof ChannelledSocket) {
                     try {
-                        if (!$this->API instanceof Client) {
-                            $this->logger->logger('Restarting to full instance (again): the bot is already running!');
+                        if (!$this->wrapper->getAPI() instanceof Client) {
+                            $this->wrapper->logger('Restarting to full instance (again): the bot is already running!');
                             $result->disconnect();
                             return;
                         }
-                        $this->logger->logger('Restarting to full instance (again): sending shutdown signal!');
+                        $this->wrapper->logger('Restarting to full instance (again): sending shutdown signal!');
                         $result->send(Server::SHUTDOWN);
                         $result->disconnect();
                     } catch (SecurityException|SignalException $e) {
@@ -237,7 +238,7 @@ final class API extends InternalDoc
                                 throw $e;
                             }
                         }
-                        $this->logger->logger("Restarting to full instance: error in stop loop $e");
+                        $this->wrapper->logger("Restarting to full instance: error in stop loop $e");
                     }
                     EventLoop::queue($cb);
                 }
@@ -292,32 +293,28 @@ final class API extends InternalDoc
             return $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
-            $this->API = new Client($unserialized, $this->session, Logger::$default);
+            $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
             $this->APIFactory();
             return true;
         } elseif ($unserialized) {
             // Success, full session
-            if ($this->API) {
-                $this->API->unreference();
-                $this->API = null;
+            if ($this->wrapper->getAPI()) {
+                $this->wrapper->getAPI()->unreference();
+                $this->wrapper->setAPI(null);
             }
-            $unserialized->session = $this->session;
-            APIWrapper::link($this, $unserialized);
-            APIWrapper::link($this->wrapper, $this);
+            $this->wrapper->setWebApiTemplate($unserialized->getWebAPITemplate());
+            $this->wrapper->setAPI($unserialized->getAPI());
             AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
-            /** @var ?MTProto $this->API */
-            if (isset($this->API)) {
-                $this->storage = $this->API->storage ?? $this->storage;
-
+            if ($this->wrapper->getAPI()) {
                 unset($unserialized);
 
                 if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
-                $this->methods = self::getInternalMethodList($this->API, MTProto::class);
-                $this->API->wakeup($settings, $this->wrapper);
+                $this->methods = self::getInternalMethodList($this->wrapper->getAPI(), MTProto::class);
+                $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
                 $this->APIFactory();
-                $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+                $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return true;
             }
         }
@@ -350,41 +347,40 @@ final class API extends InternalDoc
      */
     public function __destruct()
     {
-        if (!$this->oldInstance) {
-            $id = \count(self::$destructors);
-            self::$destructors[$id] = async(function () use ($id): void {
-                $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
-                if ($this->API) {
-                    $this->API->unreference();
-                }
-                if (isset($this->wrapper)) {
-                    $this->logger->logger('Prompting final serialization...');
-                    $this->wrapper->serialize();
-                    $this->logger->logger('Done final serialization!');
-                }
-                if ($this->unlock) {
-                    ($this->unlock)();
-                }
-                unset(self::$destructors[$id]);
-            });
-        } elseif ($this->logger) {
-            $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
+        if ($this->oldInstance) {
+            return;
         }
+        $id = \count(self::$destructors);
+        self::$destructors[$id] = async(function () use ($id): void {
+            $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');
+            if ($this->wrapper->getAPI()) {
+                $this->wrapper->getAPI()->unreference();
+            }
+            if (isset($this->wrapper)) {
+                $this->wrapper->logger('Prompting final serialization...');
+                $this->wrapper->serialize();
+                $this->wrapper->logger('Done final serialization!');
+            }
+            if ($this->unlock) {
+                ($this->unlock)();
+            }
+            unset(self::$destructors[$id]);
+        });
     }
     /**
      * Init API wrapper.
      */
     private function APIFactory(): void
     {
-        if ($this->API && $this->API->isInited()) {
-            if ($this->API instanceof MTProto) {
-                foreach ($this->API->getMethodNamespaces() as $namespace) {
+        if ($this->wrapper->getAPI()?->isInited()) {
+            if ($this->wrapper->getAPI() instanceof MTProto) {
+                foreach ($this->wrapper->getAPI()->getMethodNamespaces() as $namespace) {
                     if (!$this->{$namespace}) {
                         $this->{$namespace} = $this->exportNamespace($namespace);
                     }
                 }
             }
-            $this->methods = self::getInternalMethodList($this->API, MTProto::class);
+            $this->methods = self::getInternalMethodList($this->wrapper->getAPI(), MTProto::class);
         }
     }
 
@@ -413,12 +409,12 @@ final class API extends InternalDoc
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->API->isInited() || !$started)) {
-                    $this->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
+                if ($errors[$t] > 10 && (!$this->wrapper->getAPI()->isInited() || !$started)) {
+                    $this->wrapper->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
-                $this->logger->logger((string) $e, Logger::FATAL_ERROR);
+                $this->wrapper->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
         );
@@ -455,11 +451,11 @@ final class API extends InternalDoc
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
                 if ($errors[$t] > 10 && \array_sum($started) !== \count($eventHandler)) {
-                    $instanceOne->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
+                    $instanceOne->wrapper->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;
-                $instanceOne->logger->logger((string) $e, Logger::FATAL_ERROR);
+                $instanceOne->wrapper->logger((string) $e, Logger::FATAL_ERROR);
                 $instanceOne->report("Surfaced: $e");
             }
         );
@@ -488,54 +484,8 @@ final class API extends InternalDoc
             return;
         }
 
-        $this->API->setEventHandler($eventHandler);
+        $this->wrapper->getAPI()->setEventHandler($eventHandler);
         $started = true;
-        /** @var API $this->API */
-        $this->API->loop();
-    }
-    /**
-     * Get attribute.
-     *
-     * @param string $name Attribute nam
-     * @internal
-     */
-    public function &__get(string $name)
-    {
-        if ($name === 'logger') {
-            if (isset($this->API)) {
-                return $this->API->logger;
-            }
-            return Logger::$default;
-        }
-        return $this->storage[$name];
-    }
-    /**
-     * Set an attribute.
-     *
-     * @param string $name  Name
-     * @param mixed  $value Value
-     * @internal
-     */
-    public function __set(string $name, mixed $value)
-    {
-        return $this->storage[$name] = $value;
-    }
-    /**
-     * Whether an attribute exists.
-     *
-     * @param string $name Attribute name
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->storage[$name]);
-    }
-    /**
-     * Unset attribute.
-     *
-     * @param string $name Attribute name
-     */
-    public function __unset(string $name): void
-    {
-        unset($this->storage[$name]);
+        $this->wrapper->getAPI()->loop();
     }
 }

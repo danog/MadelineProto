@@ -24,65 +24,34 @@ use danog\MadelineProto\Ipc\Client;
 
 final class APIWrapper
 {
-    /**
-     * MTProto instance.
-     *
-     */
     private MTProto|Client|null $API = null;
-
-    /**
-     * Session path.
-     */
-    public SessionPaths $session;
-
-    /**
-     * Web API template.
-     */
     private string $webApiTemplate = '';
 
     /**
-     * AbstractAPIFactory instance.
-     */
-    private AbstractAPIFactory $factory;
-
-    /**
-     * Property storage.
-     */
-    public array $storage = [];
-    /**
      * API wrapper.
-     *
-     * @param API                $API     API instance to wrap
-     * @param AbstractAPIFactory $factory Factory
      */
-    public function __construct(API $API, AbstractAPIFactory $factory)
-    {
-        self::link($this, $API);
-        $this->factory = $factory;
+    public function __construct(
+        private SessionPaths $session,
+        private AbstractAPIFactory $factory,
+    ) {
     }
 
-    /**
-     * Link two APIWrapper and API instances.
-     *
-     * @param API|APIWrapper $a Instance to which link
-     * @param API|APIWrapper $b Instance from which link
-     *
-     * @psalm-suppress InvalidPassByReference
-     */
-    public static function link(API|APIWrapper $a, API|APIWrapper $b): void
+    public function getWebApiTemplate(): string
     {
-        foreach (self::properties() as $var) {
-            Tools::setVar($a, $var, Tools::getVar($b, $var));
-        }
-        Tools::setVar($a, 'session', Tools::getVar($b, 'session'));
+        return $this->webApiTemplate;
+    }
+    public function setWebApiTemplate(string $template): void
+    {
+        $this->webApiTemplate = $template;
     }
 
-    /**
-     * Property list.
-     */
-    public static function properties(): array
+    public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
-        return ['API', 'webApiTemplate', 'storage'];
+        ($this->API->logger ?? Logger::$default)->logger($param, $level, $file);
+    }
+    public function setAPI(Client|MTProto|null $API): void
+    {
+        $this->API = $API;
     }
 
     /**
@@ -90,14 +59,13 @@ final class APIWrapper
      */
     public function __sleep(): array
     {
-        return self::properties();
+        return ['API', 'webApiTemplate'];
     }
 
     /**
      * Get MTProto instance.
-     *
      */
-    public function &getAPI(): Client|MTProto|null
+    public function getAPI(): Client|MTProto|null
     {
         return $this->API;
     }
@@ -131,9 +99,7 @@ final class APIWrapper
         if ($this->API instanceof Client) {
             return false;
         }
-        if ($this->API) {
-            $this->API->waitForInit();
-        }
+        $this->API->waitForInit();
 
         $this->session->serialize(
             $this->API->serializeSession($this),
