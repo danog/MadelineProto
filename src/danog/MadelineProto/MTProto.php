@@ -62,7 +62,6 @@ use danog\MadelineProto\Wrappers\Login;
 use danog\MadelineProto\Wrappers\Loop;
 use danog\MadelineProto\Wrappers\Start;
 use danog\MadelineProto\Wrappers\Templates;
-use danog\MadelineProto\Wrappers\TOS;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -103,7 +102,6 @@ final class MTProto implements TLCallback, LoggerGetter
     use Loop;
     use Start;
     use Templates;
-    use TOS;
     use DbPropertiesTrait;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
@@ -270,11 +268,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $config = ['expires' => -1];
     /**
-     * TOS info.
-     *
-     */
-    private array $tos = ['expires' => 0, 'accepted' => true];
-    /**
      * Whether we're initing authorization.
      *
      */
@@ -384,17 +377,13 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public MinDatabase $minDatabase;
     /**
-     * TOS check loop.
-     */
-    public ?PeriodicLoopInternal $checkTosLoop = null;
-    /**
      * Phone config loop.
      */
     public ?PeriodicLoopInternal $phoneConfigLoop = null;
     /**
      * Config loop.
      */
-    public ?PeriodicLoopInternal  $configLoop = null;
+    public ?PeriodicLoopInternal $configLoop = null;
     /**
      * Call checker loop.
      */
@@ -709,7 +698,6 @@ final class MTProto implements TLCallback, LoggerGetter
             'last_stored',
             'qres',
             'supportUser',
-            'tos',
 
             // Event handler
             'event_handler',

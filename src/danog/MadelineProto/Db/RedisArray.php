@@ -12,6 +12,12 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
 /**
  * Redis database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends DriverArray<TKey, TValue>
  */
 class RedisArray extends DriverArray
 {

@@ -13,6 +13,12 @@ use PDO;
 
 /**
  * MySQL database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends SqlArray<TKey, TValue>
  */
 class MysqlArray extends SqlArray
 {

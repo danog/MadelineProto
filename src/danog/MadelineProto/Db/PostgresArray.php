@@ -13,6 +13,11 @@ use PDO;
 
 /**
  * Postgres database backend.
+ *
+ * @internal
+ * @template TKey as array-key
+ * @template TValue
+ * @extends DriverArray<TKey, TValue>
  */
 class PostgresArray extends SqlArray
 {

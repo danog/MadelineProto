@@ -12,6 +12,12 @@ use function serialize;
 
 /**
  * Generic SQL database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends DriverArray<TKey, TValue>
  */
 abstract class SqlArray extends DriverArray
 {

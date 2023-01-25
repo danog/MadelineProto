@@ -6281,13 +6281,6 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, [$params]);
     }
     /**
-     * Accept terms of service update.
-     */
-    public function acceptTos(): void
-    {
-        $this->__call(__FUNCTION__, []);
-    }
-    /**
      * Add user info.
      *
      * @param array $user User info
@@ -6420,15 +6413,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id]);
     }
     /**
-     * Check for terms of service update.
-     *
-     * Will throw a \danog\MadelineProto\Exception if a new TOS is available.
-     */
-    public function checkTos(): void
-    {
-        $this->__call(__FUNCTION__, []);
-    }
-    /**
      * Close connection with client, connected via web.
      *
      * @param string $message Message
@@ -6491,15 +6475,6 @@ class InternalDoc extends APIFactory
     public function connectToAllDcs(bool $reconnectAll = true): void
     {
         $this->__call(__FUNCTION__, [$reconnectAll]);
-    }
-    /**
-     * Decline terms of service update.
-     *
-     * THIS WILL DELETE YOUR ACCOUNT!
-     */
-    public function declineTos(): void
-    {
-        $this->__call(__FUNCTION__, []);
     }
     /**
      * Discard call.

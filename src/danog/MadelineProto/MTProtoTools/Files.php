@@ -1068,14 +1068,12 @@ trait Files
         } while (true);
     }
     /**
-     * @var array<int, array{limit: int, hash: string}>
+     * @var array<string, array<int, array{limit: int, hash: string}>>
      */
     private array $cdn_hashes = [];
     private function addCdnHashes(string $file, array $hashes): void
     {
-        if (!isset($this->cdn_hashes[$file])) {
-            $this->cdn_hashes = [];
-        }
+        $this->cdn_hashes ??= [];
         foreach ($hashes as $hash) {
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }

@@ -454,7 +454,7 @@ final class API extends InternalDoc
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->API->isInited() || \array_sum($started) !== \count($eventHandler))) {
+                if ($errors[$t] > 10 && \array_sum($started) !== \count($eventHandler)) {
                     $instanceOne->logger->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
                     return;
                 }

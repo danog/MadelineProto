@@ -23,7 +23,7 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
-Magic::start();
+Magic::start(light: false);
 Logger::constructorFromSettings(new SettingsLogger);
 $logger = Logger::$default;
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);

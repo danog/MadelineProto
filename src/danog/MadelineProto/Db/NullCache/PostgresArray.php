@@ -9,6 +9,10 @@ use danog\MadelineProto\Db\PostgresArray as DbPostgresArray;
 /**
  * Postgres database backend, no caching.
  *
+ * @template TKey as array-key
+ * @template TValue
+ *
+ * @extends DbPostgresArray<TKey, TValue>
  * @internal
  */
 final class PostgresArray extends DbPostgresArray

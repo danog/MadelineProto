@@ -20,6 +20,9 @@ use function Amp\File\move;
 use function Amp\File\read;
 use function Amp\File\write;
 
+/**
+ * @psalm-suppress UndefinedConstant
+ */
 final class GarbageCollector
 {
     /**
@@ -94,7 +97,6 @@ final class GarbageCollector
                     return true;
                 }
 
-                /** @psalm-suppress UndefinedConstant */
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
                     $base = \basename($path);
                     if ($base === 'madeline-'.Magic::$version.'.phar') {
@@ -130,7 +132,6 @@ final class GarbageCollector
     {
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
-            Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
             /*$k = 0;
             foreach (self::$map as $fiber => $_) {
                 if ($k++ === 0) {
@@ -154,8 +155,10 @@ final class GarbageCollector
                 }
                 \var_dump($tlTrace);
             }
+            Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
             $fibers = self::$map->count();
-            Logger::log("Running fibers: $fibers", Logger::ULTRA_VERBOSE);*/
+            $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
+            Logger::log("Running fibers: $fibers, maps: $maps", Logger::ULTRA_VERBOSE);*/
         }
         return (int) $memory;
     }

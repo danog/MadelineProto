@@ -437,7 +437,12 @@ final class DataCenterConnection implements JsonSerializable
         $count = $media ? $this->API->getSettings()->getConnection()->getMinMediaSocketCount() : 1;
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoopInternal($this->API, $this->even(...), "robin loop DC {$this->datacenter}", $this->API->getSettings()->getConnection()->getRobinPeriod());
+                $this->robinLoop = new PeriodicLoopInternal(
+                    $this->API,
+                    $this->even(...),
+                    "robin loop DC {$this->datacenter}",
+                    $this->API->getSettings()->getConnection()->getRobinPeriod()
+                );
             }
             $this->robinLoop->start();
         }

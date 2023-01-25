@@ -44,7 +44,7 @@ final class PingLoop extends Loop
     {
         $this->constructCommon($connection);
         $this->timeout = $this->shared->getSettings()->getPingInterval();
-        $this->timeoutDisconnect = (int)($this->timeout) + 15;
+        $this->timeoutDisconnect = (int) ($this->timeout) + 15;
     }
     /**
      * Main loop.

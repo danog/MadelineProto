@@ -11,7 +11,12 @@ use danog\MadelineProto\Settings\Database\Memory;
 /**
  * Memory database backend.
  *
- * @extends ArrayIterator<array-key, mixed>
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends ArrayIterator<TKey, TValue>
+ * @implements DbArray<TKey, TValue>
  */
 final class MemoryArray extends ArrayIterator implements DbArray
 {
@@ -40,29 +45,50 @@ final class MemoryArray extends ArrayIterator implements DbArray
         return new static($previous);
     }
 
+    /**
+     * @param TKey $key
+     * @param TValue $value
+     */
     public function set(string|int $key, mixed $value): void
     {
         parent::offsetSet($key, $value);
     }
+    /**
+     * @param TKey $key
+     */
     public function isset(string|int $key): bool
     {
         return parent::offsetExists($key);
     }
+    /**
+     * @param TKey $key
+     */
     public function unset(string|int $key): void
     {
         parent::offsetUnset($key);
     }
 
+    /**
+     * @param TKey $offset
+     */
     public function offsetExists(mixed $offset): bool
     {
         return parent::offsetExists($offset);
     }
 
+    /**
+     * @param TKey $offset
+     *
+     * @return TValue
+     */
     public function offsetGet(mixed $offset): mixed
     {
         return parent::offsetExists($offset) ? parent::offsetGet($offset) : null;
     }
 
+    /**
+     * @param TKey $offset
+     */
     public function offsetUnset(mixed $offset): void
     {
         parent::offsetUnset($offset);

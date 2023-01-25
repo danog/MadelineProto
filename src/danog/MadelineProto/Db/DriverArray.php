@@ -16,7 +16,13 @@ use function Amp\Future\await;
 /**
  * Array caching trait.
  *
- * @implements IteratorAggregate<array-key, mixed>
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ *
+ * @implements IteratorAggregate<TKey, TValue>
+ * @implements DbArray<TKey, TValue>
  */
 abstract class DriverArray implements DbArray, IteratorAggregate
 {
