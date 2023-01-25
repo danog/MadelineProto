@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
+use Revolt\EventLoop;
 use Throwable;
 
 /**
@@ -31,7 +33,19 @@ use Throwable;
  */
 final class PingLoop extends Loop
 {
-    use Common;
+    use Common {
+        __construct as constructCommon;
+    }
+    private int $timeoutDisconnect;
+    /**
+     * Constructor function.
+     */
+    public function __construct(Connection $connection)
+    {
+        $this->constructCommon($connection);
+        $this->timeout = $this->shared->getSettings()->getPingInterval();
+        $this->timeoutDisconnect = (int)($this->timeout) + 15;
+    }
     /**
      * Main loop.
      */
@@ -42,17 +56,16 @@ final class PingLoop extends Loop
             return self::PAUSE;
         }
 
-        $timeout = $this->shared->getSettings()->getPingInterval();
-        $timeoutDisconnect = (int) $timeout+15;
-
-        $this->logger->logger("Ping DC {$this->datacenter}");
-        try {
-            $this->connection->methodCallAsyncWrite('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
-        } catch (Throwable $e) {
-            $this->logger->logger("Error while pinging DC {$this->datacenter}");
-            $this->logger->logger((string) $e);
-        }
-        return $timeout;
+        EventLoop::queue(function (): void {
+            $this->logger->logger("Ping DC {$this->datacenter}");
+            try {
+                $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $this->timeoutDisconnect]);
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while pinging DC {$this->datacenter}");
+                $this->logger->logger((string) $e);
+            }
+        });
+        return $this->timeout;
     }
     /**
      * Get loop name.
