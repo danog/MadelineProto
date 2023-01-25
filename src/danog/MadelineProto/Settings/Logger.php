@@ -191,7 +191,7 @@ final class Logger extends SettingsAbstract
      */
     public function setLevel(int $level): self
     {
-        $this->level = \max($level, MadelineProtoLogger::NOTICE);
+        $this->level = $level;
 
         return $this;
     }
