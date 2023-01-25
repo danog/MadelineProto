@@ -144,7 +144,7 @@ final class ReferenceDatabase implements TLCallback
         $this->cache = [];
 
         if ($ctx || $cache) {
-            throw new Exception("Found $ctx pending contexts and $cache pending locations, pending serializations: ".ReadLoop::$des);
+            throw new Exception("Found $ctx pending contexts and $cache pending locations");
         }
     }
     public function addReference(array $location): bool

@@ -431,7 +431,7 @@ final class TL
     /**
      * @template T
      *
-     * @param list<array<string, list{list<T>, bool, string}>> $callbacks
+     * @param list<list{array<string, list<T>>, bool, string}>> $callbacks
      * @return array<string, list<T>>
      */
     private function mergeCallbacks(array $callbacks): array

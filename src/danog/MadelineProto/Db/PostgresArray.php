@@ -17,7 +17,7 @@ use PDO;
  * @internal
  * @template TKey as array-key
  * @template TValue
- * @extends DriverArray<TKey, TValue>
+ * @extends SqlArray<TKey, TValue>
  */
 class PostgresArray extends SqlArray
 {

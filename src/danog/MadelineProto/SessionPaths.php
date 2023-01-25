@@ -262,6 +262,7 @@ final class SessionPaths
      */
     public function getLightState(): LightState
     {
+        /** @var LightState */
         return $this->lightState ??= $this->unserialize($this->lightStatePath);
     }
 
