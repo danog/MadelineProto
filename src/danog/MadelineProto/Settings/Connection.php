@@ -76,7 +76,7 @@ final class Connection extends SettingsAbstract
     /**
      * Connection timeout.
      */
-    protected float $timeout = 2.0;
+    protected float $timeout = 5.0;
     /**
      * Ping interval.
      */

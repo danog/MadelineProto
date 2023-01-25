@@ -131,14 +131,31 @@ final class GarbageCollector
         $memory = \round(\memory_get_usage()/1024/1024, 1);
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
-            /*$fibers = self::$map->count();
-            Logger::log("Running fibers: $fibers", Logger::ULTRA_VERBOSE);
-            /*foreach (self::$map as $fiber => $_) {
-                if ($fiber->isTerminated()) continue;
-                if (!$fiber->isStarted()) continue;
+            /*$k = 0;
+            foreach (self::$map as $fiber => $_) {
+                if ($k++ === 0) {
+                    continue;
+                }
+                if ($fiber->isTerminated()) {
+                    continue;
+                }
+                if (!$fiber->isStarted()) {
+                    continue;
+                }
                 $reflection = new ReflectionFiber($fiber);
-                Logger::log($reflection->getExecutingFile(), Logger::ULTRA_VERBOSE);
-            }*/
+
+                $tlTrace = '';
+                foreach ($reflection->getTrace() as $k => $frame) {
+                    $tlTrace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
+                    $tlTrace .= isset($frame['function']) ? $frame['function'].'(' : '';
+                    $tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']) ?: '', 1, -1) : '';
+                    $tlTrace .= ')';
+                    $tlTrace .= "\n";
+                }
+                \var_dump($tlTrace);
+            }
+            $fibers = self::$map->count();
+            Logger::log("Running fibers: $fibers", Logger::ULTRA_VERBOSE);*/
         }
         return (int) $memory;
     }

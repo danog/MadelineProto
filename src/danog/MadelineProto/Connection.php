@@ -35,6 +35,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use Webmozart\Assert\Assert;
 
 /**
  * Connection class.
@@ -280,14 +281,14 @@ final class Connection
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-        $this->writer->start();
-        $this->reader->start();
-        if (!$this->checker->start()) {
-            $this->checker->resume();
+        Assert::true($this->writer->start());
+        Assert::true($this->reader->start());
+        Assert::true($this->checker->start());
+        Assert::true($this->cleanup->start());
+        Assert::true($this->waiter->start());
+        if ($this->pinger) {
+            Assert::true($this->pinger?->start());
         }
-        $this->cleanup->start();
-        $this->waiter->start();
-        $this->pinger?->start();
     }
     /**
      * Apply method abstractions.

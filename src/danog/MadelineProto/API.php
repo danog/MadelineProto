@@ -339,7 +339,9 @@ final class API extends InternalDoc
      */
     public static function finalize(): void
     {
-        await(self::$destructors);
+        if (self::$destructors) {
+            await(self::$destructors);
+        }
     }
     /**
      * Destruct function.
