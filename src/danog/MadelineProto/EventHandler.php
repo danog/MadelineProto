@@ -49,7 +49,7 @@ abstract class EventHandler extends InternalDoc
     }
 
     /**
-     * Start MadelineProto and the event handler (enables async).
+     * Start MadelineProto and the event handler.
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
@@ -62,7 +62,7 @@ abstract class EventHandler extends InternalDoc
         $API->startAndLoop(static::class);
     }
     /**
-     * Start MadelineProto as a bot and the event handler (enables async).
+     * Start MadelineProto as a bot and the event handler.
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *

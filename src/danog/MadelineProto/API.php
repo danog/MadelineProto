@@ -37,6 +37,7 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -346,44 +347,6 @@ final class API extends InternalDoc
     }
 
     /**
-     * Start MadelineProto and the event handler (enables async).
-     *
-     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-     *
-     * @param string $eventHandler Event handler class name
-     */
-    public function startAndLoop(string $eventHandler): void
-    {
-        $started = false;
-        $errors = [];
-        $prev = EventLoop::getErrorHandler();
-        EventLoop::setErrorHandler(
-            function (\Throwable $e) use (&$errors, &$started): void {
-                if ($e instanceof UnhandledFutureError) {
-                    $e = $e->getPrevious();
-                }
-                if ($e instanceof SecurityException || $e instanceof SignalException) {
-                    throw $e;
-                }
-                if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
-                    throw $e;
-                }
-                $t = \time();
-                $errors = [$t => $errors[$t] ?? 0];
-                $errors[$t]++;
-                if ($errors[$t] > 10 && (!$this->wrapper->getAPI()->isInited() || !$started)) {
-                    $this->wrapper->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
-                    return;
-                }
-                echo $e;
-                $this->wrapper->logger((string) $e, Logger::FATAL_ERROR);
-                $this->report("Surfaced: $e");
-            }
-        );
-        $this->startAndLoopInternal($eventHandler, $started);
-        EventLoop::setErrorHandler($prev);
-    }
-    /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
      *
      * @param array<API> $instances Instances of madeline
@@ -392,7 +355,11 @@ final class API extends InternalDoc
     public static function startAndLoopMulti(array $instances, array|string $eventHandler): void
     {
         if (\is_string($eventHandler)) {
+            Assert::classExists($eventHandler);
             $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
+        } else {
+            Assert::notEmpty($eventHandler);
+            Assert::allClassExists($eventHandler);
         }
 
         $errors = [];
@@ -401,7 +368,7 @@ final class API extends InternalDoc
 
         $prev = EventLoop::getErrorHandler();
         EventLoop::setErrorHandler(
-            function (\Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
+            $cb = function (\Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
                 if ($e instanceof UnhandledFutureError) {
                     $e = $e->getPrevious();
                 }
@@ -424,34 +391,19 @@ final class API extends InternalDoc
             }
         );
 
-        $promises = [];
-        foreach ($instances as $k => $instance) {
-            $instance->start();
-            $promises []= async(function () use ($k, $instance, $eventHandler, &$started): void {
-                $instance->startAndLoopInternal($eventHandler[$k], $started[$k]);
-            });
+        try {
+            $promises = [];
+            foreach ($instances as $k => $instance) {
+                $instance->start();
+                $promises []= async(function () use ($k, $instance, $eventHandler, &$started): void {
+                    $instance->startAndLoopLogic($eventHandler[$k], $started[$k]);
+                });
+            }
+            await($promises);
+        } finally {
+            if (EventLoop::getErrorHandler() === $cb) {
+                EventLoop::setErrorHandler($prev);
+            }
         }
-        await($promises);
-
-        EventLoop::setErrorHandler($prev);
-    }
-
-    /**
-     * Start MadelineProto and the event handler (enables async).
-     *
-     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-     *
-     * @param string $eventHandler Event handler class name
-     */
-    private function startAndLoopInternal(string $eventHandler, bool &$started): void
-    {
-        $this->start();
-        if (!$this->reconnectFull()) {
-            return;
-        }
-
-        $this->wrapper->getAPI()->setEventHandler($eventHandler);
-        $started = true;
-        $this->wrapper->getAPI()->loop();
     }
 }

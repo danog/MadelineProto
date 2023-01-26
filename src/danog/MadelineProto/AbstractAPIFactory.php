@@ -20,7 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Future\UnhandledFutureError;
+use Amp\SignalException;
 use InvalidArgumentException;
+use Revolt\EventLoop;
 
 abstract class AbstractAPIFactory
 {
@@ -82,6 +85,61 @@ abstract class AbstractAPIFactory
             throw new InvalidArgumentException('Parameter names must be provided!');
         }
         return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
+    }
+
+    /**
+     * Start MadelineProto and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $eventHandler Event handler class name
+     */
+    protected function startAndLoopInternal(string $eventHandler): void
+    {
+        $started = false;
+        $errors = [];
+        $prev = EventLoop::getErrorHandler();
+        EventLoop::setErrorHandler(
+            $cb = function (\Throwable $e) use (&$errors, &$started): void {
+                if ($e instanceof UnhandledFutureError) {
+                    $e = $e->getPrevious();
+                }
+                if ($e instanceof SecurityException || $e instanceof SignalException) {
+                    throw $e;
+                }
+                if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
+                    throw $e;
+                }
+                $t = \time();
+                $errors = [$t => $errors[$t] ?? 0];
+                $errors[$t]++;
+                if ($errors[$t] > 10 && (!$this->wrapper->getAPI()->isInited() || !$started)) {
+                    $this->wrapper->logger('More than 10 errors in a second and not inited, exiting!', Logger::FATAL_ERROR);
+                    return;
+                }
+                echo $e;
+                $this->wrapper->logger((string) $e, Logger::FATAL_ERROR);
+                $this->report("Surfaced: $e");
+            }
+        );
+        try {
+            $this->startAndLoopLogic($eventHandler, $started);
+        } finally {
+            if (EventLoop::getErrorHandler() === $cb) {
+                EventLoop::setErrorHandler($prev);
+            }
+        }
+    }
+    private function startAndLoopLogic(string $eventHandler, bool &$started): void
+    {
+        $this->start();
+        if (!$this->reconnectFull()) {
+            return;
+        }
+
+        $this->wrapper->getAPI()->setEventHandler($eventHandler);
+        $started = true;
+        $this->wrapper->getAPI()->loop();
     }
     /**
      * Sleep function.
