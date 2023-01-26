@@ -555,11 +555,13 @@ final class MTProto implements TLCallback, LoggerGetter
             return;
         }
         $done = true;
-        Logger::log('Prompting final serialization (SHUTDOWN)...');
-        foreach (self::$references as $instance) {
-            $instance->wrapper->serialize();
+        if (self::$references) {
+            Logger::log('Prompting final serialization (SHUTDOWN)...');
+            foreach (self::$references as $instance) {
+                $instance->wrapper->serialize();
+            }
+            Logger::log('Done final serialization (SHUTDOWN)!');
         }
-        Logger::log('Done final serialization (SHUTDOWN)!');
     }
 
     private ?Future $initPromise = null;
