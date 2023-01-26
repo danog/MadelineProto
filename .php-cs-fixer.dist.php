@@ -5,6 +5,7 @@ $config = new class extends Amp\CodeStyle\Config {
     {
         return array_merge(parent::getRules(), [
             'void_return' => true,
+            'array_indentation' => true
         ]);
     }
 };

@@ -7273,7 +7273,7 @@ class InternalDoc extends APIFactory
      */
     public function methodCall(string $method, callable|array $args = [
     ], array $aargs = [
-      'msg_id' => null,
+        'msg_id' => null,
     ])
     {
         return $this->wrapper->getAPI()->{__FUNCTION__}($method, $args, $aargs);
@@ -7287,7 +7287,7 @@ class InternalDoc extends APIFactory
      */
     public function methodCallWrite(string $method, callable|array $args = [
     ], array $aargs = [
-      'msg_id' => null,
+        'msg_id' => null,
     ])
     {
         return $this->wrapper->getAPI()->{__FUNCTION__}($method, $args, $aargs);
