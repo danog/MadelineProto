@@ -178,6 +178,12 @@ abstract class AsyncTools extends StrTools
                 }
                 if ($yielded instanceof Generator) {
                     $yielded = self::consumeGenerator($yielded);
+                } elseif (is_array($yielded)) {
+                    $yielded = array_map(
+                        fn ($v) => $v instanceof Generator ? self::consumeGenerator($v) : $v,
+                        $yielded
+                    );
+                    $yielded = $g->send($yielded);
                 } else {
                     $yielded = $g->send($yielded);
                 }

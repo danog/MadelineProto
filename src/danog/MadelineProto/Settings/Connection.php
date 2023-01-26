@@ -29,10 +29,6 @@ use danog\MadelineProto\Stream\Transport\WsStream;
 final class Connection extends SettingsAbstract
 {
     /**
-     * Minimum media socket count.
-     */
-    protected int $minMediaSocketCount = 5;
-    /**
      * Maximum media socket count.
      */
     protected int $maxMediaSocketCount = 10;
@@ -114,9 +110,6 @@ final class Connection extends SettingsAbstract
             $this->setSslSubdomains($settings['connection']['ssl_subdomains']);
         }
         $settings = $settings['connection_settings'] ?? [];
-        if (isset($settings['media_socket_count']['min'])) {
-            $this->setMinMediaSocketCount($settings['media_socket_count']['min']);
-        }
         if (isset($settings['media_socket_count']['max'])) {
             $this->setMaxMediaSocketCount($settings['media_socket_count']['max']);
         }
@@ -334,26 +327,6 @@ final class Connection extends SettingsAbstract
     public function setSslSubdomains(array $sslSubdomains): self
     {
         $this->sslSubdomains = $sslSubdomains;
-
-        return $this;
-    }
-
-    /**
-     * Get minimum media socket count.
-     */
-    public function getMinMediaSocketCount(): int
-    {
-        return $this->minMediaSocketCount;
-    }
-
-    /**
-     * Set minimum media socket count.
-     *
-     * @param int $minMediaSocketCount Minimum media socket count.
-     */
-    public function setMinMediaSocketCount(int $minMediaSocketCount): self
-    {
-        $this->minMediaSocketCount = $minMediaSocketCount;
 
         return $this;
     }

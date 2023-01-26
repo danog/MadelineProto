@@ -434,8 +434,7 @@ final class DataCenterConnection implements JsonSerializable
         $this->API->logger->logger("Trying shared connection via {$ctx} ({$id})");
         $this->datacenter = $ctx->getDc();
         $media = $ctx->isMedia() || $ctx->isCDN();
-        $count = $media ? $this->API->getSettings()->getConnection()->getMinMediaSocketCount() : 1;
-        if ($count > 1) {
+        if ($media) {
             if (!$this->robinLoop) {
                 $this->robinLoop = new PeriodicLoopInternal(
                     $this->API,
@@ -454,7 +453,7 @@ final class DataCenterConnection implements JsonSerializable
                 return;
             }
             $this->ctx = $ctx->getCtx();
-            $this->connectMore($count);
+            $this->connectMore(1);
             $this->restoreBackup();
             $f = new DeferredFuture;
             $f->complete();
