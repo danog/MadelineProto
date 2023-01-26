@@ -130,7 +130,7 @@ abstract class AbstractAPIFactory
             }
         }
     }
-    private function startAndLoopLogic(string $eventHandler, bool &$started): void
+    protected function startAndLoopLogic(string $eventHandler, bool &$started): void
     {
         $this->start();
         if (!$this->reconnectFull()) {
