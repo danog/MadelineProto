@@ -59,7 +59,7 @@ abstract class EventHandler extends InternalDoc
     final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
         $API = new API($session, $settings);
-        $API->startAndLoop(static::class);
+        $API->startAndLoopInternal(static::class);
     }
     /**
      * Start MadelineProto as a bot and the event handler.
@@ -74,7 +74,7 @@ abstract class EventHandler extends InternalDoc
     {
         $API = new API($session, $settings);
         $API->botLogin($token);
-        $API->startAndLoop(static::class);
+        $API->startAndLoopInternal(static::class);
     }
     /**
      * Internal constructor.

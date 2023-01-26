@@ -331,9 +331,7 @@ final class API extends InternalDoc
         $id = \count(self::$destructors);
         self::$destructors[$id] = async(function () use ($id): void {
             $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');
-            if ($this->wrapper->getAPI()) {
-                $this->wrapper->getAPI()->unreference();
-            }
+            $this->wrapper->getAPI()?->unreference();
             if (isset($this->wrapper)) {
                 $this->wrapper->logger('Prompting final serialization...');
                 $this->wrapper->serialize();

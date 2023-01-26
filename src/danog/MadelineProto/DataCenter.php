@@ -369,7 +369,7 @@ final class DataCenter
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
             $combos = \array_unique($combos, SORT_REGULAR);
         }
-        $context = $context ?? (new ConnectContext())->withConnectTimeout($this->settings->getTimeout())->withBindTo($this->settings->getBindTo());
+        $context ??= (new ConnectContext())->withConnectTimeout($this->settings->getTimeout())->withBindTo($this->settings->getBindTo());
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [

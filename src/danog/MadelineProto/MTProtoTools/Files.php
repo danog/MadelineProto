@@ -853,7 +853,7 @@ trait Files
         if ($end === -1 && isset($messageMedia['size'])) {
             $end = $messageMedia['size'];
         }
-        $part_size = $part_size ?? 1024 * 1024;
+        $part_size ??= 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
         $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->authorized_dc;
         if ($this->datacenter->has(-$datacenter)) {
