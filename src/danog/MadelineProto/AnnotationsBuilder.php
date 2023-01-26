@@ -259,10 +259,6 @@ final class AnnotationsBuilder
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;
-            if (!$hasVariadic && !$static && !$hasReturnValue) {
-                $paramList .= '$extra, ';
-                $doc .= 'array $extra = []';
-            }
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
             $doc .= ')';
@@ -278,13 +274,12 @@ final class AnnotationsBuilder
             if ($method->getDeclaringClass()->getName() == StrTools::class) {
                 $async = false;
             }
-            $finalParamList = $hasVariadic ? "Tools::arr({$paramList})" : "[{$paramList}]";
             $ret = $type && $type instanceof ReflectionNamedType && \in_array($type->getName(), ['self', 'void']) ? '' : 'return';
             $doc .= "\n{\n";
             if ($async) {
-                $doc .= "    {$ret} \$this->__call(__FUNCTION__, {$finalParamList});\n";
+                $doc .= "    {$ret} \$this->wrapper->getAPI()->{__FUNCTION__}({$paramList});\n";
             } elseif (!$static) {
-                $doc .= "    {$ret} \$this->API->{$name}({$paramList});\n";
+                $doc .= "    {$ret} \$this->wrapper->getAPI()->{$name}({$paramList});\n";
             } else {
                 $doc .= "    {$ret} \\".$method->getDeclaringClass()->getName().'::'.$name."({$paramList});\n";
             }

@@ -84,11 +84,8 @@ abstract class EventHandler extends InternalDoc
      */
     public function initInternal(APIWrapper $MadelineProto): void
     {
-        self::link($this, $MadelineProto->getFactory());
-        $this->API =& $MadelineProto->getAPI();
-        foreach ($this->API->getMethodNamespaces() as $namespace) {
-            $this->{$namespace} = $this->exportNamespace($namespace);
-        }
+        $this->wrapper = $MadelineProto;
+        $this->exportNamespaces();
     }
     private ?Future $startFuture = null;
     /**
@@ -107,7 +104,7 @@ abstract class EventHandler extends InternalDoc
                 return;
             }
             if (isset(static::$dbProperties)) {
-                $this->internalInitDb($this->API);
+                $this->internalInitDb($this->wrapper->getAPI());
             }
             if (\method_exists($this, 'onStart')) {
                 $r = $this->onStart();
@@ -140,13 +137,5 @@ abstract class EventHandler extends InternalDoc
     public function getReportPeers()
     {
         return [];
-    }
-
-    /**
-     * Get API instance.
-     */
-    public function getAPI(): MTProto
-    {
-        return $this->API;
     }
 }

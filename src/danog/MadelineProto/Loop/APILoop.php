@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop;
 
-use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\InternalDoc;
 
 /**
@@ -44,6 +43,6 @@ trait APILoop
     public function __construct(InternalDoc $API)
     {
         $this->API = $API;
-        $this->setLogger($API instanceof EventHandler ? $API->getAPI()->getLogger() : $API->getLogger());
+        $this->setLogger($API->getLogger());
     }
 }

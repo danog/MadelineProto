@@ -601,7 +601,7 @@ final class MTProto implements TLCallback, LoggerGetter
             try {
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->session);
+                $this->ipcServer->setIpcPath($this->wrapper->getSession());
             } catch (Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
@@ -655,15 +655,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->v = self::V;
 
         $this->settings->applyChanges();
-    }
-    /**
-     * Set API wrapper needed for triggering serialization functions.
-     *
-     * @internal
-     */
-    public function setWrapper(APIWrapper $wrapper): void
-    {
-        $this->wrapper = $wrapper;
     }
     /**
      * Get API wrapper.
@@ -888,7 +879,7 @@ final class MTProto implements TLCallback, LoggerGetter
             try {
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->session);
+                $this->ipcServer->setIpcPath($this->wrapper->getSession());
             } catch (Throwable $e) {
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }

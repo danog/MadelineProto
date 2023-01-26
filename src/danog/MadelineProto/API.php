@@ -116,11 +116,6 @@ final class API extends InternalDoc
     private bool $oldInstance = false;
 
     /**
-     * API wrapper (to avoid circular references).
-     */
-    protected ?APIWrapper $wrapper = null;
-
-    /**
      * Unlock callback.
      *
      * @var ?callable
@@ -147,19 +142,8 @@ final class API extends InternalDoc
         Magic::start(light: true);
         $settings = Settings::parseFromLegacy($settings);
         $this->session = new SessionPaths($session);
-        $this->wrapper = new APIWrapper(
-            $this->session,
-            $this->exportNamespace()
-        );
-
-        foreach (\get_class_vars(APIFactory::class) as $key => $var) {
-            if (\in_array($key, ['namespace', 'API', 'asyncAPIPromise', 'methods'])) {
-                continue;
-            }
-            if (!isset($this->{$key})) {
-                $this->{$key} = $this->exportNamespace($key);
-            }
-        }
+        $this->wrapper = new APIWrapper($this->session);
+        $this->exportNamespaces();
 
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
@@ -185,7 +169,6 @@ final class API extends InternalDoc
             $appInfo->setApiHash($app['api_hash']);
         }
         $this->wrapper->setAPI(new MTProto($settings, $this->wrapper));
-        $this->APIFactory();
         $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
@@ -294,26 +277,20 @@ final class API extends InternalDoc
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
             $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
-            $this->APIFactory();
             return true;
         } elseif ($unserialized) {
             // Success, full session
-            if ($this->wrapper->getAPI()) {
-                $this->wrapper->getAPI()->unreference();
-                $this->wrapper->setAPI(null);
-            }
-            $this->wrapper->setWebApiTemplate($unserialized->getWebAPITemplate());
-            $this->wrapper->setAPI($unserialized->getAPI());
-            AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
+            $this->wrapper->getAPI()?->unreference();
+            $this->wrapper = $unserialized;
+            $this->wrapper->setSession($this->session);
+            $this->exportNamespaces();
             if ($this->wrapper->getAPI()) {
                 unset($unserialized);
 
                 if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
-                $this->methods = self::getInternalMethodList($this->wrapper->getAPI(), MTProto::class);
                 $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
-                $this->APIFactory();
                 $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return true;
             }
@@ -367,22 +344,6 @@ final class API extends InternalDoc
             unset(self::$destructors[$id]);
         });
     }
-    /**
-     * Init API wrapper.
-     */
-    private function APIFactory(): void
-    {
-        if ($this->wrapper->getAPI()?->isInited()) {
-            if ($this->wrapper->getAPI() instanceof MTProto) {
-                foreach ($this->wrapper->getAPI()->getMethodNamespaces() as $namespace) {
-                    if (!$this->{$namespace}) {
-                        $this->{$namespace} = $this->exportNamespace($namespace);
-                    }
-                }
-            }
-            $this->methods = self::getInternalMethodList($this->wrapper->getAPI(), MTProto::class);
-        }
-    }
 
     /**
      * Start MadelineProto and the event handler (enables async).
@@ -395,6 +356,7 @@ final class API extends InternalDoc
     {
         $started = false;
         $errors = [];
+        $prev = EventLoop::getErrorHandler();
         EventLoop::setErrorHandler(
             function (\Throwable $e) use (&$errors, &$started): void {
                 if ($e instanceof UnhandledFutureError) {
@@ -419,6 +381,7 @@ final class API extends InternalDoc
             }
         );
         $this->startAndLoopInternal($eventHandler, $started);
+        EventLoop::setErrorHandler($prev);
     }
     /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
@@ -436,6 +399,7 @@ final class API extends InternalDoc
         $started = \array_fill_keys(\array_keys($instances), false);
         $instanceOne = \array_values($instances)[0];
 
+        $prev = EventLoop::getErrorHandler();
         EventLoop::setErrorHandler(
             function (\Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
                 if ($e instanceof UnhandledFutureError) {
@@ -468,6 +432,8 @@ final class API extends InternalDoc
             });
         }
         await($promises);
+
+        EventLoop::setErrorHandler($prev);
     }
 
     /**

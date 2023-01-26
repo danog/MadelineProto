@@ -21,7 +21,6 @@
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
-use Revolt\EventLoop;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -53,9 +52,6 @@ class SecretHandler extends EventHandler
     public function getReportPeers()
     {
         return [self::ADMIN];
-    }
-    public function onStart(): void {
-        EventLoop::delay(2.0, $this->stop(...));
     }
     /**
      * Handle updates from users.

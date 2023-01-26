@@ -53,7 +53,7 @@ final class GarbageCollector
         }
         self::$started = true;
 
-        EventLoop::repeat(1, static function (): void {
+        EventLoop::unreference(EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 \gc_collect_cycles();
@@ -63,7 +63,7 @@ final class GarbageCollector
                     Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
                 }
             }
-        });
+        }));
 
         if (!\defined('MADELINE_RELEASE_URL')) {
             return;
@@ -71,7 +71,9 @@ final class GarbageCollector
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
         $madelinePhpContents = null;
-        $cb = function () use ($client, $request, &$madelinePhpContents): bool {
+
+        $id = null;
+        $cb = function () use ($client, $request, &$madelinePhpContents, &$id): void {
             try {
                 $madelinePhpContents ??= read(MADELINE_PHP);
                 $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
@@ -94,7 +96,10 @@ final class GarbageCollector
                     if (Magic::$isIpcWorker) {
                         throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
                     }
-                    return true;
+                    if ($id) {
+                        EventLoop::cancel($id);
+                    }
+                    return;
                 }
 
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
@@ -114,11 +119,9 @@ final class GarbageCollector
             } catch (Throwable $e) {
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
-            return false;
         };
         $cb();
-        self::$cleanupLoop = new PeriodicLoop($cb, 'Phar cleanup loop', 60*1000);
-        self::$cleanupLoop->start();
+        EventLoop::unreference($id = EventLoop::repeat(60.0, $cb));
     }
 
     /** @var \WeakMap<\Fiber, true> */

@@ -32,8 +32,11 @@ final class APIWrapper
      */
     public function __construct(
         private SessionPaths $session,
-        private AbstractAPIFactory $factory,
     ) {
+    }
+    public function setSession(SessionPaths $session): void
+    {
+        $this->session = $session;
     }
 
     public function getWebApiTemplate(): string
@@ -51,6 +54,7 @@ final class APIWrapper
     }
     public function setAPI(Client|MTProto|null $API): void
     {
+        $this->API?->unreference();
         $this->API = $API;
     }
 
@@ -68,14 +72,6 @@ final class APIWrapper
     public function getAPI(): Client|MTProto|null
     {
         return $this->API;
-    }
-
-    /**
-     * Get API factory.
-     */
-    public function getFactory(): AbstractAPIFactory
-    {
-        return $this->factory;
     }
 
     /**

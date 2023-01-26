@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\Ipc\Client;
 use InvalidArgumentException;
 
 abstract class AbstractAPIFactory
@@ -31,48 +30,27 @@ abstract class AbstractAPIFactory
      * @internal
      */
     private string $namespace = '';
-    /**
-     * Method list.
-     *
-     * @var array<string, callable>
-     */
-    protected array $methods = [];
 
     /**
-     * Main API instance.
+     * API wrapper (to avoid circular references).
      */
-    private API $mainAPI;
+    protected APIWrapper $wrapper;
 
     /**
      * Export APIFactory instance with the specified namespace.
-     *
-     * @param string $namespace Namespace
      */
-    protected function exportNamespace(string $namespace = ''): self
+    protected function exportNamespaces(): void
     {
-        $class = \array_reverse(\array_values(\class_parents(static::class)))[$namespace ? 1 : 2];
+        $class = \array_reverse(\array_values(\class_parents(static::class)))[1];
 
-        $instance = new $class;
-        $instance->namespace = $namespace ? $namespace.'.' : '';
-        self::link($instance, $this);
-
-        return $instance;
-    }
-    /**
-     * Link two APIFactory instances.
-     *
-     * @param self $a First instance
-     * @param self $b Second instance
-     */
-    protected static function link(self $a, self $b): void
-    {
-        $a->methods =& $b->methods;
-        if ($b instanceof API) {
-            $a->mainAPI = $b;
-        } elseif ($a instanceof API) {
-            $b->mainAPI = $a;
-        } else {
-            $a->mainAPI =& $b->mainAPI;
+        foreach (\get_class_vars(APIFactory::class) as $key => $var) {
+            if (\in_array($key, ['namespace', 'methods', 'wrapper'])) {
+                continue;
+            }
+            $instance = new $class;
+            $instance->namespace = $key.'.';
+            $instance->wrapper = $this->wrapper;
+            $this->{$key} = $instance;
         }
     }
     /**
@@ -96,21 +74,14 @@ abstract class AbstractAPIFactory
             $arguments = [$arguments];
         }
 
-        $lower_name = \strtolower($name);
-        if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
-            $name = $this->namespace.$name;
-            $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
-            $aargs['apifactory'] = true;
-            $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-            if (isset($args[0]) && !isset($args['multiple'])) {
-                throw new InvalidArgumentException('Parameter names must be provided!');
-            }
-            return $this->mainAPI->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
+        $name = $this->namespace.$name;
+        $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
+        $aargs['apifactory'] = true;
+        $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
+        if (isset($args[0]) && !isset($args['multiple'])) {
+            throw new InvalidArgumentException('Parameter names must be provided!');
         }
-        if ($lower_name === 'seteventhandler') {
-            throw new InvalidArgumentException('Cannot call setEventHandler like this, please use MyEventHandler::startAndLoop("session.madeline", $settings);');
-        }
-        return $this->methods[$lower_name](...$arguments);
+        return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
     }
     /**
      * Sleep function.
@@ -118,61 +89,5 @@ abstract class AbstractAPIFactory
     public function __sleep(): array
     {
         return [];
-    }
-    /**
-     * Get fully resolved method list for object, including snake_case and camelCase variants.
-     *
-     * @param API|MTProto|Client $value Value
-     * @param string             $class Custom class name
-     */
-    protected static function getInternalMethodList(API|MTProto|Client $value, ?string $class = null): array
-    {
-        return \array_map(fn ($method) => [$value, $method], self::getInternalMethodListClass($class ?? $value::class));
-    }
-    /**
-     * Get fully resolved method list for object, including snake_case and camelCase variants.
-     *
-     * @param string $class Class name
-     */
-    protected static function getInternalMethodListClass(string $class): array
-    {
-        static $cache = [];
-        if (isset($cache[$class])) {
-            return $cache[$class];
-        }
-        $methods = \get_class_methods($class);
-        foreach ($methods as $method) {
-            if ($method == 'methodCallAsyncRead') {
-                unset($methods[\array_search('methodCall', $methods)]);
-            } elseif (\stripos($method, 'async') !== false) {
-                if (\strpos($method, '_async') !== false) {
-                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
-                } else {
-                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
-                }
-            }
-        }
-        $finalMethods = [];
-        foreach ($methods as $method) {
-            $actual_method = $method;
-            if ($method == 'methodCallAsyncRead') {
-                $method = 'methodCall';
-            } elseif (\stripos($method, 'async') !== false) {
-                if (\strpos($method, '_async') !== false) {
-                    $method = \str_ireplace('_async', '', $method);
-                } else {
-                    $method = \str_ireplace('async', '', $method);
-                }
-            }
-            $finalMethods[\strtolower($method)] = $actual_method;
-            if (\strpos($method, '_') !== false) {
-                $finalMethods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
-            } else {
-                $finalMethods[\strtolower(StrTools::toSnakeCase($method))] = $actual_method;
-            }
-        }
-
-        $cache[$class] = $finalMethods;
-        return $finalMethods;
     }
 }
