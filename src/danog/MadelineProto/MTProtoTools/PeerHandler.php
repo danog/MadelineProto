@@ -1027,7 +1027,7 @@ trait PeerHandler
             return $promises;
         }
 
-        $yielded = array_merge(...await($promises));
+        $yielded = \array_merge(...await($promises));
         while ($yielded) {
             $newYielded = [];
 

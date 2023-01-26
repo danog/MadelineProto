@@ -56,7 +56,9 @@ final class ReadLoop extends Loop
                 return self::STOP;
             }
             EventLoop::queue(function () use ($e): void {
-                $this->logger->logger($e);
+                if (!$e instanceof NothingInTheSocketException) {
+                    $this->logger->logger($e);
+                }
                 $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                 $this->connection->reconnect();
             });
