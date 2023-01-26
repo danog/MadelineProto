@@ -80,7 +80,7 @@ trait Templates
      * Web template.
      *
      */
-    private string $webTemplate = 'legacy';
+    private string $webTemplate = '';
     /**
      * Format message according to template.
      *

@@ -45,7 +45,7 @@ trait Start
         if (($this->getAuthorization()) === MTProto::LOGGED_IN) {
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
-        if ($this->getWebTemplate() === 'legacy') {
+        if (!$this->getWebTemplate()) {
             $settings = $this->getSettings();
             $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());
         }

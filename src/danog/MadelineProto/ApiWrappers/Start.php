@@ -46,7 +46,7 @@ trait Start
         if (Magic::$isIpcWorker) {
             throw new Exception('Not inited!');
         }
-        if ($this->getWebAPITemplate() === 'legacy') {
+        if (!$this->getWebAPITemplate()) {
             $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
         }
         $app = [];
