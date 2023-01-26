@@ -42,10 +42,12 @@ final class CheckLoop extends Loop
      */
     protected function loop(): ?float
     {
-        if (!$this->connection->new_outgoing || !$this->connection->hasPendingCalls()) {
+        if (!$this->connection->new_outgoing) {
             return self::PAUSE;
         }
-        $last_msgid = $this->connection->msgIdHandler->getMaxId(true);
+        if (!$this->connection->hasPendingCalls()) {
+            return $this->timeout;
+        }
         if ($this->shared->hasTempAuthKey()) {
             $full_message_ids = $this->connection->getPendingCalls();
             foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
