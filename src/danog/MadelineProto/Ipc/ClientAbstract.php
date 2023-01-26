@@ -38,6 +38,7 @@ abstract class ClientAbstract
      * IPC server socket.
      */
     protected ChannelledSocket $server;
+    private int $id = 0;
     /**
      * Requests promise array.
      *
@@ -148,7 +149,7 @@ abstract class ClientAbstract
      */
     public function __call(string|int $function, array|Wrapper $arguments)
     {
-        $this->requests []= $deferred = new DeferredFuture;
+        $this->requests[$this->id++] = $deferred = new DeferredFuture;
         if ($arguments instanceof Wrapper) {
             $this->wrappers[\count($this->requests) - 1] = $arguments;
         }

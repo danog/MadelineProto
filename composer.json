@@ -89,7 +89,8 @@
             "danog\\MadelineProto\\": "src/danog/MadelineProto"
         },
         "files": [
-            "src/polyfill.php"
+            "src/polyfill.php",
+            "src/loop.php"
         ]
     },
     "autoload-dev": {
