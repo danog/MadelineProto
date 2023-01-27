@@ -28,6 +28,9 @@ use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
+/**
+ * @internal
+ */
 final class AnnotationsBuilder
 {
     /**
@@ -69,8 +72,19 @@ final class Blacklist {
         Logger::log('Generating annotations...', Logger::NOTICE);
         $this->createInternalClasses();
     }
+    private static function isVector(string $type): array
+    {
+        if (\str_contains($type, '<')) {
+            return [true, \str_replace(['Vector<', '>'], '', $type)];
+        }
+        return [false, $type];
+    }
     private function prepareTLType(string $type): string
     {
+        [$isVector, $type] = self::isVector($type);
+        if ($isVector) {
+            return 'array';
+        }
         return match ($type) {
             'string' => 'string',
             'bytes' => 'string',
@@ -79,12 +93,66 @@ final class Blacklist {
             'double' => 'float',
             'float' => 'float',
             'Bool' => 'bool',
-            'bool' => 'bool',
+            'true' => 'bool',
+            'DataJSON' => 'mixed',
+            'InputFile' => 'mixed',
             default => 'array'
         };
     }
+    private function prepareTLPsalmType(string $type, bool $input, array $stack = []): string
+    {
+        [$isVector, $type] = self::isVector($type);
+        $base = match ($type) {
+            'string' => 'string',
+            'bytes' => 'string',
+            'int' => 'int',
+            'long' => 'int',
+            'double' => 'float',
+            'float' => 'float',
+            'Bool' => 'bool',
+            'true' => 'bool',
+            'DataJSON' => 'mixed',
+            'InputFile' => 'string|mixed',
+            'Updates' => 'array',
+            default => ''
+        };
+        if (!$base) {
+            $constructors = [];
+            foreach ($this->TL->getConstructors()->by_id as $constructor) {
+                if ($constructor['type'] === $type) {
+                    $params = ["_: '{$constructor['predicate']}'"];
+                    foreach ($this->filterParams($constructor['params'], $constructor['type']) as $name => $param) {
+                        if (isset($stack[$param['type']])) {
+                            continue 2;
+                        }
+                        $stack[$param['type']] = true;
+                        if ($input) {
+                            $optional = isset($param['pow']) ? '?' : '';
+                        } else {
+                            $optional = isset($param['pow']) && \is_int($param['pow']) && $param['type'] !== 'true'
+                                ? '?'
+                                : '';
+                        }
+                        $params []= "$name$optional: ".$this->prepareTLPsalmType($param['type'], $input, $stack);
+                        unset($stack[$param['type']]);
+                    }
+                    $params = \implode(', ', $params);
+                    $constructors []= 'array{'.$params.'}';
+                }
+            }
+            $base = \implode('|', $constructors);
+        }
+        if ($isVector) {
+            $base = "list<$base>";
+        }
+        return $base;
+    }
     private function prepareTLDefault(string $type): string
     {
+        [$isVector, $type] = self::isVector($type);
+        if ($isVector) {
+            return '[]';
+        }
         return match ($type) {
             'string' => "''",
             'bytes' => "''",
@@ -93,23 +161,99 @@ final class Blacklist {
             'double' => '0.0',
             'float' => '0.0',
             'Bool' => 'false',
-            'bool' => 'false',
+            'true' => 'false',
+            'DataJSON' => 'null',
             default => '[]'
         };
     }
-    private function prepareTLTypeDescription(string $type): string
+    private function prepareTLTypeDescription(string $type, string $description): string
     {
+        [$isList, $type] = self::isVector($type);
+        if ($isList) {
+            $descriptionEnhanced = "Array of $description";
+        } else {
+            $descriptionEnhanced = $description;
+        }
         return match ($type) {
-            'string' => '',
-            'bytes' => '',
-            'int' => '',
-            'long' => '',
-            'double' => '',
-            'float' => '',
-            'Bool' => '',
-            'bool' => '',
-            default => " @see https://docs.madelineproto.xyz/API_docs/types/$type.html"
+            'string' => $description,
+            'bytes' => $description,
+            'int' => $description,
+            'long' => $description,
+            'double' => $description,
+            'float' => $description,
+            'Bool' => $description,
+            'true' => $description,
+            'DataJSON' => 'Any JSON-encodable data',
+            'InputFile' => 'A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!',
+            default => $descriptionEnhanced
+                ? "$descriptionEnhanced @see https://docs.madelineproto.xyz/API_docs/types/$type.html"
+                : "@see https://docs.madelineproto.xyz/API_docs/types/$type.html"
         };
+    }
+    private function filterParams(array $params, string $type, ?string $method = null): array
+    {
+        $newParams = [];
+        foreach ($params as $param) {
+            if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+                continue;
+            }
+            if ($method) {
+                $param['description'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$method}_param_{$param['name']}_type_{$param['type']}"] ?? '');
+            }
+            $param['type'] = \ltrim($param['type'], '%');
+            if ($param['name'] === 'data' && $type === 'messages.SentEncryptedMessage') {
+                $param['name'] = 'message';
+                $param['type'] = 'DecryptedMessage';
+            }
+            if ($param['name'] === 'chat_id' && $method !== 'messages.discardEncryption') {
+                $param['type'] = 'InputPeer';
+            }
+            if ($param['name'] === 'hash' && $param['type'] === 'long') {
+                $param['pow'] = 'optional';
+                $param['type'] = 'Vector t';
+                $param['subtype'] = 'int';
+            }
+            if (\in_array($param['type'], ['int', 'long', 'string', 'bytes'])) {
+                $param['pow'] = 'optional';
+            }
+            $param['array'] = isset($param['subtype']);
+            if ($param['array']) {
+                $param['subtype'] = \ltrim($param['subtype'], '%');
+                $param['type'] = 'Vector<'.$param['subtype'].'>';
+                $param['pow'] = 'optional';
+            }
+            $newParams[$param['name']] = $param;
+        }
+        \uasort($newParams, fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
+        return $newParams;
+    }
+    private function prepareTLParams(array $data): array
+    {
+        [
+            'params' => $params,
+            'type' => $type,
+            'method' => $method
+        ] = $data;
+        $params = $this->filterParams($params, $type, $method);
+        $contents = '';
+        $signature = [];
+        foreach ($params as $name => $param) {
+            $description = $this->prepareTLTypeDescription($param['type'], $param['description']);
+            $psalmType = $this->prepareTLPsalmType($param['type'], true);
+            $type = $this->prepareTLType($param['type']);
+            $param_var = $type.' $'.$name;
+            if (isset($param['pow'])) {
+                $param_var .= ' = '.$this->prepareTLDefault($param['type']);
+                if ($type === 'array') {
+                    $psalmType .= '|array<never, never>';
+                }
+            }
+            $signature []= $param_var;
+            $contents .= "     * @param {$psalmType} \${$name} {$description}\n";
+            $contents .= "     * \n";
+            $contents .= "     *\n";
+        }
+        return [$contents, $signature];
     }
     /**
      * Create internalDoc.
@@ -118,7 +262,7 @@ final class Blacklist {
     {
         Logger::log('Creating internal classes...', Logger::NOTICE);
         $internalDoc = [];
-        foreach ($this->TL->getMethods()->by_id as $id => $data) {
+        foreach ($this->TL->getMethods()->by_id as $data) {
             if (!\strpos($data['method'], '.')) {
                 continue;
             }
@@ -129,44 +273,24 @@ final class Blacklist {
             if (isset($this->blacklist[$data['method']])) {
                 continue;
             }
-            $internalDoc[$namespace][$method]['title'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}"] ?? '');
-            $type = \str_ireplace(['vector<', '>'], [' of ', '[]'], $data['type']);
-            foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
-                    continue;
-                }
-                if ($param['name'] === 'data' && $type === 'messages.SentEncryptedMessage') {
-                    $param['name'] = 'message';
-                    $param['type'] = 'DecryptedMessage';
-                }
-                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
-                    $param['type'] = 'InputPeer';
-                }
-                if ($param['name'] === 'hash' && $param['type'] === 'long') {
-                    $param['pow'] = 'hi';
-                    $param['type'] = 'Vector t';
-                    $param['subtype'] = 'int';
-                }
-                if ($param['type'] === 'bool') {
-                    $param['pow'] = 'hi';
-                }
-                $stype = 'type';
-                if (isset($param['subtype'])) {
-                    $stype = 'subtype';
-                }
-                $ptype = $param[$stype];
-                switch ($ptype) {
-                    case 'true':
-                    case 'false':
-                        $ptype = 'boolean';
-                }
-                $ptype = $stype === 'type' ? $ptype : "[{$ptype}]";
-                $internalDoc[$namespace][$method]['attr'][$param['name']] = ['optional' => isset($param['pow']), 'type' => $ptype, 'description' => \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? '')];
-            }
-            if ($type === 'Bool') {
-                $type = \strtolower($type);
-            }
-            $internalDoc[$namespace][$method]['return'] = $type;
+
+            $title = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}"] ?? '');
+            $title = \implode("\n     * ", \explode("\n", $title));
+            $contents = "\n    /**\n";
+            $contents .= "     * {$title}\n";
+            $contents .= "     *\n";
+            [$params, $signature] = $this->prepareTLParams($data);
+            $contents .= $params;
+            $returnType = $this->prepareTLType($data['type']);
+            $psalmType = $this->prepareTLPsalmType($data['type'], false);
+            $description = $this->prepareTLTypeDescription($data['type'], '');
+            $contents .= "     * @return {$psalmType} {$description}\n";
+            $contents .= "     */\n";
+            $contents .= "    public function {$method}(";
+            $contents .= \implode(', ', $signature);
+            $contents .= "): {$returnType};\n";
+
+            $internalDoc[$namespace][$method] = $contents;
         }
         $class = new ReflectionClass($this->reflectionClasses['MTProto']);
         $methods = $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC);
@@ -226,7 +350,6 @@ final class Blacklist {
             $doc .= $name;
             $doc .= '(';
             $paramList = '';
-            $hasVariadic = false;
             foreach ($method->getParameters() as $param) {
                 if ($type = $param->getType()) {
                     $doc .= $this->typeToStr($type).' ';
@@ -320,8 +443,8 @@ final class Blacklist {
                 "@return $promise<$1>",
                 $phpdoc,
             );
-            $internalDoc['InternalDoc'][$name]['method'] = $phpdoc;
-            $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
+            $internalDoc['InternalDoc'][$name] = $phpdoc;
+            $internalDoc['InternalDoc'][$name] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
         }
         foreach ($internalDoc as $namespace => $methods) {
             if ($namespace === 'InternalDoc') {
@@ -366,40 +489,8 @@ final class Blacklist {
 
                 \fwrite($handle, "\ninterface {$namespace}\n{");
             }
-            foreach ($methods as $method => $properties) {
-                if (isset($properties['method'])) {
-                    \fwrite($handle, $properties['method']);
-                    continue;
-                }
-                $title = \implode("\n     * ", \explode("\n", $properties['title']));
-                \fwrite($handle, "\n    /**\n");
-                \fwrite($handle, "     * {$title}\n");
-                \fwrite($handle, "     *\n");
-                $params = [];
-                if (isset($properties['attr'])) {
-                    \uasort($properties['attr'], fn (array $arr1, array $arr2) => $arr1['optional'] <=> $arr2['optional']);
-                    foreach ($properties['attr'] as $name => $param) {
-                        $param['type'] = $this->prepareTLType($param['type']);
-                        $param_var = $param['type'].' $'.$name;
-                        if ($param['optional']) {
-                            $param_var .= ' = '.$this->prepareTLDefault($param['type']);
-                        }
-                        $params []= $param_var;
-                        $param['description'] .= $this->prepareTLTypeDescription($param['type']);
-                        \fwrite($handle, "     * @param {$param['type']} \${$name} {$param['description']}\n");
-                    }
-                    \fwrite($handle, "     * \n");
-                    \fwrite($handle, "     *\n");
-                }
-                $properties['return'] = $this->prepareTLType($properties['return']);
-                $properties['return'] .= $this->prepareTLTypeDescription($properties['return']);
-                \fwrite($handle, "     * @return array\n");
-                \fwrite($handle, "     */\n");
-                \fwrite($handle, "    public function {$method}(");
-                if (isset($properties['attr'])) {
-                    \fwrite($handle, \implode(', ', $params));
-                }
-                \fwrite($handle, ");\n");
+            foreach ($methods as $contents) {
+                \fwrite($handle, $contents);
             }
             \fwrite($handle, "}\n");
         }

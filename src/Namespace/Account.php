@@ -12,69 +12,85 @@ interface Account
     /**
      * Register device to receive [PUSH notifications](https://core.telegram.org/api/push-updates).
      *
-     * @param int $token_type Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
-     * @param string $token Device token
      * @param bool $app_sandbox If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, a sandbox-certificate will be used during transmission.
+     *
+     *
+     * @param bool $no_muted Avoid receiving (silent and invisible background) notifications. Useful to save battery.
+     *
+     *
+     * @param int $token_type Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
+     *
+     *
+     * @param string $token Device token
+     *
+     *
      * @param string $secret For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
-     * @param array $other_uids List of user identifiers of other users currently using the client @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $no_muted Avoid receiving (silent and invisible background) notifications. Useful to save battery. @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
+     *
+     *
      */
-    public function registerDevice(int $token_type, string $token, bool $app_sandbox, string $secret, array $other_uids, array $no_muted = []);
+    public function registerDevice(bool $app_sandbox, bool $no_muted = false, int $token_type = 0, string $token = '', string $secret = '', array $other_uids = []): bool;
 
     /**
      * Deletes a device by its token, stops sending PUSH-notifications to it.
      *
      * @param int $token_type Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
+     *
+     *
      * @param string $token Device token
-     * @param array $other_uids List of user identifiers of other users currently using the client @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
+     *
+     *
      */
-    public function unregisterDevice(int $token_type, string $token, array $other_uids);
+    public function unregisterDevice(int $token_type = 0, string $token = '', array $other_uids = []): bool;
 
     /**
      * Edits notification settings from a given user/group, from all users/all groups.
      *
-     * @param array $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $settings Notification settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputNotifyPeer', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, top_msg_id?: int} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      *
      *
-     * @return array
+     * @param array{_: 'inputPeerNotifySettings', show_previews?: bool, silent?: bool, mute_until?: int, sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}} $settings Notification settings @see https://docs.madelineproto.xyz/API_docs/types/InputPeerNotifySettings.html
+     *
+     *
      */
-    public function updateNotifySettings(array $peer, array $settings);
+    public function updateNotifySettings(array $peer, array $settings): bool;
 
     /**
      * Gets current notification settings for a given user/group, from all users/all groups.
      *
-     * @param array $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputNotifyPeer', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, top_msg_id?: int} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      *
      *
-     * @return array
+     * @return array{_: 'peerNotifySettings', show_previews?: bool, silent?: bool, mute_until: int, ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}} @see https://docs.madelineproto.xyz/API_docs/types/PeerNotifySettings.html
      */
-    public function getNotifySettings(array $peer);
+    public function getNotifySettings(array $peer): array;
 
     /**
      * Resets all notification settings from users and groups.
      *
-     * @return array
      */
-    public function resetNotifySettings();
+    public function resetNotifySettings(): bool;
 
     /**
      * Updates user profile.
      *
      * @param string $first_name New user first name
+     *
+     *
      * @param string $last_name New user last name
+     *
+     *
      * @param string $about New bio
      *
      *
-     * @return array
+     * @return array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>} @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
-    public function updateProfile(string $first_name = '', string $last_name = '', string $about = '');
+    public function updateProfile(string $first_name = '', string $last_name = '', string $about = ''): array;
 
     /**
      * Updates online user status.
@@ -82,31 +98,33 @@ interface Account
      * @param bool $offline If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, user status will change to [(userStatusOffline)](https://docs.madelineproto.xyz/API_docs/constructors/userStatusOffline.html).
      *
      *
-     * @return array
      */
-    public function updateStatus(bool $offline);
+    public function updateStatus(bool $offline): bool;
 
     /**
      * Returns a list of available [wallpapers](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      *
-     * @return array
+     * @return array{_: 'account.wallPapersNotModified'}|array{_: 'account.wallPapers', hash: list<int>, wallpapers: list<array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}>} @see https://docs.madelineproto.xyz/API_docs/types/account.WallPapers.html
      */
-    public function getWallPapers(array $hash = []);
+    public function getWallPapers(array $hash = []): array;
 
     /**
      * Report a peer for violation of telegram's Terms of Service.
      *
-     * @param array $peer The peer to report @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $reason The reason why this peer is being reported @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}|array{_: 'inputPeerUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}|array{_: 'inputPeerChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, channel_id?: int} $peer The peer to report @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     *
+     *
+     * @param array{_: 'inputReportReasonSpam'}|array{_: 'inputReportReasonViolence'}|array{_: 'inputReportReasonPornography'}|array{_: 'inputReportReasonChildAbuse'}|array{_: 'inputReportReasonOther'}|array{_: 'inputReportReasonCopyright'}|array{_: 'inputReportReasonGeoIrrelevant'}|array{_: 'inputReportReasonFake'}|array{_: 'inputReportReasonIllegalDrugs'}|array{_: 'inputReportReasonPersonalDetails'} $reason The reason why this peer is being reported @see https://docs.madelineproto.xyz/API_docs/types/ReportReason.html
+     *
+     *
      * @param string $message Comment for report moderation
      *
      *
-     * @return array
      */
-    public function reportPeer(array $peer, array $reason, string $message);
+    public function reportPeer(array $peer, array $reason, string $message = ''): bool;
 
     /**
      * Validates a username and checks availability.
@@ -114,9 +132,8 @@ interface Account
      * @param string $username username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      *
-     * @return array
      */
-    public function checkUsername(string $username);
+    public function checkUsername(string $username = ''): bool;
 
     /**
      * Changes username for the current user.
@@ -124,30 +141,32 @@ interface Account
      * @param string $username username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      *
-     * @return array
+     * @return array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>} @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
-    public function updateUsername(string $username);
+    public function updateUsername(string $username = ''): array;
 
     /**
      * Get privacy settings of current account.
      *
-     * @param array $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'} $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
      *
      *
-     * @return array
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
-    public function getPrivacy(array $key);
+    public function getPrivacy(array $key): array;
 
     /**
      * Change privacy settings of current account.
      *
-     * @param array $key Peers to which the privacy rules apply @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $rules New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'} $key Peers to which the privacy rules apply @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
      *
      *
-     * @return array
+     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}>|array<never, never> $rules Array of New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
+     *
+     *
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
-    public function setPrivacy(array $key, array $rules);
+    public function setPrivacy(array $key, array $rules = []): array;
 
     /**
      * Delete the user's account from the telegram servers.
@@ -155,52 +174,58 @@ interface Account
      * Can also be used to delete the account of a user that provided the login code, but forgot the 2FA password and no recovery method is configured, see [here »](https://core.telegram.org/api/srp#password-recovery) for more info on password recovery, and [here »](https://core.telegram.org/api/account-deletion) for more info on account deletion.
      *
      * @param string $reason Why is the account being deleted, can be empty
-     * @param array $password [2FA password](https://core.telegram.org/api/srp): this field can be omitted even for accounts with 2FA enabled: in this case account account deletion will be delayed by 7 days [as specified in the docs »](https://core.telegram.org/api/account-deletion) @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param array{_: 'inputCheckPasswordEmpty'}|array{_: 'inputCheckPasswordSRP', srp_id?: int, A?: string, M1?: string}|array<never, never> $password [2FA password](https://core.telegram.org/api/srp): this field can be omitted even for accounts with 2FA enabled: in this case account account deletion will be delayed by 7 days [as specified in the docs »](https://core.telegram.org/api/account-deletion) @see https://docs.madelineproto.xyz/API_docs/types/InputCheckPasswordSRP.html
+     *
+     *
      */
-    public function deleteAccount(string $reason, array $password = []);
+    public function deleteAccount(string $reason = '', array $password = []): bool;
 
     /**
      * Get days to live of account.
      *
-     * @return array
+     * @return array{_: 'accountDaysTTL', days: int} @see https://docs.madelineproto.xyz/API_docs/types/AccountDaysTTL.html
      */
-    public function getAccountTTL();
+    public function getAccountTTL(): array;
 
     /**
      * Set account self-destruction period.
      *
-     * @param array $ttl Time to live in days @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'accountDaysTTL', days?: int} $ttl Time to live in days @see https://docs.madelineproto.xyz/API_docs/types/AccountDaysTTL.html
      *
      *
-     * @return array
      */
-    public function setAccountTTL(array $ttl);
+    public function setAccountTTL(array $ttl): bool;
 
     /**
      * Verify a new phone number to associate to the current account.
      *
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, logout_tokens?: list<string>} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     *
+     *
      * @param string $phone_number New phone number
-     * @param array $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, next_phone_login_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
      */
-    public function sendChangePhoneCode(string $phone_number, array $settings);
+    public function sendChangePhoneCode(array $settings, string $phone_number = ''): array;
 
     /**
      * Change the phone number of the current account.
      *
      * @param string $phone_number New phone number
+     *
+     *
      * @param string $phone_code_hash Phone code hash received when calling [account.sendChangePhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendChangePhoneCode.html)
+     *
+     *
      * @param string $phone_code Phone code received when calling [account.sendChangePhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendChangePhoneCode.html)
      *
      *
-     * @return array
+     * @return array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>} @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
-    public function changePhone(string $phone_number, string $phone_code_hash, string $phone_code);
+    public function changePhone(string $phone_number = '', string $phone_code_hash = '', string $phone_code = ''): array;
 
     /**
      * When client-side passcode lock feature is enabled, will not show message texts in incoming [PUSH notifications](https://core.telegram.org/api/push-updates).
@@ -208,225 +233,258 @@ interface Account
      * @param int $period Inactivity period after which to start hiding message texts in [PUSH notifications](https://core.telegram.org/api/push-updates).
      *
      *
-     * @return array
      */
-    public function updateDeviceLocked(int $period);
+    public function updateDeviceLocked(int $period = 0): bool;
 
     /**
      * Get logged-in sessions.
      *
-     * @return array
+     * @return array{_: 'account.authorizations', authorization_ttl_days: int, authorizations: list<array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, hash: list<int>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Authorizations.html
      */
-    public function getAuthorizations();
+    public function getAuthorizations(): array;
 
     /**
      * Log out an active [authorized session](https://core.telegram.org/api/auth) by its hash.
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash Session hash
      *
      *
-     * @return array
      */
-    public function resetAuthorization(array $hash = []);
+    public function resetAuthorization(array $hash = []): bool;
 
     /**
      * Obtain configuration for two-factor authorization with password.
      *
-     * @return array
+     * @return array{_: 'account.password', new_algo: array{_: 'passwordKdfAlgoUnknown'}|array{_: 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', salt1: string, salt2: string, g: int, p: string}, new_secure_algo: array{_: 'securePasswordKdfAlgoUnknown'}|array{_: 'securePasswordKdfAlgoPBKDF2HMACSHA512iter100000', salt: string}|array{_: 'securePasswordKdfAlgoSHA512', salt: string}, has_recovery: bool, has_secure_values: bool, has_password: bool, current_algo?: array{_: 'passwordKdfAlgoUnknown'}|array{_: 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', salt1: string, salt2: string, g: int, p: string}, srp_B: string, srp_id: int, hint: string, email_unconfirmed_pattern: string, secure_random: string, pending_reset_date: int, login_email_pattern: string} @see https://docs.madelineproto.xyz/API_docs/types/account.Password.html
      */
-    public function getPassword();
+    public function getPassword(): array;
 
     /**
      * Send confirmation code to cancel account deletion, for more info [click here »](https://core.telegram.org/api/account-deletion).
      *
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, logout_tokens?: list<string>} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     *
+     *
      * @param string $hash The hash from the service notification, for more info [click here »](https://core.telegram.org/api/account-deletion)
-     * @param array $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, next_phone_login_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
      */
-    public function sendConfirmPhoneCode(string $hash, array $settings);
+    public function sendConfirmPhoneCode(array $settings, string $hash = ''): array;
 
     /**
      * Confirm a phone number to cancel account deletion, for more info [click here »](https://core.telegram.org/api/account-deletion).
      *
      * @param string $phone_code_hash Phone code hash, for more info [click here »](https://core.telegram.org/api/account-deletion)
+     *
+     *
      * @param string $phone_code SMS code, for more info [click here »](https://core.telegram.org/api/account-deletion)
      *
      *
-     * @return array
      */
-    public function confirmPhone(string $phone_code_hash, string $phone_code);
+    public function confirmPhone(string $phone_code_hash = '', string $phone_code = ''): bool;
 
     /**
      * Get temporary payment password.
      *
-     * @param array $password SRP password parameters @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputCheckPasswordEmpty'}|array{_: 'inputCheckPasswordSRP', srp_id?: int, A?: string, M1?: string} $password SRP password parameters @see https://docs.madelineproto.xyz/API_docs/types/InputCheckPasswordSRP.html
+     *
+     *
      * @param int $period Time during which the temporary password will be valid, in seconds; should be between 60 and 86400
      *
      *
-     * @return array
+     * @return array{_: 'account.tmpPassword', tmp_password: string, valid_until: int} @see https://docs.madelineproto.xyz/API_docs/types/account.TmpPassword.html
      */
-    public function getTmpPassword(array $password, int $period);
+    public function getTmpPassword(array $password, int $period = 0): array;
 
     /**
      * Get web [login widget](https://core.telegram.org/widgets/login) authorizations.
      *
-     * @return array
+     * @return array{_: 'account.webAuthorizations', authorizations: list<array{_: 'webAuthorization', hash: list<int>, bot_id: int, domain: string, browser: string, platform: string, date_created: int, date_active: int, ip: string, region: string}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.WebAuthorizations.html
      */
-    public function getWebAuthorizations();
+    public function getWebAuthorizations(): array;
 
     /**
      * Log out an active web [telegram login](https://core.telegram.org/widgets/login) session.
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash [Session](https://docs.madelineproto.xyz/API_docs/constructors/webAuthorization.html) hash
      *
      *
-     * @return array
      */
-    public function resetWebAuthorization(array $hash = []);
+    public function resetWebAuthorization(array $hash = []): bool;
 
     /**
      * Reset all active web [telegram login](https://core.telegram.org/widgets/login) sessions.
      *
-     * @return array
      */
-    public function resetWebAuthorizations();
+    public function resetWebAuthorizations(): bool;
 
     /**
      * Get all saved [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @return array
+     * @return list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
      */
-    public function getAllSecureValues();
+    public function getAllSecureValues(): array;
 
     /**
      * Get saved [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @param array $types Requested value types @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}>|array<never, never> $types Array of Requested value types @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
      *
      *
-     * @return array
+     * @return list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
      */
-    public function getSecureValue(array $types);
+    public function getSecureValue(array $types = []): array;
 
     /**
      * Securely save [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @param array $value Secure value, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption) @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputSecureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data?: string, data_hash?: string, secret?: string}, front_side?: array{_: 'inputSecureFileUploaded', id?: int, parts?: int, md5_checksum?: string, file_hash?: string, secret?: string}|array{_: 'inputSecureFile', id?: int, access_hash?: int}, reverse_side?: array{_: 'inputSecureFileUploaded', id?: int, parts?: int, md5_checksum?: string, file_hash?: string, secret?: string}|array{_: 'inputSecureFile', id?: int, access_hash?: int}, selfie?: array{_: 'inputSecureFileUploaded', id?: int, parts?: int, md5_checksum?: string, file_hash?: string, secret?: string}|array{_: 'inputSecureFile', id?: int, access_hash?: int}, translation?: list<array{_: 'inputSecureFileUploaded', id?: int, parts?: int, md5_checksum?: string, file_hash?: string, secret?: string}|array{_: 'inputSecureFile', id?: int, access_hash?: int}>, files?: list<array{_: 'inputSecureFileUploaded', id?: int, parts?: int, md5_checksum?: string, file_hash?: string, secret?: string}|array{_: 'inputSecureFile', id?: int, access_hash?: int}>, plain_data?: array{_: 'securePlainPhone', phone?: string}|array{_: 'securePlainEmail', email?: string}} $value Secure value, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption) @see https://docs.madelineproto.xyz/API_docs/types/InputSecureValue.html
+     *
+     *
      * @param int $secure_secret_id Passport secret hash, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption)
      *
      *
-     * @return array
+     * @return array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string} @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
      */
-    public function saveSecureValue(array $value, int $secure_secret_id);
+    public function saveSecureValue(array $value, int $secure_secret_id = 0): array;
 
     /**
      * Delete stored [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @param array $types Document types to delete @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}>|array<never, never> $types Array of Document types to delete @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
      *
      *
-     * @return array
      */
-    public function deleteSecureValue(array $types);
+    public function deleteSecureValue(array $types = []): bool;
 
     /**
      * Returns a Telegram Passport authorization form for sharing data with a service.
      *
      * @param int $bot_id User identifier of the service's bot
+     *
+     *
      * @param string $scope Telegram Passport element types requested by the service
+     *
+     *
      * @param string $public_key Service's public key
      *
      *
-     * @return array
+     * @return array{_: 'account.authorizationForm', required_types: list<array{_: 'secureRequiredType', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, native_names: bool, selfie_required: bool, translation_required: bool}>, values: list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}>, errors: list<array{_: 'secureValueErrorData', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data_hash: string, field: string, text: string}|array{_: 'secureValueErrorFrontSide', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorReverseSide', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorSelfie', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorFile', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorFiles', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: list<string>, text: string}|array{_: 'secureValueError', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, hash: string, text: string}|array{_: 'secureValueErrorTranslationFile', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorTranslationFiles', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: list<string>, text: string}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>, privacy_policy_url: string} @see https://docs.madelineproto.xyz/API_docs/types/account.AuthorizationForm.html
      */
-    public function getAuthorizationForm(int $bot_id, string $scope, string $public_key);
+    public function getAuthorizationForm(int $bot_id = 0, string $scope = '', string $public_key = ''): array;
 
     /**
      * Sends a Telegram Passport authorization form, effectively sharing data with the service.
      *
+     * @param array{_: 'secureCredentialsEncrypted', data?: string, hash?: string, secret?: string} $credentials Encrypted values @see https://docs.madelineproto.xyz/API_docs/types/SecureCredentialsEncrypted.html
+     *
+     *
      * @param int $bot_id Bot ID
+     *
+     *
      * @param string $scope Telegram Passport element types requested by the service
+     *
+     *
      * @param string $public_key Service's public key
-     * @param array $value_hashes Types of values sent and their hashes @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $credentials Encrypted values @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param list<array{_: 'secureValueHash', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, hash?: string}>|array<never, never> $value_hashes Array of Types of values sent and their hashes @see https://docs.madelineproto.xyz/API_docs/types/SecureValueHash.html
+     *
+     *
      */
-    public function acceptAuthorization(int $bot_id, string $scope, string $public_key, array $value_hashes, array $credentials);
+    public function acceptAuthorization(array $credentials, int $bot_id = 0, string $scope = '', string $public_key = '', array $value_hashes = []): bool;
 
     /**
      * Send the verification phone code for telegram [passport](https://core.telegram.org/passport).
      *
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, logout_tokens?: list<string>} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     *
+     *
      * @param string $phone_number The phone number to verify
-     * @param array $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, next_phone_login_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
      */
-    public function sendVerifyPhoneCode(string $phone_number, array $settings);
+    public function sendVerifyPhoneCode(array $settings, string $phone_number = ''): array;
 
     /**
      * Verify a phone number for telegram [passport](https://core.telegram.org/passport).
      *
      * @param string $phone_number Phone number
+     *
+     *
      * @param string $phone_code_hash Phone code hash received from the call to [account.sendVerifyPhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendVerifyPhoneCode.html)
+     *
+     *
      * @param string $phone_code Code received after the call to [account.sendVerifyPhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendVerifyPhoneCode.html)
      *
      *
-     * @return array
      */
-    public function verifyPhone(string $phone_number, string $phone_code_hash, string $phone_code);
+    public function verifyPhone(string $phone_number = '', string $phone_code_hash = '', string $phone_code = ''): bool;
 
     /**
      * Send an email verification code.
      *
-     * @param array $purpose  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
+     *
+     *
      * @param string $email The email where to send the code.
      *
      *
-     * @return array
+     * @return array{_: 'account.sentEmailCode', email_pattern: string, length: int} @see https://docs.madelineproto.xyz/API_docs/types/account.SentEmailCode.html
      */
-    public function sendVerifyEmailCode(array $purpose, string $email);
+    public function sendVerifyEmailCode(array $purpose, string $email = ''): array;
 
     /**
      * Verify an email address.
      *
-     * @param array $purpose  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $verification  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
      *
      *
-     * @return array
+     * @param array{_: 'emailVerificationCode', code?: string}|array{_: 'emailVerificationGoogle', token?: string}|array{_: 'emailVerificationApple', token?: string} $verification @see https://docs.madelineproto.xyz/API_docs/types/EmailVerification.html
+     *
+     *
+     * @return array{_: 'account.emailVerified', email: string}|array{_: 'account.emailVerifiedLogin', sent_code: array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, next_phone_login_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int}, email: string} @see https://docs.madelineproto.xyz/API_docs/types/account.EmailVerified.html
      */
-    public function verifyEmail(array $purpose, array $verification);
+    public function verifyEmail(array $purpose, array $verification): array;
 
     /**
      * Initialize account takeout session.
      *
-     * @param array $contacts Whether to export contacts @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $message_users Whether to export messages in private chats @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $message_chats Whether to export messages in [basic groups](https://core.telegram.org/api/channel#basic-groups) @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $message_megagroups Whether to export messages in [supergroups](https://core.telegram.org/api/channel#supergroups) @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $message_channels Whether to export messages in [channels](https://core.telegram.org/api/channel#channels) @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $files Whether to export files @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param bool $contacts Whether to export contacts
+     *
+     *
+     * @param bool $message_users Whether to export messages in private chats
+     *
+     *
+     * @param bool $message_chats Whether to export messages in [basic groups](https://core.telegram.org/api/channel#basic-groups)
+     *
+     *
+     * @param bool $message_megagroups Whether to export messages in [supergroups](https://core.telegram.org/api/channel#supergroups)
+     *
+     *
+     * @param bool $message_channels Whether to export messages in [channels](https://core.telegram.org/api/channel#channels)
+     *
+     *
+     * @param bool $files Whether to export files
+     *
+     *
      * @param int $file_max_size Maximum size of files to export
      *
      *
-     * @return array
+     * @return array{_: 'account.takeout', id: int} @see https://docs.madelineproto.xyz/API_docs/types/account.Takeout.html
      */
-    public function initTakeoutSession(array $contacts = [], array $message_users = [], array $message_chats = [], array $message_megagroups = [], array $message_channels = [], array $files = [], int $file_max_size = 0);
+    public function initTakeoutSession(bool $contacts = false, bool $message_users = false, bool $message_chats = false, bool $message_megagroups = false, bool $message_channels = false, bool $files = false, int $file_max_size = 0): array;
 
     /**
      * Finish account takeout session.
      *
-     * @param array $success Data exported successfully @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param bool $success Data exported successfully
      *
      *
-     * @return array
      */
-    public function finishTakeoutSession(array $success = []);
+    public function finishTakeoutSession(bool $success = false): bool;
 
     /**
      * Verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
@@ -434,30 +492,26 @@ interface Account
      * @param string $code The phone code that was received after [setting a recovery email](https://core.telegram.org/api/srp#email-verification)
      *
      *
-     * @return array
      */
-    public function confirmPasswordEmail(string $code);
+    public function confirmPasswordEmail(string $code = ''): bool;
 
     /**
      * Resend the code to verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
      *
-     * @return array
      */
-    public function resendPasswordEmail();
+    public function resendPasswordEmail(): bool;
 
     /**
      * Cancel the code that was sent to verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
      *
-     * @return array
      */
-    public function cancelPasswordEmail();
+    public function cancelPasswordEmail(): bool;
 
     /**
      * Whether the user will receive notifications when contacts sign up.
      *
-     * @return array
      */
-    public function getContactSignUpNotification();
+    public function getContactSignUpNotification(): bool;
 
     /**
      * Toggle contact sign up notifications.
@@ -465,259 +519,305 @@ interface Account
      * @param bool $silent Whether to disable contact sign up notifications
      *
      *
-     * @return array
      */
-    public function setContactSignUpNotification(bool $silent);
+    public function setContactSignUpNotification(bool $silent): bool;
 
     /**
      * Returns list of chats with non-default notification settings.
      *
-     * @param array $compare_sound If true, chats with non-default sound will also be returned @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param bool $compare_sound If true, chats with non-default sound will also be returned
      *
      *
-     * @return array
+     * @param array{_: 'inputNotifyPeer', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, top_msg_id?: int}|array<never, never> $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
+     *
+     *
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function getNotifyExceptions(array $compare_sound = [], array $peer = []);
+    public function getNotifyExceptions(bool $compare_sound = false, array $peer = []): array;
 
     /**
      * Get info about a certain [wallpaper](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $wallpaper The [wallpaper](https://core.telegram.org/api/wallpapers) to get info about @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int} $wallpaper The [wallpaper](https://core.telegram.org/api/wallpapers) to get info about @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
      *
      *
-     * @return array
+     * @return array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}} @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
      */
-    public function getWallPaper(array $wallpaper);
+    public function getWallPaper(array $wallpaper): array;
 
     /**
      * Create and upload a new [wallpaper](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $file The JPG/PNG wallpaper @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
+     * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int} $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     *
+     *
      * @param string $mime_type MIME type of uploaded wallpaper
-     * @param array $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}} @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
      */
-    public function uploadWallPaper(array $file, string $mime_type, array $settings);
+    public function uploadWallPaper(mixed $file, array $settings, string $mime_type = ''): array;
 
     /**
      * Install/uninstall [wallpaper](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $wallpaper [Wallpaper](https://core.telegram.org/api/wallpapers) to install or uninstall @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int} $wallpaper [Wallpaper](https://core.telegram.org/api/wallpapers) to install or uninstall @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
+     *
+     *
      * @param bool $unsave Uninstall wallpaper?
-     * @param array $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int} $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     *
+     *
      */
-    public function saveWallPaper(array $wallpaper, bool $unsave, array $settings);
+    public function saveWallPaper(array $wallpaper, bool $unsave, array $settings): bool;
 
     /**
      * Install [wallpaper](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $wallpaper [Wallpaper](https://core.telegram.org/api/wallpapers) to install @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $settings [Wallpaper](https://core.telegram.org/api/wallpapers) settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int} $wallpaper [Wallpaper](https://core.telegram.org/api/wallpapers) to install @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
      *
      *
-     * @return array
+     * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int} $settings [Wallpaper](https://core.telegram.org/api/wallpapers) settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     *
+     *
      */
-    public function installWallPaper(array $wallpaper, array $settings);
+    public function installWallPaper(array $wallpaper, array $settings): bool;
 
     /**
      * Delete all installed [wallpapers](https://core.telegram.org/api/wallpapers), reverting to the default wallpaper set.
      *
-     * @return array
      */
-    public function resetWallPapers();
+    public function resetWallPapers(): bool;
 
     /**
      * Get media autodownload settings.
      *
-     * @return array
+     * @return array{_: 'account.autoDownloadSettings', low: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}, medium: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}, high: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoDownloadSettings.html
      */
-    public function getAutoDownloadSettings();
+    public function getAutoDownloadSettings(): array;
 
     /**
      * Change media autodownload settings.
      *
-     * @param array $settings Media autodownload settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $low Whether to save media in the low data usage preset @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $high Whether to save media in the high data usage preset @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'autoDownloadSettings', disabled?: bool, video_preload_large?: bool, audio_preload_next?: bool, phonecalls_less_data?: bool, photo_size_max?: int, video_size_max?: int, file_size_max?: int, video_upload_maxbitrate?: int} $settings Media autodownload settings @see https://docs.madelineproto.xyz/API_docs/types/AutoDownloadSettings.html
      *
      *
-     * @return array
+     * @param bool $low Whether to save media in the low data usage preset
+     *
+     *
+     * @param bool $high Whether to save media in the high data usage preset
+     *
+     *
      */
-    public function saveAutoDownloadSettings(array $settings, array $low = [], array $high = []);
+    public function saveAutoDownloadSettings(array $settings, bool $low = false, bool $high = false): bool;
 
     /**
      * Upload theme.
      *
-     * @param array $file [Previously uploaded](https://core.telegram.org/api/themes#uploading-theme-files) theme file with platform-specific colors for UI components, can be left unset when creating themes that only modify the wallpaper or accent colors. @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
+     * @param string|mixed $thumb A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
      * @param string $file_name File name
+     *
+     *
      * @param string $mime_type MIME type, must be `application/x-tgtheme-{format}`, where `format` depends on the client
-     * @param array $thumb Thumbnail @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>} @see https://docs.madelineproto.xyz/API_docs/types/Document.html
      */
-    public function uploadTheme(array $file, string $file_name, string $mime_type, array $thumb = []);
+    public function uploadTheme(mixed $file, mixed $thumb = [], string $file_name = '', string $mime_type = ''): array;
 
     /**
      * Create a theme.
      *
      * @param string $slug Unique theme ID used to generate [theme deep links](https://core.telegram.org/api/links#theme-links), can be empty to autogenerate a random ID.
+     *
+     *
      * @param string $title Theme name
-     * @param array $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $settings Theme settings, multiple values can be provided for the different base themes (day/night mode, etc). @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param array{_: 'inputDocumentEmpty'}|array{_: 'inputDocument', id?: int, access_hash?: int, file_reference?: string}|array<never, never> $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     *
+     *
+     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}>|array<never, never> $settings Array of Theme settings, multiple values can be provided for the different base themes (day/night mode, etc). @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
+     *
+     *
+     * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
      */
-    public function createTheme(string $slug, string $title, array $document = [], array $settings = []);
+    public function createTheme(string $slug = '', string $title = '', array $document = [], array $settings = []): array;
 
     /**
      * Update theme.
      *
+     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string} $theme Theme to update @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
+     *
+     *
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param array $theme Theme to update @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     *
+     *
      * @param string $slug Unique theme ID
+     *
+     *
      * @param string $title Theme name
-     * @param array $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $settings Theme settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param array{_: 'inputDocumentEmpty'}|array{_: 'inputDocument', id?: int, access_hash?: int, file_reference?: string}|array<never, never> $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     *
+     *
+     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}>|array<never, never> $settings Array of Theme settings @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
+     *
+     *
+     * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
      */
-    public function updateTheme(string $format, array $theme, string $slug = '', string $title = '', array $document = [], array $settings = []);
+    public function updateTheme(array $theme, string $format = '', string $slug = '', string $title = '', array $document = [], array $settings = []): array;
 
     /**
      * Save a theme.
      *
-     * @param array $theme Theme to save @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string} $theme Theme to save @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
+     *
+     *
      * @param bool $unsave Unsave
      *
      *
-     * @return array
      */
-    public function saveTheme(array $theme, bool $unsave);
+    public function saveTheme(array $theme, bool $unsave): bool;
 
     /**
      * Install a theme.
      *
-     * @param array $dark Whether to install the dark version @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $theme Theme to install @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param bool $dark Whether to install the dark version
+     *
+     *
+     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string}|array<never, never> $theme Theme to install @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
+     *
+     *
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param array $base_theme Indicates a basic theme provided by all clients @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}|array<never, never> $base_theme Indicates a basic theme provided by all clients @see https://docs.madelineproto.xyz/API_docs/types/BaseTheme.html
+     *
+     *
      */
-    public function installTheme(array $dark = [], array $theme = [], string $format = '', array $base_theme = []);
+    public function installTheme(bool $dark = false, array $theme = [], string $format = '', array $base_theme = []): bool;
 
     /**
      * Get theme information.
      *
+     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string} $theme Theme @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
+     *
+     *
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param array $theme Theme @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
      */
-    public function getTheme(string $format, array $theme);
+    public function getTheme(array $theme, string $format = ''): array;
 
     /**
      * Get installed themes.
      *
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
      *
      *
-     * @return array
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     *
+     *
+     * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
      */
-    public function getThemes(string $format, array $hash = []);
+    public function getThemes(string $format = '', array $hash = []): array;
 
     /**
      * Set sensitive content settings (for viewing or hiding NSFW content).
      *
-     * @param array $sensitive_enabled Enable NSFW content @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param bool $sensitive_enabled Enable NSFW content
      *
      *
-     * @return array
      */
-    public function setContentSettings(array $sensitive_enabled = []);
+    public function setContentSettings(bool $sensitive_enabled = false): bool;
 
     /**
      * Get sensitive content settings.
      *
-     * @return array
+     * @return array{_: 'account.contentSettings', sensitive_enabled: bool, sensitive_can_change: bool} @see https://docs.madelineproto.xyz/API_docs/types/account.ContentSettings.html
      */
-    public function getContentSettings();
+    public function getContentSettings(): array;
 
     /**
      * Get info about multiple [wallpapers](https://core.telegram.org/api/wallpapers).
      *
-     * @param array $wallpapers [Wallpapers](https://core.telegram.org/api/wallpapers) to fetch info about @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}>|array<never, never> $wallpapers Array of [Wallpapers](https://core.telegram.org/api/wallpapers) to fetch info about @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
      *
      *
-     * @return array
+     * @return list<array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
      */
-    public function getMultiWallPapers(array $wallpapers);
+    public function getMultiWallPapers(array $wallpapers = []): array;
 
     /**
      * Get global privacy settings.
      *
-     * @return array
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
-    public function getGlobalPrivacySettings();
+    public function getGlobalPrivacySettings(): array;
 
     /**
      * Set global privacy settings.
      *
-     * @param array $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      *
      *
-     * @return array
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
-    public function setGlobalPrivacySettings(array $settings);
+    public function setGlobalPrivacySettings(array $settings): array;
 
     /**
      * Report a profile photo of a dialog.
      *
-     * @param array $peer The dialog @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $photo_id Dialog photo ID @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $reason Report reason @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}|array{_: 'inputPeerUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}|array{_: 'inputPeerChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, channel_id?: int} $peer The dialog @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     *
+     *
+     * @param array{_: 'inputPhotoEmpty'}|array{_: 'inputPhoto', id?: int, access_hash?: int, file_reference?: string} $photo_id Dialog photo ID @see https://docs.madelineproto.xyz/API_docs/types/InputPhoto.html
+     *
+     *
+     * @param array{_: 'inputReportReasonSpam'}|array{_: 'inputReportReasonViolence'}|array{_: 'inputReportReasonPornography'}|array{_: 'inputReportReasonChildAbuse'}|array{_: 'inputReportReasonOther'}|array{_: 'inputReportReasonCopyright'}|array{_: 'inputReportReasonGeoIrrelevant'}|array{_: 'inputReportReasonFake'}|array{_: 'inputReportReasonIllegalDrugs'}|array{_: 'inputReportReasonPersonalDetails'} $reason Report reason @see https://docs.madelineproto.xyz/API_docs/types/ReportReason.html
+     *
+     *
      * @param string $message Comment for report moderation
      *
      *
-     * @return array
      */
-    public function reportProfilePhoto(array $peer, array $photo_id, array $reason, string $message);
+    public function reportProfilePhoto(array $peer, array $photo_id, array $reason, string $message = ''): bool;
 
     /**
      * Initiate a 2FA password reset: can only be used if the user is already logged-in, [see here for more info »](https://core.telegram.org/api/srp#password-reset).
      *
-     * @return array
+     * @return array{_: 'account.resetPasswordFailedWait', retry_date: int}|array{_: 'account.resetPasswordRequestedWait', until_date: int}|array{_: 'account.resetPasswordOk'} @see https://docs.madelineproto.xyz/API_docs/types/account.ResetPasswordResult.html
      */
-    public function resetPassword();
+    public function resetPassword(): array;
 
     /**
      * Abort a pending 2FA password reset, [see here for more info »](https://core.telegram.org/api/srp#password-reset).
      *
-     * @return array
      */
-    public function declinePasswordReset();
+    public function declinePasswordReset(): bool;
 
     /**
      * Get all available chat themes.
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      *
-     * @return array
+     * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
      */
-    public function getChatThemes(array $hash = []);
+    public function getChatThemes(array $hash = []): array;
 
     /**
      * Set time-to-live of current session.
@@ -725,31 +825,33 @@ interface Account
      * @param int $authorization_ttl_days Time-to-live of current session in days
      *
      *
-     * @return array
      */
-    public function setAuthorizationTTL(int $authorization_ttl_days);
+    public function setAuthorizationTTL(int $authorization_ttl_days = 0): bool;
 
     /**
      * Change authorization settings.
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash Session ID from the [authorization](https://docs.madelineproto.xyz/API_docs/constructors/authorization.html) constructor, fetchable using [account.getAuthorizations](https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizations.html)
+     *
+     *
      * @param bool $encrypted_requests_disabled Whether to enable or disable receiving encrypted chats: if the flag is not set, the previous setting is not changed
+     *
+     *
      * @param bool $call_requests_disabled Whether to enable or disable receiving calls: if the flag is not set, the previous setting is not changed
      *
      *
-     * @return array
      */
-    public function changeAuthorizationSettings(array $hash = [], bool $encrypted_requests_disabled = false, bool $call_requests_disabled = false);
+    public function changeAuthorizationSettings(array $hash = [], bool $encrypted_requests_disabled = false, bool $call_requests_disabled = false): bool;
 
     /**
      * Fetch saved notification sounds.
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      *
-     * @return array
+     * @return array{_: 'account.savedRingtonesNotModified'}|array{_: 'account.savedRingtones', hash: list<int>, ringtones: list<array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedRingtones.html
      */
-    public function getSavedRingtones(array $hash = []);
+    public function getSavedRingtones(array $hash = []): array;
 
     /**
      * Save or remove saved notification sound.
@@ -757,79 +859,71 @@ interface Account
      * If the notification sound is already in MP3 format, [account.savedRingtone](https://docs.madelineproto.xyz/API_docs/constructors/account.savedRingtone.html) will be returned.
      * Otherwise, it will be automatically converted and a [account.savedRingtoneConverted](https://docs.madelineproto.xyz/API_docs/constructors/account.savedRingtoneConverted.html) will be returned, containing a new [document](https://docs.madelineproto.xyz/API_docs/constructors/document.html) object that should be used to refer to the ringtone from now on (ie when deleting it using the `unsave` parameter, or when downloading it).
      *
-     * @param array $id Notification sound uploaded using [account.uploadRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.uploadRingtone.html) @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputDocumentEmpty'}|array{_: 'inputDocument', id?: int, access_hash?: int, file_reference?: string} $id Notification sound uploaded using [account.uploadRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.uploadRingtone.html) @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     *
+     *
      * @param bool $unsave Whether to add or delete the notification sound
      *
      *
-     * @return array
+     * @return array{_: 'account.savedRingtone'}|array{_: 'account.savedRingtoneConverted', document: array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>}} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedRingtone.html
      */
-    public function saveRingtone(array $id, bool $unsave);
+    public function saveRingtone(array $id, bool $unsave): array;
 
     /**
      * Upload notification sound, use [account.saveRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.saveRingtone.html) to convert it and add it to the list of saved notification sounds.
      *
-     * @param array $file Notification sound @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
      * @param string $file_name File name
+     *
+     *
      * @param string $mime_type MIME type of file
      *
      *
-     * @return array
+     * @return array{_: 'documentEmpty', id: int}|array{_: 'document', id: int, access_hash: int, file_reference: string, date: int, mime_type: string, size: int, thumbs: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_thumbs: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int, attributes: list<array{_: 'documentAttributeImageSize', w: int, h: int}|array{_: 'documentAttributeAnimated'}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, mask: bool, alt: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n: int}}|array{_: 'documentAttributeVideo', round_message: bool, supports_streaming: bool, duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', voice: bool, duration: int, title: string, performer: string, waveform: string}|array{_: 'documentAttributeFilename', file_name: string}|array{_: 'documentAttributeHasStickers'}|array{_: 'documentAttributeCustomEmoji', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, free: bool, text_color: bool, alt: string}|array{_: 'documentAttributeSticker'}|array{_: 'documentAttributeVideo', duration: int, w: int, h: int}|array{_: 'documentAttributeAudio', duration: int}|array{_: 'documentAttributeSticker', stickerset: array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id: int, access_hash: int}|array{_: 'inputStickerSetShortName', short_name: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}, alt: string}|array{_: 'documentAttributeAudio', duration: int, title: string, performer: string}>} @see https://docs.madelineproto.xyz/API_docs/types/Document.html
      */
-    public function uploadRingtone(array $file, string $file_name, string $mime_type);
+    public function uploadRingtone(mixed $file, string $file_name = '', string $mime_type = ''): array;
 
     /**
      *
      *
-     * @param array $emoji_status  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id?: int}|array{_: 'emojiStatusUntil', document_id?: int, until?: int} $emoji_status @see https://docs.madelineproto.xyz/API_docs/types/EmojiStatus.html
      *
      *
-     * @return array
      */
-    public function updateEmojiStatus(array $emoji_status);
+    public function updateEmojiStatus(array $emoji_status): bool;
 
     /**
      *
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash
      *
      *
-     * @return array
+     * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
-    public function getDefaultEmojiStatuses(array $hash = []);
+    public function getDefaultEmojiStatuses(array $hash = []): array;
 
     /**
      *
      *
-     * @param array $hash  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<int>|array<never, never> $hash
      *
      *
-     * @return array
+     * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
-    public function getRecentEmojiStatuses(array $hash = []);
+    public function getRecentEmojiStatuses(array $hash = []): array;
+
+    public function clearRecentEmojiStatuses(): bool;
 
     /**
      *
      *
-     * @return array
+     * @param list<string>|array<never, never> $order
+     *
+     *
      */
-    public function clearRecentEmojiStatuses();
+    public function reorderUsernames(array $order = []): bool;
 
-    /**
-     *
-     *
-     * @param array $order  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     *
-     *
-     * @return array
-     */
-    public function reorderUsernames(array $order);
-
-    /**
-     *
-     *
-     *
-     *
-     * @return array
-     */
-    public function toggleUsername(string $username, bool $active);
+    public function toggleUsername(bool $active, string $username = ''): bool;
 }

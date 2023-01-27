@@ -12,61 +12,81 @@ interface Photos
     /**
      * Installs a previously uploaded photo as a profile photo.
      *
-     * @param array $id Input photo @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $fallback  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputPhotoEmpty'}|array{_: 'inputPhoto', id?: int, access_hash?: int, file_reference?: string} $id Input photo @see https://docs.madelineproto.xyz/API_docs/types/InputPhoto.html
      *
      *
-     * @return array
+     *
+     *
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: int}|array{_: 'photo', has_stickers: bool, id: int, access_hash: int, file_reference: string, date: int, sizes: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_sizes: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int}, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function updateProfilePhoto(array $id, array $fallback = []);
+    public function updateProfilePhoto(array $id, bool $fallback = false): array;
 
     /**
      * Updates current user profile photo.
      *
-     * @param array $fallback  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $file File saved in parts by means of [upload.saveFilePart](https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html) method @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $video [Animated profile picture](https://core.telegram.org/api/files#animated-profile-pictures) video @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     *
+     *
+     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
+     * @param string|mixed $video A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
      * @param float $video_start_ts Floating point UNIX timestamp in seconds, indicating the frame of the video that should be used as static preview.
      *
      *
-     * @return array
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: int}|array{_: 'photo', has_stickers: bool, id: int, access_hash: int, file_reference: string, date: int, sizes: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_sizes: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int}, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function uploadProfilePhoto(array $fallback = [], array $file = [], array $video = [], float $video_start_ts = 0.0);
+    public function uploadProfilePhoto(bool $fallback = false, mixed $file = [], mixed $video = [], float $video_start_ts = 0.0): array;
 
     /**
      * Deletes profile photos. The method returns a list of successfully deleted photo IDs.
      *
-     * @param array $id Input photos to delete @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param list<array{_: 'inputPhotoEmpty'}|array{_: 'inputPhoto', id?: int, access_hash?: int, file_reference?: string}>|array<never, never> $id Array of Input photos to delete @see https://docs.madelineproto.xyz/API_docs/types/InputPhoto.html
      *
      *
-     * @return array
+     * @return list<int>
      */
-    public function deletePhotos(array $id);
+    public function deletePhotos(array $id = []): array;
 
     /**
      * Returns the list of user photos.
      *
-     * @param array $user_id User ID @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int} $user_id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     *
+     *
      * @param int $offset Number of list elements to be skipped
+     *
+     *
      * @param int $max_id If a positive value was transferred, the method will return only photos with IDs less than the set one
+     *
+     *
      * @param int $limit Number of list elements to be returned
      *
      *
-     * @return array
+     * @return array{_: 'photos.photos', photos: list<array{_: 'photoEmpty', id: int}|array{_: 'photo', has_stickers: bool, id: int, access_hash: int, file_reference: string, date: int, sizes: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_sizes: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>}|array{_: 'photos.photosSlice', count: int, photos: list<array{_: 'photoEmpty', id: int}|array{_: 'photo', has_stickers: bool, id: int, access_hash: int, file_reference: string, date: int, sizes: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_sizes: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photos.html
      */
-    public function getUserPhotos(array $user_id, int $offset, int $max_id, int $limit);
+    public function getUserPhotos(array $user_id, int $offset = 0, int $max_id = 0, int $limit = 0): array;
 
     /**
      *
      *
-     * @param array $user_id  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $suggest  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $save  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $file  @see https://docs.madelineproto.xyz/API_docs/types/array.html
-     * @param array $video  @see https://docs.madelineproto.xyz/API_docs/types/array.html
+     * @param array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int} $user_id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      *
      *
-     * @return array
+     *
+     *
+     *
+     *
+     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
+     * @param string|mixed $video A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     *
+     *
+     *
+     *
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: int}|array{_: 'photo', has_stickers: bool, id: int, access_hash: int, file_reference: string, date: int, sizes: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: int, local_id: int, secret: int}|array{_: 'fileLocation', dc_id: int, volume_id: int, local_id: int, secret: int}, type: string, w: int, h: int, bytes: string}>, video_sizes: list<array{_: 'videoSize', type: string, w: int, h: int, size: int, video_start_ts?: float}>, dc_id: int}, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function uploadContactProfilePhoto(array $user_id, array $suggest = [], array $save = [], array $file = [], array $video = [], float $video_start_ts = 0.0);
+    public function uploadContactProfilePhoto(array $user_id, bool $suggest = false, bool $save = false, mixed $file = [], mixed $video = [], float $video_start_ts = 0.0): array;
 }

@@ -732,15 +732,15 @@ final class TL
                     }
                 }
                 if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'long') {
-                    $serialized .= \pack('@8');
+                    $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
                 if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'int') {
-                    $serialized .= \pack('@4');
+                    $serialized .= "\0\0\0\0";
                     continue;
                 }
                 if ($current_argument['name'] === 'flags' && $current_argument['type'] === 'int') {
-                    $serialized .= \pack('@4');
+                    $serialized .= "\0\0\0\0";
                     continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
@@ -748,11 +748,11 @@ final class TL
                     continue;
                 }
                 if ($tl['type'] === 'DocumentAttribute' && \in_array($current_argument['name'], ['w', 'h', 'duration'])) {
-                    $serialized .= \pack('@4');
+                    $serialized .= "\0\0\0\0";
                     continue;
                 }
                 if (\in_array($current_argument['type'], ['bytes', 'string', 'int'])) {
-                    $serialized .= \pack('@4');
+                    $serialized .= "\0\0\0\0";
                     continue;
                 }
                 if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $current_argument['type']) {
@@ -1038,7 +1038,7 @@ final class TL
                 foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
                     $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
                 }
-                if ($message->getType() && \stripos($message->getType(), '<') !== false) {
+                if ($message->getType() && \str_contains($message->getType(), '<')) {
                     $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
                 }
             } elseif ($x['_'] === 'msg_container' && $arg['name'] === 'messages') {
