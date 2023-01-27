@@ -28,8 +28,6 @@ use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
-use function Amp\File\read;
-
 final class AnnotationsBuilder
 {
     /**
@@ -55,13 +53,16 @@ final class AnnotationsBuilder
         $tlSchema = new TLSchema;
         $tlSchema->mergeArray($settings);
         $this->TL->init($tlSchema);
-        $this->blacklist = json_decode(read(__DIR__.'/../../../docs/template/disallow.json'), true);
+        $this->blacklist = \json_decode(\file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
         $this->blacklistHard = $this->blacklist;
-        unset($this->blacklistHard['messages.getHistory']);
-        unset($this->blacklistHard['channels.getMessages']);
-        unset($this->blacklistHard['updates.getDifference']);
-        unset($this->blacklistHard['updates.getChannelDifference']);
-        unset($this->blacklistHard['updates.getState']);
+        unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['updates.getDifference'], $this->blacklistHard['updates.getChannelDifference'], $this->blacklistHard['updates.getState']);
+        \file_put_contents(__DIR__.'/Namespace/Blacklist.php', '<?php
+namespace danog\MadelineProto\Namespace;
+
+final class Blacklist {
+    public const BLACKLIST = '.\var_export($this->blacklistHard, true).';
+}
+        ');
     }
     public function mkAnnotations(): void
     {

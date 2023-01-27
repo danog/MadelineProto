@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Namespace;
 
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\Exception;
 use InvalidArgumentException;
 
 /**
@@ -47,6 +48,10 @@ final class AbstractAPI
         }
 
         $name = $this->namespace.'.'.$name;
+        if (isset(Blacklist::BLACKLIST[$name])) {
+            throw new Exception(Blacklist::BLACKLIST[$name]);
+        }
+
         $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
         $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
         if (isset($args[0]) && !isset($args['multiple'])) {

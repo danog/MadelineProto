@@ -53,7 +53,6 @@
         "danog/loop": "^1",
         "phpseclib/phpseclib": "^3",
         "amphp/redis": "^2",
-        "symfony/polyfill-php80": "^1.18",
         "amphp/websocket-client": "^2",
         "psr/http-factory": "^1.0",
         "psr/log": "^3",
