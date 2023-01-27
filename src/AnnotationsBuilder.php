@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use AssertionError;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use ReflectionClass;
@@ -71,7 +72,6 @@ final class Blacklist {
         foreach (DocsBuilder::DEFAULT_TEMPLATES as $key => $types) {
             $replace = match ($key) {
                 'User' => 'array|int|string',
-                'DataJSON' => 'mixed',
                 'InputFile' => 'mixed',
                 'PhoneCall' => '\\danog\\MadelineProto\\VoIP|array',
                 default => 'array'
@@ -110,6 +110,8 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'InputMessage' => 'array|int',
+            'DataJSON' => 'mixed',
+            'JSONValue' => 'mixed',
             default => $this->special[$type] ?? 'array'
         };
     }
@@ -126,6 +128,8 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'Updates' => 'array',
+            'DataJSON' => 'mixed',
+            'JSONValue' => 'mixed',
             default => $this->special[$type] ?? ''
         };
         if ($type === 'channels.AdminLogResults') {
@@ -158,6 +162,9 @@ final class Blacklist {
                     $constructors []= 'array{'.$params.'}';
                 }
             }
+            if ($constructors === []) {
+                throw new AssertionError("No constructors for $type!");
+            }
             $base = \implode('|', $constructors);
         }
         if ($type === 'InputMessage') {
@@ -184,6 +191,7 @@ final class Blacklist {
             'Bool' => 'false',
             'true' => 'false',
             'DataJSON' => 'null',
+            'JSONValue' => 'null',
             default => '[]'
         };
     }
@@ -205,6 +213,7 @@ final class Blacklist {
             'Bool' => $description,
             'true' => $description,
             'DataJSON' => 'Any JSON-encodable data',
+            'JSONValue' => 'Any JSON-encodable data',
             'InputFile' => 'A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!',
             default => $descriptionEnhanced
                 ? "$descriptionEnhanced @see https://docs.madelineproto.xyz/API_docs/types/$type.html"
@@ -445,7 +454,6 @@ final class Blacklist {
             if (!$type) {
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
-            $promise = '\\';
             $phpdoc = $method->getDocComment() ?: '';
             if (!\str_contains($phpdoc, '@return')) {
                 if (!\trim($phpdoc)) {
@@ -454,26 +462,11 @@ final class Blacklist {
                     $phpdoc = \str_replace('*/', ' * @return '.$type."\n     */", $phpdoc);
                 }
             }
-            $phpdoc = \str_replace('@return \\Generator', "@return $promise", $phpdoc);
-            $phpdoc = \str_replace('@return \\Promise', "@return $promise", $phpdoc);
-            $phpdoc = \str_replace('@return Generator', "@return $promise", $phpdoc);
-            $phpdoc = \str_replace('@return Promise', "@return $promise", $phpdoc);
             if ($hasReturnValue && $async && \preg_match('/@return (.*)/', $phpdoc, $matches)) {
                 $ret = $matches[1];
-                $new = $ret;
-                if ($type && !\str_contains($ret, '<')) {
-                    $new = $this->typeToStr($type);
-                }
                 $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
-                if (!\str_contains($phpdoc, '@return')) {
-                    $phpdoc = \str_replace('@return ', "@return $new|$promise<$new>\n     * @return ", $phpdoc);
-                }
             }
-            $phpdoc = \preg_replace(
-                '/@return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/',
-                "@return $promise<$1>",
-                $phpdoc,
-            );
+            $phpdoc = \str_replace('@return Amp\\Future', '@return Future', $phpdoc);
             $internalDoc['InternalDoc'][$name] = $phpdoc;
             $internalDoc['InternalDoc'][$name] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
         }
@@ -543,7 +536,7 @@ final class Blacklist {
             }
             if (!$type->isBuiltin()) {
                 $new .= '\\';
-            }
+            };
             $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
         } elseif ($type instanceof ReflectionUnionType) {
             return \implode('|', \array_map($this->typeToStr(...), $type->getTypes()));

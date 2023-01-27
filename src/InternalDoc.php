@@ -154,8 +154,6 @@ abstract class InternalDoc
      * @param Generator|Future $a Promise A
      * @param Generator|Future $b Promise B
      * @psalm-suppress InvalidScope
-     *
-      * @return Amp\Future
      */
     public static function after(\Generator|\Amp\Future $a, \Generator|\Amp\Future $b): \Amp\Future
     {

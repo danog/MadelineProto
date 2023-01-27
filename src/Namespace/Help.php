@@ -83,16 +83,16 @@ interface Help
     /**
      * Look for updates of telegram's terms of service.
      *
-     * @return array{_: 'help.termsOfServiceUpdateEmpty', expires: int}|array{_: 'help.termsOfServiceUpdate', terms_of_service: array{_: 'help.termsOfService', id: array{_: 'dataJSON', data: string}, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>, min_age_confirm: int}, expires: int} @see https://docs.madelineproto.xyz/API_docs/types/help.TermsOfServiceUpdate.html
+     * @return array{_: 'help.termsOfServiceUpdateEmpty', expires: int}|array{_: 'help.termsOfServiceUpdate', terms_of_service: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>, min_age_confirm: int}, expires: int} @see https://docs.madelineproto.xyz/API_docs/types/help.TermsOfServiceUpdate.html
      */
     public function getTermsOfServiceUpdate(): array;
 
     /**
      * Accept the new terms of service.
      *
-     * @param array{_: 'dataJSON', data?: string} $id Any JSON-encodable data
+     * @param mixed $id Any JSON-encodable data
      */
-    public function acceptTermsOfService(array $id): bool;
+    public function acceptTermsOfService(mixed $id): bool;
 
     /**
      * Get info about an unsupported deep link, see [here for more info »](https://core.telegram.org/api/links#unsupported-links).
@@ -105,21 +105,21 @@ interface Help
     /**
      * Get app-specific configuration, see [client configuration](https://core.telegram.org/api/config#client-configuration) for more info on the result.
      *
-     * @return array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value: string}|array{_: 'jsonArray', value: list<array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value: string}|array{_: 'jsonObject', value: list<array{_: 'jsonObjectValue', value: array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value: string}, key: string}>}>}|array{_: 'jsonObject', value: list<array{_: 'jsonObjectValue', value: array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value: string}|array{_: 'jsonArray', value: list<array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value: string}>}, key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/JSONValue.html
+     * @return mixed Any JSON-encodable data
      */
-    public function getAppConfig(): array;
+    public function getAppConfig(): mixed;
 
     /**
      * Saves logs of application on the server.
      *
-     * @param list<array{_: 'inputAppEvent', time: float, data: array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value?: string}|array{_: 'jsonArray', value?: list<array{_: 'jsonNull'}|array{_: 'jsonBool', value: bool}|array{_: 'jsonNumber', value: float}|array{_: 'jsonString', value?: string}|array{_: 'jsonObject', value?: list<>}>}|array{_: 'jsonObject', value?: list<>}, type?: string, peer?: int}>|array<never, never> $events Array of List of input events @see https://docs.madelineproto.xyz/API_docs/types/InputAppEvent.html
+     * @param list<array{_: 'inputAppEvent', time: float, data: mixed, type?: string, peer?: int}>|array<never, never> $events Array of List of input events @see https://docs.madelineproto.xyz/API_docs/types/InputAppEvent.html
      */
     public function saveAppLog(array $events = []): bool;
 
     /**
      * Get [passport](https://core.telegram.org/passport) configuration.
      *
-     * @return array{_: 'help.passportConfigNotModified'}|array{_: 'help.passportConfig', countries_langs: array{_: 'dataJSON', data: string}, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.PassportConfig.html
+     * @return array{_: 'help.passportConfigNotModified'}|array{_: 'help.passportConfig', countries_langs: mixed, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.PassportConfig.html
      */
     public function getPassportConfig(int $hash = 0): array;
 

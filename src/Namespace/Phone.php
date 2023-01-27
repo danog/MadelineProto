@@ -12,9 +12,9 @@ interface Phone
     /**
      * Get phone call configuration to be passed to libtgvoip's shared config.
      *
-     * @return array{_: 'dataJSON', data: string} Any JSON-encodable data
+     * @return mixed Any JSON-encodable data
      */
-    public function getCallConfig(): array;
+    public function getCallConfig(): mixed;
 
     /**
      * Optional: notify the server that the user is currently busy in a call: this will automatically refuse all incoming phone calls until the current phone call is ended.
@@ -38,9 +38,9 @@ interface Phone
      * Send phone call debug data to server.
      *
      * @param array{_: 'inputPhoneCall', id?: int, access_hash?: int} $peer Phone call @see https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html
-     * @param array{_: 'dataJSON', data?: string} $debug Any JSON-encodable data
+     * @param mixed $debug Any JSON-encodable data
      */
-    public function saveCallDebug(array $peer, array $debug): bool;
+    public function saveCallDebug(array $peer, mixed $debug): bool;
 
     /**
      * Send VoIP signaling data.
@@ -66,13 +66,13 @@ interface Phone
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param array|int|string $join_as Join the group call, presenting yourself as the specified user/channel @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'dataJSON', data?: string} $params Any JSON-encodable data
+     * @param mixed $params Any JSON-encodable data
      * @param bool $muted If set, the user will be muted by default upon joining.
      * @param bool $video_stopped If set, the user's video will be disabled by default upon joining.
      * @param string $invite_hash The invitation hash from the [invite link »](https://core.telegram.org/api/links#voice-chatvideo-chatlivestream-links), if provided allows speaking in a livestream or muted group chat.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinGroupCall(array $call, array|int|string $join_as, array $params, bool $muted = false, bool $video_stopped = false, string $invite_hash = ''): array;
+    public function joinGroupCall(array $call, array|int|string $join_as, mixed $params, bool $muted = false, bool $video_stopped = false, string $invite_hash = ''): array;
 
     /**
      * Leave a group call.
@@ -229,10 +229,10 @@ interface Phone
      * Start screen sharing in a call.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
-     * @param array{_: 'dataJSON', data?: string} $params Any JSON-encodable data
+     * @param mixed $params Any JSON-encodable data
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinGroupCallPresentation(array $call, array $params): array;
+    public function joinGroupCallPresentation(array $call, mixed $params): array;
 
     /**
      * Stop screen sharing in a group call.

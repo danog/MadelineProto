@@ -12,19 +12,19 @@ interface Bots
     /**
      * Sends a custom request; for bots only.
      *
-     * @param array{_: 'dataJSON', data?: string} $params Any JSON-encodable data
+     * @param mixed $params Any JSON-encodable data
      * @param string $custom_method The method name
-     * @return array{_: 'dataJSON', data: string} Any JSON-encodable data
+     * @return mixed Any JSON-encodable data
      */
-    public function sendCustomRequest(array $params, string $custom_method = ''): array;
+    public function sendCustomRequest(mixed $params, string $custom_method = ''): mixed;
 
     /**
      * Answers a custom query; for bots only.
      *
-     * @param array{_: 'dataJSON', data?: string} $data Any JSON-encodable data
+     * @param mixed $data Any JSON-encodable data
      * @param int $query_id Identifier of a custom query
      */
-    public function answerWebhookJSONQuery(array $data, int $query_id = 0): bool;
+    public function answerWebhookJSONQuery(mixed $data, int $query_id = 0): bool;
 
     /**
      * Set bot command list.
