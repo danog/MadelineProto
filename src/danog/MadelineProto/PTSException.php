@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * PTSException module.
  *
@@ -11,23 +13,26 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use Exception;
+
+use const PHP_EOL;
+
 /**
  * Internal error indicating a problem with Telegram's servers.
  */
-class PTSException extends \Exception
+final class PTSException extends Exception
 {
     use TL\PrettyException;
-    public function __toString()
+    public function __toString(): string
     {
-        return \get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        return static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
     }
     public function __construct($message, $file = '')
     {

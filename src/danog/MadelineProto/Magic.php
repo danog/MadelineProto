@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Magic module.
  *
@@ -11,51 +13,58 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
-use Amp\Deferred;
-use Amp\Loop;
-use Amp\Loop\Driver;
+use Amp\DeferredFuture;
+use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
-use ReflectionClass;
-use function Amp\ByteStream\getStdin;
-use function Amp\File\read;
-use function Amp\Log\hasColorSupport;
-use function Amp\Promise\wait;
+use phpseclib3\Math\BigInteger;
+use Revolt\EventLoop;
+use Throwable;
 
-class Magic
+use const DIRECTORY_SEPARATOR;
+use const E_ALL;
+use const MADELINE_WORKER_TYPE;
+use const PHP_INT_SIZE;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+
+use const PHP_SAPI;
+use const SIG_DFL;
+use const SIGINT;
+use const SIGTERM;
+use function Amp\Log\hasColorSupport;
+use function define;
+use function function_exists;
+
+final class Magic
 {
     const ZERO_CHANNEL_ID = -1000000000000;
     /**
      * Static storage.
      *
-     * @var array
      */
-    public static $storage = [];
+    public static array $storage = [];
     /**
      * Whether this system is bigendian.
      *
-     * @var boolean
      */
-    public static $BIG_ENDIAN = false;
+    public static bool $BIG_ENDIAN = false;
     /**
      * Whether this is a TTY console.
      *
-     * @var boolean
      */
-    public static $isatty = false;
+    public static bool $isatty = false;
     /**
      * Whether we're in a fork.
      *
-     * @var boolean
      */
-    public static $isFork = false;
+    public static bool $isFork = false;
     /**
      * Whether this is an IPC worker.
      */
@@ -63,163 +72,126 @@ class Magic
     /**
      * Whether we can get our PID.
      *
-     * @var boolean
      */
-    public static $can_getmypid = true;
-    /**
-     * Whether we can amphp/parallel.
-     *
-     * @var boolean
-     */
-    public static $can_parallel = false;
+    public static bool $can_getmypid = true;
     /**
      * Whether we can get our CWD.
      *
-     * @var boolean
      */
-    public static $can_getcwd = false;
+    public static bool $can_getcwd = false;
     /**
      * Whether we've processed forks.
      *
-     * @var boolean
      */
-    public static $processed_fork = false;
+    public static bool $processed_fork = false;
     /**
      * Whether we can use ipv6.
      *
-     * @var bool
      */
-    public static $ipv6 = false;
+    public static bool $ipv6 = false;
     /**
      * Our PID.
      *
-     * @var int
      */
-    public static $pid;
+    public static ?int $pid = null;
     /**
      * Whether we've inited all light constants.
      *
-     * @var boolean
      */
-    private static $initedLight = false;
+    private static bool $initedLight = false;
     /**
      * Whether we've inited all static constants.
      *
-     * @var boolean
      */
-    private static $inited = false;
+    private static bool $inited = false;
     /**
      * Whether we've inited the ipv6 property.
      *
-     * @var boolean
      */
-    private static $initedIpv6 = false;
+    private static bool $initedIpv6 = false;
     /**
      * Bigint zero.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $zero;
+    public static BigInteger $zero;
     /**
      * Bigint one.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $one;
+    public static BigInteger $one;
     /**
      * Bigint two.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $two;
+    public static BigInteger $two;
     /**
      * Bigint 2^1984.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $twoe1984;
+    public static BigInteger $twoe1984;
     /**
      * Bigint 2^2047.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $twoe2047;
+    public static BigInteger $twoe2047;
     /**
      * Bigint 2^2048.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public static $twoe2048;
+    public static BigInteger $twoe2048;
     /**
      * Decoded UTF8 emojis for call fingerprint.
      *
-     * @var array
      */
-    public static $emojis;
+    public static array $emojis;
     /**
      * MadelineProto revision.
      *
-     * @var string
      */
-    public static $revision;
+    public static string $revision;
     /**
      * MadelineProto version (clean).
      *
-     * @var string
      */
-    public static $version;
+    public static ?string $version;
     /**
      * Latest MadelineProto version.
      *
-     * @var string
      */
-    public static $version_latest;
+    public static ?string $version_latest;
     /**
      * Our CWD.
      *
-     * @var string
      */
-    public static $cwd;
+    public static string $cwd;
     /**
      * Caller script CWD.
      *
-     * @var string
      */
-    public static $script_cwd;
+    public static string $script_cwd;
     /**
      * Whether we're running on altervista.
      *
-     * @var boolean
      */
-    public static $altervista = false;
+    public static bool $altervista = false;
     /**
      * Wether we're running on 000webhost (yuck).
      *
-     * @var boolean
      */
-    public static $zerowebhost = false;
-    /**
-     * Whether a signal was sent to the processand the system must shut down.
-     *
-     * @var boolean
-     */
-    public static $signaled = false;
+    public static bool $zerowebhost = false;
     /**
      * Whether to suspend certain stdout log printing, when reading input.
-     *
-     * @var ?Deferred
      */
-    public static $suspendPeriodicLogging;
+    public static ?DeferredFuture $suspendPeriodicLogging = null;
     /**
      * All mime types.
      *
      * @var array<string, string>
      */
-    public static $allMimes = [];
+    public static array $allMimes = [];
     /**
      * Whether the openssl extension is loaded.
      *
-     * @var boolean
      */
     public static bool $hasOpenssl = false;
     /**
@@ -232,22 +204,24 @@ class Magic
      * Initialize magic constants.
      *
      * @param bool $light Use lightweight initialization routine
-     *
-     * @return void
      */
-    public static function start(bool $light = false): void
+    public static function start(bool $light): void
     {
         if (self::$inited || (self::$initedLight && $light)) {
             return;
         }
         if (PHP_INT_SIZE < 8) {
-            throw new \danog\MadelineProto\Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.', 0, null, 'MadelineProto', 1);
+            throw new Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.0+ recommended.', 0, null, 'MadelineProto', 1);
+        }
+        if (!\defined('AMP_WORKER')) {
+            \define('AMP_WORKER', 1);
         }
         if (!self::$initedLight) {
             // Setup error reporting
-            \set_error_handler([Exception::class, 'ExceptionErrorHandler']);
-            \set_exception_handler([Exception::class, 'ExceptionHandler']);
-            self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
+            Shutdown::init();
+            \set_error_handler(Exception::exceptionErrorHandler(...));
+            \set_exception_handler(Exception::exceptionHandler(...));
+            self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             // Important, obtain root relative to caller script
             $backtrace = \debug_backtrace(0);
             self::$script_cwd = self::$cwd = \dirname(\end($backtrace)['file']);
@@ -255,30 +229,30 @@ class Magic
                 try {
                     \error_reporting(E_ALL);
                     \ini_set('log_errors', 1);
-                    \ini_set('error_log', Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-                } catch (\Throwable $e) {
+                    \ini_set('error_log', self::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
+                } catch (Throwable $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
             try {
                 \ini_set('memory_limit', -1);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
             // Check if we're in a console, for colorful log output
             try {
                 self::$isatty = \defined('STDOUT') && hasColorSupport();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
             try {
                 self::$cwd = \getcwd();
                 self::$can_getcwd = true;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
             try {
                 if (\function_exists('set_time_limit')) {
                     \set_time_limit(-1);
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
             // Define signal handlers
             if (\defined('SIGINT')) {
@@ -286,24 +260,34 @@ class Magic
                 try {
                     \pcntl_signal(SIGINT, fn () => null);
                     \pcntl_signal(SIGINT, SIG_DFL);
-                    Loop::unreference(Loop::onSignal(SIGINT, static function () {
-                        Logger::log('Got sigint', Logger::FATAL_ERROR);
-                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
+                    EventLoop::unreference(EventLoop::onSignal(SIGINT, static function (): void {
+                        if (self::$suspendPeriodicLogging) {
+                            self::togglePeriodicLogging();
+                        }
+                        throw new SignalException('SIGINT received');
                     }));
-                    Loop::unreference(Loop::onSignal(SIGTERM, static function () {
-                        Logger::log('Got sigterm', Logger::FATAL_ERROR);
-                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
+                    EventLoop::unreference(EventLoop::onSignal(SIGTERM, static function (): void {
+                        if (self::$suspendPeriodicLogging) {
+                            self::togglePeriodicLogging();
+                        }
+                        throw new SignalException('SIGTERM received');
                     }));
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
             }
             self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
+            self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
+            self::$version = null;
+            if (\file_exists(__DIR__.'/../../../.git/refs/heads/stable')) {
+                try {
+                    self::$version = \trim(@\file_get_contents(__DIR__.'/../../../.git/refs/heads/stable'));
+                } catch (Throwable $e) {
+                }
+            }
+            self::$revision = 'Revision: '.self::$version;
             self::$initedLight = true;
             if ($light) {
-                if (!\defined('AMP_WORKER')) {
-                    \define('AMP_WORKER', true);
-                }
                 return;
             }
         }
@@ -314,67 +298,32 @@ class Magic
         }
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
         if (\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION, ['1.5.0'])) {
-                throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
+            if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(VoIP::PHP_LIBTGVOIP_VERSION, ['1.5.0'])) {
+                throw new Exception(\hex2bin(Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
             }
         }
         self::$hasOpenssl = \extension_loaded('openssl');
         self::$emojis = \json_decode(self::JSON_EMOJIS);
-        self::$zero = new \phpseclib3\Math\BigInteger(0);
-        self::$one = new \phpseclib3\Math\BigInteger(1);
-        self::$two = new \phpseclib3\Math\BigInteger(2);
-        self::$twoe1984 = new \phpseclib3\Math\BigInteger('010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
-        self::$twoe2047 = new \phpseclib3\Math\BigInteger('80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
-        self::$twoe2048 = new \phpseclib3\Math\BigInteger('0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
-        self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-        if (\file_exists(__DIR__.'/../../../.git/refs/heads/master')) {
-            self::$version = null;
-            try {
-                self::$version = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
-            } catch (\Throwable $e) {
-            }
-        }
+        self::$zero = new BigInteger(0);
+        self::$one = new BigInteger(1);
+        self::$two = new BigInteger(2);
+        self::$twoe1984 = new BigInteger('010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
+        self::$twoe2047 = new BigInteger('80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
+        self::$twoe2048 = new BigInteger('0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
         if (self::$version) {
-            self::$revision = 'Revision: '.self::$version;
             self::$version_latest = null;
             try {
                 $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-                self::$version_latest = @\file_get_contents("https://phar.madelineproto.xyz/release$php");
-            } catch (\Throwable $e) {
+                self::$version_latest = \trim(@\file_get_contents("https://phar.madelineproto.xyz/release$php"));
+            } catch (Throwable $e) {
             }
             if (self::$version_latest !== self::$version) {
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
-            };
-        }
-        self::$can_parallel = false;
-        if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !(\class_exists(\Phar::class) && \Phar::running())) {
-            try {
-                $back = \debug_backtrace(0);
-                if (!\defined('AMP_WORKER')) {
-                    \define('AMP_WORKER', 1);
-                }
-                $promise = read(\end($back)['file']);
-                do {
-                    try {
-                        if (wait($promise)) {
-                            self::$can_parallel = true;
-                            break;
-                        }
-                    } catch (\Throwable $e) {
-                        if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
-                            throw $e;
-                        }
-                    }
-                } while (true);
-            } catch (\Throwable $e) {
             }
-        }
-        if (!self::$can_parallel && !\defined('AMP_WORKER')) {
-            \define('AMP_WORKER', 1);
         }
         try {
             $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
         if (isset($res, $res['ok']) && $res['ok']) {
             RPCErrorException::$errorMethodMap = $res['result'];
@@ -388,14 +337,13 @@ class Magic
                 }
             }
         }
+        GarbageCollector::start();
         self::$inited = true;
     }
     /**
      * Check if this is a POSIX fork of the main PHP process.
-     *
-     * @return boolean
      */
-    public static function isFork()
+    public static function isFork(): bool
     {
         if (self::$isFork) {
             return true;
@@ -408,47 +356,16 @@ class Magic
                 self::$pid = \getmypid();
             }
             return self::$isFork = self::$pid !== \getmypid();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return self::$can_getmypid = false;
         }
     }
     /**
      * Get current working directory.
-     *
-     * @return string
      */
     public static function getcwd(): string
     {
         return self::$can_getcwd ? \getcwd() : self::$cwd;
-    }
-    /**
-     * Shutdown system.
-     *
-     * @param int $code Exit code
-     *
-     * @return void
-     */
-    public static function shutdown(int $code = 0)
-    {
-        self::$signaled = true;
-        if (\defined('STDIN')) {
-            getStdin()->unreference();
-        }
-        if ($code !== 0) {
-            $driver = Loop::get();
-            $reflectionClass = new ReflectionClass(Driver::class);
-            $reflectionProperty = $reflectionClass->getProperty('watchers');
-            $reflectionProperty->setAccessible(true);
-            foreach (\array_keys($reflectionProperty->getValue($driver)) as $key) {
-                $driver->unreference($key);
-            }
-        }
-        MTProto::serializeAll();
-        Loop::stop();
-        if (\class_exists(Installer::class)) {
-            Installer::unlock();
-        }
-        die($code);
     }
     /**
      * Toggle periodic logging.
@@ -458,9 +375,9 @@ class Magic
         if (self::$suspendPeriodicLogging) {
             $deferred = self::$suspendPeriodicLogging;
             self::$suspendPeriodicLogging = null;
-            $deferred->resolve();
+            $deferred->complete();
         } else {
-            self::$suspendPeriodicLogging = new Deferred;
+            self::$suspendPeriodicLogging = new DeferredFuture;
         }
     }
 
@@ -468,8 +385,6 @@ class Magic
      * Set whether we can use ipv6.
      *
      * @param bool $ipv6 Whether we can use ipv6.
-     *
-     * @return void
      */
     public static function setIpv6(bool $ipv6): void
     {

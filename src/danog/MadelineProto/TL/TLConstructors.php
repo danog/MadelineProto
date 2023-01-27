@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TLConstructors module.
  *
@@ -11,21 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
 
-class TLConstructors
+final class TLConstructors
 {
-    use \danog\Serializable;
     use TLParams;
-    public $by_id = [];
-    public $by_predicate_and_layer = [];
-    public $layers = [];
+    public array $by_id = [];
+    public array $by_predicate_and_layer = [];
+    public array $layers = [];
     public function __sleep()
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];
@@ -35,7 +35,7 @@ class TLConstructors
         if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) {
             return;
         }
-        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
+        $predicate = ($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate'];
         $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
@@ -67,7 +67,9 @@ class TLConstructors
                         $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                     }
                 } elseif (!isset($chosenid)) {
-                    $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    if (isset($this->by_predicate_and_layer[$predicate.$alayer])) {
+                        $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    }
                 }
             }
             if (!isset($chosenid)) {
@@ -88,10 +90,8 @@ class TLConstructors
      * Find constructor by ID.
      *
      * @param string $id Constructor ID
-     *
-     * @return array|false
      */
-    public function findById(string $id)
+    public function findById(string $id): array|false
     {
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];

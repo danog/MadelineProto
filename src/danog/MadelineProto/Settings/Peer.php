@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Peer database settings.
  */
-class Peer extends SettingsAbstract
+final class Peer extends SettingsAbstract
 {
     /**
      * Cache time for full peer information (seconds).
@@ -27,7 +29,7 @@ class Peer extends SettingsAbstract
         foreach (self::toCamel([
             'full_info_cache_time',
             'full_fetch',
-            'cache_all_peers_on_startup'
+            'cache_all_peers_on_startup',
         ]) as $object => $array) {
             if (isset($settings['peer'][$array])) {
                 $this->{$object}($settings['peer'][$array]);
@@ -36,8 +38,6 @@ class Peer extends SettingsAbstract
     }
     /**
      * Get cache time for full peer information (seconds).
-     *
-     * @return int
      */
     public function getFullInfoCacheTime(): int
     {
@@ -48,8 +48,6 @@ class Peer extends SettingsAbstract
      * Set cache time for full peer information (seconds).
      *
      * @param int $fullInfoCacheTime Cache time for full peer information (seconds).
-     *
-     * @return self
      */
     public function setFullInfoCacheTime(int $fullInfoCacheTime): self
     {
@@ -60,8 +58,6 @@ class Peer extends SettingsAbstract
 
     /**
      * Get should madeline fetch the full member list of every group it meets?
-     *
-     * @return bool
      */
     public function getFullFetch(): bool
     {
@@ -72,8 +68,6 @@ class Peer extends SettingsAbstract
      * Set should madeline fetch the full member list of every group it meets?
      *
      * @param bool $fullFetch Should madeline fetch the full member list of every group it meets?
-     *
-     * @return self
      */
     public function setFullFetch(bool $fullFetch): self
     {
@@ -84,8 +78,6 @@ class Peer extends SettingsAbstract
 
     /**
      * Get whether to cache all peers on startup for userbots.
-     *
-     * @return bool
      */
     public function getCacheAllPeersOnStartup(): bool
     {
@@ -96,8 +88,6 @@ class Peer extends SettingsAbstract
      * Set whether to cache all peers on startup for userbots.
      *
      * @param bool $cacheAllPeersOnStartup Whether to cache all peers on startup for userbots.
-     *
-     * @return self
      */
     public function setCacheAllPeersOnStartup(bool $cacheAllPeersOnStartup): self
     {

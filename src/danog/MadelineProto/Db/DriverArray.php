@@ -1,58 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
-use Amp\Promise;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
+use IteratorAggregate;
 use ReflectionClass;
 
-use function Amp\call;
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Array caching trait.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ *
+ * @implements IteratorAggregate<TKey, TValue>
+ * @implements DbArray<TKey, TValue>
  */
-abstract class DriverArray implements DbArray
+abstract class DriverArray implements DbArray, IteratorAggregate
 {
     protected string $table;
 
     use ArrayCacheTrait;
 
     /**
-     * Initialize connection.
-     */
-    abstract public function initConnection(DatabaseAbstract $settings): \Generator;
-    /**
      * Initialize on startup.
-     *
-     * @return \Generator
      */
-    abstract public function initStartup(): \Generator;
+    abstract public function initStartup(): void;
 
     /**
      * Create table for property.
-     *
-     * @return \Generator
-     *
-     * @throws \Throwable
      */
-    abstract protected function prepareTable(): \Generator;
+    abstract protected function prepareTable(): void;
 
     /**
      * Rename table.
-     *
-     * @param string $from
-     * @param string $to
-     * @return \Generator
      */
-    abstract protected function renameTable(string $from, string $to): \Generator;
+    abstract protected function renameTable(string $from, string $to): void;
 
     /**
      * Get the value of table.
-     *
-     * @return string
      */
     public function getTable(): string
     {
@@ -61,10 +55,6 @@ abstract class DriverArray implements DbArray
 
     /**
      * Set the value of table.
-     *
-     * @param string $table
-     *
-     * @return self
      */
     public function setTable(string $table): self
     {
@@ -77,27 +67,16 @@ abstract class DriverArray implements DbArray
      * Check if key isset.
      *
      * @param mixed $key
-     *
-     * @return Promise<bool> true if the offset exists, otherwise false
+     * @return bool true if the offset exists, otherwise false
      */
-    public function isset(string|int $key): Promise
+    public function isset(string|int $key): bool
     {
-        return call(function () use ($key) {
-            return null !== yield $this->offsetGet($key);
-        });
+        return $this->offsetGet($key) !== null;
     }
 
-    /**
-     * @param string $table
-     * @param DbArray|array|null $previous
-     * @param DatabaseAbstract $settings
-     *
-     * @return Promise
-     *
-     * @psalm-return Promise<static>
-     */
-    public static function getInstance(string $table, $previous, $settings): Promise
+    public static function getInstance(string $table, DbType|array|null $previous, $settings): static
     {
+        /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
         $instance->setTable($table);
 
@@ -107,20 +86,18 @@ abstract class DriverArray implements DbArray
 
         $instance->startCacheCleanupLoop();
 
-        return call(static function () use ($instance, $previous, $settings) {
-            yield from $instance->initConnection($settings);
-            yield from $instance->prepareTable();
+        $instance->initConnection($settings);
+        $instance->prepareTable();
 
-            if (static::getClassName($previous) !== static::getClassName($instance)) {
-                if ($previous instanceof DriverArray) {
-                    yield from $previous->initStartup();
-                }
-                yield from static::renameTmpTable($instance, $previous);
-                yield from static::migrateDataToDb($instance, $previous);
+        if (static::getClassName($previous) !== static::getClassName($instance)) {
+            if ($previous instanceof DriverArray) {
+                $previous->initStartup();
             }
+            static::renameTmpTable($instance, $previous);
+            static::migrateDataToDb($instance, $previous);
+        }
 
-            return $instance;
-        });
+        return $instance;
     }
 
     /**
@@ -130,56 +107,45 @@ abstract class DriverArray implements DbArray
      *
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
-     *
-     * @return \Generator
      */
-    protected static function renameTmpTable(self $new, $old): \Generator
+    protected static function renameTmpTable(self $new, DbArray|array|null $old): void
     {
         if ($old instanceof SqlArray && $old->getTable()) {
-            if (
-                $old->getTable() !== $new->getTable() &&
+            if ($old->getTable() !== $new->getTable() &&
                 !\str_starts_with($new->getTable(), 'tmp')
             ) {
-                yield from $new->renameTable($old->getTable(), $new->getTable());
+                $new->renameTable($old->getTable(), $new->getTable());
             } else {
                 $new->setTable($old->getTable());
             }
         }
     }
 
-    /**
-     * @param self $new
-     * @param DbArray|array|null $old
-     *
-     * @return \Generator
-     * @throws \Throwable
-     */
-    protected static function migrateDataToDb(self $new, $old): \Generator
+    protected static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {
-                $old = yield MemoryArray::getInstance('', $old, new Memory);
+                $old = MemoryArray::getInstance('', $old, new Memory);
             }
-            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
+            Logger::log('Converting '.$old::class.' to '.$new::class, Logger::ERROR);
 
             $counter = 0;
-            $total = yield $old->count();
-            $iterator = $old->getIterator();
-            while (yield $iterator->advance()) {
+            $total = \count($old);
+            $promises = [];
+            foreach ($old as $key => $value) {
                 $counter++;
+                $promises []= async($new->set(...), $key, $value);
                 if ($counter % 500 === 0 || $counter === $total) {
-                    yield $new->set(...$iterator->getCurrent());
+                    await($promises);
+                    $promises = [];
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
-                } else {
-                    $new->set(...$iterator->getCurrent());
                 }
                 $new->clearCache();
             }
-            yield $old->clear();
+            $old->clear();
             Logger::log('Converting database done.', Logger::ERROR);
         }
     }
-
 
     public function __destruct()
     {
@@ -188,8 +154,6 @@ abstract class DriverArray implements DbArray
 
     /**
      * Get the value of table.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -198,15 +162,13 @@ abstract class DriverArray implements DbArray
 
     /**
      * Sleep function.
-     *
-     * @return array
      */
     public function __sleep(): array
     {
         return ['table', 'dbSettings'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (isset($this->settings) && \is_array($this->settings)) {
             $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();
@@ -221,7 +183,7 @@ abstract class DriverArray implements DbArray
     }
     final public function offsetExists($index): bool
     {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
+        return $this->isset($index);
     }
 
     final public function offsetSet(mixed $index, mixed $value): void
@@ -234,6 +196,14 @@ abstract class DriverArray implements DbArray
         $this->unset($index);
     }
 
+    /**
+     * Get array copy.
+     */
+    public function getArrayCopy(): array
+    {
+        return \iterator_to_array($this->getIterator());
+    }
+
     protected static function getClassName($instance): ?string
     {
         if ($instance === null) {
@@ -241,6 +211,6 @@ abstract class DriverArray implements DbArray
         } elseif (\is_array($instance)) {
             return 'Array';
         }
-        return \str_replace('NullCache\\', '', \get_class($instance));
+        return \str_replace('NullCache\\', '', $instance::class);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Buffered raw stream.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -28,16 +29,14 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
+final class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
 {
     /**
      * Read data asynchronously.
      *
      * @param int $length Amount of data to read
-     *
-     * @return \Generator
      */
-    public function bufferReadGenerator(int $length): \Generator
+    public function bufferRead(int $length): string
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
@@ -46,7 +45,7 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
             \fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = yield $this->read();
+            $chunk = $this->read();
             if ($chunk === null) {
                 break;
             }
@@ -58,8 +57,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -67,11 +64,9 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     }
     /**
      * Get class name.
-     *
-     * @return string
      */
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

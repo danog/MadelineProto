@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
-use Amp\Iterator;
-use Amp\Producer;
-use Amp\Promise;
-use Amp\Success;
+use ArrayIterator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Memory;
 
-use function Amp\call;
-
 /**
  * Memory database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends ArrayIterator<TKey, TValue>
+ * @implements DbArray<TKey, TValue>
  */
-class MemoryArray extends \ArrayIterator implements DbArray
+final class MemoryArray extends ArrayIterator implements DbArray
 {
     public function __construct($array = [], $flags = 0)
     {
@@ -22,88 +26,86 @@ class MemoryArray extends \ArrayIterator implements DbArray
     }
 
     /**
-     * Get instance.
-     *
-     * @param string $table
-     * @param mixed  $previous
      * @param Memory $settings
-     * @return Promise<self>
      */
-    public static function getInstance(string $table, $previous, $settings): Promise
+    public static function getInstance(string $table, $previous, $settings): static
     {
-        return call(static function () use ($previous) {
-            if ($previous instanceof MemoryArray) {
-                return $previous;
+        if ($previous instanceof MemoryArray) {
+            return $previous;
+        }
+        if ($previous instanceof DbArray) {
+            Logger::log('Loading database to memory. Please wait.', Logger::WARNING);
+            if ($previous instanceof DriverArray) {
+                $previous->initStartup();
             }
-            if ($previous instanceof DbArray) {
-                Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
-                if ($previous instanceof DriverArray) {
-                    yield from $previous->initStartup();
-                }
-                $temp = yield $previous->getArrayCopy();
-                yield $previous->clear();
-                $previous = $temp;
-            }
-            return new static($previous);
-        });
+            $temp = $previous->getArrayCopy();
+            $previous->clear();
+            $previous = $temp;
+        }
+        return new static($previous);
     }
 
-    public function set(string|int $key, mixed $value): Promise
+    /**
+     * @param TKey $key
+     * @param TValue $value
+     */
+    public function set(string|int $key, mixed $value): void
     {
         parent::offsetSet($key, $value);
-        return new Success();
     }
-    public function isset(string|int $key): Promise
+    /**
+     * @param TKey $key
+     */
+    public function isset(string|int $key): bool
     {
-        return new Success(parent::offsetExists($key));
+        return parent::offsetExists($key);
     }
-    public function unset(string|int $key): Promise
+    /**
+     * @param TKey $key
+     */
+    public function unset(string|int $key): void
     {
         parent::offsetUnset($key);
-        return new Success();
     }
 
-
-
+    /**
+     * @param TKey $offset
+     */
     public function offsetExists(mixed $offset): bool
     {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
+        return parent::offsetExists($offset);
     }
 
-    public function offsetGet(mixed $offset): Promise
+    /**
+     * @param TKey $offset
+     *
+     * @return TValue
+     */
+    public function offsetGet(mixed $offset): mixed
     {
-        return new Success(parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
+        return parent::offsetExists($offset) ? parent::offsetGet($offset) : null;
     }
 
+    /**
+     * @param TKey $offset
+     */
     public function offsetUnset(mixed $offset): void
     {
         parent::offsetUnset($offset);
     }
 
-    #[\ReturnTypeWillChange]
-    public function count(): Promise
+    public function count(): int
     {
-        return new Success(parent::count());
+        return parent::count();
     }
 
-    #[\ReturnTypeWillChange]
-    public function getArrayCopy(): Promise
-    {
-        return new Success(parent::getArrayCopy());
-    }
-
-    public function clear(): Promise
+    public function clear(): void
     {
         parent::__construct([], parent::getFlags());
-        return new Success();
     }
 
-    public function getIterator(): Iterator
+    public function getIterator(): \Traversable
     {
-        return new Producer(function (callable $emit) {
-            foreach ($this as $key => $value) {
-                yield $emit([$key, $value]);
-            }
-        });
+        return $this;
     }
 }

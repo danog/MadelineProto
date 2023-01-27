@@ -1,18 +1,23 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="6"
+    errorLevel="5"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorBaseline="psalm-baseline.xml"
 >
     <projectFiles>
         <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />
             <file name="src/danog/MadelineProto/InternalDoc.php" />
-            <file name="src/danog/MadelineProto/TON/InternalDoc.php" />
-            <file name="src/danog/MadelineProto/Lua.php" />
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <ParamNameMismatch errorLevel="suppress" />
+        <StringIncrement errorLevel="suppress" />
+        <InvalidTraversableImplementation errorLevel="suppress" />
+        <RedundantPropertyInitializationCheck errorLevel="suppress" />
+    </issueHandlers>
 </psalm>

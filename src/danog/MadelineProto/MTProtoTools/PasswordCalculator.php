@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Password calculator module.
  *
@@ -11,18 +13,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
+use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
+
+use const STR_PAD_LEFT;
+
+use function hash;
 
 /**
  * Manages SRP password calculation.
@@ -30,56 +37,46 @@ use phpseclib3\Math\BigInteger;
  * @author Daniil Gentili <daniil@daniil.it>
  * @link   https://docs.madelineproto.xyz MadelineProto documentation
  */
-class PasswordCalculator
+final class PasswordCalculator
 {
     /**
      * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object).
      *
-     * @var array
      */
-    private $new_algo;
+    private array $new_algo;
     /**
      * A secure random string that can be used to compute the password.
      *
-     * @var string
      */
-    private $secure_random = '';
+    private string $secure_random;
     /**
      * The algorithm to use for calculatuing the hash of the current password (a PasswordKdfAlgo object).
      *
-     * @var array
      */
-    private $current_algo;
+    private array $current_algo;
     /**
      * SRP b parameter.
      *
-     * @var BigInteger
      */
-    private $srp_B;
+    private BigInteger $srp_B;
     /**
      * SRP b parameter for hashing.
      *
-     * @var string
      */
-    private $srp_BForHash;
+    private string $srp_BForHash;
     /**
      * SRP ID.
-     *
-     * @var [type]
      */
-    private $srp_id;
+    private ?int $srp_id = null;
     /**
      * Logger.
      *
-     * @var \danog\MadelineProto\Logger
      */
-    public $logger;
+    public Logger $logger;
     /**
      * Initialize logger.
-     *
-     * @param \danog\MadelineProto\Logger $logger
      */
-    public function __construct($logger)
+    public function __construct(Logger $logger)
     {
         $this->logger = $logger;
     }
@@ -87,8 +84,6 @@ class PasswordCalculator
      * Popupate 2FA configuration.
      *
      * @param array $object 2FA configuration object obtained using account.getPassword
-     *
-     * @return void
      */
     public function addInfo(array $object): void
     {
@@ -106,22 +101,24 @@ class PasswordCalculator
                     $object['current_algo']['g'] = new BigInteger($object['current_algo']['g']);
                     $object['current_algo']['p'] = new BigInteger((string) $object['current_algo']['p'], 256);
                     Crypt::checkPG($object['current_algo']['p'], $object['current_algo']['g']);
-                    $object['current_algo']['gForHash'] = \str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-                    $object['current_algo']['pForHash'] = \str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+                    $object['current_algo']['gForHash'] = \str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                    $object['current_algo']['pForHash'] = \str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                    $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
+                    $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
                     break;
                 default:
                     throw new Exception("Unknown KDF algo {$object['current_algo']['_']}");
             }
             $this->current_algo = $object['current_algo'];
             $object['srp_B'] = new BigInteger((string) $object['srp_B'], 256);
-            if ($object['srp_B']->compare(\danog\MadelineProto\Magic::$zero) < 0) {
+            if ($object['srp_B']->compare(Magic::$zero) < 0) {
                 throw new SecurityException('srp_B < 0');
             }
             if ($object['srp_B']->compare($object['current_algo']['p']) > 0) {
                 throw new SecurityException('srp_B > p');
             }
             $this->srp_B = $object['srp_B'];
-            $this->srp_BForHash = \str_pad($object['srp_B']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+            $this->srp_BForHash = \str_pad($object['srp_B']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $this->srp_id = $object['srp_id'];
         } else {
             $this->current_algo = null;
@@ -136,14 +133,16 @@ class PasswordCalculator
                 $object['new_algo']['g'] = new BigInteger($object['new_algo']['g']);
                 $object['new_algo']['p'] = new BigInteger((string) $object['new_algo']['p'], 256);
                 Crypt::checkPG($object['new_algo']['p'], $object['new_algo']['g']);
-                $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-                $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+                $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
+                $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
                 break;
             default:
                 throw new Exception("Unknown KDF algo {$object['new_algo']['_']}");
         }
         $this->new_algo = $object['new_algo'];
-        $this->secure_random = $object['secure_random'];
+        $this->secure_random = (string) $object['secure_random'];
     }
     /**
      * Create a random string (eventually prefixed by the specified string).
@@ -153,7 +152,7 @@ class PasswordCalculator
      */
     public function createSalt(string $prefix = ''): string
     {
-        return $prefix.\danog\MadelineProto\Tools::random(32);
+        return $prefix.Tools::random(32);
     }
     /**
      * Hash specified data using the salt with SHA256.
@@ -207,16 +206,16 @@ class PasswordCalculator
         $g_x = $g->powMod($x, $p);
         $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
-        $a = new BigInteger(\danog\MadelineProto\Tools::random(2048 / 8), 256);
+        $a = new BigInteger(Tools::random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
         Crypt::checkG($A, $p);
-        $AForHash = \str_pad($A->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+        $AForHash = \str_pad($A->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
         $u = new BigInteger(\hash('sha256', $AForHash.$BForHash, true), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
         $S = $b_kg_x->powMod($a_ux, $p);
-        $SForHash = \str_pad($S->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+        $SForHash = \str_pad($S->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         $K = \hash('sha256', $SForHash, true);
         $h1 = \hash('sha256', $pForHash, true);
         $h2 = \hash('sha256', $gForHash, true);
@@ -237,15 +236,15 @@ class PasswordCalculator
         $oldPassword = $this->getCheckPassword($params['password'] ?? '');
         $return = ['password' => $oldPassword, 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
         $new_settings =& $return['new_settings'];
-        if (isset($params['new_password']) && $params['new_password'] !== '') {
+        if (isset($params['new_password']) && ((string) $params['new_password']) !== '') {
             $client_salt = $this->createSalt($this->new_algo['salt1']);
             $server_salt = $this->new_algo['salt2'];
             $g = $this->new_algo['g'];
             $p = $this->new_algo['p'];
             $pForHash = $this->new_algo['pForHash'];
-            $x = new BigInteger($this->hashPassword($params['new_password'], $client_salt, $server_salt), 256);
+            $x = new BigInteger($this->hashPassword((string) $params['new_password'], $client_salt, $server_salt), 256);
             $v = $g->powMod($x, $p);
-            $vForHash = \str_pad($v->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
+            $vForHash = \str_pad($v->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $new_settings['new_algo'] = ['_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', 'salt1' => $client_salt, 'salt2' => $server_salt, 'g' => (int) $g->toString(), 'p' => $pForHash];
             $new_settings['new_password_hash'] = $vForHash;
             $new_settings['hint'] = $params['hint'] ?? '';

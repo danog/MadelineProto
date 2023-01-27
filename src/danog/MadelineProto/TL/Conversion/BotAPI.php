@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * BotAPI module.
  *
@@ -11,19 +13,21 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
+use Parsedown;
+use Throwable;
 
 use const danog\Decoder\TYPES_IDS;
 
@@ -34,9 +38,7 @@ trait BotAPI
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
     /**
-     * @return ((bool|mixed|string)[][]|string)[][]
-     *
-     * @psalm-return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
+     * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
      */
     private function parseButtons($rows): array
     {
@@ -109,15 +111,13 @@ trait BotAPI
      * Convert MTProto parameters to bot API parameters.
      *
      * @param array $data Data
-     *
-     * @return \Generator<array>
      */
-    public function MTProtoToBotAPI(array $data): \Generator
+    public function MTProtoToBotAPI(array $data): array
     {
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = (yield from $this->MTProtoToBotAPI($element));
+                $newd[$key] = ($this->MTProtoToBotAPI($element));
             }
             return $newd;
         }
@@ -129,7 +129,7 @@ trait BotAPI
             case 'updateShortSentMessage':
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $data = yield from $this->extractMessageUpdate($data);
+                $data = $this->extractMessageUpdate($data);
                 // no break
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
@@ -142,11 +142,11 @@ trait BotAPI
                 $newd['post'] = $data['post'];
                 $newd['silent'] = $data['silent'];
                 if (isset($data['from_id'])) {
-                    $newd['from'] = (yield from $this->getPwrChat($data['from_id']));
+                    $newd['from'] = ($this->getPwrChat($data['from_id']));
                 }
-                $newd['chat'] = (yield from $this->getPwrChat($data['peer_id']));
+                $newd['chat'] = ($this->getPwrChat($data['peer_id']));
                 if (isset($data['entities'])) {
-                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities']));
+                    $newd['entities'] = ($this->MTProtoToBotAPI($data['entities']));
                 }
                 if (isset($data['views'])) {
                     $newd['views'] = $data['views'];
@@ -155,15 +155,15 @@ trait BotAPI
                     $newd['edit_date'] = $data['edit_date'];
                 }
                 if (isset($data['via_bot_id'])) {
-                    $newd['via_bot'] = (yield from $this->getPwrChat($data['via_bot_id']));
+                    $newd['via_bot'] = ($this->getPwrChat($data['via_bot_id']));
                 }
                 if (isset($data['fwd_from']['from_id'])) {
-                    $newd['forward_from'] = (yield from $this->getPwrChat($data['fwd_from']['from_id']));
+                    $newd['forward_from'] = ($this->getPwrChat($data['fwd_from']['from_id']));
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
-                        $newd['forward_from_chat'] = yield from $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
-                    } catch (\Throwable $e) {
+                        $newd['forward_from_chat'] = $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
+                    } catch (Throwable $e) {
                     }
                 }
                 if (isset($data['fwd_from']['date'])) {
@@ -173,7 +173,7 @@ trait BotAPI
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media']));
+                    $newd = \array_merge($newd, $this->MTProtoToBotAPI($data['media']));
                 }
                 return $newd;
             case 'messageEntityMention':
@@ -231,7 +231,7 @@ trait BotAPI
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
-                $data['user'] = (yield from $this->getPwrChat($data['user_id']));
+                $data['user'] = ($this->getPwrChat($data['user_id']));
                 unset($data['user_id']);
                 return $data;
             case 'messageMediaPhoto':
@@ -324,7 +324,7 @@ trait BotAPI
                 $fileId = new FileId;
                 $fileId->setId($data['document']['id']);
                 $fileId->setAccessHash($data['document']['access_hash']);
-                $fileId->setFileReference($data['document']['file_reference'] ?? '');
+                $fileId->setFileReference((string) ($data['document']['file_reference'] ?? ''));
                 $fileId->setDcId($data['document']['dc_id']);
                 $fileId->setType(TYPES_IDS[$type_name]);
 
@@ -332,15 +332,13 @@ trait BotAPI
                 $res['file_unique_id'] = $fileId->getUniqueBotAPI();
                 return [$type_name => $res, 'caption' => $data['caption'] ?? ''];
             default:
-                throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
+                throw new Exception(\sprintf(Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
     /**
      * Convert bot API parameters to MTProto parameters.
      *
      * @param array $arguments Arguments
-     *
-     * @return array
      */
     public function botAPIToMTProto(array $arguments): array
     {
@@ -362,12 +360,9 @@ trait BotAPI
      * Convert markdown and HTML messages.
      *
      * @param array $arguments Arguments
-     *
      * @internal
-     *
-     * @return \Generator<array>
      */
-    public function parseMode(array $arguments)
+    public function parseMode(array $arguments): array
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -379,58 +374,61 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
+            $arguments['message'] = Parsedown::instance()->line($arguments['message']);
             $arguments['parse_mode'] = 'HTML';
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
             $entities = new DOMEntities($arguments['message']);
             $arguments['message'] = $entities->message;
             $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
-            if ($entities->buttons) {
-                $arguments['reply_markup'] = $this->buildRows($entities->buttons);
-            }
             unset($arguments['parse_mode']);
         }
         return $arguments;
     }
+
     /**
      * Split too long message into chunks.
      *
      * @param array $args Arguments
-     *
      * @internal
      */
-    public function splitToChunks($args): array
+    public function splitToChunks(array $args): array
     {
         $args = $this->parseMode($args);
-        if (!isset($args['entities'])) {
-            $args['entities'] = [];
-        }
+        $args['entities'] ??= [];
+
+        // UTF-8 length, not UTF-16
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
-        $max_entity_length = 100;
-        $max_entity_size = 8110;
-        $text_arr = [];
-        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
-            if (\mb_strlen($word, 'UTF-8') > $max_length) {
-                foreach (StrTools::mbStrSplit($word, $max_length) as $vv) {
-                    $text_arr[] = $vv;
-                }
-            } else {
-                $text_arr[] = $word;
-            }
-        }
+        $cur_len = 0;
+        $cur = '';
         $multiple_args_base = \array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
-        $multiple_args = [$multiple_args_base];
-        $i = 0;
-        foreach ($text_arr as $word) {
-            if (StrTools::mbStrlen($multiple_args[$i]['message'].$word) <= $max_length) {
-                $multiple_args[$i]['message'] .= $word;
-            } else {
-                $i++;
-                $multiple_args[$i] = $multiple_args_base;
-                $multiple_args[$i]['message'] .= $word;
+        unset($multiple_args_base['message']);
+        $multiple_args = [];
+        foreach (\explode("\n", $args['message']) as $word) {
+            foreach (\mb_str_split($word."\n", $max_length, 'UTF-8') as $vv) {
+                $len = \mb_strlen($vv, 'UTF-8');
+                if ($cur_len + $len <= $max_length) {
+                    $cur .= $vv;
+                    $cur_len += $len;
+                } else {
+                    if (\trim($cur) !== '') {
+                        $multiple_args[] = [
+                            ...$multiple_args_base,
+                            'message' => $cur
+                        ];
+                    }
+                    $cur = $vv;
+                    $cur_len = $len;
+                }
             }
         }
+        if (\trim($cur) !== '') {
+            $multiple_args[] = [
+                ...$multiple_args_base,
+                'message' => $cur
+            ];
+        }
+
         $i = 0;
         $offset = 0;
         for ($k = 0; $k < \count($args['entities']); $k++) {
@@ -481,8 +479,8 @@ trait BotAPI
         }
         $total = 0;
         foreach ($multiple_args as $args) {
-            if (\count($args['entities']) > $max_entity_length) {
-                $total += \count($args['entities']) - $max_entity_length;
+            if (\count($args['entities']) > self::MAX_ENTITY_LENGTH) {
+                $total += \count($args['entities']) - self::MAX_ENTITY_LENGTH;
             }
             $c = 0;
             foreach ($args['entities'] as $entity) {
@@ -490,7 +488,7 @@ trait BotAPI
                     $c += \strlen($entity['url']);
                 }
             }
-            if ($c >= $max_entity_size) {
+            if ($c >= self::MAX_ENTITY_SIZE) {
                 $this->logger->logger('Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.', Logger::FATAL_ERROR);
             }
         }
@@ -498,55 +496,5 @@ trait BotAPI
             $this->logger->logger("Too many entities, {$total} entities will be truncated", Logger::FATAL_ERROR);
         }
         return $multiple_args;
-    }
-    /**
-     * @return string[]
-     *
-     * @psalm-return list<string>
-     */
-    private function multipleExplodeKeepDelimiters($delimiters, $string): array
-    {
-        $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
-        $finalArray = [];
-        /** @var int */
-        $delimOffset = 0;
-        foreach ($initialArray as $item) {
-            $delimOffset += StrTools::mbStrlen($item);
-            /** @var int $delimOffset */
-            $finalArray[] = $item.($delimOffset < StrTools::mbStrlen($string) ? $string[$delimOffset] : '');
-            $delimOffset++;
-        }
-        return $finalArray;
-    }
-    /**
-     * @return ((array|string)[][]|string)[]
-     *
-     * @psalm-return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
-     */
-    private function buildRows($button_list): array
-    {
-        $end = false;
-        $rows = [];
-        $buttons = [];
-        $cols = 0;
-        foreach ($button_list as $button) {
-            if (isset($button['new'])) {
-                if (\count($buttons) == 0) {
-                    $buttons[] = $button;
-                } else {
-                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                    $rows[] = $row;
-                    $buttons = [$button];
-                }
-            } else {
-                $buttons[] = $button;
-                $end = true;
-            }
-        }
-        if ($end) {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-            $rows[] = $row;
-        }
-        return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

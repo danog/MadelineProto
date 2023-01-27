@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TLParams module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,7 +27,7 @@ trait TLParams
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
             if (\preg_match('/([^.]+)\\.(\\d+)\\?(.+)/', $param['type'], $matches)) {
                 $param['flag'] = $matches[1];
-                $param['pow'] = \pow(2, $matches[2]);
+                $param['pow'] = \pow(2, (int) $matches[2]);
                 $param['type'] = $matches[3];
             }
             if (\preg_match('/^(v|V)ector\\<(.*)\\>$/', $param['type'], $matches)) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * RSA module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,47 +23,41 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\TL\TL;
 use phpseclib3\Math\BigInteger;
 
+use const STR_PAD_LEFT;
+
 /**
  * RSA class.
  */
-class RSA
+final class RSA
 {
-    use \danog\Serializable;
     /**
      * Exponent.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public $e;
+    public BigInteger $e;
     /**
      * Modulus.
      *
-     * @var \phpseclib3\Math\BigInteger
      */
-    public $n;
+    public BigInteger $n;
     /**
      * Fingerprint.
      *
-     * @var string
      */
-    public $fp;
+    public string $fp;
     /**
      * Load RSA key.
      *
      * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, array|mixed, mixed, self>
      */
-    public static function load(TL $TL, string $rsa_key): \Generator
+    public static function load(TL $TL, string $rsa_key): self
     {
         $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $instance = new self;
         $instance->n = Tools::getVar($key, 'modulus');
         $instance->e = Tools::getVar($key, 'exponent');
-        $instance->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
+        $instance->fp = \substr(\sha1(($TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).($TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
         return $instance;
     }
     /**
@@ -73,27 +68,15 @@ class RSA
     }
     /**
      * Sleep function.
-     *
-     * @return array
      */
     public function __sleep(): array
     {
         return ['e', 'n', 'fp'];
     }
-    public function __wakeup()
-    {
-        foreach ($this->__sleep() as $bigint) {
-            if ($this->{$bigint} instanceof \tgseclib\Math\BigInteger) {
-                $this->{$bigint} = $this->{$bigint}->real;
-            }
-        }
-    }
     /**
      * Encrypt data.
      *
      * @param BigInteger $data Data to encrypt
-     *
-     * @return string
      */
     public function encrypt(BigInteger $data): string
     {

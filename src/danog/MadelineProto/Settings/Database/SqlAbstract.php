@@ -1,8 +1,8 @@
 <?php
 
-namespace danog\MadelineProto\Settings\Database;
+declare(strict_types=1);
 
-use danog\MadelineProto\Settings\Database;
+namespace danog\MadelineProto\Settings\Database;
 
 /**
  * Generic db backend settings.
@@ -51,8 +51,6 @@ abstract class SqlAbstract extends DatabaseAbstract
 
     /**
      * Get maximum connection limit.
-     *
-     * @return int
      */
     public function getMaxConnections(): int
     {
@@ -63,8 +61,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      * Set maximum connection limit.
      *
      * @param int $maxConnections Maximum connection limit.
-     *
-     * @return self
      */
     public function setMaxConnections(int $maxConnections): self
     {
@@ -75,8 +71,6 @@ abstract class SqlAbstract extends DatabaseAbstract
 
     /**
      * Get idle timeout.
-     *
-     * @return int
      */
     public function getIdleTimeout(): int
     {
@@ -87,8 +81,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      * Set idle timeout.
      *
      * @param int $idleTimeout Idle timeout.
-     *
-     * @return self
      */
     public function setIdleTimeout(int $idleTimeout): self
     {
@@ -99,8 +91,6 @@ abstract class SqlAbstract extends DatabaseAbstract
 
     /**
      * Get database name.
-     *
-     * @return string
      */
     public function getDatabase(): string
     {
@@ -111,10 +101,8 @@ abstract class SqlAbstract extends DatabaseAbstract
      * Set database name.
      *
      * @param string $database Database name.
-     *
-     * @return self
      */
-    public function setDatabase($database): self
+    public function setDatabase(string $database): self
     {
         $this->database = $database;
 
@@ -123,8 +111,6 @@ abstract class SqlAbstract extends DatabaseAbstract
 
     /**
      * Get username.
-     *
-     * @return string
      */
     public function getUsername(): string
     {
@@ -135,8 +121,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      * Set username.
      *
      * @param string $username Username.
-     *
-     * @return self
      */
     public function setUsername(string $username): self
     {
@@ -147,8 +131,6 @@ abstract class SqlAbstract extends DatabaseAbstract
 
     /**
      * Get database URI.
-     *
-     * @return string
      */
     public function getUri(): string
     {
@@ -159,8 +141,6 @@ abstract class SqlAbstract extends DatabaseAbstract
      * Set database URI.
      *
      * @param string $uri Database URI.
-     *
-     * @return self
      */
     public function setUri(string $uri): self
     {

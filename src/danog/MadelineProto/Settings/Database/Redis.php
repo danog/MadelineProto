@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings\Database;
 
 /**
  * Redis backend settings.
  */
-class Redis extends DatabaseAbstract
+final class Redis extends DatabaseAbstract
 {
     /**
      * Database number.
@@ -27,8 +29,6 @@ class Redis extends DatabaseAbstract
 
     /**
      * Get database number.
-     *
-     * @return int
      */
     public function getDatabase(): int
     {
@@ -39,10 +39,8 @@ class Redis extends DatabaseAbstract
      * Set database number.
      *
      * @param int $database Database number.
-     *
-     * @return self
      */
-    public function setDatabase($database): self
+    public function setDatabase(int $database): self
     {
         $this->database = $database;
 
@@ -51,8 +49,6 @@ class Redis extends DatabaseAbstract
 
     /**
      * Get database URI.
-     *
-     * @return string
      */
     public function getUri(): string
     {
@@ -63,8 +59,6 @@ class Redis extends DatabaseAbstract
      * Set database URI.
      *
      * @param string $uri Database URI.
-     *
-     * @return self
      */
     public function setUri(string $uri): self
     {

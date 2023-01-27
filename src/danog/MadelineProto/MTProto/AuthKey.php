@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * MTProto Auth key.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -30,21 +31,18 @@ abstract class AuthKey implements JsonSerializable
     /**
      * Auth key.
      *
-     * @var ?string
      */
-    protected $authKey;
+    protected ?string $authKey = null;
     /**
      * Auth key ID.
      *
-     * @var ?string
      */
-    protected $id;
+    protected ?string $id = null;
     /**
      * Server salt.
      *
-     * @var ?string
      */
-    protected $serverSalt;
+    protected ?string $serverSalt = null;
     /**
      * Constructor function.
      *
@@ -66,18 +64,14 @@ abstract class AuthKey implements JsonSerializable
      * Set auth key.
      *
      * @param string $authKey Authorization key
-     *
-     * @return void
      */
-    public function setAuthKey(string $authKey)
+    public function setAuthKey(string $authKey): void
     {
         $this->authKey = $authKey;
         $this->id = \substr(\sha1($authKey, true), -8);
     }
     /**
      * Check if auth key is present.
-     *
-     * @return boolean
      */
     public function hasAuthKey(): bool
     {
@@ -85,8 +79,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key.
-     *
-     * @return string
      */
     public function getAuthKey(): string
     {
@@ -95,8 +87,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key ID.
-     *
-     * @return string
      */
     public function getID(): string
     {
@@ -107,17 +97,13 @@ abstract class AuthKey implements JsonSerializable
      * Set server salt.
      *
      * @param string $salt Server salt
-     *
-     * @return void
      */
-    public function setServerSalt(string $salt)
+    public function setServerSalt(string $salt): void
     {
         $this->serverSalt = $salt;
     }
     /**
      * Get server salt.
-     *
-     * @return string
      */
     public function getServerSalt(): string
     {
@@ -126,8 +112,6 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if has server salt.
-     *
-     * @return boolean
      */
     public function hasServerSalt(): bool
     {
@@ -135,16 +119,12 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     abstract public function isAuthorized(): bool;
     /**
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
-     * @return void
      */
-    abstract public function authorized(bool $authorized);
+    abstract public function authorized(bool $authorized): void;
 }

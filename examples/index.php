@@ -1,4 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
+use danog\MadelineProto\API;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\RPCErrorException;
+
 /**
  * Example script.
  *
@@ -12,20 +19,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 require '../vendor/autoload.php';
 
-$MadelineProto = new \danog\MadelineProto\API('index.madeline');
+$MadelineProto = new API('index.madeline');
 $me = $MadelineProto->start();
 
 $me = $MadelineProto->getSelf();
 
-\danog\MadelineProto\Logger::log($me);
+Logger::log($me);
 
 if (!$me['bot']) {
     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
@@ -33,7 +39,7 @@ if (!$me['bot']) {
 
     try {
         $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
-    } catch (\danog\MadelineProto\RPCErrorException $e) {
+    } catch (RPCErrorException $e) {
     }
 
     $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);

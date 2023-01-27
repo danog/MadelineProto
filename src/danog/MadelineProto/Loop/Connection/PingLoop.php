@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Ping loop.
  *
@@ -11,64 +13,62 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
+use Revolt\EventLoop;
+use Throwable;
 
 /**
  * Ping loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class PingLoop extends ResumableSignalLoop
+final class PingLoop extends Loop
 {
-    use Common;
+    use Common {
+        __construct as constructCommon;
+    }
+    private int $timeoutDisconnect;
+    /**
+     * Constructor function.
+     */
+    public function __construct(Connection $connection)
+    {
+        $this->constructCommon($connection);
+        $this->timeout = $this->shared->getSettings()->getPingInterval();
+        $this->timeoutDisconnect = (int) ($this->timeout) + 15;
+    }
     /**
      * Main loop.
-     *
-     * @return \Generator
      */
-    public function loop(): \Generator
+    public function loop(): ?float
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-        $shared = $this->datacenterConnection;
-        $timeout = $shared->getSettings()->getPingInterval();
-        $timeoutMs = $timeout * 1000;
-        $timeoutDisconnect = $timeout+15;
-        while (true) {
-            while (!$shared->hasTempAuthKey()) {
-                $API->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
-                if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting in {$this} while waiting for temp key (init)!", Logger::LEVEL_ULTRA_VERBOSE);
-                    return;
-                }
-            }
-            $API->logger->logger("Ping DC {$datacenter}");
-            try {
-                yield from $connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $timeoutDisconnect]);
-            } catch (\Throwable $e) {
-                $API->logger->logger("Error while pinging DC {$datacenter}");
-                $API->logger->logger((string) $e);
-            }
-            if (yield $this->waitSignal($this->pause($timeoutMs))) {
-                $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
-                return;
-            }
+        if (!$this->shared->hasTempAuthKey()) {
+            $this->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
+            return self::PAUSE;
         }
+
+        EventLoop::queue(function (): void {
+            $this->logger->logger("Ping DC {$this->datacenter}");
+            try {
+                $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $this->timeoutDisconnect]);
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while pinging DC {$this->datacenter}");
+                $this->logger->logger((string) $e);
+            }
+        });
+        return $this->timeout;
     }
     /**
      * Get loop name.
-     *
-     * @return string
      */
     public function __toString(): string
     {

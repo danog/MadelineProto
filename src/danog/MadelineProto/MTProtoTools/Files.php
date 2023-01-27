@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Files module.
  *
@@ -11,34 +13,41 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
+use Amp\Future;
 use Amp\Http\Client\Request;
-use Amp\Http\Status;
-use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use Generator;
+use Revolt\EventLoop;
+use Throwable;
 
-
-use const danog\Decoder\TYPES;
+use const LOCK_EX;
+use function Amp\async;
+use function Amp\File\deleteFile;
 use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\File\touch as touchAsync;
-use function Amp\Promise\all;
+use function Amp\Future\await;
+use function Amp\Future\awaitFirst;
+use function end;
 
 /**
  * Manages upload and download of files.
@@ -56,42 +65,37 @@ trait Files
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\Http\Client\Response>|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
-            $url = yield $url->getFile();
+            $url = $url->getFile();
         }
-        /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
-        $request->setTransferTimeout(10 * 1000 * 3600);
+        $request->setTransferTimeout(10 * 3600);
         $request->setBodySizeLimit(512 * 1024 * 8000);
-        $response = yield $this->datacenter->getHTTPClient()->request($request);
-        if (200 !== ($status = $response->getStatus())) {
+        $response = $this->datacenter->getHTTPClient()->request($request);
+        if (($status = $response->getStatus()) !== 200) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
         $mime = \trim(\explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
-        $size = $response->getHeader('content-length') ?? $size;
+        $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
         if (!$size) {
             $this->logger->logger("No content length for {$url}, caching first");
             $body = $stream;
             $stream = new BlockingFile(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
-            while (null !== ($chunk = yield $body->read())) {
-                yield $stream->write($chunk);
+            while (($chunk = $body->read()) !== null) {
+                $stream->write($chunk);
             }
             $size = $stream->tell();
             if (!$size) {
                 throw new Exception('Wrong size!');
             }
-            yield $stream->seek(0);
+            $stream->seek(0);
         }
-        return yield from $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
+        return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
     /**
      * Upload file from callable.
@@ -106,28 +110,33 @@ trait Files
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, \Amp\Promise|\Amp\Promise<array>, mixed, array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         if (!\is_callable($callable)) {
             throw new Exception('Invalid callable provided');
         }
         if ($cb === null) {
             $cb = function ($percent): void {
-                $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Upload status: '.$percent.'%', Logger::NOTICE);
+            };
+        } else {
+            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
+                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+                    $r = $cb($percent, $speed, $time);
+                    if ($r instanceof Generator) {
+                        Tools::consumeGenerator($r);
+                    }
+                });
             };
         }
-        $datacenter = $this->settings->getDefaultDc();
-        if ($this->datacenter->has($datacenter.'_media')) {
-            $datacenter .= '_media';
+        $datacenter = $this->authorized_dc;
+        if ($this->datacenter->has(-$datacenter)) {
+            $datacenter = -$datacenter;
         }
         $part_size = 512 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
@@ -155,10 +164,16 @@ trait Files
         $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
             static $cur = 0;
             $cur++;
-            Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
+            $cb($cur * 100 / $part_total_num, $speed, $time);
         };
-        $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige): \Generator {
-            $bytes = yield $callable($part_num * $part_size, $part_size);
+        $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
+            $bytes = $callable($part_num * $part_size, $part_size);
+            if ($bytes instanceof Generator) {
+                $bytes = Tools::consumeGenerator($bytes);
+            }
+            if ($bytes instanceof Future) {
+                $bytes = $bytes->await();
+            }
             if ($ige) {
                 $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
             }
@@ -166,50 +181,56 @@ trait Files
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
         $resPromises = [];
-        $exception = null;
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $resa = $callable($part_num);
-            $writePromise = Tools::call($this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
+            $writePromise = async(
+                $this->methodCallAsyncWrite(...),
+                $method,
+                fn () => $callable($part_num),
+                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
+            );
             if (!$seekable) {
-                yield $writePromise;
+                $writePromise->await();
             }
-            $writePromise->onResolve(function ($e, $readDeferred) use ($cb, $part_num, &$resPromises, &$exception): \Generator {
-                if ($e) {
-                    $this->logger("Got exception while uploading: {$e}");
-                    $exception = $e;
-                    return;
-                }
-                $resPromises[] = $readDeferred->promise();
+            EventLoop::queue(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
+                $readFuture = $writePromise->await();
+                $d = new DeferredFuture;
+                $resPromises[] = $d->getFuture();
                 try {
                     // Wrote chunk!
-                    if (!yield Tools::call($readDeferred->promise())) {
-                        throw new \danog\MadelineProto\Exception('Upload of part '.$part_num.' failed');
+                    if (!$readFuture->await()) {
+                        throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
                     $cb();
-                } catch (\Throwable $e) {
+                    $d->complete();
+                } catch (Throwable $e) {
                     $this->logger("Got exception while uploading: {$e}");
-                    $exception = $e;
+                    $d->error($e);
+                    throw $e;
                 }
             });
             $promises[] = $writePromise;
             ++$part_num;
-            if (!($part_num % $parallel_chunks)) {
+            if (\count($promises) === $parallel_chunks) {
                 // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                yield Tools::all($promises);
-                $promises = [];
-                if ($exception) {
-                    throw $exception;
+                awaitFirst($promises);
+                foreach ($promises as $k => $p) {
+                    if ($p->isComplete()) {
+                        unset($promises[$k]);
+                        break;
+                    }
                 }
+            }
+            if (!($part_num % $parallel_chunks)) {
                 $time = \microtime(true) - $start;
                 $speed = (int) ($size * 8 / $time) / 1000000;
                 $this->logger->logger("Partial upload time: {$time}");
                 $this->logger->logger("Partial upload speed: {$speed} mbps");
             }
         }
-        yield all($promises);
-        yield all($resPromises);
+        await($promises);
+        await($resPromises);
         $time = \microtime(true) - $start;
         $speed = (int) ($size * 8 / $time) / 1000000;
         $this->logger->logger("Total upload time: {$time}");
@@ -231,18 +252,14 @@ trait Files
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, mixed>
      */
-    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
-            $media = yield $media->getFile();
+            $media = $media->getFile();
         }
-        $media = (yield from $this->getDownloadInfo($media));
+        $media = ($this->getDownloadInfo($media));
         if (!isset($media['size'], $media['mime'])) {
             throw new Exception('Wrong file provided!');
         }
@@ -253,33 +270,31 @@ trait Files
             /**
              * Read promises.
              *
-             * @var Deferred[]
+             * @var array<DeferredFuture>
              */
-            private $read = [];
+            private array $read = [];
             /**
              * Read promises (write lenth).
              *
-             * @var int[]
+             * @var array<int>
              */
-            private $wrote = [];
+            private array $wrote = [];
             /**
              * Write promises.
              *
-             * @var Deferred[]
+             * @var array<DeferredFuture>
              */
-            private $write = [];
+            private array $write = [];
             /**
              * Part size.
              *
-             * @var int
              */
-            private $partSize;
+            private int $partSize;
             /**
              * Offset for callback.
              *
-             * @var int
              */
-            private $offset = 0;
+            private int $offset = 0;
             /**
              * Callback.
              *
@@ -291,13 +306,13 @@ trait Files
              *
              * @param integer  $size     Total file size
              * @param integer  $partSize Part size
-             * @param ?callable $cb       Callback
+             * @param null|callable $cb       Callback
              */
             public function __construct(int $size, int $partSize, ?callable $cb)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
-                    $this->read[] = new Deferred();
-                    $this->write[] = new Deferred();
+                    $this->read[] = new DeferredFuture();
+                    $this->write[] = new DeferredFuture();
                     $this->wrote[] = $size - $x < $partSize ? $size - $x : $partSize;
                 }
                 $this->partSize = $partSize;
@@ -308,54 +323,49 @@ trait Files
              *
              * @param integer $offset Offset
              * @param integer $size   Chunk size
-             *
-             * @return Promise
              */
-            public function read(int $offset, int $size): Promise
+            public function read(int $offset, int $size): string
             {
                 $offset /= $this->partSize;
-                return $this->write[$offset]->promise();
+                return $this->write[$offset]->getFuture()->await();
             }
             /**
              * Write chunk.
              *
              * @param string  $data   Data
              * @param integer $offset Offset
-             *
-             * @return Promise
              */
-            public function write(string $data, int $offset): Promise
+            public function write(string $data, int $offset): void
             {
                 $offset /= $this->partSize;
-                $this->write[$offset]->resolve($data);
-                return $this->read[$offset]->promise();
+                $this->write[$offset]->complete($data);
+                $this->read[$offset]->getFuture()->await();
             }
             /**
              * Read callback, called when the chunk is read and fully resent.
              *
              * @param mixed ...$params Params to be passed to cb
-             *
-             * @return void
              */
-            public function callback(...$params): void
+            public function callback(mixed ...$params): mixed
             {
                 $offset = $this->offset++;
-                $this->read[$offset]->resolve($this->wrote[$offset]);
+                $this->read[$offset]->complete($this->wrote[$offset]);
                 if ($this->cb) {
-                    Tools::callFork(($this->cb)(...$params));
+                    return ($this->cb)(...$params);
                 }
+                return null;
             }
         };
-        $reader = [$bridge, 'read'];
-        $writer = [$bridge, 'write'];
-        $cb = [$bridge, 'callback'];
-        $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
-        $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
-        [$res] = yield Tools::all([$read, $write]);
+        $reader = $bridge->read(...);
+        $writer = $bridge->write(...);
+        $cb = $bridge->callback(...);
+        $read = async($this->uploadFromCallable(...), $reader, $size, $mime, '', $cb, true, $encrypted);
+        $write = async($this->downloadToCallable(...), $media, $writer, null, true, 0, -1, $chunk_size);
+        [$res] = await([$read, $write]);
         return $res;
     }
 
-    private function genAllFile($media): \Generator
+    private function genAllFile($media)
     {
         $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
         switch ($media['_']) {
@@ -365,7 +375,7 @@ trait Files
                 if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
                     if (empty($media['results']['results'])) {
                         //quizzes need a correct answer
-                        throw new \danog\MadelineProto\Exception('No poll results');
+                        throw new Exception('No poll results');
                     }
                     foreach ($media['results']['results'] as $answer) {
                         if ($answer['correct']) {
@@ -387,7 +397,7 @@ trait Files
                 if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
                     if (empty($media['results']['results'])) {
                         //quizzes need a correct answer
-                        throw new \danog\MadelineProto\Exception('No poll results');
+                        throw new Exception('No poll results');
                     }
                     foreach ($media['results']['results'] as $answer) {
                         if ($answer['correct']) {
@@ -404,10 +414,10 @@ trait Files
                 break;
             case 'messageMediaPhoto':
                 if (!isset($media['photo']['access_hash'])) {
-                    throw new \danog\MadelineProto\Exception('No access hash');
+                    throw new Exception('No access hash');
                 }
                 $res['Photo'] = $media['photo'];
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media['photo'])];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media['photo'])];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -415,10 +425,10 @@ trait Files
                 break;
             case 'messageMediaDocument':
                 if (!isset($media['document']['access_hash'])) {
-                    throw new \danog\MadelineProto\Exception('No access hash');
+                    throw new Exception('No access hash');
                 }
                 $res['Document'] = $media['document'];
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media['document'])];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media['document'])];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -432,22 +442,22 @@ trait Files
                 break;
             case 'document':
                 if (!isset($media['access_hash'])) {
-                    throw new \danog\MadelineProto\Exception('No access hash');
+                    throw new Exception('No access hash');
                 }
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media)];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media)];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $media];
                 break;
             case 'photo':
                 if (!isset($media['access_hash'])) {
-                    throw new \danog\MadelineProto\Exception('No access hash');
+                    throw new Exception('No access hash');
                 }
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media)];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media)];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Could not convert media object of type {$media['_']}");
+                throw new Exception("Could not convert media object of type {$media['_']}");
         }
         return $res;
     }
@@ -455,10 +465,8 @@ trait Files
      * Get info about file.
      *
      * @param mixed $constructor File ID
-     *
-     * @return \Generator<array>
      */
-    public function getFileInfo($constructor): \Generator
+    public function getFileInfo(mixed $constructor): array
     {
         if (\is_string($constructor)) {
             $constructor = $this->unpackFileId($constructor);
@@ -476,11 +484,11 @@ trait Files
             case 'updateEditMessage':
             case 'updateEditChannelMessage':
                 $constructor = $constructor['message'];
-            // no break
+                // no break
             case 'message':
                 $constructor = $constructor['media'];
         }
-        return yield from $this->genAllFile($constructor);
+        return $this->genAllFile($constructor);
     }
     /**
      * Get download info of the propic of a user
@@ -490,24 +498,19 @@ trait Files
      * `$info['name']` - The file name, without the extension
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
-     *
-     * @param mixed $messageMedia File ID
-     *
-     * @return \Generator<array>
      */
-    public function getPropicInfo($data): \Generator
+    public function getPropicInfo($data): array
     {
-        return yield from $this->getDownloadInfo(yield $this->chats[yield from $this->getInfo($data, MTProto::INFO_TYPE_ID)]);
+        return $this->getDownloadInfo($this->chats[$this->getInfo($data, MTProto::INFO_TYPE_ID)]);
     }
     /**
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
-     *
-     * @return ?array
      */
-    public static function extractBotAPIFile(array $info): ?array
+    public static function extractBotAPIFile(array $info): array|null
     {
+        /** @psalm-suppress UndefinedConstant */
         foreach (TYPES as $type) {
             if (isset($info[$type]) && \is_array($info[$type])) {
                 $method = $type;
@@ -534,10 +537,8 @@ trait Files
      * `$info['size']` - The file size
      *
      * @param mixed $messageMedia File ID
-     *
-     * @return \Generator<array>
      */
-    public function getDownloadInfo($messageMedia): \Generator
+    public function getDownloadInfo(mixed $messageMedia): array
     {
         if (\is_string($messageMedia)) {
             $messageMedia = $this->unpackFileId($messageMedia);
@@ -551,7 +552,7 @@ trait Files
                 $messageMedia = self::extractBotAPIFile($messageMedia) ?? $messageMedia;
             }
             if (isset($messageMedia['file_id'])) {
-                $res = yield from $this->getDownloadInfo($messageMedia['file_id']);
+                $res = $this->getDownloadInfo($messageMedia['file_id']);
                 $pathinfo = \pathinfo($messageMedia['file_name']);
                 if (isset($pathinfo['extension'])) {
                     $res['ext'] = '.'.$pathinfo['extension'];
@@ -569,16 +570,16 @@ trait Files
             case 'updateEditMessage':
             case 'updateEditChannelMessage':
                 $messageMedia = $messageMedia['message'];
-            // no break
+                // no break
             case 'message':
-                return yield from $this->getDownloadInfo($messageMedia['media']);
+                return $this->getDownloadInfo($messageMedia['media']);
             case 'updateNewEncryptedMessage':
                 $messageMedia = $messageMedia['message'];
-            // Secret media
-            // no break
+                // Secret media
+                // no break
             case 'encryptedMessage':
                 if ($messageMedia['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
-                    return yield from $this->getDownloadInfo($messageMedia['decrypted_message']['media']);
+                    return $this->getDownloadInfo($messageMedia['decrypted_message']['media']);
                 }
                 $res['InputFileLocation'] = ['_' => 'inputEncryptedFileLocation', 'id' => $messageMedia['file']['id'], 'access_hash' => $messageMedia['file']['access_hash'], 'dc_id' => $messageMedia['file']['dc_id']];
                 $res['size'] = $messageMedia['decrypted_message']['media']['size'];
@@ -629,10 +630,10 @@ trait Files
                     $res['name'] = Tools::unpackSignedLongString($messageMedia['file']['access_hash']);
                 }
                 return $res;
-            // Wallpapers
+                // Wallpapers
             case 'wallPaper':
                 return $this->getDownloadInfo($messageMedia['document']);
-            // Photos
+                // Photos
             case 'photo':
             case 'messageMediaPhoto':
                 if ($messageMedia['_'] == 'photo') {
@@ -647,19 +648,19 @@ trait Files
                         'id' => $messageMedia['id'],
                         'access_hash' => $messageMedia['access_hash'],
                         'dc_id' => $messageMedia['dc_id'],
-                        'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
+                        'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
                         'volume_id' => $size['volume_id'],
                         'local_id' => $size['local_id'],
                         'secret' => $size['secret'],
                     ];
                 } else {
-                    $res = \array_merge($res, yield from $this->getDownloadInfo($size));
+                    $res = \array_merge($res, $this->getDownloadInfo($size));
                     $res['InputFileLocation'] = [
                         '_' => 'inputPhotoFileLocation',
                         'id' => $messageMedia['id'],
                         'access_hash' => $messageMedia['access_hash'],
                         'dc_id' => $messageMedia['dc_id'],
-                        'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
+                        'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
                         'thumb_size' => $res['thumb_size'] ?? 'x',
                     ];
                 }
@@ -672,19 +673,19 @@ trait Files
             case 'channel':
             case 'chat':
             case 'updateUserPhoto':
-                $res = (yield from $this->getDownloadInfo($messageMedia['photo']));
+                $res = ($this->getDownloadInfo($messageMedia['photo']));
                 if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
                     // bot API file ID
                     $messageMedia['min'] = false;
                     $peer = $this->genAll($messageMedia, null, MTProto::INFO_TYPE_PEER);
                 } else {
-                    $peer = yield from $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
+                    $peer = $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
                 }
                 $res['InputFileLocation'] = [
                     '_' => 'inputPeerPhotoFileLocation',
                     'big' => true,
                     'peer' => $peer,
-                    'photo_id' => $res['InputFileLocation']['photo_id']
+                    'photo_id' => $res['InputFileLocation']['photo_id'],
                 ];
                 $res['name'] = Tools::unpackSignedLongString($messageMedia['id']).'_'.($res['thumb_size'] ?? 'x').'_'.$messageMedia['photo']['dc_id'];
                 $res['ext'] = '.jpg';
@@ -719,11 +720,11 @@ trait Files
                     $res['size'] = \end($messageMedia['sizes']);
                 }
                 return $res;
-            // Documents
+                // Documents
             case 'decryptedMessageMediaExternalDocument':
             case 'document':
                 $messageMedia = ['_' => 'messageMediaDocument', 'ttl_seconds' => 0, 'document' => $messageMedia];
-            // no break
+                // no break
             case 'messageMediaDocument':
                 $res['MessageMedia'] = $messageMedia;
                 foreach ($messageMedia['document']['attributes'] as $attribute) {
@@ -746,7 +747,7 @@ trait Files
                         $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
-                $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $messageMedia['document']['id'], 'access_hash' => $messageMedia['document']['access_hash'], 'version' => isset($messageMedia['document']['version']) ? $messageMedia['document']['version'] : 0, 'dc_id' => $messageMedia['document']['dc_id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $messageMedia['document'])];
+                $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $messageMedia['document']['id'], 'access_hash' => $messageMedia['document']['access_hash'], 'version' => $messageMedia['document']['version'] ?? 0, 'dc_id' => $messageMedia['document']['dc_id'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $messageMedia['document'])];
                 if (!isset($res['ext']) || $res['ext'] === '') {
                     $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], Tools::getExtensionFromMime($messageMedia['document']['mime_type']));
                 }
@@ -760,7 +761,7 @@ trait Files
                 $res['mime'] = $messageMedia['document']['mime_type'];
                 return $res;
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$messageMedia['_']);
+                throw new Exception('Invalid constructor provided: '.$messageMedia['_']);
         }
     }
     /**
@@ -769,19 +770,15 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
      */
-    public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
-            $dir = yield $dir->getFile();
+            $dir = $dir->getFile();
         }
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
-        return yield from $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb);
+        $messageMedia = ($this->getDownloadInfo($messageMedia));
+        return $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb);
     }
     /**
      * Download file.
@@ -789,34 +786,30 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator Downloaded file path
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
      */
-    public function downloadToFile($messageMedia, $file, $cb = null): \Generator
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null): false|string
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = yield $file->getFile();
+            $file = $file->getFile();
         }
         $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
-        if (!yield exists($file)) {
-            yield touchAsync($file);
+        if (!exists($file)) {
+            touchAsync($file);
         }
         $file = \realpath($file);
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
-        $size = yield getSize($file);
-        $stream = yield openFile($file, 'cb');
+        $messageMedia = ($this->getDownloadInfo($messageMedia));
+        $size = getSize($file);
+        $stream = openFile($file, 'cb');
         $this->logger->logger('Waiting for lock of file to download...');
-        $unlock = yield Tools::flock("$file.lock", LOCK_EX);
+        $unlock = Tools::flock("$file.lock", LOCK_EX);
         $this->logger->logger('Got lock of file to download');
         try {
-            yield from $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
+            $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
         } finally {
             $unlock();
-            \unlink("$file.lock");
-            yield $stream->close();
+            deleteFile("$file.lock");
+            $stream->close();
         }
         return $file;
     }
@@ -824,49 +817,53 @@ trait Files
      * Download file to callable.
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
-     * The callable should return the number of written bytes.
      *
-     * @param mixed                          $messageMedia File to download
+     * @param mixed                          $messageMedia  File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
      * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
      * @param bool                           $seekable      Whether the callable can be called out of order
      * @param int                            $offset        Offset where to start downloading
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, true>
      */
-    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
     {
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
+        $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         if (!\is_callable($callable)) {
             throw new Exception('Wrong callable provided');
         }
         if ($cb === null) {
             $cb = function ($percent): void {
-                $this->logger->logger('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Download status: '.$percent.'%', Logger::NOTICE);
+            };
+        } else {
+            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
+                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+                    $r = $cb($percent, $speed, $time);
+                    if ($r instanceof Generator) {
+                        Tools::consumeGenerator($r);
+                    }
+                });
             };
         }
         if ($end === -1 && isset($messageMedia['size'])) {
             $end = $messageMedia['size'];
         }
-        $part_size = $part_size ?? 1024 * 1024;
+        $part_size ??= 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
-        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings->getDefaultDc();
-        if ($this->datacenter->has($datacenter.'_media')) {
-            $datacenter .= '_media';
+        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->authorized_dc;
+        if ($this->datacenter->has(-$datacenter)) {
+            $datacenter = -$datacenter;
         }
         if (isset($messageMedia['key'])) {
             $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
             $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
-                throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
+                throw new Exception('Fingerprint mismatch!');
             }
             $ige = IGE::getInstance($messageMedia['key'], $messageMedia['iv']);
             $seekable = false;
@@ -902,13 +899,13 @@ trait Files
         $cb = static function () use ($cb, $count, &$time, &$speed): void {
             static $cur = 0;
             $cur++;
-            Tools::callFork($cb($cur * 100 / $count, $time, $speed));
+            $cb($cur * 100 / $count, $time, $speed);
         };
         $cdn = false;
-        $params[0]['previous_promise'] = new Success(true);
+        $params[0]['previous_promise'] = true;
         $start = \microtime(true);
         $old_dc = null;
-        $size = yield from $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
+        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
             $origCb(100, 0, 0);
@@ -916,26 +913,26 @@ trait Files
         }
         $parallel_chunks = $seekable ? $parallel_chunks : 1;
         if ($params) {
-            $previous_promise = new Success(true);
+            $previous_promise = true;
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = Tools::call($this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
-                $previous_promise->onResolve(static function ($e, $res) use (&$size) {
-                    if ($res) {
-                        $size += $res;
-                    }
+                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable);
+                $previous_promise->map(static function (int $res) use (&$size): void {
+                    $size += $res;
                 });
                 $promises[] = $previous_promise;
-                if (!($key % $parallel_chunks)) {
+                if (\count($promises) === $parallel_chunks) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps
-                    $res = yield Tools::all($promises);
-                    $promises = [];
-                    foreach ($res as $r) {
-                        if (!$r) {
-                            break 2;
+                    awaitFirst($promises);
+                    foreach ($promises as $k => $p) {
+                        if ($p->isComplete()) {
+                            unset($promises[$k]);
+                            break;
                         }
                     }
+                }
+                if (!($key % $parallel_chunks)) {
                     $time = \microtime(true) - $start;
                     $speed = (int) ($size * 8 / $time) / 1000000;
                     $this->logger->logger("Partial download time: {$time}");
@@ -943,7 +940,7 @@ trait Files
                 }
             }
             if ($promises) {
-                yield Tools::all($promises);
+                await($promises);
             }
         }
         $time = \microtime(true) - $start;
@@ -961,26 +958,19 @@ trait Files
     /**
      * Download file part.
      *
-     * @param array    $messageMedia File object
+     * @param array    $messageMedia  File object
      * @param bool     $cdn           Whether this is a CDN file
-     * @param string   $datacenter    DC ID
-     * @param ?string   $old_dc        Previous DC ID
+     * @param int      $datacenter    DC ID
+     * @param null|int     $old_dc       Previous DC ID
      * @param IGE      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
      * @param array    $offset        Offset
      * @param callable $callable      Chunk callback
      * @param boolean  $seekable      Whether the download file is seekable
      * @param boolean  $postpone      Whether to postpone method call
-     *
-     * @return \Generator
      */
-    private function downloadPart(&$messageMedia, bool &$cdn, &$datacenter, &$old_dc, &$ige, $cb, array $offset, $callable, bool $seekable, bool $postpone = false): \Generator
+    private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false): int
     {
-        static $method = [
-            false => 'upload.getFile',
-            // non-cdn
-            true => 'upload.getCdnFile',
-        ];
         do {
             if (!$cdn) {
                 $basic_param = ['location' => $messageMedia['InputFileLocation']];
@@ -990,11 +980,15 @@ trait Files
             //$x = 0;
             while (true) {
                 try {
-                    $res = yield from $this->methodCallAsyncRead($method[$cdn], $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]);
+                    $res = $this->methodCallAsyncRead(
+                        $cdn ? 'upload.getCdnFile' : 'upload.getFile',
+                        $basic_param + $offset,
+                        ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
+                    );
                     break;
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                } catch (RPCErrorException $e) {
                     if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                        yield Tools::sleep(1);
+                        Tools::sleep(1);
                         continue;
                     }
                     switch ($e->rpc) {
@@ -1013,19 +1007,19 @@ trait Files
                 $messageMedia['cdn_key'] = $res['encryption_key'];
                 $messageMedia['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
-                $datacenter = $res['dc_id'].'_cdn';
+                $datacenter = $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
-                    yield from $this->getConfig([]);
+                    $this->getConfig();
                 }
-                $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger(Lang::$current_lang['stored_on_cdn'], Logger::NOTICE);
                 continue;
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
-                $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
-                yield from $this->getConfig([]);
+                $this->logger->logger(Lang::$current_lang['cdn_reupload'], Logger::NOTICE);
+                $this->getConfig();
                 try {
-                    $this->addCdnHashes($messageMedia['file_token'], yield from $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                } catch (RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
                         case 'REQUEST_TOKEN_INVALID':
@@ -1042,7 +1036,7 @@ trait Files
                 $datacenter = 0;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
-                $res = yield from $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
+                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
             }
             if ($res['bytes'] === '') {
                 return 0;
@@ -1059,46 +1053,50 @@ trait Files
                 $res['bytes'] = \substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
             if (!$seekable) {
-                yield $offset['previous_promise'];
+                $offset['previous_promise'];
             }
-            $res = yield $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
+            $len = \strlen($res['bytes']);
+            $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
+            if ($res instanceof Generator) {
+                $res = Tools::consumeGenerator($res);
+            }
+            if ($res instanceof Future) {
+                $res = $res->await();
+            }
             $cb();
-            return $res;
+            return $len;
         } while (true);
     }
-    private $cdn_hashes = [];
-    private function addCdnHashes($file, $hashes): void
+    /**
+     * @var array<string, array<int, array{limit: int, hash: string}>>
+     */
+    private array $cdn_hashes = [];
+    private function addCdnHashes(string $file, array $hashes): void
     {
-        if (!isset($this->cdn_hashes[$file])) {
-            $this->cdn_hashes = [];
-        }
+        $this->cdn_hashes ??= [];
         foreach ($hashes as $hash) {
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
-    private function checkCdnHash($file, $offset, $data, &$datacenter): \Generator
+    private function checkCdnHash(string $file, int $offset, string $data, int &$datacenter): void
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->addCdnHashes($file, yield from $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
+                throw new Exception('Could not fetch CDN hashes for offset '.$offset);
             }
             if (\hash('sha256', \substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
-                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset '.$offset);
+                throw new SecurityException('CDN hash mismatch for offset '.$offset);
             }
             $data = \substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
-        return true;
     }
-    /**
-     * @return true
-     */
-    private function clearCdnHashes($file): bool
+
+    private function clearCdnHashes(string $file): void
     {
         unset($this->cdn_hashes[$file]);
-        return true;
     }
 }

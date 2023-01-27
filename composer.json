@@ -22,8 +22,9 @@
         "krakjoe/pthreads-polyfill": "*",
         "ext-pthreads": "*"
     },
+    "minimum-stability": "dev",
     "require": {
-        "php-64bit": ">=8.0",
+        "php-64bit": ">=8.1",
         "danog/primemodule": "^1",
         "erusev/parsedown": "^1.7",
         "symfony/polyfill-mbstring": "*",
@@ -35,28 +36,27 @@
         "ext-hash": "*",
         "ext-zlib": "*",
         "ext-fileinfo": "*",
-        "amphp/amp": "^2",
-        "amphp/http-client": "^4",
-        "amphp/socket": "^1",
-        "amphp/dns": "^1",
-        "amphp/byte-stream": "^1",
-        "amphp/file": "^2",
-        "amphp/mysql": "^2",
-        "amphp/postgres": "^1.2",
-        "danog/dns-over-https": "^0.2",
-        "amphp/http-client-cookies": "^1",
+        "amphp/amp": "^3",
+        "amphp/http-client": "^5",
+        "amphp/socket": "^2",
+        "amphp/dns": "^2",
+        "amphp/byte-stream": "^2",
+        "amphp/file": "^3",
+        "amphp/mysql": "^3",
+        "amphp/postgres": "^2",
+        "danog/dns-over-https": "^1",
+        "amphp/http-client-cookies": "^2",
         "danog/tg-file-decoder": "^0.1",
-        "danog/magicalserializer": "^1.0",
         "league/uri": "^6",
-        "danog/ipc": "^0.1",
-        "amphp/log": "^1.1",
-        "danog/loop": "^0.1.0",
+        "danog/ipc": "^1",
+        "amphp/log": "^2",
+        "danog/loop": "^1",
         "phpseclib/phpseclib": "^3",
-        "amphp/redis": "^1.0",
+        "amphp/redis": "^2",
         "symfony/polyfill-php80": "^1.18",
-        "amphp/websocket-client": "^1.0",
+        "amphp/websocket-client": "^2",
         "psr/http-factory": "^1.0",
-        "psr/log": "^1|^2|^3",
+        "psr/log": "^3",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
@@ -64,10 +64,12 @@
         "ext-ctype": "*",
         "danog/phpdoc": "^0.1.7",
         "phpunit/phpunit": "^9",
-        "phabel/phabel": "^1",
+        "amphp/phpunit-util": "^3",
         "bamarni/composer-bin-plugin": "1.5.0",
         "roave/security-advisories": "dev-latest",
-        "symfony/yaml": "^6.0"
+        "symfony/yaml": "^6.0",
+        "amphp/http-server": "^3",
+        "dg/bypass-finals": "dev-master"
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
@@ -87,8 +89,8 @@
             "danog\\MadelineProto\\": "src/danog/MadelineProto"
         },
         "files": [
-            "src/BigIntegor.php",
-            "src/polyfill.php"
+            "src/polyfill.php",
+            "src/loop.php"
         ]
     },
     "autoload-dev": {
@@ -138,7 +140,8 @@
     "config": {
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
-            "phabel/phabel": true
+            "phabel/phabel": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

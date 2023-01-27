@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -12,6 +14,8 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 namespace danog\MadelineProto\VoIP;
+
+use danog\MadelineProto\Logger;
 
 trait AckHandler
 {
@@ -38,12 +42,12 @@ trait AckHandler
             $this->session_in_seq_no = $packet_seq_no;
         } elseif (($diff = $this->session_in_seq_no - $packet_seq_no) < 32) {
             if (!$this->received_timestamp_map[$diff]) {
-                \danog\MadelineProto\Logger::log("Got duplicate $packet_seq_no");
+                Logger::log("Got duplicate $packet_seq_no");
                 return false;
             }
             $this->received_timestamp_map[$diff] = \microtime(true);
         } else {
-            \danog\MadelineProto\Logger::log("Packet $packet_seq_no is out of order and too late");
+            Logger::log("Packet $packet_seq_no is out of order and too late");
             return false;
         }
         if ($this->seqgt($last_ack_id, $this->session_out_seq_no)) {

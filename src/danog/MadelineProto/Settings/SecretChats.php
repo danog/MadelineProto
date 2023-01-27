@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Secret chat settings.
  */
-class SecretChats extends SettingsAbstract
+final class SecretChats extends SettingsAbstract
 {
     /**
      * What secret chats to accept.
@@ -16,7 +18,7 @@ class SecretChats extends SettingsAbstract
      *
      * @var bool|array<int>
      */
-    protected $accept = true;
+    protected bool|array $accept = true;
 
     public function mergeArray(array $settings): void
     {
@@ -29,7 +31,7 @@ class SecretChats extends SettingsAbstract
      *
      * @return bool|array<int>
      */
-    public function getAccept()
+    public function getAccept(): bool|array
     {
         return $this->accept;
     }
@@ -38,10 +40,8 @@ class SecretChats extends SettingsAbstract
      * Set boolean or array of IDs.
      *
      * @param bool|array<int> $accept Boolean or array of IDs
-     *
-     * @return self
      */
-    public function setAccept($accept): self
+    public function setAccept(bool|array $accept): self
     {
         $this->accept = $accept;
 
@@ -52,9 +52,6 @@ class SecretChats extends SettingsAbstract
      * Can we accept this chat.
      *
      * @internal
-     *
-     * @param integer $id
-     * @return boolean
      */
     public function canAccept(int $id): bool
     {

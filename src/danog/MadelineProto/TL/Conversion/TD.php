@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TD module.
  *
@@ -11,25 +13,24 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Conversion;
+
+use danog\MadelineProto\Lang;
 
 trait TD
 {
     /**
      * Convert tdcli parameters to tdcli.
      *
-     * @param array $params Params
+     * @param mixed $params Params
      * @param array $key    Key
-     *
-     * @return array
      */
-    public function tdcliToTd(&$params, $key = null): array
+    public function tdcliToTd(&$params, ?array $key = null): array
     {
         if (!\is_array($params)) {
             return $params;
@@ -53,34 +54,30 @@ trait TD
      * Convert TD to MTProto parameters.
      *
      * @param array $params Parameters
-     *
-     * @return \Generator<array>
      */
-    public function tdToMTProto(array $params): \Generator
+    public function tdToMTProto(array $params): array
     {
         $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
-            if (\is_array($mtproto)) {
-                switch (\end($mtproto)) {
-                    case 'choose_message_content':
-                        switch ($params[$td]['_']) {
-                            case 'inputMessageText':
-                                $params[$td]['_'] = 'messages.sendMessage';
-                                if (isset($params['disable_web_page_preview'])) {
-                                    $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
-                                }
-                                $newparams = \array_merge($params[$td], $newparams);
-                                break;
-                            default:
-                                throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
-                        }
-                        break;
-                    default:
-                        $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
-                        if (\is_array($newparams[$mtproto[0]])) {
-                            $newparams[$mtproto[0]] = (yield from $this->MTProtoToTd($newparams[$mtproto[0]]));
-                        }
-                }
+            switch (\end($mtproto)) {
+                case 'choose_message_content':
+                    switch ($params[$td]['_']) {
+                        case 'inputMessageText':
+                            $params[$td]['_'] = 'messages.sendMessage';
+                            if (isset($params['disable_web_page_preview'])) {
+                                $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
+                            }
+                            $newparams = \array_merge($params[$td], $newparams);
+                            break;
+                        default:
+                            throw new Exception(Lang::$current_lang['non_text_conversion']);
+                    }
+                    break;
+                default:
+                    $newparams[$mtproto[0]] = $params[$td] ?? null;
+                    if (\is_array($newparams[$mtproto[0]])) {
+                        $newparams[$mtproto[0]] = ($this->MTProtoToTd($newparams[$mtproto[0]]));
+                    }
             }
         }
         return $newparams;
@@ -89,21 +86,17 @@ trait TD
      * MTProto to TDCLI params.
      *
      * @param mixed $params Params
-     *
-     * @return \Generator
      */
-    public function MTProtoToTdcli($params): \Generator
+    public function MTProtoToTdcli(mixed $params)
     {
-        return $this->tdToTdcli(yield from $this->MTProtoToTd($params));
+        return $this->tdToTdcli($this->MTProtoToTd($params));
     }
     /**
      * MTProto to TD params.
      *
      * @param mixed $params Params
-     *
-     * @return \Generator
      */
-    public function MTProtoToTd(&$params): \Generator
+    public function MTProtoToTd(mixed &$params)
     {
         if (!\is_array($params)) {
             return $params;
@@ -122,7 +115,7 @@ trait TD
             } else {
                 switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'];
+                        $newparams[$td] = ($this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : ($this->getInfo($params[$mtproto[0]]))['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];
@@ -151,7 +144,7 @@ trait TD
                         }
                         break;
                     case 'choose_ttl':
-                        $newparams[$td] = isset($params['ttl']) ? $params['ttl'] : 0;
+                        $newparams[$td] = $params['ttl'] ?? 0;
                         break;
                     case 'choose_ttl_expires_in':
                         $newparams[$td] = $newparams['ttl'] - \microtime(true);
@@ -160,23 +153,23 @@ trait TD
                         if ($params['message'] !== '') {
                             $newparams[$td] = ['_' => 'messageText', 'text' => $params['message']];
                             if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') {
-                                $newparams[$td]['web_page'] = (yield from $this->MTProtoToTd($params['media']['webpage']));
+                                $newparams[$td]['web_page'] = ($this->MTProtoToTd($params['media']['webpage']));
                             }
                             if (isset($params['entities'])) {
                                 $newparams[$td]['entities'] = $params['entities'];
                             }
                         } else {
-                            throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
+                            throw new Exception(Lang::$current_lang['non_text_conversion']);
                         }
                         break;
                     default:
                         if (isset($mtproto[1])) {
-                            $newparams[$td] = isset($params[$mtproto[0]][$mtproto[1]]) ? $params[$mtproto[0]][$mtproto[1]] : null;
+                            $newparams[$td] = $params[$mtproto[0]][$mtproto[1]] ?? null;
                         } else {
-                            $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
+                            $newparams[$td] = $params[$mtproto[0]] ?? null;
                         }
                         if (\is_array($newparams[$td])) {
-                            $newparams[$td] = (yield from $this->MTProtoToTd($newparams[$td]));
+                            $newparams[$td] = ($this->MTProtoToTd($newparams[$td]));
                         }
                 }
             }
@@ -187,10 +180,8 @@ trait TD
      * Convert TD parameters to tdcli.
      *
      * @param mixed $params Parameters
-     *
-     * @return mixed
      */
-    public function tdToTdcli($params)
+    public function tdToTdcli(mixed $params)
     {
         if (!\is_array($params)) {
             return $params;

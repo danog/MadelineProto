@@ -1,40 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\TL\Exception;
+use RuntimeException;
+use Throwable;
 
-use function Amp\Parallel\Sync\flattenThrowableBacktrace;
+use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThrowableBacktrace;
 
 final class ExitFailure
 {
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var string */
-    private $message;
+    private string $message;
 
-    /** @var int|string */
-    private $code;
+    private int|string $code;
 
-    /** @var string[] */
-    private $trace;
+    /** @var list<array<non-empty-string, list<scalar>|scalar>> */
+    private array $trace;
 
-    /** @var string */
-    private $tlTrace;
+    private ?string $tlTrace = null;
 
-    /** @var self|null */
-    private $previous;
+    private ?self $previous = null;
 
-    /** @var string|null */
-    private $localized;
+    private ?string $localized = null;
 
-    public function __construct(\Throwable $exception)
+    public function __construct(Throwable $exception)
     {
-        $this->type = \get_class($exception);
+        $this->type = $exception::class;
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
-        $this->trace = flattenThrowableBacktrace($exception);
+        $this->trace = ContextFlattenThrowableBacktrace($exception);
         if (\method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
         }
@@ -52,7 +51,16 @@ final class ExitFailure
     {
         $previous = $this->previous ? $this->previous->getException() : null;
 
-        $exception = new $this->type($this->message, $this->code, $previous);
+        try {
+            if ($this->type === Exception::class) {
+                $exception = new $this->type($this->message);
+            } else {
+                $exception = new $this->type($this->message, $this->code, $previous);
+            }
+        } catch (Throwable $e) {
+            $exception = new RuntimeException($this->message, $this->code, $previous);
+        }
+
         if ($this->tlTrace) {
             $exception->setTLTrace($this->tlTrace);
         }

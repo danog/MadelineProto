@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Outgoing message.
  *
@@ -11,24 +13,21 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProto;
 
-use Amp\Deferred;
-use Amp\Promise;
-use danog\MadelineProto\Tools;
+use Amp\Future;
 
 /**
  * Incoming message.
  *
  * @internal
  */
-class IncomingMessage extends Message
+final class IncomingMessage extends Message
 {
     /**
      * We have received this message.
@@ -71,12 +70,7 @@ class IncomingMessage extends Message
      */
     private bool $fromContainer;
 
-    /**
-     * DB side effects to be resolved before using the content.
-     *
-     * @var Promise[]
-     */
-    private $sideEffects = [];
+    private ?Future $sideEffects = null;
 
     /**
      * Constructor.
@@ -97,10 +91,18 @@ class IncomingMessage extends Message
             $this->state |= 16; // message not requiring acknowledgment
         }
     }
+    public function setSideEffects(?Future $sideEffects): void
+    {
+        $this->sideEffects = $sideEffects;
+    }
+    public function consumeSideEffects(): ?Future
+    {
+        $side = $this->sideEffects;
+        $this->sideEffects = null;
+        return $side;
+    }
     /**
      * Get deserialized response content.
-     *
-     * @return array
      */
     public function getContent(): array
     {
@@ -109,8 +111,6 @@ class IncomingMessage extends Message
 
     /**
      * Get was present in container.
-     *
-     * @return bool
      */
     public function isFromContainer(): bool
     {
@@ -120,11 +120,9 @@ class IncomingMessage extends Message
     /**
      * Get log line.
      *
-     * @param int|string $dc DC ID
-     *
-     * @return string
+     * @param int $dc DC ID
      */
-    public function log($dc): string
+    public function log(int $dc): string
     {
         if ($this->fromContainer) {
             return "Inside of container, received {$this->content['_']} from DC $dc";
@@ -134,8 +132,6 @@ class IncomingMessage extends Message
 
     /**
      * Get message type.
-     *
-     * @return string
      */
     public function getType(): string
     {
@@ -144,18 +140,14 @@ class IncomingMessage extends Message
 
     /**
      * Get message type.
-     *
-     * @return string
      */
     public function __toString(): string
     {
-        return $this->content['_'];
+        return "incoming message {$this->content['_']}";
     }
 
     /**
      * We have acked this message.
-     *
-     * @return void
      */
     public function ack(): void
     {
@@ -163,8 +155,6 @@ class IncomingMessage extends Message
     }
     /**
      * Read this message, clearing its contents.
-     *
-     * @return array
      */
     public function read(): array
     {
@@ -176,8 +166,6 @@ class IncomingMessage extends Message
 
     /**
      * Check if this message can be garbage collected.
-     *
-     * @return boolean
      */
     public function canGarbageCollect(): bool
     {
@@ -186,8 +174,6 @@ class IncomingMessage extends Message
 
     /**
      * Get ID of message to which this message replies.
-     *
-     * @return string
      */
     public function getRequestId(): string
     {
@@ -195,8 +181,6 @@ class IncomingMessage extends Message
     }
     /**
      * Get state.
-     *
-     * @return int
      */
     public function getState(): int
     {
@@ -204,67 +188,7 @@ class IncomingMessage extends Message
     }
 
     /**
-     * Set DB side effects to be resolved before using the content.
-     *
-     * @param Promise[] $sideEffects DB side effects to be resolved before using the content
-     *
-     * @return self
-     */
-    public function setSideEffects(array $sideEffects): self
-    {
-        $this->sideEffects = $sideEffects;
-
-        return $this;
-    }
-
-    /**
-     * Get DB side effects to be resolved before using the specified content.
-     *
-     * @template T
-     *
-     * @param T $return Return value
-     *
-     * @psalm-return ?Promise<T>
-     */
-    public function getSideEffects($return): ?Promise
-    {
-        if (!$this->sideEffects) {
-            return null;
-        }
-
-        $deferred = new Deferred;
-        $result = $deferred->promise();
-
-        $pending = \count($this->sideEffects);
-
-        foreach ($this->sideEffects as $promise) {
-            $promise = Tools::call($promise);
-            $promise->onResolve(function ($exception, $value) use (&$deferred, &$pending, $return) {
-                if ($pending === 0) {
-                    return;
-                }
-
-                if ($exception) {
-                    $pending = 0;
-                    $deferred->fail($exception);
-                    $deferred = null;
-                    return;
-                }
-
-                if (0 === --$pending) {
-                    $deferred->resolve($return);
-                }
-            });
-        }
-        $this->sideEffects = [];
-        return $result;
-    }
-
-
-    /**
      * Get receive date.
-     *
-     * @return int
      */
     public function getReceived(): int
     {

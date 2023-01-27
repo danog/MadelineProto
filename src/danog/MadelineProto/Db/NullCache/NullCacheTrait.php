@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db\NullCache;
+
+use RuntimeException;
 
 /**
  * Trait that disables database caching.
@@ -16,19 +20,14 @@ trait NullCacheTrait
     {
         return false;
     }
-    /**
-     * @return null
-     */
-    protected function getCache(string $key)
+
+    protected function getCache(string $key): void
     {
-        throw new \RuntimeException('Not implemented!');
+        throw new RuntimeException('Not implemented!');
     }
 
     /**
      * Save item in cache.
-     *
-     * @param string $key
-     * @param mixed $value
      */
     protected function setCache(string $key, $value): void
     {
@@ -36,8 +35,6 @@ trait NullCacheTrait
 
     /**
      * Remove key from cache.
-     *
-     * @param string $key
      */
     protected function unsetCache(string $key): void
     {

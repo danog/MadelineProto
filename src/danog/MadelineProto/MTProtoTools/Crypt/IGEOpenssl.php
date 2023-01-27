@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Crypt module.
  *
@@ -11,13 +13,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
+
+use const OPENSSL_RAW_DATA;
+use const OPENSSL_ZERO_PADDING;
 
 /**
  * Openssl IGE implementation.
@@ -33,7 +37,7 @@ final class IGEOpenssl extends IGE
     }
     public function encrypt(string $plaintext): string
     {
-        $ciphertext = "";
+        $ciphertext = '';
         for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
             $plain = \substr($plaintext, $i, 16);
 
@@ -49,7 +53,7 @@ final class IGEOpenssl extends IGE
     }
     public function decrypt(string $ciphertext): string
     {
-        $plaintext = "";
+        $plaintext = '';
         for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
             $cipher = \substr($ciphertext, $i, 16);
 

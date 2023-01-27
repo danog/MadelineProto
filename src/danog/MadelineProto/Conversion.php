@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Conversion module.
  *
@@ -10,41 +13,41 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\MTProtoTools\Crypt;
+use PDO;
+use Webmozart\Assert\Assert;
 
-class Conversion
+use const DIRECTORY_SEPARATOR;
+
+use function stream_get_contents;
+
+final class Conversion
 {
     /**
      * Prepare API instance.
      *
      * @param array<int, string> $authorization Authorization info
-     * @param int $main_dc_id
-     * @param string $session
-     * @param SettingsAbstract|array $settings
-     *
-     * @return \Generator<mixed, mixed, mixed, API>
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, $settings): \Generator
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, SettingsAbstract|array $settings): API
     {
         $settings = Settings::parseFromLegacyFull($settings);
         $settings->getIpc()->setSlow(true);
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
         $settings->getAuth()->setPfs(true);
-        $MadelineProto = new \danog\MadelineProto\API($session, $settings);
-        yield $MadelineProto->help->getConfig();
-        yield $MadelineProto->logger("About to import auth!", Logger::FATAL_ERROR);
-        yield $MadelineProto->importAuthorization($authorization, $main_dc_id);
+        $MadelineProto = new API($session, $settings);
+        $MadelineProto->help->getConfig();
+        $MadelineProto->logger('About to import auth!', Logger::FATAL_ERROR);
+        $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;
     }
-    public static function telethon(string $session, string $new_session, $settings = []): \Generator
+    public static function telethon(string $session, string $new_session, $settings = [])
     {
         if (!\extension_loaded('sqlite3')) {
             throw new Exception(['extension', 'sqlite3']);
@@ -53,8 +56,8 @@ class Conversion
             $session .= '.session';
         }
         $session = Tools::absolute($session);
-        $sqlite = new \PDO("sqlite:$session");
-        $sqlite->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $sqlite = new PDO("sqlite:$session");
+        $sqlite->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sessions = $sqlite->query('SELECT * FROM sessions')->fetchAll();
 
@@ -66,7 +69,7 @@ class Conversion
         return self::importAuthorization($dcs, $dc['dc_id'], $new_session, $settings);
     }
 
-    public static function pyrogram(string $session, string $new_session, $settings = []): \Generator
+    public static function pyrogram(string $session, string $new_session, $settings = [])
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!isset(\pathinfo($session)['extension'])) {
@@ -75,6 +78,8 @@ class Conversion
         $session = Tools::absolute($session);
         $session = \json_decode(\file_get_contents($session), true);
         $session['auth_key'] = \base64_decode(\implode('', $session['auth_key']));
+        Assert::notFalse($session['auth_key']);
+        Assert::integer($session['dc_id']);
 
         $settings['connection_settings']['all']['test_mode'] = $session['test_mode'];
 
@@ -90,7 +95,9 @@ class Conversion
         $dc = $session['dc'];
         $key = \hex2bin($session["dc$dc".'_auth_key']);
 
-        return yield from self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
+        Assert::integer($dc);
+        Assert::string($key);
+        return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 
     public static function tdesktop_md5($data)
@@ -120,21 +127,21 @@ class Conversion
         }
         foreach ($totry as $fp) {
             if (\stream_get_contents($fp, 4) !== 'TDF$') {
-                \danog\MadelineProto\Logger::log('Wrong magic', Logger::ERROR);
+                Logger::log('Wrong magic', Logger::ERROR);
                 continue;
             }
             $versionBytes = \stream_get_contents($fp, 4);
             $version = Tools::unpackSignedInt($versionBytes);
-            \danog\MadelineProto\Logger::log("TDesktop version: $version");
+            Logger::log("TDesktop version: $version");
             $data = \stream_get_contents($fp);
             $md5 = \substr($data, -16);
             $data = \substr($data, 0, -16);
 
             $length = \pack('l', \strlen($data));
-            $length = \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($length) : $length;
+            $length = Magic::$BIG_ENDIAN ? \strrev($length) : $length;
 
             if (\md5($data.$length.$versionBytes.'TDF$', true) !== $md5) {
-                \danog\MadelineProto\Logger::log('Wrong MD5', Logger::ERROR);
+                Logger::log('Wrong MD5', Logger::ERROR);
             }
 
             $res = \fopen('php://memory', 'rw+b');
@@ -155,7 +162,7 @@ class Conversion
         $length = \unpack('V', \stream_get_contents($res, 4))[1];
 
         if ($length > \fstat($res)['size'] || $length < 4) {
-            throw new \danog\MadelineProto\Exception('Wrong length');
+            throw new Exception('Wrong length');
         }
 
         return $res;
@@ -180,11 +187,11 @@ class Conversion
         $message_key = \stream_get_contents($data, 16);
         $encrypted_data = \stream_get_contents($data);
 
-        list($aes_key, $aes_iv) = Crypt::oldAesCalculate($message_key, $auth_key, false);
+        [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $auth_key, false);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
         if ($message_key != \substr(\sha1($decrypted_data, true), 0, 16)) {
-            throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+            throw new SecurityException('msg_key mismatch');
         }
 
         $res = \fopen('php://memory', 'rw+b');
@@ -284,7 +291,7 @@ class Conversion
             $session .= DIRECTORY_SEPARATOR.'tdata';
         }
 
-        list($part_one_md5, $part_two_md5) = \str_split(self::tdesktop_md5($settings['old_session_key']), 16);
+        [$part_one_md5, $part_two_md5] = \str_split(self::tdesktop_md5($settings['old_session_key']), 16);
         self::$tdesktop_base_path = $session.DIRECTORY_SEPARATOR;
         self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.DIRECTORY_SEPARATOR;
 
@@ -299,8 +306,8 @@ class Conversion
 
             self::$tdesktop_key = \stream_get_contents(
                 self::tdesktop_read_bytearray(
-                    self::tdesktop_decrypt($encryptedKey, $passKey)
-                )
+                    self::tdesktop_decrypt($encryptedKey, $passKey),
+                ),
             );
         } else {
             $key = 'key_'.$settings['old_session_key'];
@@ -308,7 +315,7 @@ class Conversion
 
             $salt = self::tdesktop_read_bytearray($data, true);
             if (\strlen($salt) !== 32) {
-                throw new Exception("Length of salt is wrong!");
+                throw new Exception('Length of salt is wrong!');
             }
 
             $encryptedKey = self::tdesktop_read_bytearray($data);
@@ -393,11 +400,11 @@ class Conversion
                     switch (Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)))) {
                         case 2:
                         case 3:
-                        self::tdesktop_read_bytearray($main);
-                        \stream_get_contents($main, 4);
-                        self::tdesktop_read_bytearray($main);
-                        self::tdesktop_read_bytearray($main);
-                        break;
+                            self::tdesktop_read_bytearray($main);
+                            \stream_get_contents($main, 4);
+                            self::tdesktop_read_bytearray($main);
+                            self::tdesktop_read_bytearray($main);
+                            break;
                     }
                     break;
                 case self::dbiConnectionType:
@@ -440,6 +447,6 @@ class Conversion
             }
         }
 
-        return yield from self::importAuthorization($auth_keys, $main_dc_id, $new_session, $settings);
+        return self::importAuthorization($auth_keys, $main_dc_id, $new_session, $settings);
     }
 }

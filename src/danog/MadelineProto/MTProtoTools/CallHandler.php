@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * CallHandler module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -29,50 +30,27 @@ use danog\MadelineProto\Settings;
 trait CallHandler
 {
     /**
-     * Synchronous wrapper for methodCall.
-     *
-     * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
-     * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return mixed
-     */
-    public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
-    {
-        return \danog\MadelineProto\Tools::wait($this->methodCallAsyncRead($method, $args, $aargs));
-    }
-    /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
-        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
-        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args, $aargs);
     }
 }

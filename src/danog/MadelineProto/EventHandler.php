@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * EventHandler module.
  *
@@ -11,16 +13,18 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use Generator;
 
 /**
  * Event handler.
@@ -39,102 +43,99 @@ abstract class EventHandler extends InternalDoc
      * API instance.
      */
     protected MTProto $API;
-    public function __construct($API) // BC
+    public function __construct($API)
     {
+        // BC
     }
 
     /**
-     * Start MadelineProto and the event handler (enables async).
+     * Start MadelineProto and the event handler.
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
-     *
-     * @return void
      */
     final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
         $API = new API($session, $settings);
-        $API->startAndLoop(static::class);
+        $API->startAndLoopInternal(static::class);
     }
     /**
-     * Start MadelineProto as a bot and the event handler (enables async).
+     * Start MadelineProto as a bot and the event handler.
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $session Session name
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
-     *
-     * @return void
      */
     final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
     {
         $API = new API($session, $settings);
         $API->botLogin($token);
-        $API->startAndLoop(static::class);
+        $API->startAndLoopInternal(static::class);
     }
     /**
      * Internal constructor.
      *
      * @internal
-     *
      * @param APIWrapper $MadelineProto MadelineProto instance
-     *
-     * @return void
      */
     public function initInternal(APIWrapper $MadelineProto): void
     {
-        self::link($this, $MadelineProto->getFactory());
-        $this->API =& $MadelineProto->getAPI();
-        foreach ($this->API->getMethodNamespaces() as $namespace) {
-            $this->{$namespace} = $this->exportNamespace($namespace);
-        }
+        $this->wrapper = $MadelineProto;
+        $this->exportNamespaces();
     }
+    private ?Future $startFuture = null;
     /**
      * Start method handler.
      *
      * @internal
-     *
-     * @return \Generator
      */
-    public function startInternal(): \Generator
+    public function startInternal(): void
     {
         $this->startMutex ??= new LocalMutex;
-        $lock = yield $this->startMutex->acquire();
+        $startDeferred = new DeferredFuture;
+        $this->startFuture = $startDeferred->getFuture();
+        $lock = $this->startMutex->acquire();
         try {
             if ($this->startedInternal) {
                 return;
             }
             if (isset(static::$dbProperties)) {
-                yield from $this->internalInitDb($this->API);
+                $this->internalInitDb($this->wrapper->getAPI());
             }
             if (\method_exists($this, 'onStart')) {
-                yield $this->onStart();
+                $r = $this->onStart();
+                if ($r instanceof Generator) {
+                    $r = Tools::consumeGenerator($r);
+                }
+                if ($r instanceof Future) {
+                    $r = $r->await();
+                }
             }
             $this->startedInternal = true;
         } finally {
+            $this->startFuture = null;
+            $startDeferred->complete();
             $lock->release();
         }
     }
     /**
+     * @internal
+     */
+    public function waitForStartInternal(): void
+    {
+        $this->startFuture?->await();
+    }
+    /**
      * Get peers where to send error reports.
      *
-     * @return array|string|int
+     * @return string|int|array<string|int>
      */
     public function getReportPeers()
     {
         return [];
-    }
-
-    /**
-     * Get API instance.
-     *
-     * @return MTProto
-     */
-    public function getAPI(): MTProto
-    {
-        return $this->API;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Templates module.
  *
@@ -11,17 +13,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
-use \danog\MadelineProto\MTProto;
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\MTProto;
+
 use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
@@ -30,12 +31,10 @@ trait Templates
      * Echo page to console.
      *
      * @param string $message Error message
-     *
-     * @return \Generator
      */
-    private function webEcho(string $message = ''): \Generator
+    private function webEcho(string $message = ''): void
     {
-        $auth = yield $this->getAuthorization();
+        $auth = $this->getAuthorization();
         $form = null;
         if ($auth === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['type'])) {
@@ -62,8 +61,7 @@ trait Templates
             $title = Lang::$current_lang['loginUserPassWeb'];
             $hint = \htmlentities(\sprintf(
                 Lang::$current_lang['loginUserPassHint'],
-                /** @psalm-suppress InvalidIterator */
-                $this instanceof Client ? yield from $this->getHint() : $this->getHint()
+                $this->getHint(),
             ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
         } elseif ($auth === MTProto::WAITING_SIGNUP) {
@@ -76,21 +74,18 @@ trait Templates
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
-        return getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
+        getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
     }
     /**
      * Web template.
      *
-     * @var string
      */
-    private $webTemplate = 'legacy';
+    private string $webTemplate = '';
     /**
      * Format message according to template.
      *
      * @param string $message Message
      * @param string $form    Form contents
-     *
-     * @return string
      */
     private function webEchoTemplate(string $message, string $form): string
     {
@@ -98,8 +93,6 @@ trait Templates
     }
     /**
      * Get web template.
-     *
-     * @return string
      */
     public function getWebTemplate(): string
     {
@@ -109,8 +102,6 @@ trait Templates
      * Set web template.
      *
      * @param string $template Template
-     *
-     * @return void
      */
     public function setWebTemplate(string $template): void
     {

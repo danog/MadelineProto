@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * FileCallbackInterface module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,18 +27,14 @@ interface FileCallbackInterface
 {
     /**
      * Get file.
-     *
-     * @return mixed
      */
-    public function getFile();
+    public function getFile(): mixed;
     /**
      * Invoke callback.
      *
      * @param float $percent Percent
      * @param float $speed   Speed in mbps
      * @param float $time    Time
-     *
-     * @return mixed
      */
-    public function __invoke($percent, $speed, $time);
+    public function __invoke(float $percent, float $speed, float $time);
 }

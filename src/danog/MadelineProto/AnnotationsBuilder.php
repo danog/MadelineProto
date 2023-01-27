@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * AnnotationsBuilder module.
  *
@@ -11,23 +13,24 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use phpDocumentor\Reflection\DocBlockFactory;
+use ReflectionClass;
+use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionType;
 use ReflectionUnionType;
 
-class AnnotationsBuilder
+final class AnnotationsBuilder
 {
     /**
      * Reflection classes.
@@ -59,13 +62,7 @@ class AnnotationsBuilder
         $this->logger = $logger;
         $this->namespace = $namespace;
         /** @psalm-suppress InvalidArgument */
-        $this->TL = new TL(new class($logger) {
-            public Logger $logger;
-            public function __construct(Logger $logger)
-            {
-                $this->logger = $logger;
-            }
-        });
+        $this->TL = new TL();
         $tlSchema = new TLSchema;
         $tlSchema->mergeArray($settings);
         $this->TL->init($tlSchema);
@@ -74,7 +71,7 @@ class AnnotationsBuilder
     }
     public function mkAnnotations(): void
     {
-        \danog\MadelineProto\Logger::log('Generating annotations...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating annotations...', Logger::NOTICE);
         $this->setProperties();
         $this->createInternalClasses();
     }
@@ -82,14 +79,12 @@ class AnnotationsBuilder
      * Open file of class APIFactory
      * Insert properties
      * save the file with new content.
-     *
-     * @return void
      */
-    private function setProperties()
+    private function setProperties(): void
     {
-        \danog\MadelineProto\Logger::log('Generating properties...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating properties...', Logger::NOTICE);
         $fixture = DocBlockFactory::createInstance();
-        $class = new \ReflectionClass($this->reflectionClasses['APIFactory']);
+        $class = new ReflectionClass($this->reflectionClasses['APIFactory']);
         $content = \file_get_contents($filename = $class->getFileName());
         foreach ($class->getProperties() as $property) {
             if ($raw_docblock = $property->getDocComment()) {
@@ -106,22 +101,20 @@ class AnnotationsBuilder
     }
     /**
      * Create internalDoc.
-     *
-     * @return void
      */
     private function createInternalClasses(): void
     {
-        \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Creating internal classes...', Logger::NOTICE);
         $handle = \fopen($this->output, 'w');
         \fwrite($handle, "<?php namespace {$this->namespace}; class InternalDoc extends APIFactory {}");
-        $class = new \ReflectionClass($this->reflectionClasses['API']);
-        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass($this->reflectionClasses['API']);
+        $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
         $ignoreMethods = ['fetchserializableobject'];
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
-        $class = new \ReflectionClass(TLCallback::class);
-        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass(TLCallback::class);
+        $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
@@ -132,7 +125,7 @@ class AnnotationsBuilder
             if (!\strpos($data['method'], '.')) {
                 continue;
             }
-            list($namespace, $method) = \explode('.', $data['method']);
+            [$namespace, $method] = \explode('.', $data['method']);
             if (!\in_array($namespace, $this->TL->getMethodNamespaces())) {
                 continue;
             }
@@ -173,21 +166,21 @@ class AnnotationsBuilder
             }
             $internalDoc[$namespace][$method]['return'] = $type;
         }
-        $class = new \ReflectionClass($this->reflectionClasses['MTProto']);
-        $methods = $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC);
-        $class = new \ReflectionClass(Tools::class);
-        $methods = \array_merge($methods, $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC));
+        $class = new ReflectionClass($this->reflectionClasses['MTProto']);
+        $methods = $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC);
+        $class = new ReflectionClass(Tools::class);
+        $methods = \array_merge($methods, $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
-            if ($method == 'methodCallAsyncRead') {
+            if ($name == 'methodCallAsyncRead') {
                 unset($methods[\array_search('methodCall', $methods)]);
             } elseif (\strpos($name, '__') === 0) {
                 unset($methods[$key]);
             } elseif (\stripos($name, 'async') !== false) {
                 if (\strpos($name, '_async') !== false) {
-                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
+                    unset($methods[\array_search(\str_ireplace('_async', '', $name), $methods)]);
                 } else {
-                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
+                    unset($methods[\array_search(\str_ireplace('async', '', $name), $methods)]);
                 }
             }
         }
@@ -204,7 +197,7 @@ class AnnotationsBuilder
             if (isset($ignoreMethods[$name])) {
                 continue;
             }
-            if (\strpos($method->getDocComment() ?? '', '@internal') !== false) {
+            if (\strpos($method->getDocComment() ?: '', '@internal') !== false) {
                 continue;
             }
             $static = $method->isStatic();
@@ -237,27 +230,9 @@ class AnnotationsBuilder
             $hasVariadic = false;
             foreach ($method->getParameters() as $param) {
                 if ($type = $param->getType()) {
-                    if ($type instanceof ReflectionNamedType) {
-                        if ($type->allowsNull()) {
-                            $doc .= '?';
-                        }
-                        if (!$type->isBuiltin()) {
-                            $doc .= '\\';
-                        }
-                        $doc .= $type->getName();
-                        $doc .= ' ';
-                    } elseif ($type instanceof ReflectionUnionType) {
-                        foreach ($type->getTypes() as $t) {
-                            if (!$t->isBuiltin()) {
-                                $doc .= '\\';
-                            }
-                            $doc .= $t->getName();
-                            $doc .= '|';
-                        }
-                        $doc[\strlen($doc)-1] = ' ';
-                    }
+                    $doc .= $this->typeToStr($type).' ';
                 } else {
-                    Logger::log($name.'.'.$param->getName()." has no type!", Logger::WARNING);
+                    Logger::log($name.'.'.$param->getName().' has no type!', Logger::WARNING);
                 }
                 if ($param->isVariadic()) {
                     $doc .= '...';
@@ -284,26 +259,13 @@ class AnnotationsBuilder
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;
-            if ($type instanceof ReflectionNamedType && \in_array($type->getName(), [\Generator::class, Promise::class])) {
-                $hasReturnValue = false;
-            }
-            if (!$hasVariadic && !$static && !$hasReturnValue) {
-                $paramList .= '$extra, ';
-                $doc .= 'array $extra = []';
-            }
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
-            $doc .= ")";
+            $doc .= ')';
             $async = true;
             if ($hasReturnValue && $static) {
                 $doc .= ': ';
-                if ($type->allowsNull()) {
-                    $doc .= '?';
-                }
-                if (!$type->isBuiltin()) {
-                    $doc .= '\\';
-                }
-                $doc .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
+                $doc .= $this->typeToStr($type);
                 $async = false;
             }
             if ($method->getDeclaringClass()->getName() == Tools::class) {
@@ -312,15 +274,14 @@ class AnnotationsBuilder
             if ($method->getDeclaringClass()->getName() == StrTools::class) {
                 $async = false;
             }
-            $finalParamList = $hasVariadic ? "Tools::arr({$paramList})" : "[{$paramList}]";
             $ret = $type && $type instanceof ReflectionNamedType && \in_array($type->getName(), ['self', 'void']) ? '' : 'return';
             $doc .= "\n{\n";
             if ($async) {
-                $doc .= "    {$ret} \$this->__call(__FUNCTION__, {$finalParamList});\n";
+                $doc .= "    {$ret} \$this->wrapper->getAPI()->{__FUNCTION__}({$paramList});\n";
             } elseif (!$static) {
-                $doc .= "    {$ret} \$this->API->{$name}({$paramList});\n";
+                $doc .= "    {$ret} \$this->wrapper->getAPI()->{$name}({$paramList});\n";
             } else {
-                $doc .= "    {$ret} \\".$method->getDeclaringClass()->getName()."::".$name."({$paramList});\n";
+                $doc .= "    {$ret} \\".$method->getDeclaringClass()->getName().'::'.$name."({$paramList});\n";
             }
             if (!$ret && $type->getName() === 'self') {
                 $doc .= "    return \$this;\n";
@@ -332,44 +293,34 @@ class AnnotationsBuilder
             if (!$type) {
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
-            $promise = '\\'.Promise::class;
-            $phpdoc = $method->getDocComment() ?? '';
-            $phpdoc = \str_replace("@return \\Generator", "@return $promise", $phpdoc);
-            $phpdoc = \str_replace("@return \\Promise", "@return $promise", $phpdoc);
-            $phpdoc = \str_replace("@return Promise", "@return $promise", $phpdoc);
-            if ($hasReturnValue && $async && \preg_match("/@return (.*)/", $phpdoc, $matches)) {
+            $promise = '\\';
+            $phpdoc = $method->getDocComment() ?: '';
+            if (!\str_contains($phpdoc, '@return')) {
+                if (!\trim($phpdoc)) {
+                    $phpdoc = '/** @return '.$type.' */';
+                } else {
+                    $phpdoc = \str_replace('*/', ' * @return '.$type."\n     */", $phpdoc);
+                }
+            }
+            $phpdoc = \str_replace('@return \\Generator', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return \\Promise', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return Generator', "@return $promise", $phpdoc);
+            $phpdoc = \str_replace('@return Promise', "@return $promise", $phpdoc);
+            if ($hasReturnValue && $async && \preg_match('/@return (.*)/', $phpdoc, $matches)) {
                 $ret = $matches[1];
                 $new = $ret;
                 if ($type && !\str_contains($ret, '<')) {
-                    $new = '';
-                    if ($type instanceof ReflectionNamedType) {
-                        if ($type->allowsNull()) {
-                            $new .= '?';
-                        }
-                        if (!$type->isBuiltin()) {
-                            $new .= '\\';
-                        }
-                        $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type;
-                    } elseif ($type instanceof ReflectionUnionType) {
-                        foreach ($type->getTypes() as $t) {
-                            if (!$t->isBuiltin()) {
-                                $new .= '\\';
-                            }
-                            $new .= $t->getName() === 'self' ? $this->reflectionClasses['API'] : $t;
-                            $new .= '|';
-                        }
-                        $new = \substr($new, 0, -1);
-                    }
+                    $new = $this->typeToStr($type);
                 }
-                $phpdoc = \str_replace("@return ".$ret, "@return mixed", $phpdoc);
-                if (!\str_contains($phpdoc, '@psalm-return')) {
-                    $phpdoc = \str_replace("@return ", "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
+                $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
+                if (!\str_contains($phpdoc, '@return')) {
+                    $phpdoc = \str_replace('@return ', "@return $new|$promise<$new>\n     * @return ", $phpdoc);
                 }
             }
             $phpdoc = \preg_replace(
-                "/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/",
-                "@psalm-return $promise<$1>",
-                $phpdoc
+                '/@return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/',
+                "@return $promise<$1>",
+                $phpdoc,
             );
             $internalDoc['InternalDoc'][$name]['method'] = $phpdoc;
             $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
@@ -425,5 +376,22 @@ class AnnotationsBuilder
             \fwrite($handle, "}\n");
         }
         \fclose($handle);
+    }
+
+    private function typeToStr(ReflectionType $type): string
+    {
+        $new = '';
+        if ($type instanceof ReflectionNamedType) {
+            if ($type->allowsNull() && $type->getName() !== 'mixed') {
+                $new .= '?';
+            }
+            if (!$type->isBuiltin()) {
+                $new .= '\\';
+            }
+            $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
+        } elseif ($type instanceof ReflectionUnionType) {
+            return \implode('|', \array_map($this->typeToStr(...), $type->getTypes()));
+        }
+        return $new;
     }
 }

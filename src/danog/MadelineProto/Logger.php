@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Logger module.
  *
@@ -11,19 +13,31 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
-use Amp\ByteStream\ResourceOutputStream;
-use Amp\Failure;
-use Amp\Loop;
+use Amp\ByteStream\WritableResourceStream;
+use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop;
+use Throwable;
+use Webmozart\Assert\Assert;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use const DIRECTORY_SEPARATOR;
+
+use const E_ALL;
+use const FILE_APPEND;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use const PATHINFO_DIRNAME;
+use const PHP_EOL;
+use const PHP_SAPI;
 
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
@@ -31,7 +45,7 @@ use function Amp\ByteStream\getStdout;
 /**
  * Logger class.
  */
-class Logger
+final class Logger
 {
     /**
      * @internal ANSI foreground color escapes
@@ -52,65 +66,57 @@ class Logger
     /**
      * Logging mode.
      *
-     * @var integer
      */
-    public $mode = 0;
+    private readonly int $mode;
     /**
      * Optional logger parameter.
      *
      * @var null|string|callable
      */
-    public $optional = null;
+    private readonly mixed $optional;
     /**
      * Logger prefix.
      *
-     * @var string
      */
-    public $prefix = '';
+    private readonly string $prefix;
     /**
      * Logging level.
      *
-     * @var integer
      */
-    public $level = self::NOTICE;
+    private readonly int $level;
     /**
      * Logging colors.
      *
-     * @var array
      */
-    public $colors = [];
+    private array $colors;
     /**
      * Newline.
      *
-     * @var string
      */
-    public $newline = "\n";
+    private readonly string $newline;
     /**
      * Logfile.
      *
-     * @var ResourceOutputStream
      */
-    public $stdout;
-    /**
-     * Default logger instance.
-     *
-     * @var self
-     */
-    public static $default;
-    /**
-     * Whether the AGPL notice was printed.
-     *
-     * @var boolean
-     */
-    public static $printed = false;
+    private readonly WritableStream $stdout;
     /**
      * Log rotation loop ID.
      */
-    private string $rotateId = '';
+    private ?string $rotateId = null;
     /**
      * PSR logger.
      */
-    private PsrLogger $psr;
+    private readonly PsrLogger $psr;
+    /**
+     * Default logger instance.
+     *
+     */
+    public static ?self $default = null;
+    /**
+     * Whether the AGPL notice was printed.
+     *
+     */
+    private static bool $printed = false;
     /**
      * Ultra verbose logging.
      *
@@ -148,13 +154,6 @@ class Logger
      */
     const FATAL_ERROR = 0;
 
-    /**
-     * Disable logger (DEPRECATED).
-     *
-     * @internal
-     * @deprecated
-     */
-    const NO_LOGGER = 0;
     /**
      * Default logger (syslog).
      *
@@ -226,8 +225,6 @@ class Logger
      * Construct global static logger from MadelineProto settings.
      *
      * @param SettingsLogger $settings Settings instance
-     *
-     * @return self
      */
     public static function constructorFromSettings(SettingsLogger $settings): self
     {
@@ -236,9 +233,6 @@ class Logger
 
     /**
      * Construct logger.
-     *
-     * @param SettingsLogger $settings
-     * @param string $prefix
      */
     public function __construct(SettingsLogger $settings, string $prefix = '')
     {
@@ -246,22 +240,24 @@ class Logger
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
 
         $this->mode = $settings->getType();
-        $this->optional = $settings->getExtra();
         $this->level = $settings->getLevel();
+
+        $optional = $settings->getExtra();
 
         $maxSize = $settings->getMaxSize();
 
         if ($this->mode === self::FILE_LOGGER) {
-            if (!$this->optional || !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
-                $this->optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
+            if (!$optional || !\file_exists(\pathinfo($optional, PATHINFO_DIRNAME))) {
+                $optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
             }
-            if (!\str_ends_with($this->optional, '.log')) {
-                $this->optional .= '.log';
+            if (!\str_ends_with($optional, '.log')) {
+                $optional .= '.log';
             }
-            if ($maxSize !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $maxSize) {
-                \file_put_contents($this->optional, '');
+            if ($maxSize !== -1 && \file_exists($optional) && \filesize($optional) > $maxSize) {
+                \file_put_contents($optional, '');
             }
         }
+        $this->optional = $optional;
         $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
         $this->colors[self::VERBOSE] = \implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
         $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
@@ -275,28 +271,28 @@ class Logger
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
+            $this->stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
-                $optional = &$this->optional;
-                $stdout = &$this->stdout;
-                $this->rotateId = Loop::repeat(
-                    10*1000,
-                    static function () use ($maxSize, $optional, &$stdout) {
+                $optional = $this->optional;
+                $stdout = $this->stdout;
+                $this->rotateId = EventLoop::repeat(
+                    10,
+                    static function () use ($maxSize, $optional, $stdout): void {
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
                             \ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize");
                         }
-                    }
+                    },
                 );
-                Loop::unreference($this->rotateId);
+                EventLoop::unreference($this->rotateId);
             }
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
             $result = @\ini_get('error_log');
             if ($result === 'syslog') {
                 $this->stdout = getStderr();
             } elseif ($result) {
-                $this->stdout = new ResourceOutputStream(\fopen($result, 'a+'));
+                $this->stdout = new WritableResourceStream(\fopen($result, 'a+'));
             } else {
                 $this->stdout = getStderr();
             }
@@ -306,13 +302,33 @@ class Logger
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 \error_reporting(E_ALL);
-                \ini_set('log_errors', "1");
+                \ini_set('log_errors', '1');
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (Exception) {
                 $this->logger('Could not enable PHP logging');
             }
+        }
+
+        if (!self::$printed) {
+            self::$printed = true;
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            $this->logger('MadelineProto');
+            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
+            $this->logger('Licensed under AGPLv3');
+            $this->logger('https://github.com/danog/MadelineProto');
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        }
+    }
+    /**
+     * Truncate logfile.
+     */
+    public function truncate(): void
+    {
+        if ($this->mode === self::FILE_LOGGER) {
+            Assert::true($this->stdout instanceof WritableResourceStream);
+            \ftruncate($this->stdout->getResource(), 0);
         }
     }
     /**
@@ -321,7 +337,7 @@ class Logger
     public function __destruct()
     {
         if ($this->rotateId) {
-            Loop::cancel($this->rotateId);
+            EventLoop::cancel($this->rotateId);
         }
     }
     /**
@@ -329,10 +345,8 @@ class Logger
      *
      * @param mixed $param Message
      * @param int   $level Logging level
-     *
-     * @return void
      */
-    public static function log($param, int $level = self::NOTICE)
+    public static function log(mixed $param, int $level = self::NOTICE): void
     {
         if (!\is_null(self::$default)) {
             self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
@@ -346,33 +360,23 @@ class Logger
      * @param mixed  $param Message to log
      * @param int    $level Logging level
      * @param string $file  File that originated the message
-     *
-     * @return void
      */
-    public function logger($param, int $level = self::NOTICE, string $file = ''): void
+    public function logger(mixed $param, int $level = self::NOTICE, string $file = ''): void
     {
         if ($level > $this->level) {
             return;
         }
         if (Magic::$suspendPeriodicLogging) {
-            Magic::$suspendPeriodicLogging->promise()->onResolve(fn () => $this->logger($param, $level, $file));
+            Magic::$suspendPeriodicLogging->getFuture()->map(fn () => $this->logger($param, $level, $file));
             return;
         }
-        if (!self::$printed) {
-            self::$printed = true;
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
-            $this->logger('MadelineProto');
-            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
-            $this->logger('Licensed under AGPLv3');
-            $this->logger('https://github.com/danog/MadelineProto');
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
-        }
+
         if ($this->mode === self::CALLABLE_LOGGER) {
             \call_user_func_array($this->optional, [$param, $level]);
             return;
         }
         $prefix = $this->prefix;
-        if ($param instanceof \Throwable) {
+        if ($param instanceof Throwable) {
             $param = (string) $param;
         } elseif (!\is_string($param)) {
             $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -382,13 +386,17 @@ class Logger
         }
         $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         if ($this->mode === self::DEFAULT_LOGGER) {
-            if ($this->stdout->write($param.$this->newline) instanceof Failure) {
+            try {
+                $this->stdout->write($param.$this->newline);
+            } catch (\Throwable) {
                 \error_log($param);
             }
             return;
         }
         $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
-        if ($this->stdout->write($param) instanceof Failure) {
+        try {
+            $this->stdout->write($param);
+        } catch (\Throwable) {
             switch ($this->mode) {
                 case self::ECHO_LOGGER:
                     echo $param;
@@ -402,8 +410,6 @@ class Logger
 
     /**
      * Get PSR logger.
-     *
-     * @return LoggerInterface
      */
     public function getPsrLogger(): LoggerInterface
     {

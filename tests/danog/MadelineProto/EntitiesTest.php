@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\StrTools;
 
 class EntitiesTest extends MadelineTestCase
 {
-    public function testMb()
+    public function testMb(): void
     {
         $this->assertEquals(1, StrTools::mbStrlen('t'));
         $this->assertEquals(1, StrTools::mbStrlen('я'));
@@ -26,7 +28,7 @@ class EntitiesTest extends MadelineTestCase
     /**
      * @dataProvider provideEntities
      */
-    public function testEntities(string $mode, string $html, string $bare, array $entities)
+    public function testEntities(string $mode, string $html, string $bare, array $entities): void
     {
         $result = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
         $result = self::$MadelineProto->MTProtoToBotAPI($result);
@@ -46,9 +48,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -58,9 +60,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -70,9 +72,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 0,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -82,9 +84,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -94,9 +96,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -106,9 +108,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 4,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -118,9 +120,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 5,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -130,9 +132,9 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 4,
                         'length' => 5,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -142,26 +144,26 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 5,
                         'length' => 25,
-                        'type' => 'bold'
+                        'type' => 'bold',
                     ],
                     [
                         'offset' => 10,
                         'length' => 15,
-                        'type' => 'italic'
-                    ]
-                ]
+                        'type' => 'italic',
+                    ],
+                ],
             ],
             [
                 'html',
-                '<b>&\'"</b>',
-                '&\'"',
+                '<b>\'"</b>',
+                '\'"',
                 [
                     [
                         'offset' => 0,
-                        'length' => 3,
-                        'type' => 'bold'
-                    ]
-                ]
+                        'length' => 2,
+                        'type' => 'bold',
+                    ],
+                ],
             ],
             [
                 'html',
@@ -172,15 +174,27 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention
+                        'user' => $mention,
                     ],
                     [
                         'offset' => 9,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention
-                    ]
-                ]
+                        'user' => $mention,
+                    ],
+                ],
+            ],
+            [
+                'markdown',
+                '_a b c &lt;b&gt; &amp; &quot; &#039;_',
+                'a b c <b> & " \'',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 15,
+                        'type' => 'italic',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -190,40 +204,40 @@ class EntitiesTest extends MadelineTestCase
                     [
                         'offset' => 5,
                         'length' => 6,
-                        'type' => 'italic'
+                        'type' => 'italic',
                     ],
                     [
                         'offset' => 12,
                         'length' => 4,
-                        'type' => 'bold'
+                        'type' => 'bold',
                     ],
                     [
                         'offset' => 17,
                         'length' => 10,
-                        'type' => 'underline'
+                        'type' => 'underline',
                     ],
                     [
                         'offset' => 28,
                         'length' => 13,
-                        'type' => 'strikethrough'
+                        'type' => 'strikethrough',
                     ],
                     [
                         'offset' => 42,
                         'length' => 3,
                         'type' => 'pre',
-                        'language' => 'test'
+                        'language' => 'test',
                     ],
                     [
                         'offset' => 46,
                         'length' => 4,
-                        'type' => 'code'
+                        'type' => 'code',
                     ],
                     [
                         'offset' => 51,
                         'length' => 7,
-                        'type' => 'spoiler'
+                        'type' => 'spoiler',
                     ],
-                ]
+                ],
             ],
         ];
     }

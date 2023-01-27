@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Common abstract class for all connection loops.
  *
@@ -10,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -25,6 +27,8 @@ use danog\MadelineProto\Loop\InternalLoop;
 /**
  * RPC call status check loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 trait Common
@@ -35,27 +39,28 @@ trait Common
     /**
      * Connection instance.
      */
-    protected Connection $connection;
+    private Connection $connection;
     /**
      * DC ID.
-     *
-     * @var string
      */
-    protected string $datacenter;
+    private string $datacenter;
     /**
      * DataCenterConnection instance.
      */
-    protected DataCenterConnection $datacenterConnection;
+    private DataCenterConnection $shared;
+    /**
+     * Network-related timeouts.
+     */
+    private float $timeout;
     /**
      * Constructor function.
-     *
-     * @param Connection $connection Connection
      */
     public function __construct(Connection $connection)
     {
         $this->init($connection->getExtra());
         $this->connection = $connection;
         $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
+        $this->shared = $connection->getShared();
+        $this->timeout = $this->shared->getSettings()->getTimeout();
     }
 }

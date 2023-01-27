@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings\Database;
 
 use danog\MadelineProto\Settings\DatabaseAbstract as SettingsDatabaseAbstract;
+
+use function time;
 
 /**
  * Base class for database backends.
@@ -23,7 +27,7 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
         foreach (self::toCamel([
             'database',
             'password',
-            'cache_ttl'
+            'cache_ttl',
         ]) as $object => $array) {
             if (isset($settings[$array])) {
                 $this->{$object}($settings[$array]);
@@ -33,8 +37,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get DB key.
-     *
-     * @return string
      */
     public function getKey(): string
     {
@@ -46,8 +48,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get for how long to keep records in memory after last read, for cached backends.
-     *
-     * @return int
      */
     public function getCacheTtl(): int
     {
@@ -64,10 +64,8 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Clean up is done once per minute.
      *
      * @param int|string $cacheTtl For how long to keep records in memory after last read, for cached backends.
-     *
-     * @return self
      */
-    public function setCacheTtl($cacheTtl): self
+    public function setCacheTtl(int|string $cacheTtl): self
     {
         $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : \strtotime($cacheTtl) - \time();
 
@@ -76,8 +74,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 
     /**
      * Get password.
-     *
-     * @return string
      */
     public function getPassword(): string
     {
@@ -88,8 +84,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Set password.
      *
      * @param string $password Password.
-     *
-     * @return self
      */
     public function setPassword(string $password): self
     {
@@ -101,28 +95,15 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get database name/ID.
      *
-     * @return string|int
      */
-    abstract public function getDatabase();
+    abstract public function getDatabase(): string|int;
     /**
      * Get database URI.
-     *
-     * @return string
      */
     abstract public function getUri(): string;
 
     /**
-     * Set database name/ID.
-     *
-     * @param int|string $database
-     * @return self
-     */
-    abstract public function setDatabase($database): self;
-    /**
      * Set database URI.
-     *
-     * @param string $uri
-     * @return self
      */
     abstract public function setUri(string $uri): self;
 }

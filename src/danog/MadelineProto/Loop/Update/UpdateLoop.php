@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Update loop.
  *
@@ -11,15 +13,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
@@ -32,7 +33,7 @@ use danog\MadelineProto\RPCErrorException;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UpdateLoop extends ResumableSignalLoop
+final class UpdateLoop extends Loop
 {
     use InternalLoop {
         __construct as private init;
@@ -42,7 +43,9 @@ class UpdateLoop extends ResumableSignalLoop
      */
     const GENERIC = 0;
 
-    private $toPts;
+    private const DEFAULT_TIMEOUT = 10.0;
+
+    private ?int $toPts = null;
     /**
      * Loop name.
      */
@@ -50,12 +53,10 @@ class UpdateLoop extends ResumableSignalLoop
     /**
      * Feed loop.
      */
-    private ?FeedLoop $feeder = null;
+    private FeedLoop $feeder;
+    private bool $first = true;
     /**
      * Constructor.
-     *
-     * @param MTProto $API
-     * @param integer $channelId
      */
     public function __construct(MTProto $API, int $channelId)
     {
@@ -64,157 +65,145 @@ class UpdateLoop extends ResumableSignalLoop
     }
     /**
      * Main loop.
-     *
-     * @return \Generator
      */
-    public function loop(): \Generator
+    public function loop(): ?float
     {
-        $API = $this->API;
-        $feeder = $this->feeder = $API->feeders[$this->channelId];
-        if (yield from $this->waitForAuthOrSignal()) {
-            return;
+        if (!$this->API->hasAllAuth()) {
+            return self::PAUSE;
         }
-        $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        $timeout = 10;
-        $first = true;
+        $this->feeder = $this->API->feeders[$this->channelId];
+        $state = $this->channelId === self::GENERIC ? $this->API->loadUpdateState() : $this->API->loadChannelState($this->channelId);
+
+        $result = [];
+        $toPts = $this->toPts;
+        $this->toPts = null;
         while (true) {
-            if (yield from $this->waitForAuthOrSignal(false)) {
-                return;
-            }
-            $result = [];
-            $toPts = $this->toPts;
-            $this->toPts = null;
-            while (true) {
-                if ($this->channelId) {
-                    $API->logger->logger('Resumed and fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    if ($state->pts() <= 1) {
-                        $limit = 10;
-                    } elseif ($API->authorization['user']['bot']) {
-                        $limit = 100000;
-                    } else {
-                        $limit = 100;
-                    }
-                    $request_pts = $state->pts();
-                    try {
-                        $difference = yield from $API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
-                    } catch (RPCErrorException $e) {
-                        if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'])) {
-                            $feeder->signal(true);
-                            unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
-                            $API->getChannelStates()->remove($this->channelId);
-                            $API->logger->logger("Channel private, exiting {$this}");
-                            return true;
-                        }
-                        throw $e;
-                    } catch (Exception $e) {
-                        if (\in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
-                            $feeder->signal(true);
-                            $API->getChannelStates()->remove($this->channelId);
-                            unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
-                            $API->logger->logger("Channel private, exiting {$this}");
-                            return true;
-                        }
-                        throw $e;
-                    } catch (PTSException $e) {
-                        $API->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
-                        return true;
-                    }
-                    if (isset($difference['timeout'])) {
-                        $timeout = $difference['timeout'];
-                    }
-                    $timeout = \min(10, $timeout);
-                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    switch ($difference['_']) {
-                        case 'updates.channelDifferenceEmpty':
-                            $state->update($difference);
-                            unset($difference);
-                            break 2;
-                        case 'updates.channelDifference':
-                            if ($request_pts >= $difference['pts'] && $request_pts > 1) {
-                                $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
-                                $difference['pts'] = $request_pts + 1;
-                            }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
-                            $state->update($difference);
-                            $feeder->saveMessages($difference['new_messages']);
-                            if (!$difference['final']) {
-                                if ($difference['pts'] >= $toPts) {
-                                    unset($difference);
-                                    break 2;
-                                }
-                                unset($difference);
-                                break;
-                            }
-                            unset($difference);
-                            break 2;
-                        case 'updates.channelDifferenceTooLong':
-                            if (isset($difference['dialog']['pts'])) {
-                                $difference['pts'] = $difference['dialog']['pts'];
-                            }
-                            $state->update($difference);
-                            $feeder->saveMessages($difference['messages']);
-                            unset($difference);
-                            break;
-                        default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
-                    }
+            if ($this->channelId) {
+                $this->logger->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::ULTRA_VERBOSE);
+                if ($state->pts() <= 1) {
+                    $limit = 10;
+                } elseif ($this->API->authorization['user']['bot']) {
+                    $limit = 100000;
                 } else {
-                    $API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    $difference = yield from $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
-                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    switch ($difference['_']) {
-                        case 'updates.differenceEmpty':
-                            $state->update($difference);
-                            unset($difference);
-                            break 2;
-                        case 'updates.difference':
-                            $state->qts($difference['state']['qts']);
-                            foreach ($difference['new_encrypted_messages'] as &$encrypted) {
-                                $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
-                            }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
-                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
-                            $state->update($difference['state']);
-                            $feeder->saveMessages($difference['new_messages']);
-                            unset($difference);
-                            break 2;
-                        case 'updates.differenceSlice':
-                            $state->qts($difference['intermediate_state']['qts']);
-                            foreach ($difference['new_encrypted_messages'] as &$encrypted) {
-                                $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
-                            }
-                            $result += (yield from $feeder->feed($difference['other_updates']));
-                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
-                            $state->update($difference['intermediate_state']);
-                            $feeder->saveMessages($difference['new_messages']);
-                            if ($difference['intermediate_state']['pts'] >= $toPts) {
+                    $limit = 100;
+                }
+                $request_pts = $state->pts();
+                try {
+                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->currentDatacenter, 'postpone' => $this->first]);
+                } catch (RPCErrorException $e) {
+                    if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'])) {
+                        $this->feeder->stop();
+                        unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                        $this->API->getChannelStates()->remove($this->channelId);
+                        $this->logger->logger("Channel private, exiting {$this}");
+                        return self::STOP;
+                    }
+                    throw $e;
+                } catch (Exception $e) {
+                    if (\in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
+                        $this->feeder->stop();
+                        $this->API->getChannelStates()->remove($this->channelId);
+                        unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                        $this->logger->logger("Channel private, exiting {$this}");
+                        return self::STOP;
+                    }
+                    throw $e;
+                } catch (PTSException $e) {
+                    $this->feeder->stop();
+                    $this->API->getChannelStates()->remove($this->channelId);
+                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                    $this->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
+                    return self::STOP;
+                }
+                $timeout = \min(self::DEFAULT_TIMEOUT, $difference['timeout'] ?? self::DEFAULT_TIMEOUT);
+                $this->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
+                switch ($difference['_']) {
+                    case 'updates.channelDifferenceEmpty':
+                        $state->update($difference);
+                        unset($difference);
+                        break 2;
+                    case 'updates.channelDifference':
+                        if ($request_pts >= $difference['pts'] && $request_pts > 1) {
+                            $this->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), Logger::VERBOSE);
+                            $difference['pts'] = $request_pts + 1;
+                        }
+                        $result += ($this->feeder->feed($difference['other_updates']));
+                        $state->update($difference);
+                        $this->feeder->saveMessages($difference['new_messages']);
+                        if (!$difference['final']) {
+                            if ($difference['pts'] >= $toPts) {
                                 unset($difference);
                                 break 2;
                             }
                             unset($difference);
                             break;
-                        case 'updates.differenceTooLong':
-                            $state->update($difference);
+                        }
+                        unset($difference);
+                        break 2;
+                    case 'updates.channelDifferenceTooLong':
+                        if (isset($difference['dialog']['pts'])) {
+                            $difference['pts'] = $difference['dialog']['pts'];
+                        }
+                        $state->update($difference);
+                        $this->feeder->saveMessages($difference['messages']);
+                        unset($difference);
+                        break;
+                    default:
+                        throw new Exception('Unrecognized update difference received: '.\var_export($difference, true));
+                }
+            } else {
+                $this->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
+                $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->authorized_dc]);
+                $this->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
+                $timeout = self::DEFAULT_TIMEOUT;
+                switch ($difference['_']) {
+                    case 'updates.differenceEmpty':
+                        $state->update($difference);
+                        unset($difference);
+                        break 2;
+                    case 'updates.difference':
+                        $state->qts($difference['state']['qts']);
+                        foreach ($difference['new_encrypted_messages'] as &$encrypted) {
+                            $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
+                        }
+                        $result += ($this->feeder->feed($difference['other_updates']));
+                        $result += ($this->feeder->feed($difference['new_encrypted_messages']));
+                        $state->update($difference['state']);
+                        $this->feeder->saveMessages($difference['new_messages']);
+                        unset($difference);
+                        break 2;
+                    case 'updates.differenceSlice':
+                        $state->qts($difference['intermediate_state']['qts']);
+                        foreach ($difference['new_encrypted_messages'] as &$encrypted) {
+                            $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
+                        }
+                        $result += ($this->feeder->feed($difference['other_updates']));
+                        $result += ($this->feeder->feed($difference['new_encrypted_messages']));
+                        $state->update($difference['intermediate_state']);
+                        $this->feeder->saveMessages($difference['new_messages']);
+                        if ($difference['intermediate_state']['pts'] >= $toPts) {
                             unset($difference);
-                            break;
-                        default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
-                    }
+                            break 2;
+                        }
+                        unset($difference);
+                        break;
+                    case 'updates.differenceTooLong':
+                        $state->update($difference);
+                        unset($difference);
+                        break;
+                    default:
+                        throw new Exception('Unrecognized update difference received: '.\var_export($difference, true));
                 }
             }
-            $API->logger->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
-            foreach ($result as $channelId => $_) {
-                $API->feeders[$channelId]->resumeDefer();
-            }
-            $API->logger->logger("Finished resuming feeders in {$this}, signaling updates", Logger::ULTRA_VERBOSE);
-            $API->signalUpdate();
-            $API->logger->logger("Finished signaling updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
-            $first = false;
-            if (yield $this->waitSignal($this->pause($timeout * 1000))) {
-                $API->logger->logger("Exiting {$this} due to signal");
-                return;
-            }
         }
+        $this->logger->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
+        foreach ($result as $channelId => $_) {
+            $this->API->feeders[$channelId]?->resume();
+        }
+        $this->logger->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
+        $this->first = false;
+
+        return $timeout;
     }
     public function setLimit(int $toPts): void
     {
@@ -222,8 +211,6 @@ class UpdateLoop extends ResumableSignalLoop
     }
     /**
      * Get loop name.
-     *
-     * @return string
      */
     public function __toString(): string
     {

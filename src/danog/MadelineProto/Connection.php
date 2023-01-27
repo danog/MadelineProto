@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Connection module.
  *
@@ -11,17 +13,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Deferred;
-use Amp\Failure;
+use Amp\DeferredFuture;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -30,147 +30,125 @@ use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
-use danog\MadelineProto\Stream\StreamInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * Connection class.
  *
  * Manages connection to Telegram datacenters
  *
- * @internal
+ * @psalm-suppress RedundantPropertyInitializationCheck
  *
+ * @internal
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Connection
+final class Connection
 {
     use Session;
-    use \danog\Serializable;
     /**
      * Writer loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\WriteLoop
      */
-    protected $writer;
+    protected ?WriteLoop $writer = null;
     /**
      * Reader loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\ReadLoop
      */
-    protected $reader;
+    protected ?ReadLoop $reader = null;
     /**
      * Checker loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\CheckLoop
      */
-    protected $checker;
+    protected ?CheckLoop $checker = null;
     /**
      * Waiter loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\HttpWaitLoop
      */
-    protected $waiter;
+    protected ?HttpWaitLoop $waiter = null;
     /**
      * Ping loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\PingLoop
      */
-    protected $pinger;
+    protected ?PingLoop $pinger = null;
     /**
      * Cleanup loop.
      *
-     * @var \danog\MadelineProto\Loop\Connection\CleanupLoop
      */
-    protected $cleanup;
+    protected ?CleanupLoop $cleanup = null;
     /**
      * The actual socket.
-     *
-     * @var StreamInterface
+     * @var (MTProtoBufferInterface&BufferedStreamInterface)|null
      */
-    public $stream;
+    public MTProtoBufferInterface|null $stream = null;
     /**
      * Connection context.
      *
-     * @var ConnectionContext
      */
-    private $ctx;
+    private ConnectionContext $ctx;
     /**
      * HTTP request count.
      *
-     * @var integer
      */
-    private $httpReqCount = 0;
+    private int $httpReqCount = 0;
     /**
      * HTTP response count.
      *
-     * @var integer
      */
-    private $httpResCount = 0;
+    private int $httpResCount = 0;
     /**
-     * Date of last chunk received.
-     *
-     * @var float
+     * Whether we're currently reading an MTProto packet.
      */
-    private float $lastChunk = 0;
+    private bool $reading = false;
     /**
      * Logger instance.
      *
-     * @var Logger
      */
-    protected $logger;
+    protected Logger $logger;
     /**
      * Main instance.
      *
-     * @var MTProto
      */
-    public $API;
+    public MTProto $API;
     /**
      * Shared connection instance.
      *
-     * @var DataCenterConnection
      */
-    protected $shared;
+    protected DataCenterConnection $shared;
     /**
      * DC ID.
      *
-     * @var string
      */
-    protected $datacenter;
+    protected int $datacenter;
     /**
      * Connection ID.
      *
-     * @var int
      */
-    private $id = 0;
+    private int $id = 0;
     /**
      * DC ID and connection ID concatenated.
-     *
-     * @var
      */
-    private $datacenterId = '';
+    private string $datacenterId = '';
     /**
      * Whether this socket has to be reconnected.
      *
-     * @var boolean
      */
-    private $needsReconnect = false;
+    private bool $needsReconnect = false;
     /**
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
-     *
-     * @return void
      */
-    public function needReconnect(bool $needsReconnect)
+    public function needReconnect(bool $needsReconnect): void
     {
         $this->needsReconnect = $needsReconnect;
     }
     /**
      * Whether this sockets needs to be reconnected.
-     *
-     * @return boolean
      */
     public function shouldReconnect(): bool
     {
@@ -178,10 +156,6 @@ class Connection
     }
     /**
      * Set writing boolean.
-     *
-     * @param boolean $writing
-     *
-     * @return void
      */
     public function writing(bool $writing): void
     {
@@ -189,46 +163,28 @@ class Connection
     }
     /**
      * Set reading boolean.
-     *
-     * @param boolean $reading
-     *
-     * @return void
      */
     public function reading(bool $reading): void
     {
+        $this->reading = $reading;
         $this->shared->reading($reading, $this->id);
     }
     /**
-     * Tell the class that we have read a chunk of data from the socket.
-     *
-     * @return void
+     * Whether we're currently reading an MTProto packet.
      */
-    public function haveRead()
+    public function isReading(): bool
     {
-        $this->lastChunk = \microtime(true);
-    }
-    /**
-     * Get the receive date of the latest chunk of data from the socket.
-     *
-     * @return float
-     */
-    public function getLastChunk(): float
-    {
-        return $this->lastChunk;
+        return $this->reading;
     }
     /**
      * Indicate a received HTTP response.
-     *
-     * @return void
      */
-    public function httpReceived()
+    public function httpReceived(): void
     {
         $this->httpResCount++;
     }
     /**
      * Count received HTTP responses.
-     *
-     * @return integer
      */
     public function countHttpReceived(): int
     {
@@ -236,17 +192,13 @@ class Connection
     }
     /**
      * Indicate a sent HTTP request.
-     *
-     * @return void
      */
-    public function httpSent()
+    public function httpSent(): void
     {
         $this->httpReqCount++;
     }
     /**
      * Count sent HTTP requests.
-     *
-     * @return integer
      */
     public function countHttpSent(): int
     {
@@ -254,8 +206,6 @@ class Connection
     }
     /**
      * Get connection ID.
-     *
-     * @return integer
      */
     public function getID(): int
     {
@@ -263,8 +213,6 @@ class Connection
     }
     /**
      * Get datacenter concatenated with connection ID.
-     *
-     * @return string
      */
     public function getDatacenterID(): string
     {
@@ -272,8 +220,6 @@ class Connection
     }
     /**
      * Get connection context.
-     *
-     * @return ConnectionContext
      */
     public function getCtx(): ConnectionContext
     {
@@ -281,8 +227,6 @@ class Connection
     }
     /**
      * Check if is an HTTP connection.
-     *
-     * @return boolean
      */
     public function isHttp(): bool
     {
@@ -290,8 +234,6 @@ class Connection
     }
     /**
      * Check if is a media connection.
-     *
-     * @return boolean
      */
     public function isMedia(): bool
     {
@@ -299,8 +241,6 @@ class Connection
     }
     /**
      * Check if is a CDN connection.
-     *
-     * @return boolean
      */
     public function isCDN(): bool
     {
@@ -310,80 +250,53 @@ class Connection
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
      * @param ConnectionContext $ctx Connection context
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<mixed, StreamInterface, mixed, void>
      */
-    public function connect(ConnectionContext $ctx): \Generator
+    public function connect(ConnectionContext $ctx): void
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->datacenterId = $this->datacenter . '.' . $this->id;
-        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
         $this->createSession();
-        $ctx->setReadCallback([$this, 'haveRead']);
-        $this->stream = (yield from $ctx->getStream());
-        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", \danog\MadelineProto\Logger::WARNING);
+        $this->stream = ($ctx->getStream());
+        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
         }
         $this->httpReqCount = 0;
         $this->httpResCount = 0;
-        if (!isset($this->writer)) {
-            $this->writer = new WriteLoop($this);
-        }
-        if (!isset($this->reader)) {
-            $this->reader = new ReadLoop($this);
-        }
-        if (!isset($this->checker)) {
-            $this->checker = new CheckLoop($this);
-        }
-        if (!isset($this->cleanup)) {
-            $this->cleanup = new CleanupLoop($this);
-        }
-        if (!isset($this->waiter)) {
-            $this->waiter = new HttpWaitLoop($this);
-        }
+        $this->writer ??= new WriteLoop($this);
+        $this->reader ??= new ReadLoop($this);
+        $this->checker ??= new CheckLoop($this);
+        $this->cleanup ??= new CleanupLoop($this);
+        $this->waiter ??= new HttpWaitLoop($this);
         if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN()) {
             $this->pinger = new PingLoop($this);
         }
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->isUnencrypted()) {
                 if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                    $message->reply(new Failure(new Exception('Restart because we were reconnected')));
+                    $message->reply(fn () => new Exception('Restart because we were reconnected'));
                 }
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-        $this->writer->start();
-        $this->reader->start();
-        if (!$this->checker->start()) {
-            $this->checker->resume();
-        }
-        $this->cleanup->start();
-        $this->waiter->start();
+        Assert::true($this->writer->start());
+        Assert::true($this->reader->start());
+        Assert::true($this->checker->start());
+        Assert::true($this->cleanup->start());
+        Assert::true($this->waiter->start());
         if ($this->pinger) {
-            $this->pinger->start();
+            Assert::true($this->pinger?->start());
         }
-
-        /*if (!isset($this->r)) {
-            $this->r = true;
-            Tools::callFork((function () {
-                yield Tools::sleep(3);
-                yield from $this->reconnect();
-            })());
-        }*/
     }
     /**
      * Apply method abstractions.
      *
      * @param string $method    Method name
      * @param array  $arguments Arguments
-     *
-     * @return \Generator Whether we need to resolve a queue promise
      */
-    private function methodAbstractions(string &$method, array &$arguments): \Generator
+    private function methodAbstractions(string &$method, array &$arguments): ?DeferredFuture
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
             [$invite, $content] = $r;
@@ -424,14 +337,14 @@ class Connection
                 if ($singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
                     || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
                 ) {
-                    $singleMedia['media'] = yield from $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
+                    $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
                 }
             }
             $this->logger->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
-                    $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
+                    $arguments['file'] = ($this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -443,12 +356,12 @@ class Connection
                     $arguments['message']['media']['size'] = $arguments['file']['size'];
                 }
             }
-            $arguments['queuePromise'] = new Deferred;
+            $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = yield from $this->API->getInfo($arguments['chat_id']);
+            $res = $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
-                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
+                throw new Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
             $arguments['chat_id'] = $res['chat_id'];
         } elseif ($method === 'photos.updateProfilePhoto') {
@@ -480,7 +393,7 @@ class Connection
             }
         }
         if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
-            $arguments['queuePromise'] = new Deferred;
+            $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         }
         return null;
@@ -490,25 +403,23 @@ class Connection
      *
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
-     *
-     * @return \Generator
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true): \Generator
+    public function sendMessage(OutgoingMessage $message, bool $flush = true): void
     {
         $message->trySend();
         $promise = $message->getSendPromise();
         if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
-            $body = yield from $message->getBody();
+            $body = $message->getBody();
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod()) {
                 $method = $message->getConstructor();
-                $queuePromise = yield from $this->methodAbstractions($method, $body);
-                $body = yield from $this->API->getTL()->serializeMethod($method, $body);
+                $queuePromise = $this->methodAbstractions($method, $body);
+                $body = $this->API->getTL()->serializeMethod($method, $body);
             } else {
                 $body['_'] = $message->getConstructor();
-                $body = yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
+                $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
             }
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(false);
@@ -518,30 +429,26 @@ class Connection
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
         if (isset($queuePromise)) {
-            $queuePromise->resolve();
+            $queuePromise->complete();
         }
         if ($flush && isset($this->writer)) {
-            $this->writer->resumeDeferOnce();
+            $this->writer->resume();
         }
-        return yield $promise;
+        $promise->await();
     }
     /**
      * Flush pending packets.
-     *
-     * @return void
      */
-    public function flush()
+    public function flush(): void
     {
         if (isset($this->writer)) {
-            $this->writer->resumeDeferOnce();
+            $this->writer->resume();
         }
     }
     /**
      * Resume HttpWaiter.
-     *
-     * @return void
      */
-    public function pingHttpWaiter()
+    public function pingHttpWaiter(): void
     {
         if (isset($this->waiter)) {
             $this->waiter->resume();
@@ -555,10 +462,8 @@ class Connection
      *
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
-     *
-     * @return void
      */
-    public function setExtra($extra, int $id)
+    public function setExtra(DataCenterConnection $extra, int $id): void
     {
         $this->shared = $extra;
         $this->id = $id;
@@ -567,8 +472,6 @@ class Connection
     }
     /**
      * Get main instance.
-     *
-     * @return MTProto
      */
     public function getExtra(): MTProto
     {
@@ -576,8 +479,6 @@ class Connection
     }
     /**
      * Get shared connection instance.
-     *
-     * @return DataCenterConnection
      */
     public function getShared(): DataCenterConnection
     {
@@ -587,18 +488,11 @@ class Connection
      * Disconnect from DC.
      *
      * @param bool $temporary Whether the disconnection is temporary, triggered by the reconnect method
-     *
-     * @return void
      */
-    public function disconnect(bool $temporary = false)
+    public function disconnect(bool $temporary = false): void
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
-        foreach (['reader', 'writer', 'checker', 'waiter', 'updater', 'pinger', 'cleanup'] as $loop) {
-            if (isset($this->{$loop}) && $this->{$loop}) {
-                $this->{$loop}->signal($loop === 'reader' ? new NothingInTheSocketException() : true);
-            }
-        }
         if ($this->stream) {
             try {
                 $this->stream->disconnect();
@@ -606,6 +500,13 @@ class Connection
                 $this->API->logger->logger($e);
             }
         }
+
+        $this->reader?->stop();
+        $this->writer?->stop();
+        $this->checker?->stop();
+        $this->cleanup?->stop();
+        $this->pinger?->stop();
+
         if (!$temporary) {
             $this->shared->signalDisconnect($this->id);
         }
@@ -613,22 +514,18 @@ class Connection
     }
     /**
      * Reconnect to DC.
-     *
-     * @return \Generator
      */
-    public function reconnect(): \Generator
+    public function reconnect(): void
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        yield from $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
+        $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
     }
     /**
      * Get name.
-     *
-     * @return string
      */
     public function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

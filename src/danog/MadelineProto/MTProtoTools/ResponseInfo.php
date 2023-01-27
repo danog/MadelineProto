@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Response information module.
  *
@@ -10,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,12 +25,12 @@ use Amp\Http\Status;
 /**
  * Obtain response information for file to server.
  */
-class ResponseInfo
+final class ResponseInfo
 {
     private const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
     private const NO_CACHE = [
         'Cache-Control' => ['no-store, no-cache, must-revalidate, max-age=0', 'post-check=0, pre-check=0'],
-        'Pragma' => 'no-cache'
+        'Pragma' => 'no-cache',
     ];
 
     /**
@@ -99,7 +101,7 @@ class ResponseInfo
         $this->serve = $method !== 'HEAD';
         if ($seek_start > 0 || $seek_end < $size - 1) {
             $this->code = Status::PARTIAL_CONTENT;
-            $this->headers['Content-Range'] = "bytes ${seek_start}-${seek_end}/${size}";
+            $this->headers['Content-Range'] = "bytes $seek_start-$seek_end/$size";
             $this->headers['Content-Length'] = $seek_end - $seek_start + 1;
         } elseif ($size > 0) {
             $this->headers['Content-Length'] = $size;
@@ -123,8 +125,6 @@ class ResponseInfo
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
-     *
-     * @return self
      */
     public static function parseHeaders(string $method, array $headers, array $messageMedia): self
     {
@@ -132,18 +132,16 @@ class ResponseInfo
     }
     /**
      * Get explanation for HTTP code.
-     *
-     * @return string
      */
     public function getCodeExplanation(): string
     {
         $reason = Status::getReason($this->code);
         $body = "<html><body><h1>{$this->code} $reason</h1><br>";
         if ($this->code === Status::RANGE_NOT_SATISFIABLE) {
-            $body .= "<p>Could not use selected range.</p>";
+            $body .= '<p>Could not use selected range.</p>';
         }
         $body .= self::POWERED_BY;
-        $body .= "</body></html>";
+        $body .= '</body></html>';
         return $body;
     }
 

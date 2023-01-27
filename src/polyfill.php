@@ -1,34 +1,11 @@
 <?php
 
-if (PHP_OS_FAMILY === 'Windows') {
-    echo(PHP_EOL.'========='.PHP_EOL.'WARNING: MadelineProto does not support Windows, please use Linux or another UNIX system (WSLv2 on Windows, Mac OS, BSD, etc).'.PHP_EOL.'========='.PHP_EOL.PHP_EOL);
-}
+declare(strict_types=1);
 
-// Polyfill for some PHP 5 functions
-function callMe($allable, ...$args)
-{
-    return $allable(...$args);
-}
-function returnMe($res)
-{
-    return $res;
-}
-function __coalesce($ifNotNull, $then)
-{
-    return $ifNotNull ?: $then;
-}
-function __destructure($list, $value): array
-{
-    $res = [];
-    foreach ($list as $key) {
-        if (\is_string($key)) {
-            $res[] = $value[$key];
-        } else {
-            $res = \array_merge($res, __destructure($key, $value[$key]));
-        }
-    }
-    return $res;
-}
+use Amp\Http\Client\Cookie\InMemoryCookieJar;
+use Amp\Http\Client\Cookie\LocalCookieJar;
+use Amp\Socket\EncryptableSocket;
+use Amp\Socket\ResourceSocket;
 
 $ampFilePolyfill = 'namespace Amp\\File {';
 foreach ([
@@ -55,6 +32,9 @@ foreach ([
 ] as $old => $new) {
     $ampFilePolyfill .= "function $old(...\$args) { return $new(...\$args); }";
 }
-$ampFilePolyfill .= "}";
+$ampFilePolyfill .= '}';
 eval($ampFilePolyfill);
 unset($ampFilePolyfill);
+
+class_alias(LocalCookieJar::class, InMemoryCookieJar::class);
+class_alias(ResourceSocket::class, EncryptableSocket::class);

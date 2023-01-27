@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Callback module.
+ * LoggerGetter interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -11,29 +13,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto;
 
-/**
- * Manages logging in and out.
- */
-trait Callback
+interface LoggerGetter
 {
-    /**
-     * Set update handling callback.
-     *
-     * @param callable $callback Callback
-     *
-     * @return void
-     */
-    public function setCallback($callback): void
-    {
-        $this->updateHandler = $callback;
-        $this->startUpdateSystem();
-    }
+    public function getLogger(): Logger;
 }

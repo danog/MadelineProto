@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Session paths module.
  *
@@ -11,33 +13,42 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\Ipc\IpcState;
 
+use const LOCK_EX;
+use const LOCK_SH;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+use const PHP_VERSION;
+
+use function Amp\File\createDirectory;
+use function Amp\File\deleteFile;
 use function Amp\File\exists;
+use function Amp\File\getStatus;
+use function Amp\File\isDirectory;
+use function Amp\File\isFile;
+use function Amp\File\move;
 use function Amp\File\openFile;
-use function Amp\File\put;
-use function Amp\File\rename as renameAsync;
-use function Amp\File\stat;
+use function Amp\File\touch;
+use function Amp\File\write;
+use function serialize;
 
 /**
  * Session path information.
  */
-class SessionPaths
+final class SessionPaths
 {
     /**
      * Legacy session path.
      */
-    private string $legacySessionPath;
+    private string $sessionDirectoryPath;
     /**
      * Session path.
      */
@@ -75,25 +86,37 @@ class SessionPaths
     public function __construct(string $session)
     {
         $session = Tools::absolute($session);
-        $this->legacySessionPath = $session;
-        $this->sessionPath = "$session.safe.php";
-        $this->lightStatePath = "$session.lightState.php";
-        $this->lockPath = "$session.lock";
-        $this->ipcPath = "$session.ipc";
-        $this->ipcCallbackPath = "$session.callback.ipc";
-        $this->ipcStatePath = "$session.ipcState.php";
+        $this->sessionDirectoryPath = $session;
+        $this->sessionPath = $session.DIRECTORY_SEPARATOR."safe.php";
+        $this->lightStatePath = $session.DIRECTORY_SEPARATOR."lightState.php";
+        $this->lockPath = $session.DIRECTORY_SEPARATOR."lock";
+        $this->ipcPath = $session.DIRECTORY_SEPARATOR."ipc";
+        $this->ipcCallbackPath = $session.DIRECTORY_SEPARATOR."callback.ipc";
+        $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
+        if (!exists($session)) {
+            createDirectory($session);
+            return;
+        }
+        if (!isDirectory($session) && isFile("$session.safe.php")) {
+            deleteFile($session);
+            createDirectory($session);
+            foreach (['safe.php', 'lightState.php', 'lock', 'ipc', 'callback.ipc', 'ipcState.php'] as $part) {
+                if (exists("$session.$part")) {
+                    move("$session.$part", $session.DIRECTORY_SEPARATOR."$part");
+                }
+                if (exists("$session.$part.lock")) {
+                    move("$session.$part.lock", $session.DIRECTORY_SEPARATOR."$part.lock");
+                }
+            }
+        }
     }
     /**
      * Serialize object to file.
-     *
-     * @param object $object
-     * @param string $path
-     * @return \Generator
      */
-    public function serialize(object $object, string $path): \Generator
+    public function serialize(object $object, string $path): void
     {
         Logger::log("Waiting for exclusive lock of $path.lock...");
-        $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_EX, 0.1);
+        $unlock = Tools::flock("$path.lock", LOCK_EX, 0.1);
 
         try {
             Logger::log("Got exclusive lock of $path.lock...");
@@ -104,12 +127,12 @@ class SessionPaths
                 .\chr(PHP_MINOR_VERSION)
                 .\serialize($object);
 
-            yield put(
+            write(
                 "$path.temp.php",
-                $object
+                $object,
             );
 
-            yield renameAsync("$path.temp.php", $path);
+            move("$path.temp.php", $path);
         } finally {
             $unlock();
         }
@@ -119,34 +142,34 @@ class SessionPaths
      * Deserialize new object.
      *
      * @param string $path Object path, defaults to session path
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, object>
      */
-    public function unserialize(string $path = ''): \Generator
+    public function unserialize(string $path = ''): ?object
     {
         $path = $path ?: $this->sessionPath;
 
-        if (!yield exists($path)) {
+        if (!exists($path)) {
             return null;
         }
         $headerLen = \strlen(Serialization::PHP_HEADER);
 
         Logger::log("Waiting for shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
-        $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_SH, 0.1);
+        $unlock = Tools::flock("$path.lock", LOCK_SH, 0.1);
 
         try {
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
-            $file = yield openFile($path, 'rb');
-            $size = yield stat($path);
+            $file = openFile($path, 'rb');
+            try {
+                touch($path); // Invalidate size cache
+            } catch (\Throwable) {
+            }
+            $size = getStatus($path);
             $size = $size['size'] ?? $headerLen;
 
-            yield $file->seek($headerLen++);
-            $v = \ord(yield $file->read(1));
+            $file->seek($headerLen++);
+            $v = \ord($file->read(null, 1));
             if ($v === Serialization::VERSION) {
-                $php = yield $file->read(2);
+                $php = $file->read(null, 2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
                 if (\version_compare("$major.$minor", PHP_VERSION) > 0) {
@@ -154,8 +177,8 @@ class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
-            yield $file->close();
+            $unserialized = \unserialize($file->read(null, $size - $headerLen) ?? '');
+            $file->close();
         } finally {
             $unlock();
         }
@@ -164,28 +187,22 @@ class SessionPaths
 
     /**
      * Get session path.
-     *
-     * @return string
      */
     public function __toString(): string
     {
-        return $this->legacySessionPath;
+        return $this->sessionDirectoryPath;
     }
 
     /**
      * Get legacy session path.
-     *
-     * @return string
      */
-    public function getLegacySessionPath(): string
+    public function getSessionDirectoryPath(): string
     {
-        return $this->legacySessionPath;
+        return $this->sessionDirectoryPath;
     }
 
     /**
      * Get session path.
-     *
-     * @return string
      */
     public function getSessionPath(): string
     {
@@ -194,8 +211,6 @@ class SessionPaths
 
     /**
      * Get lock path.
-     *
-     * @return string
      */
     public function getLockPath(): string
     {
@@ -204,8 +219,6 @@ class SessionPaths
 
     /**
      * Get IPC socket path.
-     *
-     * @return string
      */
     public function getIpcPath(): string
     {
@@ -214,8 +227,6 @@ class SessionPaths
 
     /**
      * Get IPC light state path.
-     *
-     * @return string
      */
     public function getIpcStatePath(): string
     {
@@ -224,30 +235,22 @@ class SessionPaths
 
     /**
      * Get IPC state.
-     *
-     * @psalm-suppress InvalidReturnType
-     * @return Promise<?IpcState>
      */
-    public function getIpcState(): Promise
+    public function getIpcState(): ?IpcState
     {
-        return Tools::call($this->unserialize($this->ipcStatePath));
+        return $this->unserialize($this->ipcStatePath);
     }
 
     /**
      * Store IPC state.
-     *
-     * @return \Generator
      */
-    public function storeIpcState(IpcState $state): \Generator
+    public function storeIpcState(IpcState $state): void
     {
-        return $this->serialize($state, $this->getIpcStatePath());
+        $this->serialize($state, $this->getIpcStatePath());
     }
-
 
     /**
      * Get light state path.
-     *
-     * @return string
      */
     public function getLightStatePath(): string
     {
@@ -256,39 +259,24 @@ class SessionPaths
 
     /**
      * Get light state.
-     *
-     * @psalm-suppress InvalidReturnType
-     * @return Promise<LightState>
      */
-    public function getLightState(): Promise
+    public function getLightState(): LightState
     {
-        if ($this->lightState) {
-            return new Success($this->lightState);
-        }
-        $promise = Tools::call($this->unserialize($this->lightStatePath));
-        $promise->onResolve(function (?\Throwable $e, ?LightState $res) {
-            if ($res) {
-                $this->lightState = $res;
-            }
-        });
-        return $promise;
+        /** @var LightState */
+        return $this->lightState ??= $this->unserialize($this->lightStatePath);
     }
 
     /**
      * Store light state.
-     *
-     * @return \Generator
      */
-    public function storeLightState(MTProto $state): \Generator
+    public function storeLightState(MTProto $state): void
     {
         $this->lightState = new LightState($state);
-        return $this->serialize($this->lightState, $this->getLightStatePath());
+        $this->serialize($this->lightState, $this->getLightStatePath());
     }
 
     /**
      * Get IPC callback socket path.
-     *
-     * @return string
      */
     public function getIpcCallbackPath(): string
     {

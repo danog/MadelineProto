@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Cryptography settings.
  */
-class Auth extends SettingsAbstract
+final class Auth extends SettingsAbstract
 {
     /**
      * Validity period of temporary keys.
@@ -45,8 +47,6 @@ class Auth extends SettingsAbstract
 
     /**
      * Get validity period of the binding of temporary and permanent keys.
-     *
-     * @return int
      */
     public function getDefaultTempAuthKeyExpiresIn(): int
     {
@@ -57,8 +57,6 @@ class Auth extends SettingsAbstract
      * Set validity period of the binding of temporary and permanent keys.
      *
      * @param int $defaultTempAuthKeyExpiresIn Validity period of the binding of temporary and permanent keys.
-     *
-     * @return self
      */
     public function setDefaultTempAuthKeyExpiresIn(int $defaultTempAuthKeyExpiresIn): self
     {
@@ -69,8 +67,6 @@ class Auth extends SettingsAbstract
 
     /**
      * Get whether to use PFS.
-     *
-     * @return bool
      */
     public function getPfs(): bool
     {
@@ -81,8 +77,6 @@ class Auth extends SettingsAbstract
      * Set whether to use PFS.
      *
      * @param bool $pfs Whether to use PFS
-     *
-     * @return self
      */
     public function setPfs(bool $pfs): self
     {
@@ -93,8 +87,6 @@ class Auth extends SettingsAbstract
 
     /**
      * Get max tries for generating auth key.
-     *
-     * @return int
      */
     public function getMaxAuthTries(): int
     {
@@ -105,8 +97,6 @@ class Auth extends SettingsAbstract
      * Set max tries for generating auth key.
      *
      * @param int $maxAuthTries Max tries for generating auth key
-     *
-     * @return self
      */
     public function setMaxAuthTries(int $maxAuthTries): self
     {

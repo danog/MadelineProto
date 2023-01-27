@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * RPC call status check loop.
  *
@@ -11,43 +13,45 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Loop;
-use danog\Loop\ResumableSignalLoop;
+use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 
 /**
  * Message cleanup loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class CleanupLoop extends ResumableSignalLoop
+final class CleanupLoop extends Loop
 {
-    use Common;
+    use Common {
+        __construct as initCommon;
+    }
+
+    public function __construct(Connection $connection)
+    {
+        $this->initCommon($connection);
+        $this->logPauses = false;
+    }
+
     /**
      * Main loop.
-     *
-     * @return \Generator
      */
-    public function loop(): \Generator
+    protected function loop(): ?float
     {
-        $connection = $this->connection;
-        while (!yield $this->waitSignal($this->pause(1000))) {
-            if (isset($connection->msgIdHandler)) {
-                $connection->msgIdHandler->cleanup();
-            }
-        }
+        $this->connection->msgIdHandler?->cleanup();
+        return 1.0;
     }
     /**
      * Loop name.
-     *
-     * @return string
      */
     public function __toString(): string
     {

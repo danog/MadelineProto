@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Files module.
  *
@@ -11,24 +13,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Promise;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
+use Revolt\EventLoop;
 
 /**
  * Manages min peers.
  */
-class MinDatabase implements TLCallback
+final class MinDatabase implements TLCallback
 {
     use DbPropertiesTrait;
 
@@ -38,33 +41,29 @@ class MinDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var DbArray
      */
-    private $db;
+    private DbArray $db;
     /**
      * Temporary cache during deserialization.
      *
-     * @var array
      */
-    private $cache = [];
+    private array $cache = [];
     /**
      * Instance of MTProto.
      *
-     * @var \danog\MadelineProto\MTProto
      */
-    private $API;
+    private MTProto $API;
 
     /**
      * Whether we cleaned up old database information.
      *
-     * @var boolean
      */
-    private $clean = false;
+    private bool $clean = false;
 
     /**
      * List of properties stored in database (memory or external).
+     *
      * @see DbPropertiesFactory
-     * @var array
      */
     protected static array $dbProperties = [
         'db' => 'array',
@@ -78,54 +77,56 @@ class MinDatabase implements TLCallback
     {
         return ['db', 'API', 'clean'];
     }
-    public function init(): \Generator
+    public function init(): void
     {
-        yield from $this->initDb($this->API);
+        $this->initDb($this->API);
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
-            yield $this->db->clear();
+            $this->db->clear();
         }
         if ($this->clean) {
             return;
         }
-        \Amp\Loop::defer(function () {
-            $iterator = $this->db->getIterator();
-            while (yield $iterator->advance()) {
-                [$id, $origin] = $iterator->getCurrent();
+        EventLoop::queue(function (): void {
+            foreach ($this->db as $id => $origin) {
                 if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                    $this->db->unset($id);
+                    unset($this->db[$id]);
                 }
             }
             $this->clean = true;
         });
     }
-    public function getMethodCallbacks(): array
+    public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    public function getMethodBeforeCallbacks(): array
+    public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
-    public function getConstructorCallbacks(): array
+    public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [[$this, 'addPeer']]), \array_fill_keys(self::ORIGINS, [[$this, 'addOrigin']]));
+        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), \array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
     }
-    public function getConstructorBeforeCallbacks(): array
+    public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return \array_fill_keys(self::ORIGINS, [[$this, 'addOriginContext']]);
+        return \array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
     }
-    public function getConstructorSerializeCallbacks(): array
+    public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return \array_fill_keys(self::SWITCH_CONSTRUCTORS, [$this, 'populateFrom']);
+        return \array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
     }
     public function getTypeMismatchCallbacks(): array
     {
         return [];
     }
+    public function areDeserializationCallbacksMutuallyExclusive(): bool
+    {
+        return true;
+    }
     public function reset(): void
     {
         if ($this->cache) {
-            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
             $this->cache = [];
         }
     }
@@ -156,7 +157,7 @@ class MinDatabase implements TLCallback
             default:
                 $peers[$this->API->getId($location)] = true;
         }
-        $this->API->logger->logger("Caching peer location info from location from {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Caching peer location info from location from {$location['_']}", Logger::ULTRA_VERBOSE);
         $key = \count($this->cache) - 1;
         foreach ($peers as $id => $true) {
             $this->cache[$key][$id] = $id;
@@ -165,14 +166,14 @@ class MinDatabase implements TLCallback
     }
     public function addOriginContext(string $type): void
     {
-        $this->API->logger->logger("Adding peer origin context for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Adding peer origin context for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cache[] = [];
     }
     public function addOrigin(array $data = []): void
     {
         $cache = \array_pop($this->cache);
         if ($cache === null) {
-            throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
+            throw new Exception('Trying to add origin with no origin context set');
         }
         $origin = [];
         switch ($data['_']) {
@@ -182,7 +183,7 @@ class MinDatabase implements TLCallback
                 $origin['msg_id'] = $data['id'];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+                throw new Exception("Unknown origin type provided: {$data['_']}");
         }
         foreach ($cache as $id) {
             if ($origin['peer'] === $id) {
@@ -190,19 +191,19 @@ class MinDatabase implements TLCallback
             }
             $this->db[$id] = $origin;
         }
-        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }
-    public function populateFrom(array $object): \Generator
+    public function populateFrom(array $object)
     {
         if (!($object['min'] ?? false)) {
             return $object;
         }
         $id = $this->API->getId($object);
-        $dbObject = yield $this->db[$id];
+        $dbObject = $this->db[$id];
         if ($dbObject) {
             $new = \array_merge($object, $dbObject);
             $new['_'] .= 'FromMessage';
-            $new['peer'] = yield from $this->API->getInputPeer($new['peer']);
+            $new['peer'] = $this->API->getInputPeer($new['peer']);
             if ($new['peer']['min']) {
                 $this->API->logger->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
                 return $object;
@@ -216,14 +217,11 @@ class MinDatabase implements TLCallback
     /**
      * Check if location info is available for peer.
      *
-     * @param float|int $id Peer ID
-     *
-     * @return Promise
-     * @psalm-return Promise<bool>
+     * @param int $id Peer ID
      */
-    public function hasPeer($id): Promise
+    public function hasPeer(int $id): bool
     {
-        return $this->db->isset($id);
+        return isset($this->db[$id]);
     }
     public function __debugInfo()
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Ads module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -34,18 +35,23 @@ trait Ads
      *
      * See [the API documentation](https://core.telegram.org/api/sponsored-messages) for more info on how to handle sponsored messages.
      *
-     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
-     * @return \Generator
+     * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages($peer): \Generator
+    public function getSponsoredMessages(int|string|array $peer): array
     {
-        $peer = (yield from $this->getInfo($peer))['bot_api_id'];
-        $cache = yield $this->sponsoredMessages[$peer];
+        $peer = ($this->getInfo($peer))['bot_api_id'];
+        $cache = $this->sponsoredMessages[$peer];
         if ($cache && $cache[0] > \time()) {
             return $cache[1];
         }
-        $result = (yield from $this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]))['messages'];
-        $this->sponsoredMessages->set($peer, [\time() + 5*60, $result]);
+        $result = $this->methodCallAsyncRead('channels.getSponsoredMessages', ['channel' => $peer]);
+        if (\array_key_exists('messages', $result)) {
+            $result = $result['messages'];
+        } else {
+            $result = null;
+        }
+
+        $this->sponsoredMessages[$peer] = [\time() + 5*60, $result];
         return $result;
     }
     /**
@@ -53,10 +59,8 @@ trait Ads
      *
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
-     *
-     * @return \Generator Bool
      */
-    public function viewSponsoredMessage($peer, $message): \Generator
+    public function viewSponsoredMessage(int|array $peer, string|array $message): bool
     {
         if (\is_array($message)) {
             $message = $message['random_id'];

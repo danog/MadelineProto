@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Events module.
  *
@@ -11,18 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
 
+use __PHP_Incomplete_Class;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
-
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\UpdateHandlerType;
 
 /**
  * Event handler.
@@ -36,25 +39,25 @@ trait Events
      *
      * @var class-string<EventHandler>
      */
-    public $event_handler;
+    public ?string $event_handler = null;
     /**
      * Event handler instance.
      *
-     * @var EventHandler|null
+     * Can't make it strictly typed or else the IPC server may fail without access to the instance.
+     *
+     * @psalm-var ?EventHandler
      */
-    private $event_handler_instance;
+    private $event_handler_instance = null;
     /**
      * Event handler method list.
      *
      * @var array<string, callable>
      */
-    private $eventHandlerMethods = [];
+    private array $eventHandlerMethods = [];
     /**
      * Initialize event handler.
      *
      * @param class-string<EventHandler> $eventHandler
-     *
-     * @return void
      */
     private function initEventHandler(string $eventHandler): void
     {
@@ -68,22 +71,19 @@ trait Events
     /**
      * Set event handler.
      *
-     * @param class-string<EventHandler> $eventHandler Event handler
+     * @internal
      *
-     * @return \Generator
+     * @param class-string<EventHandler> $eventHandler Event handler
      */
-    public function setEventHandler(string $eventHandler): \Generator
+    public function setEventHandler(string $eventHandler): void
     {
         if (!\is_subclass_of($eventHandler, EventHandler::class)) {
-            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
+            throw new Exception('Wrong event handler was defined');
         }
         $this->initEventHandler($eventHandler);
         $this->eventHandlerMethods = [];
-        $this->loop_callback = null;
         foreach (\get_class_methods($this->event_handler) as $method) {
-            if ($method === 'onLoop') {
-                $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
-            } elseif ($method === 'onAny') {
+            if ($method === 'onAny') {
                 foreach ($this->getTL()->getConstructors()->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
                         $this->eventHandlerMethods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
@@ -96,21 +96,20 @@ trait Events
                 }
             }
         }
-        yield from $this->setReportPeers($this->event_handler_instance->getReportPeers());
-        Tools::callFork($this->event_handler_instance->startInternal());
-        $this->updateHandler = [$this, 'eventUpdateHandler'];
-        if ($this->inited()) {
-            $this->startUpdateSystem();
-        }
+        $this->setReportPeers(Tools::call($this->event_handler_instance->getReportPeers())->await());
+        Tools::call($this->event_handler_instance->startInternal())->await();
+
+        $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
+        \array_map($this->handleUpdate(...), $this->updates);
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->startUpdateSystem();
     }
     /**
      * Unset event handler.
      *
-     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
-     *
-     * @return void
      */
-    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    public function unsetEventHandler(): void
     {
         $this->event_handler = null;
         $this->event_handler_instance = null;
@@ -119,35 +118,16 @@ trait Events
     }
     /**
      * Get event handler.
-     *
-     * @return EventHandler
      */
-    public function getEventHandler(): EventHandler
+    public function getEventHandler(): EventHandler|__PHP_Incomplete_Class|null
     {
         return $this->event_handler_instance;
     }
     /**
      * Check if an event handler instance is present.
-     *
-     * @return boolean
      */
     public function hasEventHandler(): bool
     {
         return isset($this->event_handler_instance);
-    }
-    /**
-     * Event update handler.
-     *
-     * @param array $update Update
-     *
-     * @return void
-     *
-     * @internal Internal event handler
-     */
-    public function eventUpdateHandler(array $update)
-    {
-        if (isset($this->eventHandlerMethods[$update['_']])) {
-            return $this->eventHandlerMethods[$update['_']]($update);
-        }
     }
 }

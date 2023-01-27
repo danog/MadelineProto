@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Ipc;
+
+use Throwable;
 
 /**
  * IPC state class.
@@ -21,11 +25,8 @@ final class IpcState
     private ?ExitFailure $exception;
     /**
      * Construct.
-     *
-     * @param integer    $startupId
-     * @param \Throwable $exception
      */
-    public function __construct(int $startupId, \Throwable $exception = null)
+    public function __construct(int $startupId, ?Throwable $exception = null)
     {
         $this->startupTime = \microtime(true);
         $this->startupId = $startupId;
@@ -34,8 +35,6 @@ final class IpcState
 
     /**
      * Get startup time.
-     *
-     * @return float
      */
     public function getStartupTime(): float
     {
@@ -44,8 +43,6 @@ final class IpcState
 
     /**
      * Get startup ID.
-     *
-     * @return int
      */
     public function getStartupId(): int
     {
@@ -54,10 +51,8 @@ final class IpcState
 
     /**
      * Get exception.
-     *
-     * @return ?\Throwable
      */
-    public function getException(): ?\Throwable
+    public function getException(): ?Throwable
     {
         return $this->exception ? $this->exception->getException() : null;
     }

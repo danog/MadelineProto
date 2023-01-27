@@ -1,83 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db\Driver;
 
-use Amp\Postgres\ConnectionConfig;
-use Amp\Postgres\Pool;
+use Amp\Postgres\PostgresConfig;
+use Amp\Postgres\PostgresConnectionPool;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
-
-use function Amp\Postgres\Pool;
+use Throwable;
 
 /**
  * Postgres driver wrapper.
  *
  * @internal
  */
-class Postgres
+final class Postgres
 {
-    /** @var Pool[] */
+    /** @var array<PostgresConnectionPool> */
     private static array $connections = [];
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $db
-     *
-     * @param int $maxConnections
-     * @param int $idleTimeout
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator<Pool>
-     */
-    public static function getConnection(DatabasePostgres $settings): \Generator
+    public static function getConnection(DatabasePostgres $settings): PostgresConnectionPool
     {
         $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+            $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
                 ->withUser($settings->getUsername())
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
 
-            yield from static::createDb($config);
-            static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+            static::createDb($config);
+            static::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
         return static::$connections[$dbKey];
     }
 
-    /**
-     * @param ConnectionConfig $config
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     */
-    private static function createDb(ConnectionConfig $config): \Generator
+    private static function createDb(PostgresConfig $config): void
     {
         try {
             $db = $config->getDatabase();
             $user = $config->getUser();
-            $connection = pool($config->withDatabase(null));
+            $connection =  new PostgresConnectionPool($config->withDatabase(null));
 
-            $result = yield $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
+            $result = $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
 
-            while (yield $result->advance()) {
-                $row = $result->getCurrent();
-                if ($row===false) {
-                    yield $connection->query("
-                            CREATE DATABASE {$db}
-                            OWNER {$user}
-                            ENCODING utf8
-                        ");
-                }
+            // Replace with getRowCount once it gets fixed
+            if (!\iterator_to_array($result)) {
+                $connection->query("
+                    CREATE DATABASE {$db}
+                    OWNER {$user}
+                    ENCODING utf8
+                ");
             }
-            yield $connection->query("
+
+            $connection->query("
                     CREATE OR REPLACE FUNCTION update_ts()
                     RETURNS TRIGGER AS $$
                     BEGIN
@@ -91,7 +68,7 @@ class Postgres
                     $$ language 'plpgsql'
                 ");
             $connection->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
         }
     }

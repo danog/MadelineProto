@@ -1,18 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Load schema file names.
  *
- * @return array
  */
 function loadSchemas(): array
 {
     $res = [];
-    foreach (\glob(\getcwd().'/schemas/TL_telegram_*') as $file) {
-        \preg_match("/telegram_v(\d+)/", $file, $matches);
+    foreach (glob(getcwd().'/schemas/TL_telegram_*') as $file) {
+        preg_match("/telegram_v(\d+)/", $file, $matches);
         $res[$matches[1]] = $file;
     }
-    \ksort($res);
+    ksort($res);
     return $res;
 }
 
@@ -25,8 +24,8 @@ function loadSchemas(): array
  */
 function maxLayer(array $schemas): int
 {
-    $schemas = \array_keys($schemas);
-    return \end($schemas);
+    $schemas = array_keys($schemas);
+    return end($schemas);
 }
 
 /**

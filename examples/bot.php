@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 /**
  * Example bot.
  *
@@ -13,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -30,11 +29,11 @@ use danog\MadelineProto\Settings\Database\Redis;
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     /**
      * @psalm-suppress MissingFile
@@ -54,17 +53,22 @@ class MyEventHandler extends EventHandler
 
     /**
      * List of properties automatically stored in database (MySQL, Postgres, redis or memory).
+     *
      * @see https://docs.madelineproto.xyz/docs/DATABASE.html
-     * @var array
      */
     protected static array $dbProperties = [
-        'dataStoredOnDb' => 'array'
+        'dataStoredOnDb' => 'array',
+        'notifiedChats' => 'array',
     ];
 
     /**
-     * @var DbArray<array>
+     * @var DbArray<array-key, array>
      */
-    protected $dataStoredOnDb;
+    protected DbArray $dataStoredOnDb;
+    /**
+     * @var DbArray<int, bool>
+     */
+    protected DbArray $notifiedChats;
 
     /**
      * Get peer(s) where to report errors.
@@ -78,69 +82,79 @@ class MyEventHandler extends EventHandler
     /**
      * Initialization logic.
      */
-    public function onStart()
+    public function onStart(): void
     {
         $this->logger("The bot was started!");
-        \var_dump(yield $this->getFullInfo('madelineproto'));
+        $this->logger($this->getFullInfo('MadelineProto'));
     }
     /**
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update
-     *
-     * @return void
      */
-    public function onUpdateNewChannelMessage(array $update): \Generator
+    public function onUpdateNewChannelMessage(array $update): void
     {
-        return $this->onUpdateNewMessage($update);
+        $this->onUpdateNewMessage($update);
     }
 
     /**
      * Handle updates from users.
      *
      * @param array $update Update
-     *
-     * @return \Generator
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): void
     {
-        $this->logger($update);
-
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
 
-        /*
-        // Example code to json-dump all incoming updates (be wary of enabling it in chats)
-        $res = \json_encode($update, JSON_PRETTY_PRINT);
-        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
-        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame' && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-        }
-        */
+        $this->logger($update);
 
+        // Chat id
+        $id = $this->getId($update);
 
         // You can also use the built-in MadelineProto MySQL async driver!
+        if (!isset($this->notifiedChats[$id])) {
+            $this->notifiedChats[$id] = true;
 
-        // Can be anything serializable, an array, an int, an object
+            $this->messages->sendMessage(
+                peer: $update,
+                message: "This userbot is powered by [MadelineProto](https://t.me/MadelineProto)!",
+                reply_to_msg_id: $update['message']['id'] ?? null,
+                parse_mode: 'Markdown'
+            );
+
+            if (isset($update['message']['media'])
+                && !in_array($update['message']['media']['_'], [
+                    'messageMediaGame',
+                    'messageMediaWebPage',
+                    'messageMediaPoll'
+                ])
+            ) {
+                $this->messages->sendMedia(
+                    peer: $update,
+                    message: $update['message']['message'],
+                    media: $update
+                );
+            }
+        }
+
+        // Can be anything serializable: an array, an int, an object, ...
         $myData = [];
 
-        // Use the isset method to check whether some data exists in the database
-        if (yield $this->dataStoredOnDb->isset('yourKey')) {
-            // Always yield when fetching data
-            $myData = yield $this->dataStoredOnDb['yourKey'];
+        if (isset($this->dataStoredOnDb['yourKey'])) {
+            // Always when fetching data
+            $myData = $this->dataStoredOnDb['yourKey'];
         }
         $this->dataStoredOnDb['yourKey'] = $myData + ['moreStuff' => 'yay'];
 
         $this->dataStoredOnDb['otherKey'] = 0;
         unset($this->dataStoredOnDb['otherKey']);
 
-        $this->logger("Count: ".(yield $this->dataStoredOnDb->count()));
+        $this->logger("Count: ".count($this->dataStoredOnDb));
 
-        // You can even use an async iterator to iterate over the data
-        $iterator = $this->dataStoredOnDb->getIterator();
-        while (yield $iterator->advance()) {
-            [$key, $value] = $iterator->getCurrent();
+        // You can even iterate over the data
+        foreach ($this->dataStoredOnDb as $key => $value) {
             $this->logger($key);
             $this->logger($value);
         }

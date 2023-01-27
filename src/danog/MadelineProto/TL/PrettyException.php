@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * PrettyException module.
  *
@@ -11,13 +13,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
+
+use const PHP_EOL;
+use const PHP_SAPI;
 
 /**
  * Handle async stack traces.
@@ -27,29 +31,22 @@ trait PrettyException
     /**
      * TL trace.
      *
-     * @var string
      */
-    public $tlTrace = '';
+    public string $tlTrace = '';
     /**
      * Method name.
      *
-     * @var string
      */
-    private $method = '';
+    private string $method = '';
     /**
      * Whether the TL trace was updated.
      *
-     * @var boolean
      */
-    private $updated = false;
+    private bool $updated = false;
     /**
      * Update TL trace.
-     *
-     * @param array $trace
-     *
-     * @return void
      */
-    public function updateTLTrace(array $trace)
+    public function updateTLTrace(array $trace): void
     {
         if (!$this->updated) {
             $this->updated = true;
@@ -58,8 +55,6 @@ trait PrettyException
     }
     /**
      * Get TL trace.
-     *
-     * @return string
      */
     public function getTLTrace(): string
     {
@@ -69,8 +64,6 @@ trait PrettyException
      * Set TL trace.
      *
      * @param string $tlTrace TL trace
-     *
-     * @return void
      */
     public function setTLTrace(string $tlTrace): void
     {
@@ -81,10 +74,8 @@ trait PrettyException
      *
      * @param string $init  Method name
      * @param array  $trace Async trace
-     *
-     * @return void
      */
-    public function prettifyTL(string $init = '', array $trace = null)
+    public function prettifyTL(string $init = '', ?array $trace = null): void
     {
         $this->method = $init;
         $previous_trace = $this->tlTrace;
@@ -109,7 +100,7 @@ trait PrettyException
                 }
                 $this->tlTrace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
                 $this->tlTrace .= isset($frame['function']) ? $frame['function'].'(' : '';
-                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
+                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']) ?: '', 1, -1) : '';
                 $this->tlTrace .= ')';
                 $this->tlTrace .= $eol;
                 $tl = false;

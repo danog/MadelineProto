@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * API wrapper module.
  *
@@ -10,18 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use danog\MadelineProto\Logger;
+use Throwable;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
 use function Amp\Ipc\connect;
 
@@ -34,16 +38,17 @@ abstract class ClientAbstract
      * IPC server socket.
      */
     protected ChannelledSocket $server;
+    private int $id = 0;
     /**
      * Requests promise array.
      *
-     * @var Deferred[]
+     * @var array<DeferredFuture>
      */
     private array $requests = [];
     /**
      * Wrappers array.
      *
-     * @var Wrapper[]
+     * @var array<Wrapper>
      */
     private array $wrappers = [];
     /**
@@ -61,32 +66,28 @@ abstract class ClientAbstract
     /**
      * Logger.
      *
-     * @param string $param Parameter
+     * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
-     *
-     * @return void
      */
-    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
+    public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
-        if ($file === null) {
+        if ($file === '') {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
         isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
     /**
      * Main loop.
-     *
-     * @return \Generator
      */
-    protected function loopInternal(): \Generator
+    protected function loopInternal(): void
     {
         do {
             while (true) {
                 $payload = null;
                 try {
-                    $payload = yield $this->server->receive();
-                } catch (\Throwable $e) {
+                    $payload = $this->server->receive();
+                } catch (Throwable $e) {
                     Logger::log("Got exception while receiving in IPC client: $e");
                 }
                 if (!$payload) {
@@ -99,28 +100,28 @@ abstract class ClientAbstract
                     $promise = $this->requests[$id];
                     unset($this->requests[$id]);
                     if (isset($this->wrappers[$id])) {
-                        yield $this->wrappers[$id]->disconnect();
+                        $this->wrappers[$id]->disconnect();
                         unset($this->wrappers[$id]);
                     }
                     if ($payload instanceof ExitFailure) {
-                        $promise->fail($payload->getException());
+                        $promise->error($payload->getException());
                     } else {
-                        $promise->resolve($payload);
+                        $promise->complete($payload);
                     }
                     unset($promise);
                 }
             }
             if ($this->run) {
-                $this->logger("Reconnecting to IPC server!");
+                $this->logger('Reconnecting to IPC server!');
                 try {
-                    yield $this->server->disconnect();
-                } catch (\Throwable $e) {
+                    $this->server->disconnect();
+                } catch (Throwable $e) {
                 }
                 if ($this instanceof Client) {
                     try {
-                        yield Server::startMe($this->session);
-                        $this->server = yield connect($this->session->getIpcPath());
-                    } catch (\Throwable $e) {
+                        Server::startMe($this->session)->await();
+                        $this->server = connect($this->session->getIpcPath());
+                    } catch (Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
                     }
                 } else {
@@ -131,17 +132,13 @@ abstract class ClientAbstract
     }
     /**
      * Disconnect cleanly from main instance.
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, Promise, mixed, void>
      */
-    public function disconnect(): \Generator
+    public function disconnect(): void
     {
         $this->run = false;
-        yield $this->server->disconnect();
+        $this->server->disconnect();
         foreach ($this->wrappers as $w) {
-            yield from $w->disconnect();
+            $w->disconnect();
         }
     }
     /**
@@ -149,16 +146,14 @@ abstract class ClientAbstract
      *
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
-     *
-     * @return \Generator
      */
-    public function __call($function, $arguments): \Generator
+    public function __call(string|int $function, array|Wrapper $arguments)
     {
-        $this->requests []= $deferred = new Deferred;
+        $this->requests[$this->id++] = $deferred = new DeferredFuture;
         if ($arguments instanceof Wrapper) {
             $this->wrappers[\count($this->requests) - 1] = $arguments;
         }
-        yield $this->server->send([$function, $arguments]);
-        return yield $deferred->promise();
+        $this->server->send([$function, $arguments]);
+        return $deferred->getFuture()->await();
     }
 }

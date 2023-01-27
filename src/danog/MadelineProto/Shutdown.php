@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Shutdown module.
  *
@@ -11,78 +13,88 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use function Amp\ByteStream\getStdin;
+
 /**
  * Class that controls script shutdown.
  */
-class Shutdown
+final class Shutdown
 {
     /**
      * Callbacks to call on shutdown.
      *
      * @var array<callable>
      */
-    private static $callbacks = [];
+    private static array $callbacks = [];
     /**
      * Whether the main shutdown was registered.
      *
-     * @var boolean
      */
-    private static $registered = false;
+    private static bool $registered = false;
     /**
      * Incremental ID for new callback.
      *
-     * @var integer
      */
-    private static $id = 0;
+    private static int $id = 0;
     /**
      * Function to be called on shutdown.
-     *
-     * @return void
      */
-    private static function shutdown()
+    private static function shutdown(): void
     {
         foreach (self::$callbacks as $callback) {
             $callback();
         }
         self::$callbacks = [];
-        Magic::shutdown(0);
+
+        if (\defined('STDIN')) {
+            getStdin()->unreference();
+        }
+        API::finalize();
+        MTProto::serializeAll();
+        if (\class_exists(Installer::class)) {
+            Installer::unlock();
+        }
+    }
+    /**
+     * Register shutdown function.
+     */
+    public static function init(): void
+    {
+        if (!self::$registered) {
+            \register_shutdown_function(fn () => self::shutdown());
+            self::$registered = true;
+        }
     }
     /**
      * Add a callback for script shutdown.
      *
      * @param callable $callback The callback to set
      * @param null|string $id The optional callback ID
-     *
      * @return int|string The callback ID
      */
-    public static function addCallback($callback, $id = null)
+    public static function addCallback(callable $callback, ?string $id = null): int|string
     {
         if (!$id) {
             $id = self::$id++;
         }
         self::$callbacks[$id] = $callback;
-        if (!self::$registered) {
-            \register_shutdown_function(fn () => self::shutdown());
-            self::$registered = true;
-        }
+        self::init();
         return $id;
     }
     /**
      * Remove a callback from the script shutdown callable list.
      *
      * @param null|string|int $id The optional callback ID
-     *
      * @return bool true if the callback was removed correctly, false otherwise
      */
-    public static function removeCallback($id)
+    public static function removeCallback(string|int|null $id): bool
     {
         if (isset(self::$callbacks[$id])) {
             unset(self::$callbacks[$id]);

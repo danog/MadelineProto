@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * IPC callback server.
  *
@@ -10,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -20,28 +22,27 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Loop;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\SessionPaths;
+use Revolt\EventLoop;
 
 /**
  * IPC callback server.
  */
-class ServerCallback extends Server
+final class ServerCallback extends Server
 {
     /**
      * Timeout watcher list, indexed by socket ID.
      *
      * @var array<int, string>
      */
-    private $watcherList = [];
+    private array $watcherList = [];
     /**
      * Timeout watcher list, indexed by socket ID.
      *
      * @var array<int, ChannelledSocket>
      */
-    private $socketList = [];
+    private array $socketList = [];
     /**
      * Counter.
      */
@@ -50,8 +51,6 @@ class ServerCallback extends Server
      * Set IPC path.
      *
      * @param SessionPaths $session Session
-     *
-     * @return void
      */
     public function setIpcPath(SessionPaths $session): void
     {
@@ -61,36 +60,30 @@ class ServerCallback extends Server
      * Client handler loop.
      *
      * @param ChannelledSocket $socket Client
-     *
-     * @return Promise
      */
-    protected function clientLoop(ChannelledSocket $socket)
+    protected function clientLoop(ChannelledSocket $socket): void
     {
         $id = $this->id++;
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
         $this->socketList[$id] = $socket;
-        $this->watcherList[$id] = Loop::delay(30*1000, function () use ($id) {
+        $this->watcherList[$id] = EventLoop::delay(30, function () use ($id): void {
             unset($this->watcherList[$id], $this->socketList[$id]);
         });
 
-        return $socket->send($id);
+        $socket->send($id);
     }
-
 
     /**
      * Unwrap value.
-     *
-     * @param Wrapper $wrapper
-     * @return mixed
      */
     protected function unwrap(Wrapper $wrapper)
     {
         $id = $wrapper->getRemoteId();
         if (!isset($this->socketList[$id])) {
-            throw new Exception("IPC timeout, could not find callback socket!");
+            throw new Exception('IPC timeout, could not find callback socket!');
         }
         $socket = $this->socketList[$id];
-        Loop::cancel($this->watcherList[$id]);
+        EventLoop::cancel($this->watcherList[$id]);
         unset($this->watcherList[$id], $this->socketList[$id]);
         return $wrapper->unwrap($socket);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TL callback module.
  *
@@ -11,112 +13,79 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\MTProto\OutgoingMessage;
+
 /**
- * Interface for managing TL serialization callbacks.
+ * @psalm-type TBeforeMethodResponseDeserialization=Closure(string): void
+ * @psalm-type TAfterMethodResponseDeserialization=Closure(OutgoingMessage, array): void
+ *
+ * @psalm-type TBeforeConstructorSerialization=Closure(array): mixed
+ * @psalm-type TBeforeConstructorDeserialization=Closure(string): void
+ * @psalm-type TAfterConstructorDeserialization=Closure(array): void
+ * @psalm-type TTypeMismatch=Closure(array): mixed
+ *
+ * @internal Interface for managing TL serialization callbacks.
  */
 interface TLCallback
 {
     /**
-     * Called after serializing a method.
-     *
-     * @internal
-     *
-     * @var int
+     * Whether to allow parallel execution of the deserialization handlers or not.
      */
-    const METHOD_CALLBACK = 0;
+    public function areDeserializationCallbacksMutuallyExclusive(): bool;
     /**
-     * Called before serializing a method.
+     * Called right before deserialization of the result of a method starts.
      *
-     * @internal
+     * Pass only the method name, will return void
      *
-     * @var int
+     * @return array<string, list<TBeforeMethodResponseDeserialization>>
      */
-    const METHOD_BEFORE_CALLBACK = 1;
+    public function getMethodBeforeResponseDeserializationCallbacks(): array;
     /**
-     * Called after serializing a constructor.
+     * Called after deserialization of the result of a method.
      *
-     * @internal
+     * Pass the method name and response, will return void
      *
-     * @var int
+     * @return array<string, list<TAfterMethodResponseDeserialization>>
      */
-    const CONSTRUCTOR_CALLBACK = 2;
-    /**
-     * Called before serializing a constructor.
-     *
-     * @internal
-     *
-     * @var int
-     */
-    const CONSTRUCTOR_BEFORE_CALLBACK = 3;
-    /**
-     * Called on constructor serialization.
-     *
-     * @internal
-     *
-     * @var int
-     */
-    const CONSTRUCTOR_SERIALIZE_CALLBACK = 4;
-    /**
-     * Called if objects of the specified type cannot be serialized.
-     *
-     * @internal
-     *
-     * @var int
-     */
-    const TYPE_MISMATCH_CALLBACK = 5;
-    /**
-     * Called after serialization of method.
-     *
-     * Pass the method name and arguments
-     *
-     * @return array
-     */
-    public function getMethodCallbacks(): array;
-    /**
-     * Called right before serialization of method starts.
-     *
-     * Pass the method name
-     *
-     * @return array
-     */
-    public function getMethodBeforeCallbacks(): array;
-    /**
-     * Called right after deserialization of object, passing the final object.
-     *
-     * @return array
-     */
-    public function getConstructorCallbacks(): array;
-    /**
-     * Called right before deserialization of object.
-     *
-     * Pass only the constructor name
-     *
-     * @return array
-     */
-    public function getConstructorBeforeCallbacks(): array;
+    public function getMethodAfterResponseDeserializationCallbacks(): array;
     /**
      * Called right before serialization of constructor.
      *
-     * Passed the object, will return a modified version.
+     * Passed the constructor, will return a modified version.
      *
-     * @return array
+     * @return array<string, TBeforeConstructorSerialization>
      */
-    public function getConstructorSerializeCallbacks(): array;
+    public function getConstructorBeforeSerializationCallbacks(): array;
     /**
-     * Called if objects of the specified type cannot be serialized.
+     * Called right before deserialization of constructor.
      *
-     * Passed the unserializable object,
-     * will try to convert it to an object of the proper type.
+     * Pass only the constructor name, will return void
      *
-     * @return array
+     * @return array<string, list<TBeforeConstructorDeserialization>>
+     */
+    public function getConstructorBeforeDeserializationCallbacks(): array;
+    /**
+     * Called right after deserialization of constructor.
+     *
+     * Pass the deserialized constructor, will return void
+     *
+     * @return array<string, list<TAfterConstructorDeserialization>>
+     */
+    public function getConstructorAfterDeserializationCallbacks(): array;
+    /**
+     * Called if constructors of the specified type cannot be serialized.
+     *
+     * Passed the unserializable constructor,
+     * will try to convert it to an constructor of the proper type.
+     *
+     * @return array<string, TTypeMismatch>
      */
     public function getTypeMismatchCallbacks(): array;
 }

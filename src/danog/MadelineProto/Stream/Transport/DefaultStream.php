@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Default stream wrapper.
  *
@@ -11,25 +13,29 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
-use Amp\CancellationToken;
-use Amp\Promise;
+use Amp\Cancellation;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\Connector;
-use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
-use danog\MadelineProto\Stream\Async\RawStream;
+use Amp\Socket\SocketConnector;
+use AssertionError;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Throwable;
+use Webmozart\Assert\Assert;
+
 use function Amp\Socket\connector;
+use function Amp\Socket\socketConnector;
 
 /**
  * Default stream wrapper.
@@ -37,34 +43,29 @@ use function Amp\Socket\connector;
  * Manages reading data in chunks
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<?SocketConnector>
  */
 class DefaultStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
     /**
      * Socket.
      *
-     * @var ?EncryptableSocket
      */
-    protected $stream;
+    protected ?Socket $stream = null;
     /**
      * Connector.
-     *
-     * @var Connector
      */
-    private $connector;
-    public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
+    private ?SocketConnector $connector = null;
+    public function setupTls(?Cancellation $cancellationToken = null): void
     {
-        return $this->stream->setupTls($cancellationToken);
+        $this->stream->setupTls($cancellationToken);
     }
-    /**
-     * @return EncryptableSocket
-     */
-    public function getStream()
+    public function getStream(): RawStreamInterface
     {
-        return $this->stream;
+        throw new AssertionError("No underlying stream!");
     }
-    public function connect(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -72,75 +73,66 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $this->stream = (yield ($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken()));
+        $this->stream = (($this->connector ?? socketConnector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
         if ($secure) {
-            yield $this->stream->setupTls();
+            $this->stream->setupTls();
         }
-        yield $this->stream->write($header);
+        $this->stream->write($header);
     }
     /**
      * Async chunked read.
-     *
-     * @return Promise
      */
-    public function read(): Promise
+    public function read(?Cancellation $cancellation = null): ?string
     {
-        return $this->stream ? $this->stream->read() : new \Amp\Success(null);
+        return $this->stream ? $this->stream->read($cancellation) : null;
     }
     /**
      * Async write.
      *
      * @param string $data Data to write
-     *
-     * @return Promise
      */
-    public function write(string $data): Promise
+    public function write(string $data): void
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     /**
      * Close.
-     *
-     * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             if ($this->stream) {
                 $this->stream->close();
                 $this->stream = null;
             }
-        } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
     }
     /**
      * Close.
-     *
-     * @return void
      */
-    public function close()
+    public function close(): void
     {
         $this->disconnect();
     }
     /**
      * {@inheritdoc}
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
+        Assert::notNull($this->stream);
         return $this->stream;
     }
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
         $this->connector = $extra;
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

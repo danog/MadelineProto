@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * AckHandler module.
  *
@@ -11,15 +13,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
@@ -35,24 +37,18 @@ trait AckHandler
      * Acknowledge outgoing message ID.
      *
      * @param string|int $message_id Message Id
-     *
-     * @return boolean
      */
-    public function ackOutgoingMessageId($message_id): bool
+    public function ackOutgoingMessageId(string|int $message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', Logger::WARNING);
             return false;
         }
         return true;
     }
     /**
      * We have gotten a response for an outgoing message.
-     *
-     * @param OutgoingMessage $message Message
-     *
-     * @return void
      */
     public function gotResponseForOutgoingMessage(OutgoingMessage $outgoingMessage): void
     {
@@ -67,8 +63,6 @@ trait AckHandler
      * Acknowledge incoming message ID.
      *
      * @param IncomingMessage $message Message
-     *
-     * @return void
      */
     public function ackIncomingMessage(IncomingMessage $message): void
     {
@@ -81,8 +75,6 @@ trait AckHandler
 
     /**
      * Check if there are some pending calls.
-     *
-     * @return boolean
      */
     public function hasPendingCalls(): bool
     {
@@ -107,8 +99,6 @@ trait AckHandler
     }
     /**
      * Get all pending calls (also clear pending state requests).
-     *
-     * @return array
      */
     public function getPendingCalls(): array
     {
@@ -135,7 +125,7 @@ trait AckHandler
                     continue;
                 }
                 if ($message->getSent() + $dropTimeout < \time()) {
-                    $this->handleReject($message, new \danog\MadelineProto\Exception("Request timeout"));
+                    $this->handleReject($message, fn () => new Exception('Request timeout'));
                     continue;
                 }
                 if ($message->getState() & OutgoingMessage::STATE_REPLIED) {

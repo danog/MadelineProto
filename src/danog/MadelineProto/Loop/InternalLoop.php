@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Internal loop trait.
  *
@@ -10,15 +13,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop;
 
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 
 trait InternalLoop
@@ -40,26 +41,5 @@ trait InternalLoop
     {
         $this->API = $API;
         $this->setLogger($API->getLogger());
-    }
-
-    private function waitForAuthOrSignal(bool $waitAfter = true): \Generator
-    {
-        $API = $this->API;
-        while (!$API->hasAllAuth()) {
-            $waitAfter = false;
-            $API->logger->logger("Waiting for auth in {$this}");
-            if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting in {$this} while waiting for auth (init)!", Logger::LEVEL_ULTRA_VERBOSE);
-                return true;
-            }
-        }
-        if (!$waitAfter) {
-            return false;
-        }
-        if (yield $this->waitSignal($this->pause())) {
-            $API->logger->logger("Exiting in {$this} due to signal!", Logger::LEVEL_ULTRA_VERBOSE);
-            return true;
-        }
-        return false;
     }
 }

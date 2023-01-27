@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Websocket stream wrapper.
  *
@@ -11,98 +13,91 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\Cancellation;
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
-use Amp\Websocket\Client\Connection;
+use Amp\Socket\Socket;
 use Amp\Websocket\Client\Connector;
-use Amp\Websocket\Client\Handshake;
+use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
+use Amp\Websocket\Client\WebsocketConnection;
+use Amp\Websocket\Client\WebsocketConnector;
+use Amp\Websocket\Client\WebsocketHandshake;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
-use danog\MadelineProto\Stream\Async\RawStream;
+use Amp\Websocket\WebsocketMessage;
+use AssertionError;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Websocket\Client\connector;
+use Throwable;
 
 /**
  * Websocket stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<?WebsocketConnector>
  */
 class WsStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
     /**
      * Websocket stream.
-     *
-     * @var Connection
      */
-    private $stream;
+    private WebsocketConnection $stream;
     /**
      * Websocket message.
      *
-     * @var Message
      */
-    private $message;
+    private ?WebsocketMessage $message = null;
     /**
      * Websocket Connector.
      *
-     * @var Connector
      */
-    private $connector;
+    private WebsocketConnector $connector;
     /**
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        if (!\class_exists(Handshake::class)) {
-            throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
-        }
-        $this->dc = $ctx->getIntDc();
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
-        $handshake = new Handshake($uri);
-        $this->stream = yield ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellationToken());
+        $handshake = new WebsocketHandshake($uri);
+        $this->stream = ($this->connector ?? new Rfc6455Connector(new Rfc6455ConnectionFactory(), HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellation());
         if (\strlen($header)) {
-            yield $this->write($header);
+            $this->write($header);
         }
     }
     /**
      * Async close.
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             $this->stream->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
     }
-    public function readGenerator(): \Generator
+    public function read(?Cancellation $token = null): ?string
     {
         try {
-            if (!$this->message || ($data = yield $this->message->buffer()) === null) {
-                $this->message = yield $this->stream->receive();
+            if (!$this->message || ($data = $this->message->buffer($token)) === null) {
+                $this->message = $this->stream->receive($token);
                 if (!$this->message) {
                     return null;
                 }
-                $data = yield $this->message->buffer();
+                $data = $this->message->buffer($token);
                 $this->message = null;
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($e instanceof ClosedException && $e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
@@ -114,30 +109,26 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * Async write.
      *
      * @param string $data Data to write
-     *
-     * @return Promise
      */
-    public function write(string $data): \Amp\Promise
+    public function write(string $data): void
     {
-        return $this->stream->sendBinary($data);
+        $this->stream->sendBinary($data);
     }
     /**
      * {@inheritdoc}
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
-        return $this->stream->getSocket();
+        throw new AssertionError("Unreachable!");
     }
-    public function setExtra($extra)
+    public function setExtra($extra): void
     {
-        if ($extra instanceof Connector) {
+        if ($extra instanceof WebsocketConnector) {
             $this->connector = $extra;
         }
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
-use Amp\Promise;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 
 interface DbType
 {
     /**
-     * @param string            $table
-     * @param null|DbType|array $previous
-     * @param DatabaseAbstract  $settings
-     *
-     * @return Promise<self>
+     * @param DatabaseAbstract $settings
      */
-    public static function getInstance(string $table, $previous, $settings): Promise;
+    public static function getInstance(string $table, DbType|array|null $previous, $settings): static;
 }

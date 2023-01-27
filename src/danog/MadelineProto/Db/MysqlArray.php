@@ -1,16 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
-use Amp\Mysql\ConnectionConfig;
-use Amp\Promise;
+use Amp\Mysql\MysqlConfig;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+use PDO;
 
 /**
  * MySQL database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends SqlArray<TKey, TValue>
  */
 class MysqlArray extends SqlArray
 {
@@ -21,21 +29,17 @@ class MysqlArray extends SqlArray
 
     /**
      * Initialize on startup.
-     *
-     * @return \Generator
      */
-    public function initStartup(): \Generator
+    public function initStartup(): void
     {
         $this->setTable($this->table);
-        yield from $this->initConnection($this->dbSettings);
+        $this->initConnection($this->dbSettings);
     }
 
     /**
      * Prepare statements.
      *
-     * @param SqlArray::STATEMENT_* $type
-     *
-     * @return string
+     * @param SqlArray::SQL_* $type
      */
     protected function getSqlQuery(int $type): string
     {
@@ -68,41 +72,29 @@ class MysqlArray extends SqlArray
         throw new Exception("An invalid statement type $type was provided!");
     }
 
-
     /**
      * Initialize connection.
-     *
-     * @param DatabaseMysql $settings
-     * @return \Generator
      */
-    public function initConnection($settings): \Generator
+    public function initConnection(DatabaseMysql $settings): void
     {
-        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
+        $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
-        $this->pdo = new \PDO(
+        $this->pdo = new PDO(
             "mysql:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
-            $settings->getPassword()
+            $settings->getPassword(),
         );
-        if (!isset($this->db)) {
-            $this->db = yield from Mysql::getConnection($settings);
-        }
+        $this->db ??= Mysql::getConnection($settings);
     }
 
     /**
      * Create table for property.
-     *
-     * @return \Generator
-     *
-     * @throws \Throwable
-     *
-     * @psalm-return \Generator<int, Promise, mixed, mixed>
      */
-    protected function prepareTable(): \Generator
+    protected function prepareTable(): void
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-        return yield $this->db->query("
+        $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,
@@ -116,16 +108,16 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): \Generator
+    protected function renameTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
-        yield $this->db->query("
+        $this->db->query("
             REPLACE INTO `{$to}`
             SELECT * FROM `{$from}`;
         ");
 
-        yield $this->db->query("
+        $this->db->query("
             DROP TABLE `{$from}`;
         ");
     }

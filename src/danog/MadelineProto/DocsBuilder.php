@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * DocsBuilder module.
  *
@@ -11,19 +13,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\DocsBuilder\Constructors;
+use danog\MadelineProto\DocsBuilder\Methods;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 
 // This code was written a few years ago: it is garbage, and has to be rewritten
-class DocsBuilder
+final class DocsBuilder
 {
     const DEFAULT_TEMPLATES = [
         'User' => ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'],
@@ -37,8 +40,8 @@ class DocsBuilder
         'InputMessage' => ['InputMessage'],
         'KeyboardButton' => ['KeyboardButton'],
     ];
-    use \danog\MadelineProto\DocsBuilder\Methods;
-    use \danog\MadelineProto\DocsBuilder\Constructors;
+    use Methods;
+    use Constructors;
     public $td = false;
     protected array $settings;
     protected string $index;
@@ -50,12 +53,7 @@ class DocsBuilder
         $this->logger = $logger;
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         /** @psalm-suppress InvalidArgument */
-        $this->TL = new TL(new class($logger) {
-            public function __construct($logger)
-            {
-                $this->logger = $logger;
-            }
-        });
+        $this->TL = new TL(null);
         $new = new TLSchema;
         $new->mergeArray($settings);
         $this->TL->init($new);
@@ -69,22 +67,21 @@ class DocsBuilder
         \chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
 
-        foreach (\glob($this->settings['template']."/*") as $template) {
+        foreach (\glob($this->settings['template'].'/*') as $template) {
             $this->templates[\basename($template, '.md')] = \file_get_contents($template);
         }
     }
     /**
      * Documentation templates.
      *
-     * @var array
      */
-    protected $templates = [];
+    protected array $templates = [];
 
     public $types = [];
     public $any = '*';
     public function mkDocs(): void
     {
-        \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating documentation index...', Logger::NOTICE);
         \file_put_contents($this->index, $this->template('index', $this->settings['description']));
 
         $this->mkMethods();
@@ -98,7 +95,7 @@ class DocsBuilder
         \mkdir('types');
         \ksort($this->types);
         $index = '';
-        \danog\MadelineProto\Logger::log('Generating types documentation...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating types documentation...', Logger::NOTICE);
         foreach ($this->types as $otype => $keys) {
             $type = StrTools::typeEscape($otype);
             $index .= '['.StrTools::markdownEscape($type).'](/API_docs/types/'.$type.'.md)<a name="'.$type.'"></a>  
@@ -136,26 +133,26 @@ class DocsBuilder
                 StrTools::markdownEscape($type),
                 $header,
                 $constructors,
-                $methods
+                $methods,
             );
             \file_put_contents('types/'.$type.'.md', $header);
         }
-        \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating types index...', Logger::NOTICE);
         \file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);
 
-        \danog\MadelineProto\Logger::log('Generating additional types...', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Generating additional types...', Logger::NOTICE);
         foreach (['string', 'bytes', 'int', 'int53', 'long', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON', '!X'] as $type) {
             \file_put_contents("types/$type.md", $this->templates[$type]);
         }
         foreach (['boolFalse', 'boolTrue', 'null', 'photoStrippedSize'] as $constructor) {
             \file_put_contents("constructors/$constructor.md", $this->templates[$constructor]);
         }
-        \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
+        Logger::log('Done!', Logger::NOTICE);
     }
     public static function addToLang(string $key, string $value = '', bool $force = false): void
     {
-        if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
-            \danog\MadelineProto\Lang::$lang['en'][$key] = $value;
+        if (!isset(Lang::$lang['en'][$key]) || $force) {
+            Lang::$lang['en'][$key] = $value;
         }
     }
     /**
@@ -163,8 +160,6 @@ class DocsBuilder
      *
      * @param string   $name      Template name
      * @param string   ...$params Params
-     *
-     * @return string
      */
     protected function template(string $name, string ...$params): string
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * MTProto temporary auth key.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,26 +25,23 @@ use JsonSerializable;
 /**
  * MTProto temporary auth key.
  */
-class TempAuthKey extends AuthKey implements JsonSerializable
+final class TempAuthKey extends AuthKey implements JsonSerializable
 {
     /**
      * Bound auth key instance.
      *
-     * @var PermAuthKey|null
      */
-    private $bound;
+    private ?PermAuthKey $bound = null;
     /**
      * Expiration date.
      *
-     * @var int
      */
-    private $expires = 0;
+    private int $expires = 0;
     /**
      * Whether the connection is inited for this auth key.
      *
-     * @var boolean
      */
-    protected $inited = false;
+    protected bool $inited = false;
     /**
      * Constructor function.
      *
@@ -63,17 +61,13 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Init or deinit connection for auth key.
      *
      * @param boolean $init Init or deinit
-     *
-     * @return void
      */
-    public function init(bool $init = true)
+    public function init(bool $init = true): void
     {
         $this->inited = $init;
     }
     /**
      * Check if connection is inited for auth key.
-     *
-     * @return boolean
      */
     public function isInited(): bool
     {
@@ -84,10 +78,8 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      *
      * @param PermAuthKey|null $bound Permanent auth key
      * @param bool             $pfs   Whether to bind using PFS
-     *
-     * @return void
      */
-    public function bind(?PermAuthKey $bound, bool $pfs = true)
+    public function bind(?PermAuthKey $bound, bool $pfs = true): void
     {
         $this->bound = $bound;
         if (!$pfs) {
@@ -98,8 +90,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key is bound.
-     *
-     * @return boolean
      */
     public function isBound(): bool
     {
@@ -107,8 +97,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     public function isAuthorized(): bool
     {
@@ -118,10 +106,8 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
-     * @return void
      */
-    public function authorized(bool $authorized)
+    public function authorized(bool $authorized): void
     {
         $this->bound->authorized($authorized);
     }
@@ -129,17 +115,13 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * Set expiration date of temporary auth key.
      *
      * @param integer $expires Expiration date
-     *
-     * @return void
      */
-    public function expires(int $expires)
+    public function expires(int $expires): void
     {
         $this->expires = $expires;
     }
     /**
      * Check if auth key has expired.
-     *
-     * @return boolean
      */
     public function expired(): bool
     {
@@ -147,8 +129,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * JSON serialization function.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -156,20 +136,9 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Sleep function.
-     *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['authKey', 'id', 'serverSalt', 'bound', 'expires', 'inited'];
-    }
-    /**
-     * Wakeup function.
-     *
-     * @return void
-     */
-    public function __wakeup(): void
-    {
-        $this->inited = (bool) $this->inited;
     }
 }

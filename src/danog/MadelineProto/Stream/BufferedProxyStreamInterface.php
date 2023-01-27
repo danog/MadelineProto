@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Buffered proxy stream interface.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -23,6 +24,9 @@ namespace danog\MadelineProto\Stream;
  * Buffered proxy stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @template TT
+ * @extends ProxyStreamInterface<TT>
  */
 interface BufferedProxyStreamInterface extends BufferedStreamInterface, ProxyStreamInterface
 {

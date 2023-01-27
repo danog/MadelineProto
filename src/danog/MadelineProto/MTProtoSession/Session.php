@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Session module.
  *
@@ -11,18 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use danog\MadelineProto\Connection;
-use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\Tools;
+
+use function time;
 
 /**
  * Manages MTProto session-specific data.
@@ -40,77 +43,68 @@ trait Session
     /**
      * Incoming message array.
      *
-     * @var IncomingMessage[]
+     * @var array<IncomingMessage>
      */
-    public $incoming_messages = [];
+    public array $incoming_messages = [];
     /**
      * Outgoing message array.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $outgoing_messages = [];
+    public array $outgoing_messages = [];
     /**
      * New incoming message ID array.
      *
-     * @var IncomingMessage[]
+     * @var array<IncomingMessage>
      */
-    public $new_incoming = [];
+    public array $new_incoming = [];
     /**
      * New outgoing message array.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $new_outgoing = [];
+    public array $new_outgoing = [];
     /**
      * Pending outgoing messages.
      *
-     * @var OutgoingMessage[]
+     * @var array<OutgoingMessage>
      */
-    public $pendingOutgoing = [];
+    public array $pendingOutgoing = [];
     /**
      * Pending outgoing key.
      *
-     * @var string
      */
-    public $pendingOutgoingKey = 'a';
+    public int $pendingOutgoingKey = 0;
     /**
      * Time delta with server.
      *
-     * @var integer
      */
-    public $time_delta = 0;
+    public int $time_delta = 0;
     /**
      * Call queue.
      *
-     * @var array
      */
-    public $call_queue = [];
+    public array $call_queue = [];
     /**
      * Ack queue.
      *
-     * @var array
      */
-    public $ack_queue = [];
+    public array $ack_queue = [];
     /**
      * Message ID handler.
      *
-     * @var MsgIdHandler
      */
-    public $msgIdHandler;
+    public MsgIdHandler $msgIdHandler;
     /**
      * Reset MTProto session.
-     *
-     * @return void
      */
     public function resetSession(): void
     {
-        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", \danog\MadelineProto\Logger::WARNING);
-        $this->session_id = \danog\MadelineProto\Tools::random(8);
+        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", Logger::WARNING);
+        $this->session_id = Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
-        if (!isset($this->msgIdHandler)) {
-            $this->msgIdHandler = MsgIdHandler::createInstance($this);
-        }
+        $this->msgIdHandler ??= new MsgIdHandler($this);
         foreach ($this->outgoing_messages as &$msg) {
             if ($msg->hasMsgId()) {
                 $msg->setMsgId(null);
@@ -122,8 +116,6 @@ trait Session
     }
     /**
      * Cleanup incoming and outgoing messages.
-     *
-     * @return void
      */
     public function cleanupSession(): void
     {
@@ -133,14 +125,14 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", Logger::VERBOSE);
                 $incoming[$key] = $message;
             }
         }
         $this->incoming_messages = $incoming;
         $total = \count($this->incoming_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
 
         $count = 0;
@@ -151,7 +143,7 @@ trait Session
             } else {
                 $ago = \time() - $message->getSent();
                 if ($ago > 2) {
-                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter} sent $ago seconds ago, no response has been received or it wasn't yet handled!", \danog\MadelineProto\Logger::VERBOSE);
+                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }
                 $outgoing[$key] = $message;
             }
@@ -159,13 +151,11 @@ trait Session
         $this->outgoing_messages = $outgoing;
         $total = \count($this->outgoing_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
     }
     /**
      * Create MTProto session if needed.
-     *
-     * @return void
      */
     public function createSession(): void
     {
@@ -176,7 +166,7 @@ trait Session
     /**
      * Backup eventual unsent messages before session deletion.
      *
-     * @return OutgoingMessage[]
+     * @return array<OutgoingMessage>
      */
     public function backupSession(): array
     {

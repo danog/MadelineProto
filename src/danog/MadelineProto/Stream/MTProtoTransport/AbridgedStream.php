@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Abridged stream wrapper.
  *
@@ -11,17 +13,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
-use danog\MadelineProto\Stream\Async\BufferedStream;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -32,38 +31,31 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     private $stream;
     /**
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = (yield from $ctx->getStream(\chr(239).$header));
+        $this->stream = ($ctx->getStream(\chr(239).$header));
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return \Generator
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $length >>= 2;
         if ($length < 127) {
@@ -71,40 +63,34 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         } else {
             $message = \chr(127).\substr(\pack('V', $length), 0, 3);
         }
-        $buffer = yield $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
-        yield $buffer->bufferWrite($message);
+        $buffer = $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
+        $buffer->bufferWrite($message);
         return $buffer;
     }
     /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     * @return \Generator
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \ord(yield $buffer->bufferRead(1));
+        $buffer = $this->stream->getReadBuffer($l);
+        $length = \ord($buffer->bufferRead(1));
         if ($length >= 127) {
-            $length = \unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
+            $length = \unpack('V', ($buffer->bufferRead(3))."\0")[1];
         }
         $length <<= 2;
         return $buffer;
     }
     /**
      * {@inheritdoc}
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -112,6 +98,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

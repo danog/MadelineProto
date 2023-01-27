@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * AES CTR stream wrapper.
  *
@@ -11,18 +13,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\Socket;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -35,11 +35,14 @@ use phpseclib3\Crypt\AES;
  * Manages AES CTR encryption/decryption
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<array{
+ *      encrypt: array{key: string, iv: string},
+ *      decrypt: array{key: string, iv: string},
+ * }>
  */
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    use Buffer;
-    use BufferedStream;
     private $encrypt;
     private $decrypt;
     private $stream;
@@ -52,40 +55,34 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->encrypt = new \phpseclib3\Crypt\AES('ctr');
+        $this->encrypt = new AES('ctr');
         $this->encrypt->enableContinuousBuffer();
         $this->encrypt->setKey($this->extra['encrypt']['key']);
         $this->encrypt->setIV($this->extra['encrypt']['iv']);
-        $this->decrypt = new \phpseclib3\Crypt\AES('ctr');
+        $this->decrypt = new AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return \Generator
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
-        $this->write_buffer = yield $this->stream->getWriteBuffer($length);
+        $this->write_buffer = $this->stream->getWriteBuffer($length);
         if (\strlen($append)) {
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
@@ -96,33 +93,25 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     * @return \Generator
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
-        $this->read_buffer = yield $this->stream->getReadBuffer($length);
+        $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
     }
     /**
      * Decrypts read data asynchronously.
-     *
-     * @param Promise $promise Promise that resolves with a string when new data is available or `null` if the stream has closed.
-     *
-     * @return \Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
-    public function bufferReadGenerator(int $length): \Generator
+    public function bufferRead(int $length): string
     {
-        return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
+        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length));
     }
     /**
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
             $this->append_after -= \strlen($data);
@@ -132,35 +121,29 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
             } elseif ($this->append_after < 0) {
                 $this->append_after = 0;
                 $this->append = '';
-                throw new \danog\MadelineProto\Exception('Tried to send too much out of frame data, cannot append');
+                throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-        return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
+        $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
     }
     /**
      * Set obfuscation keys/IVs.
      *
      * @param array $data Keys
-     *
-     * @return void
      */
-    public function setExtra($data)
+    public function setExtra($data): void
     {
         $this->extra = $data;
     }
     /**
      * {@inheritdoc}
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -176,6 +159,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

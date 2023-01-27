@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 Copyright 2016-2020 Daniil Gentili
 (https://daniil.it)
@@ -15,6 +17,9 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\Magic;
+use finfo;
+
+use const FILEINFO_MIME_TYPE;
 
 /**
  * Manages generation of extensions for files.
@@ -27,8 +32,6 @@ abstract class Extension
      *
      * @param string $extension File extension
      * @param string $default   Default mime type
-     *
-     * @return string
      */
     public static function getMimeFromExtension(string $extension, string $default): string
     {
@@ -42,8 +45,6 @@ abstract class Extension
      * Get extension from mime type.
      *
      * @param string $mime MIME type
-     *
-     * @return string
      */
     public static function getExtensionFromMime(string $mime): string
     {
@@ -54,10 +55,8 @@ abstract class Extension
      *
      * @param mixed  $location File location
      * @param string $default  Default extension
-     *
-     * @return string
      */
-    public static function getExtensionFromLocation($location, string $default): string
+    public static function getExtensionFromLocation(mixed $location, string $default): string
     {
         return $default;
     }
@@ -65,24 +64,20 @@ abstract class Extension
      * Get mime type of file.
      *
      * @param string $file File
-     *
-     * @return string
      */
     public static function getMimeFromFile(string $file): string
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
         return $finfo->file($file);
     }
     /**
      * Get mime type from buffer.
      *
      * @param string $buffer Buffer
-     *
-     * @return string
      */
     public static function getMimeFromBuffer(string $buffer): string
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
         return $finfo->buffer($buffer);
     }
 }

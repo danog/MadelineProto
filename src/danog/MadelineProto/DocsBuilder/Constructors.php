@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Constructors module.
  *
@@ -11,19 +13,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 
+use const PHP_EOL;
+
 trait Constructors
 {
+    private array $docs_constructors;
     public function mkConstructors(): void
     {
         foreach (\glob('constructors/'.$this->any) as $unlink) {
@@ -34,7 +40,7 @@ trait Constructors
         }
         \mkdir('constructors');
         $this->docs_constructors = [];
-        $this->logger->logger('Generating constructors documentation...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating constructors documentation...', Logger::NOTICE);
         $got = [];
         foreach ($this->TL->getConstructors($this->td)->by_predicate_and_layer as $predicate => $id) {
             $data = $this->TL->getConstructors($this->td)->by_id[$id];
@@ -86,9 +92,9 @@ trait Constructors
 ';
             if (!isset($this->TL->getDescriptions()['constructors'][$constructor])) {
                 $this->addToLang('object_'.$constructor);
-                if (\danog\MadelineProto\Lang::$lang['en']['object_'.$constructor] !== '') {
+                if (Lang::$lang['en']['object_'.$constructor] !== '') {
                     /** @psalm-suppress InvalidArrayAssignment */
-                    $this->TL->getDescriptions()['constructors'][$constructor]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor];
+                    $this->TL->getDescriptions()['constructors'][$constructor]['description'] = Lang::$lang['en']['object_'.$constructor];
                 }
             }
             if (isset($this->TL->getDescriptions()['constructors'][$constructor]) && !empty($data['params'])) {
@@ -112,7 +118,7 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
-                    unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']]);
+                    unset(Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
                 $ptype = $param[isset($param['subtype']) ? 'subtype' : 'type'];
@@ -152,7 +158,7 @@ trait Constructors
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptions()['constructors'][$constructor]['description'])) {
                         /** @psalm-suppress InvalidArrayAssignment */
-                        $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
+                        $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']] = Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
                 if (isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) && $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) {
@@ -221,7 +227,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
             }
             \file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
-        $this->logger->logger('Generating constructors index...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating constructors index...', Logger::NOTICE);
         \ksort($this->docs_constructors);
         $last_namespace = '';
         foreach ($this->docs_constructors as $constructor => &$value) {

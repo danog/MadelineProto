@@ -1,30 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\StrTools;
+use DOMDocument;
+use DOMElement;
 use DOMNode;
 use DOMText;
 
 final class DOMEntities
 {
     /**
-     * @readonly
+     * @readonly-allow-private-mutation
      */
     public array $entities = [];
     /**
-     * @readonly
-     */
-    public array $buttons = [];
-    /**
-     * @readonly
+     * @readonly-allow-private-mutation
      */
     public string $message = '';
     public function __construct(string $html)
     {
-        $dom = new \DOMDocument();
-        $html = \preg_replace("/\<br(\s*)?\/?\>/i", "\n", $html);
-        $dom->loadxml("<body>" . \str_replace(['&amp;', '&#039;', '&quot;', '&gt;', '&lt;', '&'], ['&', '\'', "\"", '>', '<', '&amp;'], \trim($html)) . "</body>");
+        $dom = new DOMDocument();
+        $html = \preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
+        $dom->loadxml('<body>' . \trim($html) . '</body>');
         $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
     }
     /**
@@ -40,6 +40,7 @@ final class DOMEntities
             $this->message .= "\n";
             return 1;
         }
+        /** @var DOMElement $node */
         $entity = match ($node->nodeName) {
             's', 'strike', 'del' =>['_' => 'messageEntityStrike'],
             'u' =>  ['_' => 'messageEntityUnderline'],
@@ -77,7 +78,7 @@ final class DOMEntities
         return $length;
     }
 
-    private function handleA(DOMNode $node): array
+    private function handleA(DOMElement $node): array
     {
         $href = $node->getAttribute('href');
         if (\preg_match('|^mention:(.+)|', $href, $matches) || \preg_match('|^tg://user\\?id=(.+)|', $href, $matches)) {
@@ -85,14 +86,6 @@ final class DOMEntities
         }
         if (\preg_match('|^emoji:(\d+)$|', $href, $matches)) {
             return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $matches[1]];
-        }
-        if (\preg_match('|^buttonurl:(.+)|', $href)) {
-            if (\strpos(\substr($href, -4), '|:new|') !== false) {
-                $this->buttons[] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => \str_replace(['buttonurl:', ':new'], '', $href), 'new' => true];
-            } else {
-                $this->buttons[] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => \str_replace('buttonurl:', '', $href)];
-            }
-            return null;
         }
         return ['_' => 'messageEntityTextUrl', 'url' => $href];
     }

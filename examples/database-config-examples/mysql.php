@@ -1,17 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Database\Mysql;
 
 /*
     * load MadelineProto in Your Project
 */
 
-
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 }
@@ -19,7 +22,7 @@ if (\file_exists('vendor/autoload.php')) {
 /*
     * create default mysql object
 */
-$database = new \danog\MadelineProto\Settings\Database\Mysql;
+$database = new Mysql;
 
 /*
     config and set auth information
@@ -41,7 +44,6 @@ $settings = new Settings;
 */
 
 $settings->setDb($database);
-
 
 /*
     create madeline proto session

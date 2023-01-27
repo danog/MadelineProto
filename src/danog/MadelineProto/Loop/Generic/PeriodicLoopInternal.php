@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Update feeder loop.
  *
@@ -11,15 +13,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Loop\Generic;
 
-use danog\Loop\Generic\PeriodicLoop as GenericPeriodicLoop;
+use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 
@@ -28,7 +29,7 @@ use danog\MadelineProto\MTProto;
  *
  * @internal For internal use
  */
-class PeriodicLoopInternal extends GenericPeriodicLoop
+final class PeriodicLoopInternal extends PeriodicLoop
 {
     use InternalLoop {
         __construct as private init;
@@ -44,6 +45,6 @@ class PeriodicLoopInternal extends GenericPeriodicLoop
     public function __construct(MTProto $API, callable $callable, string $name, ?int $interval)
     {
         $this->init($API);
-        parent::__construct($callable, $name, $interval);
+        parent::__construct(fn () => $callable(), $name, $interval);
     }
 }

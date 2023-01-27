@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Web and CLI template settings for login.
  */
-class Templates extends SettingsAbstract
+final class Templates extends SettingsAbstract
 {
     /**
      * Web template used for querying app information.
@@ -16,8 +18,6 @@ class Templates extends SettingsAbstract
 
     /**
      * Get web template used for querying app information.
-     *
-     * @return string
      */
     public function getHtmlTemplate(): string
     {
@@ -28,8 +28,6 @@ class Templates extends SettingsAbstract
      * Set web template used for querying app information.
      *
      * @param string $htmlTemplate Web template used for querying app information.
-     *
-     * @return self
      */
     public function setHtmlTemplate(string $htmlTemplate): self
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TCP Intermediate stream wrapper.
  *
@@ -11,21 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
-use danog\MadelineProto\Stream\Async\BufferedStream;
+use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Tools;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -34,70 +34,57 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     private $stream;
     /**
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4).$header));
+        $this->stream = ($ctx->getStream(\str_repeat(\chr(221), 4).$header));
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return \Generator
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
-        $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
-        yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
+        $padding_length = Tools::randomInt($modulus = 16);
+        $buffer = $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
+        $buffer->bufferWrite(\pack('V', $padding_length + $length));
         return $buffer;
     }
     /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     * @return \Generator
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \unpack('V', yield $buffer->bufferRead(4))[1];
+        $buffer = $this->stream->getReadBuffer($l);
+        $length = \unpack('V', $buffer->bufferRead(4))[1];
         return $buffer;
     }
     /**
      * {@inheritdoc}
-     *
-     * @return EncryptableSocket
      */
-    public function getSocket(): EncryptableSocket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -105,6 +92,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

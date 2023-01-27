@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Tools module.
  *
@@ -11,17 +13,17 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
-use DOMDocument;
 use Parsedown;
+use Webmozart\Assert\Assert;
 
 /**
  * Some tools.
@@ -32,17 +34,15 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
-     *
-     * @return float|int
      */
-    public static function mbStrlen(string $text)
+    public static function mbStrlen(string $text): int
     {
         $length = 0;
         $textlength = \strlen($text);
         for ($x = 0; $x < $textlength; $x++) {
             $char = \ord($text[$x]);
             if (($char & 0xc0) != 0x80) {
-                $length += 1 + ($char >= 0xf0);
+                $length += 1 + ($char >= 0xf0 ? 1 : 0);
             }
         }
         return $length;
@@ -52,20 +52,18 @@ abstract class StrTools extends Extension
      *
      * @param string  $text   Text to substring
      * @param integer $offset Offset
-     * @param ?int    $length Length
-     *
-     * @return string
+     * @param null|int    $length Length
      */
-    public static function mbSubstr(string $text, int $offset, $length = null): string
+    public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \mb_convert_encoding(
             \substr(
                 \mb_convert_encoding($text, 'UTF-16'),
                 $offset<<1,
-                $length === null ? null : ($length<<1)
+                $length === null ? null : ($length<<1),
             ),
             'UTF-8',
-            'UTF-16'
+            'UTF-16',
         );
     }
     /**
@@ -73,14 +71,15 @@ abstract class StrTools extends Extension
      *
      * @param string  $text   Text
      * @param integer $length Length
-     *
      * @return array<string>
      */
     public static function mbStrSplit(string $text, int $length): array
     {
         $result = [];
         foreach (\str_split(\mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
-            $result []= \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+            $chunk = \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+            Assert::string($chunk);
+            $result []= $chunk;
         }
         return $result;
     }
@@ -88,8 +87,6 @@ abstract class StrTools extends Extension
      * Convert to camelCase.
      *
      * @param string $input String
-     *
-     * @return string
      */
     public static function toCamelCase(string $input): string
     {
@@ -99,8 +96,6 @@ abstract class StrTools extends Extension
      * Convert to snake_case.
      *
      * @param string $input String
-     *
-     * @return string
      */
     public static function toSnakeCase(string $input): string
     {
@@ -115,8 +110,6 @@ abstract class StrTools extends Extension
      * Escape string for markdown.
      *
      * @param string $hwat String to escape
-     *
-     * @return string
      */
     public static function markdownEscape(string $hwat): string
     {
@@ -126,8 +119,6 @@ abstract class StrTools extends Extension
      * Escape type name.
      *
      * @param string $type String to escape
-     *
-     * @return string
      */
     public static function typeEscape(string $type): string
     {
@@ -138,8 +129,6 @@ abstract class StrTools extends Extension
      * Escape method name.
      *
      * @param string $method Method name
-     *
-     * @return string
      */
     public static function methodEscape(string $method): string
     {
@@ -149,21 +138,12 @@ abstract class StrTools extends Extension
      * Strip markdown tags.
      *
      * @internal
-     *
-     * @param string $markdown
-     * @return string
      */
     public static function toString(string $markdown): string
     {
         if ($markdown === '') {
             return $markdown;
         }
-        $html = (new Parsedown($markdown))->text($markdown);
-        $document = new DOMDocument('', 'utf-8');
-        @$document->loadHTML(\mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-        if (!$document->getElementsByTagName('body')[0]) {
-            return '';
-        }
-        return $document->getElementsByTagName('body')[0]->childNodes[0]->textContent;
+        return (new DOMEntities(Parsedown::instance()->text($markdown)))->message;
     }
 }

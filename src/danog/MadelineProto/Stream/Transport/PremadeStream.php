@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Premade stream wrapper.
  *
@@ -11,22 +13,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
-use Amp\CancellationToken;
-use Amp\Promise;
+use Amp\ByteStream\ReadableStream;
+use Amp\Cancellation;
 use Amp\Socket\Socket;
-use danog\MadelineProto\Stream\Async\RawStream;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * Premade stream wrapper.
@@ -34,57 +37,52 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * Manages reading data in chunks
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements ProxyStreamInterface<Socket>
  */
-class PremadeStream implements RawStreamInterface, ProxyStreamInterface
+final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
-    use RawStream;
-    private $stream;
+    private Socket|ReadableStream|null $stream = null;
     public function __construct()
     {
     }
-    public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
+    public function setupTls(?Cancellation $cancellationToken = null): void
     {
-        return $this->stream->setupTls($cancellationToken);
+        $this->stream->setupTls($cancellationToken);
     }
     public function getStream()
     {
         return $this->stream;
     }
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if ($header !== '') {
-            yield $this->stream->write($header);
+            $this->stream->write($header);
         }
     }
     /**
      * Async chunked read.
-     *
-     * @return Promise
      */
-    public function read(): Promise
+    public function read(?Cancellation $cancellation = null): ?string
     {
-        return $this->stream ? $this->stream->read() : new \Amp\Success(null);
+        return $this->stream ? $this->stream->read($cancellation) : null;
     }
     /**
      * Async write.
      *
      * @param string $data Data to write
-     *
-     * @return Promise
      */
-    public function write(string $data): Promise
+    public function write(string $data): void
     {
         if (!$this->stream) {
-            throw new ClosedException("MadelineProto stream was disconnected");
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
-        return $this->stream->write($data);
+        $this->stream->write($data);
     }
     /**
      * Async close.
-     *
-     * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         try {
             if ($this->stream) {
@@ -93,32 +91,25 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
                 }
                 $this->stream = null;
             }
-        } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
     }
     public function close(): void
     {
         $this->disconnect();
     }
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Amp\Socket\Socket
-     */
     public function getSocket(): Socket
     {
+        Assert::true($this->stream instanceof Socket);
         return $this->stream;
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtra($extra)
+    public function setExtra(mixed $extra): void
     {
         $this->stream = $extra;
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

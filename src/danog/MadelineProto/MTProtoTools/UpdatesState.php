@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * UpdatesState class.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,7 +23,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Stores the state of updates.
  */
-class UpdatesState
+final class UpdatesState
 {
     /**
      * PTS.
@@ -43,9 +44,8 @@ class UpdatesState
     /**
      * Channel ID.
      *
-     * @var int
      */
-    private $channelId;
+    private int $channelId;
     /**
      * Is busy?
      */
@@ -66,24 +66,12 @@ class UpdatesState
      *
      * @return array Parameters to serialize
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return $this->channelId ? ['pts', 'channelId'] : ['pts', 'qts', 'seq', 'date', 'channelId'];
     }
     /**
-     * Wakeup function.
-     */
-    public function __wakeup()
-    {
-        /** @psalm-suppress DocblockTypeContradiction */
-        if ($this->channelId === false) {
-            $this->channelId = 0;
-        }
-    }
-    /**
      * Is this state relative to a channel?
-     *
-     * @return bool
      */
     public function isChannel(): bool
     {
@@ -91,8 +79,6 @@ class UpdatesState
     }
     /**
      * Get the channel ID.
-     *
-     * @return int
      */
     public function getChannel(): int
     {
@@ -101,11 +87,9 @@ class UpdatesState
     /**
      * Are we currently busy?
      *
-     * @param bool|null $set Update the currently busy flag
-     *
-     * @return bool
+     * @param bool $set Update the currently busy flag
      */
-    public function syncLoading(bool $set = null): bool
+    public function syncLoading(?bool $set = null): bool
     {
         if ($set !== null) {
             $this->syncLoading = $set;
@@ -116,8 +100,6 @@ class UpdatesState
      * Update multiple parameters.
      *
      * @param array $init Parameters to update
-     *
-     * @return self
      */
     public function update(array $init): self
     {
@@ -132,7 +114,6 @@ class UpdatesState
      * Get/set PTS.
      *
      * @param int $set PTS to set
-     *
      * @return int PTS
      */
     public function pts(int $set = 0): int
@@ -146,7 +127,6 @@ class UpdatesState
      * Get/set QTS.
      *
      * @param int $set QTS to set
-     *
      * @return int QTS
      */
     public function qts(int $set = 0): int
@@ -160,7 +140,6 @@ class UpdatesState
      * Get/set seq.
      *
      * @param int $set Seq to set
-     *
      * @return int seq
      */
     public function seq(int $set = 0): int
@@ -174,7 +153,6 @@ class UpdatesState
      * Get/set date.
      *
      * @param int $set Date to set
-     *
      * @return int Date
      */
     public function date(int $set = 0): int
@@ -188,7 +166,6 @@ class UpdatesState
      * Check validity of PTS contained in update.
      *
      * @param array $update Update
-     *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkPts(array $update): int
@@ -199,7 +176,6 @@ class UpdatesState
      * Check validity of seq contained in update.
      *
      * @param int $seq Seq
-     *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkSeq(int $seq): int

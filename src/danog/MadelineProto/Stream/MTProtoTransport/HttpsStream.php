@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * HTTPS stream wrapper.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -28,23 +29,19 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpsStream extends HttpStream implements MTProtoBufferInterface
+final class HttpsStream extends HttpStream implements MTProtoBufferInterface
 {
     /**
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        return parent::connect($ctx->getCtx()->secure(true), $header);
+        parent::connect($ctx->getCtx()->secure(true), $header);
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -52,6 +49,6 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
-use Amp\Loop;
 use danog\MadelineProto\Logger;
+use Revolt\EventLoop;
 
 /**
  * Array caching trait.
@@ -44,9 +46,6 @@ trait ArrayCacheTrait
 
     /**
      * Save item in cache.
-     *
-     * @param string $key
-     * @param mixed $value
      */
     protected function setCache(string $key, $value): void
     {
@@ -56,8 +55,6 @@ trait ArrayCacheTrait
 
     /**
      * Remove key from cache.
-     *
-     * @param string $key
      */
     protected function unsetCache(string $key): void
     {
@@ -66,15 +63,15 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        $this->cacheCleanupId = Loop::repeat(
-            \max(1000, ($this->cacheTtl * 1000) / 5),
+        $this->cacheCleanupId = EventLoop::repeat(
+            \max(1, $this->cacheTtl / 5),
             fn () => $this->cleanupCache(),
         );
     }
     protected function stopCacheCleanupLoop(): void
     {
         if ($this->cacheCleanupId) {
-            Loop::cancel($this->cacheCleanupId);
+            EventLoop::cancel($this->cacheCleanupId);
             $this->cacheCleanupId = null;
         }
     }
@@ -107,12 +104,12 @@ trait ArrayCacheTrait
 
         Logger::log(
             \sprintf(
-                "cache for table: %s; keys left: %s; keys removed: %s",
+                'cache for table: %s; keys left: %s; keys removed: %s',
                 (string) $this,
                 \count($this->cache),
-                $oldCount
+                $oldCount,
             ),
-            Logger::VERBOSE
+            Logger::VERBOSE,
         );
     }
 }

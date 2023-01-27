@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings\Database;
 
 /**
@@ -7,13 +9,13 @@ namespace danog\MadelineProto\Settings\Database;
  *
  * MariaDb 10.2+ or Mysql 5.6+ required.
  */
-class Mysql extends SqlAbstract
+final class Mysql extends SqlAbstract
 {
     public function mergeArray(array $settings): void
     {
         $settings = $settings['db']['mysql'] ?? [];
         if (isset($settings['host'])) {
-            $this->setUri("tcp://".($settings['host']).(isset($settings['port']) ? ':'.($settings['port']) : ''));
+            $this->setUri('tcp://'.($settings['host']).(isset($settings['port']) ? ':'.($settings['port']) : ''));
         }
         parent::mergeArray($settings);
     }

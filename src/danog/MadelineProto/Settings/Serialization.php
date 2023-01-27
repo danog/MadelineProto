@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * Serialization settings.
  */
-class Serialization extends SettingsAbstract
+final class Serialization extends SettingsAbstract
 {
     /**
      * Serialization interval, in seconds.
@@ -22,8 +24,6 @@ class Serialization extends SettingsAbstract
     }
     /**
      * Get serialization interval, in seconds.
-     *
-     * @return int
      */
     public function getInterval(): int
     {
@@ -34,8 +34,6 @@ class Serialization extends SettingsAbstract
      * Set serialization interval, in seconds.
      *
      * @param int $interval Serialization interval, in seconds.
-     *
-     * @return self
      */
     public function setInterval(int $interval): self
     {

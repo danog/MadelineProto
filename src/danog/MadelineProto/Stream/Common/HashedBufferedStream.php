@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Hash stream wrapper.
  *
@@ -11,16 +13,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Promise;
-use danog\MadelineProto\Stream\Async\BufferedStream;
+use Amp\Socket\Socket;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -30,10 +31,11 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  * Hash stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements BufferedProxyStreamInterface<string>
  */
-class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterface
+final class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    use BufferedStream;
     private $hash_name;
     private $read_hash;
     private $write_hash;
@@ -47,10 +49,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     private $rev = false;
     /**
      * Enable read hashing.
-     *
-     * @return void
      */
-    public function startReadHash()
+    public function startReadHash(): void
     {
         $this->read_hash = \hash_init($this->hash_name);
     }
@@ -58,17 +58,13 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * Check the read hash after N bytes are read.
      *
      * @param int $after The number of bytes to read before checking the hash
-     *
-     * @return void
      */
-    public function checkReadHash(int $after)
+    public function checkReadHash(int $after): void
     {
         $this->read_check_after = $after;
     }
     /**
      * Stop read hashing and get final hash.
-     *
-     * @return string
      */
     public function getReadHash(): string
     {
@@ -83,8 +79,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     }
     /**
      * Check if we are read hashing.
-     *
-     * @return bool
      */
     public function hasReadHash(): bool
     {
@@ -92,10 +86,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     }
     /**
      * Enable write hashing.
-     *
-     * @return void
      */
-    public function startWriteHash()
+    public function startWriteHash(): void
     {
         $this->write_hash = \hash_init($this->hash_name);
     }
@@ -103,17 +95,13 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * Write the write hash after N bytes are read.
      *
      * @param int $after The number of bytes to read before writing the hash
-     *
-     * @return void
      */
-    public function checkWriteHash(int $after)
+    public function checkWriteHash(int $after): void
     {
         $this->write_check_after = $after;
     }
     /**
      * Stop write hashing and get final hash.
-     *
-     * @return string
      */
     public function getWriteHash(): string
     {
@@ -128,49 +116,17 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     }
     /**
      * Check if we are write hashing.
-     *
-     * @return bool
      */
     public function hasWriteHash(): bool
     {
         return $this->write_hash !== null;
     }
     /**
-     * Hashes read data asynchronously.
-     *
-     * @param int $length Read and hash $length bytes
-     *
-     * @return \Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
-     */
-    public function bufferReadGenerator(int $length): \Generator
-    {
-        if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
-            if ($length + $this->read_check_pos > $this->read_check_after) {
-                throw new \danog\MadelineProto\Exception('Tried to read too much out of frame data');
-            }
-            $data = yield $this->read_buffer->bufferRead($length);
-            \hash_update($this->read_hash, $data);
-            $hash = $this->getReadHash();
-            if ($hash !== yield $this->read_buffer->bufferRead(\strlen($hash))) {
-                throw new \danog\MadelineProto\Exception('Hash mismatch');
-            }
-            return $data;
-        }
-        $data = yield $this->read_buffer->bufferRead($length);
-        \hash_update($this->read_hash, $data);
-        if ($this->read_check_after) {
-            $this->read_check_pos += $length;
-        }
-        return $data;
-    }
-    /**
      * Set the hash algorithm.
      *
      * @param string $hash Algorithm name
-     *
-     * @return void
      */
-    public function setExtra($hash)
+    public function setExtra($hash): void
     {
         $rev = \strpos($hash, '_rev');
         $this->rev = false;
@@ -184,10 +140,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -195,78 +149,87 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         $this->read_hash = null;
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     * @return \Generator
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         //if ($this->read_hash) {
-        $this->read_buffer = yield $this->stream->getReadBuffer($length);
+        $this->read_buffer = $this->stream->getReadBuffer($length);
         return $this;
         //}
-        //return yield $this->stream->getReadBuffer($length);
+        //return $this->stream->getReadBuffer($length);
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return \Generator
      */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         //if ($this->write_hash) {
-        $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
+        $this->write_buffer = $this->stream->getWriteBuffer($length, $append);
         return $this;
         //}
-        //return yield $this->stream->getWriteBuffer($length, $append);
+        //return $this->stream->getWriteBuffer($length, $append);
     }
     /**
      * Reads data from the stream.
-     *
-     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
      */
-    public function bufferRead(int $length): Promise
+    public function bufferRead(int $length): ?string
     {
         if ($this->read_hash === null) {
             return $this->read_buffer->bufferRead($length);
         }
-        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
+        if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
+            if ($length + $this->read_check_pos > $this->read_check_after) {
+                throw new Exception('Tried to read too much out of frame data');
+            }
+            $data = $this->read_buffer->bufferRead($length);
+            \hash_update($this->read_hash, $data);
+            $hash = $this->getReadHash();
+            if ($hash !== $this->read_buffer->bufferRead(\strlen($hash))) {
+                throw new Exception('Hash mismatch');
+            }
+            return $data;
+        }
+        $data = $this->read_buffer->bufferRead($length);
+        \hash_update($this->read_hash, $data);
+        if ($this->read_check_after) {
+            $this->read_check_pos += $length;
+        }
+        return $data;
     }
     /**
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferWrite(string $data): Promise
+    public function bufferWrite(string $data): void
     {
         if ($this->write_hash === null) {
-            return $this->write_buffer->bufferWrite($data);
+            $this->write_buffer->bufferWrite($data);
+            return;
         }
         $length = \strlen($data);
         if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
             if ($length + $this->write_check_pos > $this->write_check_after) {
-                throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
+                throw new Exception('Too much out of frame data was sent, cannot check hash');
             }
             \hash_update($this->write_hash, $data);
-            return $this->write_buffer->bufferWrite($data.$this->getWriteHash());
+            $this->write_buffer->bufferWrite($data.$this->getWriteHash());
+            return;
         }
         if ($this->write_check_after) {
             $this->write_check_pos += $length;
@@ -274,21 +237,17 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         if ($this->write_hash) {
             \hash_update($this->write_hash, $data);
         }
-        return $this->write_buffer->bufferWrite($data);
+        $this->write_buffer->bufferWrite($data);
     }
     /**
      * {@inheritdoc}
-     *
-     * @return \Amp\Socket\Socket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
     /**
      * {@inheritDoc}
-     *
-     * @return RawStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
@@ -296,6 +255,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

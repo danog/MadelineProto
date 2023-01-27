@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
@@ -19,7 +19,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require 'vendor/autoload.php';
 $logger = new Logger(new SettingsLogger);
 
-\set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 if ($argc !== 3) {
     die("Usage: {$argv[0]} layernumberold layernumbernew\n");
@@ -41,7 +41,7 @@ function getTL($layer)
             };
             $API->logger = Logger::$default;
             parent::__construct($API);
-            $this->init((new TLSchema)->setAPISchema($layer));
+            $this->init((new TLSchema)->setAPISchema($layer)->setSecretSchema(''));
         }
     };
 
@@ -49,7 +49,7 @@ function getTL($layer)
 }
 function getUrl($constructor, $type)
 {
-    $changed = \str_replace('.', '_', $constructor);
+    $changed = str_replace('.', '_', $constructor);
 
     //return "[$constructor](https://github.com/danog/MadelineProtoDocs/blob/geochats/docs/API_docs/$type/$changed.md)";
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
@@ -63,7 +63,7 @@ foreach (['methods', 'constructors'] as $type) {
     $key = $type === 'methods' ? 'method' : 'predicate';
 
     // New constructors
-    $res .= "\n\nNew ".\ucfirst($type)."\n";
+    $res .= "\n\nNew ".ucfirst($type).":\n";
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$old[$type]->$finder($name)) {
@@ -73,7 +73,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 
     // Changed constructors
-    $res .= "\n\nChanged ".\ucfirst($type)."\n";
+    $res .= "\n\nChanged ".ucfirst($type).":\n";
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if ($old[$type]->$finder($name)) {
@@ -103,7 +103,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 
     // Deleted constructors
-    $res .= "\n\nDeleted ".\ucfirst($type)."\n";
+    $res .= "\n\nDeleted ".ucfirst($type).":\n";
     foreach ($old[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$new[$type]->$finder($name)) {
@@ -112,12 +112,11 @@ foreach (['methods', 'constructors'] as $type) {
     }
 }
 
-
 $bot = new \danog\MadelineProto\API('layer.madeline');
 $bot->start();
 
-foreach (\explode("\n\n", $res) as $chunk) {
-    if (!$chunk) {
+foreach (explode("\n\n", $res) as $chunk) {
+    if (!$chunk || !trim(explode(':', $chunk)[1])) {
         continue;
     }
     $bot->messages->sendMessage(['peer' => 'danogentili', 'message' => $chunk, 'parse_mode' => 'markdown']);

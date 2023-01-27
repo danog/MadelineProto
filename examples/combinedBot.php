@@ -13,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -26,11 +25,11 @@ use danog\MadelineProto\Logger;
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists('vendor/autoload.php')) {
+if (file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 }
@@ -57,10 +56,8 @@ class MyEventHandler extends EventHandler
      * Handle updates from supergroups and channels.
      *
      * @param array $update Update
-     *
-     * @return \Generator
      */
-    public function onUpdateNewChannelMessage(array $update): \Generator
+    public function onUpdateNewChannelMessage(array $update)
     {
         return $this->onUpdateNewMessage($update);
     }
@@ -68,28 +65,21 @@ class MyEventHandler extends EventHandler
      * Handle updates from users.
      *
      * @param array $update Update
-     *
-     * @return \Generator
      */
-    public function onUpdateNewMessage(array $update): \Generator
+    public function onUpdateNewMessage(array $update): void
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
-        $res = \json_encode($update, JSON_PRETTY_PRINT);
-
-        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
-        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
-            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-        }
+        $this->logger($update);
     }
 }
 
 $MadelineProtos = [];
 foreach ([
-    'bot.madeline' => 'Bot Login',
-    'user.madeline' => 'Userbot login',
-    'user2.madeline' => 'Userbot login (2)'
+    'session1.madeline' => 'Bot Login',
+    'session2.madeline' => 'Userbot login',
+    'session3.madeline' => 'Userbot login (2)',
 ] as $session => $message) {
     Logger::log($message, Logger::WARNING);
     $MadelineProtos []= new API($session);

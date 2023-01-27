@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Exception module.
  *
@@ -11,25 +13,30 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
+use const DIRECTORY_SEPARATOR;
+use const PHP_EOL;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
+use const PHP_SAPI;
+
 /**
  * Basic exception.
  */
-class Exception extends \Exception
+final class Exception extends \Exception
 {
     use TL\PrettyException;
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
+        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
     }
-    public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
+    public function __construct($message = null, $code = 0, ?self $previous = null, $file = null, $line = null)
     {
         $this->prettifyTL();
         if ($file !== null) {
@@ -42,15 +49,13 @@ class Exception extends \Exception
         if (\strpos($message, 'socket_accept') === false
             && !\in_array(\basename($this->file), ['PKCS8.php', 'PSS.php'])
         ) {
-            \danog\MadelineProto\Logger::log($message.' in '.\basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+            Logger::log($message.' in '.\basename($this->file).':'.$this->line, Logger::FATAL_ERROR);
         }
     }
     /**
      * Complain about missing extensions.
      *
      * @param string $extensionName Extension name
-     *
-     * @return self
      */
     public static function extension(string $extensionName): self
     {
@@ -69,11 +74,9 @@ class Exception extends \Exception
         return new self($message, 0, null, $file, $line);
     }
     /**
-     * ExceptionErrorHandler.
+     * @internal
      *
      * Error handler
-     *
-     * @return false
      */
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
@@ -82,6 +85,7 @@ class Exception extends \Exception
         if (\error_reporting() === 0
             || \strpos($errstr, 'headers already sent')
             || \strpos($errstr, 'Creation of dynamic property') !== false
+            || \strpos($errstr, 'Legacy nullable type detected') !== false
             || $errfileReplaced && (
                 \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
                 || \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
@@ -93,15 +97,33 @@ class Exception extends \Exception
         throw new self($errstr, $errno, null, $errfile, $errline);
     }
     /**
+     * @internal
+     *
      * ExceptionErrorHandler.
-     *
-     * Error handler
-     *
-     * @return void
      */
-    public static function exceptionHandler($exception): void
+    public static function exceptionHandler(\Throwable $exception): void
     {
+        if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
+            || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
+        ) {
+            $maps = "";
+            try {
+                $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
+                $pid = \getmypid();
+                $maps = '~'.\substr_count(\file_get_contents("/proc/$pid/maps"), "\n");
+            } catch (\Throwable) {
+            }
+            if ($maps !== '') {
+                $maps = " ($maps)";
+            }
+            Logger::log("========= MANUAL SYSTEM ADMIN ACTION REQUIRED =========", Logger::FATAL_ERROR);
+            Logger::log("The maximum number of mmap'ed regions was reached$maps: please increase the vm.max_map_count kernel config to 262144 to fix.");
+            Logger::log("To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count");
+            Logger::log("To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf");
+            Logger::log("On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.");
+            Logger::log("========= MANUAL SYSTEM ADMIN ACTION REQUIRED =========", Logger::FATAL_ERROR);
+        }
         Logger::log($exception, Logger::FATAL_ERROR);
-        Magic::shutdown(1);
+        die(1);
     }
 }

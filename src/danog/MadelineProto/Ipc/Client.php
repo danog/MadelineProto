@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * API wrapper module.
  *
@@ -10,30 +13,36 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\Wrappers\Start;
+use danog\MadelineProto\Wrappers\Templates;
+use Generator;
+use Revolt\EventLoop;
+use Throwable;
+
+use function Amp\async;
 
 /**
  * IPC client.
  */
-class Client extends ClientAbstract
+final class Client extends ClientAbstract
 {
-    use \danog\MadelineProto\Wrappers\Start;
-    use \danog\MadelineProto\Wrappers\Templates;
+    use Start;
+    use Templates;
     use FilesLogic;
 
     /**
@@ -43,19 +52,11 @@ class Client extends ClientAbstract
 
     /**
      * Returns an instance of a client by session name.
-     *
-     * @param string $session
-     * @return Client
      */
     public static function giveInstanceBySession(string $session): Client
     {
         return self::$instances[$session];
     }
-
-    /**
-     * Whether the wrapper API is async.
-     */
-    public bool $async;
 
     /**
      * Session.
@@ -64,45 +65,47 @@ class Client extends ClientAbstract
     /**
      * Constructor function.
      *
-     * @param ChannelledSocket $socket  IPC client socket
      * @param SessionPaths     $session Session paths
      * @param Logger           $logger  Logger
-     * @param bool             $async   Whether the wrapper API is async
      */
-    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger, bool &$async)
+    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger)
     {
-        $this->async = &$async;
         $this->logger = $logger;
         $this->server = $server;
         $this->session = $session;
-        self::$instances[$session->getLegacySessionPath()] = $this;
-        Tools::callFork($this->loopInternal());
+        self::$instances[$session->getSessionDirectoryPath()] = $this;
+        EventLoop::queue($this->loopInternal(...));
     }
     /**
      * Run the provided async callable.
      *
-     * @param callable $callback Async callable to run
+     * @deprecated Not needed anymore since MadelineProto v8 and amp v3
      *
-     * @return \Generator
+     * @param callable $callback Async callable to run
      */
-    public function loop(callable $callback): \Generator
+    public function loop(callable $callback)
     {
-        return yield $callback();
+        $r = $callback();
+        if ($r instanceof Generator) {
+            $r = Tools::consumeGenerator($r);
+        }
+        if ($r instanceof Future) {
+            $r = $r->await();
+        }
+        return $r;
     }
     /**
      * Unreference.
-     *
-     * @return void
      */
     public function unreference(): void
     {
         try {
-            Tools::wait($this->disconnect());
-        } catch (\Throwable $e) {
+            $this->disconnect();
+        } catch (Throwable $e) {
             $this->logger("An error occurred while disconnecting the client: $e");
         }
-        if (isset(self::$instances[$this->session->getLegacySessionPath()])) {
-            unset(self::$instances[$this->session->getLegacySessionPath()]);
+        if (isset(self::$instances[$this->session->getSessionDirectoryPath()])) {
+            unset(self::$instances[$this->session->getSessionDirectoryPath()]);
         }
     }
     /**
@@ -110,24 +113,13 @@ class Client extends ClientAbstract
      *
      * @internal
      */
-    public function stopIpcServer(): Promise
+    public function stopIpcServer(): void
     {
         $this->run = false;
-        return $this->server->send(Server::SHUTDOWN);
-    }
-    /**
-     * Restart IPC server instance.
-     *
-     * @internal
-     */
-    public function restartIpcServer(): Promise
-    {
-        return $this->server->send(Server::SHUTDOWN);
+        $this->server->send(Server::SHUTDOWN);
     }
     /**
      * Whether we're an IPC client instance.
-     *
-     * @return boolean
      */
     public function isIpc(): bool
     {
@@ -142,19 +134,17 @@ class Client extends ClientAbstract
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
-            $url = yield $url->getFile();
+            $url = $url->getFile();
         }
         $params = [$url, $size, $fileName, &$cb, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('uploadFromUrl', $wrapper);
+        return $this->__call('uploadFromUrl', $wrapper);
     }
     /**
      * Upload file from callable.
@@ -169,22 +159,18 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);
-        return yield from $this->__call('uploadFromCallable', $wrapper);
+        return $this->__call('uploadFromCallable', $wrapper);
     }
     /**
      * Reupload telegram file.
@@ -192,36 +178,28 @@ class Client extends ClientAbstract
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
-    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
-            $media = yield $media->getFile();
+            $media = $media->getFile();
         }
         $params = [$media, &$cb, $encrypted];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('uploadFromTgfile', $wrapper);
+        return $this->__call('uploadFromTgfile', $wrapper);
     }
     /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
-     * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
+     * @param string              $method Method name
+     * @param array|(callable(): array) $args Arguments
+     * @param array               $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, $args, array $aargs)
+    public function methodCallAsyncRead(string $method, array $args, array $aargs)
     {
         if (\is_array($args)) {
             if (($method === 'messages.editInlineBotMessage' ||
@@ -232,21 +210,21 @@ class Client extends ClientAbstract
                 $args['media']['file'] instanceof FileCallbackInterface
             ) {
                 $params = [$method, &$args, $aargs];
-                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                $wrapper = Wrapper::create($params, $this->session, $this->logger);
                 $wrapper->wrap($args['media']['file'], true);
-                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+                return $this->__call('methodCallAsyncRead', $wrapper);
             } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
                 $params = [$method, &$args, $aargs];
-                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                $wrapper = Wrapper::create($params, $this->session, $this->logger);
                 foreach ($args['multi_media'] as &$media) {
                     if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
                         $wrapper->wrap($media['media']['file'], true);
                     }
                 }
-                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+                return $this->__call('methodCallAsyncRead', $wrapper);
             }
         }
-        return yield from $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
+        return $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
     }
     /**
      * Download file to directory.
@@ -254,21 +232,17 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator Downloaded file path
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
-    public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
-            $dir = yield $dir->getFile();
+            $dir = $dir->getFile();
         }
         $params = [$messageMedia, $dir, &$cb];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToDir', $wrapper);
+        return $this->__call('downloadToDir', $wrapper);
     }
     /**
      * Download file.
@@ -276,21 +250,17 @@ class Client extends ClientAbstract
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator Downloaded file path
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
-    public function downloadToFile($messageMedia, $file, $cb = null): \Generator
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = yield $file->getFile();
+            $file = $file->getFile();
         }
         $params = [$messageMedia, $file, &$cb];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToFile', $wrapper);
+        return $this->__call('downloadToFile', $wrapper);
     }
     /**
      * Download file to callable.
@@ -305,44 +275,36 @@ class Client extends ClientAbstract
      * @param int                            $offset       Offset where to start downloading
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
-    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
     {
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
+        $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = yield $callable->getFile();
+            $callable = $callable->getFile();
         }
         $params = [$messageMedia, &$callable, &$cb, $seekable, $offset, $end, $part_size, ];
-        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($callable, false);
         $wrapper->wrap($cb, false);
-        return yield from $this->__call('downloadToCallable', $wrapper);
+        return $this->__call('downloadToCallable', $wrapper);
     }
     /**
      * Placeholder.
      *
      * @param mixed ...$params Params
-     *
-     * @return void
      */
-    public function setEventHandler(...$params): void
+    public function setEventHandler(mixed ...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
+        throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
     /**
      * Placeholder.
      *
      * @param mixed ...$params Params
-     *
-     * @return void
      */
-    public function getEventHandler(...$params): void
+    public function getEventHandler(mixed ...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
+        throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
 }

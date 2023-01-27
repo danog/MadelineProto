@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * MadelineProto fileserver.
  *
@@ -10,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,7 +26,7 @@ use danog\MadelineProto\Exception;
 /**
  * MadelineProto fileserver.
  */
-class Server
+final class Server
 {
     /**
      * Constructor function.
@@ -32,7 +34,7 @@ class Server
     public function __construct()
     {
         if (!\class_exists(HttpServer::class)) {
-            throw new Exception("Please install https://github.com/amphp/http-server to use this module (composer require amphp/http-server)");
+            throw new Exception('Please install https://github.com/amphp/http-server to use this module (composer require amphp/http-server)');
         }
     }
 }

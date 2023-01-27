@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\API;
@@ -10,15 +12,11 @@ abstract class MadelineTestCase extends TestCase
 {
     /**
      * MadelineProto instance.
-     *
-     * @var API
      */
-    protected static $MadelineProto;
+    protected static API $MadelineProto;
 
     /**
      * Setup MadelineProto instance.
-     *
-     * @return void
      */
     public static function setUpBeforeClass(): void
     {
@@ -35,17 +33,15 @@ abstract class MadelineTestCase extends TestCase
                 'logger' => [
                     'logger' => Logger::FILE_LOGGER,
                     'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE
-                ]
-            ]
+                    'logger_level' => Logger::ULTRA_VERBOSE,
+                ],
+            ],
         );
         self::$MadelineProto->botLogin(\getenv('BOT_TOKEN'));
     }
 
     /**
      * Teardown.
-     *
-     * @return void
      */
     public static function tearDownAfterClass(): void
     {

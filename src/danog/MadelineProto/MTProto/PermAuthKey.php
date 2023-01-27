@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * MTProto permanent auth key.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -22,14 +23,13 @@ namespace danog\MadelineProto\MTProto;
 /**
  * MTProto permanent auth key.
  */
-class PermAuthKey extends AuthKey
+final class PermAuthKey extends AuthKey
 {
     /**
      * Whether this auth key is authorized (as in associated to an account on Telegram).
      *
-     * @var boolean
      */
-    private $authorized = false;
+    private bool $authorized = false;
     /**
      * Constructor function.
      *
@@ -44,8 +44,6 @@ class PermAuthKey extends AuthKey
     }
     /**
      * Check if we are logged in.
-     *
-     * @return boolean
      */
     public function isAuthorized(): bool
     {
@@ -55,17 +53,13 @@ class PermAuthKey extends AuthKey
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
-     *
-     * @return void
      */
-    public function authorized(bool $authorized)
+    public function authorized(bool $authorized): void
     {
         $this->authorized = $authorized;
     }
     /**
      * JSON serialization function.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -73,10 +67,8 @@ class PermAuthKey extends AuthKey
     }
     /**
      * Sleep function.
-     *
-     * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['authKey', 'id', 'serverSalt', 'authorized'];
     }

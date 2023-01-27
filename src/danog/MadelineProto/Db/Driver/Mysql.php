@@ -1,77 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db\Driver;
 
-use Amp\Mysql\ConnectionConfig;
-use Amp\Mysql\Pool;
+use Amp\Mysql\MysqlConfig;
+use Amp\Mysql\MysqlConnectionPool;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
-
-use function Amp\Mysql\Pool;
+use Throwable;
 
 /**
  * MySQL driver wrapper.
  *
  * @internal
  */
-class Mysql
+final class Mysql
 {
-    /** @var Pool[] */
+    /** @var array<MysqlConnectionPool> */
     private static array $connections = [];
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $db
-     *
-     * @param int $maxConnections
-     * @param int $idleTimeout
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator<Pool>
-     */
-    public static function getConnection(DatabaseMysql $settings): \Generator
+    public static function getConnection(DatabaseMysql $settings): MysqlConnectionPool
     {
         $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+        if (!isset(self::$connections[$dbKey])) {
+            $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
                 ->withUser($settings->getUsername())
                 ->withPassword($settings->getPassword())
                 ->withDatabase($settings->getDatabase());
 
-            yield from static::createDb($config);
-            static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+            self::createDb($config);
+            self::$connections[$dbKey] = new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
-        return static::$connections[$dbKey];
+        return self::$connections[$dbKey];
     }
 
-    /**
-     * @param ConnectionConfig $config
-     *
-     * @throws \Amp\Sql\ConnectionException
-     * @throws \Amp\Sql\FailureException
-     * @throws \Throwable
-     *
-     * @return \Generator
-     */
-    private static function createDb(ConnectionConfig $config): \Generator
+    private static function createDb(MysqlConfig $config): void
     {
         try {
             $db = $config->getDatabase();
-            $connection = pool($config->withDatabase(null));
-            yield $connection->query("
+            $connection = new MysqlConnectionPool($config->withDatabase(null));
+            $connection->query("
                     CREATE DATABASE IF NOT EXISTS `{$db}`
                     CHARACTER SET 'utf8mb4' 
                     COLLATE 'utf8mb4_general_ci'
                 ");
+            try {
+                $max = (int) $connection->query("SHOW VARIABLES LIKE 'max_connections'")->fetchRow()['Value'];
+                if ($max < 100000) {
+                    $connection->query("SET GLOBAL max_connections = 100000");
+                }
+            } catch (Throwable) {
+            }
             $connection->close();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
         }
     }

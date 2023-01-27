@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Generic stream interface.
  *
@@ -11,15 +13,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 
 /**
@@ -33,20 +33,14 @@ interface StreamInterface
      * Connect to a server.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator;
+    public function connect(ConnectionContext $ctx, string $header = ''): void;
     /**
      * Disconnect from the server.
-     *
-     * @return void
      */
-    public function disconnect();
+    public function disconnect(): void;
     /**
      * Get underlying AMPHP socket resource.
-     *
-     * @return EncryptableSocket
      */
     public function getSocket(): Socket;
 }

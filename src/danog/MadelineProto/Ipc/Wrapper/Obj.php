@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
@@ -7,38 +7,20 @@ use danog\MadelineProto\Ipc\Wrapper;
 /**
  * Generic callback wrapper object.
  */
-class Obj
+abstract class Obj
 {
-    /**
-     * Method list.
-     *
-     * @var array<string, int>
-     */
-    private array $methods = [];
-    /**
-     * Wrapper.
-     */
-    private Wrapper $wrapper;
     /**
      * Constructor.
      *
-     * @param Wrapper $wrapper
-     * @param array $methods
+     * @param array<string, int> $methods
      */
-    public function __construct(Wrapper $wrapper, array $methods)
+    public function __construct(private Wrapper $wrapper, private array $methods)
     {
-        $this->wrapper = $wrapper;
-        $this->methods = $methods;
     }
     /**
      * Call method.
-     *
-     * @param string $name
-     * @param array $arguments
-     *
-     * @return \Generator<mixed, mixed, mixed, mixed>
      */
-    public function __call(string $name, array $arguments = []): \Generator
+    public function __call(string $name, array $arguments = []): mixed
     {
         return $this->wrapper->__call($this->methods[$name], $arguments);
     }

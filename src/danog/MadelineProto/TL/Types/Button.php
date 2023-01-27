@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Button module.
  *
@@ -11,28 +13,29 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL\Types;
 
-use danog\MadelineProto\API;
+use ArrayAccess;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Tools;
+use JsonSerializable;
 
 /**
  * Clickable button.
+ *
+ * @implements ArrayAccess<array-key, mixed>
  */
-class Button implements \JsonSerializable, \ArrayAccess
+final class Button implements JsonSerializable, ArrayAccess
 {
     /**
      * Button data.
      *
-     * @psalm-var array<array-key, mixed>
+     * @var array<array-key, mixed>
      */
     private array $button = [];
     /**
@@ -42,9 +45,8 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * MTProto instance.
      *
-     * @var MTProto|Client|null
      */
-    private $API = null;
+    private MTProto|Client|null $API = null;
     /**
      * Message ID.
      */
@@ -52,9 +54,8 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Peer ID.
      *
-     * @var array|int
      */
-    private $peer;
+    private array|int $peer;
     /**
      * Constructor function.
      *
@@ -77,12 +78,10 @@ class Button implements \JsonSerializable, \ArrayAccess
         $this->button = $button;
         $this->id = $message['id'];
         $this->API = $API;
-        $this->session = $API->getWrapper()->getSession()->getLegacySessionPath();
+        $this->session = $API->getWrapper()->getSession()->getSessionDirectoryPath();
     }
     /**
      * Sleep function.
-     *
-     * @return array
      */
     public function __sleep(): array
     {
@@ -92,36 +91,27 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Click on button.
      *
      * @param boolean $donotwait Whether to wait for the result of the method
-     *
-     * @return mixed
      */
     public function click(bool $donotwait = true)
     {
         if (!isset($this->API)) {
             $this->API = Client::giveInstanceBySession($this->session);
         }
-        $async = $this->API instanceof Client ? $this->API->async : $this->API->wrapper->isAsync();
         switch ($this->button['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
                 return $this->button['url'];
             case 'keyboardButton':
-                $res = $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
             case 'keyboardButtonCallback':
-                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
             case 'keyboardButtonGame':
-                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
-                break;
+                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
         }
-        return $async ? $res : Tools::wait($res);
     }
     /**
      * Get debug info.
-     *
-     * @return array
      */
     public function __debugInfo(): array
     {
@@ -131,8 +121,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     }
     /**
      * Serialize button.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -143,8 +131,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param mixed $name  Offset
      * @param mixed $value Value
-     *
-     * @return void
      */
     public function offsetSet(mixed $name, mixed $value): void
     {
@@ -158,8 +144,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Get button info.
      *
      * @param mixed $name Field name
-     *
-     * @return mixed
      */
     public function offsetGet(mixed $name): mixed
     {
@@ -169,8 +153,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Unset button info.
      *
      * @param mixed $name Offset
-     *
-     * @return void
      */
     public function offsetUnset(mixed $name): void
     {
@@ -180,8 +162,6 @@ class Button implements \JsonSerializable, \ArrayAccess
      * Check if button field exists.
      *
      * @param mixed $name Offset
-     *
-     * @return boolean
      */
     public function offsetExists(mixed $name): bool
     {

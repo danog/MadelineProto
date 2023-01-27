@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Methods module.
  *
@@ -11,19 +13,24 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 
+use const PHP_EOL;
+
 trait Methods
 {
+    private array $docs_methods;
+    private array $human_docs_methods;
     public function mkMethods(): void
     {
         static $bots;
@@ -54,7 +61,7 @@ trait Methods
         \mkdir('methods');
         $this->docs_methods = [];
         $this->human_docs_methods = [];
-        $this->logger->logger('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating methods documentation...', Logger::NOTICE);
         foreach ($this->TL->getMethods($this->td)->by_id as $id => $data) {
             $method = $data['method'];
             $phpMethod = StrTools::methodEscape($method);
@@ -82,12 +89,12 @@ trait Methods
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
-                $params .= $param['name'].": ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
+                $params .= $param['name'].': '.(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             if (!isset($this->tdDescriptions['methods'][$method])) {
                 $this->addToLang('method_'.$method);
-                if (\danog\MadelineProto\Lang::$lang['en']['method_'.$method] !== '') {
-                    $this->tdDescriptions['methods'][$method]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method];
+                if (Lang::$lang['en']['method_'.$method] !== '') {
+                    $this->tdDescriptions['methods'][$method]['description'] = Lang::$lang['en']['method_'.$method];
                 }
             }
             $md_method = '['.$phpMethod.'](/API_docs/methods/'.$method.'.md)';
@@ -95,10 +102,7 @@ trait Methods
 
 ';
             if (isset($this->tdDescriptions['methods'][$method])) {
-                $desc = \Parsedown::instance()->line(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'])[0], '.'));
-                $dom = new \DOMDocument();
-                $dom->loadHTML(\mb_convert_encoding($desc, 'HTML-ENTITIES', 'UTF-8'));
-                $desc = $dom->textContent;
+                $desc = StrTools::toString(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'])[0], '.'));
                 $this->human_docs_methods[$this->tdDescriptions['methods'][$method]['description'].': '.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$method.'</a>
 
 ';
@@ -135,7 +139,7 @@ trait Methods
                 }
                 if (!isset($this->tdDescriptions['methods'][$method]['params'][$param['name']])) {
                     if (isset($this->tdDescriptions['methods'][$method]['description'])) {
-                        $this->tdDescriptions['methods'][$method]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
+                        $this->tdDescriptions['methods'][$method]['params'][$param['name']] = Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
                     }
                 }
                 if ($param['name'] === 'hash' && ($param['type'] === 'long' || $param['type'] === 'int')) {
@@ -178,7 +182,7 @@ trait Methods
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
                 $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
-                $params .= $param['name'].": ";
+                $params .= $param['name'].': ';
                 $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
                 $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";
@@ -209,7 +213,9 @@ trait Methods
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
             }
             if (\in_array($method, ['messages.getHistory', 'messages.getMessages', 'channels.getMessages'])) {
-                $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, please use the [event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
+                $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
+                $header .= "# Warning: non-realtime results\n**Warning: this method is not suitable for receiving messages in real-time from chats and users, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
+                $header .= "# Warning: this is probably NOT what you need\nYou probably need to use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven) :)\n\n";
             }
             $header .= isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
@@ -247,7 +253,7 @@ trait Methods
             }
             \file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
-        $this->logger->logger('Generating methods index...', \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger('Generating methods index...', Logger::NOTICE);
         \ksort($this->docs_methods);
         \ksort($this->human_docs_methods);
         $last_namespace = '';

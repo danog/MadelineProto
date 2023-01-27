@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * CombinedUpdatesState class.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -24,25 +25,22 @@ namespace danog\MadelineProto\MTProtoTools;
  *
  * @internal
  */
-class CombinedUpdatesState
+final class CombinedUpdatesState
 {
     /**
      * Update states.
      *
      * @var array<UpdatesState>
      */
-    private $states = [];
+    private array $states = [];
     /**
      * Constructor function.
      *
      * @param array $init Initial array of states
      */
-    public function __construct($init = [])
+    public function __construct(array $init = [])
     {
-        $this->states[false] = new UpdatesState();
-        if (!\is_array($init)) {
-            return;
-        }
+        $this->states[0] = new UpdatesState();
         foreach ($init as $channel => $state) {
             if (\is_array($state)) {
                 $state = new UpdatesState($state, $channel);
@@ -55,10 +53,9 @@ class CombinedUpdatesState
      *
      * @param int   $channel Channel to get info about (optional, if not provided returns the entire info array)
      * @param array $init    Parameters to update
-     *
-     * @return UpdatesState|UpdatesState[]
+     * @return UpdatesState|array<UpdatesState>
      */
-    public function get(int $channel = null, array $init = [])
+    public function get(?int $channel = null, array $init = []): UpdatesState|array
     {
         if ($channel === null) {
             return $this->states;
@@ -72,10 +69,8 @@ class CombinedUpdatesState
      * Remove update state.
      *
      * @param int $channel Channel whose state should be removed
-     *
-     * @return void
      */
-    public function remove(int $channel)
+    public function remove(int $channel): void
     {
         if (isset($this->states[$channel])) {
             unset($this->states[$channel]);
@@ -85,8 +80,6 @@ class CombinedUpdatesState
      * Check if update state is present.
      *
      * @param int $channel Channel ID
-     *
-     * @return bool
      */
     public function has(int $channel): bool
     {
@@ -95,12 +88,10 @@ class CombinedUpdatesState
     /**
      * Are we currently busy?
      *
-     * @param int       $channel Channel to get info about
-     * @param bool|null $set     Busy flag to set before returning
-     *
-     * @return bool
+     * @param int   $channel Channel to get info about
+     * @param null|bool $set     Busy flag to set before returning
      */
-    public function syncLoading(int $channel, bool $set = null): bool
+    public function syncLoading(int $channel, ?bool $set = null): bool
     {
         return $this->get($channel)->syncLoading($set);
     }

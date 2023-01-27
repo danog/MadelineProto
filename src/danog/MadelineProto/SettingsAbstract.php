@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto;
 
 use ReflectionClass;
@@ -10,30 +12,30 @@ abstract class SettingsAbstract
     /**
      * Whether this setting was changed.
      *
-     * @var boolean
      */
-    protected $changed = true;
+    protected bool $changed = true;
     /**
      * Merge legacy settings array.
      *
      * @param array $settings Settings array
-     *
      * @internal
-     *
-     * @return void
      */
     public function mergeArray(array $settings): void
     {
     }
 
+    public function __sleep()
+    {
+        $result = [];
+        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
+            $result []= $property->getName();
+        }
+        return $result;
+    }
     /**
      * Merge with other settings instance.
      *
-     * @param self $other
-     *
      * @internal
-     *
-     * @return void
      */
     public function merge(self $other): void
     {
@@ -67,8 +69,6 @@ abstract class SettingsAbstract
      * Convert array of legacy array property names to new camel case names.
      *
      * @param array $properties Properties
-     *
-     * @return array
      */
     protected static function toCamel(array $properties): array
     {
@@ -83,8 +83,6 @@ abstract class SettingsAbstract
      * Get whether this setting was changed, also applies changes.
      *
      * @internal
-     *
-     * @return boolean
      */
     public function hasChanged(): bool
     {
@@ -94,7 +92,6 @@ abstract class SettingsAbstract
      * Apply changes.
      *
      * @internal
-     *
      * @return static
      */
     public function applyChanges(): self
@@ -105,9 +102,6 @@ abstract class SettingsAbstract
 
     /**
      * @deprecated
-     *
-     * @param string $name
-     * @param array $arguments
      * @return static
      */
     public function __call(string $name, array $arguments): mixed

@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Failure;
 use Amp\Parallel\Context\ContextException;
-use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use Throwable;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+use const DIRECTORY_SEPARATOR;
+use const PHP_URL_PATH;
 
 final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */
-    private static $runPath;
+    private static ?string $runPath = null;
 
     /**
      * Resources.
@@ -24,13 +28,11 @@ final class WebRunner extends RunnerAbstract
      * Start.
      *
      * @param string $session Session path
-     *
-     * @return Promise<bool>
      */
-    public static function start(string $session, int $startupId): Promise
+    public static function start(string $session, int $startupId): bool
     {
         if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
-            return new Failure(new \Exception("Can't start the web runner!"));
+            return false;
         }
 
         if (!self::$runPath) {
@@ -63,9 +65,9 @@ final class WebRunner extends RunnerAbstract
                 self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
             } else {
                 $contents = \file_get_contents(self::SCRIPT_PATH);
-                $contents = \str_replace("__DIR__", \var_export($absoluteRootDir, true), $contents);
+                $contents = \str_replace('__DIR__', \var_export($absoluteRootDir, true), $contents);
                 $suffix = \bin2hex(\random_bytes(10));
-                $runPath = $absoluteRootDir."/madeline-ipc-".$suffix.".php";
+                $runPath = $absoluteRootDir.'/madeline-ipc-'.$suffix.'.php';
                 \file_put_contents($runPath, $contents);
 
                 self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
@@ -81,7 +83,7 @@ final class WebRunner extends RunnerAbstract
 
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => Magic::getcwd()
+            'cwd' => Magic::getcwd(),
         ];
 
         $params = \http_build_query($params);
@@ -90,25 +92,27 @@ final class WebRunner extends RunnerAbstract
             try {
                 $address = $proto.'://'.$_SERVER['SERVER_NAME'];
                 $port = $_SERVER['SERVER_PORT'];
-                $res = \fsockopen($address, $port);
+                $res = \fsockopen($address, (int) $port);
                 break;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Logger::log("Error while connecting to ourselves: $e");
             }
         }
         if (!isset($res)) {
-            throw new Exception("Could not connect to ourselves, please check the server configuration!");
+            throw new Exception('Could not connect to ourselves, please check the server configuration!');
         }
 
         $uri = self::$runPath.'?'.$params;
 
-        $payload = "GET $uri HTTP/1.1\r\nHost: ${_SERVER['SERVER_NAME']}\r\n\r\n";
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
+
+        Logger::log("Sending payload: $payload");
 
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
         \fwrite($res, $payload);
         self::$resources []= $res;
 
-        return new Success(true);
+        return true;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * DialogHandler module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -21,6 +22,7 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
+use Throwable;
 
 /**
  * Dialog handler.
@@ -33,29 +35,23 @@ trait DialogHandler
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<bool>, mixed, list<mixed>>
+     * @return list<array>
      */
-    public function getDialogs(bool $force = true): \Generator
+    public function getDialogs(bool $force = true): array
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
-            /** @uses DbArray::getIterator() */
-            $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
-                [, $chat] = $iterator->getCurrent();
+            foreach ($this->chats as $chat) {
                 try {
                     $res[] = $this->genAll($chat, null, MTProto::INFO_TYPE_ALL)['Peer'];
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     continue;
                 }
             }
             return $res;
         }
         $res = [];
-        foreach (yield from $this->getFullDialogs($force) as $dialog) {
+        foreach ($this->getFullDialogs($force) as $dialog) {
             $res[] = $dialog['peer'];
         }
         return $res;
@@ -64,10 +60,8 @@ trait DialogHandler
      * Get full info of all dialogs.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
-     * @return \Generator
      */
-    public function getFullDialogs(bool $force = true): \Generator
+    public function getFullDialogs(bool $force = true): array
     {
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
@@ -76,11 +70,11 @@ trait DialogHandler
             $this->dialog_params['hash'] = 0;
         }
         $res = ['dialogs' => [0], 'count' => 1];
-        $datacenter = $this->datacenter->curdc;
+        $datacenter = $this->datacenter->currentDatacenter;
         $dialogs = [];
-        $this->logger->logger("Getting dialogs...");
+        $this->logger->logger('Getting dialogs...');
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = yield from $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;

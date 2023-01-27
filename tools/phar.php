@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
@@ -40,11 +40,11 @@ class Installer
      */
     public function __construct()
     {
-        if ((PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION < 7) {
-            throw new \Exception('MadelineProto requires at least PHP 7.1 to run, PHP 8.1+ is recommended.');
+        if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
+            die('MadelineProto requires at least PHP 8.1.'.PHP_EOL);
         }
         if (PHP_INT_SIZE < 8) {
-            throw new \Exception('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1+ recommended.');
+            die('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.'.PHP_EOL);
         }
         $backtrace = \debug_backtrace(0);
         if (\count($backtrace) === 1) {
@@ -65,6 +65,7 @@ class Installer
         }
         $this->version = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
+        \define('MADELINE_PHAR_VERSION', \getcwd().DIRECTORY_SEPARATOR."madeline.version");
         \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
@@ -83,11 +84,11 @@ class Installer
     /**
      * Extract composer package versions from phar.
      *
-     * @param string|null $release
      * @return array<string, string>
      */
-    private static function extractVersions($release)
+    private static function extractVersions(?string $release): array
     {
+        $release ??= '';
         $phar = "madeline-$release.phar";
         $packages = ['danog/madelineproto' => 'old'];
         if (!\file_exists("phar://$phar/vendor/composer/installed.json")) {
@@ -111,16 +112,10 @@ class Installer
         return $packages;
     }
 
-
     /**
      * Report installs to composer.
-     *
-     * @param string $local_release
-     * @param string $remote_release
-     *
-     * @return void
      */
-    private static function reportComposer($local_release, $remote_release)
+    private static function reportComposer(?string $local_release, ?string $remote_release): void
     {
         $previous = self::extractVersions($local_release);
         $current = self::extractVersions($remote_release);
@@ -135,11 +130,7 @@ class Installer
             ];
         }
 
-        if (\defined('HHVM_VERSION')) {
-            $phpVersion = 'HHVM '.HHVM_VERSION;
-        } else {
-            $phpVersion = 'PHP '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
-        }
+        $phpVersion = 'PHP '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
         $opts = ['http' =>
             [
                 'method' => 'POST',
@@ -164,13 +155,13 @@ class Installer
 
     /**
      * Load phar file.
-     *
-     * @param string|null $release
-     * @return mixed
      */
-    private static function load($release)
+    private static function load(?string $release): mixed
     {
         if ($release === null) {
+            if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
+                throw new \Exception('MadelineProto requires at least PHP 8.1.');
+            }
             throw new \Exception('Could not download MadelineProto, please check your internet connection and PHP configuration!');
         }
         $phar = "madeline-$release.phar";
@@ -188,21 +179,16 @@ class Installer
     /**
      * Unlock phar.
      *
-     * @return void
      */
-    public static function unlock()
+    public static function unlock(): void
     {
         \flock(self::$lock, LOCK_UN);
     }
 
     /**
      * Lock installer.
-     *
-     * @param string $version Version file to lock
-     *
-     * @return bool
      */
-    private function lock($version)
+    private function lock(string $version): bool
     {
         if ($this->lockInstaller) {
             return true;
@@ -213,28 +199,25 @@ class Installer
 
     /**
      * Install MadelineProto.
-     *
-     * @return mixed
      */
     public function install()
     {
-        $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
-        $madeline_phar = "madeline-$remote_release.phar";
-        $madeline_version = "madeline-{$this->version}.phar.version";
-
-        if (\file_exists($madeline_version)) {
-            $local_release = \file_get_contents($madeline_version) ?: null;
+        if (\file_exists(MADELINE_PHAR_VERSION)) {
+            $local_release = \file_get_contents(MADELINE_PHAR_VERSION) ?: null;
         } else {
-            \touch($madeline_version);
+            \touch(MADELINE_PHAR_VERSION);
             $local_release = null;
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        if (($remote_release === $local_release && \file_exists($madeline_phar)) || $remote_release === null) {
+        if ($local_release !== null) {
             return self::load($local_release);
         }
 
-        if (!$this->lock($madeline_version)) {
+        $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
+        $madeline_phar = "madeline-$remote_release.phar";
+
+        if (!$this->lock(MADELINE_PHAR_VERSION)) {
             \flock($this->lockInstaller, LOCK_EX);
             return $this->install();
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * UpdateHandler module.
  *
@@ -11,27 +13,36 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
-use Amp\Loop;
-use Amp\Promise;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use Amp\Http\Client\Request;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\RPCErrorException;
-
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\UpdateHandlerType;
+use danog\MadelineProto\VoIP;
+use Generator;
+use Revolt\EventLoop;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages updates.
@@ -42,89 +53,162 @@ use danog\MadelineProto\Tools;
  */
 trait UpdateHandler
 {
+    private UpdateHandlerType $updateHandlerType = UpdateHandlerType::NOOP;
+
+    private bool $got_state = false;
+    private CombinedUpdatesState $channels_state;
+    private array $updates = [];
+    private int $updates_key = 0;
+
     /**
-     * Update handler callback.
-     *
-     * @var ?callable
+     * Set NOOP update handler, ignoring all updates.
      */
-    private $updateHandler;
-    private $got_state = false;
-    private $channels_state;
-    public $updates = [];
-    public $updates_key = 0;
+    public function setNoop(): void
+    {
+        $this->updateHandlerType = UpdateHandlerType::NOOP;
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
+        $this->startUpdateSystem();
+    }
+    /**
+     * PWRTelegram webhook URL.
+     */
+    private ?string $webhookUrl = null;
+    /**
+     * Set webhook update handler.
+     *
+     * @param string $webhookUrl Webhook URL
+     */
+    public function setWebhook(string $webhookUrl): void
+    {
+        $this->webhookUrl = $webhookUrl;
+        $this->updateHandlerType = UpdateHandlerType::WEBHOOK;
+        \array_map($this->handleUpdate(...), $this->updates);
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
+        $this->startUpdateSystem();
+    }
+
+    /**
+     * Event update handler.
+     *
+     * @param array $update Update
+     */
+    private function eventUpdateHandler(array $update): void
+    {
+        if (!isset($this->eventHandlerMethods[$update['_']])) {
+            return;
+        }
+        $this->event_handler_instance->waitForStartInternal();
+        $r = $this->eventHandlerMethods[$update['_']]($update);
+        if ($r instanceof Generator) {
+            Tools::consumeGenerator($r);
+        }
+    }
+
+    /**
+     * Send update to webhook.
+     *
+     * @param array $update Update
+     */
+    private function pwrWebhook(array $update): void
+    {
+        $payload = \json_encode($update);
+        Assert::notEmpty($payload);
+        Assert::notNull($this->webhookUrl);
+        $request = new Request($this->webhookUrl, 'POST');
+        $request->setHeader('content-type', 'application/json');
+        $request->setBody($payload);
+        $result = ($this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
+        $this->logger->logger('Result of webhook query is '.$result, Logger::NOTICE);
+        $result = \json_decode($result, true);
+        if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
+            try {
+                $this->logger->logger('Reverse webhook command returned', $this->methodCallAsyncRead($result['method'], $result));
+            } catch (Throwable $e) {
+                $this->logger->logger("Reverse webhook command returned: {$e}");
+            }
+        }
+    }
+
+    private ?DeferredFuture $update_deferred = null;
+    /**
+     * Signal update.
+     *
+     * @internal
+     */
+    private function signalUpdate(array $update): void
+    {
+        $this->updates[$this->updates_key++] = $update;
+        if ($this->update_deferred) {
+            $deferred = $this->update_deferred;
+            $this->update_deferred = null;
+            $deferred->complete();
+        }
+    }
 
     /**
      * Get updates.
      *
-     * @param array $params Params
-     *
-     * @internal
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, \Amp\Promise<mixed|null>, mixed, list<array{update_id: mixed, update: mixed}>|mixed>
+     * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @return list<array{update_id: mixed, update: mixed}>
      */
-    public function getUpdates($params = []): \Generator
+    public function getUpdates(array $params = []): array
     {
-        $this->updateHandler = MTProto::GETUPDATES_HANDLER;
-        $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
-        if (empty($this->updates)) {
-            $params['timeout'] *= 1000;
-            yield Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
+        $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->eventHandlerMethods = [];
+
+        [
+            'offset' => $offset,
+            'limit' => $limit,
+            'timeout' => $timeout
+        ] = \array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
+
+        if (!$this->updates) {
+            try {
+                $this->update_deferred = new DeferredFuture();
+                $this->update_deferred->getFuture()->await(new TimeoutCancellation($timeout));
+            } catch (CancelledException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
+            }
         }
-        if (empty($this->updates)) {
-            return $this->updates;
+        if (!$this->updates) {
+            return [];
         }
-        if ($params['offset'] < 0) {
-            $params['offset'] = \array_reverse(\array_keys((array) $this->updates))[\abs($params['offset']) - 1];
+        if ($offset < 0) {
+            $offset = $this->updates_key+$offset;
         }
         $updates = [];
         foreach ($this->updates as $key => $value) {
-            if ($params['offset'] > $key) {
+            if ($offset > $key) {
                 unset($this->updates[$key]);
-            } elseif ($params['limit'] === null || \count($updates) < $params['limit']) {
-                $updates[] = ['update_id' => $key, 'update' => $value];
+                continue;
+            }
+
+            $updates[] = ['update_id' => $key, 'update' => $value];
+
+            if ($limit !== null && \count($updates) === $limit) {
+                break;
             }
         }
         $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
         return $updates;
     }
-    private ?Deferred $update_deferred = null;
-    /**
-     * Wait for update.
-     *
-     * @internal
-     *
-     * @return Promise
-     */
-    public function waitUpdate(): Promise
-    {
-        $this->update_deferred = new Deferred();
-        return $this->update_deferred->promise();
-    }
-    /**
-     * Signal update.
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function signalUpdate(): void
-    {
-        if ($this->update_deferred) {
-            $deferred = $this->update_deferred;
-            $this->update_deferred = null;
-            Loop::defer(fn () => $deferred->resolve());
-        }
-    }
     /**
      * Check message ID.
      *
      * @param array $message Message
-     *
      * @internal
-     *
-     * @return boolean
      */
     public function checkMsgId(array $message): bool
     {
@@ -133,9 +217,9 @@ trait UpdateHandler
         }
         try {
             $peer_id = $this->getId($message['peer_id']);
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (Exception $e) {
             return true;
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (RPCErrorException $e) {
             return true;
         }
         $message_id = $message['id'];
@@ -149,29 +233,24 @@ trait UpdateHandler
      * Get channel state.
      *
      * @internal
-     *
-     * @return \Generator
-     * @psalm-return <mixed, mixed, mixed, UpdatesState>
      */
-    public function loadUpdateState(): \Generator
+    public function loadUpdateState()
     {
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->channels_state->get(0, yield from $this->getUpdatesState());
+            $this->channels_state->get(0, $this->getUpdatesState());
         }
         return $this->channels_state->get(0);
     }
     /**
      * Load channel state.
      *
-     * @param ?int  $channelId Channel ID
+     * @param null|int  $channelId Channel ID
      * @param array $init      Init
-     *
      * @internal
-     *
-     * @return UpdatesState|UpdatesState[]
+     * @return UpdatesState|array<UpdatesState>
      */
-    public function loadChannelState($channelId = null, $init = [])
+    public function loadChannelState(?int $channelId = null, array $init = []): UpdatesState|array
     {
         return $this->channels_state->get($channelId, $init);
     }
@@ -179,10 +258,8 @@ trait UpdateHandler
      * Get channel states.
      *
      * @internal
-     *
-     * @return CombinedUpdatesState
      */
-    public function getChannelStates()
+    public function getChannelStates(): CombinedUpdatesState
     {
         return $this->channels_state;
     }
@@ -190,51 +267,52 @@ trait UpdateHandler
      * Get update state.
      *
      * @internal
-     *
-     * @return \Generator
      */
-    public function getUpdatesState(): \Generator
+    public function getUpdatesState()
     {
-        $data = yield from $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
-        yield from $this->getCdnConfig($this->settings->getDefaultDc());
+        $data = $this->methodCallAsyncRead('updates.getState', []);
+        $this->getCdnConfig();
         return $data;
     }
     /**
-     * Extract a message constructor from an Updates constructor.
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, array>
+     * Extract a message ID from an Updates constructor.
      */
-    public function extractMessage(array $updates): \Generator
+    public function extractMessageId(array $updates): int
     {
-        return (yield from $this->extractMessageUpdate($updates))['message'];
+        return $this->extractMessage($updates)['id'];
+    }
+    /**
+     * Extract a message constructor from an Updates constructor.
+     */
+    public function extractMessage(array $updates): array
+    {
+        return ($this->extractMessageUpdate($updates))['message'];
     }
     /**
      * Extract an update message constructor from an Updates constructor.
-     *
-     * @psalm-return \Generator<mixed, mixed, mixed, array>
      */
-    public function extractMessageUpdate(array $updates): \Generator
+    public function extractMessageUpdate(array $updates): array
     {
         $result = null;
-        foreach ((yield from $this->extractUpdates($updates)) as $update) {
+        foreach (($this->extractUpdates($updates)) as $update) {
             if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage'])) {
                 if ($result !== null) {
-                    throw new \danog\MadelineProto\Exception("Found more than one update of type message, use extractUpdates to extract all updates");
+                    throw new Exception('Found more than one update of type message, use extractUpdates to extract all updates');
                 }
                 $result = $update;
             }
         }
         if ($result === null) {
-            throw new \danog\MadelineProto\Exception("Could not find any message in the updates!");
+            throw new Exception('Could not find any message in the updates!');
         }
         return $result;
     }
     /**
      * Extract Update constructors from an Updates constructor.
      *
-     * @psalm-return \Generator<mixed, mixed, mixed, array<array>>
+     * @return array<array>
      */
-    public function extractUpdates(array $updates): \Generator
+    public function extractUpdates(array $updates): array
     {
         switch ($updates['_']) {
             case 'updates':
@@ -243,22 +321,22 @@ trait UpdateHandler
             case 'updateShort':
                 return [$updates['update']];
             case 'updateShortSentMessage':
-                $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-            // no break
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $updates = \array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
-                $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
+                $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = yield from $this->getInfo($from_id, MTProto::INFO_TYPE_PEER);
-                $message['peer_id'] = yield from $this->getInfo($to_id, MTProto::INFO_TYPE_PEER);
+                $message['from_id'] = $this->getInfo($from_id, MTProto::INFO_TYPE_PEER);
+                $message['peer_id'] = $this->getInfo($to_id, MTProto::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.$updates['_']);
+                throw new ResponseException('Unrecognized update received: '.$updates['_']);
         }
     }
     private function populateMessageFlags(array &$message): void
@@ -283,24 +361,21 @@ trait UpdateHandler
     /**
      * @param array $updates        Updates
      * @param array $actual_updates Actual updates for deferred
-     *
      * @internal
-     *
-     * @return \Generator
      */
-    public function handleUpdates($updates, $actual_updates = null): \Generator
+    public function handleUpdates(array $updates, ?array $actual_updates = null): void
     {
         if ($actual_updates) {
             $updates = $actual_updates;
         }
-        $this->logger->logger('Parsing updates ('.$updates['_'].') received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
+        $this->logger->logger('Parsing updates ('.$updates['_'].') received via the socket...', Logger::VERBOSE);
         switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
                 $result = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' || $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' || $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' || $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)] = true;
+                        $result[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
@@ -316,79 +391,117 @@ trait UpdateHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
+                $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
                 break;
             case 'updateShortSentMessage':
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
-            // no break
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $updates = \array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
-                $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
+                $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                if (!((yield from $this->peerIsset($from_id)) || !((yield from $this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !((yield from $this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !((yield from $this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
-                    yield $this->updaters[FeedLoop::GENERIC]->resume();
+                if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {
+                    $this->updaters[FeedLoop::GENERIC]->resume();
                     return;
                 }
                 $message = $updates;
                 $message['_'] = 'message';
                 try {
-                    $message['from_id'] = (yield from $this->getInfo($from_id))['Peer'];
-                    $message['peer_id'] = (yield from $this->getInfo($to_id))['Peer'];
-                } catch (\danog\MadelineProto\Exception $e) {
-                    $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
+                    $message['from_id'] = ($this->getInfo($from_id))['Peer'];
+                    $message['peer_id'] = ($this->getInfo($to_id))['Peer'];
+                } catch (Exception $e) {
+                    $this->logger->logger('Still did not get user in database, postponing update', Logger::ERROR);
                     break;
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
+                } catch (RPCErrorException $e) {
+                    $this->logger->logger('Still did not get user in database, postponing update', Logger::ERROR);
                     break;
                 }
                 $this->populateMessageFlags($message);
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
+                $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
                 break;
             case 'updatesTooLong':
                 $this->updaters[UpdateLoop::GENERIC]->resume();
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.\var_export($updates, true));
+                throw new ResponseException('Unrecognized update received: '.\var_export($updates, true));
                 break;
         }
+    }
+    /**
+     * Subscribe to event handler updates for a channel/supergroup we're not a member of.
+     *
+     * @return bool False if we were already subscribed
+     */
+    public function subscribeToUpdates(mixed $channel): bool
+    {
+        $channelId = $this->getInfo($channel, MTProto::INFO_TYPE_ID);
+        if (!MTProto::isSupergroup($channelId)) {
+            throw new Exception("You can only subscribe to channels or supergroups!");
+        }
+        $channelId = MTProto::fromSupergroup($channelId);
+        if (!$this->getChannelStates()->has($channelId)) {
+            $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
+            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
+            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
+            $this->feeders[$channelId]->start();
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->resume();
+            }
+            $this->updaters[$channelId]->start();
+            if (isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->resume();
+            }
+            return true;
+        }
+        return false;
     }
     /**
      * Save update.
      *
      * @param array $update Update to save
-     *
      * @internal
-     *
-     * @return \Generator
      */
-    public function saveUpdate(array $update): \Generator
+    public function saveUpdate(array $update): void
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
-            yield from $this->getConfig();
+            $this->getConfig();
         }
-        if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink']) && $this->getSettings()->getDb()->getEnableFullPeerDb()) {
-            $id = $this->getId($update);
-            $chat = yield $this->full_chats[$id];
-            $chat['last_update'] = 0;
-            $this->full_chats[$id] = $chat;
-            yield from $this->getFullInfo($id);
+        if (
+            \in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])
+            || (
+                $update['_'] === 'updateNewChannelMessage'
+                && isset($update['message']['action']['_'])
+                && \in_array($update['message']['action']['_'], ['messageActionChatEditTitle', 'messageActionChatEditPhoto', 'messageActionChatDeletePhoto', 'messageActionChatMigrateTo', 'messageActionChannelMigrateFrom', 'messageActionGroupCall'])
+            )
+        ) {
+            try {
+                if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
+                    $this->refreshFullPeerCache($update);
+                } else {
+                    $this->refreshPeerCache($update);
+                }
+            } catch (RPCErrorException $e) {
+                if ($e->rpc !== 'CHANNEL_PRIVATE') {
+                    throw $e;
+                }
+            }
         }
         if ($update['_'] === 'updateDcOptions') {
-            $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('Got new dc options', Logger::VERBOSE);
             $this->config['dc_options'] = $update['dc_options'];
-            yield from $this->parseConfig();
+            $this->parseConfig();
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
             if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-                $this->logger->logger('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', Logger::WARNING);
                 return;
             }
             switch ($update['phone_call']['_']) {
@@ -396,20 +509,20 @@ trait UpdateHandler
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $controller = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING);
+                    $controller = new VoIP(false, $update['phone_call']['admin_id'], $this, VoIP::CALL_STATE_INCOMING);
                     $controller->setCall($update['phone_call']);
                     $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
                     $controller->storage['video'] = $update['phone_call']['video'] ?? false;
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
-                    if (!(yield from $this->confirmCall($update['phone_call']))) {
+                    if (!($this->confirmCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                     break;
                 case 'phoneCall':
-                    if (!(yield from $this->completeCall($update['phone_call']))) {
+                    if (!($this->completeCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
@@ -418,30 +531,31 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    $update['phone_call'] = $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    break;
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             if (isset($update['qts'])) {
-                $cur_state = (yield from $this->loadUpdateState());
+                $cur_state = ($this->loadUpdateState());
                 if ($cur_state->qts() === -1) {
                     $cur_state->qts($update['qts']);
                 }
                 if ($update['qts'] < $cur_state->qts()) {
-                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                    return false;
+                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                    return;
                 }
                 if ($update['qts'] > $cur_state->qts() + 1) {
-                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                    $this->updaters[UpdateLoop::GENERIC]->resumeDefer();
-                    return false;
+                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                    $this->updaters[UpdateLoop::GENERIC]->resume();
+                    return;
                 }
-                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-                yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
+                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
+                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
             }
             if (!isset($this->secret_chats[$update['message']['chat_id']])) {
-                $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
-                return false;
+                $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
+                return;
             }
             $this->secretFeeders[$update['message']['chat_id']]->feed($update);
             $this->secretFeeders[$update['message']['chat_id']]->resume();
@@ -458,15 +572,15 @@ trait UpdateHandler
                     if (!$this->settings->getSecretChats()->canAccept($update['chat']['admin_id'])) {
                         return;
                     }
-                    $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Accepting secret chat '.$update['chat']['id'], Logger::NOTICE);
                     try {
-                        yield from $this->acceptSecretChat($update['chat']);
+                        $this->acceptSecretChat($update['chat']);
                     } catch (RPCErrorException $e) {
                         $this->logger->logger("Error while accepting secret chat: {$e}", Logger::FATAL_ERROR);
                     }
                     break;
                 case 'encryptedChatDiscarded':
-                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
                     if (isset($this->secret_chats[$update['chat']['id']])) {
                         unset($this->secret_chats[$update['chat']['id']]);
                     }
@@ -478,15 +592,13 @@ trait UpdateHandler
                     }
                     break;
                 case 'encryptedChat':
-                    $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    yield from $this->completeSecretChat($update['chat']);
+                    $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);
+                    $this->completeSecretChat($update['chat']);
                     break;
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
         }
-        //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
-        //}
-        if (!$this->updateHandler) {
+        if ($this->updateHandlerType === UpdateHandlerType::NOOP) {
             return;
         }
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
@@ -509,7 +621,15 @@ trait UpdateHandler
         if (isset($update['message']['peer_id'])) {
             $update['message']['to_id'] = $update['message']['peer_id'];
         }
-        // First save to array, then once the feed loop signals resumal of loop, resume and handle
-        $this->updates[$this->updates_key++] = $update;
+        $this->handleUpdate($update);
+    }
+    private function handleUpdate(array $update): void
+    {
+        /** @var UpdateHandlerType::EVENT_HANDLER|UpdateHandlerType::WEBHOOK|UpdateHandlerType::GET_UPDATES $this->updateHandlerType */
+        EventLoop::queue(match ($this->updateHandlerType) {
+            UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler(...),
+            UpdateHandlerType::WEBHOOK => $this->pwrWebhook(...),
+            UpdateHandlerType::GET_UPDATES => $this->signalUpdate(...),
+        }, $update);
     }
 }

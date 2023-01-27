@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Test;
 
 use CURLFile;
 use danog\Decoder\FileId;
+use Generator;
+
+use const CURLOPT_POST;
+use const CURLOPT_POSTFIELDS;
+use const CURLOPT_RETURNTRANSFER;
 
 class FileIdTest extends MadelineTestCase
 {
@@ -11,8 +18,6 @@ class FileIdTest extends MadelineTestCase
      * Strip file reference from file ID.
      *
      * @param string $fileId File ID
-     *
-     * @return string
      */
     public static function stripFileReference(string $fileId): string
     {
@@ -22,8 +27,6 @@ class FileIdTest extends MadelineTestCase
      * Strip access hash (and possibly ID) from file ID.
      *
      * @param string $fileId File ID
-     *
-     * @return string
      */
     public static function stripForChat(string $fileId): string
     {
@@ -36,12 +39,9 @@ class FileIdTest extends MadelineTestCase
      * @param string $fileIdAstr File ID A
      * @param string $fileIdBstr File ID B
      * @param string $message    Message
-     *
      * @throws PHPUnit\Framework\AssertionFailedError
-     *
-     * @return void
      */
-    public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, $message = '')
+    public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, string $message = ''): void
     {
         $fileIdAstr = self::stripFileReference($fileIdAstr);
         $fileIdBstr = self::stripFileReference($fileIdBstr);
@@ -52,13 +52,11 @@ class FileIdTest extends MadelineTestCase
     }
 
     /**
-     * @param string $fileId File ID
      * @param string $type   Expected type
      * @param string $type   Original type
-     *
      * @dataProvider provideFileIdsAndType
      */
-    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
+    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
@@ -66,13 +64,11 @@ class FileIdTest extends MadelineTestCase
         $this->assertTrue(true);
     }
     /**
-     * @param string $fileId File ID
      * @param string $type   Expected type
      * @param string $type   Original type
-     *
      * @dataProvider provideFileIdsAndType
      */
-    public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
+    public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to resend and then reconvert $fileIdStr");
         if ($type === 'profile_photo') {
@@ -92,11 +88,11 @@ class FileIdTest extends MadelineTestCase
         $res = self::$MadelineProto->messages->sendMedia(
             [
                 'peer' => \getenv('DEST'),
-                'media' => $fileIdStr
+                'media' => $fileIdStr,
             ],
             [
-                'botAPI' => true
-            ]
+                'botAPI' => true,
+            ],
         );
         if ($type === 'thumbnail') {
             $this->assertArrayHasKey($fullInfo[0], $res);
@@ -105,7 +101,7 @@ class FileIdTest extends MadelineTestCase
             $this->assertFileIdEquals($fileIdStr, $res['thumb']['file_id']);
             $this->assertEquals($uniqueFileIdStr, $res['thumb']['file_unique_id']);
 
-            list($type, $fileIdStr, $uniqueFileIdStr) = $fullInfo;
+            [$type, $fileIdStr, $uniqueFileIdStr] = $fullInfo;
         } else {
             $this->assertArrayHasKey($type, $res);
             $res = $res[$type];
@@ -130,7 +126,7 @@ class FileIdTest extends MadelineTestCase
         }
     }
 
-    public function provideFileIdsAndType(): \Generator
+    public function provideFileIdsAndType(): Generator
     {
         $dest = \getenv('DEST');
         $token = \getenv('BOT_TOKEN');
@@ -159,7 +155,7 @@ class FileIdTest extends MadelineTestCase
                 $handle = \curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
                 \curl_setopt($handle, CURLOPT_POST, true);
                 \curl_setopt($handle, CURLOPT_POSTFIELDS, [
-                    $type => new CURLFile(\basename($url))
+                    $type => new CURLFile(\basename($url)),
                 ]);
                 \curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
                 $botResult = \json_decode(\curl_exec($handle), true);

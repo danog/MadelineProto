@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TLMethods module.
  *
@@ -11,21 +13,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
 
-class TLMethods
+final class TLMethods
 {
-    use \danog\Serializable;
     use TLParams;
-    public $by_id = [];
-    public $by_method = [];
-    public $method_namespace = [];
+    public array $by_id = [];
+    public array $by_method = [];
+    public array $method_namespace = [];
     public function __sleep(): array
     {
         return ['by_id', 'by_method', 'method_namespace'];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,7 +9,7 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * RPC settings.
  */
-class RPC extends SettingsAbstract
+final class RPC extends SettingsAbstract
 {
     /**
      * RPC timeout.
@@ -47,8 +49,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get RPC timeout.
-     *
-     * @return int
      */
     public function getRpcTimeout(): int
     {
@@ -59,8 +59,6 @@ class RPC extends SettingsAbstract
      * Set RPC timeout.
      *
      * @param int $rpcTimeout RPC timeout.
-     *
-     * @return self
      */
     public function setRpcTimeout(int $rpcTimeout): self
     {
@@ -71,8 +69,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
-     *
-     * @return int
      */
     public function getFloodTimeout(): int
     {
@@ -83,8 +79,6 @@ class RPC extends SettingsAbstract
      * Set flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
      *
      * @param int $floodTimeout Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously
-     *
-     * @return self
      */
     public function setFloodTimeout(int $floodTimeout): self
     {
@@ -95,8 +89,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get maximum number of messages to consider when using call queues.
-     *
-     * @return int
      */
     public function getLimitCallQueue(): int
     {
@@ -107,8 +99,6 @@ class RPC extends SettingsAbstract
      * Set maximum number of messages to consider when using call queues.
      *
      * @param int $limitCallQueue Maximum number of messages to consider when using call queues
-     *
-     * @return self
      */
     public function setLimitCallQueue(int $limitCallQueue): self
     {
@@ -119,8 +109,6 @@ class RPC extends SettingsAbstract
 
     /**
      * Get encode payload with GZIP if bigger than.
-     *
-     * @return int
      */
     public function getGzipEncodeIfGt(): int
     {
@@ -131,8 +119,6 @@ class RPC extends SettingsAbstract
      * Set encode payload with GZIP if bigger than.
      *
      * @param int $gzipEncodeIfGt Encode payload with GZIP if bigger than
-     *
-     * @return self
      */
     public function setGzipEncodeIfGt(int $gzipEncodeIfGt): self
     {

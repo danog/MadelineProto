@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
+use Closure;
 use danog\MadelineProto\Logger as MadelineProtoLogger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SettingsAbstract;
 use danog\MadelineProto\Tools;
 
+use const PHP_SAPI;
+
 /**
  * Logger settings.
  */
-class Logger extends SettingsAbstract
+final class Logger extends SettingsAbstract
 {
     /**
      * Logger type.
@@ -86,20 +91,20 @@ class Logger extends SettingsAbstract
         $this->type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
             ? MadelineProtoLogger::ECHO_LOGGER
             : MadelineProtoLogger::FILE_LOGGER;
-        Magic::start(true);
+        Magic::start(light: true);
         $this->extra = Magic::$script_cwd.'/MadelineProto.log';
     }
 
     public function __sleep()
     {
-        return $this->extra instanceof \Closure
+        return $this->extra instanceof Closure
             ? ['type', 'extra', 'level', 'maxSize']
             : ['type', 'level', 'maxSize'];
     }
     /**
      * Wakeup function.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
             ? MadelineProtoLogger::ECHO_LOGGER
@@ -112,12 +117,10 @@ class Logger extends SettingsAbstract
     }
     /**
      * Initialize global logging.
-     *
-     * @return void
      */
-    private function init()
+    private function init(): void
     {
-        Magic::start(false);
+        Magic::start(light: true);
         MadelineProtoLogger::constructorFromSettings($this);
     }
     /**
@@ -134,16 +137,9 @@ class Logger extends SettingsAbstract
      * Set $type Logger type.
      *
      * @param MadelineProtoLogger::LOGGER_* $type $type Logger type.
-     *
-     * @return self
      */
     public function setType(int $type): self
     {
-        if ($type === MadelineProtoLogger::NO_LOGGER) {
-            $type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
-                ? MadelineProtoLogger::ECHO_LOGGER
-                : MadelineProtoLogger::FILE_LOGGER;
-        }
         $this->type = $type;
 
         return $this;
@@ -152,9 +148,8 @@ class Logger extends SettingsAbstract
     /**
      * Get extra parameter for logger.
      *
-     * @return null|callable|string
      */
-    public function getExtra()
+    public function getExtra(): callable|string|null
     {
         return $this->type === MadelineProtoLogger::FILE_LOGGER
             ? Tools::absolute($this->extra)
@@ -165,10 +160,8 @@ class Logger extends SettingsAbstract
      * Set extra parameter for logger.
      *
      * @param null|callable|string $extra Extra parameter for logger.
-     *
-     * @return self
      */
-    public function setExtra($extra): self
+    public function setExtra(callable|string|null $extra): self
     {
         if ($this->type === MadelineProtoLogger::CALLABLE_LOGGER && !\is_callable($extra)) {
             $this->setType((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
@@ -195,8 +188,6 @@ class Logger extends SettingsAbstract
      * Set logging level.
      *
      * @param MadelineProtoLogger::LEVEL_* $level Logging level.
-     *
-     * @return self
      */
     public function setLevel(int $level): self
     {
@@ -207,8 +198,6 @@ class Logger extends SettingsAbstract
 
     /**
      * Get maximum filesize for logger, in case of file logging.
-     *
-     * @return int
      */
     public function getMaxSize(): int
     {
@@ -219,8 +208,6 @@ class Logger extends SettingsAbstract
      * Set maximum filesize for logger, in case of file logging.
      *
      * @param int $maxSize Maximum filesize for logger, in case of file logging.
-     *
-     * @return self
      */
     public function setMaxSize(int $maxSize): self
     {

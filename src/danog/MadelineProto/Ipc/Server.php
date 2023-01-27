@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * API wrapper module.
  *
@@ -10,35 +13,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Promise;
-use Amp\Success;
-use danog\Loop\SignalLoop;
-use danog\MadelineProto\Exception as Exception;
+use danog\Loop\Loop;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
+use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
+use Throwable;
 
-use function Amp\Promise\first;
+use function Amp\async;
+use function Amp\delay;
 
 /**
  * IPC server.
  */
-class Server extends SignalLoop
+class Server extends Loop
 {
     use InternalLoop;
     /**
@@ -56,7 +61,7 @@ class Server extends SignalLoop
     /**
      * Deferred to shut down worker, if started.
      */
-    private static ?Deferred $shutdownDeferred = null;
+    private static ?DeferredFuture $shutdownDeferred = null;
     /**
      * Boolean whether to shut down worker, if started.
      */
@@ -77,12 +82,10 @@ class Server extends SignalLoop
      * Set IPC path.
      *
      * @param SessionPaths $session Session
-     *
-     * @return void
      */
     public function setIpcPath(SessionPaths $session): void
     {
-        self::$shutdownDeferred ??= new Deferred;
+        self::$shutdownDeferred ??= new DeferredFuture;
         $this->server = new IpcServer($session->getIpcPath());
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
@@ -95,141 +98,123 @@ class Server extends SignalLoop
      * Start IPC server in background.
      *
      * @param SessionPaths $session   Session path
-     *
-     * @return Promise
      */
-    public static function startMe(SessionPaths $session): Promise
+    public static function startMe(SessionPaths $session): Future
     {
         $id = Tools::randomInt(2000000000);
         $started = false;
-        $promises = [];
         try {
             Logger::log("Starting IPC server $session (process)");
-            $promises []= ProcessRunner::start($session, $id);
+            ProcessRunner::start((string) $session, $id);
             $started = true;
-            $promises []= WebRunner::start($session, $id);
-            return Tools::call(self::monitor($session, $id, $started, first($promises)));
-        } catch (\Throwable $e) {
+            WebRunner::start((string) $session, $id);
+            return async(self::monitor(...), $session, $id, $started);
+        } catch (Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
-            $promises []= WebRunner::start($session, $id);
-            $started = true;
-        } catch (\Throwable $e) {
+            if (WebRunner::start((string) $session, $id)) {
+                $started = true;
+            }
+        } catch (Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new Deferred)->promise()));
+        return async(self::monitor(...), $session, $id, $started);
     }
     /**
      * Monitor session.
-     *
-     * @param SessionPaths  $session
-     * @param int           $id
-     * @param bool          $started
-     * @param Promise<bool> $cancelConnect
-     *
-     * @return \Generator
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): \Generator
+    private static function monitor(SessionPaths $session, int $id, bool $started): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
         }
         $count = 0;
         while (true) {
-            $state = yield $session->getIpcState();
+            $state = $session->getIpcState();
             if ($state && $state->getStartupId() === $id) {
                 if ($e = $state->getException()) {
                     Logger::log("IPC server got exception $e");
                     return $e;
                 }
-                Logger::log("IPC server started successfully!");
+                Logger::log('IPC server started successfully!');
                 return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!");
             }
-            try {
-                yield Tools::timeoutWithDefault($cancelConnect, 500, null);
-                $cancelConnect = (new Deferred)->promise();
-            } catch (\Throwable $e) {
-                Logger::log("$e");
-                Logger::log("Could not start IPC server, please check the logs for more details!");
-                return $e;
-            }
+            delay(0.5);
             $count++;
         }
         return false;
     }
     /**
      * Wait for shutdown.
-     *
-     * @return Promise
      */
-    public static function waitShutdown(): Promise
+    public static function waitShutdown(): void
     {
         if (self::$shutdownNow) {
-            return new Success;
+            return;
         }
-        self::$shutdownDeferred ??= new Deferred;
-        return self::$shutdownDeferred->promise();
+        self::$shutdownDeferred ??= new DeferredFuture;
+        self::$shutdownDeferred->getFuture()->await();
     }
     /**
      * Shutdown.
-     *
-     * @return void
      */
-    final public function shutdown(): void
+    final public function stop(): bool
     {
-        $this->signal(null);
+        $this->server->close();
+        if (!$this instanceof ServerCallback) {
+            $this->callback->server->close();
+        }
         if (self::$shutdownDeferred) {
             self::$shutdownNow = true;
             $deferred = self::$shutdownDeferred;
             self::$shutdownDeferred = null;
-            $deferred->resolve();
+            $deferred->complete();
         }
+        return true;
     }
     /**
      * Main loop.
-     *
-     * @return \Generator
      */
-    public function loop(): \Generator
+    protected function loop(): ?float
     {
-        while ($socket = yield $this->waitSignal($this->server->accept())) {
-            Tools::callFork($this->clientLoop($socket));
+        while ($socket = $this->server->accept()) {
+            EventLoop::queue($this->clientLoop(...), $socket);
         }
         $this->server->close();
         if (isset($this->callback)) {
-            $this->callback->signal(null);
+            $this->callback->server->close();
         }
+        return self::STOP;
     }
     /**
      * Client handler loop.
      *
      * @param ChannelledSocket $socket Client
-     *
-     * @return \Generator|Promise
      */
-    protected function clientLoop(ChannelledSocket $socket)
+    protected function clientLoop(ChannelledSocket $socket): void
     {
-        $this->API->logger("Accepted IPC client connection!");
+        $this->API->logger('Accepted IPC client connection!');
 
         $id = 0;
         $payload = null;
         try {
-            while ($payload = yield $socket->receive()) {
-                Tools::callFork($this->clientRequest($socket, $id++, $payload));
+            while ($payload = $socket->receive()) {
+                EventLoop::queue($this->clientRequest(...), $socket, $id++, $payload);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
             try {
-                yield $socket->disconnect();
-            } catch (\Throwable $e) {
+                $socket->disconnect();
+            } catch (Throwable $e) {
             }
             if ($payload === self::SHUTDOWN) {
-                $this->shutdown();
+                Shutdown::removeCallback('restarter');
+                $this->stop();
             }
         }
     }
@@ -238,61 +223,50 @@ class Server extends SignalLoop
      *
      * @param ChannelledSocket                   $socket  Socket
      * @param array{0: string, 1: array|Wrapper} $payload Payload
-     *
-     * @return \Generator
      */
-    private function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
+    private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
     {
         try {
-            yield from $this->API->initAsynchronously();
+            $this->API->waitForInit();
             if ($payload[1] instanceof Wrapper) {
                 $wrapper = $payload[1];
                 $payload[1] = $this->callback->unwrap($wrapper);
             }
             $result = $this->API->{$payload[0]}(...$payload[1]);
-            $result = $result instanceof \Generator
-                ? yield from $result
-                : ($result instanceof Promise
-                    ? yield $result
-                    : $result);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->API->logger("Got error while calling IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
         } finally {
             if (isset($wrapper)) {
                 try {
-                    yield $wrapper->disconnect();
-                } catch (\Throwable $e) {
+                    $wrapper->disconnect();
+                } catch (Throwable $e) {
                 }
             }
         }
         try {
-            yield $socket->send([$id, $result]);
-        } catch (\Throwable $e) {
-            $this->API->logger("Got error while trying to send result of ${payload[0]}: $e", Logger::ERROR);
+            $socket->send([$id, $result]);
+        } catch (Throwable $e) {
+            $this->API->logger("Got error while trying to send result of {$payload[0]}: $e", Logger::ERROR);
             try {
-                yield $socket->send([$id, new ExitFailure($e)]);
-            } catch (\Throwable $e) {
-                $this->API->logger("Got error while trying to send error of error of ${payload[0]}: $e", Logger::ERROR);
+                $socket->send([$id, new ExitFailure($e)]);
+            } catch (Throwable $e) {
+                $this->API->logger("Got error while trying to send error of error of {$payload[0]}: $e", Logger::ERROR);
             }
         }
     }
     /**
      * Get the name of the loop.
-     *
-     * @return string
      */
     public function __toString(): string
     {
-        return "IPC server";
+        return 'IPC server';
     }
 
     /**
      * Set IPC settings.
      *
      * @param Ipc $settings IPC settings
-     *
-     * @return self
      */
     public function setSettings(Ipc $settings): self
     {

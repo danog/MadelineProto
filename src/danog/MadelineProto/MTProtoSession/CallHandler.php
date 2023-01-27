@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * CallHandler module.
  *
@@ -11,19 +13,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WrappedFuture;
+use Revolt\EventLoop;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * Manages method and object calls.
@@ -33,12 +39,9 @@ trait CallHandler
     /**
      * Recall method.
      *
-     * @param string $watcherId Watcher ID for defer
      * @param array  $args      Args
-     *
-     * @return void
      */
-    public function methodRecall(string $watcherId, array $args): void
+    public function methodRecall(array $args): void
     {
         $message_id = $args['message_id'];
         $postpone = $args['postpone'] ?? false;
@@ -46,8 +49,9 @@ trait CallHandler
         if ($datacenter === $this->datacenter) {
             $datacenter = false;
         }
-        $message_ids = ($this->outgoing_messages[$message_id] ?? null) instanceof Container
-            ? $this->outgoing_messages[$message_id]->getIds()
+        $message = $this->outgoing_messages[$message_id] ?? null;
+        $message_ids = $message instanceof Container
+            ? $message->getIds()
             : [$message_id];
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id])
@@ -58,8 +62,9 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
-                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message) {
-                        Tools::callFork($r->sendMessage($message, false));
+                    EventLoop::queue(function () use ($datacenter, $message): void {
+                        $this->API->datacenter->waitGetConnection($datacenter)
+                            ->sendMessage($message, false);
                     });
                 } else {
                     /** @var OutgoingMessage */
@@ -67,7 +72,7 @@ trait CallHandler
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
-                    Tools::callFork($this->sendMessage($message, false));
+                    EventLoop::queue($this->sendMessage(...), $message, false);
                 }
             } else {
                 $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
@@ -87,46 +92,34 @@ trait CallHandler
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
-        $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
-        if (\is_array($readDeferred)) {
-            $readDeferred = Tools::all(\array_map(fn (Deferred $value) => $value->promise(), $readDeferred));
-        } else {
-            $readDeferred = $readDeferred->promise();
+        $readFuture = $this->methodCallAsyncWrite($method, $args, $aargs);
+        if ($aargs['noResponse'] ?? false) {
+            return null;
         }
-        if (!($aargs['noResponse'] ?? false)) {
-            return yield $readDeferred;
-        }
+        return $readFuture->await();
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
      * @param string            $method Method name
-     * @param array|\Generator  $args   Arguments
+     * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
-     *
-     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
-     *
-     * @return \Generator
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null]): WrappedFuture
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
-            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
-        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
+        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
             $this->logger->logger('Using media DC');
-            $aargs['datacenter'] = $this->datacenter.'_media';
-            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            $aargs['datacenter'] = -$this->datacenter;
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
@@ -135,8 +128,8 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max']) {
-                $args = (yield from $this->API->splitToChunks($args));
+            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+                $args = $this->API->splitToChunks($args);
                 $promises = [];
                 $aargs['queue'] = $method;
                 $aargs['multiple'] = true;
@@ -150,12 +143,15 @@ trait CallHandler
                 }
                 $promises = [];
                 foreach ($args as $single_args) {
-                    $promises[] = Tools::call($this->methodCallAsyncWrite($method, $single_args, $new_aargs));
+                    $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return yield Tools::all($promises);
+                return new WrappedFuture(async(fn () => \array_map(
+                    fn (WrappedFuture $f) => $f->await(),
+                    await($promises)
+                )));
             }
             $args = $this->API->botAPIToMTProto($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
@@ -166,13 +162,18 @@ trait CallHandler
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
         }
+        $response = new DeferredFuture;
         $message = new OutgoingMessage(
             $args,
             $method,
             $methodInfo['type'],
             true,
-            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect'
+            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect',
+            $response
         );
+        if (isset($aargs['queue'])) {
+            $message->setQueueId($aargs['queue']);
+        }
         if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
             $message->setUserRelated(true);
         }
@@ -188,10 +189,10 @@ trait CallHandler
         if (isset($aargs['FloodWaitLimit'])) {
             $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }
-        $aargs['postpone'] = $aargs['postpone'] ?? false;
-        $deferred = yield from $this->sendMessage($message, !$aargs['postpone']);
+        $aargs['postpone'] ??= false;
+        $this->sendMessage($message, !$aargs['postpone']);
         $this->checker->resume();
-        return $deferred;
+        return new WrappedFuture($response->getFuture());
     }
     /**
      * Send object and make sure it is asynchronously sent (generator).
@@ -199,22 +200,18 @@ trait CallHandler
      * @param string $object Object name
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
-     *
-     * @return \Generator
      */
-    public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): void
     {
         $message = new OutgoingMessage(
             $args,
             $object,
             '',
             false,
-            !$this->shared->hasTempAuthKey()
+            !$this->shared->hasTempAuthKey(),
+            $aargs['promise'] ?? null
         );
-        if (isset($aargs['promise'])) {
-            $message->setPromise($aargs['promise']);
-        }
-        $aargs['postpone'] = $aargs['postpone'] ?? false;
-        return yield from $this->sendMessage($message, !$aargs['postpone']);
+        $aargs['postpone'] ??= false;
+        $this->sendMessage($message, !$aargs['postpone']);
     }
 }

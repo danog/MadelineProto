@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
-use danog\MadelineProto\Tools;
+use danog\MadelineProto\Logger;
 use phpseclib3\Math\BigInteger;
+
+use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * @property DataCenter $datacenter
@@ -17,14 +22,12 @@ trait AuthKeyHandler
      * Asynchronously create, bind and check auth keys for all DCs.
      *
      * @internal
-     *
-     * @return \Generator
      */
-    public function initAuthorization(): \Generator
+    public function initAuthorization(): void
     {
         $this->auth_mutex ??= new LocalMutex;
-        $lock = yield $this->auth_mutex->acquire();
-        $this->logger("Initing authorization...");
+        $lock = $this->auth_mutex->acquire();
+        $this->logger('Initing authorization...');
         $this->initing_authorization = true;
         try {
             $main = [];
@@ -34,34 +37,31 @@ trait AuthKeyHandler
                     continue;
                 }
                 if ($socket->isMedia()) {
-                    $media []= [$socket, 'initAuthorization'];
+                    $media []= $socket->initAuthorization(...);
                 } else {
-                    $main []= [$socket, 'initAuthorization'];
+                    $main []= $socket->initAuthorization(...);
                 }
             }
             if ($main) {
-                $first = \array_shift($main)();
-                yield from $first;
+                \array_shift($main)();
             }
-            yield Tools::all(\array_map(fn ($cb) => $cb(), $main));
-            yield Tools::all(\array_map(fn ($cb) => $cb(), $media));
+            await(\array_map(async(...), $main));
+            await(\array_map(async(...), $media));
         } finally {
             $lock->release();
-            $this->logger("Done initing authorization!");
+            $this->logger('Done initing authorization!');
             $this->initing_authorization = false;
         }
         $this->startUpdateSystem(true);
     }
     /**
      * Get diffie-hellman configuration.
-     *
-     * @return \Generator<array>
      */
-    public function getDhConfig(): \Generator
+    public function getDhConfig(): array
     {
-        $dh_config = yield from $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
+        $dh_config = $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
-            $this->logger->logger('DH configuration not modified', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('DH configuration not modified', Logger::VERBOSE);
             return $this->dh_config;
         }
         $dh_config['p'] = new BigInteger((string) $dh_config['p'], 256);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ResponseHandler module.
  *
@@ -11,24 +13,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Deferred;
-use Amp\Failure;
-use Amp\Loop;
-use danog\MadelineProto\Coroutine;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
-use danog\MadelineProto\Tools;
+use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCErrorException;
+use phpseclib3\Math\BigInteger;
+use Revolt\EventLoop;
+use Throwable;
+
+use const PHP_EOL;
 
 /**
  * Manages responses.
@@ -37,7 +40,6 @@ use danog\MadelineProto\Tools;
  */
 trait ResponseHandler
 {
-    public $n = 0;
     public function handleMessages(): void
     {
         while ($this->new_incoming) {
@@ -47,7 +49,6 @@ trait ResponseHandler
             /** @var IncomingMessage */
             $message = $this->new_incoming[$current_msg_id];
             unset($this->new_incoming[$current_msg_id]);
-
 
             $this->logger->logger($message->log($this->datacenter), Logger::ULTRA_VERBOSE);
 
@@ -75,8 +76,8 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
-                        $this->API->updaters[UpdateLoop::GENERIC]->resumeDefer();
+                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
+                        $this->API->updaters[UpdateLoop::GENERIC]->resume();
                     }
                     break;
                 case 'msg_container':
@@ -84,6 +85,7 @@ trait ResponseHandler
                         $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
                         $newMessage->setSeqNo($message['seqno']);
+                        $newMessage->setSideEffects($message['sideEffects']);
                         $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
                     }
                     unset($newMessage, $message);
@@ -91,6 +93,7 @@ trait ResponseHandler
                     break;
                 case 'msg_copy':
                     $this->ackIncomingMessage($message);
+                    $side = $message->consumeSideEffects();
                     $content = $message->read();
                     $referencedMsgId = $content['msg_id'];
                     if (isset($this->incoming_messages[$referencedMsgId])) {
@@ -98,6 +101,7 @@ trait ResponseHandler
                     } else {
                         $this->msgIdHandler->checkMessageId($referencedMsgId, ['outgoing' => false, 'container' => true]);
                         $message = new IncomingMessage($content['orig_message'], $referencedMsgId);
+                        $message->setSideEffects($side);
                         $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
                         unset($message);
                     }
@@ -129,7 +133,12 @@ trait ResponseHandler
                     $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
                     if ($response_type == 'Updates') {
                         if (!$this->isCdn()) {
-                            Tools::callForkDefer($this->API->handleUpdates($message->read()));
+                            $side = $message->consumeSideEffects();
+                            $updates = $message->read();
+                            EventLoop::queue(function () use ($side, $updates): void {
+                                $side?->await();
+                                $this->API->handleUpdates($updates);
+                            });
                         }
                         break;
                     }
@@ -156,10 +165,13 @@ trait ResponseHandler
             $this->writer->resume();
         }
     }
-    public function handleReject(OutgoingMessage $message, \Throwable $data): void
+    /**
+     * @param callable(): \Throwable $data
+     */
+    private function handleReject(OutgoingMessage $message, callable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
-        $message->reply(new Failure($data));
+        $message->reply($data);
     }
 
     /**
@@ -167,10 +179,8 @@ trait ResponseHandler
      *
      * @param IncomingMessage $message   Incoming message
      * @param string          $requestId Request ID
-     *
-     * @return void
      */
-    private function handleResponse(IncomingMessage $message, $requestId = null): void
+    private function handleResponse(IncomingMessage $message, ?string $requestId = null): void
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();
@@ -192,8 +202,8 @@ trait ResponseHandler
         if ($constructor === 'rpc_error') {
             try {
                 $exception = $this->handleRpcError($request, $response);
-            } catch (\Throwable $e) {
-                $exception = $e;
+            } catch (Throwable $e) {
+                $exception = fn () => $e;
             }
             if ($exception) {
                 $this->handleReject($request, $exception);
@@ -205,32 +215,33 @@ trait ResponseHandler
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 20:
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 16:
                 case 17:
-                    $this->time_delta = (int) (new \phpseclib3\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \phpseclib3\Math\BigInteger(\time()))->toString();
+                    $this->time_delta = (int) (new BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new BigInteger(\time()))->toString();
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    Tools::callFork((function () use ($requestId): \Generator {
-                        yield from $this->API->initAuthorization();
-                        $this->methodRecall('', ['message_id' => $requestId]);
-                    })());
+                    EventLoop::queue(function () use ($requestId): void {
+                        $this->API->initAuthorization();
+                        $this->methodRecall(['message_id' => $requestId]);
+                    });
                     return;
             }
-            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
             return;
         }
 
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
+        $side = $message->consumeSideEffects();
         $botAPI = $request->getBotAPI();
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $body = $request->getBodyOrEmpty();
@@ -238,7 +249,7 @@ trait ResponseHandler
             if (isset($trimmed['peer'])) {
                 try {
                     $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                 }
             }
             if (isset($trimmed['message'])) {
@@ -246,40 +257,32 @@ trait ResponseHandler
             }
             $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
             unset($body);
-            Tools::callForkDefer($this->API->handleUpdates($response));
+            EventLoop::queue(function () use ($side, $response): void {
+                $side?->await();
+                $this->API->handleUpdates($response);
+            });
         }
         $this->gotResponseForOutgoingMessage($request);
 
-        if ($side = $message->getSideEffects($response)) {
+        EventLoop::queue(function () use ($side, $request, $response, $botAPI): void {
+            $side?->await();
             if ($botAPI) {
-                $deferred = new Deferred;
-                $promise = $deferred->promise();
-                $side->onResolve(function (?\Throwable $error, $result) use ($deferred): void {
-                    if ($error) {
-                        $deferred->fail($error);
-                        return;
-                    }
-                    $deferred->resolve(new Coroutine($this->API->MTProtoToBotAPI($result)));
-                });
-                $request->reply($promise);
-            } else {
-                $request->reply($side);
-            }
-        } else {
-            if ($botAPI) {
-                $request->reply(new Coroutine($this->API->MTProtoToBotAPI($response)));
+                $request->reply($this->API->MTProtoToBotAPI($response));
             } else {
                 $request->reply($response);
             }
-        }
+        });
     }
-    public function handleRpcError(OutgoingMessage $request, array $response): ?\Throwable
+    /**
+     * @return (callable(): Throwable)|null
+     */
+    private function handleRpcError(OutgoingMessage $request, array $response): ?callable
     {
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
         if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
-            return new \danog\MadelineProto\PTSException($response['error_message']);
+            return fn () => new PTSException($response['error_message']);
         }
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
@@ -291,7 +294,7 @@ trait ResponseHandler
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
-            $this->methodRecall('', ['message_id' => $msgId, 'postpone' => true]);
+            $this->methodRecall(['message_id' => $msgId, 'postpone' => true]);
             return null;
         }
 
@@ -300,24 +303,23 @@ trait ResponseHandler
             case -500:
                 if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                     $this->call_queue[$request->getQueueId()] = [];
-                    $this->methodRecall('', ['message_id' => $request->getMsgId(), 'postpone' => true]);
+                    $this->methodRecall(['message_id' => $request->getMsgId(), 'postpone' => true]);
                     return null;
                 }
                 if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
-                    Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
+                    EventLoop::delay(1.0, fn () => $this->methodRecall(['message_id' => $request->getMsgId()]));
                     return null;
                 }
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
-                $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                if ($request->isFileRelated() && $this->API->datacenter->has($datacenter . '_media')) {
-                    $datacenter .= '_media';
+                $this->API->datacenter->currentDatacenter = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                if ($request->isFileRelated() && $this->API->datacenter->has(-$datacenter)) {
+                    $datacenter = -$datacenter;
                 }
                 if ($request->isUserRelated()) {
-                    $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
+                    $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
-                Loop::defer([$this, 'methodRecall'], ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
-                //$this->API->methodRecall('', ['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
+                EventLoop::queue($this->methodRecall(...), ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
                 return null;
             case 401:
                 switch ($response['error_message']) {
@@ -335,21 +337,21 @@ trait ResponseHandler
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                         }
-                        throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                        return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== MTProto::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            Tools::callFork((function () use ($request, $response): \Generator {
-                                yield from $this->API->initAuthorization();
-                                $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
-                            })());
+                            EventLoop::queue(function () use ($request, $response): void {
+                                $this->API->initAuthorization();
+                                $this->handleReject($request, fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                            });
                             return null;
                         }
                         $this->session_id = null;
                         $this->shared->setTempAuthKey(null);
                         $this->shared->setPermAuthKey(null);
-                        $this->logger->logger("Auth key not registered in DC {$this->datacenter} with RPC error ${response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
+                        $this->logger->logger("Auth key not registered in DC {$this->datacenter} with RPC error {$response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
                         if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
                             $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
@@ -359,23 +361,23 @@ trait ResponseHandler
                             $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
-                            throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                            return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
-                        Tools::callFork((function () use ($request): \Generator {
-                            yield from $this->API->initAuthorization();
-                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
-                        })());
+                        EventLoop::queue(function () use ($request): void {
+                            $this->API->initAuthorization();
+                            $this->methodRecall(['message_id' => $request->getMsgId()]);
+                        });
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        Tools::callFork((function () use ($request): \Generator {
-                            yield from $this->API->initAuthorization();
-                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
-                        })());
+                        EventLoop::queue(function () use ($request): void {
+                            $this->API->initAuthorization();
+                            $this->methodRecall(['message_id' => $request->getMsgId()]);
+                        });
                         return null;
                 }
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 420:
                 $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->getFloodWaitLimit() ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -383,15 +385,15 @@ trait ResponseHandler
                     $this->logger->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(($request->getSent() ?? \time()) + $seconds);
+                    $request->setSent(\time() + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $msgId]);
+                    EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
                     return null;
                 }
                 // no break
             default:
-                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }
     }
 }

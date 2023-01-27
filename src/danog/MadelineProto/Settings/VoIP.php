@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
@@ -7,17 +9,15 @@ use danog\MadelineProto\SettingsAbstract;
 /**
  * VoIP settings.
  */
-class VoIP extends SettingsAbstract
+final class VoIP extends SettingsAbstract
 {
     /**
      * Whether to preload all songs in memory.
      */
-    private bool $preloadAudio = true;
+    protected bool $preloadAudio = true;
 
     /**
      * Get whether to preload all songs in memory.
-     *
-     * @return bool
      */
     public function getPreloadAudio(): bool
     {
@@ -28,8 +28,6 @@ class VoIP extends SettingsAbstract
      * Set whether to preload all songs in memory.
      *
      * @param bool $preloadAudio Whether to preload all songs in memory
-     *
-     * @return self
      */
     public function setPreloadAudio(bool $preloadAudio): self
     {

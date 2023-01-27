@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * UDP stream wrapper.
  *
@@ -11,21 +13,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
-use Amp\Failure;
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -39,50 +36,41 @@ use danog\MadelineProto\Stream\WriteBufferInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
+final class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
-    use BufferedStream;
     /**
      * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
-     *
-     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = $ctx->getStream($header);
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        return $this->stream->disconnect();
+        $this->stream->disconnect();
     }
     /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int, Promise, mixed, Failure<mixed>|Success<object>>
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
-            return new Failure(new ClosedException("MadelineProto stream was disconnected"));
+            throw new ClosedException('MadelineProto stream was disconnected');
         }
-        $chunk = yield $this->read();
+        $chunk = $this->read();
         if ($chunk === null) {
             $this->disconnect();
-            throw new \danog\MadelineProto\NothingInTheSocketException();
+            throw new NothingInTheSocketException();
         }
         $length = \strlen($chunk);
-        return new Success(new class($chunk) implements ReadBufferInterface {
+        return new class($chunk) implements ReadBufferInterface {
             /**
              * Buffer.
              *
@@ -104,12 +92,10 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * Read data from buffer.
              *
              * @param integer $length Length
-             *
-             * @return Promise<string>
              */
-            public function bufferRead(int $length): Promise
+            public function bufferRead(int $length): string
             {
-                return new Success(\fread($this->buffer, $length));
+                return \fread($this->buffer, $length);
             }
             /**
              * Destructor function.
@@ -118,18 +104,16 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             {
                 \fclose($this->buffer);
             }
-        });
+        };
     }
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
-     *
-     * @return Promise
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
+    public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
-        return new Success(new class($length, $append, $this) implements WriteBufferInterface {
+        return new class($length, $append, $this) implements WriteBufferInterface {
             private int $length;
             private string $append;
             private int $append_after;
@@ -137,10 +121,6 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             private string $data = '';
             /**
              * Constructor function.
-             *
-             * @param integer $length
-             * @param string $append
-             * @param RawStreamInterface $rawStreamInterface
              */
             public function __construct(int $length, string $append, RawStreamInterface $rawStreamInterface)
             {
@@ -155,10 +135,8 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
              * Async write.
              *
              * @param string $data Data to write
-             *
-             * @return Promise
              */
-            public function bufferWrite(string $data): Promise
+            public function bufferWrite(string $data): void
             {
                 $this->data .= $data;
                 if ($this->append_after) {
@@ -166,37 +144,18 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
                     if ($this->append_after === 0) {
                         $this->data .= $this->append;
                         $this->append = '';
-                        return $this->stream->write($this->data);
+                        $this->stream->write($this->data);
                     } elseif ($this->append_after < 0) {
                         $this->append_after = 0;
                         $this->append = '';
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
                 }
-                return new Success(\strlen($data));
             }
-        });
-    }
-    /**
-     * {@inheritdoc}
-     *
-     * @return EncryptableSocket
-     */
-    public function getSocket(): EncryptableSocket
-    {
-        return $this->getSocket();
-    }
-    /**
-     * {@inheritDoc}
-     *
-     * @return RawStreamInterface
-     */
-    public function getStream(): RawStreamInterface
-    {
-        return $this;
+        };
     }
     public static function getName(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TL module.
  *
@@ -11,87 +13,120 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\TL;
 
-use Amp\Promise;
+use Amp\Future;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
+use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
+
+use const STR_PAD_LEFT;
+
+use function Amp\async;
+use function Amp\Future\awaitAll;
 
 /**
+ *
+ * @psalm-import-type TBeforeMethodResponseDeserialization from TLCallback
+ * @psalm-import-type TAfterMethodResponseDeserialization from TLCallback
+ *
+ * @psalm-import-type TBeforeConstructorSerialization from TLCallback
+ * @psalm-import-type TBeforeConstructorDeserialization from TLCallback
+ * @psalm-import-type TAfterConstructorDeserialization from TLCallback
+ * @psalm-import-type TTypeMismatch from TLCallback
+ *
  * TL serialization.
  */
-class TL
+final class TL
 {
     /**
      * Highest available secret chat layer version.
      *
-     * @var integer
      */
-    private $secretLayer = -1;
+    private int $secretLayer = -1;
     /**
      * Constructors.
      *
-     * @var TLConstructors
      */
-    private $constructors;
+    private TLConstructors $constructors;
     /**
      * Methods.
      *
-     * @var TLMethods
      */
-    private $methods;
+    private TLMethods $methods;
     /**
      * TD Constructors.
      *
-     * @var TLConstructors
      */
-    private $tdConstructors;
+    private TLConstructors $tdConstructors;
     /**
      * TD Methods.
      *
-     * @var TLMethods
      */
-    private $tdMethods;
+    private TLMethods $tdMethods;
     /**
      * Descriptions.
      *
-     * @var array
      */
-    private $tdDescriptions;
-    /**
-     * TL callbacks.
-     *
-     * @var array
-     */
-    private $callbacks = [];
+    private array $tdDescriptions;
+
+    /** @var array<string, list<TBeforeMethodResponseDeserialization>> */
+    private array $beforeMethodResponseDeserialization;
+
+    /** @var array<string, list<TAfterMethodResponseDeserialization>> */
+    private array $afterMethodResponseDeserialization;
+
+    /** @var array<string, TBeforeConstructorSerialization> */
+    private array $beforeConstructorSerialization;
+    /** @var array<string, list<TBeforeConstructorDeserialization>> */
+    private array $beforeConstructorDeserialization;
+    /** @var array<string, list<TAfterConstructorDeserialization>> */
+    private array $afterConstructorDeserialization;
+
+    /** @var array<string, TTypeMismatch> */
+    private array $typeMismatch;
+
     /**
      * API instance.
-     *
-     * @var \danog\MadelineProto\MTProto
      */
-    private $API;
+    private ?MTProto $API = null;
+    public function __sleep()
+    {
+        return [
+            'secretLayer',
+            'constructors',
+            'methods',
+            'tdConstructors',
+            'tdMethods',
+            'tdDescriptions',
+            'API',
+        ];
+    }
     /**
      * Constructor function.
      *
      * @param MTProto $API API instance
      */
-    public function __construct($API = null)
+    public function __construct(?MTProto $API = null)
     {
-        $this->API = $API;
+        if ($API) {
+            $this->API = $API;
+        }
     }
     /**
      * Get secret chat layer version.
-     *
-     * @return integer
      */
     public function getSecretLayer(): int
     {
@@ -99,10 +134,6 @@ class TL
     }
     /**
      * Get constructors.
-     *
-     * @param bool $td
-     *
-     * @return TLConstructors
      */
     public function getConstructors(bool $td = false): TLConstructors
     {
@@ -110,10 +141,6 @@ class TL
     }
     /**
      * Get methods.
-     *
-     * @param bool $td
-     *
-     * @return TLMethods
      */
     public function getMethods(bool $td = false): TLMethods
     {
@@ -121,8 +148,6 @@ class TL
     }
     /**
      * Get TL descriptions.
-     *
-     * @return array
      */
     public function &getDescriptions(): array
     {
@@ -132,13 +157,11 @@ class TL
      * Initialize TL parser.
      *
      * @param TLSchema     $files   Scheme files
-     * @param TLCallback[] $objects TL Callback objects
-     *
-     * @return void
+     * @param list<TLCallback> $objects TL Callback objects
      */
-    public function init(TLSchema $files, array $objects = [])
+    public function init(TLSchema $files, array $objects = []): void
     {
-        $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
+        $this->API?->logger?->logger(Lang::$current_lang['TL_loading'], Logger::VERBOSE);
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
@@ -149,9 +172,9 @@ class TL
             'api' => $files->getAPISchema(),
             'mtproto' => $files->getMTProtoSchema(),
             'secret' => $files->getSecretSchema(),
-            ...$files->getOther()
+            ...$files->getOther(),
         ]) as $scheme_type => $file) {
-            $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
+            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['file_parsing'], \basename($file)), Logger::VERBOSE);
             $filec = \file_get_contents(Tools::absolute($file));
             $TL_dict = \json_decode($filec, true);
             if ($TL_dict === null) {
@@ -239,9 +262,9 @@ class TL
                     }
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
-                        $nid = \str_pad($matches[1], 8, '0', \STR_PAD_LEFT);
+                        $nid = \str_pad($matches[1], 8, '0', STR_PAD_LEFT);
                         if ($id !== $nid) {
-                            $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
+                            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), Logger::ERROR);
                         }
                         $id = $nid;
                     }
@@ -276,24 +299,24 @@ class TL
                 }
             } else {
                 foreach ($TL_dict['constructors'] as $key => $value) {
-                    $TL_dict['constructors'][$key]['id'] = \danog\MadelineProto\Tools::packSignedInt($TL_dict['constructors'][$key]['id']);
+                    $TL_dict['constructors'][$key]['id'] = Tools::packSignedInt($TL_dict['constructors'][$key]['id']);
                 }
                 foreach ($TL_dict['methods'] as $key => $value) {
-                    $TL_dict['methods'][$key]['id'] = \danog\MadelineProto\Tools::packSignedInt($TL_dict['methods'][$key]['id']);
+                    $TL_dict['methods'][$key]['id'] = Tools::packSignedInt($TL_dict['methods'][$key]['id']);
                 }
             }
 
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
+                throw new Exception(Lang::$current_lang['src_file_invalid'].$file);
             }
-            $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger(Lang::$current_lang['translating_obj'], Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
                 $this->{$scheme_type === 'td' ? 'tdConstructors' : 'constructors'}->add($elem, $scheme_type);
             }
-            $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger(Lang::$current_lang['translating_methods'], Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{$scheme_type === 'td' ? 'tdMethods' : 'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
@@ -330,8 +353,6 @@ class TL
     }
     /**
      * Get TL namespaces.
-     *
-     * @return array
      */
     public function getMethodNamespaces(): array
     {
@@ -344,8 +365,6 @@ class TL
     }
     /**
      * Get namespaced methods (method => namespace).
-     *
-     * @return array
      */
     public function getMethodsNamespaced(): array
     {
@@ -354,44 +373,106 @@ class TL
     /**
      * Update TL callbacks.
      *
-     * @param TLCallback[] $objects TL callbacks
-     *
-     * @return void
+     * @param list<TLCallback> $callbacks TL callbacks
      */
-    public function updateCallbacks(array $objects)
+    public function updateCallbacks(array $callbacks): void
     {
-        $this->callbacks = [];
-        foreach ($objects as $object) {
-            if (!isset(\class_implements(\get_class($object))[TLCallback::class])) {
-                throw new Exception('Invalid callback object provided!');
-            }
-            $new = [TLCallback::METHOD_BEFORE_CALLBACK => $object->getMethodBeforeCallbacks(), TLCallback::METHOD_CALLBACK => $object->getMethodCallbacks(), TLCallback::CONSTRUCTOR_BEFORE_CALLBACK => $object->getConstructorBeforeCallbacks(), TLCallback::CONSTRUCTOR_CALLBACK => $object->getConstructorCallbacks(), TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK => $object->getConstructorSerializeCallbacks(), TLCallback::TYPE_MISMATCH_CALLBACK => $object->getTypeMismatchCallbacks()];
-            foreach ($new as $type => $values) {
-                foreach ($values as $match => $callback) {
-                    if (!isset($this->callbacks[$type][$match])) {
-                        $this->callbacks[$type][$match] = [];
-                    }
-                    if (\in_array($type, [TLCallback::TYPE_MISMATCH_CALLBACK, TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK])) {
-                        $this->callbacks[$type][$match] = $callback;
-                    } else {
-                        $this->callbacks[$type][$match] = \array_merge($callback, $this->callbacks[$type][$match]);
-                    }
+        $this->beforeMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getMethodBeforeResponseDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
+            $callbacks
+        ));
+        $this->afterMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getMethodAfterResponseDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
+            $callbacks
+        ));
+
+        $this->beforeConstructorSerialization = \array_merge(...\array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
+            $callbacks
+        ));
+        $this->beforeConstructorDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getConstructorBeforeDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
+            $callbacks
+        ));
+        $this->afterConstructorDeserialization = $this->mergeCallbacks(\array_map(
+            fn (TLCallback $t) => [
+                $t->getConstructorAfterDeserializationCallbacks(),
+                $t->areDeserializationCallbacksMutuallyExclusive(),
+                $t::class
+            ],
+            $callbacks
+        ));
+
+        $this->typeMismatch = \array_merge(...\array_map(
+            fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
+            $callbacks
+        ));
+    }
+    /**
+     * @var array<string, list<list{callable(...): void, array}>>
+     */
+    private array $mutexSideEffects = [];
+    /**
+     * @var list<Future>
+     */
+    private array $futureSideEffects = [];
+    /**
+     * @template T
+     *
+     * @param list<list{array<string, list<T>>, bool, string}>> $callbacks
+     * @return array<string, list<T>>
+     */
+    private function mergeCallbacks(array $callbacks): array
+    {
+        $result = [];
+        foreach ($callbacks as [$map, $mutex, $queueId]) {
+            foreach ($map as $constructor => $list) {
+                $this->mutexSideEffects[$queueId] ??= [];
+                if ($mutex) {
+                    $result[$constructor] = [
+                        ...$result[$constructor] ?? [],
+                        function (...$v) use ($list, $queueId): void {
+                            foreach ($list as $cb) {
+                                $this->mutexSideEffects[$queueId][] = [$cb, $v];
+                            }
+                        }
+                    ];
+                } else {
+                    $result[$constructor] = [
+                        ...$result[$constructor] ?? [],
+                        function (...$v) use ($list): void {
+                            foreach ($list as $cb) {
+                                $this->futureSideEffects[] = async($cb, ...$v);
+                            }
+                        }
+                    ];
                 }
             }
         }
+        return $result;
     }
     /**
      * Deserialize bool.
      *
      * @param string $id Constructor ID
-     *
-     * @return bool
      */
     private function deserializeBool(string $id): bool
     {
         $tl_elem = $this->constructors->findById($id);
         if ($tl_elem === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['bool_error']);
+            throw new Exception(Lang::$current_lang['bool_error']);
         }
         return $tl_elem['predicate'] === 'boolTrue';
     }
@@ -402,27 +483,20 @@ class TL
      * @param mixed   $object Object to serialize
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, array|mixed, mixed, false|mixed|null|string>
      */
-    public function serializeObject(array $type, $object, $ctx, int $layer = -1): \Generator
+    public function serializeObject(array $type, mixed $object, string|int $ctx, int $layer = -1)
     {
-        if ($object instanceof \Generator) {
-            $object = yield from $object;
-        }
         switch ($type['type']) {
             case 'int':
                 if (!\is_numeric($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
+                    throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return \danog\MadelineProto\Tools::packSignedInt($object);
+                return Tools::packSignedInt((int) $object);
             case '#':
-                if (!\is_numeric($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
+                if (!\is_int($object)) {
+                    throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return \danog\MadelineProto\Tools::packUnsignedInt($object);
+                return Tools::packUnsignedInt($object);
             case 'long':
                 if (\is_object($object)) {
                     return \str_pad(\strrev($object->toBytes()), 8, \chr(0));
@@ -434,20 +508,20 @@ class TL
                     return \substr($object, 1);
                 }
                 if (\is_array($object) && $type['name'] === 'hash') {
-                    return \danog\MadelineProto\Tools::genVectorHash($object);
+                    return Tools::genVectorHash($object);
                 }
                 if (\is_array($object) && \count($object) === 2) {
                     return \pack('l2', ...$object); // For bot API on 32bit
                 }
                 if (!\is_numeric($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
+                    throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return \danog\MadelineProto\Tools::packSignedLong($object);
+                return Tools::packSignedLong((int) $object);
             case 'int128':
                 if (\strlen($object) !== 16) {
                     $object = \base64_decode($object);
                     if (\strlen($object) !== 16) {
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_16']);
+                        throw new Exception(Lang::$current_lang['long_not_16']);
                     }
                 }
                 return (string) $object;
@@ -455,7 +529,7 @@ class TL
                 if (\strlen($object) !== 32) {
                     $object = \base64_decode($object);
                     if (\strlen($object) !== 32) {
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_32']);
+                        throw new Exception(Lang::$current_lang['long_not_32']);
                     }
                 }
                 return (string) $object;
@@ -463,12 +537,12 @@ class TL
                 if (\strlen($object) !== 64) {
                     $object = \base64_decode($object);
                     if (\strlen($object) !== 64) {
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_64']);
+                        throw new Exception(Lang::$current_lang['long_not_64']);
                     }
                 }
                 return (string) $object;
             case 'double':
-                return \danog\MadelineProto\Tools::packDouble($object);
+                return Tools::packDouble($object);
             case 'string':
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
@@ -479,32 +553,33 @@ class TL
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
+                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
+                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'bytes':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
                     $object = \base64_decode($object['bytes']);
                 }
-                if (!\is_string($object) && !$object instanceof \danog\MadelineProto\TL\Types\Bytes) {
+                if (!\is_string($object) && !$object instanceof Bytes) {
                     throw new Exception("You didn't provide a valid string");
                 }
+                $object = (string) $object;
                 $l = \strlen($object);
                 $concat = '';
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
+                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
+                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'Bool':
@@ -515,24 +590,24 @@ class TL
                 return $object;
             case 'Vector t':
                 if (!\is_array($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
+                    throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
                     throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
-                $concat .= \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
+                $concat .= Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'vector':
                 if (!\is_array($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
+                    throw new Exception(Lang::$current_lang['array_invalid']);
                 }
-                $concat = \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
+                $concat = Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'Object':
@@ -542,9 +617,8 @@ class TL
         }
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
-            $object = $object instanceof \Generator ? yield from $object : yield $object;
+        } elseif (isset($this->typeMismatch[$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
+            $object = $this->typeMismatch[$type['type']]($object);
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
                     throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
@@ -555,19 +629,18 @@ class TL
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->findByPredicate($type['type'], $layer);
             if ($constructorData === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['predicate_not_set']);
+                throw new Exception(Lang::$current_lang['predicate_not_set']);
             }
-            $auto = true;
             $object['_'] = $constructorData['predicate'];
         }
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
-            $object = yield $this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+        if (isset($this->beforeConstructorSerialization[$object['_']])) {
+            $object = $this->beforeConstructorSerialization[$object['_']]($object);
         }
         $predicate = $object['_'];
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
-            $this->API->logger->logger($object, \danog\MadelineProto\Logger::FATAL_ERROR);
-            throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error'], $predicate));
+            $this->API->logger->logger($object, Logger::FATAL_ERROR);
+            throw new Exception(\sprintf(Lang::$current_lang['type_extract_error'], $predicate));
         }
         if ($bare = $type['type'] != '' && $type['type'][0] === '%') {
             $type['type'] = \substr($type['type'], 1);
@@ -579,25 +652,21 @@ class TL
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
         $concat = $bare ? '' : $constructorData['id'];
-        return $concat.(yield from $this->serializeParams($constructorData, $object, '', $layer, null));
+        return $concat.($this->serializeParams($constructorData, $object, '', $layer));
     }
     /**
      * Serialize method.
      *
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|Promise<string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
-    public function serializeMethod(string $method, $arguments): \Generator
+    public function serializeMethod(string $method, mixed $arguments)
     {
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
+            throw new Exception(Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'].(yield from $this->serializeParams($tl, $arguments, $method, -1, $arguments['queuePromise'] ?? null));
+        return $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
     }
     /**
      * Serialize parameters.
@@ -606,12 +675,8 @@ class TL
      * @param array   $arguments Arguments
      * @param string  $ctx       Context
      * @param integer $layer     Layer
-     *
-     * @return \Generator
-     *
-     * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
-    private function serializeParams(array $tl, $arguments, $ctx, int $layer, $promise): \Generator
+    private function serializeParams(array $tl, array $arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
@@ -642,26 +707,26 @@ class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= yield from $this->serializeObject(['type' => 'bytes'], \danog\MadelineProto\Tools::random(15 + 4 * \danog\MadelineProto\Tools::randomInt($modulus = 3)), 'random_bytes');
+                    $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= yield from $this->serializeObject($current_argument, yield from $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $promise), 'data');
+                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $arguments['queuePromise']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
-                            $serialized .= \danog\MadelineProto\Tools::random(8);
+                            $serialized .= Tools::random(8);
                             continue 2;
                         case 'int':
-                            $serialized .= \danog\MadelineProto\Tools::random(4);
+                            $serialized .= Tools::random(4);
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
                                 $serialized .= $this->constructors->findByPredicate('vector')['id'];
-                                $serialized .= \danog\MadelineProto\Tools::packUnsignedInt(\count($arguments['id']));
-                                $serialized .= \danog\MadelineProto\Tools::random(8 * \count($arguments['id']));
+                                $serialized .= Tools::packUnsignedInt(\count($arguments['id']));
+                                $serialized .= Tools::random(8 * \count($arguments['id']));
                                 continue 2;
                             }
                     }
@@ -679,7 +744,7 @@ class TL
                     continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
-                    $serialized .= (yield from $this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
+                    $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
                     continue;
                 }
                 if ($tl['type'] === 'DocumentAttribute' && \in_array($current_argument['name'], ['w', 'h', 'duration'])) {
@@ -690,11 +755,11 @@ class TL
                     $serialized .= \pack('@4');
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate('input'.$current_argument['type'].'Empty', $tl['layer'] ?? -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -708,32 +773,32 @@ class TL
                         $arguments[$current_argument['name']] = null;
                         break;
                     default:
-                        throw new Exception("Missing required parameter ".$current_argument['name']);
+                        throw new Exception('Missing required parameter '.$current_argument['name']);
                 }
             }
             if (\in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => \json_encode($arguments[$current_argument['name']])];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'])) {
-                \array_walk($arguments[$current_argument['name']], function (&$arg) {
+                \array_walk($arguments[$current_argument['name']], function (&$arg): void {
                     $arg = ['_' => 'dataJSON', 'data' => \json_encode($arg)];
                 });
             }
             if ($current_argument['type'] === 'InputFile' && (!\is_array($arguments[$current_argument['name']]) || !(isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'))) {
-                $arguments[$current_argument['name']] = (yield from $this->API->upload($arguments[$current_argument['name']]));
+                $arguments[$current_argument['name']] = ($this->API->upload($arguments[$current_argument['name']]));
             }
             if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = (yield from $this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = ($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
-                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                        throw new \danog\MadelineProto\Exception(Lang::$current_lang['sec_peer_not_in_db']);
                     }
                     $arguments[$current_argument['name']] = $this->API->getSecretChat($arguments[$current_argument['name']])['InputEncryptedChat'];
                 }
             }
             //$this->API->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
-            $serialized .= (yield from $this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));
+            $serialized .= ($this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));
         }
         return $serialized;
     }
@@ -742,10 +807,8 @@ class TL
      *
      * @param resource|string $stream Stream
      * @param array           $type   Type identifier
-     *
-     * @return int
      */
-    public function getLength($stream, $type = ['type' => '']): int
+    public function getLength($stream, array $type = ['type' => '']): int
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -753,41 +816,47 @@ class TL
             \fseek($res, 0);
             $stream = $res;
         } elseif (!\is_resource($stream)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['stream_handle_invalid']);
+            throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
-        $promises = [];
-        $this->deserializeInternal($stream, $promises, $type);
+        $this->deserialize($stream, $type);
+        Assert::null($this->getSideEffects());
         return \ftell($stream);
     }
-    /**
-     * Deserialize TL object.
-     *
-     * @param string|resource $stream Stream
-     * @param array           $type   Type identifier
-     *
-     * @return array
-     * @psalm-return array{0: mixed, 1: \Amp\Promise[]}
-     */
-    public function deserialize($stream, $type = ['type' => '']): array
-    {
-        $promises = [];
-        $result = $this->deserializeInternal($stream, $promises, $type);
-        return [
-            $result,
-            $promises
-        ];
-    }
 
+    /**
+     * @var array<string, Future>
+     */
+    private array $lastMutexSideEffect = [];
+    public function getSideEffects(): ?Future
+    {
+        foreach ($this->mutexSideEffects as $key => $sideEffects) {
+            if (!$sideEffects) {
+                continue;
+            }
+            $this->mutexSideEffects[$key] = [];
+            $lastMutexSideEffect = $this->lastMutexSideEffect[$key] ?? null;
+            $this->lastMutexSideEffect[$key] = async(function () use ($lastMutexSideEffect, $sideEffects): void {
+                $lastMutexSideEffect?->await();
+                foreach ($sideEffects as [$cb, $v]) {
+                    $cb(...$v);
+                }
+            });
+            $this->futureSideEffects []= $this->lastMutexSideEffect[$key];
+        }
+        if (!$this->futureSideEffects) {
+            return null;
+        }
+        $sideEffects = $this->futureSideEffects;
+        $this->futureSideEffects = [];
+        return async(awaitAll(...), $sideEffects);
+    }
     /**
      * Deserialize TL object.
      *
      * @param string|resource $stream    Stream
-     * @param Promise[]       &$promises Promise array
      * @param array           $type      Type identifier
-     *
-     * @return mixed
      */
-    private function deserializeInternal($stream, array &$promises, array $type)
+    public function deserialize($stream, array $type)
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -795,22 +864,22 @@ class TL
             \fseek($res, 0);
             $stream = $res;
         } elseif (!\is_resource($stream)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['stream_handle_invalid']);
+            throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
         switch ($type['type']) {
             case 'Bool':
                 return $this->deserializeBool(\stream_get_contents($stream, 4));
             case 'int':
-                return \danog\MadelineProto\Tools::unpackSignedInt(\stream_get_contents($stream, 4));
+                return Tools::unpackSignedInt(\stream_get_contents($stream, 4));
             case '#':
                 return \unpack('V', \stream_get_contents($stream, 4))[1];
             case 'long':
                 if (isset($type['idstrlong'])) {
                     return \stream_get_contents($stream, 8);
                 }
-                return isset($type['strlong']) ? \stream_get_contents($stream, 8) : \danog\MadelineProto\Tools::unpackSignedLong(\stream_get_contents($stream, 8));
+                return isset($type['strlong']) ? \stream_get_contents($stream, 8) : Tools::unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
-                return \danog\MadelineProto\Tools::unpackDouble(\stream_get_contents($stream, 8));
+                return Tools::unpackDouble(\stream_get_contents($stream, 8));
             case 'int128':
                 return \stream_get_contents($stream, 16);
             case 'int256':
@@ -821,18 +890,18 @@ class TL
             case 'bytes':
                 $l = \ord(\stream_get_contents($stream, 1));
                 if ($l > 254) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['length_too_big']);
+                    throw new Exception(Lang::$current_lang['length_too_big']);
                 }
                 if ($l === 254) {
                     $long_len = \unpack('V', \stream_get_contents($stream, 3).\chr(0))[1];
                     $x = \stream_get_contents($stream, $long_len);
-                    $resto = \danog\MadelineProto\Tools::posmod(-$long_len, 4);
+                    $resto = Tools::posmod(-$long_len, 4);
                     if ($resto > 0) {
                         \stream_get_contents($stream, $resto);
                     }
                 } else {
                     $x = $l ? \stream_get_contents($stream, $l) : '';
-                    $resto = \danog\MadelineProto\Tools::posmod(-($l + 1), 4);
+                    $resto = Tools::posmod(-($l + 1), 4);
                     if ($resto > 0) {
                         \stream_get_contents($stream, $resto);
                     }
@@ -849,20 +918,18 @@ class TL
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
-                    throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
+                    throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserializeInternal(
+                        return $this->deserialize(
                             \gzdecode(
-                                $this->deserializeInternal(
+                                (string) $this->deserialize(
                                     $stream,
-                                    $promises,
-                                    ['type' => 'bytes', 'connection' => $type['connection']]
-                                )
+                                    ['type' => 'bytes', 'connection' => $type['connection']],
+                                ),
                             ),
-                            $promises,
-                            ['type' => '', 'connection' => $type['connection']]
+                            ['type' => '', 'connection' => $type['connection']],
                         );
                     case 'Vector t':
                     case 'vector':
@@ -870,13 +937,21 @@ class TL
                     default:
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
-            // no break
+                // no break
             case 'vector':
                 $count = \unpack('V', \stream_get_contents($stream, 4))[1];
                 $result = [];
                 $type['type'] = $type['subtype'];
+                $splitSideEffects = isset($type['splitSideEffects']);
+                if ($splitSideEffects) {
+                    unset($type['splitSideEffects']);
+                }
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserializeInternal($stream, $promises, $type);
+                    $v = $this->deserialize($stream, $type);
+                    if ($splitSideEffects) {
+                        $v['sideEffects'] = $this->getSideEffects();
+                    }
+                    $result[] = $v;
                 }
                 return $result;
         }
@@ -884,7 +959,7 @@ class TL
             $checkType = \substr($type['type'], 1);
             $constructorData = $this->constructors->findByType($checkType);
             if ($constructorData === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'].$checkType);
+                throw new Exception(Lang::$current_lang['constructor_not_found'].$checkType);
             }
         } else {
             $constructorData = $this->constructors->findByPredicate($type['type']);
@@ -894,7 +969,7 @@ class TL
                 if ($constructorData === false) {
                     $constructorData = $this->methods->findById($id);
                     if ($constructorData === false) {
-                        throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
+                        throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
                     }
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
@@ -904,23 +979,21 @@ class TL
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';
             }
-            return $this->deserializeInternal(
+            return $this->deserialize(
                 \gzdecode(
-                    $this->deserializeInternal(
+                    (string) $this->deserialize(
                         $stream,
-                        $promises,
-                        ['type' => 'bytes']
-                    )
+                        ['type' => 'bytes'],
+                    ),
                 ),
-                $promises,
-                ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']]
+                ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']],
             );
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['connection'] = $type['connection'];
             $constructorData['subtype'] = $type['subtype'] ?? '';
             $constructorData['type'] = 'vector';
-            return $this->deserializeInternal($stream, $promises, $constructorData);
+            return $this->deserialize($stream, $constructorData);
         }
         if ($constructorData['predicate'] === 'boolTrue') {
             return true;
@@ -929,8 +1002,8 @@ class TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
-            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) {
+        if (isset($this->beforeConstructorDeserialization[$x['_']])) {
+            foreach ($this->beforeConstructorDeserialization[$x['_']] as $callback) {
                 $callback($x['_']);
             }
         }
@@ -945,7 +1018,7 @@ class TL
                             $x[$arg['name']] = false;
                             continue 2;
                         }
-                    // no break
+                        // no break
                     default:
                         if (($x[$arg['flag']] & $arg['pow']) === 0) {
                             continue 2;
@@ -954,30 +1027,30 @@ class TL
             }
             if (\in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
                 $arg['idstrlong'] = true;
-            }
-            if (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            } elseif (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
-            }
-            if (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
+            } elseif (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
                 /** @var OutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
-                foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$message->getConstructor()] ?? [] as $callback) {
+                foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
                     $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
                 }
                 if ($message->getType() && \stripos($message->getType(), '<') !== false) {
                     $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
                 }
+            } elseif ($x['_'] === 'msg_container' && $arg['name'] === 'messages') {
+                $arg['splitSideEffects'] = true;
             }
             if (isset($type['connection'])) {
                 $arg['connection'] = $type['connection'];
             }
-            $x[$arg['name']] = $this->deserializeInternal($stream, $promises, $arg);
+            $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'random_bytes') {
-                if (\strlen($x[$arg['name']]) < 15) {
-                    throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_small']);
+                if (\strlen((string) $x[$arg['name']]) < 15) {
+                    throw new SecurityException(Lang::$current_lang['rand_bytes_too_small']);
                 }
                 unset($x[$arg['name']]);
             }
@@ -998,22 +1071,20 @@ class TL
                     return $x['value'];
             }
         } elseif ($x['_'] === 'photoStrippedSize') {
-            $x['inflated'] = new Types\Bytes(Tools::inflateStripped($x['bytes']));
+            $x['inflated'] = new Types\Bytes(Tools::inflateStripped((string) $x['bytes']));
         }
-        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
-            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                $promise = \danog\MadelineProto\Tools::callFork($callback($x));
-                if ($promise instanceof Promise) {
-                    $promises []= $promise;
-                }
+        if (isset($this->afterConstructorDeserialization[$x['_']])) {
+            foreach ($this->afterConstructorDeserialization[$x['_']] as $callback) {
+                $callback($x);
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']])
-            && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
-            foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
+            && isset($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
+            foreach ($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
                 $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }
+        /** @psalm-suppress InvalidArgument */
         if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
             foreach ($x['reply_markup']['rows'] as $key => $row) {
                 foreach ($row['buttons'] as $bkey => $button) {

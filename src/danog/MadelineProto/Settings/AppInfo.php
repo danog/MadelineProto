@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\Exception;
@@ -7,20 +9,23 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SettingsAbstract;
+use Throwable;
+
+use const PHP_VERSION;
 
 /**
  * App information.
  */
-class AppInfo extends SettingsAbstract
+final class AppInfo extends SettingsAbstract
 {
     /**
      * API ID.
      */
-    protected int $apiId;
+    protected ?int $apiId = null;
     /**
      * API hash.
      */
-    protected string $apiHash;
+    protected ?string $apiHash = null;
     /**
      * Device model.
      */
@@ -47,13 +52,13 @@ class AppInfo extends SettingsAbstract
         // Detect device model
         try {
             $this->deviceModel = \php_uname('s');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->deviceModel = 'Web server';
         }
         // Detect system version
         try {
             $this->systemVersion = \php_uname('r');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language
@@ -64,19 +69,19 @@ class AppInfo extends SettingsAbstract
             $this->setLangCode(\explode('_', $_SERVER['LANG'])[0]);
         }
         $this->init();
+        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->init();
     }
     public function init(): void
     {
-        Magic::start(true);
+        Magic::start(light: true);
         // Detect language pack
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];
         }
-        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
     }
 
     public function mergeArray(array $settings): void
@@ -88,7 +93,7 @@ class AppInfo extends SettingsAbstract
             'system_version',
             'app_version',
             'lang_code',
-            'lang_pack'
+            'lang_pack',
         ]) as $object => $array) {
             if (isset($settings['app_info'][$array])) {
                 $this->{$object}($settings['app_info'][$array]);
@@ -98,8 +103,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Check if the settings have API ID/hash information.
-     *
-     * @return boolean
      */
     public function hasApiInfo(): bool
     {
@@ -107,8 +110,6 @@ class AppInfo extends SettingsAbstract
     }
     /**
      * Get API ID.
-     *
-     * @return int
      */
     public function getApiId(): int
     {
@@ -122,8 +123,6 @@ class AppInfo extends SettingsAbstract
      * Set API ID.
      *
      * @param int $apiId API ID.
-     *
-     * @return self
      */
     public function setApiId(int $apiId): self
     {
@@ -154,8 +153,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get API hash.
-     *
-     * @return string
      */
     public function getApiHash(): string
     {
@@ -169,8 +166,6 @@ class AppInfo extends SettingsAbstract
      * Set API hash.
      *
      * @param string $apiHash API hash.
-     *
-     * @return self
      */
     public function setApiHash(string $apiHash): self
     {
@@ -181,8 +176,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get device model.
-     *
-     * @return string
      */
     public function getDeviceModel(): string
     {
@@ -193,8 +186,6 @@ class AppInfo extends SettingsAbstract
      * Set device model.
      *
      * @param string $deviceModel Device model.
-     *
-     * @return self
      */
     public function setDeviceModel(string $deviceModel): self
     {
@@ -205,8 +196,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get system version.
-     *
-     * @return string
      */
     public function getSystemVersion(): string
     {
@@ -217,8 +206,6 @@ class AppInfo extends SettingsAbstract
      * Set system version.
      *
      * @param string $systemVersion System version.
-     *
-     * @return self
      */
     public function setSystemVersion(string $systemVersion): self
     {
@@ -229,8 +216,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get app version.
-     *
-     * @return string
      */
     public function getAppVersion(): string
     {
@@ -241,8 +226,6 @@ class AppInfo extends SettingsAbstract
      * Set app version.
      *
      * @param string $appVersion App version.
-     *
-     * @return self
      */
     public function setAppVersion(string $appVersion): self
     {
@@ -253,8 +236,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get language code.
-     *
-     * @return string
      */
     public function getLangCode(): string
     {
@@ -265,8 +246,6 @@ class AppInfo extends SettingsAbstract
      * Set language code.
      *
      * @param string $langCode Language code.
-     *
-     * @return self
      */
     public function setLangCode(string $langCode): self
     {
@@ -280,8 +259,6 @@ class AppInfo extends SettingsAbstract
 
     /**
      * Get language pack.
-     *
-     * @return string
      */
     public function getLangPack(): string
     {
@@ -292,8 +269,6 @@ class AppInfo extends SettingsAbstract
      * Set language pack.
      *
      * @param string $langPack Language pack.
-     *
-     * @return self
      */
     public function setLangPack(string $langPack): self
     {

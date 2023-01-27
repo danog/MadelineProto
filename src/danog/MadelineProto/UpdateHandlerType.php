@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Noop module.
+ * Update handler type.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -11,35 +13,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto;
 
-trait Noop
+/**
+ * @internal
+ */
+enum UpdateHandlerType
 {
-    /**
-     * Set NOOP update handler, ignoring all updates.
-     *
-     * @return void
-     */
-    public function setNoop(): void
-    {
-        $this->updateHandler = null;
-        $this->updates = [];
-        $this->startUpdateSystem();
-    }
-    /**
-     * Noop update handler.
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public static function noop(): void
-    {
-    }
+    case EVENT_HANDLER;
+    case GET_UPDATES;
+    case WEBHOOK;
+    case NOOP;
 }

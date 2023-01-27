@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace danog\MadelineProto\Db;
 
 use Amp\Iterator;
-use Amp\Producer;
-use Amp\Promise;
 use Amp\Redis\Redis as RedisRedis;
-use Amp\Success;
-use danog\MadelineProto\Db\Driver\Redis as Redis;
+use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
-use Generator;
-
-use function Amp\call;
 
 /**
  * Redis database backend.
+ *
+ * @internal
+ *
+ * @template TKey as array-key
+ * @template TValue
+ * @extends DriverArray<TKey, TValue>
  */
 class RedisArray extends DriverArray
 {
@@ -27,24 +29,16 @@ class RedisArray extends DriverArray
 
     /**
      * Initialize on startup.
-     *
-     * @return \Generator
      */
-    public function initStartup(): \Generator
+    public function initStartup(): void
     {
-        return $this->initConnection($this->dbSettings);
+        $this->initConnection($this->dbSettings);
     }
-    /**
-     * @return Generator
-     *
-     * @psalm-return Generator<int, Success<null>, mixed, void>
-     */
-    protected function prepareTable(): Generator
+    protected function prepareTable(): void
     {
-        yield new Success;
     }
 
-    protected function renameTable(string $from, string $to): \Generator
+    protected function renameTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";
@@ -53,10 +47,9 @@ class RedisArray extends DriverArray
         $request = $this->db->scan($from.'*');
 
         $lenK = \strlen($from);
-        while (yield $request->advance()) {
-            $oldKey = $request->getCurrent();
+        foreach ($request as $oldKey) {
             $newKey = $to.\substr($oldKey, $lenK);
-            $value = yield $this->db->get($oldKey);
+            $value = $this->db->get($oldKey);
             $this->db->set($newKey, $value);
             $this->db->delete($oldKey);
         }
@@ -64,180 +57,107 @@ class RedisArray extends DriverArray
 
     /**
      * Initialize connection.
-     *
-     * @param DatabaseRedis $settings
-     * @return \Generator
      */
-    public function initConnection($settings): \Generator
+    public function initConnection(DatabaseRedis $settings): void
     {
-        if (!isset($this->db)) {
-            $this->db = yield from Redis::getConnection($settings);
-        }
+        $this->db ??= Redis::getConnection($settings);
     }
-
 
     /**
      * Get redis key name.
-     *
-     * @param string $key
-     * @return string
      */
     private function rKey(string $key): string
     {
         return 'va:'.$this->table.':'.$key;
     }
-    /**
-     * Get redis ts name.
-     *
-     * @param string $key
-     * @return string
-     */
-    private function tsKey(string $key): string
-    {
-        return 'ts:'.$this->table.$key;
-    }
 
     /**
      * Get iterator key.
-     *
-     * @return string
      */
     private function itKey(): string
     {
         return 'va:'.$this->table.'*';
     }
-    /**
-     * Set value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetset.php
-     *
-     * @param string $index <p>
-     * The index to set for.
-     * </p>
-     * @param mixed $value
-     *
-     * @throws \Throwable
-     */
-    public function set(string|int $index, mixed $value): Promise
+    public function set(string|int $index, mixed $value): void
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
-            return new Success();
+            return;
         }
 
         $this->setCache($index, $value);
 
-        $request = $this->db->set($this->rKey($index), \serialize($value));
-
-        //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn () => $this->setCache($index, $value));
-
-        return $request;
+        $this->db->set($this->rKey($index), \serialize($value));
+        $this->setCache($index, $value);
     }
 
-    public function offsetGet(mixed $offset): Promise
+    public function offsetGet(mixed $offset): mixed
     {
         $offset = (string) $offset;
-        return call(function () use ($offset) {
-            if ($this->hasCache($offset)) {
-                return $this->getCache($offset);
-            }
+        if ($this->hasCache($offset)) {
+            return $this->getCache($offset);
+        }
 
-            $value = yield $this->db->get($this->rKey($offset));
+        $value = $this->db->get($this->rKey($offset));
 
-            if ($value !== null && $value = \unserialize($value)) {
-                $this->setCache($offset, $value);
-            }
+        if ($value !== null && $value = \unserialize($value)) {
+            $this->setCache($offset, $value);
+        }
 
-            return $value;
-        });
+        return $value;
     }
 
-    public function unset(string|int $key): Promise
+    public function unset(string|int $key): void
     {
         $this->unsetCache($key);
 
-        return $this->db->delete($this->rkey($key));
+        $this->db->delete($this->rkey($key));
     }
 
     /**
-     * Get array copy.
+     * Get iterator.
      *
-     * @return Promise<array>
-     * @throws \Throwable
+     * @return \Traversable<array-key, mixed>
      */
-    #[\ReturnTypeWillChange]
-    public function getArrayCopy(): Promise
+    public function getIterator(): \Traversable
     {
-        return call(function () {
-            $iterator = $this->getIterator();
-            $result = [];
-            while (yield $iterator->advance()) {
-                [$key, $value] = $iterator->getCurrent();
-                $result[$key] = $value;
-            }
-            return $result;
-        });
-    }
+        $request = $this->db->scan($this->itKey());
 
-    public function getIterator(): Iterator
-    {
-        return new Producer(function (callable $emit) {
-            $request = $this->db->scan($this->itKey());
-
-            $len = \strlen($this->rKey(''));
-            while (yield $request->advance()) {
-                $key = $request->getCurrent();
-                yield $emit([\substr($key, $len), \unserialize(yield $this->db->get($key))]);
-            }
-        });
+        $len = \strlen($this->rKey(''));
+        foreach ($request as $key) {
+            yield \substr($key, $len) => \unserialize($this->db->get($key));
+        }
     }
 
     /**
      * Count elements.
      *
      * @link https://php.net/manual/en/arrayiterator.count.php
-     * @return Promise<int> The number of elements or public properties in the associated
+     * @return int The number of elements or public properties in the associated
      * array or object, respectively.
-     * @throws \Throwable
      */
-    public function count(): Promise
+    public function count(): int
     {
-        return call(function () {
-            $request = $this->db->scan($this->itKey());
-            $count = 0;
-
-            while (yield $request->advance()) {
-                $count++;
-            }
-
-            return $count;
-        });
+        return \iterator_count($this->db->scan($this->itKey()));
     }
 
     /**
      * Clear all elements.
-     *
-     * @return Promise
      */
-    public function clear(): Promise
+    public function clear(): void
     {
         $this->clearCache();
-        return call(function () {
-            $request = $this->db->scan($this->itKey());
+        $request = $this->db->scan($this->itKey());
 
-            $keys = [];
-            $k = 0;
-            while (yield $request->advance()) {
-                $keys[$k++] = $request->getCurrent();
-                if ($k === 10) {
-                    yield $this->db->delete(...$keys);
-                    $keys = [];
-                    $k = 0;
-                }
+        $keys = [];
+        foreach ($request as $key) {
+            $keys[] = $key;
+            if (\count($keys) === 10) {
+                $this->db->delete(...$keys);
+                $keys = [];
             }
-            if (!empty($keys)) {
-                yield $this->db->delete(...$keys);
-            }
-        });
+        }
+        if ($keys) {
+            $this->db->delete(...$keys);
+        }
     }
 }

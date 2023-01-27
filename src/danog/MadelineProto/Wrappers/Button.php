@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Callback module.
  *
@@ -11,16 +13,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Wrappers;
-
-use Amp\Promise;
-use danog\MadelineProto\Tools;
 
 /**
  * Manages clicking buttons.
@@ -31,20 +29,14 @@ trait Button
      * Click on button.
      *
      * @internal
-     *
-     * @param bool $donotwait
-     * @param string $method
-     * @param array $parameters
-     *
-     * @return Promise|true
+     * @return array|true
      */
-    public function clickInternal(bool $donotwait, string $method, array $parameters)
+    public function clickInternal(bool $donotwait, string $method, array $parameters): array|bool
     {
-        $internal = $donotwait ? 'methodCallAsyncWrite' : 'methodCallAsyncRead';
-        $result = $this->{$internal}($method, $parameters);
         if ($donotwait) {
-            Tools::callFork($result);
+            $this->methodCallAsyncRead($method, $parameters, ['noResponse' => true]);
+            return true;
         }
-        return $donotwait ? true : $result;
+        return $this->methodCallAsyncRead($method, $parameters);
     }
 }

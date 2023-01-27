@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * BotAPIFiles module.
  *
@@ -11,9 +13,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
@@ -25,6 +26,7 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\MadelineProto\API;
+use danog\MadelineProto\Lang;
 
 use const danog\Decoder\ANIMATION;
 use const danog\Decoder\AUDIO;
@@ -45,7 +47,7 @@ trait BotAPIFiles
         $fileId = new FileId;
         $fileId->setId($photo['id'] ?? 0);
         $fileId->setAccessHash($photo['access_hash'] ?? 0);
-        $fileId->setFileReference($photo['file_reference'] ?? '');
+        $fileId->setFileReference((string) ($photo['file_reference'] ?? ''));
         $fileId->setDcId($photo['dc_id'] ?? 0);
 
         if (isset($photoSize['location']['local_id'])) {
@@ -72,14 +74,13 @@ trait BotAPIFiles
             'height' => $photoSize['h'],
             'file_size' => $photoSize['size'] ?? (isset($photoSize['sizes']) ? \end($photoSize['sizes']) : \strlen($photoSize['bytes'])),
             'mime_type' => 'image/jpeg',
-            'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg'
+            'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg',
         ];
     }
     /**
      * Unpack bot API file ID.
      *
      * @param string $fileId Bot API file ID
-     *
      * @return array Unpacked file ID
      */
     public function unpackFileId(string $fileId): array
@@ -109,13 +110,13 @@ trait BotAPIFiles
                             'dc_id' => $fileId->getDcId(),
                             'photo_id' => $fileId->getId(),
                         ],
-                        'min' => true
+                        'min' => true,
                     ];
                     if ($fileId->hasVolumeId()) {
                         $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
                             '_' => 'fileLocationToBeDeprecated',
                             'volume_id' => $fileId->getVolumeId(),
-                            'local_id' => $fileId->getLocalId()
+                            'local_id' => $fileId->getLocalId(),
                         ];
                     }
                     return $res;
@@ -129,13 +130,13 @@ trait BotAPIFiles
                         'dc_id' => $fileId->getDcId(),
                         'photo_id' => $fileId->getId(),
                     ],
-                    'min' => true
+                    'min' => true,
                 ];
                 if ($fileId->hasVolumeId()) {
                     $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
                         '_' => 'fileLocationToBeDeprecated',
                         'volume_id' => $fileId->getVolumeId(),
-                        'local_id' => $fileId->getLocalId()
+                        'local_id' => $fileId->getLocalId(),
                     ];
                 }
                 return $res;
@@ -148,7 +149,7 @@ trait BotAPIFiles
                     'id' => $fileId->getId(),
                     'access_hash' => $fileId->getAccessHash(),
                     'file_reference' => $fileId->getFileReference(),
-                    'thumb_size' => $photoSize->getThumbType()
+                    'thumb_size' => $photoSize->getThumbType(),
                 ];
                 $res['name'] = $fileId->getId().'_'.$photoSize->getThumbType();
                 $res['ext'] = 'jpg';
@@ -160,14 +161,14 @@ trait BotAPIFiles
                         'id' => $fileId->getId(),
                         'access_hash' => $fileId->getAccessHash(),
                         'file_reference' => $fileId->getFileReference(),
-                    ]
+                    ],
                 ];
-                if ($res['InputMedia']['id'] === 'inputPhoto') {
+                if ($res['InputMedia']['id']['_'] === 'inputPhoto') {
                     $res['InputMedia']['id']['sizes'] = [
                         [
                             '_' => 'photoSize',
                             'type' => $photoSize->getThumbType(),
-                        ]
+                        ],
                     ];
                 }
                 return $res;
@@ -178,7 +179,7 @@ trait BotAPIFiles
                     'access_hash' => $fileId->getAccessHash(),
                     'file_reference' => $fileId->getFileReference(),
                     'dc_id' => $fileId->getDcId(),
-                    'sizes' => []
+                    'sizes' => [],
                 ];
                 $constructor['sizes'][] = [
                     '_' => 'photoSize',
@@ -188,25 +189,25 @@ trait BotAPIFiles
                         'dc_id' => $fileId->getDcId(),
                         'local_id' => $fileId->hasLocalId() ? $fileId->getLocalId() : null,
                         'volume_id' => $fileId->hasVolumeId() ? $fileId->getVolumeId() : null,
-                        'secret' => $photoSize instanceof PhotoSizeSourceLegacy ? $photoSize->getSecret() : ''
-                    ]
+                        'secret' => $photoSize instanceof PhotoSizeSourceLegacy ? $photoSize->getSecret() : '',
+                    ],
                 ];
                 $res['MessageMedia'] = [
                     '_' => 'messageMediaPhoto',
                     'photo' => $constructor,
-                    'caption' => ''
+                    'caption' => '',
                 ];
                 return $res;
             case VOICE:
                 $attribute = [
                     '_' => 'documentAttributeAudio',
-                    'voice' => true
+                    'voice' => true,
                 ];
                 break;
             case VIDEO:
                 $attribute = [
                     '_' => 'documentAttributeVideo',
-                    'round_message' => false
+                    'round_message' => false,
                 ];
                 break;
             case DOCUMENT:
@@ -215,13 +216,13 @@ trait BotAPIFiles
             case STICKER:
                 $attribute = [
                     '_' => 'documentAttributeSticker',
-                    'alt' => ''
+                    'alt' => '',
                 ];
                 if ($photoSize instanceof PhotoSizeSourceStickersetThumbnail) {
                     $attribute['stickerset'] = [
                         '_' => 'inputStickerSetID',
                         'id' => $photoSize->getStickerSetId(),
-                        'access_hash' => $photoSize->getStickerSetAccessHash()
+                        'access_hash' => $photoSize->getStickerSetAccessHash(),
                     ];
                 }
                 break;
@@ -235,7 +236,7 @@ trait BotAPIFiles
                 $attribute = ['_' => 'documentAttributeVideo', 'round_message' => true];
                 break;
             default:
-                throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_type_invalid'], $fileId->getTypeName()));
+                throw new Exception(\sprintf(Lang::$current_lang['file_type_invalid'], $fileId->getTypeName()));
         }
 
         $constructor = [
@@ -245,7 +246,7 @@ trait BotAPIFiles
             'file_reference' => $fileId->getFileReference(),
             'dc_id' => $fileId->getDcId(),
             'mime_type' => 'application/octet-stream',
-            'attributes' => $attribute ? [$attribute] : []
+            'attributes' => $attribute ? [$attribute] : [],
         ];
         $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
         return $res;
