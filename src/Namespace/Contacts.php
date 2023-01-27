@@ -13,8 +13,6 @@ interface Contacts
      * Get contact by telegram IDs.
      *
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
-     *
-     *
      * @return list<int>
      */
     public function getContactIDs(array $hash = []): array;
@@ -30,9 +28,7 @@ interface Contacts
      * Returns the current user's contact list.
      *
      * @param list<int>|array<never, never> $hash If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
-     *
-     *
-     * @return array{_: 'contacts.contactsNotModified'}|array{_: 'contacts.contacts', contacts: list<array{_: 'contact', mutual: bool, user_id: int}>, saved_count: int, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Contacts.html
+     * @return array{_: 'contacts.contactsNotModified'}|array{_: 'contacts.contacts', contacts: list<array{_: 'contact', mutual: bool, user_id: int}>, saved_count: int, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Contacts.html
      */
     public function getContacts(array $hash = []): array;
 
@@ -42,18 +38,14 @@ interface Contacts
      * Use [contacts.addContact](https://docs.madelineproto.xyz/API_docs/methods/contacts.addContact.html) to add Telegram contacts without actually using their phone number.
      *
      * @param list<array{_: 'inputPhoneContact', client_id?: int, phone?: string, first_name?: string, last_name?: string}>|array<never, never> $contacts Array of List of contacts to import @see https://docs.madelineproto.xyz/API_docs/types/InputContact.html
-     *
-     *
-     * @return array{_: 'contacts.importedContacts', imported: list<array{_: 'importedContact', user_id: int, client_id: int}>, popular_invites: list<array{_: 'popularContact', client_id: int, importers: int}>, retry_contacts: list<int>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ImportedContacts.html
+     * @return array{_: 'contacts.importedContacts', imported: list<array{_: 'importedContact', user_id: int, client_id: int}>, popular_invites: list<array{_: 'popularContact', client_id: int, importers: int}>, retry_contacts: list<int>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ImportedContacts.html
      */
     public function importContacts(array $contacts = []): array;
 
     /**
      * Deletes several contacts from the list.
      *
-     * @param list<array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}>|array<never, never> $id Array of User ID list @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     *
-     *
+     * @param list<array|int|string>|array<never, never> $id Array of User ID list @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function deleteContacts(array $id = []): array;
@@ -62,39 +54,29 @@ interface Contacts
      * Delete contacts by phone number.
      *
      * @param list<string>|array<never, never> $phones Phone numbers
-     *
-     *
      */
     public function deleteByPhones(array $phones = []): bool;
 
     /**
      * Adds the user to the blacklist.
      *
-     * @param array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}|array{_: 'inputPeerUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}|array{_: 'inputPeerChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, channel_id?: int} $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     *
-     *
+     * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function block(array $id): bool;
+    public function block(array|int|string $id): bool;
 
     /**
      * Deletes the user from the blacklist.
      *
-     * @param array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}|array{_: 'inputPeerUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}|array{_: 'inputPeerChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, channel_id?: int} $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     *
-     *
+     * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function unblock(array $id): bool;
+    public function unblock(array|int|string $id): bool;
 
     /**
      * Returns the list of blocked users.
      *
      * @param int $offset The number of list elements to be skipped
-     *
-     *
      * @param int $limit The number of list elements to be returned
-     *
-     *
-     * @return array{_: 'contacts.blocked', blocked: list<array{_: 'peerBlocked', peer_id: array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}, date: int}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>}|array{_: 'contacts.blockedSlice', count: int, blocked: list<array{_: 'peerBlocked', peer_id: array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}, date: int}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Blocked.html
+     * @return array{_: 'contacts.blocked', blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.blockedSlice', count: int, blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Blocked.html
      */
     public function getBlocked(int $offset = 0, int $limit = 0): array;
 
@@ -102,12 +84,8 @@ interface Contacts
      * Returns users found by username substring.
      *
      * @param string $q Target substring
-     *
-     *
      * @param int $limit Maximum number of users to be returned
-     *
-     *
-     * @return array{_: 'contacts.found', my_results: list<array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}>, results: list<array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Found.html
+     * @return array{_: 'contacts.found', my_results: list<array|int|string>, results: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Found.html
      */
     public function search(string $q = '', int $limit = 0): array;
 
@@ -115,39 +93,17 @@ interface Contacts
      * Get most used peers.
      *
      * @param bool $correspondents Users we've chatted most frequently with
-     *
-     *
      * @param bool $bots_pm Most used bots
-     *
-     *
      * @param bool $bots_inline Most used inline bots
-     *
-     *
      * @param bool $phone_calls Most frequently called users
-     *
-     *
      * @param bool $forward_users Users to which the users often forwards messages to
-     *
-     *
      * @param bool $forward_chats Chats to which the users often forwards messages to
-     *
-     *
      * @param bool $groups Often-opened groups and supergroups
-     *
-     *
      * @param bool $channels Most frequently visited channels
-     *
-     *
      * @param int $offset Offset for [pagination](https://core.telegram.org/api/offsets)
-     *
-     *
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     *
-     *
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
-     *
-     *
-     * @return array{_: 'contacts.topPeersNotModified'}|array{_: 'contacts.topPeers', categories: list<array{_: 'topPeerCategoryPeers', category: array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'}, count: int, peers: list<array{_: 'topPeer', peer: array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}, rating: float}>}>, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>}|array{_: 'contacts.topPeersDisabled'} @see https://docs.madelineproto.xyz/API_docs/types/contacts.TopPeers.html
+     * @return array{_: 'contacts.topPeersNotModified'}|array{_: 'contacts.topPeers', categories: list<array{_: 'topPeerCategoryPeers', category: array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'}, count: int, peers: list<array{_: 'topPeer', peer: array|int|string, rating: float}>}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.topPeersDisabled'} @see https://docs.madelineproto.xyz/API_docs/types/contacts.TopPeers.html
      */
     public function getTopPeers(bool $correspondents = false, bool $bots_pm = false, bool $bots_inline = false, bool $phone_calls = false, bool $forward_users = false, bool $forward_chats = false, bool $groups = false, bool $channels = false, int $offset = 0, int $limit = 0, array $hash = []): array;
 
@@ -155,13 +111,9 @@ interface Contacts
      * Reset [rating](https://core.telegram.org/api/top-rating) of top peer.
      *
      * @param array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'} $category Top peer category @see https://docs.madelineproto.xyz/API_docs/types/TopPeerCategory.html
-     *
-     *
-     * @param array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}|array{_: 'inputPeerUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int}|array{_: 'inputPeerChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, channel_id?: int} $peer Peer whose rating should be reset @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     *
-     *
+     * @param array|int|string $peer Peer whose rating should be reset @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function resetTopPeerRating(array $category, array $peer): bool;
+    public function resetTopPeerRating(array $category, array|int|string $peer): bool;
 
     /**
      * Delete saved contacts.
@@ -180,8 +132,6 @@ interface Contacts
      * Enable/disable [top peers](https://core.telegram.org/api/top-rating).
      *
      * @param bool $enabled Enable/disable
-     *
-     *
      */
     public function toggleTopPeers(bool $enabled): bool;
 
@@ -190,47 +140,29 @@ interface Contacts
      *
      * Use [contacts.importContacts](https://docs.madelineproto.xyz/API_docs/methods/contacts.importContacts.html) to add contacts by phone number, without knowing their Telegram ID.
      *
-     * @param array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int} $id Telegram ID of the other user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     *
-     *
+     * @param array|int|string $id Telegram ID of the other user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param bool $add_phone_privacy_exception Allow the other user to see our phone number?
-     *
-     *
      * @param string $first_name First name
-     *
-     *
      * @param string $last_name Last name
-     *
-     *
      * @param string $phone User's phone number
-     *
-     *
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function addContact(array $id, bool $add_phone_privacy_exception = false, string $first_name = '', string $last_name = '', string $phone = ''): array;
+    public function addContact(array|int|string $id, bool $add_phone_privacy_exception = false, string $first_name = '', string $last_name = '', string $phone = ''): array;
 
     /**
      * If the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of a new user allow us to add them as contact, add that user as contact.
      *
-     * @param array{_: 'inputUserEmpty'}|array{_: 'inputUserSelf'}|array{_: 'inputUser', user_id?: int, access_hash?: int}|array{_: 'inputUserFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, msg_id?: int, user_id?: int} $id The user to add as contact @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     *
-     *
+     * @param array|int|string $id The user to add as contact @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function acceptContact(array $id): array;
+    public function acceptContact(array|int|string $id): array;
 
     /**
      * Get contacts near you.
      *
      * @param array{_: 'inputGeoPointEmpty'}|array{_: 'inputGeoPoint', lat: float, long: float, accuracy_radius?: int} $geo_point Geolocation @see https://docs.madelineproto.xyz/API_docs/types/InputGeoPoint.html
-     *
-     *
      * @param bool $background While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so, while setting this flag. <br>Do this only if the new location is more than 1 KM away from the previous one, or if the previous location is unknown.
-     *
-     *
      * @param int $self_expires If set, the geolocation of the current user will be public for the specified number of seconds; pass 0x7fffffff to disable expiry, 0 to make the current geolocation private; if the flag isn't set, no changes will be applied.
-     *
-     *
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function getLocated(array $geo_point, bool $background = false, int $self_expires = 0): array;
@@ -239,17 +171,9 @@ interface Contacts
      * Stop getting notifications about [thread replies](https://core.telegram.org/api/threads) of a certain user in `@replies`.
      *
      * @param bool $delete_message Whether to delete the specified message as well
-     *
-     *
      * @param bool $delete_history Whether to delete all `@replies` messages from this user as well
-     *
-     *
      * @param bool $report_spam Whether to also report this user for spam
-     *
-     *
      * @param int $msg_id ID of the message in the [@replies](https://core.telegram.org/api/threads#replies) chat
-     *
-     *
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function blockFromReplies(bool $delete_message = false, bool $delete_history = false, bool $report_spam = false, int $msg_id = 0): array;
@@ -258,9 +182,7 @@ interface Contacts
      * Resolve a phone number to get user info, if their privacy settings allow it.
      *
      * @param string $phone Phone number in international format, possibly obtained from a [phone number deep link](https://core.telegram.org/api/links#phone-number-links).
-     *
-     *
-     * @return array{_: 'contacts.resolvedPeer', peer: array{_: 'peerUser', user_id: int}|array{_: 'peerChat', chat_id: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}}|array{_: 'peerChannel', channel_id: int}, chats: list<array{_: 'chatEmpty', id: int}|array{_: 'chat', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, deactivated: bool, call_active: bool, call_not_empty: bool, noforwards: bool, id: int, title: string, participants_count: int, date: int, version: int, migrated_to?: array{_: 'inputChannelEmpty'}|array{_: 'inputChannel', channel_id: int, access_hash: int}|array{_: 'inputChannelFromMessage', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id: int, access_hash: int}|array{_: 'inputPeerChannel', channel_id: int, access_hash: int}, msg_id: int, channel_id: int}, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}}|array{_: 'chatForbidden', id: int, title: string}|array{_: 'channel', photo: array{_: 'chatPhotoEmpty'}|array{_: 'chatPhoto', has_video: bool, photo_id: int, stripped_thumb: string, dc_id: int}, creator: bool, left: bool, broadcast: bool, verified: bool, megagroup: bool, restricted: bool, signatures: bool, min: bool, scam: bool, has_link: bool, has_geo: bool, slowmode_enabled: bool, call_active: bool, call_not_empty: bool, fake: bool, gigagroup: bool, noforwards: bool, join_to_send: bool, join_request: bool, forum: bool, id: int, access_hash: int, title: string, username: string, date: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, admin_rights?: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool}, banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, default_banned_rights?: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, until_date: int}, participants_count: int, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}|array{_: 'channelForbidden', broadcast: bool, megagroup: bool, id: int, access_hash: int, title: string, until_date: int}>, users: list<array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>}>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ResolvedPeer.html
+     * @return array{_: 'contacts.resolvedPeer', peer: array|int|string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ResolvedPeer.html
      */
     public function resolvePhone(string $phone = ''): array;
 
@@ -274,9 +196,7 @@ interface Contacts
     /**
      *
      *
-     *
-     *
-     * @return array{_: 'userEmpty', id: int}|array{_: 'user', self: bool, contact: bool, mutual_contact: bool, deleted: bool, bot: bool, bot_chat_history: bool, bot_nochats: bool, verified: bool, restricted: bool, min: bool, bot_inline_geo: bool, support: bool, scam: bool, apply_min_photo: bool, fake: bool, bot_attach_menu: bool, premium: bool, attach_menu_enabled: bool, id: int, access_hash: int, first_name: string, last_name: string, username: string, phone: string, photo?: array{_: 'userProfilePhotoEmpty'}|array{_: 'userProfilePhoto', has_video: bool, personal: bool, photo_id: int, stripped_thumb: string, dc_id: int}, status?: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, bot_info_version: int, restriction_reason: list<array{_: 'restrictionReason', platform: string, reason: string, text: string}>, bot_inline_placeholder: string, lang_code: string, emoji_status?: array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}, usernames: list<array{_: 'username', editable: bool, active: bool, username: string}>} @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
-    public function importContactToken(string $token = ''): array;
+    public function importContactToken(string $token = ''): array|int|string;
 }

@@ -12,9 +12,7 @@ interface Folders
     /**
      * Edit peers in [peer folder](https://core.telegram.org/api/folders#peer-folders).
      *
-     * @param list<array{_: 'inputFolderPeer', peer: array{_: 'inputPeerEmpty'}|array{_: 'inputPeerSelf'}|array{_: 'inputPeerUser', user_id?: int, access_hash?: int}|array{_: 'inputPeerChannel', channel_id?: int, access_hash?: int}, folder_id?: int}>|array<never, never> $folder_peers Array of New peer list @see https://docs.madelineproto.xyz/API_docs/types/InputFolderPeer.html
-     *
-     *
+     * @param list<array{_: 'inputFolderPeer', peer: array|int|string, folder_id?: int}>|array<never, never> $folder_peers Array of New peer list @see https://docs.madelineproto.xyz/API_docs/types/InputFolderPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function editPeerFolders(array $folder_peers = []): array;
@@ -23,8 +21,6 @@ interface Folders
      * Delete a [peer folder](https://core.telegram.org/api/folders#peer-folders).
      *
      * @param int $folder_id [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
-     *
-     *
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function deleteFolder(int $folder_id = 0): array;

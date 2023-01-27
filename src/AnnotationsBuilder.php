@@ -68,9 +68,16 @@ final class Blacklist {
 }
         ');
         $special = [];
-        foreach (DocsBuilder::DEFAULT_TEMPLATES as $types) {
+        foreach (DocsBuilder::DEFAULT_TEMPLATES as $key => $types) {
+            $replace = match ($key) {
+                'User' => 'array|int|string',
+                'DataJSON' => 'mixed',
+                'InputFile' => 'mixed',
+                'PhoneCall' => '\\danog\\MadelineProto\\VoIP|array',
+                default => 'array'
+            };
             foreach ($types as $type) {
-                $special[$type] = true;
+                $special[$type] = $replace;
             }
         }
         $this->special = $special;
@@ -102,13 +109,11 @@ final class Blacklist {
             'float' => 'float',
             'Bool' => 'bool',
             'true' => 'bool',
-            'DataJSON' => 'mixed',
-            'InputFile' => 'mixed',
             'InputMessage' => 'array|int',
-            default => 'array'
+            default => $this->special[$type] ?? 'array'
         };
     }
-    private function prepareTLPsalmType(string $type, bool $input, int $depth = 10, array $stack = []): string
+    private function prepareTLPsalmType(string $type, bool $input, int $depth = -2, array $stack = []): string
     {
         [$isVector, $type] = self::isVector($type);
         $base = match ($type) {
@@ -120,13 +125,9 @@ final class Blacklist {
             'float' => 'float',
             'Bool' => 'bool',
             'true' => 'bool',
-            'DataJSON' => 'mixed',
-            'InputFile' => 'mixed',
-            default => ''
+            'Updates' => 'array',
+            default => $this->special[$type] ?? ''
         };
-        if ($base === '' &&) {
-
-        }
         if ($type === 'channels.AdminLogResults') {
             $depth = 1;
         }
@@ -160,7 +161,7 @@ final class Blacklist {
             $base = \implode('|', $constructors);
         }
         if ($type === 'InputMessage') {
-            $type = "int|$type";
+            $base = "int|$base";
         }
         if ($isVector) {
             $base = "list<$base>";
@@ -225,6 +226,13 @@ final class Blacklist {
                 $param['name'] = 'message';
                 $param['type'] = 'DecryptedMessage';
             }
+            if ($param['name'] === 'bytes' && $type === 'EncryptedMessage') {
+                $param['name'] = 'decrypted_message';
+                $param['type'] = 'DecryptedMessage';
+            }
+            if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
+                continue;
+            }
             if ($param['name'] === 'chat_id' && $method !== 'messages.discardEncryption') {
                 $param['type'] = 'InputPeer';
             }
@@ -270,8 +278,11 @@ final class Blacklist {
             }
             $signature []= $param_var;
             $contents .= "     * @param {$psalmType} \${$name} {$description}\n";
-            $contents .= "     * \n";
-            $contents .= "     *\n";
+
+            if ($name === 'entities') {
+                $contents .= "     * @param ''|'HTML'|'html'|'Markdown'|'markdown' \$parse_mode Whether to parse HTML or Markdown markup in the message\n";
+                $signature []= "string \$parse_mode = ''";
+            }
         }
         return [$contents, $signature];
     }
@@ -476,6 +487,12 @@ final class Blacklist {
                 \fwrite($handle, " * don't modify it manually.\n");
                 \fwrite($handle, " */\n\n");
                 \fwrite($handle, "namespace {$this->namespace};\n");
+                \fwrite($handle, "use Generator;\n");
+                \fwrite($handle, "use Amp\\Future;\n");
+                \fwrite($handle, "use Closure;\n");
+                \fwrite($handle, "use Amp\\ByteStream\\WritableStream;\n");
+                \fwrite($handle, "use Amp\\Cancellation;\n");
+                \fwrite($handle, "use Amp\\Http\\Server\\Request as ServerRequest;\n");
 
                 \fwrite($handle, "\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {

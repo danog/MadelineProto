@@ -13,11 +13,7 @@ interface Langpack
      * Get localization pack strings.
      *
      * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     *
-     *
      * @param string $lang_code Language code
-     *
-     *
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
      */
     public function getLangPack(string $lang_pack = '', string $lang_code = ''): array;
@@ -26,14 +22,8 @@ interface Langpack
      * Get strings from a language pack.
      *
      * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     *
-     *
      * @param string $lang_code Language code
-     *
-     *
      * @param list<string>|array<never, never> $keys Strings to get
-     *
-     *
      * @return list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackString.html
      */
     public function getStrings(string $lang_pack = '', string $lang_code = '', array $keys = []): array;
@@ -42,14 +32,8 @@ interface Langpack
      * Get new strings in language pack.
      *
      * @param string $lang_pack Language pack
-     *
-     *
      * @param string $lang_code Language code
-     *
-     *
      * @param int $from_version Previous localization pack version
-     *
-     *
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
      */
     public function getDifference(string $lang_pack = '', string $lang_code = '', int $from_version = 0): array;
@@ -58,8 +42,6 @@ interface Langpack
      * Get information about all languages in a localization pack.
      *
      * @param string $lang_pack Language pack
-     *
-     *
      * @return list<array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
      */
     public function getLanguages(string $lang_pack = ''): array;
@@ -68,11 +50,7 @@ interface Langpack
      * Get information about a language in a localization pack.
      *
      * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     *
-     *
      * @param string $lang_code Language code
-     *
-     *
      * @return array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string} @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
      */
     public function getLanguage(string $lang_pack = '', string $lang_code = ''): array;
