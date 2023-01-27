@@ -1607,7 +1607,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->logger->logger($e->getMessage());
             return false;
         }
-        return $this->authorization['user'];
+        return $this->getSelf();
     }
     /**
      * Get authorization info.
@@ -1752,14 +1752,23 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         return \array_merge($methods, \get_class_methods(InternalDoc::class));
     }
+    /**
+     * @internal
+     */
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @internal
+     */
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @internal
+     */
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return \array_merge(
@@ -1770,14 +1779,23 @@ final class MTProto implements TLCallback, LoggerGetter
             ['config' => [$this->addConfig(...)]],
         );
     }
+    /**
+     * @internal
+     */
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @internal
+     */
     public function getConstructorBeforeSerializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @internal
+     */
     public function getTypeMismatchCallbacks(): array
     {
         return \array_merge(
@@ -1818,6 +1836,9 @@ final class MTProto implements TLCallback, LoggerGetter
             ),
         );
     }
+    /**
+     * @internal
+     */
     public function areDeserializationCallbacksMutuallyExclusive(): bool
     {
         return false;

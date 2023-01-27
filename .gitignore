@@ -101,7 +101,7 @@ madeline.php
 composer.lock
 b.php
 telegram-cli*
-src/danog/MadelineProto/Fuzzer.php
+src/Fuzzer.php
 fuzzer.php
 tests/500mb
 *.save

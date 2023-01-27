@@ -113,7 +113,8 @@ class MyEventHandler extends EventHandler
         // Chat id
         $id = $this->getId($update);
 
-        // You can also use the built-in MadelineProto MySQL async driver!
+        // In this example code, send the "This userbot is powered by MadelineProto!" message only once per chat.
+        // Ignore all further messages coming from this chat.
         if (!isset($this->notifiedChats[$id])) {
             $this->notifiedChats[$id] = true;
 
@@ -139,17 +140,19 @@ class MyEventHandler extends EventHandler
             }
         }
 
+        // Test MadelineProto's built-in database driver, which automatically maps to MySQL/PostgreSQL/Redis
+        // properties mentioned in the MyEventHandler::$dbProperties property!
+
         // Can be anything serializable: an array, an int, an object, ...
         $myData = [];
 
-        if (isset($this->dataStoredOnDb['yourKey'])) {
-            // Always when fetching data
-            $myData = $this->dataStoredOnDb['yourKey'];
+        if (isset($this->dataStoredOnDb['k1'])) {
+            $myData = $this->dataStoredOnDb['k1'];
         }
-        $this->dataStoredOnDb['yourKey'] = $myData + ['moreStuff' => 'yay'];
+        $this->dataStoredOnDb['k1'] = $myData + ['moreStuff' => 'yay'];
 
-        $this->dataStoredOnDb['otherKey'] = 0;
-        unset($this->dataStoredOnDb['otherKey']);
+        $this->dataStoredOnDb['k2'] = 0;
+        unset($this->dataStoredOnDb['k2']);
 
         $this->logger("Count: ".count($this->dataStoredOnDb));
 

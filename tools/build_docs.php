@@ -12,7 +12,6 @@
  */
 
 use danog\MadelineProto\API;
-use danog\MadelineProto\APIFactory;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
@@ -55,10 +54,8 @@ $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
     $docs[0],
-    dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
     [
         'API' => API::class,
-        'APIFactory' => APIFactory::class,
         'MTProto' => MTProto::class
     ],
     'danog\\MadelineProto'

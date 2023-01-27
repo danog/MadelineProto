@@ -86,7 +86,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "danog\\MadelineProto\\": "src/danog/MadelineProto"
+            "danog\\MadelineProto\\": "src"
         },
         "files": [
             "src/polyfill.php",

@@ -171,7 +171,7 @@ class Installer
         \flock(self::$lock, LOCK_SH);
         $result = require_once $phar;
         if (\defined('MADELINE_WORKER_TYPE') && \constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
-            require_once "phar://$phar/vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner/entry.php";
+            require_once "phar://$phar/vendor/danog/madelineproto/src/Ipc/Runner/entry.php";
         }
         return $result;
     }
