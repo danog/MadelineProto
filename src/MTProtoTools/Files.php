@@ -987,7 +987,7 @@ trait Files
                     );
                     break;
                 } catch (RPCErrorException $e) {
-                    if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                    if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === '-503') {
                         Tools::sleep(1);
                         continue;
                     }

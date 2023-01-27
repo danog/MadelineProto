@@ -793,6 +793,23 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
+     * Get current number of memory-mapped regions, UNIX only.
+      * @return ?int
+     */
+    public static function getMaps(): ?int
+    {
+        return \danog\MadelineProto\Tools::getMaps();
+    }
+    /**
+     * Get maximum number of memory-mapped regions, UNIX only.
+     * Use testFibers to get the maximum number of fibers on any platform.
+      * @return ?int
+     */
+    public static function getMaxMaps(): ?int
+    {
+        return \danog\MadelineProto\Tools::getMaxMaps();
+    }
+    /**
      * Get TL namespaces.
      */
     public function getMethodNamespaces()
@@ -1457,6 +1474,15 @@ abstract class InternalDoc
     public function tdcliToTd(&$params, ?array $key = null)
     {
         return $this->wrapper->getAPI()->{__FUNCTION__}($params, $key);
+    }
+    /**
+     * Test fibers.
+     *
+     * @return array{maxFibers: int, realMemoryMb: int, maps: ?int, maxMaps: ?int}
+     */
+    public static function testFibers(int $fiberCount = 100000): array
+    {
+        return \danog\MadelineProto\Tools::testFibers($fiberCount);
     }
     /**
      * Create an artificial timeout for any Generator or Promise.

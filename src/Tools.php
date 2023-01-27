@@ -43,14 +43,16 @@ use function unpack;
 abstract class Tools extends AsyncTools
 {
     /**
-     * @internal Test fibers
+     * Test fibers.
+     *
+     * @return array{maxFibers: int, realMemoryMb: int, maps: ?int, maxMaps: ?int}
      */
-    public static function testFibers(): ?array
+    public static function testFibers(int $fiberCount = 100000): array
     {
         \ini_set('memory_limit', -1);
 
         $f = [];
-        for ($x = 0; $x < 100000; $x++) {
+        for ($x = 0; $x < $fiberCount; $x++) {
             try {
                 $f []= $cur = new Fiber(function (): void {
                     Fiber::suspend();
@@ -63,9 +65,39 @@ abstract class Tools extends AsyncTools
         return [
             'maxFibers' => $x,
             'realMemoryMb' => (int) (\memory_get_usage(true)/1024/1024),
-            'maps' => \substr_count(@\file_get_contents('/proc/self/maps'), "\n")-1,
-            'maxMaps' => (int) @\file_get_contents('/proc/sys/vm/max_map_count'),
+            'maps' => self::getMaps(),
+            'maxMaps' => self::getMaxMaps(),
         ];
+    }
+    /**
+     * Get current number of memory-mapped regions, UNIX only.
+     */
+    public static function getMaps(): ?int
+    {
+        try {
+            if (\file_exists('/proc/self/maps')) {
+                return \substr_count(@\file_get_contents('/proc/self/maps'), "\n")-1;
+            }
+            $pid = \getmypid();
+            if (\file_exists("/proc/$pid/maps")) {
+                return \substr_count(@\file_get_contents("/proc/$pid/maps"), "\n")-1;
+            }
+            return null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+    /**
+     * Get maximum number of memory-mapped regions, UNIX only.
+     * Use testFibers to get the maximum number of fibers on any platform.
+     */
+    public static function getMaxMaps(): ?int
+    {
+        try {
+            return ((int) @\file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
     /**
      * Sanify TL obtained from JSON for TL serialization.
