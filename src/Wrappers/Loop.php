@@ -127,6 +127,8 @@ trait Loop
     }
     /**
      * Stop update loop.
+     *
+     * @internal
      */
     public function stop(): void
     {
@@ -135,6 +137,8 @@ trait Loop
     }
     /**
      * Restart update loop.
+     *
+     * @internal
      */
     public function restart(): void
     {

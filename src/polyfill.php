@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+if (defined('MADELINE_POLYFILLED')) {
+    return;
+}
+
+define('MADELINE_POLYFILLED', true);
+
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\Cookie\LocalCookieJar;
 use Amp\Socket\EncryptableSocket;

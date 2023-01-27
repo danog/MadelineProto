@@ -1309,13 +1309,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
-     * Restart update loop.
-     */
-    public function restart(): void
-    {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
-    }
-    /**
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
@@ -1422,13 +1415,6 @@ abstract class InternalDoc
     public function start()
     {
         return $this->wrapper->getAPI()->{__FUNCTION__}();
-    }
-    /**
-     * Stop update loop.
-     */
-    public function stop(): void
-    {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.
