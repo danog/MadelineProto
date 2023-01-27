@@ -25,7 +25,7 @@ use InvalidArgumentException;
 /**
  * @internal
  */
-final class AbstractAPI
+class AbstractAPI
 {
     private APIWrapper $wrapper;
     public function __construct(private string $namespace)

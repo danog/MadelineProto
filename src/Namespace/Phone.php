@@ -397,7 +397,7 @@ interface Phone
      * @param array{_: 'inputPhoneCall', id?: int, access_hash?: int} $peer Phone call @see https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html
      *
      *
-     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      *
      *
      */

@@ -548,7 +548,7 @@ interface Account
     /**
      * Create and upload a new [wallpaper](https://core.telegram.org/api/wallpapers).
      *
-     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      *
      *
      * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int} $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
@@ -619,10 +619,10 @@ interface Account
     /**
      * Upload theme.
      *
-     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      *
      *
-     * @param string|mixed $thumb A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed $thumb A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      *
      *
      * @param string $file_name File name
@@ -872,7 +872,7 @@ interface Account
     /**
      * Upload notification sound, use [account.saveRingtone](https://docs.madelineproto.xyz/API_docs/methods/account.saveRingtone.html) to convert it and add it to the list of saved notification sounds.
      *
-     * @param string|mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      *
      *
      * @param string $file_name File name

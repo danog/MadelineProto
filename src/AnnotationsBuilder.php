@@ -47,6 +47,7 @@ final class AnnotationsBuilder
     private TL $TL;
     private array $blacklist;
     private array $blacklistHard;
+    private array $special;
     public function __construct(Logger $logger, array $settings, array $reflectionClasses, string $namespace)
     {
         $this->reflectionClasses = $reflectionClasses;
@@ -66,6 +67,13 @@ final class Blacklist {
     public const BLACKLIST = '.\var_export($this->blacklistHard, true).';
 }
         ');
+        $special = [];
+        foreach (DocsBuilder::DEFAULT_TEMPLATES as $types) {
+            foreach ($types as $type) {
+                $special[$type] = true;
+            }
+        }
+        $this->special = $special;
     }
     public function mkAnnotations(): void
     {
@@ -96,10 +104,11 @@ final class Blacklist {
             'true' => 'bool',
             'DataJSON' => 'mixed',
             'InputFile' => 'mixed',
+            'InputMessage' => 'array|int',
             default => 'array'
         };
     }
-    private function prepareTLPsalmType(string $type, bool $input, array $stack = []): string
+    private function prepareTLPsalmType(string $type, bool $input, int $depth = 10, array $stack = []): string
     {
         [$isVector, $type] = self::isVector($type);
         $base = match ($type) {
@@ -112,10 +121,18 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'DataJSON' => 'mixed',
-            'InputFile' => 'string|mixed',
-            'Updates' => 'array',
+            'InputFile' => 'mixed',
             default => ''
         };
+        if ($base === '' &&) {
+
+        }
+        if ($type === 'channels.AdminLogResults') {
+            $depth = 1;
+        }
+        if ($depth > 3) {
+            $base = 'array';
+        }
         if (!$base) {
             $constructors = [];
             foreach ($this->TL->getConstructors()->by_id as $constructor) {
@@ -133,7 +150,7 @@ final class Blacklist {
                                 ? '?'
                                 : '';
                         }
-                        $params []= "$name$optional: ".$this->prepareTLPsalmType($param['type'], $input, $stack);
+                        $params []= "$name$optional: ".$this->prepareTLPsalmType($param['type'], $input, $depth+1, $stack);
                         unset($stack[$param['type']]);
                     }
                     $params = \implode(', ', $params);
@@ -141,6 +158,9 @@ final class Blacklist {
                 }
             }
             $base = \implode('|', $constructors);
+        }
+        if ($type === 'InputMessage') {
+            $type = "int|$type";
         }
         if ($isVector) {
             $base = "list<$base>";
