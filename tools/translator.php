@@ -114,10 +114,10 @@ foreach (Lang::$current_lang as $key => $value) {
         if (in_array($key, ['v_error', 'v_tgerror'])) {
             Lang::$lang[$lang_code][$key] = bin2hex(Lang::$lang[$lang_code][$key]);
         }
-        file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
-        echo 'OK, '.($curcount * 100 / $count).'% done. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
+        file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
+        echo 'OK, '.($curcount * 100 / $count).'% done. edit src/Lang.php to fix mistakes.'.PHP_EOL;
     }
     $curcount++;
 }
-file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
-echo 'OK. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
+file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
+echo 'OK. edit src/Lang.php to fix mistakes.'.PHP_EOL;

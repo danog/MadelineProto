@@ -29,7 +29,7 @@ use Generator;
 /**
  * Event handler.
  */
-abstract class EventHandler extends InternalDoc
+abstract class EventHandler extends AbstractAPI
 {
     use DbPropertiesTrait {
         DbPropertiesTrait::initDb as private internalInitDb;
@@ -75,6 +75,10 @@ abstract class EventHandler extends InternalDoc
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
+    }
+    protected function reconnectFull(): bool
+    {
+        return true;
     }
     /**
      * Internal constructor.

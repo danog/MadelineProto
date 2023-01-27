@@ -45,7 +45,7 @@ use function Amp\Future\await;
 /**
  * Main API wrapper for MadelineProto.
  */
-final class API extends InternalDoc
+final class API extends AbstractAPI
 {
     /**
      * Release version.
@@ -176,7 +176,7 @@ final class API extends InternalDoc
     /**
      * Reconnect to full instance.
      */
-    protected function reconnectFull()
+    protected function reconnectFull(): bool
     {
         if ($this->wrapper->getAPI() instanceof Client) {
             $this->wrapper->logger('Restarting to full instance...');

@@ -540,7 +540,7 @@ trait PeerHandler
      *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * } : ($type is INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
+     * } : ($type is MTProto::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
     public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {
@@ -773,17 +773,21 @@ trait PeerHandler
     /**
      * Refresh peer cache for a certain peer.
      *
-     * @param mixed $id The peer to refresh
      */
-    public function refreshPeerCache(mixed $id): void
+    public function refreshPeerCache(mixed ...$ids): void
     {
-        $id = $this->getInfo($id, MTProto::INFO_TYPE_ID);
-        if ($this->isSupergroup($id)) {
-            $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
-        } elseif ($id < 0) {
-            $this->methodCallAsyncRead('messages.getChats', ['id' => [$id]]);
-        } else {
-            $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($this->chats[$id], 0, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
+        $ids = \array_map(fn ($id) => $this->getInfo($id, MTProto::INFO_TYPE_ID), $ids);
+        $supergroups = \array_filter($ids, self::isSupergroup(...));
+        $chats = \array_filter($ids, fn (int $id): bool => $id < 0);
+        $users = \array_filter($ids, fn (int $id): bool => $id > 0);
+        if ($supergroups) {
+            $this->methodCallAsyncRead('channels.getChannels', ['id' => $supergroups]);
+        }
+        if ($chats) {
+            $this->methodCallAsyncRead('messages.getChats', ['id' => $chats]);
+        }
+        if ($users) {
+            $this->methodCallAsyncRead('users.getUsers', ['id' => $users]);
         }
     }
     /**

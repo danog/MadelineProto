@@ -38,7 +38,7 @@ $API->loop(
 
 For a full overview of async in MadelineProtoTon, take a look at the [MadelineProto async docs](https://docs.madelineproto.xyz/docs/ASYNC.html).
 
-For a full list of methods that can be used, simply look at the PHPDOC suggestions in your favorite IDE, or take a look at the `---functions---` section of the [lite TL scheme](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/TON/schemes/lite_api.tl).
+For a full list of methods that can be used, simply look at the PHPDOC suggestions in your favorite IDE, or take a look at the `---functions---` section of the [lite TL scheme](https://github.com/danog/MadelineProto/blob/master/src/TON/schemes/lite_api.tl).
 
 This API can be used to build web-facing HTTP APIs that query the TON blockchain (using the async [http-client](https://github.com/amphp/http-client)), off-chain elements for TON applications and so much more!
 

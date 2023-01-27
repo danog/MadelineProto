@@ -308,7 +308,7 @@ class SecretHandler extends EventHandler
         while ($i < 10) {
             $this->logger("SENDING MESSAGE $i TO ".$update['message']['chat_id']);
             // You can also use the sendEncrypted parameter for more options in secret chats
-            $this->messages->sendMessage(['peer' => $update, 'message' => (string) ($i++)]);
+            $this->messages->sendMessage(peer: $update, message: (string) ($i++));
         }
         $this->sent[$update['message']['chat_id']] = true;
     }

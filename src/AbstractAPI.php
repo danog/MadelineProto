@@ -22,40 +22,10 @@ namespace danog\MadelineProto;
 
 use Amp\Future\UnhandledFutureError;
 use Amp\SignalException;
-use InvalidArgumentException;
 use Revolt\EventLoop;
 
-abstract class AbstractAPIFactory
+abstract class AbstractAPI extends InternalDoc
 {
-    /**
-     * Namespace.
-     *
-     * @internal
-     */
-    private string $namespace = '';
-
-    /**
-     * API wrapper (to avoid circular references).
-     */
-    protected APIWrapper $wrapper;
-
-    /**
-     * Export APIFactory instance with the specified namespace.
-     */
-    protected function exportNamespaces(): void
-    {
-        $class = \array_reverse(\array_values(\class_parents(static::class)))[1];
-
-        foreach (\get_class_vars(APIFactory::class) as $key => $var) {
-            if (\in_array($key, ['namespace', 'methods', 'wrapper'])) {
-                continue;
-            }
-            $instance = new $class;
-            $instance->namespace = $key.'.';
-            $instance->wrapper = $this->wrapper;
-            $this->{$key} = $instance;
-        }
-    }
     /**
      * Enable or disable async.
      *
@@ -64,29 +34,6 @@ abstract class AbstractAPIFactory
     public function async(bool $async): void
     {
     }
-    /**
-     * Call async wrapper function.
-     *
-     * @param string $name      Method name
-     * @param array  $arguments Arguments
-     * @internal
-     */
-    public function __call(string $name, array $arguments)
-    {
-        if ($arguments && !isset($arguments[0])) {
-            $arguments = [$arguments];
-        }
-
-        $name = $this->namespace.$name;
-        $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
-        $aargs['apifactory'] = true;
-        $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-        if (isset($args[0]) && !isset($args['multiple'])) {
-            throw new InvalidArgumentException('Parameter names must be provided!');
-        }
-        return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
-    }
-
     /**
      * Start MadelineProto and the event handler (enables async).
      *
@@ -130,6 +77,8 @@ abstract class AbstractAPIFactory
             }
         }
     }
+    abstract protected function reconnectFull(): bool;
+
     protected function startAndLoopLogic(string $eventHandler, bool &$started): void
     {
         $this->start();
