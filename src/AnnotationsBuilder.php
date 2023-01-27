@@ -196,9 +196,6 @@ final class Blacklist {
 
         foreach ($methods as $method) {
             $name = $method->getName();
-            if (isset($ignoreMethods[$name])) {
-                continue;
-            }
             if (\strpos($method->getDocComment() ?: '', '@internal') !== false) {
                 continue;
             }
@@ -346,6 +343,7 @@ final class Blacklist {
                 \fwrite($handle, '
                     /**
                      * Export APIFactory instance with the specified namespace.
+                     * @psalm-suppress InaccessibleProperty
                      */
                     protected function exportNamespaces(): void
                     {
