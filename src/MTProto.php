@@ -519,7 +519,8 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function serializeSession(object $data)
     {
-        if (!isset($this->session) || !$this->session || $this->session instanceof MemoryArray) {
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (!isset($this->session) || $this->session instanceof MemoryArray) {
             return $data;
         }
         $this->session['data'] = $data;
@@ -1095,7 +1096,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->authorized = self::LOGGED_IN;
             $this->setupLogger();
             $this->startLoops();
-            $this->getCdnConfig($this->datacenter->currentDatacenter);
+            $this->getCdnConfig();
             $this->initAuthorization();
         } else {
             $this->startLoops();
