@@ -35,20 +35,6 @@ abstract class EventHandler extends AbstractAPI
         DbPropertiesTrait::initDb as private internalInitDb;
     }
     /**
-     * Whether the event handler was started.
-     */
-    private bool $startedInternal = false;
-    private ?LocalMutex $startMutex = null;
-    /**
-     * API instance.
-     */
-    protected MTProto $API;
-    public function __construct($API)
-    {
-        // BC
-    }
-
-    /**
      * Start MadelineProto and the event handler.
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
@@ -105,7 +91,12 @@ abstract class EventHandler extends AbstractAPI
         $this->wrapper = $MadelineProto;
         $this->exportNamespaces();
     }
-    private ?Future $startFuture = null;
+    /**
+     * Whether the event handler was started.
+     */
+    private bool $startedInternal = false;
+    private ?LocalMutex $startMutex = null;
+    private ?DeferredFuture $startDeferred = null;
     /**
      * Start method handler.
      *
@@ -114,8 +105,8 @@ abstract class EventHandler extends AbstractAPI
     public function startInternal(): void
     {
         $this->startMutex ??= new LocalMutex;
-        $startDeferred = new DeferredFuture;
-        $this->startFuture = $startDeferred->getFuture();
+        $this->startDeferred ??= new DeferredFuture;
+        $startDeferred = $this->startDeferred;
         $lock = $this->startMutex->acquire();
         try {
             if ($this->startedInternal) {
@@ -135,7 +126,7 @@ abstract class EventHandler extends AbstractAPI
             }
             $this->startedInternal = true;
         } finally {
-            $this->startFuture = null;
+            $this->startDeferred = null;
             $startDeferred->complete();
             $lock->release();
         }
@@ -143,9 +134,12 @@ abstract class EventHandler extends AbstractAPI
     /**
      * @internal
      */
-    public function waitForStartInternal(): void
+    public function waitForStartInternal(): ?Future
     {
-        $this->startFuture?->await();
+        if (!$this->startedInternal && !$this->startDeferred) {
+            $this->startDeferred = new DeferredFuture;
+        }
+        return $this->startDeferred?->getFuture();
     }
     /**
      * Get peers where to send error reports.

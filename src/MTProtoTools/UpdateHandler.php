@@ -105,7 +105,15 @@ trait UpdateHandler
         if (!isset($this->eventHandlerMethods[$update['_']])) {
             return;
         }
-        $this->event_handler_instance->waitForStartInternal();
+        if ($f = $this->event_handler_instance->waitForStartInternal()) {
+            $this->updates[$this->updates_key++] = $update;
+            $f->map(function (): void {
+                \array_map($this->handleUpdate(...), $this->updates);
+                $this->updates = [];
+                $this->updates_key = 0;
+            });
+            return;
+        }
         $r = $this->eventHandlerMethods[$update['_']]($update);
         if ($r instanceof Generator) {
             Tools::consumeGenerator($r);

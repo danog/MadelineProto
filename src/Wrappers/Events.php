@@ -86,13 +86,13 @@ trait Events
             if ($method === 'onAny') {
                 foreach ($this->getTL()->getConstructors()->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
-                        $this->eventHandlerMethods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
+                        $this->eventHandlerMethods[$constructor['predicate']] = $this->event_handler_instance->onAny(...);
                     }
                 }
             } else {
                 $method_name = \lcfirst(\substr($method, 2));
                 if (($constructor = $this->getTL()->getConstructors()->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
-                    $this->eventHandlerMethods[$method_name] = [$this->event_handler_instance, $method];
+                    $this->eventHandlerMethods[$method_name] = $this->event_handler_instance->$method(...);
                 }
             }
         }
