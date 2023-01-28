@@ -7,7 +7,6 @@ namespace danog\MadelineProto;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\SignalException;
-use danog\Loop\PeriodicLoop;
 use ReflectionFiber;
 use Revolt\EventLoop;
 use Throwable;
@@ -40,11 +39,6 @@ final class GarbageCollector
      * Memory consumption after last cleanup.
      */
     private static int $memoryConsumption = 0;
-
-    /**
-     * Phar cleanup loop.
-     */
-    private static PeriodicLoop $cleanupLoop;
 
     public static function start(): void
     {
@@ -91,7 +85,9 @@ final class GarbageCollector
                 $latest = $client->request($request);
                 Magic::$version_latest = \trim($latest->getBody()->buffer());
                 if (Magic::$version !== Magic::$version_latest) {
-                    Logger::log('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!', Logger::FATAL_ERROR);
+                    $old = Magic::$version;
+                    $new = Magic::$version_latest;
+                    Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
                     write(MADELINE_PHAR_VERSION, '');
                     if (Magic::$isIpcWorker) {
                         throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');

@@ -72,7 +72,7 @@ final class DataCenter
      *
      * @var array<int, DataCenterConnection>
      */
-    public array $sockets = [];
+    private array $sockets = [];
     /**
      * Current DC ID.
      */
@@ -454,13 +454,6 @@ final class DataCenter
         return $ctxs;
     }
     /**
-     * Get main API.
-     */
-    public function getAPI(): MTProto
-    {
-        return $this->API;
-    }
-    /**
      * Get contents of file.
      *
      * @param string $url URL to fetch
@@ -522,15 +515,6 @@ final class DataCenter
     public function has(int $dc): bool
     {
         return isset($this->sockets[$dc]);
-    }
-    /**
-     * Check if connected to datacenter using HTTP.
-     *
-     * @param int $datacenter DC ID
-     */
-    public function isHttp(int $datacenter): bool
-    {
-        return $this->sockets[$datacenter]->isHttp();
     }
     /**
      * Check if connected to datacenter directly using IP address.
