@@ -113,6 +113,9 @@ final class GarbageCollector
                     }
                 }
             } catch (Throwable $e) {
+                if ($e instanceof SignalException) {
+                    throw $e;
+                }
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
         };
