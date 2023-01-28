@@ -43,8 +43,8 @@ final class PingLoop extends Loop
     public function __construct(Connection $connection)
     {
         $this->constructCommon($connection);
-        $this->timeout = $this->shared->getSettings()->getPingInterval();
-        $this->timeoutDisconnect = (int) ($this->timeout) + 15;
+        $this->timeout = $timeout = $this->shared->getSettings()->getPingInterval();
+        $this->timeoutDisconnect = $timeout + 15;
     }
     /**
      * Main loop.

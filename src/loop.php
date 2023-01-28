@@ -22,6 +22,7 @@ namespace danog\Loop\Generic {
                     // Might cause an error for wrapped object methods
                 }
             }
+            /** @psalm-suppress InvalidArgument */
             parent::__construct(
                 function ($_) use ($callback) {
                     $result = $callback();
@@ -50,6 +51,7 @@ namespace danog\Loop\Generic {
                     // Might cause an error for wrapped object methods
                 }
             }
+            /** @psalm-suppress InvalidArgument */
             parent::__construct(
                 function ($_) use ($callback) {
                     $result = $callback();

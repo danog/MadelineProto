@@ -660,7 +660,7 @@ trait PeerHandler
     /**
      * @param array $constructor
      * @param MTProto::INFO_TYPE_* $type
-     * @return ($type is MTProto::INFO_TYPE_ALL ? array{
+     * @return ($type is MTProto::INFO_TYPE_ALL ? (array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
      *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
@@ -671,10 +671,10 @@ trait PeerHandler
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: {_: string, user_id?: int, access_hash?: int, min?: bool},
-     *      InputChannel?: {_: string, channel_id: int, access_hash: int, min: bool},
+     *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
+     *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * }&array : array|int)
+     * }&array) : array|int)
      */
     private function genAll($constructor, $folder_id, int $type): array|int
     {

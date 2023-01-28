@@ -96,15 +96,14 @@ final class APIWrapper
             return false;
         }
         $this->API->waitForInit();
+        $API = $this->API;
 
         $this->session->serialize(
-            $this->API->serializeSession($this),
+            $API->serializeSession($this),
             $this->session->getSessionPath(),
         );
 
-        if ($this->API) {
-            $this->session->storeLightState($this->API);
-        }
+        $this->session->storeLightState($API);
 
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log('Saved session!');

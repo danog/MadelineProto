@@ -66,7 +66,6 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use function Amp\async;
 use function Amp\File\getSize;
 use function Amp\File\touch as touchAsync;
@@ -776,10 +775,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
-        if ($file === null) {
-            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
-        }
-        isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
+        ($this->logger ?? Logger::$default)->logger($param, $level, $file);
     }
     /**
      * Get TL namespaces.
@@ -1080,8 +1076,7 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->updateSettings($settings);
         // Session update process for BC
         $forceDialogs = false;
-        if (!isset($this->v)
-            || $this->v !== self::V
+        if ($this->v !== self::V
             || $this->settings->getSchema()->needsUpgrade()) {
             $this->upgradeMadelineProto();
             $forceDialogs = true;
@@ -1306,16 +1301,6 @@ final class MTProto implements TLCallback, LoggerGetter
                 $socket->setTempAuthKey(null);
             }
         }
-    }
-    /**
-     * Check if connected to datacenter using HTTP.
-     *
-     * @param int $datacenter DC ID
-     * @internal
-     */
-    public function isHttp(int $datacenter): bool
-    {
-        return $this->datacenter->isHttp($datacenter);
     }
     /**
      * Checks whether all datacenters are authorized.

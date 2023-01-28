@@ -287,7 +287,7 @@ final class Connection
         Assert::true($this->cleanup->start());
         Assert::true($this->waiter->start());
         if ($this->pinger) {
-            Assert::true($this->pinger?->start());
+            Assert::true($this->pinger->start());
         }
     }
     /**

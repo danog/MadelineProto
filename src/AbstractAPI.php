@@ -88,6 +88,7 @@ abstract class AbstractAPI extends InternalDoc
 
         $this->wrapper->getAPI()->setEventHandler($eventHandler);
         $started = true;
+        /** @psalm-suppress TooFewArguments Always MTProto here */
         $this->wrapper->getAPI()->loop();
     }
     /**
