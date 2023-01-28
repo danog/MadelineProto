@@ -776,10 +776,43 @@ trait PeerHandler
      */
     public function refreshPeerCache(mixed ...$ids): void
     {
-        $ids = \array_map(fn ($id) => $this->getInfo($id, MTProto::INFO_TYPE_ID), $ids);
-        $supergroups = \array_filter($ids, self::isSupergroup(...));
-        $chats = \array_filter($ids, fn (int $id): bool => $id < 0);
-        $users = \array_filter($ids, fn (int $id): bool => $id > 0);
+        $users = [];
+        $chats = [];
+        $supergroups = [];
+        foreach ($ids as $id) {
+            if (\is_string($id)) {
+                if ($r = Tools::parseLink($id)) {
+                    [$invite, $content] = $r;
+                    if ($invite) {
+                        $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
+                        if (isset($invite['chat'])) {
+                            continue;
+                        }
+                        throw new Exception('You have not joined this chat');
+                    } else {
+                        $id = $content;
+                    }
+                }
+                $id = \strtolower(\str_replace('@', '', $id));
+                if ($id === 'me') {
+                    $id = $this->authorization['user']['id'];
+                } elseif ($id === 'support') {
+                    $this->methodCallAsyncRead('help.getSupport', []);
+                    continue;
+                } else {
+                    $id = $this->resolveUsername($id);
+                }
+            }
+            $id = $this->getId($id);
+            Assert::notNull($id);
+            if (self::isSupergroup($id)) {
+                $supergroups []= $id;
+            } elseif ($id < 0) {
+                $chats []= $id;
+            } else {
+                $users []= $id;
+            }
+        }
         if ($supergroups) {
             $this->methodCallAsyncRead('channels.getChannels', ['id' => $supergroups]);
         }
@@ -797,7 +830,29 @@ trait PeerHandler
      */
     public function refreshFullPeerCache(mixed $id): void
     {
-        unset($this->full_chats[$this->getInfo($id, MTProto::INFO_TYPE_ID)]);
+        if (\is_string($id)) {
+            if ($r = Tools::parseLink($id)) {
+                [$invite, $content] = $r;
+                if ($invite) {
+                    $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
+                    if (!isset($invite['chat'])) {
+                        throw new Exception('You have not joined this chat');
+                    }
+                    $id = $invite['chat'];
+                } else {
+                    $id = $content;
+                }
+            }
+            $id = \strtolower(\str_replace('@', '', $id));
+            if ($id === 'me') {
+                $id = $this->authorization['user']['id'];
+            } elseif ($id === 'support') {
+                $id = $this->methodCallAsyncRead('help.getSupport', [])['user'];
+            } else {
+                $id = $this->resolveUsername($id);
+            }
+        }
+        unset($this->full_chats[$this->getId($id)]);
         $this->getFullInfo($id);
     }
     /**
@@ -1160,7 +1215,7 @@ trait PeerHandler
     /**
      * @param string $username Username
      */
-    private function resolveUsername(string $username)
+    private function resolveUsername(string $username): ?int
     {
         $username = \strtolower(\str_replace('@', '', $username));
         if (!$username) {
