@@ -138,7 +138,7 @@ final class ProcessRunner extends RunnerAbstract
     {
         $executable = \strncasecmp(PHP_OS, 'WIN', 3) === 0 ? 'php.exe' : 'php';
 
-        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv('PATH')));
+        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv('PATH') ?: ''));
         $paths[] = PHP_BINDIR;
         $paths = \array_unique($paths);
 

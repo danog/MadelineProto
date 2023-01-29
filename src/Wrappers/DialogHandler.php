@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
@@ -31,6 +32,13 @@ use Throwable;
  */
 trait DialogHandler
 {
+    private array $botDialogsUpdatesState = [
+        'qts' => 1,
+        'pts' => 1,
+        'date' => 1,
+    ];
+    private bool $cachedAllBotUsers = false;
+    private ?LocalMutex $cachingAllBotUsers = null;
     /**
      * Get dialog peers.
      *
@@ -40,6 +48,58 @@ trait DialogHandler
     public function getDialogs(bool $force = true): array
     {
         if ($this->authorization['user']['bot']) {
+            if (!$this->cachedAllBotUsers) {
+                $this->cachingAllBotUsers ??= new LocalMutex;
+                $lock = $this->cachingAllBotUsers->acquire();
+                try {
+                    while (true) {
+                        $this->logger($this->botDialogsUpdatesState);
+                        $result = $this->methodCallAsyncRead(
+                            'updates.getDifference',
+                            [
+                                ...$this->botDialogsUpdatesState,
+                                'pts_total_limit' => 2147483647
+                            ]
+                        );
+                        switch ($result['_']) {
+                            case 'updates.differenceEmpty':
+                                break 2;
+                            case 'updates.difference':
+                                $this->botDialogsUpdatesState = $result['state'];
+                                break;
+                            case 'updates.differenceSlice':
+                                $this->botDialogsUpdatesState = $result['intermediate_state'];
+                                break;
+                            case 'updates.differenceTooLong':
+                                // Binary search for working PTS
+                                $bottom = $this->botDialogsUpdatesState['pts'];
+                                $top = $result['pts'];
+                                $state = $this->botDialogsUpdatesState;
+                                $state['pts_total_limit'] = 2147483647;
+                                while ($bottom <= $top) {
+                                    $state['pts'] = ($bottom+$top)>>1;
+                                    $result = $this->methodCallAsyncRead(
+                                        'updates.getDifference',
+                                        $state
+                                    )['_'];
+                                    $this->logger("$bottom, {$state['pts']}, $top");
+                                    $this->logger($result);
+                                    if ($result === 'updates.differenceTooLong') {
+                                        $bottom = $state['pts']+1;
+                                    } else {
+                                        $top = $state['pts']-1;
+                                    }
+                                }
+                                $this->botDialogsUpdatesState['pts'] = $bottom;
+                                $this->logger("Found PTS $bottom");
+                                break;
+                        }
+                    }
+                    $this->cachedAllBotUsers = true;
+                } finally {
+                    $lock->release();
+                }
+            }
             $res = [];
             foreach ($this->chats as $chat) {
                 try {

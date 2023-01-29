@@ -687,6 +687,8 @@ final class MTProto implements TLCallback, LoggerGetter
             'tmpDbPrefix',
 
             // Misc caching
+            'botDialogsUpdatesState',
+            'cachedAllBotUsers',
             'dialog_params',
             'last_stored',
             'qres',

@@ -495,6 +495,10 @@ trait UpdateHandler
                 } else {
                     $this->refreshPeerCache($update);
                 }
+            } catch (Exception $e) {
+                if ($e->getMessage() !== 'This peer is not present in the internal peer database') {
+                    throw $e;
+                }
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'CHANNEL_PRIVATE') {
                     throw $e;
@@ -569,11 +573,6 @@ trait UpdateHandler
             $this->secretFeeders[$update['message']['chat_id']]->resume();
             return;
         }
-        /*
-                if ($update['_'] === 'updateEncryptedChatTyping') {
-                $update = ['_' => 'updateUserTyping', 'user_id' => $this->encrypted_chats[$update['chat_id']]['user_id'], 'action' => ['_' => 'sendMessageTypingAction']];
-                }
-        */
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
