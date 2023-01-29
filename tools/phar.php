@@ -210,7 +210,7 @@ class Installer
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        if ($local_release !== null) {
+        if ($local_release !== null && \file_exists("madeline-$local_release.phar")) {
             return self::load($local_release);
         }
 
