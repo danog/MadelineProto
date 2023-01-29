@@ -26,6 +26,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
@@ -391,7 +392,7 @@ trait ResponseHandler
                     EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
                     return null;
                 }
-                // no break
+                return fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
             default:
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }

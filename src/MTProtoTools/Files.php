@@ -30,6 +30,7 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
@@ -986,8 +987,11 @@ trait Files
                         ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
                     );
                     break;
+                } catch (FloodWaitError $e) {
+                    Tools::sleep(1);
+                    continue;
                 } catch (RPCErrorException $e) {
-                    if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === '-503') {
+                    if ($e->rpc === '-503') {
                         Tools::sleep(1);
                         continue;
                     }
