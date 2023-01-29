@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Sync\LocalMutex;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
@@ -39,66 +40,90 @@ trait DialogHandler
     ];
     private bool $cachedAllBotUsers = false;
     private ?LocalMutex $cachingAllBotUsers = null;
+
+    private function cacheAllBotUsers(): void
+    {
+        if ($this->cachedAllBotUsers) {
+            return;
+        }
+        $this->cachingAllBotUsers ??= new LocalMutex;
+        $lock = $this->cachingAllBotUsers->acquire();
+        try {
+            while (true) {
+                $result = $this->methodCallAsyncRead(
+                    'updates.getDifference',
+                    [
+                        ...$this->botDialogsUpdatesState,
+                        'pts_total_limit' => 2147483647
+                    ]
+                );
+                switch ($result['_']) {
+                    case 'updates.differenceEmpty':
+                        break 2;
+                    case 'updates.difference':
+                        $this->botDialogsUpdatesState = $result['state'];
+                        break;
+                    case 'updates.differenceSlice':
+                        $this->botDialogsUpdatesState = $result['intermediate_state'];
+                        break;
+                    case 'updates.differenceTooLong':
+                        // Binary search for working PTS
+                        $bottom = $this->botDialogsUpdatesState['pts'];
+                        $top = $result['pts'];
+                        $state = $this->botDialogsUpdatesState;
+                        $state['pts_total_limit'] = 2147483647;
+                        while ($bottom <= $top) {
+                            $state['pts'] = ($bottom+$top)>>1;
+                            $result = $this->methodCallAsyncRead(
+                                'updates.getDifference',
+                                $state
+                            )['_'];
+                            $this->logger("$bottom, {$state['pts']}, $top");
+                            $this->logger($result);
+                            if ($result === 'updates.differenceTooLong') {
+                                $bottom = $state['pts']+1;
+                            } else {
+                                $top = $state['pts']-1;
+                            }
+                        }
+                        $this->botDialogsUpdatesState['pts'] = $bottom;
+                        $this->logger("Found PTS $bottom");
+                        break;
+                    default:
+                        throw new Exception('Unrecognized update difference received: '.\var_export($result, true));
+                }
+            }
+            $this->cachedAllBotUsers = true;
+        } finally {
+            $lock->release();
+        }
+    }
+    /**
+     * Get dialog IDs.
+     *
+     * @return list<int>
+     */
+    public function getDialogIds(): array
+    {
+        if ($this->authorization['user']['bot']) {
+            $this->cacheAllBotUsers();
+            $res = [];
+            foreach ($this->chats as $id => $_) {
+                $res []= $id;
+            }
+            return $res;
+        }
+        return \array_keys($this->getFullDialogs());
+    }
     /**
      * Get dialog peers.
      *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
      * @return list<array>
      */
-    public function getDialogs(bool $force = true): array
+    public function getDialogs(): array
     {
         if ($this->authorization['user']['bot']) {
-            if (!$this->cachedAllBotUsers) {
-                $this->cachingAllBotUsers ??= new LocalMutex;
-                $lock = $this->cachingAllBotUsers->acquire();
-                try {
-                    while (true) {
-                        $result = $this->methodCallAsyncRead(
-                            'updates.getDifference',
-                            [
-                                ...$this->botDialogsUpdatesState,
-                                'pts_total_limit' => 2147483647
-                            ]
-                        );
-                        switch ($result['_']) {
-                            case 'updates.differenceEmpty':
-                                break 2;
-                            case 'updates.difference':
-                                $this->botDialogsUpdatesState = $result['state'];
-                                break;
-                            case 'updates.differenceSlice':
-                                $this->botDialogsUpdatesState = $result['intermediate_state'];
-                                break;
-                            case 'updates.differenceTooLong':
-                                // Binary search for working PTS
-                                $bottom = $this->botDialogsUpdatesState['pts'];
-                                $top = $result['pts'];
-                                $state = $this->botDialogsUpdatesState;
-                                $state['pts_total_limit'] = 2147483647;
-                                while ($bottom <= $top) {
-                                    $state['pts'] = ($bottom+$top)>>1;
-                                    $result = $this->methodCallAsyncRead(
-                                        'updates.getDifference',
-                                        $state
-                                    )['_'];
-                                    $this->logger("$bottom, {$state['pts']}, $top");
-                                    $this->logger($result);
-                                    if ($result === 'updates.differenceTooLong') {
-                                        $bottom = $state['pts']+1;
-                                    } else {
-                                        $top = $state['pts']-1;
-                                    }
-                                }
-                                $this->botDialogsUpdatesState['pts'] = $bottom;
-                                $this->logger("Found PTS $bottom");
-                                break;
-                        }
-                    }
-                    $this->cachedAllBotUsers = true;
-                } finally {
-                    $lock->release();
-                }
-            }
+            $this->cacheAllBotUsers();
             $res = [];
             foreach ($this->chats as $chat) {
                 try {
@@ -110,7 +135,7 @@ trait DialogHandler
             return $res;
         }
         $res = [];
-        foreach ($this->getFullDialogs($force) as $dialog) {
+        foreach ($this->getFullDialogs() as $dialog) {
             $res[] = $dialog['peer'];
         }
         return $res;
@@ -118,10 +143,26 @@ trait DialogHandler
     /**
      * Get full info of all dialogs.
      *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     * Bots should use getDialogs or getDialogIds, instead.
+     *
+     * @return array<int, array>
      */
-    public function getFullDialogs(bool $force = true): array
+    public function getFullDialogs(): array
     {
+        return $this->getFullDialogsInternal(true);
+    }
+    /**
+     * Get full info of all dialogs.
+     *
+     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     *
+     * @return array<int, array>
+     */
+    private function getFullDialogsInternal(bool $force): array
+    {
+        if ($this->authorization['user']['bot']) {
+            throw new Exception("You're logged in as a bot: please use getDialogs or getDialogsIds, instead.");
+        }
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
         }

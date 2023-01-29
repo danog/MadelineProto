@@ -1109,7 +1109,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
-            $this->getDialogs($forceDialogs);
+            $this->getFullDialogsInternal($forceDialogs);
         }
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);

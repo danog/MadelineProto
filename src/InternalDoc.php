@@ -649,13 +649,20 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
+     * Get dialog IDs.
+     *
+     */
+    public function getDialogIds()
+    {
+        return $this->wrapper->getAPI()->{__FUNCTION__}();
+    }
+    /**
      * Get dialog peers.
      *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
      */
-    public function getDialogs(bool $force = true)
+    public function getDialogs()
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($force);
+        return $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
      * Get download info of file
@@ -720,11 +727,12 @@ abstract class InternalDoc
     /**
      * Get full info of all dialogs.
      *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     * Bots should use getDialogs or getDialogIds, instead.
+     *
      */
-    public function getFullDialogs(bool $force = true)
+    public function getFullDialogs()
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($force);
+        return $this->wrapper->getAPI()->{__FUNCTION__}();
     }
     /**
      * Get full info about peer, returns an FullInfo object.
