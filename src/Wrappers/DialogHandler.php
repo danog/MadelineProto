@@ -53,7 +53,6 @@ trait DialogHandler
                 $lock = $this->cachingAllBotUsers->acquire();
                 try {
                     while (true) {
-                        $this->logger($this->botDialogsUpdatesState);
                         $result = $this->methodCallAsyncRead(
                             'updates.getDifference',
                             [

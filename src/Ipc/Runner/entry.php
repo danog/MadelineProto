@@ -65,6 +65,8 @@ use Webmozart\Assert\Assert;
         $paths = [
             dirname(__DIR__, 5).'/autoload.php',
             dirname(__DIR__, 3).'/vendor/autoload.php',
+            dirname(__DIR__, 7).'/autoload.php',
+            dirname(__DIR__, 5).'/vendor/autoload.php',
         ];
 
         foreach ($paths as $path) {

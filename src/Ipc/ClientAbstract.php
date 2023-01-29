@@ -42,15 +42,9 @@ abstract class ClientAbstract
     /**
      * Requests promise array.
      *
-     * @var array<DeferredFuture>
+     * @var array<int, list{string|int, array|Wrapper, DeferredFuture}>
      */
     private array $requests = [];
-    /**
-     * Wrappers array.
-     *
-     * @var array<Wrapper>
-     */
-    private array $wrappers = [];
     /**
      * Whether to run loop.
      */
@@ -97,11 +91,10 @@ abstract class ClientAbstract
                 if (!isset($this->requests[$id])) {
                     Logger::log("Got response for non-existing ID $id!");
                 } else {
-                    $promise = $this->requests[$id];
+                    [, $args, $promise] = $this->requests[$id];
                     unset($this->requests[$id]);
-                    if (isset($this->wrappers[$id])) {
-                        $this->wrappers[$id]->disconnect();
-                        unset($this->wrappers[$id]);
+                    if ($args instanceof Wrapper) {
+                        $args->disconnect();
                     }
                     if ($payload instanceof ExitFailure) {
                         $promise->error($payload->getException());
@@ -121,6 +114,14 @@ abstract class ClientAbstract
                     try {
                         Server::startMe($this->session)->await();
                         $this->server = connect($this->session->getIpcPath());
+                        $requests = $this->requests;
+                        $this->requests = [];
+                        $this->id = 0;
+                        foreach ($requests as [$function, $arguments, $deferred]) {
+                            $id = $this->id++;
+                            $this->requests[$id] = [$function, $arguments, $deferred];
+                            $this->server->send([$function, $arguments]);
+                        }
                     } catch (Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
                     }
@@ -137,8 +138,10 @@ abstract class ClientAbstract
     {
         $this->run = false;
         $this->server->disconnect();
-        foreach ($this->wrappers as $w) {
-            $w->disconnect();
+        foreach ($this->requests as [, $args, $promise]) {
+            if ($args instanceof Wrapper) {
+                $args->disconnect();
+            }
         }
     }
     /**
@@ -149,10 +152,9 @@ abstract class ClientAbstract
      */
     public function __call(string|int $function, array|Wrapper $arguments)
     {
-        $this->requests[$this->id++] = $deferred = new DeferredFuture;
-        if ($arguments instanceof Wrapper) {
-            $this->wrappers[\count($this->requests) - 1] = $arguments;
-        }
+        $deferred = new DeferredFuture;
+        $id = $this->id++;
+        $this->requests[$id] = [$function, $arguments, $deferred];
         $this->server->send([$function, $arguments]);
         return $deferred->getFuture()->await();
     }
