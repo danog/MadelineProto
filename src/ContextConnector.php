@@ -22,7 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
-use Amp\Socket\Socket;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
 use Throwable;
@@ -32,7 +32,7 @@ final class ContextConnector implements SocketConnector
     public function __construct(private DoHWrapper $doHWrapper, private LoggerGetter $loggerGetter, private bool $fromDns = false)
     {
     }
-    public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $cancellation = null): Socket
+    public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $cancellation = null): EncryptableSocket
     {
         $ctx = $context ?? new ConnectContext();
         $ctxs = $this->doHWrapper->generateContexts($uri, $ctx);

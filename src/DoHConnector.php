@@ -28,8 +28,8 @@ use Amp\Dns\DnsTimeoutException;
 use Amp\NullCancellation;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\ResourceSocket;
-use Amp\Socket\Socket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
 use Amp\TimeoutCancellation;
@@ -51,7 +51,7 @@ final class DoHConnector implements SocketConnector
         SocketAddress|string $uri,
         ?ConnectContext $context = null,
         ?Cancellation $token = null
-    ): Socket {
+    ): EncryptableSocket {
         $socketContext = $context ?? new ConnectContext();
         $token ??= new NullCancellation();
         $uris = [];
