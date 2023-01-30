@@ -60,7 +60,7 @@ final class AnnotationsBuilder
         $this->TL->init($tlSchema);
         $this->blacklist = \json_decode(\file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
         $this->blacklistHard = $this->blacklist;
-        unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['updates.getDifference'], $this->blacklistHard['updates.getChannelDifference'], $this->blacklistHard['updates.getState'], $this->blacklistHard['messages.getMessages']);
+        unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['messages.getMessages']);
         \file_put_contents(__DIR__.'/Namespace/Blacklist.php', '<?php
 namespace danog\MadelineProto\Namespace;
 
