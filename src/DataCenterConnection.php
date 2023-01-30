@@ -588,6 +588,9 @@ final class DataCenterConnection implements JsonSerializable
     public function waitGetConnection(): Connection
     {
         if (empty($this->availableConnections)) {
+            if (empty($this->connectionsPromise)) {
+                $this->reconnect();
+            }
             $this->connectionsPromise->await();
         }
         return $this->getConnection();
