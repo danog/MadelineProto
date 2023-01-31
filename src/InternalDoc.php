@@ -98,9 +98,9 @@ abstract class InternalDoc
          *
          * @param array $data Data
          */
-    public function MTProtoToBotAPI(array $data)
+    public function MTProtoToBotAPI(array $data): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($data);
+        return $this->wrapper->getAPI()->MTProtoToBotAPI($data);
     }
     /**
      * MTProto to TD params.
@@ -109,7 +109,7 @@ abstract class InternalDoc
      */
     public function MTProtoToTd(mixed &$params)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->MTProtoToTd($params);
     }
     /**
      * MTProto to TDCLI params.
@@ -118,16 +118,16 @@ abstract class InternalDoc
      */
     public function MTProtoToTdcli(mixed $params)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->MTProtoToTdcli($params);
     }
     /**
      * Accept call.
      *
      * @param array $call Call
      */
-    public function acceptCall(array $call)
+    public function acceptCall(array $call): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($call);
+        return $this->wrapper->getAPI()->acceptCall($call);
     }
     /**
      * Accept secret chat.
@@ -136,7 +136,7 @@ abstract class InternalDoc
      */
     public function acceptSecretChat(array $params): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        $this->wrapper->getAPI()->acceptSecretChat($params);
     }
     /**
      * Add user info.
@@ -145,7 +145,7 @@ abstract class InternalDoc
      */
     public function addUser(array $user): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($user);
+        $this->wrapper->getAPI()->addUser($user);
     }
     /**
      * Call promise $b after promise $a.
@@ -212,18 +212,18 @@ abstract class InternalDoc
      *
      * @param array $arguments Arguments
      */
-    public function botAPIToMTProto(array $arguments)
+    public function botAPIToMTProto(array $arguments): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($arguments);
+        return $this->wrapper->getAPI()->botAPIToMTProto($arguments);
     }
     /**
      * Login as bot.
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token)
+    public function botLogin(string $token): ?array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($token);
+        return $this->wrapper->getAPI()->botLogin($token);
     }
     /**
      * Convert generator, promise or any other value to a promise.
@@ -265,9 +265,9 @@ abstract class InternalDoc
      *
      * @param int $id Call ID
      */
-    public function callStatus(int $id)
+    public function callStatus(int $id): int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        return $this->wrapper->getAPI()->callStatus($id);
     }
     /**
      * Close connection with client, connected via web.
@@ -285,7 +285,7 @@ abstract class InternalDoc
      */
     public function complete2faLogin(string $password)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($password);
+        return $this->wrapper->getAPI()->complete2faLogin($password);
     }
     /**
      * Complete call handshake.
@@ -294,7 +294,7 @@ abstract class InternalDoc
      */
     public function completeCall(array $params)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->completeCall($params);
     }
     /**
      * Complet user login using login code.
@@ -303,7 +303,7 @@ abstract class InternalDoc
      */
     public function completePhoneLogin(string $code)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($code);
+        return $this->wrapper->getAPI()->completePhoneLogin($code);
     }
     /**
      * Complete signup to Telegram.
@@ -313,7 +313,7 @@ abstract class InternalDoc
      */
     public function completeSignup(string $first_name, string $last_name = '')
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($first_name, $last_name);
+        return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
     /**
      * Confirm call.
@@ -322,7 +322,7 @@ abstract class InternalDoc
      */
     public function confirmCall(array $params)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->confirmCall($params);
     }
     /**
      * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
@@ -331,7 +331,7 @@ abstract class InternalDoc
      */
     public function connectToAllDcs(bool $reconnectAll = true): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($reconnectAll);
+        $this->wrapper->getAPI()->connectToAllDcs($reconnectAll);
     }
     /**
      * Discard call.
@@ -341,9 +341,9 @@ abstract class InternalDoc
      * @param boolean $need_debug Need debug?
      */
     public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true)
+    ], bool $need_debug = true): ?\danog\MadelineProto\VoIP
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($call, $reason, $rating, $need_debug);
+        return $this->wrapper->getAPI()->discardCall($call, $reason, $rating, $need_debug);
     }
     /**
      * Discard secret chat.
@@ -352,7 +352,7 @@ abstract class InternalDoc
      */
     public function discardSecretChat(int $chat): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($chat);
+        $this->wrapper->getAPI()->discardSecretChat($chat);
     }
     /**
      * Download file to browser.
@@ -367,7 +367,7 @@ abstract class InternalDoc
      */
     public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $cb, $size, $name, $mime);
+        $this->wrapper->getAPI()->downloadToBrowser($messageMedia, $cb, $size, $name, $mime);
     }
     /**
      * Download file to callable.
@@ -384,7 +384,7 @@ abstract class InternalDoc
      */
     public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size);
+        return $this->wrapper->getAPI()->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size);
     }
     /**
      * Download file to directory.
@@ -395,7 +395,7 @@ abstract class InternalDoc
      */
     public function downloadToDir(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $dir, ?callable $cb = null)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $dir, $cb);
+        return $this->wrapper->getAPI()->downloadToDir($messageMedia, $dir, $cb);
     }
     /**
      * Download file.
@@ -404,9 +404,9 @@ abstract class InternalDoc
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      */
-    public function downloadToFile(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $file, ?callable $cb = null)
+    public function downloadToFile(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $file, ?callable $cb = null): string|false
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $file, $cb);
+        return $this->wrapper->getAPI()->downloadToFile($messageMedia, $file, $cb);
     }
     /**
      * Download file to amphp/http-server response.
@@ -420,9 +420,9 @@ abstract class InternalDoc
      * @param null|string       $name         Name of file to download, required for bot API file IDs.
      * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null)
+    public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): \Amp\Http\Server\Response
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $request, $cb, $size, $mime, $name);
+        return $this->wrapper->getAPI()->downloadToResponse($messageMedia, $request, $cb, $size, $mime, $name);
     }
     /**
      * Download file to stream.
@@ -435,7 +435,7 @@ abstract class InternalDoc
      */
     public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia, $stream, $cb, $offset, $end);
+        return $this->wrapper->getAPI()->downloadToStream($messageMedia, $stream, $cb, $offset, $end);
     }
     /**
      * Asynchronously write to stdout/browser.
@@ -458,16 +458,16 @@ abstract class InternalDoc
     /**
      * Export authorization.
      *
+     * @return array{0: (int|string), 1: string}
      */
-    public function exportAuthorization()
+    public function exportAuthorization(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->exportAuthorization();
     }
     /**
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
-      * @return ?array
      */
     public static function extractBotAPIFile(array $info): ?array
     {
@@ -476,40 +476,41 @@ abstract class InternalDoc
     /**
      * Extract a message constructor from an Updates constructor.
      */
-    public function extractMessage(array $updates)
+    public function extractMessage(array $updates): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($updates);
+        return $this->wrapper->getAPI()->extractMessage($updates);
     }
     /**
      * Extract a message ID from an Updates constructor.
      */
-    public function extractMessageId(array $updates)
+    public function extractMessageId(array $updates): int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($updates);
+        return $this->wrapper->getAPI()->extractMessageId($updates);
     }
     /**
      * Extract an update message constructor from an Updates constructor.
      */
-    public function extractMessageUpdate(array $updates)
+    public function extractMessageUpdate(array $updates): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($updates);
+        return $this->wrapper->getAPI()->extractMessageUpdate($updates);
     }
     /**
      * Extract Update constructors from an Updates constructor.
      *
+     * @return array<array>
      */
-    public function extractUpdates(array $updates)
+    public function extractUpdates(array $updates): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($updates);
+        return $this->wrapper->getAPI()->extractUpdates($updates);
     }
     /**
      * Get contents of remote file asynchronously.
      *
      * @param string $url URL
      */
-    public function fileGetContents(string $url)
+    public function fileGetContents(string $url): string
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($url);
+        return $this->wrapper->getAPI()->fileGetContents($url);
     }
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
@@ -550,16 +551,16 @@ abstract class InternalDoc
      *
      * @param mixed $id Chat ID
      */
-    public function fullChatLastUpdated(mixed $id)
+    public function fullChatLastUpdated(mixed $id): int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        return $this->wrapper->getAPI()->fullChatLastUpdated($id);
     }
     /**
      * Get info about the logged-in user, not cached.
      */
-    public function fullGetSelf()
+    public function fullGetSelf(): array|false
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->fullGetSelf();
     }
     /**
      * Generate MTProto vector hash.
@@ -574,39 +575,39 @@ abstract class InternalDoc
     /**
      * Get full list of MTProto and API methods.
      */
-    public function getAllMethods()
+    public function getAllMethods(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getAllMethods();
     }
     /**
      * Get authorization info.
      */
-    public function getAuthorization()
+    public function getAuthorization(): int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getAuthorization();
     }
     /**
      * Get cached server-side config.
      */
-    public function getCachedConfig()
+    public function getCachedConfig(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getCachedConfig();
     }
     /**
      * Get call info.
      *
      * @param int $call Call ID
      */
-    public function getCall(int $call)
+    public function getCall(int $call): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($call);
+        return $this->wrapper->getAPI()->getCall($call);
     }
     /**
      * Store RSA keys for CDN datacenters.
      */
     public function getCdnConfig(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->getCdnConfig();
     }
     /**
      * Get cached (or eventually re-fetch) server-side config.
@@ -614,55 +615,41 @@ abstract class InternalDoc
      * @param array $config  Current config
      */
     public function getConfig(array $config = [
-    ])
+    ]): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($config);
+        return $this->wrapper->getAPI()->getConfig($config);
     }
     /**
      * Get async DNS client.
      */
-    public function getDNSClient()
+    public function getDNSClient(): \Amp\Dns\DnsResolver
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
-    }
-    /**
-     * Get all datacenter connections.
-     *
-     */
-    public function getDataCenterConnections()
-    {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
-    }
-    /**
-     * Get main DC ID.
-     *
-     */
-    public function getDataCenterId()
-    {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getDNSClient();
     }
     /**
      * Get diffie-hellman configuration.
      */
-    public function getDhConfig()
+    public function getDhConfig(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getDhConfig();
     }
     /**
      * Get dialog IDs.
      *
+     * @return list<int>
      */
-    public function getDialogIds()
+    public function getDialogIds(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getDialogIds();
     }
     /**
      * Get dialog peers.
      *
+     * @return list<array>
      */
-    public function getDialogs()
+    public function getDialogs(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getDialogs();
     }
     /**
      * Get download info of file
@@ -675,16 +662,16 @@ abstract class InternalDoc
      *
      * @param mixed $messageMedia File ID
      */
-    public function getDownloadInfo(mixed $messageMedia)
+    public function getDownloadInfo(mixed $messageMedia): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($messageMedia);
+        return $this->wrapper->getAPI()->getDownloadInfo($messageMedia);
     }
     /**
      * Get event handler.
      */
-    public function getEventHandler()
+    public function getEventHandler(): \danog\MadelineProto\EventHandler|\__PHP_Incomplete_Class|null
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getEventHandler();
     }
     /**
      * Get extension from file location.
@@ -710,15 +697,14 @@ abstract class InternalDoc
      *
      * @param mixed $constructor File ID
      */
-    public function getFileInfo(mixed $constructor)
+    public function getFileInfo(mixed $constructor): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($constructor);
+        return $this->wrapper->getAPI()->getFileInfo($constructor);
     }
     /**
      * Get folder ID from object.
      *
      * @param mixed $id Object
-      * @return ?int
      */
     public static function getFolderId(mixed $id): ?int
     {
@@ -729,10 +715,11 @@ abstract class InternalDoc
      *
      * Bots should use getDialogs or getDialogIds, instead.
      *
+     * @return array<int, array>
      */
-    public function getFullDialogs()
+    public function getFullDialogs(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getFullDialogs();
     }
     /**
      * Get full info about peer, returns an FullInfo object.
@@ -740,32 +727,32 @@ abstract class InternalDoc
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/FullInfo.html
      */
-    public function getFullInfo(mixed $id)
+    public function getFullInfo(mixed $id): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        return $this->wrapper->getAPI()->getFullInfo($id);
     }
     /**
      * Get async HTTP client.
      */
-    public function getHTTPClient()
+    public function getHTTPClient(): \Amp\Http\Client\HttpClient
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getHTTPClient();
     }
     /**
      * Get current password hint.
      */
-    public function getHint()
+    public function getHint(): string
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getHint();
     }
     /**
      * Get bot API ID from peer object.
      *
      * @param mixed $id Peer
      */
-    public function getId(mixed $id)
+    public function getId(mixed $id): ?int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        return $this->wrapper->getAPI()->getId($id);
     }
     /**
      * Get info about peer, returns an Info object.
@@ -773,7 +760,7 @@ abstract class InternalDoc
      * @param mixed                $id        Peer
      * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
-     * @return mixed
+     * @return ($type is MTProto::INFO_TYPE_ALL ? array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
      *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
@@ -789,20 +776,19 @@ abstract class InternalDoc
      *      type: string
      * } : ($type is MTProto::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
-    public function getInfo(mixed $id, int $type = \danog\MadelineProto\MTProto::INFO_TYPE_ALL)
+    public function getInfo(mixed $id, int $type = \danog\MadelineProto\MTProto::INFO_TYPE_ALL): array|int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id, $type);
+        return $this->wrapper->getAPI()->getInfo($id, $type);
     }
     /**
      * Get logger.
      */
-    public function getLogger()
+    public function getLogger(): \danog\MadelineProto\Logger
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getLogger();
     }
     /**
      * Get current number of memory-mapped regions, UNIX only.
-      * @return ?int
      */
     public static function getMaps(): ?int
     {
@@ -811,7 +797,6 @@ abstract class InternalDoc
     /**
      * Get maximum number of memory-mapped regions, UNIX only.
      * Use testFibers to get the maximum number of fibers on any platform.
-      * @return ?int
      */
     public static function getMaxMaps(): ?int
     {
@@ -820,16 +805,16 @@ abstract class InternalDoc
     /**
      * Get TL namespaces.
      */
-    public function getMethodNamespaces()
+    public function getMethodNamespaces(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getMethodNamespaces();
     }
     /**
      * Get namespaced methods (method => namespace).
      */
-    public function getMethodsNamespaced()
+    public function getMethodsNamespaced(): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getMethodsNamespaced();
     }
     /**
      * Get mime type from buffer.
@@ -868,16 +853,16 @@ abstract class InternalDoc
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
      */
-    public function getPropicInfo($data)
+    public function getPropicInfo($data): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($data);
+        return $this->wrapper->getAPI()->getPropicInfo($data);
     }
     /**
      * Get PSR logger.
      */
-    public function getPsrLogger()
+    public function getPsrLogger(): \Psr\Log\LoggerInterface
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getPsrLogger();
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
@@ -885,34 +870,34 @@ abstract class InternalDoc
      * @param mixed $id Peer
      * @see https://docs.madelineproto.xyz/Chat.html
      */
-    public function getPwrChat(mixed $id, bool $fullfetch = true)
+    public function getPwrChat(mixed $id, bool $fullfetch = true): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id, $fullfetch);
+        return $this->wrapper->getAPI()->getPwrChat($id, $fullfetch);
     }
     /**
      * Get secret chat.
      *
      * @param array|int $chat Secret chat ID
      */
-    public function getSecretChat(array|int $chat)
+    public function getSecretChat(array|int $chat): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($chat);
+        return $this->wrapper->getAPI()->getSecretChat($chat);
     }
     /**
      * Get info about the logged-in user, cached.
      *
      * Use fullGetSelf to bypass the cache.
      */
-    public function getSelf()
+    public function getSelf(): array|false
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getSelf();
     }
     /**
      * Return current settings.
      */
-    public function getSettings()
+    public function getSettings(): \danog\MadelineProto\Settings
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getSettings();
     }
     /**
      * Get sponsored messages for channel.
@@ -922,26 +907,27 @@ abstract class InternalDoc
      *
      * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages(array|string|int $peer)
+    public function getSponsoredMessages(array|string|int $peer): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($peer);
+        return $this->wrapper->getAPI()->getSponsoredMessages($peer);
     }
     /**
      * Get TL serializer.
      */
-    public function getTL()
+    public function getTL(): \danog\MadelineProto\TL\TL
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getTL();
     }
     /**
      * Get updates.
      *
      * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @return list<array{update_id: mixed, update: mixed}>
      */
     public function getUpdates(array $params = [
-    ])
+    ]): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->getUpdates($params);
     }
     /**
      * Accesses a private variable from an object.
@@ -958,46 +944,46 @@ abstract class InternalDoc
     /**
      * Get a message to show to the user when starting the bot.
      */
-    public function getWebMessage(string $message)
+    public function getWebMessage(string $message): string
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($message);
+        return $this->wrapper->getAPI()->getWebMessage($message);
     }
     /**
      * Get web template.
      */
-    public function getWebTemplate()
+    public function getWebTemplate(): string
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->getWebTemplate();
     }
     /**
      * Checks whether all datacenters are authorized.
      */
-    public function hasAllAuth()
+    public function hasAllAuth(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->hasAllAuth();
     }
     /**
      * Check if an event handler instance is present.
      */
-    public function hasEventHandler()
+    public function hasEventHandler(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->hasEventHandler();
     }
     /**
      * Check if has report peers.
      */
-    public function hasReportPeers()
+    public function hasReportPeers(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->hasReportPeers();
     }
     /**
      * Check whether secret chat exists.
      *
      * @param array|int $chat Secret chat ID
      */
-    public function hasSecretChat(array|int $chat)
+    public function hasSecretChat(array|int $chat): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($chat);
+        return $this->wrapper->getAPI()->hasSecretChat($chat);
     }
     /**
      * Checks private property exists in an object.
@@ -1019,7 +1005,7 @@ abstract class InternalDoc
      */
     public function importAuthorization(array $authorization, int $mainDcID)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($authorization, $mainDcID);
+        return $this->wrapper->getAPI()->importAuthorization($authorization, $mainDcID);
     }
     /**
      * Inflate stripped photosize to full JPG payload.
@@ -1036,7 +1022,7 @@ abstract class InternalDoc
      */
     public function initSelfRestart(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->initSelfRestart();
     }
     /**
      * Whether this is altervista.
@@ -1057,23 +1043,23 @@ abstract class InternalDoc
     /**
      * Whether we're an IPC client instance.
      */
-    public function isIpc()
+    public function isIpc(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->isIpc();
     }
     /**
      * Whether we're an IPC server process (as opposed to an event handler).
      */
-    public function isIpcWorker()
+    public function isIpcWorker(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->isIpcWorker();
     }
     /**
      * Returns whether the current user is a premium user, cached.
      */
-    public function isPremium()
+    public function isPremium(): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->isPremium();
     }
     /**
      * Check whether provided bot API ID is a channel.
@@ -1093,7 +1079,7 @@ abstract class InternalDoc
      */
     public function logger(mixed $param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($param, $level, $file);
+        $this->wrapper->getAPI()->logger($param, $level, $file);
     }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
@@ -1102,7 +1088,7 @@ abstract class InternalDoc
      */
     public function loop(?callable $callback = null)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($callback);
+        return $this->wrapper->getAPI()->loop($callback);
     }
     /**
      * Escape string for markdown.
@@ -1158,7 +1144,7 @@ abstract class InternalDoc
         'msg_id' => null,
     ])
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($method, $args, $aargs);
+        return $this->wrapper->getAPI()->methodCall($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -1172,7 +1158,7 @@ abstract class InternalDoc
         'msg_id' => null,
     ])
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($method, $args, $aargs);
+        return $this->wrapper->getAPI()->methodCallWrite($method, $args, $aargs);
     }
     /**
      * Escape method name.
@@ -1224,9 +1210,9 @@ abstract class InternalDoc
      *
      * @param mixed $id Peer
      */
-    public function peerIsset(mixed $id)
+    public function peerIsset(mixed $id): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        return $this->wrapper->getAPI()->peerIsset($id);
     }
     /**
      * Login as user.
@@ -1236,7 +1222,7 @@ abstract class InternalDoc
      */
     public function phoneLogin(string $number, int $sms_type = 5)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($number, $sms_type);
+        return $this->wrapper->getAPI()->phoneLogin($number, $sms_type);
     }
     /**
      * Positive modulo
@@ -1285,7 +1271,7 @@ abstract class InternalDoc
      */
     public function refreshFullPeerCache(mixed $id): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($id);
+        $this->wrapper->getAPI()->refreshFullPeerCache($id);
     }
     /**
      * Refresh peer cache for a certain peer.
@@ -1293,16 +1279,16 @@ abstract class InternalDoc
      */
     public function refreshPeerCache(mixed ...$ids): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}(...$ids);
+        $this->wrapper->getAPI()->refreshPeerCache(...$ids);
     }
     /**
      * Rekey secret chat.
      *
      * @param int $chat Secret chat to rekey
      */
-    public function rekey(int $chat)
+    public function rekey(int $chat): ?string
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($chat);
+        return $this->wrapper->getAPI()->rekey($chat);
     }
     /**
      * Report an error to the previously set peer.
@@ -1312,7 +1298,7 @@ abstract class InternalDoc
      */
     public function report(string $message, string $parseMode = ''): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($message, $parseMode);
+        $this->wrapper->getAPI()->report($message, $parseMode);
     }
     /**
      * Request VoIP call.
@@ -1321,7 +1307,7 @@ abstract class InternalDoc
      */
     public function requestCall(mixed $user)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($user);
+        return $this->wrapper->getAPI()->requestCall($user);
     }
     /**
      * Request secret chat.
@@ -1330,14 +1316,14 @@ abstract class InternalDoc
      */
     public function requestSecretChat(mixed $user)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($user);
+        return $this->wrapper->getAPI()->requestSecretChat($user);
     }
     /**
      * Reset the update state and fetch all updates from the beginning.
      */
     public function resetUpdateState(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->resetUpdateState();
     }
     /**
      * null-byte RLE decode.
@@ -1361,17 +1347,18 @@ abstract class InternalDoc
      * Get secret chat status.
      *
      * @param int $chat Chat ID
+     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
      */
-    public function secretChatStatus(int $chat)
+    public function secretChatStatus(int $chat): int
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($chat);
+        return $this->wrapper->getAPI()->secretChatStatus($chat);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
      */
     public function setNoop(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->setNoop();
     }
     /**
      * Set peer(s) where to send errors occurred in the event loop.
@@ -1380,7 +1367,7 @@ abstract class InternalDoc
      */
     public function setReportPeers(array|string|int $userOrId): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($userOrId);
+        $this->wrapper->getAPI()->setReportPeers($userOrId);
     }
     /**
      * Sets a private variable in an object.
@@ -1402,7 +1389,7 @@ abstract class InternalDoc
      */
     public function setWebTemplate(string $template): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($template);
+        $this->wrapper->getAPI()->setWebTemplate($template);
     }
     /**
      * Set webhook update handler.
@@ -1411,14 +1398,14 @@ abstract class InternalDoc
      */
     public function setWebhook(string $webhookUrl): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($webhookUrl);
+        $this->wrapper->getAPI()->setWebhook($webhookUrl);
     }
     /**
      * Setup logger.
      */
     public function setupLogger(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->setupLogger();
     }
     /**
      * Asynchronously sleep.
@@ -1445,24 +1432,25 @@ abstract class InternalDoc
      */
     public function start()
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}();
+        return $this->wrapper->getAPI()->start();
     }
     /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.
      *
+     * @return bool False if we were already subscribed
      */
-    public function subscribeToUpdates(mixed $channel)
+    public function subscribeToUpdates(mixed $channel): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($channel);
+        return $this->wrapper->getAPI()->subscribeToUpdates($channel);
     }
     /**
      * Convert TD to MTProto parameters.
      *
      * @param array $params Parameters
      */
-    public function tdToMTProto(array $params)
+    public function tdToMTProto(array $params): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->tdToMTProto($params);
     }
     /**
      * Convert TD parameters to tdcli.
@@ -1471,7 +1459,7 @@ abstract class InternalDoc
      */
     public function tdToTdcli(mixed $params)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        return $this->wrapper->getAPI()->tdToTdcli($params);
     }
     /**
      * Convert tdcli parameters to tdcli.
@@ -1479,9 +1467,9 @@ abstract class InternalDoc
      * @param mixed $params Params
      * @param array $key    Key
      */
-    public function tdcliToTd(&$params, ?array $key = null)
+    public function tdcliToTd(&$params, ?array $key = null): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($params, $key);
+        return $this->wrapper->getAPI()->tdcliToTd($params, $key);
     }
     /**
      * Test fibers.
@@ -1571,10 +1559,11 @@ abstract class InternalDoc
      * Unpack bot API file ID.
      *
      * @param string $fileId Bot API file ID
+     * @return array Unpacked file ID
      */
-    public function unpackFileId(string $fileId)
+    public function unpackFileId(string $fileId): array
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($fileId);
+        return $this->wrapper->getAPI()->unpackFileId($fileId);
     }
     /**
      * Unpack base256 signed int.
@@ -1609,7 +1598,7 @@ abstract class InternalDoc
      */
     public function unsetEventHandler(): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}();
+        $this->wrapper->getAPI()->unsetEventHandler();
     }
     /**
      * Update the 2FA password.
@@ -1620,7 +1609,7 @@ abstract class InternalDoc
      */
     public function update2fa(array $params): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($params);
+        $this->wrapper->getAPI()->update2fa($params);
     }
     /**
      * Parse, update and store settings.
@@ -1629,7 +1618,7 @@ abstract class InternalDoc
      */
     public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings): void
     {
-        $this->wrapper->getAPI()->{__FUNCTION__}($settings);
+        $this->wrapper->getAPI()->updateSettings($settings);
     }
     /**
      * Upload file.
@@ -1641,7 +1630,7 @@ abstract class InternalDoc
      */
     public function upload(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($file, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
     }
     /**
      * Upload file to secret chat.
@@ -1652,7 +1641,7 @@ abstract class InternalDoc
      */
     public function uploadEncrypted(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($file, $fileName, $cb);
+        return $this->wrapper->getAPI()->uploadEncrypted($file, $fileName, $cb);
     }
     /**
      * Upload file from callable.
@@ -1670,7 +1659,7 @@ abstract class InternalDoc
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
     }
     /**
      * Upload file from stream.
@@ -1684,7 +1673,7 @@ abstract class InternalDoc
      */
     public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($stream, $size, $mime, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
     /**
      * Reupload telegram file.
@@ -1695,7 +1684,7 @@ abstract class InternalDoc
      */
     public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($media, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted);
     }
     /**
      * Upload file from URL.
@@ -1708,7 +1697,7 @@ abstract class InternalDoc
      */
     public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($url, $size, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted);
     }
     /**
      * Mark sponsored message as read.
@@ -1716,9 +1705,9 @@ abstract class InternalDoc
      * @param int|array $peer Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      */
-    public function viewSponsoredMessage(array|int $peer, array|string $message)
+    public function viewSponsoredMessage(array|int $peer, array|string $message): bool
     {
-        return $this->wrapper->getAPI()->{__FUNCTION__}($peer, $message);
+        return $this->wrapper->getAPI()->viewSponsoredMessage($peer, $message);
     }
     /**
      * Synchronously wait for a Future|generator.

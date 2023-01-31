@@ -840,7 +840,7 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Get all datacenter connections.
-     *
+     * @internal
      * @return array<DataCenterConnection>
      */
     public function getDataCenterConnections(): array
@@ -850,6 +850,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Get main DC ID.
      *
+     * @internal
      */
     public function getDataCenterId(): int|string
     {

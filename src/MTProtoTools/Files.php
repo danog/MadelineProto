@@ -39,7 +39,6 @@ use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
-use const danog\Decoder\TYPES;
 use const LOCK_EX;
 use function Amp\async;
 use function Amp\File\deleteFile;
@@ -512,7 +511,7 @@ trait Files
      */
     public static function extractBotAPIFile(array $info): array|null
     {
-        foreach (TYPES as $type) {
+        foreach (\danog\Decoder\TYPES as $type) {
             if (isset($info[$type]) && \is_array($info[$type])) {
                 $method = $type;
                 break;

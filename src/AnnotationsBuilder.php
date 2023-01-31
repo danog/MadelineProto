@@ -424,7 +424,7 @@ final class Blacklist {
             $paramList = \rtrim($paramList, ', ');
             $doc .= ')';
             $async = true;
-            if ($hasReturnValue && $static) {
+            if ($hasReturnValue) {
                 $doc .= ': ';
                 $doc .= $this->typeToStr($type);
                 $async = false;
@@ -441,7 +441,7 @@ final class Blacklist {
             $ret = $type && $type instanceof ReflectionNamedType && $type->getName() === 'void' ? '' : 'return';
             $doc .= "\n{\n";
             if ($async) {
-                $doc .= "    {$ret} \$this->wrapper->getAPI()->{__FUNCTION__}({$paramList});\n";
+                $doc .= "    {$ret} \$this->wrapper->getAPI()->{$name}({$paramList});\n";
             } elseif (!$static) {
                 $doc .= "    {$ret} \$this->wrapper->getAPI()->{$name}({$paramList});\n";
             } else {
@@ -455,18 +455,6 @@ final class Blacklist {
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
             $phpdoc = $method->getDocComment() ?: '';
-            if (!\str_contains($phpdoc, '@return')) {
-                if (!\trim($phpdoc)) {
-                    $phpdoc = '/** @return '.$type.' */';
-                } else {
-                    $phpdoc = \str_replace('*/', ' * @return '.$type."\n     */", $phpdoc);
-                }
-            }
-            if ($hasReturnValue && $async && \preg_match('/@return (.*)/', $phpdoc, $matches)) {
-                $ret = $matches[1];
-                $phpdoc = \str_replace('@return '.$ret, '@return mixed', $phpdoc);
-            }
-            $phpdoc = \str_replace('@return Amp\\Future', '@return Future', $phpdoc);
             $internalDoc['InternalDoc'][$name] = $phpdoc;
             $internalDoc['InternalDoc'][$name] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
         }
@@ -531,7 +519,7 @@ final class Blacklist {
     {
         $new = '';
         if ($type instanceof ReflectionNamedType) {
-            if ($type->allowsNull() && $type->getName() !== 'mixed') {
+            if ($type->allowsNull() && $type->getName() !== 'mixed' && $type->getName() !== 'null') {
                 $new .= '?';
             }
             if (!$type->isBuiltin()) {
