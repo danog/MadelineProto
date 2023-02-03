@@ -47,7 +47,7 @@ final class GarbageCollector
         }
         self::$started = true;
 
-        EventLoop::unreference(EventLoop::repeat(1, static function (): void {
+        /*EventLoop::unreference(EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 \gc_collect_cycles();
@@ -57,7 +57,7 @@ final class GarbageCollector
                     Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
                 }
             }
-        }));
+        }));*/
 
         if (!\defined('MADELINE_RELEASE_URL')) {
             return;

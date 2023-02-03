@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages upload and download of files.
@@ -489,6 +490,10 @@ final class ReferenceDatabase implements TLCallback
         if (!isset($this->db[$locationString]['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
+                if (is_array($location['file_reference'])) {
+                    Assert::eq($location['file_reference']['_'], 'bytes');
+                    return base64_decode($location['file_reference']['bytes'], true);
+                }
                 return (string) $location['file_reference'];
             }
             if (!$this->refresh) {
