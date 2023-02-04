@@ -36,3 +36,6 @@ foreach ([
 $ampFilePolyfill .= '}';
 eval($ampFilePolyfill);
 unset($ampFilePolyfill);
+
+class_alias(LocalCookieJar::class, InMemoryCookieJar::class);
+class_alias(ResourceSocket::class, EncryptableSocket::class);
