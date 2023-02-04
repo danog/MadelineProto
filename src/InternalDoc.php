@@ -1131,36 +1131,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
     }
     /**
-     * Call method and wait asynchronously for response.
-     *
-     * If the $aargs['noResponse'] is true, will not wait for a response.
-     *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
-     */
-    public function methodCall(string $method, callable|array $args = [
-    ], array $aargs = [
-        'msg_id' => null,
-    ])
-    {
-        return $this->wrapper->getAPI()->methodCall($method, $args, $aargs);
-    }
-    /**
-     * Call method and make sure it is asynchronously sent.
-     *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
-     */
-    public function methodCallWrite(string $method, callable|array $args = [
-    ], array $aargs = [
-        'msg_id' => null,
-    ])
-    {
-        return $this->wrapper->getAPI()->methodCallWrite($method, $args, $aargs);
-    }
-    /**
      * Escape method name.
      *
      * @param string $method Method name

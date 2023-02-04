@@ -34,6 +34,8 @@ trait CallHandler
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
+     * @internal
+     *
      * @param string            $method Method name
      * @param array|(callable(): array)             $args Arguments
      * @param array             $aargs  Additional arguments
@@ -44,6 +46,8 @@ trait CallHandler
     }
     /**
      * Call method and make sure it is asynchronously sent.
+     *
+     * @internal
      *
      * @param string            $method Method name
      * @param array|(callable(): array)             $args Arguments
