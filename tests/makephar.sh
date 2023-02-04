@@ -61,6 +61,7 @@ cd phar
 
 # Install
 
+mkdir ~/.composer
 echo '{"github-oauth": {"github.com": "'$GITHUB_TOKEN'"}}' > ~/.composer/auth.json
 
 echo '{
