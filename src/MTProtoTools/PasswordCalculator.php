@@ -53,17 +53,17 @@ final class PasswordCalculator
      * The algorithm to use for calculatuing the hash of the current password (a PasswordKdfAlgo object).
      *
      */
-    private array $current_algo;
+    private ?array $current_algo;
     /**
      * SRP b parameter.
      *
      */
-    private BigInteger $srp_B;
+    private ?BigInteger $srp_B;
     /**
      * SRP b parameter for hashing.
      *
      */
-    private string $srp_BForHash;
+    private ?string $srp_BForHash;
     /**
      * SRP ID.
      */
@@ -89,9 +89,6 @@ final class PasswordCalculator
     {
         if ($object['_'] !== 'account.password') {
             throw new Exception('Wrong constructor');
-        }
-        if ($object['has_secure_values']) {
-            //throw new Exception('Cannot parse secure values');
         }
         if ($object['has_password']) {
             switch ($object['current_algo']['_']) {
@@ -135,8 +132,10 @@ final class PasswordCalculator
                 Crypt::checkPG($object['new_algo']['p'], $object['new_algo']['g']);
                 $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
                 $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-                $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
-                $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
+                if (isset($object['current_algo'])) {
+                    $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
+                    $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
+                }
                 break;
             default:
                 throw new Exception("Unknown KDF algo {$object['new_algo']['_']}");
@@ -237,8 +236,8 @@ final class PasswordCalculator
         $return = ['password' => $oldPassword, 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
         $new_settings =& $return['new_settings'];
         if (isset($params['new_password']) && ((string) $params['new_password']) !== '') {
-            $client_salt = $this->createSalt($this->new_algo['salt1']);
-            $server_salt = $this->new_algo['salt2'];
+            $client_salt = $this->createSalt((string) $this->new_algo['salt1']);
+            $server_salt = (string) $this->new_algo['salt2'];
             $g = $this->new_algo['g'];
             $p = $this->new_algo['p'];
             $pForHash = $this->new_algo['pForHash'];

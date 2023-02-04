@@ -8,11 +8,6 @@ if (defined('MADELINE_POLYFILLED')) {
 
 define('MADELINE_POLYFILLED', true);
 
-use Amp\Http\Client\Cookie\InMemoryCookieJar;
-use Amp\Http\Client\Cookie\LocalCookieJar;
-use Amp\Socket\EncryptableSocket;
-use Amp\Socket\ResourceSocket;
-
 $ampFilePolyfill = 'namespace Amp\\File {';
 foreach ([
     'open' => 'openFile',
@@ -41,4 +36,3 @@ foreach ([
 $ampFilePolyfill .= '}';
 eval($ampFilePolyfill);
 unset($ampFilePolyfill);
-

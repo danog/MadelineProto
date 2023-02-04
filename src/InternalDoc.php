@@ -1575,7 +1575,7 @@ abstract class InternalDoc
      *
      * The params array can contain password, new_password, email and hint params.
      *
-     * @param array $params The params
+     * @param array{password?: string, new_password?: string, email?: string, hint?: string} $params The params
      */
     public function update2fa(array $params): void
     {
