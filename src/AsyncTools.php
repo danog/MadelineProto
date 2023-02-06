@@ -51,6 +51,13 @@ use function Amp\Future\awaitFirst;
 abstract class AsyncTools extends StrTools
 {
     /**
+     * Rethrow exception into event loop.
+     */
+    public static function rethrow(\Throwable $e): void
+    {
+        EventLoop::queue(fn () => throw $e);
+    }
+    /**
      * Synchronously wait for a Future|generator.
      *
      * @deprecated Coroutines are deprecated since amp v3

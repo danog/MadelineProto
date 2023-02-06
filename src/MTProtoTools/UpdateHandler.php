@@ -500,7 +500,7 @@ trait UpdateHandler
                     throw $e;
                 }
             } catch (RPCErrorException $e) {
-                if ($e->rpc !== 'CHANNEL_PRIVATE') {
+                if ($e->rpc !== 'CHANNEL_PRIVATE' && $e->rpc !== 'MSG_ID_INVALID') {
                     throw $e;
                 }
             }
