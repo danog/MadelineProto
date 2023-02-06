@@ -84,7 +84,7 @@ interface Payments
     /**
      * Informs server about a purchase made through the App Store: for official applications only.
      *
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      * @param string $receipt Receipt
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
@@ -94,7 +94,7 @@ interface Payments
      * Informs server about a purchase made through the Play Store: for official applications only.
      *
      * @param mixed $receipt Any JSON-encodable data
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function assignPlayMarketTransaction(mixed $receipt, array $purpose): array;
@@ -102,7 +102,7 @@ interface Payments
     /**
      * Checks whether Telegram Premium purchase is possible. Must be called before in-store Premium purchase, official apps only.
      *
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      */
     public function canPurchasePremium(array $purpose): bool;
 }

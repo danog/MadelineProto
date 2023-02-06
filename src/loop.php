@@ -3,6 +3,12 @@
 declare(strict_types=1);
 
 namespace danog\Loop\Generic {
+    if (\defined('MADELINE_POLYFILLED_LOOP')) {
+        return;
+    }
+
+    \define('MADELINE_POLYFILLED_LOOP', true);
+
     use danog\Loop\GenericLoop as LoopGenericLoop;
     use danog\Loop\PeriodicLoop as LoopPeriodicLoop;
     use danog\MadelineProto\Tools;

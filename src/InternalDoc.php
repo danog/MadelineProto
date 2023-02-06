@@ -1303,6 +1303,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->resetUpdateState();
     }
     /**
+     * Rethrow exception into event loop.
+     */
+    public static function rethrow(\Throwable $e): void
+    {
+        \danog\MadelineProto\AsyncTools::rethrow($e);
+    }
+    /**
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
