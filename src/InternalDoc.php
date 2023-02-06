@@ -893,6 +893,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getSelf();
     }
     /**
+     * Returns the session name.
+     */
+    public function getSessionName(): string
+    {
+        return $this->wrapper->getAPI()->getSessionName();
+    }
+    /**
      * Return current settings.
      */
     public function getSettings(): \danog\MadelineProto\Settings

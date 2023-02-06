@@ -668,6 +668,13 @@ final class MTProto implements TLCallback, LoggerGetter
         return $this->wrapper;
     }
     /**
+     * Returns the session name.
+     */
+    public function getSessionName(): string
+    {
+        return $this->wrapper->getSession()->getSessionDirectoryPath();
+    }
+    /**
      * Sleep function.
      *
      * @internal
