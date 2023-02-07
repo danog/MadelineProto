@@ -33,17 +33,9 @@ if ($argc !== 3) {
  */
 function getTL($layer)
 {
-    $layer = __DIR__."/../schemas/TL_telegram_v$layer.tl";
-    $layer = new class($layer) extends TL {
-        public function __construct($layer)
-        {
-            $API = new class {
-            };
-            $API->logger = Logger::$default;
-            parent::__construct($API);
-            $this->init((new TLSchema)->setAPISchema($layer)->setSecretSchema(''));
-        }
-    };
+    $layerFile = __DIR__."/../schemas/TL_telegram_v$layer.tl";
+    $layer = new TL();
+    $layer->init((new TLSchema)->setAPISchema($layerFile)->setSecretSchema(''));
 
     return ['methods' => $layer->getMethods(), 'constructors' => $layer->getConstructors()];
 }

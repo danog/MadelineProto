@@ -105,14 +105,9 @@
     "scripts": {
         "build": [
             "@docs",
-            "@phpdoc",
             "@docs-fix",
             "@cs-fix",
             "@psalm"
-        ],
-        "phpdoc": [
-            "@phpdocInternal",
-            "@phpdocMain"
         ],
         "check": [
             "@cs",
@@ -123,7 +118,6 @@
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v --diff",
         "psalm": "psalm",
-        "phpdocMain": "php tools/phpdoc.php",
         "docs": "php tools/build_docs.php",
         "docs-fix": "tools/fix_docs.sh",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml",
