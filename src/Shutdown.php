@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use ReflectionClass;
 use Revolt\EventLoop;
+use Revolt\EventLoop\Internal\AbstractDriver;
 
 use function Amp\ByteStream\getStdin;
 
