@@ -41,6 +41,7 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\Future\await;
+use function Amp\Future\awaitFirst;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -409,7 +410,7 @@ final class API extends AbstractAPI
                     $instance->startAndLoopLogic($eventHandler[$k], $started[$k]);
                 });
             }
-            await($promises);
+            awaitFirst($promises);
         } finally {
             if (EventLoop::getErrorHandler() === $cb) {
                 EventLoop::setErrorHandler($prev);
