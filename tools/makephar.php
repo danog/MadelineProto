@@ -24,14 +24,6 @@ $p->addFromString('vendor/danog/madelineproto/.git/refs/heads/stable', $argv[3])
 $p->addFromString('.git/refs/heads/stable', $argv[3]);
 
 $p->setStub('<?php
-$backtrace = debug_backtrace();
-if (!isset($backtrace[0]["file"]) || !in_array(basename($backtrace[0]["file"]), ["madeline.php", "phar.php", "testing.php"])) {
-    echo("madeline.phar cannot be required manually: use the automatic loader, instead: https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple".PHP_EOL);
-    die(1);
-}
-if (defined("MADELINE_REAL_ROOT")) {
-    @chdir(MADELINE_REAL_ROOT);
-}
 
 Phar::interceptFileFuncs();
 Phar::mapPhar("'.$argv[2].'"); 
