@@ -12,9 +12,13 @@ use danog\MadelineProto\SettingsAbstract;
 final class RPC extends SettingsAbstract
 {
     /**
-     * RPC timeout.
+     * RPC resend timeout.
      */
-    protected int $rpcTimeout = 5*60;
+    protected int $rpcResendTimeout = 10;
+    /**
+     * RPC drop timeout.
+     */
+    protected int $rpcDropTimeout = 5*60;
 
     /**
      * Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
@@ -34,7 +38,7 @@ final class RPC extends SettingsAbstract
     public function mergeArray(array $settings): void
     {
         if (isset($settings['connection_settings']['all']['drop_timeout'])) {
-            $this->setRpcTimeout($settings['connection_settings']['all']['drop_timeout']);
+            $this->setRpcDropTimeout($settings['connection_settings']['all']['drop_timeout']);
         }
         if (isset($settings['flood_timeout']['wait_if_lt'])) {
             $this->setFloodTimeout($settings['flood_timeout']['wait_if_lt']);
@@ -48,21 +52,41 @@ final class RPC extends SettingsAbstract
     }
 
     /**
-     * Get RPC timeout.
+     * Get RPC drop timeout.
      */
-    public function getRpcTimeout(): int
+    public function getRpcDropTimeout(): int
     {
-        return $this->rpcTimeout;
+        return $this->rpcDropTimeout;
     }
 
     /**
-     * Set RPC timeout.
+     * Set RPC drop timeout.
      *
-     * @param int $rpcTimeout RPC timeout.
+     * @param int $rpcDropTimeout RPC timeout.
      */
-    public function setRpcTimeout(int $rpcTimeout): self
+    public function setRpcDropTimeout(int $rpcDropTimeout): self
     {
-        $this->rpcTimeout = $rpcTimeout;
+        $this->rpcDropTimeout = $rpcDropTimeout;
+
+        return $this;
+    }
+
+    /**
+     * Get RPC resend timeout.
+     */
+    public function getRpcResendTimeout(): int
+    {
+        return $this->rpcResendTimeout;
+    }
+
+    /**
+     * Set RPC resend timeout.
+     *
+     * @param int $rpcResendTimeout RPC timeout.
+     */
+    public function setRpcResendTimeout(int $rpcResendTimeout): self
+    {
+        $this->rpcResendTimeout = $rpcResendTimeout;
 
         return $this;
     }

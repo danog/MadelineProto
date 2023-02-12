@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\DeferredFuture;
 use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Revolt\EventLoop;
@@ -36,7 +37,16 @@ use Throwable;
  */
 final class CheckLoop extends Loop
 {
-    use Common;
+    use Common {
+        __construct as initCommon;
+    }
+
+    private int $resendTimeout;
+    public function __construct(Connection $connection)
+    {
+        $this->initCommon($connection);
+        $this->resendTimeout = $this->API->settings->getRpc()->getRpcResendTimeout();
+    }
     /**
      * Main loop.
      */
@@ -82,7 +92,7 @@ final class CheckLoop extends Loop
                                 break;
                             case 4:
                                 if ($chr & 32) {
-                                    if ($message->getSent() + ($this->timeout*5) < \time()) {
+                                    if ($message->getSent() + $this->resendTimeout < \time()) {
                                         $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
                                         $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
                                     } else {
