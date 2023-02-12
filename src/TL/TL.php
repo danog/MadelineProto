@@ -672,11 +672,10 @@ final class TL
      * Serialize parameters.
      *
      * @param array   $tl        TL object definition
-     * @param array   $arguments Arguments
      * @param string  $ctx       Context
      * @param integer $layer     Layer
      */
-    private function serializeParams(array $tl, array $arguments, string|int $ctx, int $layer)
+    private function serializeParams(array $tl, array|Button $arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
