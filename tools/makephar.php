@@ -25,6 +25,10 @@ $p->addFromString('.git/refs/heads/stable', $argv[3]);
 
 $p->setStub('<?php
 
+if (defined("MADELINE_REAL_ROOT")) {
+    @chdir(MADELINE_REAL_ROOT);
+}
+
 Phar::interceptFileFuncs();
 Phar::mapPhar("'.$argv[2].'"); 
 return require_once "phar://'.$argv[2].'/vendor/autoload.php"; 
