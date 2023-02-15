@@ -8,8 +8,8 @@ if (defined('MADELINE_POLYFILLED')) {
 
 define('MADELINE_POLYFILLED', true);
 
-if (PHP_VERSION_ID === 80202 || PHP_VERSION_ID === 80115) {
-    echo('PHP 8.2.2 and PHP 8.1.15 have a critical garbage collector bug, please switch to PHP 8.1.14, PHP 8.2.1 or PHP 8.2.3 once it gets released: https://github.com/php/php-src/issues/10496'.PHP_EOL);
+if (PHP_VERSION_ID === 80202 || PHP_VERSION_ID === 80115 || PHP_VERSION_ID === 80203 || PHP_VERSION_ID === 80116) {
+    echo('PHP 8.2.2, 8.2.3, 8.1.15, 8.1.16 have a critical garbage collector bug, please switch to PHP 8.1.14 or PHP 8.2.1: https://github.com/php/php-src/issues/10496, https://t.me/MadelineProto/605'.PHP_EOL);
     die(1);
 }
 
