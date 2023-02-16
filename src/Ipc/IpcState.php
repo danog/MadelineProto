@@ -8,6 +8,8 @@ use Throwable;
 
 /**
  * IPC state class.
+ *
+ * @internal
  */
 final class IpcState
 {

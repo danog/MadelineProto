@@ -42,6 +42,8 @@ use function Amp\delay;
 
 /**
  * IPC server.
+ *
+ * @internal
  */
 class Server extends Loop
 {

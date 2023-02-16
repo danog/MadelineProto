@@ -23,6 +23,8 @@ use danog\MadelineProto\VoIP;
 
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
+ *
+ * @internal
  */
 trait MessageHandler
 {

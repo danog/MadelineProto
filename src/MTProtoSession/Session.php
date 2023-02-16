@@ -30,7 +30,7 @@ use function time;
 /**
  * Manages MTProto session-specific data.
  *
- * @extends Connection
+ * @internal
  */
 trait Session
 {

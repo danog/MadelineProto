@@ -26,6 +26,8 @@ use danog\MadelineProto\Db\DbArray;
  * Manages ads.
  *
  * @property DbArray $sponsoredMessages
+ *
+ * @internal
  */
 trait Ads
 {

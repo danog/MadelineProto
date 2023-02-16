@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+/**
+ * @internal
+ */
 trait TLParams
 {
     public function parseParams($key, $mtproto = false): void

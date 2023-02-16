@@ -24,6 +24,9 @@ use danog\MadelineProto\Lang;
 
 use function Amp\ByteStream\getOutputBufferStream;
 
+/**
+ * @internal
+ */
 trait Templates
 {
     /**

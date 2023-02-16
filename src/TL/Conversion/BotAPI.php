@@ -31,6 +31,9 @@ use Throwable;
 
 use const danog\Decoder\TYPES_IDS;
 
+/**
+ * @internal
+ */
 trait BotAPI
 {
     private function htmlEntityDecode(string $stuff): string

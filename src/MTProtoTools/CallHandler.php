@@ -26,6 +26,8 @@ use danog\MadelineProto\Settings;
  * Manages method and object calls.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait CallHandler
 {

@@ -30,6 +30,8 @@ use Revolt\EventLoop;
 
 /**
  * Manages min peers.
+ *
+ * @internal
  */
 final class MinDatabase implements TLCallback
 {

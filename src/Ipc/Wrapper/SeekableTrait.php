@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
+/**
+ * @internal
+ */
 trait SeekableTrait
 {
     /**

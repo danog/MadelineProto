@@ -24,6 +24,8 @@ use Amp\Http\Status;
 
 /**
  * Obtain response information for file to server.
+ *
+ * @internal
  */
 final class ResponseInfo
 {

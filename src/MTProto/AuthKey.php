@@ -25,6 +25,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * MTProto auth key.
+ *
+ * @internal
  */
 abstract class AuthKey implements JsonSerializable
 {

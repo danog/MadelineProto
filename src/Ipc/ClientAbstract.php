@@ -31,6 +31,8 @@ use function Amp\Ipc\connect;
 
 /**
  * IPC client.
+ *
+ * @internal
  */
 abstract class ClientAbstract
 {

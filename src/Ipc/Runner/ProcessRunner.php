@@ -21,6 +21,9 @@ use const PHP_OS;
 use const PHP_SAPI;
 use function Amp\Process\escapeArgument;
 
+/**
+ * @internal
+ */
 final class ProcessRunner extends RunnerAbstract
 {
     private const CGI_VARS = [

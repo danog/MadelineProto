@@ -27,6 +27,8 @@ use const STR_PAD_LEFT;
 
 /**
  * RSA class.
+ *
+ * @internal
  */
 final class RSA
 {

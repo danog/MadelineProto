@@ -25,6 +25,8 @@ use danog\MadelineProto\SecurityException;
 
 /**
  * Manages sequence numbers.
+ *
+ * @internal
  */
 trait SeqNoHandler
 {

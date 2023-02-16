@@ -22,6 +22,9 @@ namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\Lang;
 
+/**
+ * @internal
+ */
 trait TD
 {
     /**

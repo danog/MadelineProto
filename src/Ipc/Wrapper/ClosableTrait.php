@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use AssertionError;
 
+/**
+ * @internal
+ */
 trait ClosableTrait
 {
     /**

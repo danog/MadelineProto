@@ -30,6 +30,8 @@ use Throwable;
  * Dialog handler.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait DialogHandler
 {

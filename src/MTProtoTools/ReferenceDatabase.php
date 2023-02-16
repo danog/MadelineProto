@@ -32,6 +32,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * Manages upload and download of files.
+ *
+ * @internal
  */
 final class ReferenceDatabase implements TLCallback
 {

@@ -33,6 +33,8 @@ use function Amp\Future\await;
 
 /**
  * Manages method and object calls.
+ *
+ * @internal
  */
 trait CallHandler
 {

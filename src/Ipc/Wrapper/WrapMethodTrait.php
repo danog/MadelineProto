@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\Ipc\Wrapper;
 
+/**
+ * @internal
+ */
 trait WrapMethodTrait
 {
     abstract public function __call($name, $args);

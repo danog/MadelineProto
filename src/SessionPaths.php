@@ -42,6 +42,8 @@ use function serialize;
 
 /**
  * Session path information.
+ *
+ * @internal
  */
 final class SessionPaths
 {

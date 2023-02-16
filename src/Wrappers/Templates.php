@@ -25,6 +25,9 @@ use danog\MadelineProto\MTProto;
 
 use function Amp\ByteStream\getOutputBufferStream;
 
+/**
+ * @internal
+ */
 trait Templates
 {
     /**

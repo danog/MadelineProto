@@ -14,6 +14,9 @@ use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use const DIRECTORY_SEPARATOR;
 use const PHP_URL_PATH;
 
+/**
+ * @internal
+ */
 final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */

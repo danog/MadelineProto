@@ -42,6 +42,8 @@ use function unserialize;
 
 /**
  * Manages serialization of the MadelineProto instance.
+ *
+ * @internal
  */
 abstract class Serialization
 {

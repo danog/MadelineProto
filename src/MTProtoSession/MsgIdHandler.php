@@ -28,6 +28,8 @@ use danog\MadelineProto\Tools;
 
 /**
  * Manages message ids.
+ *
+ * @internal
  */
 final class MsgIdHandler
 {

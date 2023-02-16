@@ -25,6 +25,8 @@ use const HAD_MADELINE_PHAR;
 
 /**
  * Snitch.
+ *
+ * @internal
  */
 final class Snitch
 {

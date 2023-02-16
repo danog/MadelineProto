@@ -11,6 +11,9 @@ use Throwable;
 
 use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThrowableBacktrace;
 
+/**
+ * @internal
+ */
 final class ExitFailure
 {
     private string $type;

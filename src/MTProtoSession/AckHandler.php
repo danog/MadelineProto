@@ -30,6 +30,8 @@ use danog\MadelineProto\MTProto\OutgoingMessage;
  * Manages acknowledgement of messages.
  *
  * @property DataCenterConnection $shared
+ *
+ * @internal
  */
 trait AckHandler
 {

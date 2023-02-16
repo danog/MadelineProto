@@ -37,6 +37,8 @@ use const STR_PAD_LEFT;
  * Manages secret chats.
  *
  * https://core.telegram.org/api/end-to-end
+ *
+ * @internal
  */
 trait AuthKeyHandler
 {

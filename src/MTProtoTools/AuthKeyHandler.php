@@ -14,6 +14,8 @@ use function Amp\Future\await;
 
 /**
  * @property DataCenter $datacenter
+ *
+ * @internal
  */
 trait AuthKeyHandler
 {

@@ -20,13 +20,15 @@ use function Amp\File\read;
 use function Amp\File\write;
 
 /**
+ * @internal
+ *
  * @psalm-suppress UndefinedConstant
  */
 final class GarbageCollector
 {
     /**
-     * Ensure only one instance of GarbageCollector
-     *      when multiple instances of MadelineProto running.
+     * Ensure only one instance of GarbageCollector exists
+     * when multiple instances of MadelineProto are running.
      */
     private static bool $started = false;
 

@@ -38,6 +38,8 @@ use function Amp\async;
  * Manages logging in and out.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait Loop
 {

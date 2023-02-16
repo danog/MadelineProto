@@ -9,6 +9,8 @@ use Revolt\EventLoop;
 
 /**
  * Array caching trait.
+ *
+ * @internal
  */
 trait ArrayCacheTrait
 {

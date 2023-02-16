@@ -38,6 +38,8 @@ use function Amp\async;
 
 /**
  * IPC client.
+ *
+ * @internal
  */
 final class Client extends ClientAbstract
 {

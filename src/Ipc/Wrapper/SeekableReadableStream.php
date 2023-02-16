@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
+/**
+ * @internal
+ */
 final class SeekableReadableStream extends ReadableStream
 {
     use SeekableTrait;

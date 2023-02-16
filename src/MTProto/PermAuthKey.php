@@ -22,6 +22,8 @@ namespace danog\MadelineProto\MTProto;
 
 /**
  * MTProto permanent auth key.
+ *
+ * @internal
  */
 final class PermAuthKey extends AuthKey
 {

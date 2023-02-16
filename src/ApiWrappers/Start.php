@@ -33,6 +33,8 @@ use function Amp\ByteStream\getStdout;
 
 /**
  * Manages simple logging in and out.
+ *
+ * @internal
  */
 trait Start
 {

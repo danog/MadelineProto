@@ -27,6 +27,8 @@ use Revolt\EventLoop;
 
 /**
  * Manages responses.
+ *
+ * @internal
  */
 trait Reliable
 {

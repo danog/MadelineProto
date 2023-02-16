@@ -30,7 +30,10 @@ use phpseclib3\Math\BigInteger;
 use const OPENSSL_RAW_DATA;
 use const OPENSSL_ZERO_PADDING;
 
-abstract class Crypt
+/**
+ * @internal
+ */
+final class Crypt
 {
     /**
      * AES KDF function for MTProto v2.

@@ -22,6 +22,8 @@ namespace danog\MadelineProto\Wrappers;
 
 /**
  * Manages clicking buttons.
+ *
+ * @internal
  */
 trait Button
 {

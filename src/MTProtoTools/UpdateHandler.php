@@ -47,9 +47,10 @@ use Webmozart\Assert\Assert;
 /**
  * Manages updates.
  *
- * @extend MTProto
  * @property Settings $settings Settings
  * @property TL $TL TL
+ *
+ * @internal
  */
 trait UpdateHandler
 {

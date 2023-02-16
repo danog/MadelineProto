@@ -31,6 +31,8 @@ use danog\MadelineProto\UpdateHandlerType;
  * Event handler.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait Events
 {

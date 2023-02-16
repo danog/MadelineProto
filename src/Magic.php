@@ -42,6 +42,9 @@ use function Amp\Log\hasColorSupport;
 use function define;
 use function function_exists;
 
+/**
+ * @internal
+ */
 final class Magic
 {
     const ZERO_CHANNEL_ID = -1000000000000;

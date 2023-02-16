@@ -24,6 +24,8 @@ use JsonSerializable;
 
 /**
  * MTProto temporary auth key.
+ *
+ * @internal
  */
 final class TempAuthKey extends AuthKey implements JsonSerializable
 {

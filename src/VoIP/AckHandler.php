@@ -17,9 +17,12 @@ namespace danog\MadelineProto\VoIP;
 
 use danog\MadelineProto\Logger;
 
+/**
+ * @internal
+ */
 trait AckHandler
 {
-    public function seqgt($s1, $s2)
+    private function seqgt($s1, $s2)
     {
         return $s1 > $s2;
     }

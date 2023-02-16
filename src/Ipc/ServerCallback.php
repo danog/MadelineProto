@@ -28,6 +28,8 @@ use Revolt\EventLoop;
 
 /**
  * IPC callback server.
+ *
+ * @internal
  */
 final class ServerCallback extends Server
 {

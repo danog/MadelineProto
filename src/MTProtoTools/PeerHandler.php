@@ -46,6 +46,8 @@ use function Amp\Future\await;
  * Manages peers.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait PeerHandler
 {

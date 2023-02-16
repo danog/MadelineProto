@@ -38,6 +38,8 @@ use const STR_PAD_LEFT;
  *
  * https://core.telegram.org/mtproto/auth_key
  * https://core.telegram.org/mtproto/samples-auth_key
+ *
+ * @internal
  */
 trait AuthKeyHandler
 {

@@ -38,7 +38,6 @@ use function Amp\async;
 use function Amp\Future\awaitAll;
 
 /**
- *
  * @psalm-import-type TBeforeMethodResponseDeserialization from TLCallback
  * @psalm-import-type TAfterMethodResponseDeserialization from TLCallback
  *
@@ -48,6 +47,8 @@ use function Amp\Future\awaitAll;
  * @psalm-import-type TTypeMismatch from TLCallback
  *
  * TL serialization.
+ *
+ * @internal
  */
 final class TL
 {

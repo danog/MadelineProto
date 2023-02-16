@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\ByteStream\WritableStream as AmpWritableStream;
 
+/**
+ * @internal
+ */
 class WritableStream extends Obj implements AmpWritableStream
 {
     use ClosableTrait;

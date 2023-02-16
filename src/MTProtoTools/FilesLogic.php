@@ -39,6 +39,9 @@ use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 
+/**
+ * @internal
+ */
 trait FilesLogic
 {
     /**

@@ -25,6 +25,8 @@ use danog\MadelineProto\MTProto\IncomingMessage;
 
 /**
  * Manages sequence number.
+ *
+ * @internal
  */
 trait SeqNoHandler
 {

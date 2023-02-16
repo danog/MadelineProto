@@ -52,6 +52,8 @@ use function time;
  * @property int $datacenter
  * @property MTProto $API
  * @property Logger $logger
+ *
+ * @internal
  */
 trait AuthKeyHandler
 {

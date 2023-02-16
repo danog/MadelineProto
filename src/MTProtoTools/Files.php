@@ -54,6 +54,8 @@ use function end;
  * Manages upload and download of files.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait Files
 {

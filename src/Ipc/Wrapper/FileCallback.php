@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use danog\MadelineProto\FileCallbackInterface;
 
+/**
+ * @internal
+ */
 final class FileCallback extends Obj implements FileCallbackInterface
 {
     /**

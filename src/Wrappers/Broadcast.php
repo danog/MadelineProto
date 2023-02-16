@@ -22,6 +22,8 @@ namespace danog\MadelineProto\Wrappers;
 
 /**
  * Manages broadcasts.
+ *
+ * @internal
  */
 trait Broadcast
 {

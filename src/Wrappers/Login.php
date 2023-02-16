@@ -33,6 +33,8 @@ use danog\MadelineProto\Settings;
  * Manages logging in and out.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait Login
 {

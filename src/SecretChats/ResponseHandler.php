@@ -25,6 +25,8 @@ use danog\MadelineProto\ResponseException;
 
 /**
  * Manages responses.
+ *
+ * @internal
  */
 trait ResponseHandler
 {

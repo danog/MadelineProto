@@ -6,6 +6,8 @@ use danog\MadelineProto\Ipc\Wrapper;
 
 /**
  * Generic callback wrapper object.
+ *
+ * @internal
  */
 abstract class Obj
 {

@@ -34,6 +34,8 @@ use const PHP_SAPI;
  * Manages simple logging in and out.
  *
  * @property Settings $settings Settings
+ *
+ * @internal
  */
 trait Start
 {

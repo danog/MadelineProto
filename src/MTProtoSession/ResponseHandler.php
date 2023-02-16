@@ -37,7 +37,7 @@ use const PHP_EOL;
 /**
  * Manages responses.
  *
- * @extend Session
+ * @internal
  */
 trait ResponseHandler
 {

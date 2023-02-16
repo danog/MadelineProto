@@ -24,6 +24,8 @@ use function Amp\Ipc\connect;
 
 /**
  * Callback payload wrapper.
+ *
+ * @internal
  */
 final class Wrapper extends ClientAbstract
 {

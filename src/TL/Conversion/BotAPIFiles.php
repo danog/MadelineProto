@@ -40,6 +40,9 @@ use const danog\Decoder\VIDEO;
 use const danog\Decoder\VIDEO_NOTE;
 use const danog\Decoder\VOICE;
 
+/**
+ * @internal
+ */
 trait BotAPIFiles
 {
     private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false): array

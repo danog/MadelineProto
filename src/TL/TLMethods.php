@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+/**
+ * @internal
+ */
 final class TLMethods
 {
     use TLParams;

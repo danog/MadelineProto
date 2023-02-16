@@ -27,6 +27,9 @@ use danog\MadelineProto\Tools;
 
 use const PHP_EOL;
 
+/**
+ * @internal
+ */
 trait Constructors
 {
     private array $docs_constructors;

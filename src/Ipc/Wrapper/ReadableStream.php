@@ -8,6 +8,9 @@ use Amp\Cancellation;
 use IteratorAggregate;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
 {
     use ClosableTrait;

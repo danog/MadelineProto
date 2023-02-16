@@ -8,6 +8,9 @@ use Phar;
 
 use const MADELINE_PHP;
 
+/**
+ * @internal
+ */
 abstract class RunnerAbstract
 {
     const SCRIPT_PATH = __DIR__.'/entry.php';
