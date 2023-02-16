@@ -246,6 +246,17 @@ class ReferenceDatabase implements TLCallback
                 $origin['user_id'] = $data['user_id'];
                 break;
             case 'userFull':
+                if (!isset($data['profile_photo'])) {
+                    $key = \count($this->cacheContexts) - 1;
+                    if (!isset($this->cache[$key])) {
+                        $this->cache[$key] = [];
+                    }
+                    foreach ($cache as $location => $reference) {
+                        $this->cache[$key][$location] = $reference;
+                    }
+                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
+                    return;
+                }
                 $origin['max_id'] = $data['profile_photo']['id'];
                 $origin['offset'] = -1;
                 $origin['limit'] = 1;
