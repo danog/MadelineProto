@@ -30,7 +30,7 @@ final class DOMEntities
             $dom->loadxml('<body>' . \trim($html) . '</body>');
             $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
         } catch (Throwable $e) {
-            throw new Exception("An error occurred while parsing $html: {$e->getMessage()}", $e->getCode(), $e);
+            throw new Exception("An error occurred while parsing $html: {$e->getMessage()}", $e->getCode());
         }
     }
     /**
