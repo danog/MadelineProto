@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL\Conversion;
 
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\StrTools;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMText;
+use Throwable;
 
 final class DOMEntities
 {
@@ -22,10 +24,14 @@ final class DOMEntities
     public string $message = '';
     public function __construct(string $html)
     {
-        $dom = new DOMDocument();
-        $html = \preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
-        $dom->loadxml('<body>' . \trim($html) . '</body>');
-        $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
+        try {
+            $dom = new DOMDocument();
+            $html = \preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
+            $dom->loadxml('<body>' . \trim($html) . '</body>');
+            $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
+        } catch (Throwable $e) {
+            throw new Exception("An error occurred while parsing $html: {$e->getMessage()}", $e->getCode(), $e);
+        }
     }
     /**
      * @return integer Length of the node
