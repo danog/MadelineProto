@@ -1082,7 +1082,7 @@ trait PeerHandler
         ++$depth;
         $promises = [];
         for ($x = 'a'; $x !== 'aa' && $total_count > \count($res['participants']); $x++) {
-            $promises []= async(function () use ($channel, $filter, $q, $x, $total_count, &$res, $depth): void {
+            $promises []= async(function () use ($channel, $filter, $q, $x, $total_count, &$res, $depth) {
                 return $this->recurseAlphabetSearchParticipants($channel, $filter, $q.$x, $total_count, $res, $depth);
             });
         }
