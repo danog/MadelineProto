@@ -44,7 +44,7 @@ trait Start
      */
     public function start()
     {
-        if (($this->getAuthorization()) === MTProto::LOGGED_IN) {
+        if ($this->getAuthorization() === MTProto::LOGGED_IN) {
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
         if (!$this->getWebTemplate()) {
@@ -52,22 +52,26 @@ trait Start
             $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            if (\strpos(Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {
-                $this->botLogin(Tools::readLine(Lang::$current_lang['loginBot']));
-            } else {
-                $this->phoneLogin(Tools::readLine(Lang::$current_lang['loginUser']));
-                $authorization = ($this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode'])));
-                if ($authorization['_'] === 'account.password') {
-                    $authorization = ($this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $authorization['hint']))));
+            if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
+                if (\strpos(Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {
+                    $this->botLogin(Tools::readLine(Lang::$current_lang['loginBot']));
+                } else {
+                    $this->phoneLogin(Tools::readLine(Lang::$current_lang['loginUser']));
                 }
-                if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = ($this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName'])));
-                }
+            }
+            if ($this->getAuthorization() === MTProto::WAITING_CODE) {
+                $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode']));
+            }
+            if ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
+                $this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+            }
+            if ($this->getAuthorization() === MTProto::WAITING_SIGNUP) {
+                $this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName']));
             }
             $this->serialize();
             return $this->fullGetSelf();
         }
-        if (($this->getAuthorization()) === MTProto::NOT_LOGGED_IN) {
+        if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['phone_number'])) {
                 $this->webPhoneLogin();
             } elseif (isset($_POST['token'])) {
@@ -75,26 +79,26 @@ trait Start
             } else {
                 $this->webEcho();
             }
-        } elseif (($this->getAuthorization()) === MTProto::WAITING_CODE) {
+        } elseif ($this->getAuthorization() === MTProto::WAITING_CODE) {
             if (isset($_POST['phone_code'])) {
                 $this->webCompletePhoneLogin();
             } else {
                 $this->webEcho(Lang::$current_lang['loginNoCode']);
             }
-        } elseif (($this->getAuthorization()) === MTProto::WAITING_PASSWORD) {
+        } elseif ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
                 $this->webComplete2faLogin();
             } else {
                 $this->webEcho(Lang::$current_lang['loginNoPass']);
             }
-        } elseif (($this->getAuthorization()) === MTProto::WAITING_SIGNUP) {
+        } elseif ($this->getAuthorization() === MTProto::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
                 $this->webCompleteSignup();
             } else {
                 $this->webEcho(Lang::$current_lang['loginNoName']);
             }
         }
-        if (($this->getAuthorization()) === MTProto::LOGGED_IN) {
+        if ($this->getAuthorization() === MTProto::LOGGED_IN) {
             $this->serialize();
             return $this->fullGetSelf();
         }

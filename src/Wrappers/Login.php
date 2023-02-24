@@ -233,7 +233,6 @@ trait Login
         if ($this->authorized !== MTProto::WAITING_PASSWORD) {
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
         }
-        $this->authorized = MTProto::NOT_LOGGED_IN;
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);

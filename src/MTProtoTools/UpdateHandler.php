@@ -246,8 +246,8 @@ trait UpdateHandler
     public function loadUpdateState()
     {
         if (!$this->got_state) {
-            $this->got_state = true;
             $this->channels_state->get(0, $this->getUpdatesState());
+            $this->got_state = true;
         }
         return $this->channels_state->get(0);
     }
@@ -277,7 +277,7 @@ trait UpdateHandler
      *
      * @internal
      */
-    public function getUpdatesState()
+    private function getUpdatesState()
     {
         $data = $this->methodCallAsyncRead('updates.getState', []);
         $this->getCdnConfig();

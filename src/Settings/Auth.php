@@ -20,17 +20,13 @@ final class Auth extends SettingsAbstract
     /**
      * Whether to use PFS.
      */
-    protected bool $pfs;
+    protected bool $pfs = true;
 
     /**
      * Max tries for generating auth key.
      */
     protected int $maxAuthTries = 5;
 
-    public function __construct()
-    {
-        $this->pfs = \extension_loaded('gmp');
-    }
     public function mergeArray(array $settings): void
     {
         foreach (self::toCamel([
