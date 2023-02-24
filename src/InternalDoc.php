@@ -17,40 +17,40 @@ use Generator;
 abstract class InternalDoc
 {
     protected APIWrapper $wrapper;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Auth $auth */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $auth;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Account $account */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $account;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Users $users */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $users;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Contacts $contacts */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $contacts;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Messages $messages */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $messages;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Updates $updates */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $updates;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Photos $photos */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $photos;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Upload $upload */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $upload;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Help $help */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $help;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Channels $channels */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $channels;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Bots $bots */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $bots;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Payments $payments */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $payments;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Stickers $stickers */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $stickers;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Phone $phone */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $phone;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Langpack $langpack */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $langpack;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Folders $folders */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $folders;
-    /** @var \danog\MadelineProto\Namespace\AbstractAPI&\danog\MadelineProto\Namespace\Stats $stats */
-    public readonly \danog\MadelineProto\Namespace\AbstractAPI $stats;
+    /** @var \danog\MadelineProto\Namespace\Auth $auth */
+    public $auth;
+    /** @var \danog\MadelineProto\Namespace\Account $account */
+    public $account;
+    /** @var \danog\MadelineProto\Namespace\Users $users */
+    public $users;
+    /** @var \danog\MadelineProto\Namespace\Contacts $contacts */
+    public $contacts;
+    /** @var \danog\MadelineProto\Namespace\Messages $messages */
+    public $messages;
+    /** @var \danog\MadelineProto\Namespace\Updates $updates */
+    public $updates;
+    /** @var \danog\MadelineProto\Namespace\Photos $photos */
+    public $photos;
+    /** @var \danog\MadelineProto\Namespace\Upload $upload */
+    public $upload;
+    /** @var \danog\MadelineProto\Namespace\Help $help */
+    public $help;
+    /** @var \danog\MadelineProto\Namespace\Channels $channels */
+    public $channels;
+    /** @var \danog\MadelineProto\Namespace\Bots $bots */
+    public $bots;
+    /** @var \danog\MadelineProto\Namespace\Payments $payments */
+    public $payments;
+    /** @var \danog\MadelineProto\Namespace\Stickers $stickers */
+    public $stickers;
+    /** @var \danog\MadelineProto\Namespace\Phone $phone */
+    public $phone;
+    /** @var \danog\MadelineProto\Namespace\Langpack $langpack */
+    public $langpack;
+    /** @var \danog\MadelineProto\Namespace\Folders $folders */
+    public $folders;
+    /** @var \danog\MadelineProto\Namespace\Stats $stats */
+    public $stats;
 
     /**
      * Export APIFactory instance with the specified namespace.

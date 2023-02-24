@@ -478,8 +478,8 @@ final class Blacklist {
                 \fwrite($handle, "\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {
                     $namespaceInterface = '\\danog\\MadelineProto\\Namespace\\'.\ucfirst($namespace);
-                    \fwrite($handle, '/** @var \\danog\\MadelineProto\\Namespace\\AbstractAPI&'.$namespaceInterface.' $'.$namespace." */\n");
-                    \fwrite($handle, 'public readonly \\danog\\MadelineProto\\Namespace\\AbstractAPI $'.$namespace.";\n");
+                    \fwrite($handle, '/** @var '.$namespaceInterface.' $'.$namespace." */\n");
+                    \fwrite($handle, 'public $'.$namespace.";\n");
                 }
                 \fwrite($handle, '
                     /**
