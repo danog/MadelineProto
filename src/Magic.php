@@ -294,7 +294,7 @@ final class Magic
                 return;
             }
         }
-        foreach (['xml', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
+        foreach (['xml', 'dom', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
             if (!\extension_loaded($extension)) {
                 throw Exception::extension($extension);
             }
