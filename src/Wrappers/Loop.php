@@ -144,7 +144,8 @@ trait Loop
      */
     public function restart(): void
     {
-        $this->stopDeferred ??= new DeferredFuture;
-        $this->stopDeferred->complete();
+        $deferred = $this->stopDeferred ?? new DeferredFuture;
+        $this->stopDeferred = null;
+        $deferred->complete();
     }
 }

@@ -41,7 +41,6 @@ use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
 use Generator;
 use Revolt\EventLoop;
-use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -134,16 +133,7 @@ trait UpdateHandler
         $request = new Request($this->webhookUrl, 'POST');
         $request->setHeader('content-type', 'application/json');
         $request->setBody($payload);
-        $result = ($this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
-        $this->logger->logger('Result of webhook query is '.$result, Logger::NOTICE);
-        $result = \json_decode($result, true);
-        if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
-            try {
-                $this->logger->logger('Reverse webhook command returned', $this->methodCallAsyncRead($result['method'], $result));
-            } catch (Throwable $e) {
-                $this->logger->logger("Reverse webhook command returned: {$e}");
-            }
-        }
+        $this->datacenter->getHTTPClient()->request($request);
     }
 
     private ?DeferredFuture $update_deferred = null;
