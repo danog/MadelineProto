@@ -30,8 +30,8 @@ $API = new API(
 $API->async(true);
 $API->loop(
     function () use ($API) {
-        yield $API->connect(__DIR__.'/ton-lite-client-test1.config.json');
-        var_dump(yield $API->liteServer->getTime());
+        $API->connect(__DIR__.'/ton-lite-client-test1.config.json');
+        var_dump($API->liteServer->getTime());
     }
 );
 ```

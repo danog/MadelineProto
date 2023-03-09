@@ -282,9 +282,9 @@ final class Magic
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
             self::$version = null;
-            if (\file_exists(__DIR__.'/../.git/refs/heads/stable')) {
+            if (\file_exists(__DIR__.'/../.git/refs/heads/v8')) {
                 try {
-                    self::$version = \trim(@\file_get_contents(__DIR__.'/../.git/refs/heads/stable'));
+                    self::$version = \trim(@\file_get_contents(__DIR__.'/../.git/refs/heads/v8'));
                 } catch (Throwable $e) {
                 }
             }

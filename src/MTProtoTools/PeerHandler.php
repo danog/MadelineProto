@@ -874,7 +874,7 @@ trait PeerHandler
      */
     public function getFullInfo(mixed $id): array
     {
-        $partial = ($this->getInfo($id));
+        $partial = $this->getInfo($id);
         if (\time() - ($this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
             return \array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
         }

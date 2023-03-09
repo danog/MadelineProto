@@ -437,7 +437,7 @@ final class ReferenceDatabase implements TLCallback
         \ksort($locationValue['origins']);
         $this->db[$location] = $locationValue;
         $count = 0;
-        foreach (($this->db[$location])['origins'] as $originType => &$origin) {
+        foreach ($this->db[$location]['origins'] as $originType => $origin) {
             $count++;
             $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
             switch ($originType) {
