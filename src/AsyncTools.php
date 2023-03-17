@@ -327,7 +327,7 @@ abstract class AsyncTools extends StrTools
         } finally {
             Magic::togglePeriodicLogging();
         }
-        return \array_shift($lines);
+        return \array_shift($lines) ?? '';
     }
     /**
      * Asynchronously write to stdout/browser.
