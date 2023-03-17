@@ -9,7 +9,7 @@ if (defined('MADELINE_POLYFILLED')) {
 define('MADELINE_POLYFILLED', true);
 
 if (PHP_VERSION_ID === 80202 || PHP_VERSION_ID === 80115 || PHP_VERSION_ID === 80203 || PHP_VERSION_ID === 80116) {
-    echo('PHP 8.2.2, 8.2.3, 8.1.15, 8.1.16 have a critical garbage collector bug, please switch to PHP 8.1.14 or PHP 8.2.1, see https://t.me/MadelineProto/609 for more info'.PHP_EOL);
+    echo('MadelineProto requires PHP 8.2.4+ (recommended) or 8.1.17+.'.PHP_EOL);
     die(1);
 }
 
