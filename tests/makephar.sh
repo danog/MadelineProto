@@ -96,12 +96,10 @@ cd $madelinePath
 
 db()
 {
-    return 0
     php tests/db.php $1
 }
 cycledb()
 {
-    return 0
     db memory
     db mysql
     db postgres
@@ -111,12 +109,10 @@ cycledb()
 
 runTestSimple()
 {
-    return 0
     tests/testing.php
 }
 runTest()
 {
-    return 0
     {
         echo "b
 $BOT_TOKEN
