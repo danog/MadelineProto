@@ -81,4 +81,13 @@ interface Bots
      * @param array{_: 'chatAdminRights', change_info?: bool, post_messages?: bool, edit_messages?: bool, delete_messages?: bool, ban_users?: bool, invite_users?: bool, pin_messages?: bool, add_admins?: bool, anonymous?: bool, manage_call?: bool, other?: bool, manage_topics?: bool} $admin_rights Admin rights @see https://docs.madelineproto.xyz/API_docs/types/ChatAdminRights.html
      */
     public function setBotGroupDefaultAdminRights(array $admin_rights): bool;
+
+    public function setBotInfo(string $lang_code = '', string $about = '', string $description = ''): bool;
+
+    /**
+     *
+     *
+     * @return list<string>
+     */
+    public function getBotInfo(string $lang_code = ''): array;
 }

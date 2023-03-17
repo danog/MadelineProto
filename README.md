@@ -29,7 +29,6 @@ if (!file_exists('madeline.php')) {
 include 'madeline.php';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-$MadelineProto->async(false);
 $MadelineProto->start();
 
 $me = $MadelineProto->getSelf();
@@ -175,16 +174,11 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Build your own proxy](https://docs.madelineproto.xyz/docs/PROXY.html#build-your-proxy)
 * [Async](https://docs.madelineproto.xyz/docs/ASYNC.html)
   * [Usage](https://docs.madelineproto.xyz/docs/ASYNC.html#usage)
-    * [Enabling the MadelineProto async API](https://docs.madelineproto.xyz/docs/ASYNC.html#enabling-the-madelineproto-async-api)
-    * [Using the MadelineProto async API](https://docs.madelineproto.xyz/docs/ASYNC.html#using-the-madelineproto-async-api)
-      * [Async in event handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-event-handler)
-      * [Async in callback handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-callback-handler)
-      * [Wrapped async](https://docs.madelineproto.xyz/docs/ASYNC.html#wrapped-async)
-      * [Multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async)
-      * [ArrayAccess async](https://docs.madelineproto.xyz/docs/ASYNC.html#arrayaccess-async)
-      * [Ignored async](https://docs.madelineproto.xyz/docs/ASYNC.html#ignored-async)
-      * [Combining async operations](https://docs.madelineproto.xyz/docs/ASYNC.html#combining-async-operations)
-      * [Blocking async](https://docs.madelineproto.xyz/docs/ASYNC.html#blocking-async)
+    * [Async in event handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-event-handler)
+    * [Multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async)
+    * [Ignored async](https://docs.madelineproto.xyz/docs/ASYNC.html#ignored-async)
+    * [Combining async operations](https://docs.madelineproto.xyz/docs/ASYNC.html#combining-async-operations)
+    * [Blocking async](https://docs.madelineproto.xyz/docs/ASYNC.html#blocking-async)
     * [MadelineProto and AMPHP async APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-and-amphp-async-apis)
       * [Helper methods](https://docs.madelineproto.xyz/docs/ASYNC.html#helper-methods)
         * [Async sleep](https://docs.madelineproto.xyz/docs/ASYNC.html#async-sleep-does-not-block-the-main-thread)
@@ -194,12 +188,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
         * [Async forking](https://docs.madelineproto.xyz/docs/ASYNC.html#async-forking-does-green-thread-forking)
         * [Async flock](https://docs.madelineproto.xyz/docs/ASYNC.html#async-flock)
       * [MadelineProto async loop APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis)
-        * [Loop](https://docs.madelineproto.xyz/docs/ASYNC.html#loop)
-        * [ResumableLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#resumableloop)
-        * [SignalLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#signalloop)
-        * [ResumableSignalLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#resumablesignalloop)
-        * [GenericLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#genericloop)
-        * [PeriodicLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#periodicloop)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
   * [Named arguments (PHP 8+)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)

@@ -109,7 +109,11 @@ cycledb()
 
 runTestSimple()
 {
-    tests/testing.php
+    {
+        echo "n
+n
+n
+"; } | tests/testing.php
 }
 runTest()
 {
