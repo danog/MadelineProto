@@ -104,9 +104,9 @@ final class ResponseInfo
         if ($seek_start > 0 || $seek_end < $size - 1) {
             $this->code = Status::PARTIAL_CONTENT;
             $this->headers['Content-Range'] = "bytes $seek_start-$seek_end/$size";
-            $this->headers['Content-Length'] = $seek_end - $seek_start + 1;
+            $this->headers['Content-Length'] = (string)($seek_end - $seek_start + 1);
         } elseif ($size > 0) {
-            $this->headers['Content-Length'] = $size;
+            $this->headers['Content-Length'] = (string)$size;
         }
         $this->headers['Content-Type'] = $messageMedia['mime'];
         $this->headers['Cache-Control'] = 'max-age=31556926';
