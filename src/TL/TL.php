@@ -735,20 +735,8 @@ final class TL
                     $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
-                if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'int') {
-                    $serialized .= "\0\0\0\0";
-                    continue;
-                }
-                if ($current_argument['name'] === 'flags' && $current_argument['type'] === 'int') {
-                    $serialized .= "\0\0\0\0";
-                    continue;
-                }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
                     $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
-                    continue;
-                }
-                if ($tl['type'] === 'DocumentAttribute' && \in_array($current_argument['name'], ['w', 'h', 'duration'])) {
-                    $serialized .= "\0\0\0\0";
                     continue;
                 }
                 if (\in_array($current_argument['type'], ['bytes', 'string', 'int'])) {
