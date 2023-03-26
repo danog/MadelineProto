@@ -25,6 +25,7 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
@@ -328,6 +329,9 @@ trait FilesLogic
                 $created = true;
             }
             $callable = static function (int $offset, int $size) use ($stream) {
+                if (!$stream instanceof BufferedRawStream) {
+                    throw new \InvalidArgumentException('Invalid stream type');
+                }
                 $reader = $stream->getReadBuffer($l);
                 try {
                     return $reader->bufferRead($size);
@@ -358,6 +362,7 @@ trait FilesLogic
         }
         $res = ($this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted));
         if ($created) {
+            /** @var StreamInterface $stream */
             $stream->disconnect();
         }
         return $res;
