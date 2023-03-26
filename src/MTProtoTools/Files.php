@@ -169,8 +169,13 @@ trait Files
             $cur++;
             $cb($cur * 100 / $part_total_num, $speed, $time);
         };
-        $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
-            $bytes = $callable($part_num * $part_size, $part_size);
+        $callable = static function (int $part_num) use ($size, $file_id, $part_total_num, $part_size, $callable, $ige) {
+            static $offset = 0;
+            $bytes = $callable(
+                $offset,
+                $offset + $part_size > $size ? ($size % $part_size) : $part_size
+            );
+            $offset += $part_size;
             if ($bytes instanceof Generator) {
                 $bytes = Tools::consumeGenerator($bytes);
             }

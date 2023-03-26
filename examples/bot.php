@@ -58,7 +58,6 @@ class MyEventHandler extends EventHandler
      */
     protected static array $dbProperties = [
         'dataStoredOnDb' => 'array',
-        'notifiedChats' => 'array',
     ];
 
     /**
@@ -66,9 +65,10 @@ class MyEventHandler extends EventHandler
      */
     protected DbArray $dataStoredOnDb;
     /**
-     * @var DbArray<int, bool>
+     * This property is also saved in the db, but it's also always kept in memory, unlike $dataStoredInDb which is exclusively stored in the db.
+     * @var array<int, bool>
      */
-    protected DbArray $notifiedChats;
+    protected array $notifiedChats = [];
 
     /**
      * Get peer(s) where to report errors.
