@@ -14,7 +14,7 @@ use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
-use Amp\Http\Status;
+use Amp\Http\HttpStatus;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
@@ -25,6 +25,7 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
@@ -94,7 +95,7 @@ trait FilesLogic
         }
         \http_response_code($result->getCode());
 
-        if (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
+        if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT])) {
             Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
@@ -198,13 +199,13 @@ trait FilesLogic
             $pipe = new Pipe(1024 * 1024);
             EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
             $body = $pipe->getSource();
-        } elseif (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
+        } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT])) {
             $body = $result->getCodeExplanation();
         }
 
         $response = new Response($result->getCode(), $result->getHeaders(), $body);
         if ($result->shouldServe() && !empty($result->getHeaders()['Content-Length'])) {
-            $response->setHeader('content-length', $result->getHeaders()['Content-Length']);
+            $response->setHeader('content-length', (string)$result->getHeaders()['Content-Length']);
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
                 $response->setHeader('content-disposition', "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
             }
@@ -328,6 +329,9 @@ trait FilesLogic
                 $created = true;
             }
             $callable = static function (int $offset, int $size) use ($stream) {
+                if (!$stream instanceof BufferedRawStream) {
+                    throw new \InvalidArgumentException('Invalid stream type');
+                }
                 $reader = $stream->getReadBuffer($l);
                 try {
                     return $reader->bufferRead($size);
@@ -358,6 +362,7 @@ trait FilesLogic
         }
         $res = ($this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted));
         if ($created) {
+            /** @var StreamInterface $stream */
             $stream->disconnect();
         }
         return $res;

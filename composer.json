@@ -38,6 +38,7 @@
         "ext-fileinfo": "*",
         "amphp/amp": "^3",
         "amphp/http-client": "^5",
+        "amphp/http": "^2",
         "amphp/socket": "^2",
         "amphp/dns": "^2",
         "amphp/byte-stream": "^2",
