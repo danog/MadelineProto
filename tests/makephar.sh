@@ -42,7 +42,7 @@ k()
 }
 
 k
-rm -f madeline.phar testing.madeline*
+rm -rf madeline.phar testing.madeline*
 
 composer update
 #vendor/bin/phpunit tests/danog/MadelineProto/EntitiesTest.php
@@ -156,7 +156,7 @@ k
 
 echo "Testing with new version (restart)"
 reset
-rm -f testing.madeline* || echo
+rm -rf testing.madeline || echo
 runTest
 
 echo "Testing with new version (reload)"
