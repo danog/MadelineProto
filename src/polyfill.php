@@ -8,7 +8,9 @@ if (defined('MADELINE_POLYFILLED')) {
 
 define('MADELINE_POLYFILLED', true);
 
-if (PHP_VERSION_ID < 80204 || PHP_VERSION_ID < 80117) {
+if ((PHP_MINOR_VERSION === 2 && PHP_VERSION_ID < 80204)
+    || (PHP_MINOR_VERSION === 1 && PHP_VERSION_ID < 80117)
+) {
     echo('MadelineProto requires PHP 8.2.4+ (recommended) or 8.1.17+.'.PHP_EOL);
     die(1);
 }

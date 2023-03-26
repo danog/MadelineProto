@@ -12,9 +12,9 @@ use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
+use Amp\Http\HttpStatus;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
-use Amp\Http\HttpStatus;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
@@ -205,7 +205,7 @@ trait FilesLogic
 
         $response = new Response($result->getCode(), $result->getHeaders(), $body);
         if ($result->shouldServe() && !empty($result->getHeaders()['Content-Length'])) {
-            $response->setHeader('content-length', (string)$result->getHeaders()['Content-Length']);
+            $response->setHeader('content-length', (string) $result->getHeaders()['Content-Length']);
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
                 $response->setHeader('content-disposition', "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
             }

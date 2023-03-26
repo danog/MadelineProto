@@ -66,7 +66,7 @@ class RPCErrorException extends \Exception
                         )->getBody()->buffer(),
                         true,
                     );
-                    if (isset($res['ok']) && $res['ok'] && isset($res['result']) && is_string($res['result'])) {
+                    if (isset($res['ok']) && $res['ok'] && isset($res['result']) && \is_string($res['result'])) {
                         $description = $res['result'];
                         self::$descriptions[$error] = $description;
                         self::$errorMethodMap[$code][$method][$error] = $error;
