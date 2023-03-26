@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Http\Status;
+use Amp\Http\HttpStatus;
 
 /**
  * Obtain response information for file to server.
@@ -46,7 +46,7 @@ final class ResponseInfo
     /**
      * HTTP response code.
      */
-    private int $code = Status::OK;
+    private int $code = HttpStatus::OK;
     /**
      * Header array.
      */
@@ -76,7 +76,7 @@ final class ResponseInfo
                 [$range, $extra_ranges] = $list;
             } else {
                 $this->serve = false;
-                $this->code = Status::RANGE_NOT_SATISFIABLE;
+                $this->code = HttpStatus::RANGE_NOT_SATISFIABLE;
                 $this->headers = self::NO_CACHE;
                 return;
             }
@@ -94,7 +94,7 @@ final class ResponseInfo
 
         if (!empty($seek_start) && $seek_end < \abs(\intval($seek_start))) {
             $this->serve = false;
-            $this->code = Status::RANGE_NOT_SATISFIABLE;
+            $this->code = HttpStatus::RANGE_NOT_SATISFIABLE;
             $this->headers = self::NO_CACHE;
             return;
         }
@@ -102,7 +102,7 @@ final class ResponseInfo
 
         $this->serve = $method !== 'HEAD';
         if ($seek_start > 0 || $seek_end < $size - 1) {
-            $this->code = Status::PARTIAL_CONTENT;
+            $this->code = HttpStatus::PARTIAL_CONTENT;
             $this->headers['Content-Range'] = "bytes $seek_start-$seek_end/$size";
             $this->headers['Content-Length'] = $seek_end - $seek_start + 1;
         } elseif ($size > 0) {
@@ -137,9 +137,9 @@ final class ResponseInfo
      */
     public function getCodeExplanation(): string
     {
-        $reason = Status::getReason($this->code);
-        $body = "<html><body><h1>{$this->code} $reason</h1><br>";
-        if ($this->code === Status::RANGE_NOT_SATISFIABLE) {
+        $reason = HttpStatus::getReason($this->code);
+        $body = "<html lang='en'><body><h1>{$this->code} $reason</h1><br>";
+        if ($this->code === HttpStatus::RANGE_NOT_SATISFIABLE) {
             $body .= '<p>Could not use selected range.</p>';
         }
         $body .= self::POWERED_BY;
