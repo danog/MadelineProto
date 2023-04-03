@@ -28,6 +28,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use AssertionError;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
@@ -317,6 +318,10 @@ final class API extends AbstractAPI
     public function __wakeup(): void
     {
         $this->oldInstance = true;
+    }
+    public function __sleep(): array
+    {
+        throw new AssertionError("MadelineProto can't be serialized!");
     }
     /**
      * @var array<Future<null>>

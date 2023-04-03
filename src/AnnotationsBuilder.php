@@ -135,6 +135,15 @@ final class Blacklist {
         if ($type === 'channels.AdminLogResults') {
             $depth = 1;
         }
+        if ($type === 'messages.Messages') {
+            $depth = 1;
+        }
+        if ($type === 'messages.Dialogs') {
+            $depth = 2;
+        }
+        if ($type === 'MessageMedia') {
+            $depth = 2;
+        }
         if ($depth > 3) {
             $base = 'array';
         }
