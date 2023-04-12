@@ -32,6 +32,7 @@
         "ext-json": "*",
         "ext-xml": "*",
         "ext-dom": "*",
+        "ext-gmp": "*",
         "ext-filter": "*",
         "ext-hash": "*",
         "ext-zlib": "*",
