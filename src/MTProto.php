@@ -1521,7 +1521,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config) : $config;
         $this->parseConfig();
         $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
-        $this->logger->logger($this->config, Logger::NOTICE);
         return $this->config;
     }
     /**

@@ -1026,6 +1026,7 @@ trait Files
                 continue;
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(Lang::$current_lang['cdn_reupload'], Logger::NOTICE);
+                $this->config['expires'] = 0;
                 $this->getConfig();
                 try {
                     $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
