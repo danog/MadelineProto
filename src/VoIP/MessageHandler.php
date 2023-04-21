@@ -94,7 +94,7 @@ trait MessageHandler
                 }
                 break;
                 // streamType id:int8 type:int8 codec:int8 frame_duration:int16 enabled:int8 = StreamType;
-            //
+                //
                 // packetInitAck#2 protocol:int min_protocol:int all_streams:byteVector<streamType> = Packet;
             case VoIP::PKT_INIT_ACK:
                 $message .= Tools::packSignedInt($args['protocol']);
@@ -353,7 +353,7 @@ trait MessageHandler
                 }
                 break;
                 // streamType id:int8 type:int8 codec:int8 frame_duration:int16 enabled:int8 = StreamType;
-            //
+                //
                 // packetInitAck#2 protocol:int min_protocol:int all_streams:byteVector<streamType> = Packet;
             case VoIP::PKT_INIT_ACK:
                 $result['protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));

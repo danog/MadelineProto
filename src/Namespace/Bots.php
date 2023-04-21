@@ -82,12 +82,33 @@ interface Bots
      */
     public function setBotGroupDefaultAdminRights(array $admin_rights): bool;
 
-    public function setBotInfo(string $lang_code = '', string $about = '', string $description = ''): bool;
+    /**
+     *
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     */
+    public function setBotInfo(array|int|string $bot = [], string $lang_code = '', string $name = '', string $about = '', string $description = ''): bool;
 
     /**
      *
      *
-     * @return list<string>
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @return array{_: 'bots.botInfo', name: string, about: string, description: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.BotInfo.html
      */
-    public function getBotInfo(string $lang_code = ''): array;
+    public function getBotInfo(array|int|string $bot = [], string $lang_code = ''): array;
+
+    /**
+     *
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param list<string>|array<never, never> $order
+     */
+    public function reorderUsernames(array|int|string $bot, array $order = []): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     */
+    public function toggleUsername(array|int|string $bot, bool $active, string $username = ''): bool;
 }

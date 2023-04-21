@@ -16,12 +16,4 @@ interface Folders
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function editPeerFolders(array $folder_peers = []): array;
-
-    /**
-     * Delete a [peer folder](https://core.telegram.org/api/folders#peer-folders).
-     *
-     * @param int $folder_id [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
-     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
-     */
-    public function deleteFolder(int $folder_id = 0): array;
 }

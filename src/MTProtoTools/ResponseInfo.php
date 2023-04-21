@@ -109,7 +109,6 @@ final class ResponseInfo
             }
         }
 
-
         $this->serve = $method !== 'HEAD';
         if ($seek_start > 0 || $seek_end < $size - 1) {
             $this->code = HttpStatus::PARTIAL_CONTENT;

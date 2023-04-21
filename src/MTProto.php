@@ -132,7 +132,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 164;
+    const V = 165;
     /**
      * Release version.
      *
@@ -1085,13 +1085,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->resetMTProtoSession();
         // Update settings from constructor
         $this->updateSettings($settings);
-        // Session update process for BC
-        $forceDialogs = false;
-        if ($this->v !== self::V
-            || $this->settings->getSchema()->needsUpgrade()) {
-            $this->upgradeMadelineProto();
-            $forceDialogs = true;
-        }
         // Update TL callbacks
         $callbacks = [$this];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -1117,7 +1110,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
-            $this->getFullDialogsInternal($forceDialogs);
+            $this->getFullDialogsInternal(false);
         }
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
@@ -1270,8 +1263,12 @@ final class MTProto implements TLCallback, LoggerGetter
         if ($recurse && ($this->settings->getAuth()->hasChanged()
             || $this->settings->getConnection()->hasChanged()
             || $this->settings->getSchema()->hasChanged()
-            || $this->settings->getSchema()->needsUpgrade())) {
+            || $this->settings->getSchema()->needsUpgrade()
+            || $this->v !== self::V)) {
             $this->logger->logger("Generic settings have changed!", Logger::WARNING);
+            if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+                $this->upgradeMadelineProto();
+            }
             $this->initialize($this->settings);
         }
     }
