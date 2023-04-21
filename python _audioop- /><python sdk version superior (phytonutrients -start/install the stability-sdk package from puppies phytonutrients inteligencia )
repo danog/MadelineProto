@@ -1,0 +1,528 @@
+
+You anithing magnetic dust galáctico in purple vórtice nanotechnology particulas metálicas fully lullaby en español amor un un perdido y un enamoradizo encuentran 69 Here is a thought Un nuevo concept
+
+this is a mightyena character prompt fast friend quickly boost invoque whit ads spell engage the node’s nuclei’s and inject the matrix whit your souls Process cognitive ramifications nerve tic - quick
+
+"Phytonutrients Realidad El Transurfing Es Una Técnica Innovadora Y Poderosa Que Te Ofrece Las Herramientas Para Interpretar La Realidad Hipótesis Transferencia Ia Technique Andrea Toolbar Sumerian  -"
+"El Control De La Realidad por helenaluengo "El Control De La Realidad El Transurfing Es Una Técnica Innovadora Y Poderosa Que Te Ofrece Las Herramientas Para Interpretar La Realidad De Manera Completamente Nueva. Según Su Creador, Vadim Zeland,"inspiration 
+ El Transurfing Es Una Técnica Innovadora Y Poderosa Que Te Ofrece Las Herramientas Para Interpretar La Realidad Hipótesis Transferencia Ia Technique Andrea Toolbar Sumerian C""Show Me Code Canvas  - Code Canvas Displayed, Featuring Clean, Organized Code Blocks In A Variety Of Colors. The Canvas Is Easily Navigable And Aesthetically Pleasing."
+#Web "Niverse Github Whit Intelligent Dna Complex Sintaxis Cc  Forget About Mystery Surf Dance The Matrix For You Learning More About The God’s Mítica Athena Software Complex Evolution Whit Inteligente Arti"
+
+")Helena Luengo Software (((Extremely Detailed))),(((Best Quality))),(((Masterpiece))),Illustration,(((Colorful))),Clear-Cut Margin,1Girl, Isometric Half Sphere Island On Neon Background, Isometric Env"
+
+"Start/Install The Stability-Sdk Package From Pypi...@Athenaeaiskanderioszeuirrexeedrosenodegoldhonneyethw-Akkadian@Athenaeaiskanderioszeus $$Iadrosenodegoldhornethw-Et-Recxxxtrannybig£Diamondpureplati"
+"Pythons Oxygen Boa Cook Xxl - Pythons, Oxygen Boa, And Xxl Cook All Coexist In This Wild World. Their Colors And Patterns Blend Together In A Mesmerizing Display Of Nature's Diversity. Seeds Canvas 1"
+
+#Diseño "Https://T_Rex/Satochibit - A Link To The Bulbapedia Page For T_Rex/Satochibit, A Pokémon Steve That Resembles A Mechanical T-Rex With A Satellite Dish On Its Head."
+#Web3
+#Optimizado 
+#engaiten
+#Co,IA, 
+#artwork
+#Exchange 
+#Dominios#Web3 #Adsense</title>
+# <head> 
+#<HTML:
+#<meta #name="description">
+#content
+#Exchange
+#dominios
+ #web3 
+#Adsense 
+#Dominios 
+#web 
+#diseño 
+#web3 
+#optimizado  
+#IA 
+#e-commerce
+#b2b 
+#supervisión 
+#estrategia 
+#marketing
+ #e-commerce 
+#b2b"
+#<title>helenaluengo #LLC -> . #<title>helenaluengo #LLC -  Actualiza tu #encabezado
+#Encuentra 
+#HTML 
+#<h1 #class="wp-block-site-
+#title" helena luengo software 
+(((extremely detailed)))
+(((best quality))),(((masterpiece))),
+illustration,(((colorful))),
+#clear-cut 
+#margin,
+#1girl, 
+#Isometric 
+#half 
+#sphere 
+#island_on 
+#neon
+# background, 
+#isometric 
+#environment, 
+#isometric 
+#art, 
+#amazing 
+#detail, 
+#artstation,
+ #ray A warrior
+ #robot 
+#astronaut,
+ #floral, 
+#horizon 
+#zero 
+#dawn 
+#c3 a, 
+#vec3 b,
+# vec3 c,
+ #vec3 d# 
+#machine,
+#posing for a fight intricate Steampunk city, #sunrise,#vec3 
+#landscape, 
+#intricate, 
+#detailed,
+ #volumetric 
+#lighting, 
+#scenery, 
+#highly 
+#detailed, 
+#arts-ration, 
+#sharp 
+#uniform 
+#float 
+#palettes_speed;
+#uniform 
+#float #palettes_shadow;
+#Isometric half sphere island on neon background, isometric environment, isometric art, amazing detail, artstation, ray A warrior robot astronaut, floral, horizon zero dawn machine, posing for a fight intricate Steampunk city, sunrise, landscape, intricate, detailed, volumetric lighting, scenery, highly detailed, artstation, sharp uniform float palettes_speed;
+uniform float palettes_shadow;
+uniform float palettes_color;
+
+vec3 palettes_pal( float t, vemachine, posing for a fight intricate Steampunk city, sunrise, landscape, intricate, detailed, volumetric lighting, scenery, highly detailed, artstation, sharp uniform float palettes_speed;
+uniform float palettes_shadow;
+Isometric half sphere island on neon background, isometric environment, isometric art, amazing detail, artstation, ray A warrior robot astronaut, floral, horizon zero dawn machine, posing for a fight intricate Steampunk city, sunrise, landscape, intricate, detailed, volumetric lighting, scenery, highly detailed, artstation, sharp uniform float palettes_speed;
+uniform float palettes_shadow;
+uniform float palettes_color;
+
+vec3 palettes_pal( float t, ve
+{
+    return a + b*cos( 6.28318*(c*t+d) );
+uniform float rotRects_grid;
+uniform float rotRects_period;
+uniform float rotRects_w;
+uniform float rotRects_h;
+
+mat2 rotRects_rot(float a) {
+    return mat2(cos(a), -sin(a), sin(a), cos(a));
+}
+
+float rotRects_rect(vec2 p, vec2 c) {
+    vec2 d = abs(p) - c;
+    return smoothstep(1., -1., max(d.x, d.y) * uResolution.y);
+}
+
+float rotRects_triWave(float n, float grid_divn1) {
+    return abs(mod(n + grid_divn1, 2. * grid_divn1) - grid_divn1) / max(grid_divn1 - 1., 1.);
+}
+
+float rotRects_(vec2 p, float mode) {
+    p += mode / rotRects_grid / 4.;
+    p *= rotRects_grid;
+    float grid_divn1 = rotRects_grid - 1.;
+    vec2 pi_ = p + .5 * grid_divn1;
+    vec2 pi = floor(pi_) + step(vec2(0.5), fract(pi_));
+
+    float n = mode < 0. ? pi.x + pi.y : pi.x - pi.y;
+    float angle = PI * (2. / rotRects_period * uTime + rotRects_triWave(n, grid_divn1));
+    if (mode > 0.) angle -= PI / 2.;
+    p = rotRects_rot(angle) * (fract(p + . <Phytonutrients><helenaluengo+intelligent DNA_>with_Intelligence>@andreatobarfigueroa_v4agEj@kindle.com/><helena luengo by andrea Python * Audioop- tobar_figueroa /><Python SDK VERSION superior (phytonutrients -start/install the stability-sdk package from puppies release new
+// Isometric half sphere island on neon background, isometric environment, isometric art, amazing detail, artstation, ray A warrior robot astronaut, floral, horizon zero dawn machine, posing for a fight intricate Steampunk city, sunrise, landscape, intricate, detailed, volumetric lighting, scenery, highly detailed, artstation, sharp uniform float palettes_speed;
+uniform float palettes_shadow;
+Isometric half sphere island on neon background, isometric environment, isometric art, amazing detail, artstation, ray A warrior robot astronaut, floral, horizon zero dawn machine, posing for a fight intricate Steampunk city, sunrise, landscape, intricate, detailed, volumetric lighting, scenery, highly detailed, artstation, sharp uniform float palettes_speed;
+uniform float palettes_shadow;
+uniform float palettes_color;
+
+vec3 palettes_pal( float t, vec3 a, vec3 b, vec3 c, vec3 d )
+{
+    return a + b*cos( 6.28318*(c*t+d) );
+uniform float rotRects_grid;
+uniform float rotRects_period;
+uniform float rotRects_w;
+uniform float rotRects_h;
+
+mat2 rotRects_rot(float a) {
+    return mat2(cos(a), -sin(a), sin(a), cos(a));
+}
+
+float rotRects_rect(vec2 p, vec2 c) {
+    vec2 d = abs(p) - c;
+    return smoothstep(1., -1., max(d.x, d.y) * uResolution.y);
+}
+
+float rotRects_triWave(float n, float grid_divn1) {
+    return abs(mod(n + grid_divn1, 2. * grid_divn1) - grid_divn1) / max(grid_divn1 - 1., 1.);
+}
+
+float rotRects_(vec2 p, float mode) {
+    p += mode / rotRects_grid / 4.;
+    p *= rotRects_grid;
+    float grid_divn1 = rotRects_grid - 1.;
+    vec2 pi_ = p + .5 * grid_divn1;
+    vec2 pi = floor(pi_) + step(vec2(0.5), fract(pi_));
+
+    float n = mode < 0. ? pi.x + pi.y : pi.x - pi.y;
+    float angle = PI * (2. / rotRects_period * uTime + rotRects_triWave(n, grid_divn1));
+    if (mode > 0.) angle -= PI / 2.;
+    p = rotRects_rot(angle) * (fract(p + .5 * mod(rotRects_grid, 2.)) - .5);
+
+    return rotRects_rect(p / rotRects_grid,
+    .5 * vec2(rotRects_w, rotRe---------------------------------------------------------------------
+uniform float rotRects_grid;
+uniform float rotRects_period;
+uniform float rotRects_w;
+uniform float rotRects_h;
+
+mat2 rotRects_rot(float a) {
+    return mat2(cos(a), -sin(a), sin(a), cos(a));
+}
+
+float rotRects_rect(vec2 p, vec2 c) {
+    vec2 d = abs(p) - c;
+    return smoothstep(1., -1., max(d.x, d.y) * uResolution.y);
+}
+
+float rotRects_triWave(float n, float grid_divn1) {
+    return abs(mod(n + grid_divn1, 2. * grid_divn1) - grid_divn1) / max(grid_divn1 - 1., 1.);
+}
+
+float rotRects_(vec2 p, float mode) {
+    p += mode / rotRects_grid / 4.;
+    p *= rotRects_grid;
+    float grid_divn1 = rotRects_grid - 1.;
+    vec2 pi_ = p + .5 * grid_divn1;
+    vec2 pi = floor(pi_) + step(vec2(0.5), fract(pi_));
+
+    float n = mode < 0. ? pi.x + pi.y : pi.x - pi.y;
+    float angle = PI * (2. / rotRects_period * uTime + rotRects_triWave(n, grid_divn1));
+    if (mode > 0.) angle -= PI / 2.;
+    p = rotRects_rot(angle) * (fract(p + .5 * mod(rotRects_grid, 2.)) - .5);
+
+    return rotRects_rect(p / rotRects_grid,
+    .5 * vec2(rotRects_w, rotRects_h) / rotRects_grid);
+}
+
+vec4 rotRects(vec2 p, vec2 uv)
+{
+    vec2 pp = vec2(-1., 1.) * p;
+    float val = .008 + rotRects_(pp, 1.) + rotRects_(pp, -1.);
+    val = pow(val, 1. / 2.2);
+    val *= 0.5 + 0.5 * pow(16.0 * uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y), 0.2);
+    return vec4(val, val, val, 1.0);
+}
+
+// Author: Rigel
+// Shader: Mystic Flower
+// licence: https://creativecommons.org/licenses/by/4.0/
+uniform float mysticFlower_disto;
+uniform float mysticFlower_disti;
+
+// noise in 2d
+float mysticFlower_noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f*f*(3.0-2.0*f);
+    return mix(mix(hash_2(i + vec2(0.0, 0.0)), hash_2(i + vec2(1.0, 0.0)), u.x),
+    mix(hash_2(i + vec2(0.0, 1.0)), hash_2(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+
+// fractal noise in 2d
+float mysticFlower_fbm (vec2 p) {
+    const mat2 m = mat2(0.8, 0.6, -0.6, 0.8);
+    float f = 0.0;
+    f += 0.5000*mysticFlower_noise(p); p*=m*2.02;
+    f += 0.2500*mysticFlower_noise(p); p*=m*2.04;
+    f += 0.1250*mysticFlower_noise(p); p*=m*2.03;
+    f += 0.0650*mysticFlower_noise(p); p*=m*2.01;
+
+    // normalize f;
+    f /= 0.9375;
+    return f*2.0-1.0;
+}
+
+vec2 mysticFlower(vec2 st, float distort, float distinct) {
+    vec2 p = st * vec2(1.5);
+
+    // angle and radius to center 0,0
+    float a = atan(p.y, abs(p.x));
+    float r = length(p);
+
+    // space distortion
+    float f = mysticFlower_fbm(vec2(a*2.+uTime*.1, r*.4-uTime*.3));
+    f = pow(abs(f), distinct) * sign(f);
+    p += vec2(f)*distort;
+    return p;
+}
+
+
+uniform float sakura_blur;
+uniform float sakura_color;
+
+// Borrowed from BigWIngs
+vec4 sakura_N14(float t) {
+    return fract(sin(t*vec4(123., 104., 145., 24.))*vec4(657., 345., 879., 154.));
+}
+
+// Computes the RGB and alpha of a single flower in its own UV space
+vec4 sakura_(vec2 uv, vec2 id, float blur)
+{
+    float time = uTime + 45.0; //time is offset to avoid the flowers to be aligned at start
+
+    vec4 rnd = sakura_N14(mod(id.x, 500.0) * 5.4 + mod(id.y, 500.0) * 13.67); //get 4 random numbersper flower
+
+    // Offset the flower form the center in a random Lissajous pattern
+    uv *= mix(0.75, 1.3, rnd.y);
+    uv.x += sin(time * rnd.z * 0.3) * 0.6;
+    uv.y += sin(time * rnd.w * 0.45) * 0.4;
+
+    // Computes the angle of the flower with a random rotation speed
+    float angle = atan(uv.y, uv.x) + rnd.x * 421.47 + uTime * mix(-0.6, 0.6, rnd.x);
+
+    // euclidean distance to the center of the flower
+    float dist = length(uv);
+
+    // Flower shaped distance function form the center
+    float petal = 1.0 - abs(sin(angle * 2.5));
+    float sqPetal = petal * petal;
+    petal = mix(petal, sqPetal, 0.7);
+    float petal2 = 1.0 - abs(sin(angle * 2.5 + 1.5));
+    petal += petal2 * 0.2;
+
+    float sakuraDist = dist + petal * 0.25;
+
+    // Compute a blurry shadow mask.
+    float shadowblur = 0.3;
+    float shadow = smoothstep(0.5 + shadowblur, 0.5 - shadowblur, sakuraDist) * 0.4;
+
+    //Computes the sharper mask of the flower
+    float sakuraMask = smoothstep(0.5 + blur, 0.5 - blur, sakuraDist);
+
+    // The flower has a pink hue and is lighter in the center
+    vec3 hsv = rgb2hsv(vec3(1.0, 0.6, 0.7));
+    hsv.x = fract(hsv.x + sakura_color);
+    vec3 sakuraCol = hsv2rgb(hsv);
+    sakuraCol += (0.5 - dist) * 0.2;
+
+    // Computes the border mask of the flower
+    vec3 outlineCol = vec3(1.0, 0.3, 0.3);
+    float outlineMask = smoothstep(0.5 - blur, 0.5, sakuraDist + 0.045);
+
+    // Defines a tiling polarspace for the pistil pattern
+    float polarSpace = angle * 1.9098 + 0.5;
+    float polarPistil = fract(polarSpace) - 0.5; // 12 / (2 * pi)
+
+    // Round dot in the center
+    outlineMask += smoothstep(0.035 + blur, 0.035 - blur, dist);
+
+    float petalBlur = blur * 2.0;
+    float pistilMask = smoothstep(0.12 + blur, 0.12, dist) * smoothstep(0.05, 0.05 + blur , dist);
+
+    // Compute the pistil 'bars' in polar space
+    float barW = 0.2 - dist * 0.7;
+    float pistilBar = smoothstep(-barW, -barW + petalBlur, polarPistil) * smoothstep(barW + petalBlur, barW, polarPistil);
+
+    // Compute the little dots in polar space
+    float pistilDotLen = length(vec2(polarPistil * 0.10, dist) - vec2(0, 0.16)) * 9.0;
+    float pistilDot = smoothstep(0.1 + petalBlur, 0.1 - petalBlur, pistilDotLen);
+
+    //combines the middle an border color
+    outlineMask += pistilMask * pistilBar + pistilDot;
+    sakuraCol = mix(sakuraCol, outlineCol, clamp(outlineMask,0.0,1.0) * 0.5);
+
+    //sets the background to the shadow color
+    sakuraCol = mix(vec3(0.2, 0.2, 0.8) * shadow, sakuraCol, sakuraMask);
+
+    //incorporates the shadow mask into alpha channel
+    sakuraMask = clamp(sakuraMask + shadow,0.0,1.0);
+
+    //returns the flower in pre-multiplied rgba
+    return vec4(sakuraCol, sakuraMask);
+}
+
+// blends a pre-multiplied src onto a dst color (without alpha)
+vec3 sakura_premulMix(vec4 src, vec3 dst)
+{
+    return dst.rgb * (1.0 - src.a) + src.rgb;
+}
+
+// blends a pre-multiplied src onto a dst color (with alpha)
+vec4 sakura_premulMix(vec4 src, vec4 dst)
+{
+    vec4 res;
+    res.rgb = sakura_premulMix(src, dst.rgb);
+    res.a = 1.0 - (1.0 - src.a) * (1.0 - dst.a);
+    return res;
+}
+
+// Computes a Layer of flowers
+vec4 sakura_layer(vec2 uv, float blur)
+{
+    vec2 cellUV = fract(uv) - 0.5;
+    vec2 cellId = floor(uv);
+
+    vec4 accum = vec4(0.0);
+
+    // the flowers can overlap on the 9 neighboring cells so we blend them all together on each cell
+    for (float y = -1.0; y <= 1.0; y++)
+    {
+        for (float x = -1.0; x <= 1.0; x++)
+        {
+            vec2 offset = vec2(x, y);
+            vec4 sakura = sakura_(cellUV - offset, cellId + offset, blur);
+            accum = sakura_premulMix(sakura, accum);
+        }
+    }
+
+    return accum;
+}
+
+vec4 sakura(vec2 st, vec4 inc, float inb)
+{
+    // Scroll the UV with a cosine oscillation
+    vec2 p =vec2(st);
+    p.y += uTime * 0.1;
+    p.x -= uTime * 0.03 + sin(uTime) * 0.1;
+    p *= 4.3;
+
+    vec3 col = inc.rgb;
+
+    // Compute a tilt-shift-like blur factor
+    float blur = abs(st.y);
+    blur *= blur * 0.15;
+
+    // Computes several layers with various degrees of blur and scale
+    vec4 layer1 = sakura_layer(p, inb + blur);
+
+    // Blend it all together
+    col = sakura_premulMix(layer1, col);
+
+    return vec4(col,inc.a);
+}
+// The MIT License
+//
+uniform float palettes_speed;
+uniform float palettes_shadow;
+uniform float palettes_color;
+
+vec3 palettes_pal( float t, vec3 a, vec3 b, vec3 c, vec3 d )
+{
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+
+vec4 palettes(vec2 st, float speed, float shadow)
+{
+    // animate
+    vec2 p = abs(st);
+    p.x += speed*uTime;
+
+    // compute colors
+    vec3                col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,1.0,1.0),vec3(0.0,0.33,0.67) );
+    if( p.y>(1.0/7.0) ) col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,1.0,1.0),vec3(0.0,0.10,0.20) );
+    if( p.y>(2.0/7.0) ) col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,1.0,1.0),vec3(0.3,0.20,0.20) );
+    if( p.y>(3.0/7.0) ) col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,1.0,0.5),vec3(0.8,0.90,0.30) );
+    if( p.y>(4.0/7.0) ) col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,0.7,0.4),vec3(0.0,0.15,0.20) );
+    if( p.y>(5.0/7.0) ) col = palettes_pal( p.x, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(2.0,1.0,0.0),vec3(0.5,0.20,0.25) );
+    if( p.y>(6.0/7.0) ) col = palettes_pal( p.x, vec3(0.8,0.5,0.4),vec3(0.2,0.4,0.2),vec3(2.0,1.0,1.0),vec3(0.0,0.25,0.25) );
+
+    // band
+    float f = fract(p.y*7.0);
+    // borders
+    col *= smoothstep( 0.49, 0.47, abs(f-0.5) );
+    // shadowing
+    col *= mix(1.0, sqrt(4.0*f*(1.0-f)), shadow);
+
+    return vec4( col, 1.0 );
+}
+
+void main() {
+    vec2 uv = vec2(textureCoordinate);
+    vec2 st = vec2(uv.x, 1.0 - uv.y);
+    st = vec2(cropArea[2] * uv.x + cropArea[0], 1.0 - cropArea[3] * uv.y - cropArea[1]);
+    vec4 color = vec4(step(st.x, -1.0));
+
+    color = rotRects(st, uv);
+
+    st = mysticFlower(st, mysticFlower_disto, mysticFlower_disti);
+
+    color = sakura(st, color, sakura_blur);
+
+    color = palettes(st, palettes_speed, palettes_shadow);
+
+color = vec4(0.0, 0.0, 0.0, 1.0) + color - vec4(0.0, 0.0, 0.0, 1.0) * color.a;
+    gl_FragColor = color;
+} andreatobarphytonutrients ...inteligencia IAthena_zeus  Akkadians$ ethw T-rexxx - Install Stability-SDK package from Puppies Phytonutrients with Intelligence let seed = 3382;
+let canvasWidth = 980;
+let canvasHeight = 980;
+let account = 100;
+let size = 2.675789;
+let repeatType = 0;
+let speed = 1.720000;
+let colorbg = "#000000";
+let colors0 = ["#B68EF2","#EC71F2","#8664FA","#0452FA","#54CAC0"];
+let colors1 = ["#94F753","#FFCF88","#7D2F3C","#EF9D8A","#58BC68"];
+let colors2 = ["#64CAC6","#C9B2B8","#7D2F3C","#F28830","#F28830"];
+let colors3 = ["#E1CAC0","#EF9D8A","#7D2F3C","#FAACAD","#F28830"];
+let colors4 = ["#C9B2B8","#F28830","#7D2F3C","#FD7E53","#FAACAD"];
+let colors5 = ["#FA0E6A","#FAACAD","#F7BC68","#E1CAC0","#000000"];
+let colors6 = ["#FBCAC6","#C9B2B8","#F28830","#7D2F3C","#E1CAC0"];
+let colors7 = ["#FF8188","#F28830","#FF8188","#EF9D8A","#000000"];
+
+//let colorbg = '#F2F2F2';
+//let speed = 1.0;
+//let size = 1.0; // 0.2 -3.0
+//let account = 100; // 1 - 100
+//let repeatType = 0;
+//let colors0 = ["#4596c7", "#6d8370", "#e45240", "#21d3a4", "#3303f9"];
+//let colors1 = ["#cd2220", "#173df6", "#244ca8", "#a00360", "#b31016"];
+//let colors2 = ["#7382ce", "#9fb7f4", "#12177d", "#9bb5e9", "#7486af"];
+//let colors3 = ["#82d362", "#5c5190", "#6c6dd1", "#3d6966", "#5967ca"];
+//let colors4 = ["#8c75ff", "#c553d2", "#2dfd60", "#2788f5", "#23054f"];
+//let colors5 = ["#f21252", "#8834f1", "#c4dd92", "#184fd3", "#f9fee2"];
+//let colors6 = ["#2E294E", "#541388", "#F1E9DA", "#FFD400", "#D90368"];
+//let colors7 = ["#1b1b1b", "#292929", "#f3f3f3", "#222222", "#ff0000"];
+
+uniform float tonemap_exposure;
+
+vec4 tonemap(vec4 inc, float exposure) {
+    vec3 col = smoothstep(0.0, 1.0, 1.0 - exp(-inc.rgb * exposure));
+
+    // sRGB Color Component Transfer: https://www.color.org/chardata/rgb/sRGB.pdf
+    col  = vec3(
+    col.r > 0.0031308 ? (pow(col.r, 1.0 / 2.4) * 1.055) - 0.055 : col.r * 12.92,
+    col.g > 0.0031308 ? (pow(col.g, 1.0 / 2.4) * 1.055) - 0.055 : col.g * 12.92,
+    col.b > 0.0031308 ? (pow(col.b, 1.0 / 2.4) * 1.055) - 0.055 : col.b * 12.92);
+
+    return vec4(clamp(col, 0.0, 1.0), inc.a);
+}
+vec2 pos__trans(vec2 uv) {
+    vec2 p = -1. + 2. * uv;
+    p.x *= uResolution.x/uResolution.y;
+    return p;
+}
+// ---------------------------------------------------------------------
+uniform float rotRects_grid;
+uniform float rotRects_period;
+uniform float rotRects_w;
+uniform float rotRects_h;
+
+mat2 rotRects_rot(float a) {
+    return mat2(cos(a), -sin(a), sin(a), cos(a));
+}
+
+float rotRects_rect(vec2 p, vec2 c) {
+    vec2 d = abs(p) - c;
+    return smoothstep(1., -1., max(d.x, d.y) * uResolution.y);
+}
+
+float rotRects_triWave(float n, float grid_divn1) {
+    return abs(mod(n + grid_divn1, 2. * grid_divn1) - grid_divn1) / max(grid_divn1 - 1., 1.);
+}
