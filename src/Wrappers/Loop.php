@@ -45,8 +45,6 @@ trait Loop
 {
     private ?DeferredFuture $stopDeferred = null;
     /**
-     * @internal
-     *
      * Initialize self-restart hack.
      */
     public function initSelfRestart(): void

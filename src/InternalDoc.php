@@ -1029,6 +1029,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::inflateStripped($stripped);
     }
     /**
+     * Initialize self-restart hack.
+     */
+    public function initSelfRestart(): void
+    {
+        $this->wrapper->getAPI()->initSelfRestart();
+    }
+    /**
      * Whether this is altervista.
      */
     public static function isAltervista(): bool
