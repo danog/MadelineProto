@@ -234,7 +234,7 @@ final class ReferenceDatabase implements TLCallback
         switch ($data['_']) {
             case 'message':
             case 'messageService':
-                $origin['peer'] = $this->API->getId($data);
+                $origin['peer'] = $this->API->getIdInternal($data);
                 $origin['msg_id'] = $data['id'];
                 break;
             case 'messages.savedGifs':
@@ -444,7 +444,7 @@ final class ReferenceDatabase implements TLCallback
                 // Peer + msg ID
                 case self::MESSAGE_ORIGIN:
                     if (\is_array($origin['peer'])) {
-                        $origin['peer'] = $this->API->getId($origin['peer']);
+                        $origin['peer'] = $this->API->getIdInternal($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
                         $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]]);

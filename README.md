@@ -60,10 +60,10 @@ The following open source projects were created using MadelineProto: you can dir
 
 <!-- * [magnaluna webradio](https://magna.madelineproto.xyz) - Multifeatured Telegram VoIP webradio -->
 * [TelegramApiServer](https://github.com/xtrime-ru/TelegramApiServer) - Fast, simple, async php telegram api server: an HTTP JSON API for MadelineProto!
-* [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/master/examples/downloadRenameBot.php) - Download files by URL and rename Telegram files using this async parallelized bot!
-* [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/secret_bot.php) - Secret chat bot!
-* [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/examples/pipesbot.php) - Creating inline bots and using other inline bots via a userbot!
-* [`bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/bot.php) - Examples for sending normal messages, downloading any media!
+* [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/downloadRenameBot.php) - Download files by URL and rename Telegram files using this async parallelized bot!
+* [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/secret_bot.php) - Secret chat bot!
+* [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/pipesbot.php) - Creating inline bots and using other inline bots via a userbot!
+* [`bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/bot.php) - Examples for sending normal messages, downloading any media!
 
 Want to add your own open-source project to this list? [Click here!](https://docs.madelineproto.xyz/FOSS.html)
 
@@ -84,7 +84,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
-* [Handling updates (new messages)](https://docs.madelineproto.xyz/docs/UPDATES.html)
+* [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Built-in database driver](https://docs.madelineproto.xyz/docs/UPDATES.html#built-in-database-driver)
     * [Self-restart on webhosts](https://docs.madelineproto.xyz/docs/UPDATES.html#self-restart-on-webhosts)
@@ -185,7 +185,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
         * [Async readline](https://docs.madelineproto.xyz/docs/ASYNC.html#async-readline-does-not-block-the-main-thread)
         * [Async echo](https://docs.madelineproto.xyz/docs/ASYNC.html#async-echo-does-not-block-the-main-thread)
         * [MadelineProto HTTP client](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-http-client)
-        * [Async forking](https://docs.madelineproto.xyz/docs/ASYNC.html#async-forking-does-green-thread-forking)
+        * [Async forking](https://docs.madelineproto.xyz/docs/ASYNC.html#async-forking-does-async-green-thread-forking)
         * [Async flock](https://docs.madelineproto.xyz/docs/ASYNC.html#async-flock)
       * [MadelineProto async loop APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
@@ -266,7 +266,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.createChat.html" name="messages.createChat">Creates a new chat: messages.createChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteChannel.html" name="channels.deleteChannel">Delete a channel/supergroup: channels.deleteChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteChat.html" name="messages.deleteChat">Delete a chat: messages.deleteChat</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/folders.deleteFolder.html" name="folders.deleteFolder">Delete a peer folder: folders.deleteFolder</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteExportedChatInvite.html" name="messages.deleteExportedChatInvite">Delete a chat invite: messages.deleteExportedChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetWallPapers.html" name="account.resetWallPapers">Delete all installed wallpapers, reverting to the default wallpaper set: account.resetWallPapers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteParticipantHistory.html" name="channels.deleteParticipantHistory">Delete all messages sent by a specific participant of a given supergroup: channels.deleteParticipantHistory</a>

@@ -283,7 +283,7 @@ trait PeerHandler
     public function peerIsset(mixed $id): bool
     {
         try {
-            return isset($this->chats[$this->getId($id)]);
+            return isset($this->chats[$this->getIdInternal($id)]);
         } catch (Exception $e) {
             return false;
         } catch (RPCErrorException $e) {
@@ -352,12 +352,25 @@ trait PeerHandler
         }
         return $id['folder_id'];
     }
+
     /**
-     * Get bot API ID from peer object.
+     * Get the bot API ID of a peer.
      *
      * @param mixed $id Peer
      */
-    public function getId(mixed $id): ?int
+    public function getId(mixed $id): int
+    {
+        return $this->getInfo($id, MTProto::INFO_TYPE_ID);
+    }
+
+    /**
+     * Get bot API ID from peer object.
+     *
+     * @internal
+     *
+     * @param mixed $id Peer
+     */
+    public function getIdInternal(mixed $id): ?int
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -376,7 +389,7 @@ trait PeerHandler
                 case 'updateChatDefaultBannedRights':
                 case 'folderPeer':
                 case 'inputFolderPeer':
-                    return $this->getId($id['peer']);
+                    return $this->getIdInternal($id['peer']);
                 case 'inputUserFromMessage':
                 case 'inputPeerUserFromMessage':
                     return $id['user_id'];
@@ -422,9 +435,9 @@ trait PeerHandler
                         // It is a user, and it's not ourselves
                         || $id['peer_id']['user_id'] !== $this->authorization['user']['id']
                     ) {
-                        return $this->getId($id['peer_id']);
+                        return $this->getIdInternal($id['peer_id']);
                     }
-                    return $this->getId($id['from_id']);
+                    return $this->getIdInternal($id['from_id']);
                 case 'updateChannelReadMessagesContents':
                 case 'updateChannelAvailableMessages':
                 case 'updateChannel':
@@ -468,12 +481,12 @@ trait PeerHandler
                     return $id['phone_call']->getOtherID();
                 case 'updateReadHistoryInbox':
                 case 'updateReadHistoryOutbox':
-                    return $this->getId($id['peer']);
+                    return $this->getIdInternal($id['peer']);
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
                 case 'updateEditMessage':
                 case 'updateEditChannelMessage':
-                    return $this->getId($id['message']);
+                    return $this->getIdInternal($id['message']);
                 default:
                     throw new Exception('Invalid constructor given '.$id['_']);
             }
@@ -567,7 +580,7 @@ trait PeerHandler
             }
         }
         $folder_id = $this->getFolderId($id);
-        $try_id = $this->getId($id);
+        $try_id = $this->getIdInternal($id);
         if ($try_id !== null) {
             $id = $try_id;
         }
@@ -805,7 +818,7 @@ trait PeerHandler
                     $id = $this->resolveUsername($id);
                 }
             }
-            $id = $this->getId($id);
+            $id = $this->getIdInternal($id);
             Assert::notNull($id);
             if (self::isSupergroup($id)) {
                 $supergroups []= $id;
@@ -854,7 +867,7 @@ trait PeerHandler
                 $id = $this->resolveUsername($id);
             }
         }
-        unset($this->full_chats[$this->getId($id)]);
+        unset($this->full_chats[$this->getIdInternal($id)]);
         $this->getFullInfo($id);
     }
     /**
@@ -899,7 +912,7 @@ trait PeerHandler
      */
     public function addFullChat(array $full): void
     {
-        $this->full_chats[$this->getId($full)] = [
+        $this->full_chats[$this->getIdInternal($full)] = [
             'full' => $full,
             'last_update' => \time(),
         ];
@@ -1174,7 +1187,7 @@ trait PeerHandler
                             $newres['role'] = 'banned';
                             break;
                     }
-                    $res['participants'][$participant['user_id'] ?? $this->getId($participant['peer'])] = $newres;
+                    $res['participants'][$participant['user_id'] ?? $this->getIdInternal($participant['peer'])] = $newres;
                 });
             }
             await($promises);
@@ -1233,7 +1246,7 @@ trait PeerHandler
         $this->caching_simple_username[$username] = true;
         $result = null;
         try {
-            $result = $this->getId(
+            $result = $this->getIdInternal(
                 ($this->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
             );
         } catch (RPCErrorException $e) {

@@ -210,7 +210,7 @@ final class FeedLoop extends Loop
                 ) {
                     $log = '';
                     if ($from) {
-                        $from_id = $this->API->getId($update['message']['from_id']);
+                        $from_id = $this->API->getIdInternal($update['message']['from_id']);
                         $log .= "from_id {$from_id}, ";
                     }
                     if ($to) {

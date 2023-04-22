@@ -750,11 +750,11 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getHint();
     }
     /**
-     * Get bot API ID from peer object.
+     * Get the bot API ID of a peer.
      *
      * @param mixed $id Peer
      */
-    public function getId(mixed $id): ?int
+    public function getId(mixed $id): int
     {
         return $this->wrapper->getAPI()->getId($id);
     }
@@ -1029,13 +1029,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::inflateStripped($stripped);
     }
     /**
-     * Initialize self-restart hack.
-     */
-    public function initSelfRestart(): void
-    {
-        $this->wrapper->getAPI()->initSelfRestart();
-    }
-    /**
      * Whether this is altervista.
      */
     public static function isAltervista(): bool
@@ -1094,6 +1087,8 @@ abstract class InternalDoc
     }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
+     *
+     * @deprecated Not needed anymore with amp v3
      *
      * @param callable|null $callback Async callable to run
      */
@@ -1307,6 +1302,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->resetUpdateState();
     }
     /**
+     * Restart update loop.
+     */
+    public function restart(): void
+    {
+        $this->wrapper->getAPI()->restart();
+    }
+    /**
      * Rethrow exception into event loop.
      */
     public static function rethrow(\Throwable $e): void
@@ -1421,6 +1423,13 @@ abstract class InternalDoc
     public function start()
     {
         return $this->wrapper->getAPI()->start();
+    }
+    /**
+     * Stop update loop.
+     */
+    public function stop(): void
+    {
+        $this->wrapper->getAPI()->stop();
     }
     /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.

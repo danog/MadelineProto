@@ -118,7 +118,7 @@ trait TD
             } else {
                 switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = ($this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : ($this->getInfo($params[$mtproto[0]]))['bot_api_id'];
+                        $newparams[$td] = ($this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getIdInternal($params['from_id']) : ($this->getInfo($params[$mtproto[0]]))['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];
@@ -140,7 +140,7 @@ trait TD
                                 $newparams[$td]['channel_post'] = $params['fwd_from']['channel_post'];
                             }
                             if (isset($params['fwd_from']['from_id'])) {
-                                $newparams[$td]['sender_user_id'] = $this->getId($params['fwd_from']['from_id']);
+                                $newparams[$td]['sender_user_id'] = $this->getIdInternal($params['fwd_from']['from_id']);
                             }
                         } else {
                             $newparams[$td] = null;

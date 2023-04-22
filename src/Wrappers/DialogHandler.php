@@ -182,7 +182,7 @@ trait DialogHandler
             $last_id = 0;
             $res['messages'] = \array_reverse($res['messages'] ?? []);
             foreach (\array_reverse($res['dialogs'] ?? []) as $dialog) {
-                $id = $this->getId($dialog['peer']);
+                $id = $this->getIdInternal($dialog['peer']);
                 if (!isset($dialogs[$id])) {
                     $dialogs[$id] = $dialog;
                 }
@@ -194,7 +194,7 @@ trait DialogHandler
                         $last_id = $dialog['top_message'];
                     }
                     foreach ($res['messages'] as $message) {
-                        if ($message['_'] !== 'messageEmpty' && $this->getId($message) === $last_peer && $last_id === $message['id']) {
+                        if ($message['_'] !== 'messageEmpty' && $this->getIdInternal($message) === $last_peer && $last_id === $message['id']) {
                             $last_date = $message['date'];
                             break;
                         }

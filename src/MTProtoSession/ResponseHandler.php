@@ -249,7 +249,7 @@ trait ResponseHandler
             $trimmed = $body;
             if (isset($trimmed['peer'])) {
                 try {
-                    $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
+                    $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getIdInternal($body['peer']);
                 } catch (Throwable $e) {
                 }
             }

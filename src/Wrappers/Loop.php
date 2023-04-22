@@ -45,6 +45,8 @@ trait Loop
 {
     private ?DeferredFuture $stopDeferred = null;
     /**
+     * @internal
+     *
      * Initialize self-restart hack.
      */
     public function initSelfRestart(): void
@@ -100,6 +102,8 @@ trait Loop
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
+     * @deprecated Not needed anymore with amp v3
+     *
      * @param callable|null $callback Async callable to run
      */
     public function loop(?callable $callback = null)
@@ -129,21 +133,23 @@ trait Loop
     }
     /**
      * Stop update loop.
-     *
-     * @internal
      */
     public function stop(): void
     {
+        if (!$this->hasEventHandler()) {
+            throw new Exception("Can't use this method if no event handler is running!");
+        }
         Shutdown::removeCallback('restarter');
         $this->restart();
     }
     /**
      * Restart update loop.
-     *
-     * @internal
      */
     public function restart(): void
     {
+        if (!$this->hasEventHandler()) {
+            throw new Exception("Can't use this method if no event handler is running!");
+        }
         $deferred = $this->stopDeferred ?? new DeferredFuture;
         $this->stopDeferred = null;
         $deferred->complete();

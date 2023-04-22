@@ -62,20 +62,6 @@ abstract class EventHandler extends AbstractAPI
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
     }
-    /**
-     * Stop event handler.
-     */
-    public function stop(): void
-    {
-        $this->wrapper->getAPI()->stop();
-    }
-    /**
-     * Restart event handler.
-     */
-    public function restart(): void
-    {
-        $this->wrapper->getAPI()->restart();
-    }
     protected function reconnectFull(): bool
     {
         return true;

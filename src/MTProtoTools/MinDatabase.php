@@ -138,7 +138,7 @@ final class MinDatabase implements TLCallback
         switch ($location['_']) {
             case 'messageFwdHeader':
                 if (isset($location['from_id'])) {
-                    $peers[$this->API->getId($location['from_id'])] = true;
+                    $peers[$this->API->getIdInternal($location['from_id'])] = true;
                 }
                 if (isset($location['channel_id'])) {
                     $peers[$this->API->toSupergroup($location['channel_id'])] = true;
@@ -151,13 +151,13 @@ final class MinDatabase implements TLCallback
                 }
                 break;
             case 'message':
-                $peers[$this->API->getId($location['peer_id'])] = true;
+                $peers[$this->API->getIdInternal($location['peer_id'])] = true;
                 if (isset($location['from_id'])) {
-                    $peers[$this->API->getId($location['from_id'])] = true;
+                    $peers[$this->API->getIdInternal($location['from_id'])] = true;
                 }
                 break;
             default:
-                $peers[$this->API->getId($location)] = true;
+                $peers[$this->API->getIdInternal($location)] = true;
         }
         $this->API->logger->logger("Caching peer location info from location from {$location['_']}", Logger::ULTRA_VERBOSE);
         $key = \count($this->cache) - 1;
@@ -181,7 +181,7 @@ final class MinDatabase implements TLCallback
         switch ($data['_']) {
             case 'message':
             case 'messageService':
-                $origin['peer'] = $this->API->getId($data);
+                $origin['peer'] = $this->API->getIdInternal($data);
                 $origin['msg_id'] = $data['id'];
                 break;
             default:
@@ -200,7 +200,7 @@ final class MinDatabase implements TLCallback
         if (!($object['min'] ?? false)) {
             return $object;
         }
-        $id = $this->API->getId($object);
+        $id = $this->API->getIdInternal($object);
         $dbObject = $this->db[$id];
         if ($dbObject) {
             $new = \array_merge($object, $dbObject);

@@ -122,6 +122,20 @@ foreach ($orderedfiles as $key => $filename) {
         }
         array_shift($lines);
     }
+    if (basename($filename) === 'UPDATES.md') {
+        $idx = array_search('<!-- cut_here -->', $lines, true);
+        $before = array_slice($lines, 0, $idx);
+        $idx = array_search('<!-- cut_here_end -->', $lines, true);
+        $after = array_slice($lines, $idx+1);
+        $lines = array_merge(
+            $before,
+            ['<!-- cut_here -->', '```php'],
+            explode("\n", file_get_contents(__DIR__.'/../examples/bot.php')),
+            ['```', '<!-- cut_here_end -->'],
+            $after
+        );
+    }
+
     preg_match('|^# (.*)|', $lines[0], $matches);
     $title = $matches[1];
     $description = str_replace('"', "'", Tools::toString($lines[2]));

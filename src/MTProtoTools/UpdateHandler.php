@@ -215,7 +215,7 @@ trait UpdateHandler
             return true;
         }
         try {
-            $peer_id = $this->getId($message['peer_id']);
+            $peer_id = $this->getIdInternal($message['peer_id']);
         } catch (Exception $e) {
             return true;
         } catch (RPCErrorException $e) {
