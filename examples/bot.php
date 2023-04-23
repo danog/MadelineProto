@@ -38,7 +38,7 @@ if (file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  */
-class SecretHandler extends EventHandler
+class MyEventHandler extends EventHandler
 {
     /**
      * @var int|string Username or ID of bot admin
@@ -192,7 +192,7 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
 // For users or bots
-SecretHandler::startAndLoop('bot.madeline', $settings);
+MyEventHandler::startAndLoop('bot.madeline', $settings);
 
 // For bots only
-// SecretHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);
+// MyEventHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);
