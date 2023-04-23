@@ -772,7 +772,9 @@ final class MTProto implements TLCallback, LoggerGetter
             async(function (): void {
                 try {
                     $promises = [];
+                    $counter = 0;
                     foreach ($this->chats as $id => $chat) {
+                        $counter++;
                         $id = (int) $id;
                         if (isset($chat['username'])) {
                             $promises []= async($this->usernames->set(...), \strtolower($chat['username']), $id);
@@ -783,6 +785,7 @@ final class MTProto implements TLCallback, LoggerGetter
                         if (\count($promises) >= 500) {
                             await($promises);
                             $promises = [];
+                            $this->logger("Filling database cache. $counter", Logger::WARNING);
                         }
                     }
                     await($promises);
