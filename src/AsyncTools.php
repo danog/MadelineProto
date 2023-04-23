@@ -39,7 +39,6 @@ use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 use function Amp\delay;
 use function Amp\File\exists;
-use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
 
 use function Amp\Future\awaitAny;
@@ -262,7 +261,7 @@ abstract class AsyncTools extends StrTools
     public static function flock(string $file, int $operation, float $polling = 0.1, ?Cancellation $token = null, ?Closure $failureCb = null): ?Closure
     {
         if (!exists($file)) {
-            touchAsync($file);
+            \touch($file);
         }
         $operation |= LOCK_NB;
         $res = \fopen($file, 'c');
