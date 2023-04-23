@@ -132,7 +132,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 165;
+    const V = 166;
     /**
      * Release version.
      *
@@ -761,17 +761,25 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->usernames->clear();
             return;
         }
-        if (!isset($this->usernames[''])) {
+        if (!isset($this->usernames[' '])) {
             $this->logger('Filling database cache. This can take a few minutes.', Logger::WARNING);
+
+            $promises = [];
             foreach ($this->chats as $id => $chat) {
+                $id = (int) $id;
                 if (isset($chat['username'])) {
-                    $this->usernames[\strtolower($chat['username'])] = $id;
+                    $promises []= async($this->usernames->set(...), \strtolower($chat['username']), $id);
                 }
                 foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
-                    $this->usernames[\strtolower($username)] = $id;
+                    $promises []= async($this->usernames->set(...), \strtolower($username), $id);
+                }
+                if (\count($promises) % 500 === 0) {
+                    await($promises);
+                    $promises = [];
                 }
             }
-            $this->usernames[''] = 0;
+            await($promises);
+            $this->usernames[' '] = 0;
             $this->logger('Cache filled.', Logger::WARNING);
         }
     }
@@ -1012,7 +1020,9 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         $this->settings->setSchema(new TLSchema);
-        $this->usernames->clear();
+        if (!isset($this->usernames[' '])) {
+            $this->usernames->clear();
+        }
 
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
