@@ -755,6 +755,7 @@ final class MTProto implements TLCallback, LoggerGetter
         ];
     }
 
+    private bool $runningUsernameMigration = false;
     private function fillUsernamesCache(): void
     {
         if (!$this->settings->getDb()->getEnableUsernameDb()) {
@@ -762,25 +763,35 @@ final class MTProto implements TLCallback, LoggerGetter
             return;
         }
         if (!isset($this->usernames[' '])) {
+            if ($this->runningUsernameMigration) {
+                return;
+            }
+            $this->runningUsernameMigration = true;
             $this->logger('Filling database cache. This can take a few minutes.', Logger::WARNING);
 
-            $promises = [];
-            foreach ($this->chats as $id => $chat) {
-                $id = (int) $id;
-                if (isset($chat['username'])) {
-                    $promises []= async($this->usernames->set(...), \strtolower($chat['username']), $id);
-                }
-                foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
-                    $promises []= async($this->usernames->set(...), \strtolower($username), $id);
-                }
-                if (\count($promises) >= 500) {
-                    await($promises);
+            async(function (): void {
+                try {
                     $promises = [];
+                    foreach ($this->chats as $id => $chat) {
+                        $id = (int) $id;
+                        if (isset($chat['username'])) {
+                            $promises []= async($this->usernames->set(...), \strtolower($chat['username']), $id);
+                        }
+                        foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
+                            $promises []= async($this->usernames->set(...), \strtolower($username), $id);
+                        }
+                        if (\count($promises) >= 500) {
+                            await($promises);
+                            $promises = [];
+                        }
+                    }
+                    await($promises);
+                    $this->usernames[' '] = 0;
+                    $this->logger('Cache filled.', Logger::WARNING);
+                } finally {
+                    $this->runningUsernameMigration = false;
                 }
-            }
-            await($promises);
-            $this->usernames[' '] = 0;
-            $this->logger('Cache filled.', Logger::WARNING);
+            });
         }
     }
 
