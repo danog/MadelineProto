@@ -773,7 +773,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
                     $promises []= async($this->usernames->set(...), \strtolower($username), $id);
                 }
-                if (\count($promises) % 500 === 0) {
+                if (\count($promises) >= 500) {
                     await($promises);
                     $promises = [];
                 }
