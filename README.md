@@ -333,7 +333,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getPaymentForm.html" name="payments.getPaymentForm">Get a payment form: payments.getPaymentForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getArchivedStickers.html" name="messages.getArchivedStickers">Get all archived stickers: messages.getArchivedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getChatThemes.html" name="account.getChatThemes">Get all available chat themes: account.getChatThemes</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAllChats.html" name="messages.getAllChats">Get all chats, channels and supergroups: messages.getAllChats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getSaved.html" name="contacts.getSaved">Get all contacts: contacts.getSaved</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getGroupsForDiscussion.html" name="channels.getGroupsForDiscussion">Get all groups that can be used as discussion groups: channels.getGroupsForDiscussion</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAllStickers.html" name="messages.getAllStickers">Get all installed stickers: messages.getAllStickers</a>

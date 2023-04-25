@@ -738,14 +738,6 @@ interface Messages
     public function getCommonChats(array|int|string $user_id, int $max_id = 0, int $limit = 0): array;
 
     /**
-     * Get all chats, channels and supergroups
-     *
-     * @param list<int>|array<never, never> $except_ids Except these chats/channels/supergroups
-     * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
-     */
-    public function getAllChats(array $except_ids = []): array;
-
-    /**
      * Get [instant view](https://instantview.telegram.org) page
      *
      * @param string $url URL of IV page to fetch
