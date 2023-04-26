@@ -147,6 +147,10 @@ class MyEventHandler extends EventHandler
             $this->restart();
         }
 
+        if (($update['message']['message'] ?? '') === 'ping') {
+            $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
+        }
+
         // Remove the following example code when running your bot
 
         // Test MadelineProto's built-in database driver, which automatically maps to MySQL/PostgreSQL/Redis

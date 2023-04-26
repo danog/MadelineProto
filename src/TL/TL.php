@@ -731,7 +731,7 @@ final class TL
                             }
                     }
                 }
-                if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'long') {
+                if ($current_argument['type'] === 'long') {
                     $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
