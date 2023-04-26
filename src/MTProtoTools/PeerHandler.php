@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
@@ -139,8 +140,7 @@ trait PeerHandler
                     $user['access_hash'] = $existingChat['access_hash'];
                 }
             }
-            $this->decacheChatUsername($user['id'], $existingChat);
-            $this->cacheChatUsername($user['id'], $user);
+            $this->recacheChatUsername($user['id'], $existingChat, $user);
             if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
                 $user = [
                     '_' => $user['_'],
@@ -212,8 +212,7 @@ trait PeerHandler
             }
         }
         if ($existingChat !== $chat) {
-            $this->decacheChatUsername($bot_api_id, $existingChat);
-            $this->cacheChatUsername($bot_api_id, $chat);
+            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
             $this->logger->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
             if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
                 $this->logger->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
@@ -237,24 +236,32 @@ trait PeerHandler
         }
     }
 
-    private function cacheChatUsername(int $id, array $chat): void
+    private ?LocalMutex $decacheMutex = null;
+    private function recacheChatUsername(int $id, ?array $old, array $new): void
     {
         if (!$this->getSettings()->getDb()->getEnableUsernameDb()) {
             return;
         }
-        foreach ($this->getUsernames($chat) as $username) {
-            $this->usernames[$username] = $id;
-        }
-    }
-    private function decacheChatUsername(int $id, ?array $chat): void
-    {
-        if (!$chat || !$this->getSettings()->getDb()->getEnableUsernameDb()) {
+        $new = $this->getUsernames($new);
+        $old = $old ? $this->getUsernames($old) : [];
+        $diffToRemove = \array_diff($old, $new);
+        $diffToAdd = \array_diff($new, $old);
+        if (!$diffToAdd && !$diffToRemove) {
             return;
         }
-        foreach ($this->getUsernames($chat) as $username) {
-            if ($this->usernames[$username] === $id) {
-                unset($this->usernames[$username]);
+        $this->decacheMutex ??= new LocalMutex;
+        $lock = $this->decacheMutex->acquire();
+        try {
+            foreach ($diffToRemove as $username) {
+                if ($this->usernames[$username] === $id) {
+                    unset($this->usernames[$username]);
+                }
             }
+            foreach ($diffToAdd as $username) {
+                $this->usernames[$username] = $id;
+            }
+        } finally {
+            $lock->release();
         }
     }
 
