@@ -630,4 +630,11 @@ trait UpdateHandler
             UpdateHandlerType::GET_UPDATES => $this->signalUpdate(...),
         }, $update);
     }
+    /**
+     * Sends an updateCustomEvent update to the event handler.
+     */
+    public function sendCustomEvent(mixed $payload): void
+    {
+        $this->handleUpdate(['_' => 'updateCustomEvent', 'payload' => $payload]);
+    }
 }

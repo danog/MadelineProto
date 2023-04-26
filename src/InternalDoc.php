@@ -1351,6 +1351,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->secretChatStatus($chat);
     }
     /**
+     * Sends an updateCustomEvent update to the event handler.
+     */
+    public function sendCustomEvent(mixed $payload): void
+    {
+        $this->wrapper->getAPI()->sendCustomEvent($payload);
+    }
+    /**
      * Set NOOP update handler, ignoring all updates.
      */
     public function setNoop(): void
