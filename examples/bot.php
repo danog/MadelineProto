@@ -108,6 +108,10 @@ class MyEventHandler extends EventHandler
     /**
      * Handle updates from users.
      *
+     * 100+ other types of onUpdate... method types are available, see https://docs.madelineproto.xyz/API_docs/types/Update.html for the full list.
+     * You can also use onAny to catch all update types (only for debugging)
+     * A special onUpdateCustomEvent method can also be defined, to send messages to the event handler from an API instance, using the sendCustomEvent method.
+     *
      * @param array $update Update
      */
     public function onUpdateNewMessage(array $update): void
@@ -181,10 +185,6 @@ class MyEventHandler extends EventHandler
             $this->logger($value);
         }
     }
-
-    // 100+ other types of onUpdate... method types are available, see https://docs.madelineproto.xyz/API_docs/types/Update.html for the full list.
-
-    // You can also use onAny to catch all update types (only for debugging)
 }
 
 $settings = new Settings;

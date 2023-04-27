@@ -248,6 +248,9 @@ abstract class Serialization
     {
         for ($x = 0; $x < 60; $x++) {
             Logger::log('MadelineProto is starting, please wait...');
+            if (\PHP_OS_FAMILY === 'Windows') {
+                Logger::log('For Windows users: please switch to Linux if this fails.');
+            }
             try {
                 \clearstatcache(true, $ipcPath);
                 $socket = connect($ipcPath);
