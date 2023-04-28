@@ -55,11 +55,7 @@ trait AckHandler
     public function gotResponseForOutgoingMessage(OutgoingMessage $outgoingMessage): void
     {
         // The server acknowledges that it received my message
-        if (isset($this->new_outgoing[$outgoingMessage->getMsgId()])) {
-            unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
-        } else {
-            $this->logger->logger("Could not find $outgoingMessage in new_outgoing!", Logger::FATAL_ERROR);
-        }
+        unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
     }
     /**
      * Acknowledge incoming message ID.

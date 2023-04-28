@@ -197,7 +197,9 @@ class OutgoingMessage extends Message
     public function reply($result): void
     {
         if ($this->state & self::STATE_REPLIED) {
-            throw new Exception("Trying to double reply to message $this!");
+            //throw new Exception("Trying to double reply to message $this!");
+            // It can happen, no big deal
+            return;
         }
         $this->serializedBody = null;
         $this->body = null;
