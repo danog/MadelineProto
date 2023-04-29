@@ -110,6 +110,7 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'InputMessage' => 'array|int',
+            'InputCheckPasswordSRP' => 'string|array',
             'DataJSON' => 'mixed',
             'JSONValue' => 'mixed',
             default => $this->special[$type] ?? 'array'
@@ -128,21 +129,31 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'Updates' => 'array',
+            'InputCheckPasswordSRP' => 'string|array',
             'DataJSON' => 'mixed',
             'JSONValue' => 'mixed',
             default => $this->special[$type] ?? ''
         };
         if ($type === 'channels.AdminLogResults') {
-            $depth = 1;
+            $depth = 3;
         }
         if ($type === 'messages.Messages') {
-            $depth = 1;
+            $depth = 3;
         }
         if ($type === 'messages.Dialogs') {
-            $depth = 2;
+            $depth = 3;
         }
         if ($type === 'MessageMedia') {
             $depth = 2;
+        }
+        if ($type === 'DecryptedMessage' || $type === 'messages.BotResults' || $type === 'InputBotInlineResult') {
+            $depth = 2;
+        }
+        if ($type === 'WebPage') {
+            $depth = 3;
+        }
+        if ($type === 'Document' || $type === 'Photo') {
+            $depth = 3;
         }
         if ($depth > 3) {
             $base = 'array';
