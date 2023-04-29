@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -69,23 +68,11 @@ final class PasswordCalculator
      */
     private ?int $srp_id = null;
     /**
-     * Logger.
-     *
-     */
-    public Logger $logger;
-    /**
-     * Initialize logger.
-     */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
-    }
-    /**
      * Popupate 2FA configuration.
      *
      * @param array $object 2FA configuration object obtained using account.getPassword
      */
-    public function addInfo(array $object): void
+    public function __construct(array $object)
     {
         if ($object['_'] !== 'account.password') {
             throw new Exception('Wrong constructor');

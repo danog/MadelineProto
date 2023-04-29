@@ -233,8 +233,7 @@ trait Login
         if ($this->authorized !== MTProto::WAITING_PASSWORD) {
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
         }
-        $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
+        $hasher = new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', []));
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         $this->authorization = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
         $this->authorized = MTProto::LOGGED_IN;
@@ -254,8 +253,7 @@ trait Login
      */
     public function update2fa(array $params): void
     {
-        $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo($this->methodCallAsyncRead('account.getPassword', []));
+        $hasher = new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', []));
         $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
     }
 }

@@ -40,6 +40,7 @@ use danog\MadelineProto\MTProtoTools\CallHandler;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
+use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
@@ -1842,6 +1843,12 @@ final class MTProto implements TLCallback, LoggerGetter
             \array_fill_keys(
                 ['InputFileLocation'],
                 $this->getDownloadInfo(...),
+            ),
+            \array_fill_keys(
+                ['InputCheckPasswordSRP'],
+                function (string $password): array {
+                    return (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password);
+                }
             ),
         );
     }
