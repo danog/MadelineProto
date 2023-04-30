@@ -8,6 +8,7 @@ use Amp\Postgres\PostgresConfig;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use PDO;
 
@@ -21,7 +22,6 @@ use PDO;
  */
 class PostgresArray extends SqlArray
 {
-    public DatabasePostgres $dbSettings;
 
     // Legacy
     protected array $settings;
@@ -90,14 +90,14 @@ class PostgresArray extends SqlArray
         }
     }
 
-    protected function getValue(string $value): mixed
+    protected function unserialize(string $value): mixed
     {
-        return \unserialize(\hex2bin($value));
+        return parent::unserialize(\hex2bin($value));
     }
 
-    protected function setValue(mixed $value): string
+    protected function serialize(mixed $value): string
     {
-        return \bin2hex(\serialize($value));
+        return \bin2hex(parent::serialize($value));
     }
 
     /**

@@ -6,12 +6,10 @@ namespace danog\MadelineProto\Settings\Database;
 
 use danog\MadelineProto\Settings\DatabaseAbstract as SettingsDatabaseAbstract;
 
-use function time;
-
 /**
  * Base class for database backends.
  */
-abstract class DatabaseAbstract extends SettingsDatabaseAbstract
+abstract class PersistentDatabaseAbstract extends SettingsDatabaseAbstract
 {
     /**
      * For how long to keep records in memory after last read, for cached backends.
@@ -22,12 +20,18 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      */
     protected string $password = '';
 
+    /**
+     * Which serializer strategy use by default
+     */
+    protected SerializerType $serializer = SerializerType::SERIALIZE;
+
     public function mergeArray(array $settings): void
     {
         foreach (self::toCamel([
             'database',
             'password',
             'cache_ttl',
+            'serializer',
         ]) as $object => $array) {
             if (isset($settings[$array])) {
                 $this->{$object}($settings[$array]);
@@ -106,4 +110,15 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Set database URI.
      */
     abstract public function setUri(string $uri): self;
+
+
+    public function getSerializer(): SerializerType
+    {
+        return $this->serializer;
+    }
+
+    public function setSerializer(SerializerType $serializer): void
+    {
+        $this->serializer = $serializer;
+    }
 }

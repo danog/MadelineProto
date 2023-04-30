@@ -22,7 +22,6 @@ use PDO;
  */
 class MysqlArray extends SqlArray
 {
-    protected DatabaseMysql $dbSettings;
 
     // Legacy
     protected array $settings;

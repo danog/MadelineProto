@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use danog\MadelineProto\Settings\Database\DatabaseAbstract;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 interface DbType
 {
-    /**
-     * @param DatabaseAbstract $settings
-     */
-    public static function getInstance(string $table, DbType|array|null $previous, $settings): static;
+    public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static;
 }

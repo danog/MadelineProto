@@ -8,8 +8,6 @@ use Amp\Sql\Pool;
 use Amp\Sql\Result;
 use PDO;
 
-use function serialize;
-
 /**
  * Generic SQL database backend.
  *
@@ -59,21 +57,6 @@ abstract class SqlArray extends DriverArray
 
         return $this;
     }
-    /**
-     * Deserialize retrieved value.
-     */
-    protected function getValue(string $value): mixed
-    {
-        return \unserialize($value);
-    }
-
-    /**
-     * Serialize retrieved value.
-     */
-    protected function setValue(mixed $value): string
-    {
-        return \serialize($value);
-    }
 
     /**
      * Get iterator.
@@ -83,7 +66,7 @@ abstract class SqlArray extends DriverArray
     public function getIterator(): \Traversable
     {
         foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['key' => $key, 'value' => $value]) {
-            yield $key => $this->getValue($value);
+            yield $key => $this->unserialize($value);
         }
     }
 
@@ -103,7 +86,7 @@ abstract class SqlArray extends DriverArray
             return null;
         }
 
-        $value = $this->getValue($row['value']);
+        $value = $this->unserialize($row['value']);
         $this->setCache($key, $value);
 
         return $value;
@@ -122,7 +105,7 @@ abstract class SqlArray extends DriverArray
             $this->queries[self::SQL_SET],
             [
                 'index' => $key,
-                'value' => $this->setValue($value),
+                'value' => $this->serialize($value),
             ],
         );
         $this->setCache($key, $value);

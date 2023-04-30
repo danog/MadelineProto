@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use danog\MadelineProto\Settings\Database\DatabaseAbstract as DatabaseDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
+use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
@@ -18,12 +19,7 @@ use InvalidArgumentException;
 abstract class DbPropertiesFactory
 {
     /**
-     * Indicates a simple K-V array stored in a database backend.
-     * Values can be objects or other arrays, but when lots of nesting is required, it's best to split the array into multiple arrays.
-     */
-    const TYPE_ARRAY = 'array';
-    /**
-     * @param self::TYPE_*|array $propertyType
+     * @param SerializerType | array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int} $config
      * @return DbType
      * @internal
      * @uses \danog\MadelineProto\Db\MemoryArray
@@ -31,41 +27,49 @@ abstract class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, ?DbType $value = null)
+    public static function get(DatabaseAbstract $dbSettings, string $table, SerializerType|array $config, ?DbType $value = null)
     {
-        $config = $propertyType['config'] ?? [];
-        $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
-        $propertyType = \strtolower($propertyType);
-        $class = $dbSettings instanceof DatabaseDatabaseAbstract && (!($config['enableCache'] ?? true) || !$dbSettings->getCacheTtl())
-            ? __NAMESPACE__.'\\NullCache'
-            : __NAMESPACE__;
+        $dbSettingsCopy = clone $dbSettings;
+        $class = __NAMESPACE__;
+
+        if ($dbSettingsCopy instanceof PersistentDatabaseAbstract) {
+            if ($config instanceof SerializerType) {
+                $config = [
+                    'serializer' => $config
+                ];
+            }
+
+            $config = array_merge([
+                'serializer' => $dbSettings->getSerializer(),
+                'enableCache' => true,
+                'cacheTtl' => $dbSettings->getCacheTtl(),
+            ], $config);
+
+            $class = $dbSettings instanceof PersistentDatabaseAbstract && (!($config['enableCache'] ?? true) || !$config['cacheTtl'])
+                ? __NAMESPACE__ . '\\NullCache'
+                : __NAMESPACE__;
+
+            $dbSettingsCopy->setSerializer($config['serializer']);
+            $dbSettingsCopy->setCacheTtl($config['cacheTtl']);
+        }
 
         switch (true) {
             case $dbSettings instanceof Memory:
-                $class .= '\\Memory';
+                $class .= '\\MemoryArray';
                 break;
             case $dbSettings instanceof Mysql:
-                $class .= '\\Mysql';
+                $class .= '\\MysqlArray';
                 break;
             case $dbSettings instanceof Postgres:
-                $class .= '\\Postgres';
+                $class .= '\\PostgresArray';
                 break;
             case $dbSettings instanceof Redis:
-                $class .= '\\Redis';
+                $class .= '\\RedisArray';
                 break;
             default:
-                throw new InvalidArgumentException('Unknown dbType: '.$dbSettings::class);
+                throw new InvalidArgumentException('Unknown dbType: ' . $dbSettings::class);
         }
-
         /** @var DbType $class */
-        switch (\strtolower($propertyType)) {
-            case self::TYPE_ARRAY:
-                $class .= 'Array';
-                break;
-            default:
-                throw new InvalidArgumentException("Unknown $propertyType: {$propertyType}");
-        }
-
-        return $class::getInstance($table, $value, $dbSettings);
+        return $class::getInstance($table, $value, $dbSettingsCopy);
     }
 }

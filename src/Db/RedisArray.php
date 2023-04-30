@@ -21,7 +21,6 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  */
 class RedisArray extends DriverArray
 {
-    protected DatabaseRedis $dbSettings;
     private RedisRedis $db;
 
     // Legacy
@@ -86,7 +85,7 @@ class RedisArray extends DriverArray
 
         $this->setCache($index, $value);
 
-        $this->db->set($this->rKey($index), \serialize($value));
+        $this->db->set($this->rKey($index), $this->serialize($value));
         $this->setCache($index, $value);
     }
 
@@ -99,7 +98,7 @@ class RedisArray extends DriverArray
 
         $value = $this->db->get($this->rKey($offset));
 
-        if ($value !== null && $value = \unserialize($value)) {
+        if ($value !== null && $value = $this->unserialize($value)) {
             $this->setCache($offset, $value);
         }
 

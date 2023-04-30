@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\SettingsAbstract;
 use IteratorAggregate;
 use ReflectionClass;
@@ -27,6 +29,7 @@ use function Amp\Future\await;
 abstract class DriverArray implements DbArray, IteratorAggregate
 {
     protected string $table;
+    protected PersistentDatabaseAbstract $dbSettings;
 
     use ArrayCacheTrait;
 
@@ -80,7 +83,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $instance = new static();
         $instance->setTable($table);
 
-        /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->dbSettings = $settings;
         $instance->setCacheTtl($settings->getCacheTtl());
 
@@ -212,5 +214,31 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             return 'Array';
         }
         return \str_replace('NullCache\\', '', $instance::class);
+    }
+
+    /**
+     * Serialize retrieved value.
+     */
+    protected function serialize(mixed $value): string
+    {
+        return match ($this->dbSettings->getSerializer()) {
+            SerializerType::SERIALIZE => \serialize($value),
+            SerializerType::IGBINARY => \igbinary_serialize($value),
+            SerializerType::JSON => json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::STRING => (string)$value,
+        };
+    }
+
+    /**
+     * Deserialize retrieved value.
+     */
+    protected function unserialize(string $value): mixed
+    {
+        return match ($this->dbSettings->getSerializer()) {
+            SerializerType::SERIALIZE  => \unserialize($value),
+            SerializerType::IGBINARY  => \igbinary_unserialize($value),
+            SerializerType::JSON => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => $value,
+        };
     }
 }

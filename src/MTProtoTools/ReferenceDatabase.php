@@ -87,7 +87,7 @@ final class ReferenceDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => 'array',
+        'db' => [],
     ];
 
     public function __construct(private MTProto $API)
