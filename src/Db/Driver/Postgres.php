@@ -53,20 +53,6 @@ final class Postgres
                     ENCODING utf8
                 ");
             }
-
-            $connection->query("
-                    CREATE OR REPLACE FUNCTION update_ts()
-                    RETURNS TRIGGER AS $$
-                    BEGIN
-                       IF row(NEW.*) IS DISTINCT FROM row(OLD.*) THEN
-                          NEW.ts = now(); 
-                          RETURN NEW;
-                       ELSE
-                          RETURN OLD;
-                       END IF;
-                    END;
-                    $$ language 'plpgsql'
-                ");
             $connection->close();
         } catch (Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);

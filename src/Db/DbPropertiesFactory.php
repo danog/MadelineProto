@@ -14,7 +14,7 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
 /**
- * @psalm-type TOrmConfig=array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int}
+ * @psalm-import-type TOrmConfig from DbPropertiesTrait
  * This factory class initializes the correct database backend for MadelineProto.
  */
 abstract class DbPropertiesFactory
