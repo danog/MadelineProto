@@ -43,7 +43,7 @@ class MyEventHandler extends EventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "danogentili"; // !!! Change this to your username !!!
+    const ADMIN = "@me"; // !!! Change this to your username !!!
 
     /**
      * List of properties automatically stored in database (MySQL, Postgres, redis or memory).
