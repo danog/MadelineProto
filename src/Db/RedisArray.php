@@ -85,7 +85,7 @@ class RedisArray extends DriverArray
 
         $this->setCache($index, $value);
 
-        $this->db->set($this->rKey($index), $this->serialize($value));
+        $this->db->set($this->rKey($index), ($this->serializer)($value));
         $this->setCache($index, $value);
     }
 
@@ -98,7 +98,7 @@ class RedisArray extends DriverArray
 
         $value = $this->db->get($this->rKey($offset));
 
-        if ($value !== null && $value = $this->unserialize($value)) {
+        if ($value !== null && $value = ($this->deserializer)($value)) {
             $this->setCache($offset, $value);
         }
 
@@ -123,7 +123,7 @@ class RedisArray extends DriverArray
 
         $len = \strlen($this->rKey(''));
         foreach ($request as $key) {
-            yield \substr($key, $len) => \unserialize($this->db->get($key));
+            yield \substr($key, $len) => ($this->deserializer)($this->db->get($key));
         }
     }
 

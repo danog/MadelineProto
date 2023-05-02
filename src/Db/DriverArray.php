@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
+use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\SerializerType;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\MadelineProto\SettingsAbstract;
 use IteratorAggregate;
 use ReflectionClass;
@@ -29,7 +30,11 @@ use function Amp\Future\await;
 abstract class DriverArray implements DbArray, IteratorAggregate
 {
     protected string $table;
-    protected PersistentDatabaseAbstract $dbSettings;
+    /** @var callable(mixed): mixed */
+    protected $serializer;
+    /** @var callable(string): mixed */
+    protected $deserializer;
+    protected DriverDatabaseAbstract $dbSettings;
 
     use ArrayCacheTrait;
 
@@ -77,7 +82,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
-    public static function getInstance(string $table, DbType|array|null $previous, $settings): static
+    public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
@@ -85,6 +90,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
 
         $instance->dbSettings = $settings;
         $instance->setCacheTtl($settings->getCacheTtl());
+        $instance->setSerializer($settings->getSerializer());
 
         $instance->startCacheCleanupLoop();
 
@@ -100,6 +106,22 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         }
 
         return $instance;
+    }
+
+    protected function setSerializer(SerializerType $serializer): void
+    {
+        $this->serializer = match ($serializer) {
+            SerializerType::SERIALIZE => \serialize(...),
+            SerializerType::IGBINARY => \igbinary_serialize(...),
+            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::STRING => strval(...),
+        };
+        $this->deserializer = match ($serializer) {
+            SerializerType::SERIALIZE => \unserialize(...),
+            SerializerType::IGBINARY => \igbinary_unserialize(...),
+            SerializerType::JSON => fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => fn ($v) => $v,
+        };
     }
 
     /**
@@ -214,31 +236,5 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             return 'Array';
         }
         return \str_replace('NullCache\\', '', $instance::class);
-    }
-
-    /**
-     * Serialize retrieved value.
-     */
-    protected function serialize(mixed $value): string
-    {
-        return match ($this->dbSettings->getSerializer()) {
-            SerializerType::SERIALIZE => \serialize($value),
-            SerializerType::IGBINARY => \igbinary_serialize($value),
-            SerializerType::JSON => json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-            SerializerType::STRING => (string)$value,
-        };
-    }
-
-    /**
-     * Deserialize retrieved value.
-     */
-    protected function unserialize(string $value): mixed
-    {
-        return match ($this->dbSettings->getSerializer()) {
-            SerializerType::SERIALIZE  => \unserialize($value),
-            SerializerType::IGBINARY  => \igbinary_unserialize($value),
-            SerializerType::JSON => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
-            SerializerType::STRING => $value,
-        };
     }
 }

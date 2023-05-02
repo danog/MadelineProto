@@ -26,6 +26,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
 use Webmozart\Assert\Assert;
@@ -87,7 +88,7 @@ final class ReferenceDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => [],
+        'db' => ['serializer' => SerializerType::SERIALIZE],
     ];
 
     public function __construct(private MTProto $API)

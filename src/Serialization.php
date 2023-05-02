@@ -51,11 +51,9 @@ abstract class Serialization
     /**
      * Header for session files.
      */
-    const PHP_HEADER = '<?php __HALT_COMPILER();';
-    /**
-     * Serialization version.
-     */
-    const VERSION = 2;
+    public const PHP_HEADER = '<?php __HALT_COMPILER();';
+    public const VERSION_OLD = 2;
+    public const VERSION_SERIALIZATION_AWARE = 3;
 
     /**
      * Unserialize session.
@@ -217,7 +215,7 @@ abstract class Serialization
                 $unserialized = DbPropertiesFactory::get(
                     $settings,
                     $tableName,
-                    SerializerType::SERIALIZE,
+                    ['serializer' => SerializerType::SERIALIZE],
                     $unserialized,
                 );
             } else {

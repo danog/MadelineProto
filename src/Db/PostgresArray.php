@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Postgres\ByteA;
 use Amp\Postgres\PostgresConfig;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use PDO;
 
 /**
@@ -22,7 +23,6 @@ use PDO;
  */
 class PostgresArray extends SqlArray
 {
-
     // Legacy
     protected array $settings;
 
@@ -90,16 +90,21 @@ class PostgresArray extends SqlArray
         }
     }
 
-    protected function unserialize(string $value): mixed
+    protected function setSerializer(SerializerType $serializer): void
     {
-        return parent::unserialize(\hex2bin($value));
+        $this->serializer = match ($serializer) {
+            SerializerType::SERIALIZE => fn ($v) => new ByteA(\serialize($v)),
+            SerializerType::IGBINARY => fn ($v) => new ByteA(\igbinary_serialize($v)),
+            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::STRING => strval(...),
+        };
+        $this->deserializer = match ($serializer) {
+            SerializerType::SERIALIZE => \unserialize(...),
+            SerializerType::IGBINARY => \igbinary_unserialize(...),
+            SerializerType::JSON => fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => fn ($v) => $v,
+        };
     }
-
-    protected function serialize(mixed $value): string
-    {
-        return \bin2hex(parent::serialize($value));
-    }
-
     /**
      * Create table for property.
      */
@@ -111,7 +116,7 @@ class PostgresArray extends SqlArray
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
             (
                 \"key\" VARCHAR(255) PRIMARY KEY NOT NULL,
-                \"value\" TEXT NOT NULL
+                \"value\" BYTEA NOT NULL
             );            
         ");
     }

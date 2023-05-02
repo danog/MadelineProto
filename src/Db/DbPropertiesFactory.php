@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
+use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
-use danog\MadelineProto\Settings\Database\PersistentDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\Database\SerializerType;
@@ -14,12 +14,13 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
 /**
+ * @psalm-type TOrmConfig=array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int}
  * This factory class initializes the correct database backend for MadelineProto.
  */
 abstract class DbPropertiesFactory
 {
     /**
-     * @param SerializerType | array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int} $config
+     * @param TOrmConfig|'array' $config
      * @return DbType
      * @internal
      * @uses \danog\MadelineProto\Db\MemoryArray
@@ -27,25 +28,22 @@ abstract class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, SerializerType|array $config, ?DbType $value = null)
+    public static function get(DatabaseAbstract $dbSettings, string $table, string|array $config, ?DbType $value = null)
     {
+        if ($config === 'array') {
+            $config = [];
+        }
         $dbSettingsCopy = clone $dbSettings;
         $class = __NAMESPACE__;
 
-        if ($dbSettingsCopy instanceof PersistentDatabaseAbstract) {
-            if ($config instanceof SerializerType) {
-                $config = [
-                    'serializer' => $config
-                ];
-            }
-
-            $config = array_merge([
+        if ($dbSettingsCopy instanceof DriverDatabaseAbstract) {
+            $config = \array_merge([
                 'serializer' => $dbSettings->getSerializer(),
                 'enableCache' => true,
                 'cacheTtl' => $dbSettings->getCacheTtl(),
             ], $config);
 
-            $class = $dbSettings instanceof PersistentDatabaseAbstract && (!($config['enableCache'] ?? true) || !$config['cacheTtl'])
+            $class = $dbSettings instanceof DriverDatabaseAbstract && (!($config['enableCache'] ?? true) || !$config['cacheTtl'])
                 ? __NAMESPACE__ . '\\NullCache'
                 : __NAMESPACE__;
 

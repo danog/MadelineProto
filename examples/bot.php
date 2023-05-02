@@ -57,7 +57,7 @@ class MyEventHandler extends EventHandler
      * @see https://docs.madelineproto.xyz/docs/DATABASE.html
      */
     protected static array $dbProperties = [
-        'dataStoredOnDb' => 'array',
+        'dataStoredOnDb' => [],
     ];
 
     /**

@@ -124,10 +124,11 @@ final class SessionPaths
             Logger::log("Got exclusive lock of $path.lock...");
 
             $object = Serialization::PHP_HEADER
-                .\chr(Serialization::VERSION)
+                .\chr(Serialization::VERSION_SERIALIZATION_AWARE)
                 .\chr(PHP_MAJOR_VERSION)
                 .\chr(PHP_MINOR_VERSION)
-                .\serialize($object);
+                .\chr(Magic::$can_use_igbinary ? 1 : 0)
+                .(Magic::$can_use_igbinary ? \igbinary_serialize($object) : \serialize($object));
 
             write(
                 "$path.temp.php",
@@ -170,7 +171,7 @@ final class SessionPaths
 
             $file->seek($headerLen++);
             $v = \ord($file->read(null, 1));
-            if ($v === Serialization::VERSION) {
+            if ($v >= Serialization::VERSION_OLD) {
                 $php = $file->read(null, 2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
@@ -179,7 +180,16 @@ final class SessionPaths
                 }
                 $headerLen += 2;
             }
-            $unserialized = \unserialize($file->read(null, $size - $headerLen) ?? '');
+            $igbinary = false;
+            if ($v >= Serialization::VERSION_SERIALIZATION_AWARE) {
+                $igbinary = (bool) \ord($file->read(null, 1));
+                if ($igbinary && !Magic::$can_use_igbinary) {
+                    throw Exception::extension('igbinary');
+                }
+                $headerLen++;
+            }
+            $unserialized = $file->read(null, $size - $headerLen) ?? '';
+            $unserialized = $igbinary ? \igbinary_unserialize($unserialized) : \unserialize($unserialized);
             $file->close();
         } finally {
             $unlock();

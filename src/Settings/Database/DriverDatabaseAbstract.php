@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Settings\DatabaseAbstract as SettingsDatabaseAbstract;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
  * Base class for database backends.
  */
-abstract class PersistentDatabaseAbstract extends SettingsDatabaseAbstract
+abstract class DriverDatabaseAbstract extends DatabaseAbstract
 {
     /**
      * For how long to keep records in memory after last read, for cached backends.
@@ -21,7 +21,7 @@ abstract class PersistentDatabaseAbstract extends SettingsDatabaseAbstract
     protected string $password = '';
 
     /**
-     * Which serializer strategy use by default
+     * Which serializer strategy to use by default.
      */
     protected SerializerType $serializer = SerializerType::SERIALIZE;
 
@@ -31,7 +31,6 @@ abstract class PersistentDatabaseAbstract extends SettingsDatabaseAbstract
             'database',
             'password',
             'cache_ttl',
-            'serializer',
         ]) as $object => $array) {
             if (isset($settings[$array])) {
                 $this->{$object}($settings[$array]);
@@ -110,7 +109,6 @@ abstract class PersistentDatabaseAbstract extends SettingsDatabaseAbstract
      * Set database URI.
      */
     abstract public function setUri(string $uri): self;
-
 
     public function getSerializer(): SerializerType
     {

@@ -66,7 +66,7 @@ abstract class SqlArray extends DriverArray
     public function getIterator(): \Traversable
     {
         foreach ($this->execute($this->queries[self::SQL_ITERATE]) as ['key' => $key, 'value' => $value]) {
-            yield $key => $this->unserialize($value);
+            yield $key => ($this->deserializer)($value);
         }
     }
 
@@ -86,7 +86,7 @@ abstract class SqlArray extends DriverArray
             return null;
         }
 
-        $value = $this->unserialize($row['value']);
+        $value = ($this->deserializer)($row['value']);
         $this->setCache($key, $value);
 
         return $value;
@@ -105,7 +105,7 @@ abstract class SqlArray extends DriverArray
             $this->queries[self::SQL_SET],
             [
                 'index' => $key,
-                'value' => $this->serialize($value),
+                'value' => ($this->serializer)($value),
             ],
         );
         $this->setCache($key, $value);
