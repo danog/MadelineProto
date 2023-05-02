@@ -23,9 +23,6 @@ use PDO;
  */
 class PostgresArray extends SqlArray
 {
-    // Legacy
-    protected array $settings;
-
     /**
      * Prepare statements.
      *

@@ -16,8 +16,10 @@ use InvalidArgumentException;
 /**
  * @psalm-import-type TOrmConfig from DbPropertiesTrait
  * This factory class initializes the correct database backend for MadelineProto.
+ * 
+ * @internal
  */
-abstract class DbPropertiesFactory
+final class DbPropertiesFactory
 {
     /**
      * @param TOrmConfig|'array' $config
@@ -30,6 +32,7 @@ abstract class DbPropertiesFactory
      */
     public static function get(DatabaseAbstract $dbSettings, string $table, string|array $config, ?DbType $value = null)
     {
+        // Legacy
         if ($config === 'array') {
             $config = [];
         }

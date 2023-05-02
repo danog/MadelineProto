@@ -192,19 +192,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return ['table', 'dbSettings'];
     }
 
-    public function __wakeup(): void
-    {
-        if (isset($this->settings) && \is_array($this->settings)) {
-            $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();
-            /**
-             * @var SettingsAbstract
-             * @psalm-suppress UndefinedThisPropertyAssignment
-             */
-            $this->dbSettings = new $clazz;
-            $this->dbSettings->mergeArray($this->settings);
-            unset($this->settings);
-        }
-    }
     final public function offsetExists($index): bool
     {
         return $this->isset($index);

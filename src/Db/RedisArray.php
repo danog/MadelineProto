@@ -23,9 +23,6 @@ class RedisArray extends DriverArray
 {
     private RedisRedis $db;
 
-    // Legacy
-    protected array $settings;
-
     /**
      * Initialize on startup.
      */
