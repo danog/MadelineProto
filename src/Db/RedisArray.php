@@ -34,7 +34,7 @@ class RedisArray extends DriverArray
     {
     }
 
-    protected function renameTable(string $from, string $to): void
+    protected function moveDataFromTableToTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";

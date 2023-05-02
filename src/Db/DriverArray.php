@@ -51,7 +51,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     /**
      * Rename table.
      */
-    abstract protected function renameTable(string $from, string $to): void;
+    abstract protected function moveDataFromTableToTable(string $from, string $to): void;
 
     /**
      * Get the value of table.
@@ -125,9 +125,8 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     }
 
     /**
-     * Rename table of old database, if the new one is not a temporary table name.
-     *
-     * Otherwise, simply change name of table in new database to match old table name.
+     * If the new db has a temporary table name, change its table name to match the old table name.
+     * Otherwise rename table of old database.
      *
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
@@ -138,7 +137,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             if ($old->getTable() !== $new->getTable() &&
                 !\str_starts_with($new->getTable(), 'tmp')
             ) {
-                $new->renameTable($old->getTable(), $new->getTable());
+                $new->moveDataFromTableToTable($old->getTable(), $new->getTable());
             } else {
                 $new->setTable($old->getTable());
             }
