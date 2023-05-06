@@ -133,7 +133,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 166;
+    const V = 167;
     /**
      * Release version.
      *
@@ -1236,6 +1236,10 @@ final class MTProto implements TLCallback, LoggerGetter
             if (!isset($this->settings)) {
                 $this->settings = new Settings;
             } else {
+                if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+                    $this->logger->logger("Generic settings have changed!", Logger::WARNING);
+                    $this->upgradeMadelineProto();
+                }
                 return;
             }
         } else {
