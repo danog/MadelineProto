@@ -76,10 +76,10 @@ interface Payments
     /**
      * Generate an [invoice deep link](https://core.telegram.org/api/links#invoice-links).
      *
-     * @param array $invoice_media Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputMedia.html
+     * @param string|array $invoice_media Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputMedia.html
      * @return array{_: 'payments.exportedInvoice', url: string} @see https://docs.madelineproto.xyz/API_docs/types/payments.ExportedInvoice.html
      */
-    public function exportInvoice(array $invoice_media): array;
+    public function exportInvoice(array|string $invoice_media): array;
 
     /**
      * Informs server about a purchase made through the App Store: for official applications only.

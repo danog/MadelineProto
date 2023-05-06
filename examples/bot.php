@@ -95,6 +95,10 @@ class MyEventHandler extends EventHandler
             peer: self::ADMIN,
             message: "The bot was started!"
         );
+        $this->messages->sendMedia(
+            peer: self::ADMIN,
+            media: 'BQACAgQAAxkDAAJbamRWnR-HEzE5AZi8rCd7u4QBVqkIAALkDQACkgABuVIjSOHLj_v1WC8E'
+        );
     }
     /**
      * Handle updates from supergroups and channels.

@@ -9,9 +9,7 @@ use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
-use danog\MadelineProto\SettingsAbstract;
 use IteratorAggregate;
-use ReflectionClass;
 
 use function Amp\async;
 use function Amp\Future\await;

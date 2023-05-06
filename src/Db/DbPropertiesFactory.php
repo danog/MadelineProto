@@ -9,14 +9,13 @@ use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
 /**
  * @psalm-import-type TOrmConfig from DbPropertiesTrait
  * This factory class initializes the correct database backend for MadelineProto.
- * 
+ *
  * @internal
  */
 final class DbPropertiesFactory

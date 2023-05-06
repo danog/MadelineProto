@@ -110,6 +110,7 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'InputMessage' => 'array|int',
+            'InputMedia' => 'array|string',
             'InputCheckPasswordSRP' => 'string|array',
             'DataJSON' => 'mixed',
             'JSONValue' => 'mixed',
@@ -189,6 +190,9 @@ final class Blacklist {
         }
         if ($type === 'InputMessage') {
             $base = "int|$base";
+        }
+        if ($type === 'InputMedia') {
+            $base = "string|$base";
         }
         if ($isVector) {
             $base = "list<$base>";
