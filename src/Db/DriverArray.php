@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
-use danog\MadelineProto\SettingsAbstract;
+use danog\MadelineProto\Settings\Database\SerializerType;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 use IteratorAggregate;
-use ReflectionClass;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -27,6 +28,11 @@ use function Amp\Future\await;
 abstract class DriverArray implements DbArray, IteratorAggregate
 {
     protected string $table;
+    /** @var callable(mixed): mixed */
+    protected $serializer;
+    /** @var callable(string): mixed */
+    protected $deserializer;
+    protected DriverDatabaseAbstract $dbSettings;
 
     use ArrayCacheTrait;
 
@@ -43,7 +49,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     /**
      * Rename table.
      */
-    abstract protected function renameTable(string $from, string $to): void;
+    abstract protected function moveDataFromTableToTable(string $from, string $to): void;
 
     /**
      * Get the value of table.
@@ -74,15 +80,15 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
-    public static function getInstance(string $table, DbType|array|null $previous, $settings): static
+    public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
         $instance->setTable($table);
 
-        /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->dbSettings = $settings;
         $instance->setCacheTtl($settings->getCacheTtl());
+        $instance->setSerializer($settings->getSerializer());
 
         $instance->startCacheCleanupLoop();
 
@@ -100,10 +106,25 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $instance;
     }
 
+    protected function setSerializer(SerializerType $serializer): void
+    {
+        $this->serializer = match ($serializer) {
+            SerializerType::SERIALIZE => \serialize(...),
+            SerializerType::IGBINARY => \igbinary_serialize(...),
+            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::STRING => strval(...),
+        };
+        $this->deserializer = match ($serializer) {
+            SerializerType::SERIALIZE => \unserialize(...),
+            SerializerType::IGBINARY => \igbinary_unserialize(...),
+            SerializerType::JSON => fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => fn ($v) => $v,
+        };
+    }
+
     /**
-     * Rename table of old database, if the new one is not a temporary table name.
-     *
-     * Otherwise, simply change name of table in new database to match old table name.
+     * If the new db has a temporary table name, change its table name to match the old table name.
+     * Otherwise rename table of old database.
      *
      * @param self               $new New db
      * @param DbArray|array|null $old Old db
@@ -114,7 +135,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             if ($old->getTable() !== $new->getTable() &&
                 !\str_starts_with($new->getTable(), 'tmp')
             ) {
-                $new->renameTable($old->getTable(), $new->getTable());
+                $new->moveDataFromTableToTable($old->getTable(), $new->getTable());
             } else {
                 $new->setTable($old->getTable());
             }
@@ -168,19 +189,6 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return ['table', 'dbSettings'];
     }
 
-    public function __wakeup(): void
-    {
-        if (isset($this->settings) && \is_array($this->settings)) {
-            $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();
-            /**
-             * @var SettingsAbstract
-             * @psalm-suppress UndefinedThisPropertyAssignment
-             */
-            $this->dbSettings = new $clazz;
-            $this->dbSettings->mergeArray($this->settings);
-            unset($this->settings);
-        }
-    }
     final public function offsetExists($index): bool
     {
         return $this->isset($index);

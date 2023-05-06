@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Settings\DatabaseAbstract as SettingsDatabaseAbstract;
-
-use function time;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
  * Base class for database backends.
  */
-abstract class DatabaseAbstract extends SettingsDatabaseAbstract
+abstract class DriverDatabaseAbstract extends DatabaseAbstract
 {
     /**
      * For how long to keep records in memory after last read, for cached backends.
@@ -21,6 +19,11 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Database password.
      */
     protected string $password = '';
+
+    /**
+     * Which serializer strategy to use by default.
+     */
+    protected SerializerType $serializer = SerializerType::SERIALIZE;
 
     public function mergeArray(array $settings): void
     {
@@ -106,4 +109,14 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
      * Set database URI.
      */
     abstract public function setUri(string $uri): self;
+
+    public function getSerializer(): SerializerType
+    {
+        return $this->serializer;
+    }
+
+    public function setSerializer(SerializerType $serializer): void
+    {
+        $this->serializer = $serializer;
+    }
 }

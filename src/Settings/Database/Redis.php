@@ -7,7 +7,7 @@ namespace danog\MadelineProto\Settings\Database;
 /**
  * Redis backend settings.
  */
-final class Redis extends DatabaseAbstract
+final class Redis extends DriverDatabaseAbstract
 {
     /**
      * Database number.

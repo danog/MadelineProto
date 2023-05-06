@@ -7,7 +7,7 @@ namespace danog\MadelineProto\Settings\Database;
 /**
  * Generic db backend settings.
  */
-abstract class SqlAbstract extends DatabaseAbstract
+abstract class SqlAbstract extends DriverDatabaseAbstract
 {
     /**
      * Database name.

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Postgres\ByteA;
 use Amp\Postgres\PostgresConfig;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use PDO;
 
 /**
@@ -21,11 +23,6 @@ use PDO;
  */
 class PostgresArray extends SqlArray
 {
-    public DatabasePostgres $dbSettings;
-
-    // Legacy
-    protected array $settings;
-
     /**
      * Prepare statements.
      *
@@ -90,16 +87,21 @@ class PostgresArray extends SqlArray
         }
     }
 
-    protected function getValue(string $value): mixed
+    protected function setSerializer(SerializerType $serializer): void
     {
-        return \unserialize(\hex2bin($value));
+        $this->serializer = match ($serializer) {
+            SerializerType::SERIALIZE => fn ($v) => new ByteA(\serialize($v)),
+            SerializerType::IGBINARY => fn ($v) => new ByteA(\igbinary_serialize($v)),
+            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::STRING => strval(...),
+        };
+        $this->deserializer = match ($serializer) {
+            SerializerType::SERIALIZE => \unserialize(...),
+            SerializerType::IGBINARY => \igbinary_unserialize(...),
+            SerializerType::JSON => fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => fn ($v) => $v,
+        };
     }
-
-    protected function setValue(mixed $value): string
-    {
-        return \bin2hex(\serialize($value));
-    }
-
     /**
      * Create table for property.
      */
@@ -111,12 +113,12 @@ class PostgresArray extends SqlArray
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
             (
                 \"key\" VARCHAR(255) PRIMARY KEY NOT NULL,
-                \"value\" TEXT NOT NULL
+                \"value\" BYTEA NOT NULL
             );            
         ");
     }
 
-    protected function renameTable(string $from, string $to): void
+    protected function moveDataFromTableToTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 

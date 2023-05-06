@@ -48,7 +48,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\SecretChats\MessageHandler;
 use danog\MadelineProto\SecretChats\ResponseHandler;
 use danog\MadelineProto\SecretChats\SeqNoHandler;
-use danog\MadelineProto\Settings\Database\Memory;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -139,7 +139,7 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @var string
      */
-    const RELEASE = '7.0';
+    const RELEASE = '8.0';
     /**
      * We're not logged in.
      *
@@ -502,15 +502,12 @@ final class MTProto implements TLCallback, LoggerGetter
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'chats' => 'array',
-        'full_chats' => 'array',
-        'sponsoredMessages' => 'array',
-        'channelParticipants' => 'array',
-        'usernames' => 'array',
-        'session' => [
-            'type' => 'array',
-            'config' => ['enableCache' => false],
-        ],
+        'chats' => ['serializer' => SerializerType::SERIALIZE],
+        'full_chats' => ['serializer' => SerializerType::SERIALIZE],
+        'sponsoredMessages' => ['serializer' => SerializerType::SERIALIZE],
+        'channelParticipants' => ['serializer' => SerializerType::SERIALIZE],
+        'usernames' => ['serializer' => SerializerType::SERIALIZE],
+        'session' => ['serializer' => SerializerType::SERIALIZE, 'enableCache' => false],
     ];
 
     /**

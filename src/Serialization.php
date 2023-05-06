@@ -30,6 +30,7 @@ use Amp\TimeoutException;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use Revolt\EventLoop;
 use Throwable;
@@ -50,11 +51,9 @@ abstract class Serialization
     /**
      * Header for session files.
      */
-    const PHP_HEADER = '<?php __HALT_COMPILER();';
-    /**
-     * Serialization version.
-     */
-    const VERSION = 2;
+    public const PHP_HEADER = '<?php __HALT_COMPILER();';
+    public const VERSION_OLD = 2;
+    public const VERSION_SERIALIZATION_AWARE = 3;
 
     /**
      * Unserialize session.
@@ -216,7 +215,7 @@ abstract class Serialization
                 $unserialized = DbPropertiesFactory::get(
                     $settings,
                     $tableName,
-                    DbPropertiesFactory::TYPE_ARRAY,
+                    ['serializer' => SerializerType::SERIALIZE],
                     $unserialized,
                 );
             } else {

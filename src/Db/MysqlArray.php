@@ -22,11 +22,6 @@ use PDO;
  */
 class MysqlArray extends SqlArray
 {
-    protected DatabaseMysql $dbSettings;
-
-    // Legacy
-    protected array $settings;
-
     /**
      * Initialize on startup.
      */
@@ -108,7 +103,7 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    protected function renameTable(string $from, string $to): void
+    protected function moveDataFromTableToTable(string $from, string $to): void
     {
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 

@@ -83,6 +83,11 @@ final class Magic
      */
     public static bool $can_getcwd = false;
     /**
+     * Whether we can use igbinary.
+     *
+     */
+    public static bool $can_use_igbinary = false;
+    /**
      * Whether we've processed forks.
      *
      */
@@ -224,6 +229,7 @@ final class Magic
             Shutdown::init();
             \set_error_handler(Exception::exceptionErrorHandler(...));
             \set_exception_handler(Exception::exceptionHandler(...));
+            self::$can_use_igbinary = \function_exists('igbinary_serialize');
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             // Important, obtain root relative to caller script
             $backtrace = \debug_backtrace(0);
