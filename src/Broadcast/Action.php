@@ -30,9 +30,9 @@ interface Action
     /**
      * Do something with a single peer.
      *
-     * @param integer      $broadcastId Broadcast ID
-     * @param integer      $peer Broadcast peer
-     * @param Cancellation $peer Cancellation token
+     * @param integer      $broadcastId  Broadcast ID
+     * @param integer      $peer         Broadcast peer
+     * @param Cancellation $cancellation Cancellation token
      */
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void;
 }

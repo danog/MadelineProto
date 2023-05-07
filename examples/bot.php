@@ -17,6 +17,8 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use danog\MadelineProto\Broadcast\Progress;
+use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
@@ -49,11 +51,14 @@ class MyEventHandler extends EventHandler
     /**
      * List of properties automatically stored in database (MySQL, Postgres, redis or memory).
      *
-     * Note that **all** properties will be stored in the database, regardless of whether they're specified here.
+     * Note that **all** class properties will be stored in the database, regardless of whether they're specified here.
      * The only difference is that properties *not* specified in this array will also always have a full copy in RAM.
      *
      * Also, properties specified in this array are NOT thread-safe, meaning you should also use a synchronization primitive
-     * from https://github.com/amphp/sync/ to use them in a thread-safe manner.
+     * from https://github.com/amphp/sync/ to use them in a thread-safe manner (i.e. when checking-and-setting with isset=>set, et cetera).
+     *
+     * Remember: **ALL** onUpdate... handler methods are called in separate green threads, so at the end of the day,
+     * unless your property is too large to be comfortably stored in memory (say >100MB), you should use normal properties to avoid race conditions.
      *
      * @see https://docs.madelineproto.xyz/docs/DATABASE.html
      */
@@ -62,15 +67,26 @@ class MyEventHandler extends EventHandler
     ];
 
     /**
+     * Use this *only* if the data you will store here is huge (>100MB).
      * @var DbArray<array-key, array>
      */
     protected DbArray $dataStoredOnDb;
+
+    /**
+     * Otherwise use this.
+     * This property is also saved in the db, but it's also always kept in memory, unlike $dataStoredInDb which is exclusively stored in the db.
+     */
+    protected array $dataAlsoStoredOnDbAndInRam = [];
+
     /**
      * This property is also saved in the db, but it's also always kept in memory, unlike $dataStoredInDb which is exclusively stored in the db.
      * @var array<int, bool>
      */
     protected array $notifiedChats = [];
 
+    /**
+     * This property is also saved in the db, but it's also always kept in memory, unlike $dataStoredInDb which is exclusively stored in the db.
+     */
     private int $adminId;
 
     /**
@@ -91,11 +107,30 @@ class MyEventHandler extends EventHandler
         $this->logger($this->getFullInfo('MadelineProto'));
         $this->adminId = $this->getId(self::ADMIN);
 
+        if ($this->getSelf()['bot'] && $this->getSelf()['id'] === $this->adminId) {
+            return;
+        }
         $this->messages->sendMessage(
             peer: self::ADMIN,
             message: "The bot was started!"
         );
     }
+
+    private int $lastLog = 0;
+    /**
+     * Handles updates to an in-progress broadcast.
+     */
+    public function onUpdateBroadcastProgress(Progress $progress): void
+    {
+        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
+            $this->lastLog = time();
+            $this->messages->sendMessage(
+                peer: self::ADMIN,
+                message: (string) $progress
+            );
+        }
+    }
+
     /**
      * Handle updates from supergroups and channels.
      *
@@ -152,38 +187,28 @@ class MyEventHandler extends EventHandler
             $this->restart();
         }
 
+        // We can broadcast messages to all users.
+        if ($update['message']['message'] === '/broadcast'
+            && $from_id === $this->adminId
+        ) {
+            if (!isset($update['message']['reply_to']['reply_to_msg_id'])) {
+                $this->messages->sendMessage(
+                    peer: $update,
+                    message: "You should reply to the message you want to broadcast.",
+                    reply_to_msg_id: $update['message']['id'] ?? null,
+                );
+                return;
+            }
+            $this->broadcastForwardMessages(
+                from_peer: $update,
+                ids: [$update['message']['reply_to']['reply_to_msg_id']],
+                drop_author: true,
+            );
+            return;
+        }
+
         if (($update['message']['message'] ?? '') === 'ping') {
             $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
-        }
-
-        // Remove the following example code when running your bot
-
-        // Test MadelineProto's built-in database driver, which automatically maps to MySQL/PostgreSQL/Redis
-        // properties mentioned in the MyEventHandler::$dbProperties property!
-
-        // Note that **all** properties will be stored in the database, regardless of whether they're specified in $dbProperties
-        // The only difference is that properties *not* specified in $dbProperties will also always have a full copy in RAM.
-        //
-        // Also, properties specified in $dbProperties are NOT thread-safe, meaning you should also use a synchronization primitive
-        // from https://github.com/amphp/sync/ to use them in a thread-safe manner.
-        //
-        // Can be anything serializable: an array, an int, an object, ...
-        $myData = [];
-
-        if (isset($this->dataStoredOnDb['k1'])) {
-            $myData = $this->dataStoredOnDb['k1'];
-        }
-        $this->dataStoredOnDb['k1'] = $myData + ['moreStuff' => 'yay'];
-
-        $this->dataStoredOnDb['k2'] = 0;
-        unset($this->dataStoredOnDb['k2']);
-
-        $this->logger("Count: ".count($this->dataStoredOnDb));
-
-        // You can even iterate over the data
-        foreach ($this->dataStoredOnDb as $key => $value) {
-            $this->logger($key);
-            $this->logger($value);
         }
     }
 }
