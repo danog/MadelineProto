@@ -24,7 +24,6 @@ use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
-use Throwable;
 
 /** @internal */
 final class ActionForward implements Action

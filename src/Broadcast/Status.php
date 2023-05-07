@@ -23,7 +23,7 @@ namespace danog\MadelineProto\Broadcast;
 /**
  * Broadcast status.
  */
-enum Status : string
+enum Status: string
 {
     case GATHERING_PEERS = 'gathering peer information';
     case BROADCASTING = 'broadcasting';

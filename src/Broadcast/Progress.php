@@ -35,7 +35,7 @@ final class Progress implements JsonSerializable
         public readonly int $successCount,
         public readonly int $failCount,
     ) {
-        $this->percent = $pendingCount ? (int)(($successCount+$failCount)*100/$pendingCount) : 0;
+        $this->percent = $pendingCount ? (int) (($successCount+$failCount)*100/$pendingCount) : 0;
     }
     public function jsonSerialize(): mixed
     {
