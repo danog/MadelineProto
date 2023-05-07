@@ -105,6 +105,9 @@ trait UpdateHandler
         if (!isset($this->eventHandlerMethods[$update['_']])) {
             return;
         }
+        if ($update['_'] === 'updateBroadcastProgress') {
+            $update = $update['progress'];
+        }
         if ($f = $this->event_handler_instance->waitForStartInternal()) {
             $this->updates[$this->updates_key++] = $update;
             $f->map(function (): void {

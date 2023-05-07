@@ -25,6 +25,7 @@ use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Amp\Sync\LocalMutex;
+use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
@@ -103,6 +104,7 @@ final class MTProto implements TLCallback, LoggerGetter
     use Start;
     use Templates;
     use DbPropertiesTrait;
+    use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
     private const RSA_KEYS = [
@@ -698,6 +700,7 @@ final class MTProto implements TLCallback, LoggerGetter
             'last_stored',
             'qres',
             'supportUser',
+            'broadcasts',
 
             // Event handler
             'event_handler',
@@ -1135,6 +1138,10 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->updaters[UpdateLoop::GENERIC]->resume();
         }
         $this->updaters[UpdateLoop::GENERIC]->start();
+
+        foreach ($this->broadcasts as $broadcast) {
+            $broadcast->resume();
+        }
 
         $deferred->complete();
     }
@@ -1684,9 +1691,17 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
         }
+        $selfBot = $this->getSelf()['bot'];
         foreach ($userOrId as $k => &$peer) {
             try {
-                $peer = ($this->getInfo($peer))['bot_api_id'];
+                $peer = $this->getInfo($peer);
+                $type = $peer['type'];
+                $peer = $peer['bot_api_id'];
+                if ($type === 'bot' && $selfBot) {
+                    unset($userOrId[$k]);
+                    $this->logger("Can't use a bot as report peer: $peer", Logger::FATAL_ERROR);
+                    continue;
+                }
             } catch (Throwable $e) {
                 unset($userOrId[$k]);
                 $this->logger("Could not obtain info about report peer $peer: $e", Logger::FATAL_ERROR);

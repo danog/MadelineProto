@@ -229,6 +229,23 @@ abstract class InternalDoc
     {
         return $this->wrapper->getAPI()->botLogin($token);
     }
+
+    public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action): int
+    {
+        return $this->wrapper->getAPI()->broadcastCustom($action);
+    }
+    /**
+     * @param list<int> $ids
+     */
+    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false): int
+    {
+        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $ids, $drop_author);
+    }
+
+    public function broadcastMessages(array $messages): int
+    {
+        return $this->wrapper->getAPI()->broadcastMessages($messages);
+    }
     /**
      * Convert generator, promise or any other value to a promise.
      *
@@ -272,6 +289,15 @@ abstract class InternalDoc
     public function callStatus(int $id): int
     {
         return $this->wrapper->getAPI()->callStatus($id);
+    }
+    /**
+     * Cancel a running broadcast.
+     *
+     * @param integer $id Broadcast ID
+     */
+    public function cancelBroadcast(int $id): void
+    {
+        $this->wrapper->getAPI()->cancelBroadcast($id);
     }
     /**
      * Close connection with client, connected via web.
@@ -589,6 +615,19 @@ abstract class InternalDoc
     public function getAuthorization(): int
     {
         return $this->wrapper->getAPI()->getAuthorization();
+    }
+    /**
+     * Get the progress of a currently running broadcast.
+     *
+     * Will return null if the broadcast doesn't exist, has already completed or was cancelled.
+     *
+     * Use updateBroadcastProgress updates to get real-time progress status without polling.
+     *
+     * @param integer $id Broadcast ID
+     */
+    public function getBroadcastProgress(int $id): ?\danog\MadelineProto\Broadcast\Progress
+    {
+        return $this->wrapper->getAPI()->getBroadcastProgress($id);
     }
     /**
      * Get cached server-side config.

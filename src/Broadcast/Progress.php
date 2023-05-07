@@ -18,18 +18,31 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto\Broadcast;
+
+use JsonSerializable;
 
 /**
- * Manages broadcasts.
- *
- * @internal
+ * Broadcast progress.
  */
-trait Broadcast
+final class Progress implements JsonSerializable
 {
-    public function broadcastMessage(...$args): void
+    public readonly int $percent;
+    public function __construct(
+        public readonly int $broadcastId,
+        public readonly Status $status,
+        public readonly int $pendingCount,
+        public readonly int $successCount,
+        public readonly int $failCount,
+    ) {
+        $this->percent = $pendingCount ? (int)(($successCount+$failCount)*100/$pendingCount) : 0;
+    }
+    public function jsonSerialize(): mixed
     {
-        foreach ($this->getDialogIds() as $id) {
-        }
+        return \get_object_vars($this);
+    }
+    public function __toString()
+    {
+        return "Progress for {$this->broadcastId}: {$this->percent}%, status {$this->status->value}, sent to {$this->successCount} peers, failed sending to {$this->failCount} peers, {$this->pendingCount} peers left.";
     }
 }
