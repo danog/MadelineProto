@@ -99,13 +99,4 @@ abstract class SettingsAbstract
         $this->changed = false;
         return $this;
     }
-
-    /**
-     * @deprecated
-     * @return static
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        return $this;
-    }
 }

@@ -39,7 +39,8 @@ final class DocsBuilder
         'InputMedia' => ['InputMedia'],
         'InputMessage' => ['InputMessage'],
         'KeyboardButton' => ['KeyboardButton'],
-        'InputCheckPasswordSRP' => ['InputCheckPasswordSRP']
+        'InputCheckPasswordSRP' => ['InputCheckPasswordSRP'],
+        'Updates' => ['Updates'],
     ];
     use Methods;
     use Constructors;

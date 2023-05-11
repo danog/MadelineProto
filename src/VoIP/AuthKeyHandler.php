@@ -281,9 +281,9 @@ trait AuthKeyHandler
             $this->logger->logger(\sprintf(Lang::$current_lang['call_debug_saving'], $call['id']), Logger::VERBOSE);
             $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
         }
-        $call = $this->calls[$call['id']];
+        $c = $this->calls[$call['id']];
         unset($this->calls[$call['id']]);
-        return $call;
+        return $c;
     }
     /**
      * Check state of calls.
