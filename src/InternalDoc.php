@@ -957,7 +957,7 @@ abstract class InternalDoc
      *
      * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages(array|string|int $peer): array
+    public function getSponsoredMessages(array|string|int $peer): ?array
     {
         return $this->wrapper->getAPI()->getSponsoredMessages($peer);
     }

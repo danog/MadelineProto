@@ -39,7 +39,7 @@ trait Ads
      *
      * @param int|string|array $peer Channel ID, or Update, or Message, or Peer.
      */
-    public function getSponsoredMessages(int|string|array $peer): array
+    public function getSponsoredMessages(int|string|array $peer): ?array
     {
         $peer = ($this->getInfo($peer))['bot_api_id'];
         $cache = $this->sponsoredMessages[$peer];
