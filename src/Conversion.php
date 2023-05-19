@@ -38,7 +38,6 @@ final class Conversion
     public static function importAuthorization(array $authorization, int $main_dc_id, string $session, SettingsAbstract|array $settings): API
     {
         $settings = Settings::parseFromLegacyFull($settings);
-        $settings->getIpc()->setSlow(true);
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
         $settings->getAuth()->setPfs(true);
         $MadelineProto = new API($session, $settings);

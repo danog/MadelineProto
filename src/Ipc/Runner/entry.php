@@ -109,7 +109,7 @@ use Webmozart\Assert\Assert;
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
             $session = new SessionPaths($session);
-            $API = new API((string) $session, (new Ipc)->setSlow(true));
+            $API = new API((string) $session, new Ipc);
             $API->initSelfRestart();
             $session->storeIpcState(new IpcState($runnerId));
             while (true) {
