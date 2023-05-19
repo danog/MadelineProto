@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\MysqlConfig;
+use Amp\Sql\Result;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -22,6 +23,9 @@ use PDO;
  */
 class MysqlArray extends SqlArray
 {
+    // We're forced to use quoting (just like PDO does internally when using prepares) because native MySQL prepares are extremely slow.
+    protected PDO $pdo;
+    
     /**
      * Initialize on startup.
      */
@@ -67,6 +71,21 @@ class MysqlArray extends SqlArray
         throw new Exception("An invalid statement type $type was provided!");
     }
 
+    /**
+     * Perform async request to db.
+     *
+     * @psalm-param self::STATEMENT_* $stmt
+     */
+    protected function execute(string $sql, array $params = []): Result
+    {
+        foreach ($params as $key => $value) {
+            $value = $this->pdo->quote($value);
+            $sql = \str_replace(":$key", $value, $sql);
+        }
+
+        return $this->db->query($sql);
+    }
+    
     /**
      * Initialize connection.
      */

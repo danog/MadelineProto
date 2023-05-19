@@ -20,8 +20,6 @@ use PDO;
 abstract class SqlArray extends DriverArray
 {
     protected Pool $db;
-    //Pdo driver used for value quoting, to prevent sql injections.
-    protected PDO $pdo;
 
     protected const SQL_GET = 0;
     protected const SQL_SET = 1;
@@ -157,11 +155,6 @@ abstract class SqlArray extends DriverArray
      */
     protected function execute(string $sql, array $params = []): Result
     {
-        foreach ($params as $key => $value) {
-            $value = $this->pdo->quote($value);
-            $sql = \str_replace(":$key", $value, $sql);
-        }
-
-        return $this->db->query($sql);
+        return $this->db->prepare($sql)->execute($params);
     }
 }
