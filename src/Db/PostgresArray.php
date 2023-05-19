@@ -74,17 +74,7 @@ class PostgresArray extends SqlArray
      */
     public function initConnection(DatabasePostgres $settings): void
     {
-        $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
-        $host = $config->getHost();
-        $port = $config->getPort();
-        $this->pdo = new PDO(
-            "pgsql:host={$host};port={$port}",
-            $settings->getUsername(),
-            $settings->getPassword(),
-        );
-        if (!isset($this->db)) {
-            $this->db = Postgres::getConnection($settings);
-        }
+        $this->db ??= Postgres::getConnection($settings);
     }
 
     protected function setSerializer(SerializerType $serializer): void
@@ -92,8 +82,8 @@ class PostgresArray extends SqlArray
         $this->serializer = match ($serializer) {
             SerializerType::SERIALIZE => fn ($v) => new ByteA(\serialize($v)),
             SerializerType::IGBINARY => fn ($v) => new ByteA(\igbinary_serialize($v)),
-            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-            SerializerType::STRING => strval(...),
+            SerializerType::JSON => fn ($v) => new ByteA(\json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
+            SerializerType::STRING => fn ($v) => new ByteA(strval($v)),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),

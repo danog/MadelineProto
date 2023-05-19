@@ -75,11 +75,7 @@ abstract class SqlArray extends DriverArray
             return $this->getCache($key);
         }
 
-        $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key]);
-        /*if (!$row->getRowCount()) {
-            return null;
-        }*/
-        $row = $row->fetchRow();
+        $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key])->fetchRow();
         if ($row === null) {
             return null;
         }
