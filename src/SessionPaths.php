@@ -36,9 +36,7 @@ use function Amp\File\isDirectory;
 use function Amp\File\isFile;
 use function Amp\File\move;
 use function Amp\File\openFile;
-use function Amp\File\touch;
 use function Amp\File\write;
-use function serialize;
 
 /**
  * Session path information.
@@ -163,7 +161,7 @@ final class SessionPaths
 
             $file = openFile($path, 'rb');
             try {
-                touch($path); // Invalidate size cache
+                \touch($path); // Invalidate size cache
             } catch (\Throwable) {
             }
             $size = getStatus($path);

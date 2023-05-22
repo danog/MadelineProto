@@ -45,10 +45,8 @@ use function Amp\File\deleteFile;
 use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
-use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
 use function Amp\Future\awaitFirst;
-use function end;
 
 /**
  * Manages upload and download of files.
@@ -802,7 +800,7 @@ trait Files
         }
         $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
         if (!exists($file)) {
-            touchAsync($file);
+            \touch($file);
         }
         $file = \realpath($file);
         $messageMedia = ($this->getDownloadInfo($messageMedia));

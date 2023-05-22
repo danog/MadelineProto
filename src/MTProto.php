@@ -70,7 +70,6 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\File\getSize;
-use function Amp\File\touch as touchAsync;
 use function Amp\Future\await;
 
 use function time;
@@ -1728,7 +1727,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $file = null;
             if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
                 && $path = $this->settings->getLogger()->getExtra()) {
-                touchAsync($path);
+                \touch($path);
                 if (!getSize($path)) {
                     $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
                 } else {
