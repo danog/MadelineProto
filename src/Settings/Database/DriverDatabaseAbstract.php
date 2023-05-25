@@ -68,7 +68,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * @param int|string $cacheTtl For how long to keep records in memory after last read, for cached backends.
      */
-    public function setCacheTtl(int|string $cacheTtl): self
+    public function setCacheTtl(int|string $cacheTtl): static
     {
         $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : \strtotime($cacheTtl) - \time();
 
@@ -88,7 +88,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * @param string $password Password.
      */
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
@@ -108,7 +108,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
     /**
      * Set database URI.
      */
-    abstract public function setUri(string $uri): self;
+    abstract public function setUri(string $uri): static;
 
     public function getSerializer(): SerializerType
     {

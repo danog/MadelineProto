@@ -62,7 +62,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param int $maxConnections Maximum connection limit.
      */
-    public function setMaxConnections(int $maxConnections): self
+    public function setMaxConnections(int $maxConnections): static
     {
         $this->maxConnections = $maxConnections;
 
@@ -82,7 +82,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param int $idleTimeout Idle timeout.
      */
-    public function setIdleTimeout(int $idleTimeout): self
+    public function setIdleTimeout(int $idleTimeout): static
     {
         $this->idleTimeout = $idleTimeout;
 
@@ -102,7 +102,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param string $database Database name.
      */
-    public function setDatabase(string $database): self
+    public function setDatabase(string $database): static
     {
         $this->database = $database;
 
@@ -122,7 +122,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param string $username Username.
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -142,7 +142,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param string $uri Database URI.
      */
-    public function setUri(string $uri): self
+    public function setUri(string $uri): static
     {
         $this->uri = $uri;
 

@@ -99,7 +99,19 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }
-            static::renameTmpTable($instance, $previous);
+
+            // If the new db has a temporary table name, change its table name to match the old table name.
+            // Otherwise rename table of old database.
+            if ($previous instanceof SqlArray && $previous->getTable()) {
+                if ($previous->getTable() !== $instance->getTable() &&
+                    !\str_starts_with($instance->getTable(), 'tmp')
+                ) {
+                    $instance->moveDataFromTableToTable($previous->getTable(), $instance->getTable());
+                } else {
+                    $instance->setTable($previous->getTable());
+                }
+            }
+
             static::migrateDataToDb($instance, $previous);
         }
 
@@ -121,28 +133,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             SerializerType::STRING => fn ($v) => $v,
         };
     }
-
-    /**
-     * If the new db has a temporary table name, change its table name to match the old table name.
-     * Otherwise rename table of old database.
-     *
-     * @param self               $new New db
-     * @param DbArray|array|null $old Old db
-     */
-    protected static function renameTmpTable(self $new, DbArray|array|null $old): void
-    {
-        if ($old instanceof SqlArray && $old->getTable()) {
-            if ($old->getTable() !== $new->getTable() &&
-                !\str_starts_with($new->getTable(), 'tmp')
-            ) {
-                $new->moveDataFromTableToTable($old->getTable(), $new->getTable());
-            } else {
-                $new->setTable($old->getTable());
-            }
-        }
-    }
-
-    protected static function migrateDataToDb(self $new, DbArray|array|null $old): void
+    private static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
         if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             if (!$old instanceof DbArray) {
