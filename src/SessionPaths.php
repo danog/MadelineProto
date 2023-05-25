@@ -31,7 +31,6 @@ use const PHP_VERSION;
 use function Amp\File\createDirectory;
 use function Amp\File\deleteFile;
 use function Amp\File\exists;
-use function Amp\File\getStatus;
 use function Amp\File\isDirectory;
 use function Amp\File\isFile;
 use function Amp\File\move;
@@ -160,12 +159,9 @@ final class SessionPaths
             Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
             $file = openFile($path, 'rb');
-            try {
-                \touch($path); // Invalidate size cache
-            } catch (\Throwable) {
-            }
-            $size = getStatus($path);
-            $size = $size['size'] ?? $headerLen;
+
+            \clearstatcache(true, $path);
+            $size = \filesize($path);
 
             $file->seek($headerLen++);
             $v = \ord($file->read(null, 1));

@@ -42,7 +42,6 @@ use Throwable;
 use const LOCK_EX;
 use function Amp\async;
 use function Amp\File\deleteFile;
-use function Amp\File\exists;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\Future\await;
@@ -799,7 +798,7 @@ trait Files
             $file = $file->getFile();
         }
         $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
-        if (!exists($file)) {
+        if (!\file_exists($file)) {
             \touch($file);
         }
         $file = \realpath($file);
