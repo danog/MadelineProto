@@ -14,8 +14,8 @@ interface Account
      *
      * @param bool $app_sandbox If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, a sandbox-certificate will be used during transmission.
      * @param bool $no_muted Avoid receiving (silent and invisible background) notifications. Useful to save battery.
-     * @param int $token_type Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
-     * @param string $token Device token
+     * @param int $token_type Device token type, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
+     * @param string $token Device token, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
      * @param string $secret For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
      * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
      */
@@ -24,8 +24,8 @@ interface Account
     /**
      * Deletes a device by its token, stops sending PUSH-notifications to it.
      *
-     * @param int $token_type Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
-     * @param string $token Device token
+     * @param int $token_type Device token type, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
+     * @param string $token Device token, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
      * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
      */
     public function unregisterDevice(int $token_type = 0, string $token = '', array $other_uids = []): bool;
@@ -308,7 +308,7 @@ interface Account
     /**
      * Send an email verification code.
      *
-     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
+     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose Verification purpose. @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
      * @param string $email The email where to send the code.
      * @return array{_: 'account.sentEmailCode', email_pattern: string, length: int} @see https://docs.madelineproto.xyz/API_docs/types/account.SentEmailCode.html
      */
@@ -317,8 +317,8 @@ interface Account
     /**
      * Verify an email address.
      *
-     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
-     * @param array{_: 'emailVerificationCode', code?: string}|array{_: 'emailVerificationGoogle', token?: string}|array{_: 'emailVerificationApple', token?: string} $verification @see https://docs.madelineproto.xyz/API_docs/types/EmailVerification.html
+     * @param array{_: 'emailVerifyPurposeLoginSetup', phone_number?: string, phone_code_hash?: string}|array{_: 'emailVerifyPurposeLoginChange'}|array{_: 'emailVerifyPurposePassport'} $purpose Verification purpose @see https://docs.madelineproto.xyz/API_docs/types/EmailVerifyPurpose.html
+     * @param array{_: 'emailVerificationCode', code?: string}|array{_: 'emailVerificationGoogle', token?: string}|array{_: 'emailVerificationApple', token?: string} $verification Email verification code or token @see https://docs.madelineproto.xyz/API_docs/types/EmailVerification.html
      * @return array{_: 'account.emailVerified', email: string}|array{_: 'account.emailVerifiedLogin', sent_code: array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period: int, reset_pending_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce: string, receipt: string, push_timeout: int, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', user: array|int|string, setup_password_required: bool, otherwise_relogin_days: int, tmp_sessions: int, future_auth_token: string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>, min_age_confirm: int}}}, email: string} @see https://docs.madelineproto.xyz/API_docs/types/account.EmailVerified.html
      */
     public function verifyEmail(array $purpose, array $verification): array;
@@ -398,6 +398,7 @@ interface Account
      *
      * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int} $settings Wallpaper settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     * @param bool $for_chat Set this flag when uploading wallpapers to be passed to [messages.setChatWallPaper](https://docs.madelineproto.xyz/API_docs/methods/messages.setChatWallPaper.html).
      * @param string $mime_type MIME type of uploaded wallpaper
      * @return array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}} @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
      */
@@ -628,69 +629,86 @@ interface Account
     public function uploadRingtone(mixed $file, string $file_name = '', string $mime_type = ''): array;
 
     /**
+     * Set an [emoji status](https://core.telegram.org/api/emoji-status).
      *
-     *
-     * @param array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id?: int}|array{_: 'emojiStatusUntil', document_id?: int, until?: int} $emoji_status @see https://docs.madelineproto.xyz/API_docs/types/EmojiStatus.html
+     * @param array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id?: int}|array{_: 'emojiStatusUntil', document_id?: int, until?: int} $emoji_status [Emoji status](https://core.telegram.org/api/emoji-status) to set @see https://docs.madelineproto.xyz/API_docs/types/EmojiStatus.html
      */
     public function updateEmojiStatus(array $emoji_status): bool;
 
     /**
+     * Get a list of default suggested [emoji statuses](https://core.telegram.org/api/emoji-status).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
     public function getDefaultEmojiStatuses(array $hash = []): array;
 
     /**
+     * Get recently used [emoji statuses](https://core.telegram.org/api/emoji-status).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
     public function getRecentEmojiStatuses(array $hash = []): array;
 
+    /**
+     * Clears list of recently used [emoji statuses](https://core.telegram.org/api/emoji-status).
+     *
+     */
     public function clearRecentEmojiStatuses(): bool;
 
     /**
+     * Reorder usernames associated with the currently logged-in user.
      *
-     *
-     * @param list<string>|array<never, never> $order
+     * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
      */
     public function reorderUsernames(array $order = []): bool;
 
+    /**
+     * Activate or deactivate a purchased [fragment.com](https://fragment.com) username associated to the currently logged-in user.
+     *
+     * @param bool $active Whether to activate or deactivate it
+     * @param string $username Username
+     */
     public function toggleUsername(bool $active, string $username = ''): bool;
 
     /**
+     * Get a set of suggested [custom emoji stickers](https://core.telegram.org/api/custom-emoji) that can be [used as profile picture](https://core.telegram.org/api/files#sticker-profile-pictures).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function getDefaultProfilePhotoEmojis(array $hash = []): array;
 
     /**
+     * Get a set of suggested [custom emoji stickers](https://core.telegram.org/api/custom-emoji) that can be [used as group picture](https://core.telegram.org/api/files#sticker-profile-pictures).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function getDefaultGroupPhotoEmojis(array $hash = []): array;
 
     /**
-     *
+     * Get autosave settings.
      *
      * @return array{_: 'account.autoSaveSettings', users_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size: int}, chats_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size: int}, broadcasts_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size: int}, exceptions: list<array{_: 'autoSaveException', peer: array|int|string, settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size: int}}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoSaveSettings.html
      */
     public function getAutoSaveSettings(): array;
 
     /**
+     * Modify autosave settings.
      *
-     *
-     * @param array{_: 'autoSaveSettings', photos?: bool, videos?: bool, video_max_size?: int} $settings @see https://docs.madelineproto.xyz/API_docs/types/AutoSaveSettings.html
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array{_: 'autoSaveSettings', photos?: bool, videos?: bool, video_max_size?: int} $settings The new autosave settings @see https://docs.madelineproto.xyz/API_docs/types/AutoSaveSettings.html
+     * @param bool $users Whether the new settings should affect all private chats
+     * @param bool $chats Whether the new settings should affect all groups
+     * @param bool $broadcasts Whether the new settings should affect all [channels](https://core.telegram.org/api/channel)
+     * @param array|int|string $peer Whether the new settings should affect a specific peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
     public function saveAutoSaveSettings(array $settings, bool $users = false, bool $chats = false, bool $broadcasts = false, array|int|string $peer = []): bool;
 
+    /**
+     * Clear all peer-specific autosave settings.
+     *
+     */
     public function deleteAutoSaveExceptions(): bool;
 }

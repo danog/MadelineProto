@@ -87,7 +87,7 @@ interface Messages
      *
      * @param array|int|string $peer Target user or group @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array{_: 'sendMessageTypingAction'}|array{_: 'sendMessageCancelAction'}|array{_: 'sendMessageRecordVideoAction'}|array{_: 'sendMessageUploadVideoAction', progress?: int}|array{_: 'sendMessageRecordAudioAction'}|array{_: 'sendMessageUploadAudioAction', progress?: int}|array{_: 'sendMessageUploadPhotoAction', progress?: int}|array{_: 'sendMessageUploadDocumentAction', progress?: int}|array{_: 'sendMessageGeoLocationAction'}|array{_: 'sendMessageChooseContactAction'}|array{_: 'sendMessageGamePlayAction'}|array{_: 'sendMessageRecordRoundAction'}|array{_: 'sendMessageUploadRoundAction', progress?: int}|array{_: 'speakingInGroupCallAction'}|array{_: 'sendMessageHistoryImportAction', progress?: int}|array{_: 'sendMessageChooseStickerAction'}|array{_: 'sendMessageEmojiInteraction', interaction: mixed, emoticon?: string, msg_id?: int}|array{_: 'sendMessageEmojiInteractionSeen', emoticon?: string}|array{_: 'sendMessageUploadVideoAction'}|array{_: 'sendMessageUploadAudioAction'}|array{_: 'sendMessageUploadPhotoAction'}|array{_: 'sendMessageUploadDocumentAction'}|array{_: 'sendMessageUploadRoundAction'} $action Type of action @see https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html
-     * @param int $top_msg_id [Thread ID](https://core.telegram.org/api/threads)
+     * @param int $top_msg_id [Topic ID](https://core.telegram.org/api/threads)
      */
     public function setTyping(array|int|string $peer, array $action, int $top_msg_id = 0): bool;
 
@@ -100,7 +100,9 @@ interface Messages
      * @param bool $background Send this message as background message
      * @param bool $clear_draft Clear the draft field
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param int $reply_to_msg_id The message ID to which this message will reply to
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
      * @param string $message The message
      * @param array|array<never, never> $reply_markup Reply markup for sending bot buttons @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>|array<never, never> $entities Array of Message [entities](https://core.telegram.org/api/entities) for sending styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
@@ -120,7 +122,9 @@ interface Messages
      * @param bool $background Send message in background
      * @param bool $clear_draft Clear the draft
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param int $reply_to_msg_id Message ID to which this message should reply to
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
      * @param string $message Caption
      * @param array|array<never, never> $reply_markup Reply markup for bot keyboards @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>|array<never, never> $entities Array of Message [entities](https://core.telegram.org/api/entities) for styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
@@ -143,6 +147,7 @@ interface Messages
      * @param bool $drop_media_captions Whether to strip captions from media
      * @param bool $noforwards Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param list<int>|array<never, never> $id IDs of messages
+     * @param int $top_msg_id Destination [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @param int $schedule_date Scheduled message date for scheduled messages
      * @param array|int|string $send_as Forward the messages as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
@@ -203,6 +208,8 @@ interface Messages
     /**
      * Adds a user to a chat and sends a service message on it.
      *
+     * May also return 0-N updates of type [updateGroupInvitePrivacyForbidden](https://docs.madelineproto.xyz/API_docs/constructors/updateGroupInvitePrivacyForbidden.html): it indicates we couldn't add a user to a chat because of their privacy settings; if required, an [invite link](https://core.telegram.org/api/invites) can be shared with the user, instead.
+     *
      * @param array|int|string $chat_id Chat ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array|int|string $user_id User ID to be added @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param int $fwd_limit Number of last messages to be forwarded
@@ -223,8 +230,11 @@ interface Messages
     /**
      * Creates a new chat.
      *
+     * May also return 0-N updates of type [updateGroupInvitePrivacyForbidden](https://docs.madelineproto.xyz/API_docs/constructors/updateGroupInvitePrivacyForbidden.html): it indicates we couldn't add a user to a chat because of their privacy settings; if required, an [invite link](https://core.telegram.org/api/invites) can be shared with the user, instead.
+     *
      * @param list<array|int|string>|array<never, never> $users Array of List of user IDs to be invited @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $title Chat name
+     * @param int $ttl_period Time-to-live of all messages that will be sent in the chat: once message.date+message.ttl\_period === time(), the message will be deleted on the server, and must be deleted locally as well. You can use [messages.setDefaultHistoryTTL](https://docs.madelineproto.xyz/API_docs/methods/messages.setDefaultHistoryTTL.html) to edit this value later.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function createChat(array $users = [], string $title = '', int $ttl_period = 0): array;
@@ -479,8 +489,8 @@ interface Messages
      * @param list<array{_: 'inputBotInlineResult', send_message: array{_: 'inputBotInlineMessageMediaAuto', message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageText', no_webpage?: array, message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaGeo', geo_point: array, heading?: array, period?: array, proximity_notification_radius?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaVenue', geo_point: array, title?: array, address?: array, provider?: array, venue_id?: array, venue_type?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaContact', phone_number?: array, first_name?: array, last_name?: array, vcard?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageGame', reply_markup?: array}|array{_: 'inputBotInlineMessageMediaInvoice', invoice: array, provider_data: array, title?: array, description?: array, photo?: array, payload?: array, provider?: array, reply_markup?: array}, id?: string, type?: string, title?: string, description?: string, url?: string, thumb?: array{_: 'inputWebDocument', url?: array, size?: array, mime_type?: array, attributes?: list<array>}, content?: array{_: 'inputWebDocument', url?: array, size?: array, mime_type?: array, attributes?: list<array>}}|array{_: 'inputBotInlineResultPhoto', photo: array, send_message: array{_: 'inputBotInlineMessageMediaAuto', message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageText', no_webpage?: array, message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaGeo', geo_point: array, heading?: array, period?: array, proximity_notification_radius?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaVenue', geo_point: array, title?: array, address?: array, provider?: array, venue_id?: array, venue_type?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaContact', phone_number?: array, first_name?: array, last_name?: array, vcard?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageGame', reply_markup?: array}|array{_: 'inputBotInlineMessageMediaInvoice', invoice: array, provider_data: array, title?: array, description?: array, photo?: array, payload?: array, provider?: array, reply_markup?: array}, id?: string, type?: string}|array{_: 'inputBotInlineResultDocument', document: array, send_message: array{_: 'inputBotInlineMessageMediaAuto', message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageText', no_webpage?: array, message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaGeo', geo_point: array, heading?: array, period?: array, proximity_notification_radius?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaVenue', geo_point: array, title?: array, address?: array, provider?: array, venue_id?: array, venue_type?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaContact', phone_number?: array, first_name?: array, last_name?: array, vcard?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageGame', reply_markup?: array}|array{_: 'inputBotInlineMessageMediaInvoice', invoice: array, provider_data: array, title?: array, description?: array, photo?: array, payload?: array, provider?: array, reply_markup?: array}, id?: string, type?: string, title?: string, description?: string}|array{_: 'inputBotInlineResultGame', send_message: array{_: 'inputBotInlineMessageMediaAuto', message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageText', no_webpage?: array, message?: array, entities?: list<array>, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaGeo', geo_point: array, heading?: array, period?: array, proximity_notification_radius?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaVenue', geo_point: array, title?: array, address?: array, provider?: array, venue_id?: array, venue_type?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageMediaContact', phone_number?: array, first_name?: array, last_name?: array, vcard?: array, reply_markup?: array}|array{_: 'inputBotInlineMessageGame', reply_markup?: array}|array{_: 'inputBotInlineMessageMediaInvoice', invoice: array, provider_data: array, title?: array, description?: array, photo?: array, payload?: array, provider?: array, reply_markup?: array}, id?: string, short_name?: string}>|array<never, never> $results Array of Vector of results for the inline query @see https://docs.madelineproto.xyz/API_docs/types/InputBotInlineResult.html
      * @param int $cache_time The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
      * @param string $next_offset Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don't support pagination. Offset length can't exceed 64 bytes.
-     * @param array{_: 'inlineBotSwitchPM', text?: string, start_param?: string}|array<never, never> $switch_pm If passed, clients will display a button with specified text that switches the user to a private chat with the bot and sends the bot a start message with a certain parameter. @see https://docs.madelineproto.xyz/API_docs/types/InlineBotSwitchPM.html
-     * @param array{_: 'inlineBotWebView', text?: string, url?: string}|array<never, never> $switch_webview @see https://docs.madelineproto.xyz/API_docs/types/InlineBotWebView.html
+     * @param array{_: 'inlineBotSwitchPM', text?: string, start_param?: string}|array<never, never> $switch_pm If passed, clients will display a button on top of the remaining inline result list with the specified text, that switches the user to a private chat with the bot and sends the bot a start message with a certain parameter. @see https://docs.madelineproto.xyz/API_docs/types/InlineBotSwitchPM.html
+     * @param array{_: 'inlineBotWebView', text?: string, url?: string}|array<never, never> $switch_webview If passed, clients will display a button on top of the remaining inline result list with the specified text, that switches the user to the specified [bot web app](https://core.telegram.org/api/bots/webapps#simple-web-apps). @see https://docs.madelineproto.xyz/API_docs/types/InlineBotWebView.html
      */
     public function setInlineBotResults(bool $gallery = false, bool $private = false, int $query_id = 0, array $results = [], int $cache_time = 0, string $next_offset = '', array $switch_pm = [], array $switch_webview = []): bool;
 
@@ -493,6 +503,7 @@ interface Messages
      * @param bool $clear_draft Whether to clear the [draft](https://core.telegram.org/api/drafts)
      * @param bool $hide_via Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](https://docs.madelineproto.xyz/API_docs/constructors/config.html))
      * @param int $reply_to_msg_id ID of the message this message should reply to
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
      * @param int $query_id Query ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param string $id Result ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param int $schedule_date Scheduled message date for scheduled messages
@@ -576,6 +587,7 @@ interface Messages
      * @param array|int|string $peer Destination of the message that should be sent @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param bool $no_webpage Disable generation of the webpage preview
      * @param int $reply_to_msg_id Message ID the message should reply to
+     * @param int $top_msg_id [Forum topic](https://core.telegram.org/api/forum#forum-topics) where the message will be sent
      * @param string $message The draft
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>|array<never, never> $entities Array of Message [entities](https://core.telegram.org/api/entities) for styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
      * @param ''|'HTML'|'html'|'Markdown'|'markdown' $parse_mode Whether to parse HTML or Markdown markup in the message
@@ -801,6 +813,7 @@ interface Messages
      * Get unread messages where we were mentioned.
      *
      * @param array|int|string $peer Peer where to look for mentions @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id If set, considers only messages within the specified [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @param int $offset_id [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * @param int $add_offset [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
@@ -814,6 +827,7 @@ interface Messages
      * Mark mentions as read.
      *
      * @param array|int|string $peer Dialog @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id Mark as read only mentions within the specified [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @return array{_: 'messages.affectedHistory', pts: int, pts_count: int, offset: int} @see https://docs.madelineproto.xyz/API_docs/types/messages.AffectedHistory.html
      */
     public function readMentions(array|int|string $peer, int $top_msg_id = 0): array;
@@ -836,8 +850,10 @@ interface Messages
      * @param bool $background Send in background?
      * @param bool $clear_draft Whether to clear [drafts](https://core.telegram.org/api/drafts)
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param int $reply_to_msg_id The message to reply to
-     * @param list<array{_: 'inputSingleMedia', media: string|array, message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}>|array<never, never> $multi_media Array of The medias to send @see https://docs.madelineproto.xyz/API_docs/types/InputSingleMedia.html
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
+     * @param list<array{_: 'inputSingleMedia', media: string|array, message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}>|array<never, never> $multi_media Array of The medias to send: note that they must be separately uploaded using [messages.uploadMedia](https://docs.madelineproto.xyz/API_docs/methods/messages.uploadMedia.html) first, using raw `inputMediaUploaded*` constructors is not supported. @see https://docs.madelineproto.xyz/API_docs/types/InputSingleMedia.html
      * @param int $schedule_date Scheduled message date for scheduled messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
@@ -948,7 +964,7 @@ interface Messages
     public function editChatDefaultBannedRights(array|int|string $peer, array $banned_rights): array;
 
     /**
-     * Get localized emoji keywords.
+     * Get localized [emoji keywords »](https://core.telegram.org/api/custom-emoji#emoji-keywords).
      *
      * @param string $lang_code Language code
      * @return array{_: 'emojiKeywordsDifference', lang_code: string, from_version: int, version: int, keywords: list<array{_: 'emojiKeyword', keyword: string, emoticons: list<string>}|array{_: 'emojiKeywordDeleted', keyword: string, emoticons: list<string>}>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiKeywordsDifference.html
@@ -956,26 +972,28 @@ interface Messages
     public function getEmojiKeywords(string $lang_code = ''): array;
 
     /**
-     * Get changed emoji keywords.
+     * Get changed [emoji keywords »](https://core.telegram.org/api/custom-emoji#emoji-keywords).
      *
      * @param string $lang_code Language code
-     * @param int $from_version Previous emoji keyword localization version
+     * @param int $from_version Previous stored emoji keyword list `version`
      * @return array{_: 'emojiKeywordsDifference', lang_code: string, from_version: int, version: int, keywords: list<array{_: 'emojiKeyword', keyword: string, emoticons: list<string>}|array{_: 'emojiKeywordDeleted', keyword: string, emoticons: list<string>}>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiKeywordsDifference.html
      */
     public function getEmojiKeywordsDifference(string $lang_code = '', int $from_version = 0): array;
 
     /**
-     * Get info about an emoji keyword localization.
+     * Obtain a list of related languages that must be used when fetching [emoji keyword lists »](https://core.telegram.org/api/custom-emoji#emoji-keywords).
      *
-     * @param list<string>|array<never, never> $lang_codes Language codes
+     * Usually the method will return the passed language codes (if localized) + `en` + some language codes for similar languages (if applicable).
+     *
+     * @param list<string>|array<never, never> $lang_codes The user's language codes
      * @return list<array{_: 'emojiLanguage', lang_code: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/EmojiLanguage.html
      */
     public function getEmojiKeywordsLanguages(array $lang_codes = []): array;
 
     /**
-     * Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new emoji replacements. The URL will be valid for 30 seconds after generation.
+     * Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new [emoji keywords »](https://core.telegram.org/api/custom-emoji#emoji-keywords). The URL will be valid for 30 seconds after generation.
      *
-     * @param string $lang_code Language code for which the emoji replacements will be suggested
+     * @param string $lang_code Language code for which the emoji keywords will be suggested
      * @return array{_: 'emojiURL', url: string} @see https://docs.madelineproto.xyz/API_docs/types/EmojiURL.html
      */
     public function getEmojiURL(string $lang_code = ''): array;
@@ -984,6 +1002,7 @@ interface Messages
      * Get the number of results that would be found by a [messages.search](https://docs.madelineproto.xyz/API_docs/methods/messages.search.html) call with the same parameters.
      *
      * @param array|int|string $peer Peer where to search @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id If set, consider only messages within the specified [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @param list<array{_: 'inputMessagesFilterEmpty'}|array{_: 'inputMessagesFilterPhotos'}|array{_: 'inputMessagesFilterVideo'}|array{_: 'inputMessagesFilterPhotoVideo'}|array{_: 'inputMessagesFilterDocument'}|array{_: 'inputMessagesFilterUrl'}|array{_: 'inputMessagesFilterGif'}|array{_: 'inputMessagesFilterVoice'}|array{_: 'inputMessagesFilterMusic'}|array{_: 'inputMessagesFilterChatPhotos'}|array{_: 'inputMessagesFilterPhoneCalls', missed?: bool}|array{_: 'inputMessagesFilterRoundVoice'}|array{_: 'inputMessagesFilterRoundVideo'}|array{_: 'inputMessagesFilterMyMentions'}|array{_: 'inputMessagesFilterGeo'}|array{_: 'inputMessagesFilterContacts'}|array{_: 'inputMessagesFilterPinned'}>|array<never, never> $filters Array of Search filters @see https://docs.madelineproto.xyz/API_docs/types/MessagesFilter.html
      * @return list<array{_: 'messages.searchCounter', filter: array{_: 'inputMessagesFilterEmpty'}|array{_: 'inputMessagesFilterPhotos'}|array{_: 'inputMessagesFilterVideo'}|array{_: 'inputMessagesFilterPhotoVideo'}|array{_: 'inputMessagesFilterDocument'}|array{_: 'inputMessagesFilterUrl'}|array{_: 'inputMessagesFilterGif'}|array{_: 'inputMessagesFilterVoice'}|array{_: 'inputMessagesFilterMusic'}|array{_: 'inputMessagesFilterChatPhotos'}|array{_: 'inputMessagesFilterPhoneCalls', missed: bool}|array{_: 'inputMessagesFilterRoundVoice'}|array{_: 'inputMessagesFilterRoundVideo'}|array{_: 'inputMessagesFilterMyMentions'}|array{_: 'inputMessagesFilterGeo'}|array{_: 'inputMessagesFilterContacts'}|array{_: 'inputMessagesFilterPinned'}, inexact: bool, count: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/messages.SearchCounter.html
      */
@@ -1154,6 +1173,7 @@ interface Messages
      * [Unpin](https://core.telegram.org/api/pin) all pinned messages.
      *
      * @param array|int|string $peer Chat where to unpin @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id [Forum topic](https://core.telegram.org/api/forum#forum-topics) where to unpin
      * @return array{_: 'messages.affectedHistory', pts: int, pts_count: int, offset: int} @see https://docs.madelineproto.xyz/API_docs/types/messages.AffectedHistory.html
      */
     public function unpinAllMessages(array|int|string $peer, int $top_msg_id = 0): array;
@@ -1389,10 +1409,13 @@ interface Messages
     /**
      * React to message.
      *
+     * Starting from layer 159, the reaction will be sent from the peer specified using [messages.saveDefaultSendAs](https://docs.madelineproto.xyz/API_docs/methods/messages.saveDefaultSendAs.html).
+     *
      * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param bool $big Whether a bigger and longer reaction should be shown
+     * @param bool $add_to_recent Add this reaction to the [recent reactions list »](https://core.telegram.org/api/reactions#recent-reactions).
      * @param int $msg_id Message ID to react to
-     * @param list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}>|array<never, never> $reaction Array of  @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
+     * @param list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}>|array<never, never> $reaction Array of A list of reactions @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function sendReaction(array|int|string $peer, bool $big = false, bool $add_to_recent = false, int $msg_id = 0, array $reaction = []): array;
@@ -1411,7 +1434,7 @@ interface Messages
      *
      * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param int $id Message ID
-     * @param array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}|array<never, never> $reaction @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
+     * @param array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}|array<never, never> $reaction Get only reactions of this type (UTF8 emoji) @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
      * @param string $offset Offset (typically taken from the `next_offset` field of the returned [messages.MessageReactionsList](https://docs.madelineproto.xyz/API_docs/types/messages.MessageReactionsList.html))
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @return array{_: 'messages.messageReactionsList', count: int, reactions: list<array{_: 'messagePeerReaction', peer_id: array|int|string, reaction: array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon: string}|array{_: 'reactionCustomEmoji', document_id: int}, big: bool, unread: bool, date: int}>, chats: list<array|int|string>, users: list<array|int|string>, next_offset: string} @see https://docs.madelineproto.xyz/API_docs/types/messages.MessageReactionsList.html
@@ -1422,7 +1445,7 @@ interface Messages
      * Change the set of [message reactions »](https://core.telegram.org/api/reactions) that can be used in a certain group, supergroup or channel.
      *
      * @param array|int|string $peer Group where to apply changes @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'chatReactionsNone'}|array{_: 'chatReactionsAll', allow_custom?: bool}|array{_: 'chatReactionsSome', reactions?: list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}>} $available_reactions @see https://docs.madelineproto.xyz/API_docs/types/ChatReactions.html
+     * @param array{_: 'chatReactionsNone'}|array{_: 'chatReactionsAll', allow_custom?: bool}|array{_: 'chatReactionsSome', reactions?: list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}>} $available_reactions Allowed reaction emojis @see https://docs.madelineproto.xyz/API_docs/types/ChatReactions.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function setChatAvailableReactions(array|int|string $peer, array $available_reactions): array;
@@ -1437,16 +1460,18 @@ interface Messages
     /**
      * Change default emoji reaction to use in the quick reaction menu: the value is synced across devices and can be fetched using [help.getConfig, `reactions_default` field](https://docs.madelineproto.xyz/API_docs/methods/help.getConfig.html).
      *
-     * @param array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int} $reaction @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
+     * @param array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int} $reaction New emoji reaction @see https://docs.madelineproto.xyz/API_docs/types/Reaction.html
      */
     public function setDefaultReaction(array $reaction): bool;
 
     /**
      * Translate a given text.
      *
+     * [Styled text entities](https://core.telegram.org/api/entities) will only be preserved for [Telegram Premium](https://core.telegram.org/api/premium) users.
+     *
      * @param array|int|string $peer If the text is a chat message, the peer ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param list<int>|array<never, never> $id
-     * @param list<array{_: 'textWithEntities', text?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}>|array<never, never> $text Array of  @see https://docs.madelineproto.xyz/API_docs/types/TextWithEntities.html
+     * @param list<int>|array<never, never> $id A list of message IDs to translate
+     * @param list<array{_: 'textWithEntities', text?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}>|array<never, never> $text Array of A list of styled messages to translate @see https://docs.madelineproto.xyz/API_docs/types/TextWithEntities.html
      * @param string $to_lang Two-letter ISO 639-1 language code of the language to which the message is translated
      * @return array{_: 'messages.translateResult', result: list<array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.TranslatedText.html
      */
@@ -1456,6 +1481,7 @@ interface Messages
      * Get unread reactions to messages you sent.
      *
      * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id If set, considers only reactions to messages within the specified [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @param int $offset_id [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * @param int $add_offset [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
@@ -1469,6 +1495,7 @@ interface Messages
      * Mark [message reactions »](https://core.telegram.org/api/reactions) as read.
      *
      * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $top_msg_id Mark as read only reactions to messages within the specified [forum topic](https://core.telegram.org/api/forum#forum-topics)
      * @return array{_: 'messages.affectedHistory', pts: int, pts_count: int, offset: int} @see https://docs.madelineproto.xyz/API_docs/types/messages.AffectedHistory.html
      */
     public function readReactions(array|int|string $peer, int $top_msg_id = 0): array;
@@ -1505,6 +1532,7 @@ interface Messages
      *
      * @param array|int|string $bot Bot ID @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param bool $enabled Toggle
+     * @param bool $write_allowed Whether the user authorizes the bot to write messages to them, if requested by [attachMenuBot](https://docs.madelineproto.xyz/API_docs/constructors/attachMenuBot.html).`request_write_access`
      */
     public function toggleBotInAttachMenu(array|int|string $bot, bool $enabled, bool $write_allowed = false): bool;
 
@@ -1520,7 +1548,9 @@ interface Messages
      * @param string $url [Web app URL](https://core.telegram.org/api/bots/webapps)
      * @param string $start_param If the web app was opened from the attachment menu using a [attachment menu deep link](https://core.telegram.org/api/links#bot-attachment-menu-links), `start_param` should contain the `data` from the `startattach` parameter.
      * @param mixed $theme_params Any JSON-encodable data
+     * @param string $platform Short name of the application; 0-64 English letters, digits, and underscores
      * @param int $reply_to_msg_id Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent in reply to this message ID.
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
      * @param array|int|string $send_as Open the web app as the specified peer, sending the resulting the message as the specified peer. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'webViewResultUrl', query_id: int, url: string} @see https://docs.madelineproto.xyz/API_docs/types/WebViewResult.html
      */
@@ -1529,11 +1559,14 @@ interface Messages
     /**
      * Indicate to the server (from the user side) that the user is still using a web app.
      *
+     * If the method returns a `QUERY_ID_INVALID` error, the webview must be closed.
+     *
      * @param array|int|string $peer Dialog where the web app was opened. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array|int|string $bot Bot that owns the [web app](https://core.telegram.org/api/bots/webapps) @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param bool $silent Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent silently (no notifications for the receivers).
      * @param int $query_id Web app interaction ID obtained from [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html)
      * @param int $reply_to_msg_id Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent in reply to this message ID.
+     * @param int $top_msg_id This field must contain the topic ID **only** when replying to messages in [forum topics](https://core.telegram.org/api/forum#forum-topics) different from the "General" topic (i.e. `reply_to_msg_id` is set and `reply_to_msg_id != topicID` and `topicID != 1`). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.
      * @param array|int|string $send_as Open the web app as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
     public function prolongWebView(array|int|string $peer, array|int|string $bot, bool $silent = false, int $query_id = 0, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string $send_as = []): bool;
@@ -1542,8 +1575,10 @@ interface Messages
      * Open a [bot web app](https://core.telegram.org/api/bots/webapps).
      *
      * @param array|int|string $bot Bot that owns the webapp @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param bool $from_switch_webview Whether the webapp was opened by clicking on the `switch_webview` button shown on top of the inline results list returned by [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html).
      * @param string $url Web app URL
      * @param mixed $theme_params Any JSON-encodable data
+     * @param string $platform Short name of the application; 0-64 English letters, digits, and underscores
      * @return array{_: 'simpleWebViewResultUrl', url: string} @see https://docs.madelineproto.xyz/API_docs/types/SimpleWebViewResult.html
      */
     public function requestSimpleWebView(array|int|string $bot, bool $from_switch_webview = false, string $url = '', mixed $theme_params = null, string $platform = ''): array;
@@ -1613,119 +1648,141 @@ interface Messages
     public function getFeaturedEmojiStickers(array $hash = []): array;
 
     /**
+     * Report a [message reaction](https://core.telegram.org/api/reactions).
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array|int|string $reaction_peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $peer Peer where the message was sent @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $reaction_peer Peer that sent the reaction @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $id Message ID
      */
     public function reportReaction(array|int|string $peer, array|int|string $reaction_peer, int $id = 0): bool;
 
     /**
+     * Got popular [message reactions](https://core.telegram.org/api/reactions).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'messages.reactionsNotModified'}|array{_: 'messages.reactions', hash: list<int>, reactions: list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon: string}|array{_: 'reactionCustomEmoji', document_id: int}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Reactions.html
      */
     public function getTopReactions(int $limit = 0, array $hash = []): array;
 
     /**
+     * Get recently used [message reactions](https://core.telegram.org/api/reactions).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'messages.reactionsNotModified'}|array{_: 'messages.reactions', hash: list<int>, reactions: list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon: string}|array{_: 'reactionCustomEmoji', document_id: int}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Reactions.html
      */
     public function getRecentReactions(int $limit = 0, array $hash = []): array;
 
+    /**
+     * Clear recently used [message reactions](https://core.telegram.org/api/reactions).
+     *
+     */
     public function clearRecentReactions(): bool;
 
     /**
+     * Get information about extended media.
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param list<int>|array<never, never> $id
+     * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param list<int>|array<never, never> $id Message IDs
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function getExtendedMedia(array|int|string $peer, array $id = []): array;
 
+    /**
+     * Changes the default value of the Time-To-Live setting, applied to all new chats.
+     *
+     * @param int $period The new default Time-To-Live of all messages sent in new chats.
+     */
     public function setDefaultHistoryTTL(int $period = 0): bool;
 
     /**
-     *
+     * Gets the default value of the Time-To-Live setting, applied to all new chats.
      *
      * @return array{_: 'defaultHistoryTTL', period: int} @see https://docs.madelineproto.xyz/API_docs/types/DefaultHistoryTTL.html
      */
     public function getDefaultHistoryTTL(): array;
 
     /**
+     * Send a chosen peer, as requested by a [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) button.
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array|int|string $requested_peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $peer The bot that sent the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) button. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $requested_peer The chosen peer. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $msg_id ID of the message that contained the reply keyboard with the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) button.
+     * @param int $button_id The `button_id` field from the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) constructor.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function sendBotRequestedPeer(array|int|string $peer, array|int|string $requested_peer, int $msg_id = 0, int $button_id = 0): array;
 
     /**
-     *
+     * Represents a list of [emoji categories](https://core.telegram.org/api/custom-emoji#emoji-categories), to be used when selecting [custom emojis](https://core.telegram.org/api/custom-emoji).
      *
      * @return array{_: 'messages.emojiGroupsNotModified'}|array{_: 'messages.emojiGroups', hash: int, groups: list<array{_: 'emojiGroup', title: string, icon_emoji_id: int, emoticons: list<string>}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.EmojiGroups.html
      */
     public function getEmojiGroups(int $hash = 0): array;
 
     /**
-     *
+     * Represents a list of [emoji categories](https://core.telegram.org/api/custom-emoji#emoji-categories), to be used when selecting custom emojis to set as [custom emoji status](https://core.telegram.org/api).
      *
      * @return array{_: 'messages.emojiGroupsNotModified'}|array{_: 'messages.emojiGroups', hash: int, groups: list<array{_: 'emojiGroup', title: string, icon_emoji_id: int, emoticons: list<string>}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.EmojiGroups.html
      */
     public function getEmojiStatusGroups(int $hash = 0): array;
 
     /**
-     *
+     * Represents a list of [emoji categories](https://core.telegram.org/api/custom-emoji#emoji-categories), to be used when selecting custom emojis to set as [profile picture](https://core.telegram.org/api/files#sticker-profile-pictures).
      *
      * @return array{_: 'messages.emojiGroupsNotModified'}|array{_: 'messages.emojiGroups', hash: int, groups: list<array{_: 'emojiGroup', title: string, icon_emoji_id: int, emoticons: list<string>}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.EmojiGroups.html
      */
     public function getEmojiProfilePhotoGroups(int $hash = 0): array;
 
     /**
+     * Look for [custom emojis](https://core.telegram.org/api/custom-emoji) associated to a UTF8 emoji.
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param string $emoticon The emoji
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function searchCustomEmoji(string $emoticon = '', array $hash = []): array;
 
     /**
+     * Show or hide the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat.
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $peer The peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param bool $disabled Whether to disable or enable the real-time chat translation popup
      */
     public function togglePeerTranslations(array|int|string $peer, bool $disabled = false): bool;
 
     /**
+     * Obtain information about a [named bot web app](https://core.telegram.org/api/bots/webapps#named-bot-web-apps).
      *
-     *
-     * @param array{_: 'inputBotAppID', id?: int, access_hash?: int}|array{_: 'inputBotAppShortName', bot_id: array|int|string, short_name?: string} $app @see https://docs.madelineproto.xyz/API_docs/types/InputBotApp.html
-     * @param list<int>|array<never, never> $hash
+     * @param array{_: 'inputBotAppID', id?: int, access_hash?: int}|array{_: 'inputBotAppShortName', bot_id: array|int|string, short_name?: string} $app Bot app information obtained from a [named bot web app deep link »](https://core.telegram.org/api/links#named-bot-web-app-links). @see https://docs.madelineproto.xyz/API_docs/types/InputBotApp.html
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'messages.botApp', app: array{_: 'botAppNotModified'}|array{_: 'botApp', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}, id: int, access_hash: int, short_name: string, title: string, description: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, hash: list<int>}, inactive: bool, request_write_access: bool} @see https://docs.madelineproto.xyz/API_docs/types/messages.BotApp.html
      */
     public function getBotApp(array $app, array $hash = []): array;
 
     /**
+     * Open a [bot web app](https://core.telegram.org/bots/webapps) from a [named bot web app deep link](https://core.telegram.org/api/links#named-bot-web-app-links), sending over user information after user confirmation.
      *
+     * After calling this method, until the user closes the webview, [messages.prolongWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.prolongWebView.html) must be called every 60 seconds.
      *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputBotAppID', id?: int, access_hash?: int}|array{_: 'inputBotAppShortName', bot_id: array|int|string, short_name?: string} $app @see https://docs.madelineproto.xyz/API_docs/types/InputBotApp.html
+     * @param array|int|string $peer If the client has clicked on the link in a Telegram chat, pass the chat's peer information; otherwise pass the bot's peer information, instead. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array{_: 'inputBotAppID', id?: int, access_hash?: int}|array{_: 'inputBotAppShortName', bot_id: array|int|string, short_name?: string} $app The app obtained by invoking [messages.getBotApp](https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html) as specified in the [named bot web app deep link](https://core.telegram.org/api/links#named-bot-web-app-links) docs. @see https://docs.madelineproto.xyz/API_docs/types/InputBotApp.html
+     * @param bool $write_allowed Set this flag if the bot is asking permission to send messages to the user as specified in the [named bot web app deep link](https://core.telegram.org/api/links#named-bot-web-app-links) docs, and the user agreed.
+     * @param string $start_param If the `startapp` query string parameter is present in the [named bot web app deep link](https://core.telegram.org/api/links#named-bot-web-app-links), pass it to `start_param`.
      * @param mixed $theme_params Any JSON-encodable data
+     * @param string $platform Short name of the application; 0-64 English letters, digits, and underscores
      * @return array{_: 'appWebViewResultUrl', url: string} @see https://docs.madelineproto.xyz/API_docs/types/AppWebViewResult.html
      */
     public function requestAppWebView(array|int|string $peer, array $app, bool $write_allowed = false, string $start_param = '', mixed $theme_params = null, string $platform = ''): array;
 
     /**
+     * Set a custom [wallpaper »](https://core.telegram.org/api/wallpapers) in a specific private chat with another user.
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}|array<never, never> $wallpaper @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
-     * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}|array<never, never> $settings @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     * @param array|int|string $peer The private chat where the wallpaper will be set @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}|array<never, never> $wallpaper The [wallpaper »](https://core.telegram.org/api/wallpapers), obtained as described in the [wallpaper documentation »](https://core.telegram.org/api/wallpapers#uploading-wallpapers); must **not** be provided when installing a wallpaper obtained from a [messageActionSetChatWallPaper](https://docs.madelineproto.xyz/API_docs/constructors/messageActionSetChatWallPaper.html) service message (`id` must be provided, instead). @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
+     * @param array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}|array<never, never> $settings Wallpaper settings, obtained as described in the [wallpaper documentation »](https://core.telegram.org/api/wallpapers#uploading-wallpapers) or from [messageActionSetChatWallPaper](https://docs.madelineproto.xyz/API_docs/constructors/messageActionSetChatWallPaper.html).`wallpaper`.`settings`. @see https://docs.madelineproto.xyz/API_docs/types/WallPaperSettings.html
+     * @param int $id If the wallpaper was obtained from a [messageActionSetChatWallPaper](https://docs.madelineproto.xyz/API_docs/constructors/messageActionSetChatWallPaper.html) service message, must contain the ID of that message.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function setChatWallPaper(array|int|string $peer, array $wallpaper = [], array $settings = [], int $id = 0): array;

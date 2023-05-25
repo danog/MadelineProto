@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use Amp\Postgres\ByteA;
-use Amp\Postgres\PostgresConfig;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use danog\MadelineProto\Settings\Database\SerializerType;
-use PDO;
 
 /**
  * Postgres database backend.
@@ -83,7 +81,7 @@ class PostgresArray extends SqlArray
             SerializerType::SERIALIZE => fn ($v) => new ByteA(\serialize($v)),
             SerializerType::IGBINARY => fn ($v) => new ByteA(\igbinary_serialize($v)),
             SerializerType::JSON => fn ($v) => new ByteA(\json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
-            SerializerType::STRING => fn ($v) => new ByteA(strval($v)),
+            SerializerType::STRING => fn ($v) => new ByteA(\strval($v)),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),

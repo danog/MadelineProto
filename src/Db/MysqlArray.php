@@ -25,7 +25,7 @@ class MysqlArray extends SqlArray
 {
     // We're forced to use quoting (just like PDO does internally when using prepares) because native MySQL prepares are extremely slow.
     protected PDO $pdo;
-    
+
     /**
      * Initialize on startup.
      */
@@ -85,7 +85,7 @@ class MysqlArray extends SqlArray
 
         return $this->db->query($sql);
     }
-    
+
     /**
      * Initialize connection.
      */

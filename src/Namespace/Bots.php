@@ -83,32 +83,39 @@ interface Bots
     public function setBotGroupDefaultAdminRights(array $admin_rights): bool;
 
     /**
+     * Set localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     *
-     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param string $lang_code Language code, if left empty update the fallback about text and description
+     * @param string $name New bot name
+     * @param string $about New about text
+     * @param string $description New description
      */
     public function setBotInfo(array|int|string $bot = [], string $lang_code = '', string $name = '', string $about = '', string $description = ''): bool;
 
     /**
+     * Get localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     *
-     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param string $lang_code Language code, if left empty this method will return the fallback about text and description.
      * @return array{_: 'bots.botInfo', name: string, about: string, description: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.BotInfo.html
      */
     public function getBotInfo(array|int|string $bot = [], string $lang_code = ''): array;
 
     /**
+     * Reorder usernames associated to a bot we own.
      *
-     *
-     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     * @param list<string>|array<never, never> $order
+     * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
      */
     public function reorderUsernames(array|int|string $bot, array $order = []): bool;
 
     /**
+     * Activate or deactivate a purchased [fragment.com](https://fragment.com) username associated to a bot we own.
      *
-     *
-     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param bool $active Whether to activate or deactivate it
+     * @param string $username Username
      */
     public function toggleUsername(array|int|string $bot, bool $active, string $username = ''): bool;
 }

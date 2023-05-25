@@ -6,7 +6,6 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Sql\Pool;
 use Amp\Sql\Result;
-use PDO;
 
 /**
  * Generic SQL database backend.

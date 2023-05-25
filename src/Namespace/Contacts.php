@@ -187,15 +187,16 @@ interface Contacts
     public function resolvePhone(string $phone = ''): array;
 
     /**
-     *
+     * Generates a [temporary profile link](https://core.telegram.org/api/links#temporary-profile-links) for the currently logged-in user.
      *
      * @return array{_: 'exportedContactToken', url: string, expires: int} @see https://docs.madelineproto.xyz/API_docs/types/ExportedContactToken.html
      */
     public function exportContactToken(): array;
 
     /**
+     * Obtain user info from a [temporary profile link](https://core.telegram.org/api/links#temporary-profile-links).
      *
-     *
+     * @param string $token The token extracted from the [temporary profile link](https://core.telegram.org/api/links#temporary-profile-links).
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
     public function importContactToken(string $token = ''): array|int|string;

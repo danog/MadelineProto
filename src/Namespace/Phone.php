@@ -69,7 +69,7 @@ interface Phone
      * @param mixed $params Any JSON-encodable data
      * @param bool $muted If set, the user will be muted by default upon joining.
      * @param bool $video_stopped If set, the user's video will be disabled by default upon joining.
-     * @param string $invite_hash The invitation hash from the [invite link »](https://core.telegram.org/api/links#voice-chatvideo-chatlivestream-links), if provided allows speaking in a livestream or muted group chat.
+     * @param string $invite_hash The invitation hash from the [invite link »](https://core.telegram.org/api/links#video-chatlivestream-links), if provided allows speaking in a livestream or muted group chat.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function joinGroupCall(array $call, array|int|string $join_as, mixed $params, bool $muted = false, bool $video_stopped = false, string $invite_hash = ''): array;
@@ -192,7 +192,7 @@ interface Phone
     public function getGroupCallJoinAs(array|int|string $peer): array;
 
     /**
-     * Get an [invite link](https://core.telegram.org/api/links#voice-chatvideo-chatlivestream-links) for a group call or livestream.
+     * Get an [invite link](https://core.telegram.org/api/links#video-chatlivestream-links) for a group call or livestream.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param bool $can_self_unmute For livestreams or muted group chats, if set, users that join using this link will be able to speak without explicitly requesting permission by (for example by raising their hand).

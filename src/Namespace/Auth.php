@@ -100,17 +100,30 @@ interface Auth
     public function checkRecoveryPassword(string $code = ''): bool;
 
     /**
+     * Login by importing an authorization token.
      *
-     *
+     * @param int $api_id [API ID](https://core.telegram.org/api/obtaining_api_id)
+     * @param string $api_hash [API hash](https://core.telegram.org/api/obtaining_api_id)
+     * @param string $web_auth_token The authorization token
      * @return array{_: 'auth.authorization', user: array|int|string, setup_password_required: bool, otherwise_relogin_days: int, tmp_sessions: int, future_auth_token: string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>, min_age_confirm: int}} @see https://docs.madelineproto.xyz/API_docs/types/auth.Authorization.html
      */
     public function importWebTokenAuthorization(int $api_id = 0, string $api_hash = '', string $web_auth_token = ''): array;
 
+    /**
+     * Request an SMS code via Firebase.
+     *
+     * @param string $phone_number Phone number
+     * @param string $phone_code_hash Phone code hash returned by [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
+     * @param string $safety_net_token On Android, a JWS object obtained as described in the [auth documentation »](https://core.telegram.org/api/auth)
+     * @param string $ios_push_secret Secret token received via an apple push notification
+     */
     public function requestFirebaseSms(string $phone_number = '', string $phone_code_hash = '', string $safety_net_token = '', string $ios_push_secret = ''): bool;
 
     /**
+     * Reset the [login email »](https://core.telegram.org/api/auth#email-verification).
      *
-     *
+     * @param string $phone_number Phone number of the account
+     * @param string $phone_code_hash Phone code hash, obtained as described in the [documentation »](https://core.telegram.org/api/auth)
      * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period: int, reset_pending_date: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce: string, receipt: string, push_timeout: int, length: int}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', user: array|int|string, setup_password_required: bool, otherwise_relogin_days: int, tmp_sessions: int, future_auth_token: string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset: int, length: int}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}>, min_age_confirm: int}}} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
      */
     public function resetLoginEmail(string $phone_number = '', string $phone_code_hash = ''): array;
