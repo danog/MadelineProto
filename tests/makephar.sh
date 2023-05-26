@@ -139,12 +139,11 @@ db mysql
 k
 
 echo "Testing with new version (upgrade)..."
-rm -f madeline-*phar madeline-*version
-rm -f tests/madeline-*phar tests/madeline-*version
+rm -f madeline-*phar madeline.version
 
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-81"
-cp "madeline$php$branch.phar" "tests/madeline-TESTING.phar"
-echo -n "TESTING" > "tests/madeline-$php.phar.version"
+cp "madeline$php$branch.phar" "madeline-TESTING.phar"
+echo -n "TESTING" > "madeline.version"
 echo 0.0.0.0 phar.madelineproto.xyz > /etc/hosts
 cp tools/phar.php madeline.php
 export ACTIONS_PHAR=1
