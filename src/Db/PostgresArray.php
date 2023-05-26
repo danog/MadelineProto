@@ -21,6 +21,44 @@ use danog\MadelineProto\Settings\Database\SerializerType;
  */
 class PostgresArray extends PostgresArrayBytea
 {
+    /**
+     * Prepare statements.
+     *
+     * @param SqlArray::SQL_* $type
+     */
+    protected function getSqlQuery(int $type): string
+    {
+        switch ($type) {
+            case SqlArray::SQL_GET:
+                return "SELECT value FROM \"{$this->table}\" WHERE key = :index";
+            case SqlArray::SQL_SET:
+                return "
+                INSERT INTO \"{$this->table}\"
+                (key,value)
+                VALUES (:index, :value)
+                ON CONFLICT (key) DO UPDATE SET value = :value
+            ";
+            case SqlArray::SQL_UNSET:
+                return "
+                DELETE FROM \"{$this->table}\"
+                WHERE key = :index
+            ";
+            case SqlArray::SQL_COUNT:
+                return "
+                SELECT count(key) as count FROM \"{$this->table}\"
+            ";
+            case SqlArray::SQL_ITERATE:
+                return "
+                SELECT key, value FROM \"{$this->table}\"
+            ";
+            case SqlArray::SQL_CLEAR:
+                return "
+                DELETE FROM \"{$this->table}\"
+            ";
+        }
+        throw new Exception("An invalid statement type $type was provided!");
+    }
+
     protected function setSerializer(SerializerType $serializer): void
     {
         $this->serializer = match ($serializer) {

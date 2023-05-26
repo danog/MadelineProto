@@ -94,7 +94,7 @@ abstract class SqlArray extends DriverArray
 
         $this->setCache($key, $value);
 
-        $result = $this->execute(
+        $this->execute(
             $this->queries[self::SQL_SET],
             [
                 'index' => $key,
