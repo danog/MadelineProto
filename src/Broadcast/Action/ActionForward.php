@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Broadcast\Action;
 
 use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 
@@ -54,10 +55,18 @@ final class ActionForward implements Action
             if ($e->rpc === 'CHAT_WRITE_FORBIDDEN') {
                 return;
             }
+            if ($e->rpc === 'CHANNEL_PRIVATE') {
+                return;
+            }
             if ($e->rpc === 'USER_IS_BLOCKED') {
                 return;
             }
             if ($e->rpc === 'PEER_ID_INVALID') {
+                return;
+            }
+            throw $e;
+        } catch (Exception $e) {
+            if ($e->getMessage() === 'This peer is not present in the internal peer database') {
                 return;
             }
             throw $e;

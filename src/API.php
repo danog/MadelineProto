@@ -28,7 +28,6 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
-use AssertionError;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
@@ -111,12 +110,6 @@ final class API extends AbstractAPI
      * @internal
      */
     private SessionPaths $session;
-
-    /**
-     * Whether this is an old instance.
-     *
-     */
-    private bool $oldInstance = false;
 
     /**
      * Unlock callback.
@@ -317,11 +310,11 @@ final class API extends AbstractAPI
      */
     public function __wakeup(): void
     {
-        $this->oldInstance = true;
+        $this->__construct($this->session->getSessionDirectoryPath());
     }
     public function __sleep(): array
     {
-        throw new AssertionError("MadelineProto can't be serialized!");
+        return ['session'];
     }
     /**
      * @var array<Future<null>>
@@ -343,9 +336,6 @@ final class API extends AbstractAPI
      */
     public function __destruct()
     {
-        if ($this->oldInstance) {
-            return;
-        }
         $id = \count(self::$destructors);
         self::$destructors[$id] = async(function () use ($id): void {
             $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');

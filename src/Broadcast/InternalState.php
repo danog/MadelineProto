@@ -112,16 +112,24 @@ final class InternalState
         $this->setStatus(StatusInternal::GATHERING_PEERS);
         async(function (): void {
             $peers = $this->API->getDialogIds();
-            $peers = \array_filter($peers, fn (int $peer): bool => !(
-                \in_array($peer, $this->filter->blacklist, true)
-                || !match ($this->API->getType($peer)) {
-                    'user' => $this->filter->allowUsers,
-                    'bot' => $this->filter->allowBots,
-                    'chat' => $this->filter->allowGroups,
-                    'supergroup' => $this->filter->allowGroups,
-                    'channel' => $this->filter->allowChannels,
+            $peers = \array_filter($peers, function (int $peer): bool {
+                if (\in_array($peer, $this->filter->blacklist, true)) {
+                    return false;
                 }
-            ));
+                try {
+                    if (!match ($this->API->getType($peer)) {
+                        'user' => $this->filter->allowUsers,
+                        'bot' => $this->filter->allowBots,
+                        'chat' => $this->filter->allowGroups,
+                        'supergroup' => $this->filter->allowGroups,
+                        'channel' => $this->filter->allowChannels,
+                    }) {
+                        return false;
+                    }
+                } catch (Throwable) {
+                }
+                return true;
+            });
             $this->peers = $peers;
             $this->pendingCount = \count($peers);
             $this->setStatus(StatusInternal::IDLING_BEFORE_BROADCASTING);
