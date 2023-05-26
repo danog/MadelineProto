@@ -122,7 +122,7 @@ final class GarbageCollector
             }
         };
         $cb();
-        EventLoop::unreference($id = EventLoop::repeat(60.0, $cb));
+        EventLoop::unreference($id = EventLoop::repeat(3600.0, $cb));
     }
 
     /** @var \WeakMap<\Fiber, true> */

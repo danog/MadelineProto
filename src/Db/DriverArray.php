@@ -8,6 +8,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\SerializerType;
+use danog\MadelineProto\Settings\Database\SqlAbstract;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use IteratorAggregate;
 
@@ -80,15 +81,25 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
+    protected function setSettings(SqlAbstract $settings): void {
+        $this->dbSettings = $settings;
+        $this->setCacheTtl($settings->getCacheTtl());
+        $this->setSerializer($settings->getSerializer());
+    }
+    
+    public function __wakeup()
+    {
+        $this->setSettings($this->dbSettings);
+    }
+    
+    /** @param SqlAbstract $settings */
     public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
         $instance->setTable($table);
 
-        $instance->dbSettings = $settings;
-        $instance->setCacheTtl($settings->getCacheTtl());
-        $instance->setSerializer($settings->getSerializer());
+        $instance->setSettings($settings);
 
         $instance->startCacheCleanupLoop();
 
