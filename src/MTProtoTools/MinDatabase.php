@@ -25,7 +25,6 @@ use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\TL\TLCallback;
 use Revolt\EventLoop;
 
@@ -69,7 +68,7 @@ final class MinDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => ['serializer' => SerializerType::SERIALIZE],
+        'db' => [],
     ];
 
     public function __construct(MTProto $API)

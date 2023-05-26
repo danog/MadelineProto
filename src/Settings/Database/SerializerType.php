@@ -2,10 +2,10 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-enum SerializerType
+enum SerializerType: string
 {
-    case SERIALIZE;
-    case IGBINARY;
-    case JSON;
-    case STRING;
+    case SERIALIZE = 'serialize';
+    case IGBINARY = 'igbinary';
+    case JSON = 'json';
+    case STRING = 'string';
 }

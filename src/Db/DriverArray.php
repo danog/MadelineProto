@@ -81,17 +81,18 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
-    private function setSettings(SqlAbstract $settings): void {
+    private function setSettings(SqlAbstract $settings): void
+    {
         $this->dbSettings = $settings;
         $this->setCacheTtl($settings->getCacheTtl());
         $this->setSerializer($settings->getSerializer());
     }
-    
-    public function __wakeup()
+
+    public function __wakeup(): void
     {
         $this->setSettings($this->dbSettings);
     }
-    
+
     /** @param SqlAbstract $settings */
     public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static
     {
@@ -106,7 +107,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $instance->initConnection($settings);
         $instance->prepareTable();
 
-        if (self::getClassName($previous) !== self::getClassName($instance)) {
+        if (self::getMigrationName($previous) !== self::getMigrationName($instance)) {
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }
@@ -146,11 +147,13 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     }
     private static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
-        if (!empty($old) && self::getClassName($old) !== self::getClassName($new)) {
+        $oldName = self::getMigrationName($old);
+        $newName = self::getMigrationName($new);
+        if (!empty($old) && $oldName !== $newName) {
             if (!$old instanceof DbArray) {
                 $old = MemoryArray::getInstance('', $old, new Memory);
             }
-            Logger::log('Converting '.$old::class.' to '.$new::class, Logger::ERROR);
+            Logger::log("Converting $oldName to $newName", Logger::ERROR);
 
             $counter = 0;
             $total = \count($old);
@@ -165,7 +168,10 @@ abstract class DriverArray implements DbArray, IteratorAggregate
                 }
                 $new->clearCache();
             }
-            $old->clear();
+            if (self::getMigrationName($new, false) !== self::getMigrationName($old, false)) {
+                Logger::log("Dropping data from table {$old}", Logger::WARNING);
+                $old->clear();
+            }
             Logger::log('Converting database done.', Logger::ERROR);
         }
     }
@@ -214,13 +220,17 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return \iterator_to_array($this->getIterator());
     }
 
-    private static function getClassName($instance): ?string
+    private static function getMigrationName(DbType|array|null $instance, bool $include_serialization_type = true): ?string
     {
         if ($instance === null) {
             return null;
         } elseif (\is_array($instance)) {
             return 'Array';
         }
-        return \str_replace('NullCache\\', '', $instance::class);
+        $base = \str_replace('NullCache\\', '', $instance::class);
+        if ($include_serialization_type && $instance instanceof DriverArray) {
+            $base .= ' ('.$instance->dbSettings->getSerializer()->value.')';
+        }
+        return $base;
     }
 }

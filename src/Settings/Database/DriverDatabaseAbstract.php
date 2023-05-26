@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Settings\Database;
 
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
@@ -21,9 +22,11 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
     protected string $password = '';
 
     /**
-     * Which serializer strategy to use by default.
+     * Which serializer to use by default.
+     *
+     * If null, the best serializater is chosen.
      */
-    protected SerializerType $serializer = SerializerType::SERIALIZE;
+    protected ?SerializerType $serializer = null;
 
     public function mergeArray(array $settings): void
     {
@@ -112,10 +115,15 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
 
     public function getSerializer(): SerializerType
     {
-        return $this->serializer;
+        return $this->serializer ?? (Magic::$can_use_igbinary ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
     }
 
-    public function setSerializer(SerializerType $serializer): void
+    /**
+     * Which serializer to use by default.
+     *
+     * If null, the best serializer is chosen.
+     */
+    public function setSerializer(?SerializerType $serializer): void
     {
         $this->serializer = $serializer;
     }

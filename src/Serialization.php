@@ -30,7 +30,6 @@ use Amp\TimeoutException;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use Revolt\EventLoop;
 use Throwable;
@@ -215,7 +214,7 @@ abstract class Serialization
                 $unserialized = DbPropertiesFactory::get(
                     $settings,
                     $tableName,
-                    ['serializer' => SerializerType::SERIALIZE],
+                    [],
                     $unserialized,
                 );
             } else {
