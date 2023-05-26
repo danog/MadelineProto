@@ -109,6 +109,7 @@ trait UpdateHandler
             $update = $update['progress'];
         }
         if ($f = $this->event_handler_instance->waitForStartInternal()) {
+            $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using EventLoop::queue to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
             $f->map(function (): void {
                 \array_map($this->handleUpdate(...), $this->updates);
@@ -471,6 +472,7 @@ trait UpdateHandler
      */
     public function saveUpdate(array $update): void
     {
+        $this->logger->logger("Saving update of type {$update['_']}", Logger::VERBOSE);
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
             $this->getConfig();
