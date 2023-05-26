@@ -21,7 +21,7 @@ interface DbArray extends DbType, ArrayAccess, Countable
     /**
      * Get Array copy.
      *
-     * @return array<TKey, TValue>
+     * @psalm-return array<TKey, TValue>
      */
     public function getArrayCopy(): array;
     /**

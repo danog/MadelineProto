@@ -84,6 +84,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
+* [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html)
 * [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Built-in database driver](https://docs.madelineproto.xyz/docs/UPDATES.html#built-in-database-driver)

@@ -60,7 +60,7 @@ final class Redis extends DriverDatabaseAbstract
      *
      * @param string $uri Database URI.
      */
-    public function setUri(string $uri): self
+    public function setUri(string $uri): static
     {
         $this->uri = $uri;
 

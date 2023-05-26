@@ -229,19 +229,60 @@ abstract class InternalDoc
     {
         return $this->wrapper->getAPI()->botLogin($token);
     }
-
+    /**
+     * Executes a custom broadcast action with all peers (users, chats, channels) of the bot.
+     *
+     * Will return an integer ID that can be used to:
+     *
+     * - Get the current broadcast progress with getBroadcastProgress
+     * - Cancel the broadcast using cancelBroadcast
+     *
+     * Note that to avoid manually polling the progress,
+     * MadelineProto will also periodically emit updateBroadcastProgress updates,
+     * containing a Progress object for all broadcasts currently in-progress.
+     *
+     * @param Action $action A custom, serializable Action class that will be called once for every peer.
+     */
     public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action): int
     {
         return $this->wrapper->getAPI()->broadcastCustom($action);
     }
     /**
-     * @param list<int> $ids
+     * Forwards a list of messages to all peers (users, chats, channels) of the bot.
+     *
+     * Will return an integer ID that can be used to:
+     *
+     * - Get the current broadcast progress with getBroadcastProgress
+     * - Cancel the broadcast using cancelBroadcast
+     *
+     * Note that to avoid manually polling the progress,
+     * MadelineProto will also periodically emit updateBroadcastProgress updates,
+     * containing a Progress object for all broadcasts currently in-progress.
+     *
+     * @param mixed $from_peer Bot API ID or Update, from where to forward the messages.
+     * @param list<int> $ids IDs of the messages to forward.
+     * @param bool $drop_author If true, will forward messages without quoting the original author.
      */
     public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false): int
     {
         return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $ids, $drop_author);
     }
-
+    /**
+     * Sends a list of messages to all peers (users, chats, channels) of the bot.
+     *
+     * A simplified version of this method is also available: broadcastForwardMessages can work with pre-prepared messages.
+     *
+     * Will return an integer ID that can be used to:
+     *
+     * - Get the current broadcast progress with getBroadcastProgress
+     * - Cancel the broadcast using cancelBroadcast
+     *
+     * Note that to avoid manually polling the progress,
+     * MadelineProto will also periodically emit updateBroadcastProgress updates,
+     * containing a Progress object for all broadcasts currently in-progress.
+     *
+     * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
+     */
     public function broadcastMessages(array $messages): int
     {
         return $this->wrapper->getAPI()->broadcastMessages($messages);

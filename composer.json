@@ -61,7 +61,8 @@
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "dev-master",
+        "phpdocumentor/type-resolver": "1.x-dev@dev",
         "ext-ctype": "*",
         "danog/phpdoc": "^0.1.7",
         "phpunit/phpunit": "^9",

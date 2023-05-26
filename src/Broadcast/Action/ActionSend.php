@@ -23,7 +23,7 @@ namespace danog\MadelineProto\Broadcast\Action;
 use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action;
 use danog\MadelineProto\MTProto;
-use LogicException;
+use danog\MadelineProto\RPCErrorException;
 
 /** @internal */
 final class ActionSend implements Action
@@ -33,6 +33,34 @@ final class ActionSend implements Action
     }
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void
     {
-        throw new LogicException("todo")
+        try {
+            foreach ($this->messages as $message) {
+                if ($cancellation->isRequested()) {
+                    return;
+                }
+                $this->API->methodCallAsyncRead(
+                    'messages.sendMessage',
+                    \array_merge($message, ['to_peer' => $peer]),
+                    ['FloodWaitLimit' => 2*86400]
+                );
+            }
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'INPUT_USER_DEACTIVATED') {
+                return;
+            }
+            if ($e->rpc === 'USER_IS_BOT') {
+                return;
+            }
+            if ($e->rpc === 'CHAT_WRITE_FORBIDDEN') {
+                return;
+            }
+            if ($e->rpc === 'USER_IS_BLOCKED') {
+                return;
+            }
+            if ($e->rpc === 'PEER_ID_INVALID') {
+                return;
+            }
+            throw $e;
+        }
     }
 }
