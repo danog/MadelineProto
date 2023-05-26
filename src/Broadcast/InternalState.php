@@ -44,6 +44,7 @@ final class InternalState
         private int $broadcastId,
         private MTProto $API,
         private Action $action,
+        private Filter $filter,
     ) {
         $this->cancellation = new DeferredCancellation;
 
@@ -111,6 +112,16 @@ final class InternalState
         $this->setStatus(StatusInternal::GATHERING_PEERS);
         async(function (): void {
             $peers = $this->API->getDialogIds();
+            $peers = \array_filter($peers, fn (int $peer): bool => !(
+                \in_array($peer, $this->filter->blacklist, true)
+                || !match ($this->API->getType($peer)) {
+                    'user' => $this->filter->allowUsers,
+                    'bot' => $this->filter->allowBots,
+                    'chat' => $this->filter->allowGroups,
+                    'supergroup' => $this->filter->allowGroups,
+                    'channel' => $this->filter->allowChannels,
+                }
+            ));
             $this->peers = $peers;
             $this->pendingCount = \count($peers);
             $this->setStatus(StatusInternal::IDLING_BEFORE_BROADCASTING);

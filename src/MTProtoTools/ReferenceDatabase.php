@@ -87,7 +87,7 @@ final class ReferenceDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => [],
+        'db' => ['innerMadelineProto' => true]
     ];
 
     public function __construct(private MTProto $API)

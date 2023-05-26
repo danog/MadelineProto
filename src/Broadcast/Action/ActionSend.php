@@ -39,7 +39,10 @@ final class ActionSend implements Action
                     return;
                 }
                 $this->API->methodCallAsyncRead(
-                    'messages.sendMessage',
+                    isset($message['media']['_']) &&
+                        $message['media']['_'] !== 'messageMediaWebPage'
+                        ? 'messages.sendMedia'
+                        : 'messages.sendMessage',
                     \array_merge($message, ['to_peer' => $peer]),
                     ['FloodWaitLimit' => 2*86400]
                 );

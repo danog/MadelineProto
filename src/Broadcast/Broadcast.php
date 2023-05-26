@@ -49,9 +49,9 @@ trait Broadcast
      *
      * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
      */
-    public function broadcastMessages(array $messages): int
+    public function broadcastMessages(array $messages, ?Filter $filter = null): int
     {
-        return $this->broadcastCustom(new ActionSend($this, $messages));
+        return $this->broadcastCustom(new ActionSend($this, $messages), $filter);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -69,9 +69,9 @@ trait Broadcast
      * @param list<int> $ids IDs of the messages to forward.
      * @param bool $drop_author If true, will forward messages without quoting the original author.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false): int
+    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false, ?Filter $filter = null): int
     {
-        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $ids, $drop_author));
+        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $ids, $drop_author), $filter);
     }
 
     /**
@@ -88,10 +88,13 @@ trait Broadcast
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
      */
-    public function broadcastCustom(Action $action): int
+    public function broadcastCustom(Action $action, ?Filter $filter = null): int
     {
+        // Ensure it can be serialized
+        \serialize($action);
+
         $id = \count($this->broadcasts);
-        $this->broadcasts[$id] = new InternalState($id, $this, $action);
+        $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default());
         return $id;
     }
     /**

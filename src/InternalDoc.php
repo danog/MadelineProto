@@ -243,9 +243,9 @@ abstract class InternalDoc
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
      */
-    public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action): int
+    public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
     {
-        return $this->wrapper->getAPI()->broadcastCustom($action);
+        return $this->wrapper->getAPI()->broadcastCustom($action, $filter);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -263,9 +263,9 @@ abstract class InternalDoc
      * @param list<int> $ids IDs of the messages to forward.
      * @param bool $drop_author If true, will forward messages without quoting the original author.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false): int
+    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
     {
-        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $ids, $drop_author);
+        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $ids, $drop_author, $filter);
     }
     /**
      * Sends a list of messages to all peers (users, chats, channels) of the bot.
@@ -283,9 +283,9 @@ abstract class InternalDoc
      *
      * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
      */
-    public function broadcastMessages(array $messages): int
+    public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
     {
-        return $this->wrapper->getAPI()->broadcastMessages($messages);
+        return $this->wrapper->getAPI()->broadcastMessages($messages, $filter);
     }
     /**
      * Convert generator, promise or any other value to a promise.
@@ -1008,6 +1008,17 @@ abstract class InternalDoc
     public function getTL(): \danog\MadelineProto\TL\TL
     {
         return $this->wrapper->getAPI()->getTL();
+    }
+    /**
+     * Get type of peer.
+     *
+     * @param mixed $id Peer
+     *
+     * @return 'user'|'bot'|'chat'|'supergroup'|'channel'
+     */
+    public function getType(mixed $id): string
+    {
+        return $this->wrapper->getAPI()->getType($id);
     }
     /**
      * Get updates.

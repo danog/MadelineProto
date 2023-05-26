@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
@@ -40,10 +42,18 @@ final class DbPropertiesFactory
 
         if ($dbSettingsCopy instanceof DriverDatabaseAbstract) {
             $config = \array_merge([
-                'serializer' => $dbSettings->getSerializer(),
+                'serializer' => $dbSettingsCopy->getSerializer() ?? (
+                    Magic::$can_use_igbinary ? SerializerType::IGBINARY : SerializerType::SERIALIZE
+                ),
+                'innerMadelineProto' => false,
                 'enableCache' => true,
-                'cacheTtl' => $dbSettings->getCacheTtl(),
+                'cacheTtl' => $dbSettingsCopy->getCacheTtl(),
             ], $config);
+            if ($config['innerMadelineProto']) {
+                $config['serializer'] = Magic::$can_use_igbinary
+                    ? SerializerType::IGBINARY
+                    : SerializerType::SERIALIZE;
+            }
 
             $class = $dbSettings instanceof DriverDatabaseAbstract && (!($config['enableCache'] ?? true) || !$config['cacheTtl'])
                 ? __NAMESPACE__ . '\\NullCache'

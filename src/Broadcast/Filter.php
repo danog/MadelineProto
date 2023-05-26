@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Broadcast module.
+ * Broadcast filter.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -20,37 +20,22 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Broadcast;
 
-use JsonSerializable;
-
 /**
- * Broadcast progress.
+ * Broadcast filter.
  */
-final class Progress implements JsonSerializable
+final class Filter
 {
-    /**
-     * Completion percentage.
-     */
-    public readonly int $percent;
     public function __construct(
-        /** Broadcast ID */
-        public readonly int $broadcastId,
-        /** Broadcast status */
-        public readonly Status $status,
-        /** Pending number of peers */
-        public readonly int $pendingCount,
-        /** Successful number of peers */
-        public readonly int $successCount,
-        /** Failed number of peers */
-        public readonly int $failCount,
+        public readonly bool $allowUsers,
+        public readonly bool $allowBots,
+        public readonly bool $allowGroups,
+        public readonly bool $allowChannels,
+        /** @var list<int> */
+        public readonly array $blacklist = []
     ) {
-        $this->percent = $pendingCount ? (int) (($successCount+$failCount)*100/$pendingCount) : 0;
     }
-    public function jsonSerialize(): mixed
+    public static function default(): self
     {
-        return \get_object_vars($this);
-    }
-    public function __toString()
-    {
-        return "Progress for {$this->broadcastId}: {$this->percent}%, status {$this->status->value}, sent to {$this->successCount} peers, failed sending to {$this->failCount} peers, {$this->pendingCount} peers left.";
+        return new self(true, true, true, true, []);
     }
 }

@@ -543,6 +543,18 @@ trait PeerHandler
     public array $caching_full_info = [];
 
     /**
+     * Get type of peer.
+     *
+     * @param mixed $id Peer
+     *
+     * @return 'user'|'bot'|'chat'|'supergroup'|'channel'
+     */
+    public function getType(mixed $id): string
+    {
+        return $this->getInfo($id)['type'];
+    }
+
+    /**
      * Get info about peer, returns an Info object.
      *
      * @param mixed                $id        Peer

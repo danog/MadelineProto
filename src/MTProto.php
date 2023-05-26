@@ -502,12 +502,12 @@ final class MTProto implements TLCallback, LoggerGetter
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'chats' => [],
-        'full_chats' => [],
-        'sponsoredMessages' => [],
-        'channelParticipants' => [],
-        'usernames' => [],
-        'session' => ['enableCache' => false],
+        'chats' => ['innerMadelineProto' => true],
+        'full_chats' => ['innerMadelineProto' => true],
+        'sponsoredMessages' => ['innerMadelineProto' => true],
+        'channelParticipants' => ['innerMadelineProto' => true],
+        'usernames' => ['innerMadelineProto' => true],
+        'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
 
     /**

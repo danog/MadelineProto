@@ -23,6 +23,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
@@ -41,7 +42,10 @@ use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
 use Generator;
 use Revolt\EventLoop;
+use Throwable;
 use Webmozart\Assert\Assert;
+
+use function Amp\delay;
 
 /**
  * Manages updates.
@@ -137,7 +141,21 @@ trait UpdateHandler
         $request = new Request($this->webhookUrl, 'POST');
         $request->setHeader('content-type', 'application/json');
         $request->setBody($payload);
-        $this->datacenter->getHTTPClient()->request($request);
+        try {
+            /** @var Response */
+            $result = $this->datacenter->getHTTPClient()->request($request);
+            $status = $result->getStatus();
+            if ($status !== 200) {
+                throw new Exception("Got bad status $status!");
+            }
+        } catch (Throwable $e) {
+            $this->logger->logger("Got {$e->getMessage()} while sending webhook", Logger::FATAL_ERROR);
+            $this->updates[$this->updates_key++] = $update;
+            delay(1.0);
+            \array_map($this->handleUpdate(...), $this->updates);
+            $this->updates = [];
+            $this->updates_key = 0;
+        }
     }
 
     private ?DeferredFuture $update_deferred = null;

@@ -68,7 +68,7 @@ final class MinDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => [],
+        'db' => ['innerMadelineProto' => true],
     ];
 
     public function __construct(MTProto $API)

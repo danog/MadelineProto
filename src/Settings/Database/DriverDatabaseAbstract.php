@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
@@ -113,9 +112,9 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      */
     abstract public function setUri(string $uri): static;
 
-    public function getSerializer(): SerializerType
+    public function getSerializer(): ?SerializerType
     {
-        return $this->serializer ?? (Magic::$can_use_igbinary ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
+        return $this->serializer;
     }
 
     /**
