@@ -139,7 +139,8 @@ db mysql
 k
 
 echo "Testing with new version (upgrade)..."
-rm madeline-*phar madeline-*version
+rm -f madeline-*phar madeline-*version
+rm -f tests/madeline-*phar tests/madeline-*version
 
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-81"
 cp "madeline$php$branch.phar" "madeline-TESTING.phar"
