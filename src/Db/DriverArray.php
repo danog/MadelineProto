@@ -81,7 +81,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
-    protected function setSettings(SqlAbstract $settings): void {
+    private function setSettings(SqlAbstract $settings): void {
         $this->dbSettings = $settings;
         $this->setCacheTtl($settings->getCacheTtl());
         $this->setSerializer($settings->getSerializer());
@@ -106,7 +106,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $instance->initConnection($settings);
         $instance->prepareTable();
 
-        if (static::getClassName($previous) !== static::getClassName($instance)) {
+        if (self::getClassName($previous) !== self::getClassName($instance)) {
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }
@@ -146,7 +146,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     }
     private static function migrateDataToDb(self $new, DbArray|array|null $old): void
     {
-        if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
+        if (!empty($old) && self::getClassName($old) !== self::getClassName($new)) {
             if (!$old instanceof DbArray) {
                 $old = MemoryArray::getInstance('', $old, new Memory);
             }
@@ -214,7 +214,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return \iterator_to_array($this->getIterator());
     }
 
-    protected static function getClassName($instance): ?string
+    private static function getClassName($instance): ?string
     {
         if ($instance === null) {
             return null;

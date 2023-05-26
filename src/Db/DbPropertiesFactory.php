@@ -61,7 +61,7 @@ final class DbPropertiesFactory
                 $class .= '\\MysqlArray';
                 break;
             case $dbSettings instanceof Postgres:
-                $class .= '\\PostgresArray';
+                $class .= '\\PostgresArrayBytea';
                 break;
             case $dbSettings instanceof Redis:
                 $class .= '\\RedisArray';
