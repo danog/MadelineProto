@@ -126,12 +126,6 @@ n
 "; } | $p tests/testing.php
 }
 
-reset()
-{
-    cp tools/phar.php madeline.php
-    sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g;s|MADELINE_RELEASE_URL|disable|g' -i madeline.php
-    cp madeline.php madelineBackup.php
-}
 k
 rm -f madeline.phar testing.madeline*
 
@@ -148,24 +142,22 @@ echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-81"
 cp "madeline$php$branch.phar" "madeline-$COMMIT-$php.phar"
 echo -n "$COMMIT-81" > "madeline-$php.phar.version"
+echo 0.0.0.0 phar.madelineproto.xyz > /etc/hosts
+cp tools/phar.php madeline.php
 export ACTIONS_PHAR=1
-reset
 runTestSimple
 cycledb
 k
 
 echo "Testing with new version (restart)"
-reset
 rm -rf testing.madeline || echo
 runTest
 
 echo "Testing with new version (reload)"
-reset
 runTestSimple
 k
 
 echo "Testing with new version (kill+reload)"
-reset
 runTestSimple
 k
 

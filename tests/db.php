@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 if (getenv('ACTIONS_PHAR')) {
     include 'madeline.php';
-    copy('madelineBackup.php', 'madeline.php');
 } elseif (!file_exists(__DIR__.'/../vendor/autoload.php') || getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if (!file_exists('madeline.php')) {
