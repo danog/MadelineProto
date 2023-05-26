@@ -116,6 +116,9 @@ final class InternalState
                 if (\in_array($peer, $this->filter->blacklist, true)) {
                     return false;
                 }
+                if (\is_array($this->filter->whitelist) && !\in_array($peer, $this->filter->whitelist, true)) {
+                    return false;
+                }
                 try {
                     if (!match ($this->API->getType($peer)) {
                         'user' => $this->filter->allowUsers,

@@ -31,11 +31,13 @@ final class Filter
         public readonly bool $allowGroups,
         public readonly bool $allowChannels,
         /** @var list<int> */
-        public readonly array $blacklist = []
+        public readonly array $blacklist = [],
+        /** @var list<int>|null If null all IDs are allowed (*) */
+        public readonly ?array $whitelist = null,
     ) {
     }
     public static function default(): self
     {
-        return new self(true, true, true, true, []);
+        return new self(true, true, true, true);
     }
 }
