@@ -27,7 +27,7 @@ final class Postgres
             $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
                 ->withUser($settings->getUsername())
                 ->withPassword($settings->getPassword())
-                ->withDatabase(\strtolower($settings->getDatabase()));
+                ->withDatabase($settings->getDatabase());
 
             static::createDb($config);
             static::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
