@@ -164,12 +164,12 @@ abstract class DriverArray implements DbArray, IteratorAggregate
                 if ($counter % 500 === 0 || $counter === $total) {
                     await($promises);
                     $promises = [];
-                    Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
+                    Logger::log("Loading data to table {$newName}: $counter/$total", Logger::WARNING);
                 }
                 $new->clearCache();
             }
             if (self::getMigrationName($new, false) !== self::getMigrationName($old, false)) {
-                Logger::log("Dropping data from table {$old}", Logger::WARNING);
+                Logger::log("Dropping data from table {$oldName}", Logger::WARNING);
                 $old->clear();
             }
             Logger::log('Converting database done.', Logger::ERROR);

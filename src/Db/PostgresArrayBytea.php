@@ -111,7 +111,7 @@ class PostgresArrayBytea extends SqlArray
         Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
         $this->db->query(/** @lang PostgreSQL */ "
-            ALTER TABLE \"$from\" RENAME TO \"$to\";
+            ALTER TABLE \"bytea_$from\" RENAME TO \"bytea_$to\";
         ");
     }
 }
