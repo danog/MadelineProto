@@ -33,7 +33,10 @@ $map = [
 ];
 
 $settings = $map[$argv[1]];
-$settings->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
+
+if (!$settings instanceof Memory) {
+    $settings->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
+}
 
 $MadelineProto->updateSettings($settings);
 
