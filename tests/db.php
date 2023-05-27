@@ -21,6 +21,7 @@ use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
+use danog\MadelineProto\Settings\Database\SerializerType;
 
 $MadelineProto = new API(__DIR__.'/../testing.madeline');
 
@@ -31,6 +32,8 @@ $map = [
     'redis' => (new Redis)->setUri('redis://redis'),
 ];
 
-$MadelineProto->updateSettings($map[$argv[1]]);
+$MadelineProto->updateSettings(
+    $map[$argv[1]]->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE)
+);
 
 var_dump($MadelineProto->getFullInfo('danogentili'));

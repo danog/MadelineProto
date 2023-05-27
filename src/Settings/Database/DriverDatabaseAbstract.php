@@ -122,8 +122,9 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * If null, the best serializer is chosen.
      */
-    public function setSerializer(?SerializerType $serializer): void
+    public function setSerializer(?SerializerType $serializer): static
     {
         $this->serializer = $serializer;
+        return $this;
     }
 }

@@ -96,15 +96,17 @@ cd $madelinePath
 
 db()
 {
-    php tests/db.php $1
+    php tests/db.php $1 $2
 }
 cycledb()
 {
-    db memory
-    db mysql
-    db postgres
-    db redis
-    db memory
+    for f in serialize igbinary; do
+        db memory $f
+        db mysql $f
+        db postgres $f
+        db redis $f
+        db memory $f
+    done
 }
 
 runTestSimple()
@@ -135,7 +137,7 @@ echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
 runTest
-db mysql
+db mysql serialize
 k
 
 echo "Testing with new version (upgrade)..."

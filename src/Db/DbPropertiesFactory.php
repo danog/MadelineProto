@@ -49,7 +49,11 @@ final class DbPropertiesFactory
                 'enableCache' => true,
                 'cacheTtl' => $dbSettingsCopy->getCacheTtl(),
             ], $config);
-            if ($config['innerMadelineProto']) {
+
+            if ($config['innerMadelineProto']
+                && $config['serializer'] !== SerializerType::IGBINARY
+                && $config['serializer'] !== SerializerType::SERIALIZE
+            ) {
                 $config['serializer'] = Magic::$can_use_igbinary
                     ? SerializerType::IGBINARY
                     : SerializerType::SERIALIZE;
