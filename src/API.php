@@ -127,6 +127,7 @@ final class API extends AbstractAPI
         $this->wrapper->setWebApiTemplate($template);
     }
 
+    private static bool $testedFibers = false;
     /**
      * Magic constructor function.
      *
@@ -149,16 +150,19 @@ final class API extends AbstractAPI
             return; // OK
         }
 
-        $result = Tools::testFibers(100);
+        if (!self::$testedFibers) {
+            $result = Tools::testFibers(100);
 
-        if ($result['maxFibers'] < 100) {
-            $message = "The maximum number of startable fibers is smaller than 100 ({$result['maxFibers']}): follow the instructions in https://t.me/MadelineProto/596 to fix.";
-            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-                echo $message.'<br>';
+            if ($result['maxFibers'] < 100) {
+                $message = "The maximum number of startable fibers is smaller than 100 ({$result['maxFibers']}): follow the instructions in https://t.me/MadelineProto/596 to fix.";
+                if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+                    echo $message.'<br>';
+                }
+                $file = 'MadelineProto';
+                $line = 1;
+                return new Exception($message, 0, null, $file, $line);
             }
-            $file = 'MadelineProto';
-            $line = 1;
-            return new Exception($message, 0, null, $file, $line);
+            self::$testedFibers = true;
         }
 
         if (!$settings instanceof Settings) {
@@ -169,6 +173,9 @@ final class API extends AbstractAPI
 
         $appInfo = $settings->getAppInfo();
         if (!$appInfo->hasApiInfo()) {
+            if (!$appInfo->getShowPrompt()) {
+                throw new Exception("No API ID or API hash was provided, please specify them in the settings!");
+            }
             $app = $this->APIStart($settings);
             if (!$app) {
                 die();

@@ -22,6 +22,8 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
+copy('https://rpc.madelineproto.xyz/v3.json', 'src/v3.json');
+
 Magic::start(light: false);
 Logger::constructorFromSettings(new SettingsLogger);
 $logger = Logger::$default;

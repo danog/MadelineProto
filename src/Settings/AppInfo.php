@@ -47,6 +47,11 @@ final class AppInfo extends SettingsAbstract
      */
     protected string $langPack = '';
 
+    /**
+     * Whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     */
+    protected bool $showPrompt = true;
+
     public function __construct()
     {
         // Detect device model
@@ -273,6 +278,29 @@ final class AppInfo extends SettingsAbstract
     public function setLangPack(string $langPack): self
     {
         $this->langPack = $langPack;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     *
+     */
+    public function getShowPrompt(): bool
+    {
+        return $this->showPrompt;
+    }
+
+    /**
+     * Set whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     *
+     * @param bool $showPrompt Whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     *
+     * @return self
+     */
+    public function setShowPrompt(bool $showPrompt): static
+    {
+        $this->showPrompt = $showPrompt;
 
         return $this;
     }

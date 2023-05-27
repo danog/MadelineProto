@@ -330,14 +330,9 @@ final class Magic
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
             }
         }
-        try {
-            $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
-        } catch (Throwable $e) {
-        }
-        if (isset($res, $res['ok']) && $res['ok']) {
-            RPCErrorException::$errorMethodMap = $res['result'];
-            RPCErrorException::$descriptions += $res['human_result'];
-        }
+        $res = \json_decode(\file_get_contents(__DIR__.'/v3.json'), true);
+        RPCErrorException::$errorMethodMap = $res['result'];
+        RPCErrorException::$descriptions += $res['human_result'];
         foreach (Extension::ALL_MIMES as $ext => $mimes) {
             $ext = ".$ext";
             foreach ($mimes as $mime) {

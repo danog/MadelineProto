@@ -1,0 +1,17 @@
+FROM php:fpm-bullseye
+
+ADD https://raw.githubusercontent.com/danog/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
+
+RUN curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
+    cd PrimeModule-ext-2.0 && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && \
+    rm -r PrimeModule-ext-2.0
+
+RUN sed -i -E "s/^(IPE_VERSION=)master$/\11.1.0/" /usr/local/bin/install-php-extensions && \
+    chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions ffi pq ev-beta eio-beta intl gmp mbstring pdo_mysql xml dom curl zip opcache && \
+    rm /usr/local/bin/install-php-extensions
+
+CMD ["php"]
