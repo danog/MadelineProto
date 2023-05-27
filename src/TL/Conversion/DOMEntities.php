@@ -56,6 +56,8 @@ final class DOMEntities
             'code' => ['_' => 'messageEntityCode'],
             'spoiler', 'tg-spoiler' => ['_' => 'messageEntitySpoiler'],
             'pre' => ['_' => 'messageEntityPre', 'language' => $node->getAttribute('language') ?? ''],
+            'tg-emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('emoji-id')],
+            'emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('id')],
             'a' => $this->handleA($node),
             default => null,
         };
@@ -90,7 +92,7 @@ final class DOMEntities
         if (\preg_match('|^mention:(.+)|', $href, $matches) || \preg_match('|^tg://user\\?id=(.+)|', $href, $matches)) {
             return ['_' => 'inputMessageEntityMentionName', 'user_id' => $matches[1]];
         }
-        if (\preg_match('|^emoji:(\d+)$|', $href, $matches)) {
+        if (\preg_match('|^emoji:(\d+)$|', $href, $matches) || \preg_match('|^tg://emoji\\?id=(.+)|', $href, $matches)) {
             return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $matches[1]];
         }
         return ['_' => 'messageEntityTextUrl', 'url' => $href];

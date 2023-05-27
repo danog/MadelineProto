@@ -152,7 +152,7 @@ class MyEventHandler extends EventHandler
      */
     public function onUpdateNewMessage(array $update): void
     {
-        if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
+        if ($update['message']['_'] === 'messageEmpty') {
             return;
         }
 

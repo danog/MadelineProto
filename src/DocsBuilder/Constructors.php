@@ -179,7 +179,7 @@ trait Constructors
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
-                if ($param['name'] === 'entities' && $constructor === 'inputSingleMedia') {
+                if ($param['name'] === 'entities') {
                     $hasentities = true;
                     $table .= '|parse\\_mode| [string](/API_docs/types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
 ';

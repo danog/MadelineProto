@@ -1825,12 +1825,6 @@ final class MTProto implements TLCallback, LoggerGetter
         return \array_merge(
             \array_fill_keys(
                 [
-                    'InputPeer',
-                ],
-                $this->getInputPeer(...),
-            ),
-            \array_fill_keys(
-                [
                     'InputUser',
                     'InputChannel',
                 ],
@@ -1854,16 +1848,13 @@ final class MTProto implements TLCallback, LoggerGetter
                 ],
                 $this->getFileInfo(...),
             ),
-            \array_fill_keys(
-                ['InputFileLocation'],
-                $this->getDownloadInfo(...),
-            ),
-            \array_fill_keys(
-                ['InputCheckPasswordSRP'],
-                function (string $password): array {
+            [
+                'InputFileLocation' => $this->getDownloadInfo(...),
+                'InputPeer' => $this->getInputPeer(...),
+                'InputCheckPasswordSRP' => function (string $password): array {
                     return (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password);
-                }
-            ),
+                },
+            ],
         );
     }
     /**
