@@ -32,8 +32,9 @@ $map = [
     'redis' => (new Redis)->setUri('redis://redis'),
 ];
 
-$MadelineProto->updateSettings(
-    $map[$argv[1]]->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE)
-);
+$settings = $map[$argv[1]];
+$settings->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
+
+$MadelineProto->updateSettings($settings);
 
 var_dump($MadelineProto->getFullInfo('danogentili'));
