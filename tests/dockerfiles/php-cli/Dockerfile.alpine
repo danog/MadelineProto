@@ -1,4 +1,5 @@
-FROM php:fpm-alpine
+ARG ARCH=
+FROM ${ARCH}php:fpm-alpine
 
 RUN apk add make g++ && \
     curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \

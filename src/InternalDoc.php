@@ -260,12 +260,12 @@ abstract class InternalDoc
      * containing a Progress object for all broadcasts currently in-progress.
      *
      * @param mixed $from_peer Bot API ID or Update, from where to forward the messages.
-     * @param list<int> $ids IDs of the messages to forward.
+     * @param list<int> $message_ids IDs of the messages to forward.
      * @param bool $drop_author If true, will forward messages without quoting the original author.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
+    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
     {
-        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $ids, $drop_author, $filter);
+        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $message_ids, $drop_author, $filter);
     }
     /**
      * Sends a list of messages to all peers (users, chats, channels) of the bot.

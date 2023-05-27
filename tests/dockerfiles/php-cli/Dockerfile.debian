@@ -1,4 +1,5 @@
-FROM php:fpm-bullseye
+ARG ARCH=
+FROM ${ARCH}php:fpm-bullseye
 
 ADD https://raw.githubusercontent.com/danog/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
