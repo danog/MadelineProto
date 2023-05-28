@@ -19,7 +19,7 @@ clone:
       tags: true
 
 pipeline:
-  docker:
+  build:
     image: woodpeckerci/plugin-docker-buildx
     secrets: [docker_username, docker_password]
     settings:
@@ -32,14 +32,14 @@ pipeline:
         - tag
         - push
   
-  docker-next:
-    image: woodpeckerci/plugin-docker-buildx
+  alias:
+    image: docker:cli
     secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.alpine"
-      platforms: ${platform}
-      tag: next
+    commands:
+      - docker login -u "$docker_username" -p "$docker_password"
+      - docker pull danog/madelineproto:next-alpine
+      - docker tag danog/madelineproto:next-alpine danog/madelineproto:next
+      - docker push danog/madelineproto:next
     when:
       event:
         - tag
