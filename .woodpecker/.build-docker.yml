@@ -28,6 +28,5 @@ pipeline:
       platforms: ${platform}
       tag: next
     when:
-      branch: v8
       event: push
       platform: ${platform}
