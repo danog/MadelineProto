@@ -29,4 +29,3 @@ pipeline:
       tag: next
     when:
       event: push
-      platform: ${platform}

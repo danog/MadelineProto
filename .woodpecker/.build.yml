@@ -25,7 +25,6 @@ pipeline:
       event:
         - tag
         - push
-      platform: ${platform}
     secrets:
       - GITHUB_TOKEN
       - API_ID
