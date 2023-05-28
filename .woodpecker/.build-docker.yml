@@ -44,3 +44,5 @@ pipeline:
       event:
         - tag
         - push
+      matrix:
+        variant: "alpine"

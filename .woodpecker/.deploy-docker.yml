@@ -1,7 +1,4 @@
 matrix:
-  variant:
-    - "debian"
-    - "alpine"
   platform:
     - linux/arm64
 
@@ -18,27 +15,21 @@ clone:
       tags: true
 
 pipeline:
-  build:
-    image: woodpeckerci/plugin-docker-buildx
-    secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
-      platforms: ${platform}
-      tag: latest-${variant}
-    when:
-      event:
-        - tag
-  
   alias:
     image: docker:cli
     secrets: [docker_username, docker_password]
     commands:
       - docker login -u "$docker_username" -p "$docker_password"
-      - docker pull danog/madelineproto:latest-alpine
-      - docker tag danog/madelineproto:latest-alpine danog/madelineproto:latest
-      - docker push danog/madelineproto:latest
+      - docker pull danog/madelineproto:next-alpine
+      - docker pull danog/madelineproto:next-debian
+      - docker pull danog/madelineproto:next
+      - docker tag danog/madelineproto:next-alpine danog/madelineproto:alpine
+      - docker tag danog/madelineproto:next-debian danog/madelineproto:debian
+      - docker tag danog/madelineproto:next danog/madelineproto:latest
     when:
       event:
         - tag
         - push
+
+depends_on:
+  - "build-docker"
