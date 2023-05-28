@@ -1,7 +1,3 @@
-matrix:
-  platform:
-    - linux/arm64
-
 pipeline:
   alias:
     image: docker:cli

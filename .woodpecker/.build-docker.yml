@@ -5,6 +5,8 @@ matrix:
   platform:
     - linux/arm64
 
+platform: ${platform}
+
 clone:
   git:
     when:
