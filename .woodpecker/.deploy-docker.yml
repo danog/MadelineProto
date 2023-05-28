@@ -10,7 +10,6 @@ clone:
     when:
       event:
         - tag
-        - push
     image: woodpeckerci/plugin-git:v1.5.0
     settings:
       depth: 1
@@ -30,7 +29,6 @@ pipeline:
     when:
       event:
         - tag
-        - push
   
   docker-latest:
     image: woodpeckerci/plugin-docker-buildx
@@ -43,4 +41,3 @@ pipeline:
     when:
       event:
         - tag
-        - push
