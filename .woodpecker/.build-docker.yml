@@ -28,6 +28,7 @@ pipeline:
       platforms: ${platform}
       tag: next-${variant}
       cache_from: danog/madelineproto:next-${variant}
+      cache_to: type=inline
     when:
       event:
         - tag
