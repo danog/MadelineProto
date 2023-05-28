@@ -1,5 +1,6 @@
-ARG ARCH=
-FROM ${ARCH}php:fpm-bullseye
+# Either "" or "danog/" to pull the risc-v images
+ARG PREFIX
+FROM ${PREFIX}php:fpm-bullseye
 
 ADD https://raw.githubusercontent.com/danog/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
