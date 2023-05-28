@@ -1,6 +1,6 @@
 # Either "" or "danog/" to pull the risc-v images
-ARG PREFIX
-FROM ${PREFIX}php:fpm-alpine
+ARG IMG_PREFIX
+FROM ${IMG_PREFIX}php:fpm-alpine
 
 RUN apk add make g++ && \
     curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
@@ -18,6 +18,6 @@ RUN sed -i -E "s/^(IPE_VERSION=)master$/\11.1.0/" /usr/local/bin/install-php-ext
     install-php-extensions ffi pq ev-beta eio-beta intl gmp mbstring pdo_mysql xml dom curl zip opcache && \
     rm /usr/local/bin/install-php-extensions
 
-ADD ./php.ini /usr/local/etc/php/php.ini
+ADD ./tests/dockerfiles/php/php.ini /usr/local/etc/php/php.ini
 
 CMD ["php"]

@@ -28,4 +28,18 @@ pipeline:
       platforms: ${platform}
       tag: next
     when:
-      event: push
+      event:
+        - tag
+        - push
+  
+  docker-deploy:
+    image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
+    settings:
+      repo: danog/madelineproto
+      dockerfile: ${dockerfile}
+      platforms: ${platform}
+      tag: latest
+    when:
+      event:
+        - tag
