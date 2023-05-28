@@ -27,6 +27,7 @@ pipeline:
       dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
       platforms: ${platform}
       tag: next-${variant}
+      cache_from: danog/madelineproto:next-${variant}
     when:
       event:
         - tag
