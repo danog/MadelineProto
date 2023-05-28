@@ -2,30 +2,21 @@ matrix:
   platform:
     - linux/arm64
 
-clone:
-  git:
-    when:
-      event:
-        - tag
-    image: woodpeckerci/plugin-git:v1.5.0
-    settings:
-      depth: 1
-      lfs: false
-      recursive: false
-      tags: true
-
 pipeline:
   alias:
     image: docker:cli
     secrets: [docker_username, docker_password]
     commands:
-      - docker login -u "$docker_username" -p "$docker_password"
+      - echo "$docker_password" | docker login -u "$docker_username" --password-stdin
       - docker pull danog/madelineproto:next-alpine
       - docker pull danog/madelineproto:next-debian
       - docker pull danog/madelineproto:next
       - docker tag danog/madelineproto:next-alpine danog/madelineproto:alpine
       - docker tag danog/madelineproto:next-debian danog/madelineproto:debian
       - docker tag danog/madelineproto:next danog/madelineproto:latest
+      - docker push danog/madelineproto:alpine
+      - docker push danog/madelineproto:debian
+      - docker push danog/madelineproto:latest
     when:
       event:
         - tag
