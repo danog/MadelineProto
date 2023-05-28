@@ -16,6 +16,6 @@ RUN sed -i -E "s/^(IPE_VERSION=)master$/\11.1.0/" /usr/local/bin/install-php-ext
     install-php-extensions ffi pq ev-beta eio-beta intl gmp mbstring pdo_mysql xml dom curl zip opcache && \
     rm /usr/local/bin/install-php-extensions
 
-ADD ./tests/dockerfiles/php/php.ini /usr/local/etc/php/php.ini
+ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
 CMD ["php"]

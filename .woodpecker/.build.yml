@@ -55,3 +55,7 @@ services:
 
   redis:
     image: redis
+
+
+depends_on:
+  - build-docker

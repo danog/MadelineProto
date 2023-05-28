@@ -26,20 +26,20 @@ pipeline:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
       platforms: ${platform}
-      tag: next-${variant}
+      tag: latest-${variant}
     when:
       event:
         - tag
         - push
   
-  docker-next:
+  docker-latest:
     image: woodpeckerci/plugin-docker-buildx
     secrets: [docker_username, docker_password]
     settings:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.alpine"
       platforms: ${platform}
-      tag: next
+      tag: latest
     when:
       event:
         - tag
