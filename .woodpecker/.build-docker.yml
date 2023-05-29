@@ -27,7 +27,7 @@ pipeline:
     settings:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
-      platforms: ${platform}
+      platforms: linux/arm64,linux/amd64
       tag: next-${variant},next-${variant}-${CI_COMMIT_SHA}
       cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
@@ -42,7 +42,7 @@ pipeline:
     settings:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
-      platforms: ${platform}
+      platforms: linux/arm64,linux/amd64
       tag: ${variant}
       cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
@@ -56,7 +56,7 @@ pipeline:
     settings:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.debian"
-      platforms: ${platform}
+      platforms: linux/arm64,linux/amd64
       tag: next
       cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
@@ -73,7 +73,7 @@ pipeline:
     settings:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.debian"
-      platforms: ${platform}
+      platforms: linux/arm64,linux/amd64
       tag: latest
       cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
