@@ -33,6 +33,7 @@ pipeline:
       - API_HASH
       - BOT_TOKEN
       - DEST
+      - DEPLOY_KEY
     environment:
       - PHP_VERSION=${php}
       - TAG=${CI_COMMIT_TAG}

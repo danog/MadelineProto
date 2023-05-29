@@ -236,7 +236,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         }
         $base = \str_replace('NullCache\\', '', $instance::class);
         if ($include_serialization_type && $instance instanceof DriverArray) {
-            $base .= ' ('.$instance->dbSettings->getSerializer()->value.')';
+            $base .= ' ('.($instance->dbSettings->getSerializer()?->value ?? 'default').')';
         }
         return $base;
     }
