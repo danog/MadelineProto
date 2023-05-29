@@ -21,7 +21,7 @@ clone:
       tags: true
 
 pipeline:
-  build:
+  variants:
     image: woodpeckerci/plugin-docker-buildx
     secrets: [docker_username, docker_password]
     settings:
@@ -35,13 +35,46 @@ pipeline:
       event:
         - tag
         - push
+  
+  variants-tag:
+    image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
+    settings:
+      repo: danog/madelineproto
+      dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
+      platforms: ${platform}
+      tag: ${variant}
+      cache_from: danog/madelineproto:next-${variant}
+      cache_to: type=inline
+    when:
+      event:
+        - tag
 
   alias:
-    image: docker:cli
+    image: woodpeckerci/plugin-docker-buildx
     secrets: [docker_username, docker_password]
-    commands:
-      - tests/alias.sh
+    settings:
+      repo: danog/madelineproto
+      dockerfile: "tests/dockerfiles/Dockerfile.debian"
+      platforms: ${platform}
+      tag: next
+      cache_from: danog/madelineproto:next-debian
+      cache_to: type=inline
     when:
       event:
         - tag
         - push
+
+  alias-tag:
+    image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
+    settings:
+      repo: danog/madelineproto
+      dockerfile: "tests/dockerfiles/Dockerfile.debian"
+      platforms: ${platform}
+      tag: latest
+      cache_from: danog/madelineproto:next-debian
+      cache_to: type=inline
+    when:
+      event:
+        - tag
