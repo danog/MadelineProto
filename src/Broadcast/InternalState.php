@@ -27,6 +27,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * @internal
@@ -152,8 +153,9 @@ final class InternalState
         }
         $this->setStatus(StatusInternal::BROADCASTING);
         $cancellation = $this->cancellation->getCancellation();
+        $promises = [];
         foreach ($this->peers as $key => $peer) {
-            async(function () use ($key, $peer, $cancellation): void {
+            $promises []= async(function () use ($key, $peer, $cancellation): void {
                 if ($this->cancellation->isCancelled()) {
                     $this->setStatus(StatusInternal::CANCELLED);
                     return;
@@ -184,6 +186,10 @@ final class InternalState
                     }
                 }
             });
+            if (count($promises) % 50 === 0) {
+                await($promises);
+                $promises = [];
+            }
         }
     }
 

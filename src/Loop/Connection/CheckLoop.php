@@ -63,6 +63,9 @@ final class CheckLoop extends Loop
             foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
                 $deferred = new DeferredFuture();
                 $deferred->getFuture()->map(function ($result) use ($message_ids): void {
+                    if (\is_callable($result)) {
+                        throw $result();
+                    }
                     $reply = [];
                     foreach (\str_split($result['info']) as $key => $chr) {
                         $message_id = $message_ids[$key];
