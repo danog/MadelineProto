@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\SerializerType;
@@ -84,11 +85,14 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     {
         $this->dbSettings = $settings;
         $this->setCacheTtl($settings->getCacheTtl());
-        $this->setSerializer($settings->getSerializer());
+        $this->setSerializer($settings->getSerializer() ?? (
+            Magic::$can_use_igbinary ? SerializerType::IGBINARY : SerializerType::SERIALIZE
+        ));
     }
 
     public function __wakeup(): void
     {
+        Magic::start(light: true);
         $this->setSettings($this->dbSettings);
     }
 
