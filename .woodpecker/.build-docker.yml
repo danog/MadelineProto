@@ -35,7 +35,7 @@ pipeline:
       event:
         - tag
         - push
-  
+
   alias:
     image: docker:cli
     secrets: [docker_username, docker_password]
@@ -43,10 +43,7 @@ pipeline:
       - DUSER=${docker_username}
       - DPASS=${docker_password}
     commands:
-      - docker login -p "$DUSER" -u "$DPASS"
-      - docker pull danog/madelineproto:next-debian
-      - docker tag danog/madelineproto:next-debian danog/madelineproto:next
-      - docker push danog/madelineproto:next
+      - tests/alias.sh
     when:
       event:
         - tag
