@@ -58,12 +58,14 @@ pipeline:
       dockerfile: "tests/dockerfiles/Dockerfile.debian"
       platforms: ${platform}
       tag: next
-      cache_from: danog/madelineproto:next-debian
+      cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
     when:
       event:
         - tag
         - push
+      matrix:
+        variant: "debian"
 
   alias-tag:
     image: woodpeckerci/plugin-docker-buildx
@@ -73,8 +75,10 @@ pipeline:
       dockerfile: "tests/dockerfiles/Dockerfile.debian"
       platforms: ${platform}
       tag: latest
-      cache_from: danog/madelineproto:next-debian
+      cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
     when:
       event:
         - tag
+      matrix:
+        variant: "debian"
