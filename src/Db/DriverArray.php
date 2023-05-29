@@ -90,16 +90,21 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         ));
     }
 
+    private bool $old = true;
     public function __wakeup(): void
     {
         Magic::start(light: true);
         $this->setSettings($this->dbSettings);
+        if ($this->old) {
+            $this->setSerializer(SerializerType::SERIALIZE);
+        }
     }
 
     public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
+        $instance->old = false;
         $instance->setTable($table);
 
         $instance->setSettings($settings);

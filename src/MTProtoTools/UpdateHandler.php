@@ -457,6 +457,8 @@ trait UpdateHandler
     /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.
      *
+     * @param mixed $channel Channel/supergroup to subscribe to
+     *
      * @return bool False if we were already subscribed
      */
     public function subscribeToUpdates(mixed $channel): bool

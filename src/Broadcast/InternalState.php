@@ -186,7 +186,7 @@ final class InternalState
                     }
                 }
             });
-            if (count($promises) % 50 === 0) {
+            if (\count($promises) % 50 === 0) {
                 await($promises);
                 $promises = [];
             }
