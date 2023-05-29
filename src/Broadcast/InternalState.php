@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Broadcast;
 
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -171,7 +172,7 @@ final class InternalState
                         // The finally block will still be executed
                         return;
                     }
-                    throw $e;
+                    $this->API->logger->logger("An error occurred while broadcasting: $e", Logger::ERROR);
                 } finally {
                     if ($this->cancellation->isCancelled()) {
                         $this->setStatus(StatusInternal::CANCELLED);
