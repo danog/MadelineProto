@@ -40,10 +40,10 @@ pipeline:
     image: docker:cli
     secrets: [docker_username, docker_password]
     environment:
-      - docker_username=${docker_username}
-      - docker_password=${docker_password}
+      - DUSER=${docker_username}
+      - DPASS=${docker_password}
     commands:
-      - docker login -p "$docker_password" -u "$docker_username"
+      - docker login -p "$DUSER" -u "$DPASS"
       - docker pull danog/madelineproto:next-debian
       - docker tag danog/madelineproto:next-debian danog/madelineproto:next
       - docker push danog/madelineproto:next
