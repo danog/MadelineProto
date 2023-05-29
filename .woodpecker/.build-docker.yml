@@ -36,9 +36,11 @@ pipeline:
         - tag
         - push
   
-  alias:
+  alias_images:
     image: docker:cli
-    secrets: [docker_username, docker_password]
+    secrets:
+      - docker_username
+      - docker_password
     commands:
       - echo "test$docker_username"test
       - docker login --username "$docker_username" --password "$docker_password"
