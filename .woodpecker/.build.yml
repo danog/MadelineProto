@@ -22,7 +22,7 @@ clone:
 pipeline:
   build:
     group: build
-    image: danog/madelineproto:latest
+    image: danog/madelineproto:next
     when:
       event:
         - tag
