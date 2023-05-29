@@ -28,7 +28,7 @@ pipeline:
       repo: danog/madelineproto
       dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
       platforms: ${platform}
-      tag: next-${variant}
+      tag: next-${variant},next-${variant}-${CI_COMMIT_SHA}
       cache_from: danog/madelineproto:next-${variant}
       cache_to: type=inline
     when:

@@ -22,7 +22,7 @@ clone:
 pipeline:
   build:
     group: build
-    image: danog/madelineproto:next
+    image: danog/madelineproto:next-debian-${CI_COMMIT_SHA}
     when:
       event:
         - tag
@@ -38,7 +38,6 @@ pipeline:
       - PHP_VERSION=${php}
       - TAG=${CI_COMMIT_TAG}
     commands:
-      - ls /bin/bash
       - /bin/bash tests/makephar.sh
 
 services:
