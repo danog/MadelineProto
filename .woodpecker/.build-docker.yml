@@ -38,10 +38,7 @@ pipeline:
 
   alias:
     image: docker:cli
-    secrets: [docker_username, docker_password]
-    environment:
-      - DUSER=${docker_username}
-      - DPASS=${docker_password}
+    secrets: [duser, dpass]
     commands:
       - tests/alias.sh
     when:
