@@ -40,7 +40,7 @@ pipeline:
     image: docker:cli
     secrets: [docker_username, docker_password]
     commands:
-      - echo "$docker_password" | docker login -u "$docker_username" --password-stdin
+      - docker login --username "$docker_username" --password "$docker_password"
       - docker pull danog/madelineproto:next-alpine
       - docker tag danog/madelineproto:next-alpine danog/madelineproto:next
       - docker push danog/madelineproto:next
