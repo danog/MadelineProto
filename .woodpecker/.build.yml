@@ -38,6 +38,7 @@ pipeline:
       - PHP_VERSION=${php}
       - TAG=${CI_COMMIT_TAG}
     commands:
+      - ls /bin/bash
       - /bin/bash tests/makephar.sh
 
 services:
