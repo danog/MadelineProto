@@ -2,8 +2,11 @@ pipeline:
   alias:
     image: docker:cli
     secrets: [docker_username, docker_password]
+    environment:
+      - docker_username=${docker_username}
+      - docker_password=${docker_password}
     commands:
-      - echo "$docker_password" | docker login -u "$docker_username" --password-stdin
+      - docker login -p "$docker_password" -u "$docker_username"
       - docker pull danog/madelineproto:next-alpine
       - docker pull danog/madelineproto:next-debian
       - docker pull danog/madelineproto:next
@@ -16,7 +19,6 @@ pipeline:
     when:
       event:
         - tag
-        - push
 
 depends_on:
   - "build-docker"

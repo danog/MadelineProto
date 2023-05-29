@@ -32,6 +32,13 @@ if [ "$TAG" == "" ]; then
     git checkout "$TAG"
 fi
 
+if [ "$TAG" != "7777" ]; then
+    grep -q "const RELEASE = '$TAG'" src/MTProto.php || {
+        echo "The RELEASE constant is not up to date!"
+        exit 1
+    }
+fi
+
 export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'

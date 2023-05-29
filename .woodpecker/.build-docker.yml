@@ -36,3 +36,18 @@ pipeline:
         - tag
         - push
   
+  alias:
+    image: docker:cli
+    secrets: [docker_username, docker_password]
+    environment:
+      - docker_username=${docker_username}
+      - docker_password=${docker_password}
+    commands:
+      - docker login -p "$docker_password" -u "$docker_username"
+      - docker pull danog/madelineproto:next-debian
+      - docker tag danog/madelineproto:next-debian danog/madelineproto:next
+      - docker push danog/madelineproto:next
+    when:
+      event:
+        - tag
+        - push

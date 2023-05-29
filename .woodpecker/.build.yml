@@ -22,7 +22,7 @@ clone:
 pipeline:
   build:
     group: build
-    image: 192.168.69.1:5000/php-ci:latest
+    image: danog/madelineproto:next
     when:
       event:
         - tag

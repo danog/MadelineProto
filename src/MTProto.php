@@ -139,7 +139,7 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @var string
      */
-    const RELEASE = '8.0.0-beta84';
+    const RELEASE = '8.0.0-beta86';
     /**
      * We're not logged in.
      *
