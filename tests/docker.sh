@@ -31,7 +31,6 @@ fi
 echo "Building for $arches"
 
 for f in alpine debian; do
-	manifest=""
 	for arch in $arches; do
 		cp tests/dockerfiles/Dockerfile.$f Dockerfile.$arch
 		if [ "$arch" == "riscv64" ]; then
@@ -44,12 +43,15 @@ for f in alpine debian; do
 			--cache-from danog/madelineproto:next-$f-$arch \
 			--cache-to type=inline \
 			--push &
-		
-		manifest="danog/madelineproto:next-$f-$arch $manifest"
 	done
 	wait
 
-	docker buildx imagetools create -t danog/madelineproto:next-$f $manifest
+	if [ "$f" == "debian" ]; then
+		docker buildx imagetools create -t danog/madelineproto:next-$f danog/madelineproto:next-$f-{arm,amd}64
+	else
+		docker buildx imagetools create -t danog/madelineproto:next-$f danog/madelineproto:next-$f-{arm,amd,riscv}64
+	fi
+	docker pull danog/madelineproto:next-$f
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
 		docker tag danog/madelineproto:next-$f danog/madelineproto:$f

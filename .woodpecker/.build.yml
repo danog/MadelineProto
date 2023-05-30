@@ -22,7 +22,7 @@ clone:
 pipeline:
   build:
     group: build
-    image: danog/madelineproto:next-debian-${CI_COMMIT_SHA}
+    image: danog/madelineproto:next
     when:
       event:
         - tag
