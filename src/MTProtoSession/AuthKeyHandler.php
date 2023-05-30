@@ -120,7 +120,6 @@ trait AuthKeyHandler
                 $ok = false;
                 $pq = Tools::unpackSignedLong(\strrev($pq_bytes));
                 foreach ([
-                    'factor_single',
                     'native_single_cpp',
                     'python_single_alt',
                     'python_single',
