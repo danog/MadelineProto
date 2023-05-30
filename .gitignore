@@ -144,3 +144,5 @@ t.php
 app_test.json
 app.json
 config.json
+
+/Dockerfile
