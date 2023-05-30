@@ -31,8 +31,8 @@ fi
 echo "Building for $arch"
 
 for f in alpine debian; do
-	content="$(cat tests/dockerfiles/Dockerfile.$f)"
-	content="$content$(cat tests/dockerfiles/Dockerfile.$f | sed "s/FROM .*/FROM danog/php:8.2-fpm-$f/")"
+	echo >> tests/dockerfiles/Dockerfile.$f
+	cat tests/dockerfiles/Dockerfile.$f | sed "s|FROM .*|FROM danog/php:8.2-fpm-$f|" >> tests/dockerfiles/Dockerfile.$f
 
 	docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform $arch . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
 	docker push danog/madelineproto:next-$f
