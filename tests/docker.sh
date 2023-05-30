@@ -11,25 +11,31 @@ if ping -c 1 192.168.69.206; then
 fi
 
 has_x86=0
-if ping -c 1 192.168.69.236; then
-	docker buildx create --append --name wp --driver remote tcp://192.168.69.236:1234
-	has_x86=1
-fi
+for f in 192.168.69.236 192.168.69.207; do
+	if ping -c 1 $f; then
+		docker buildx create --append --name wp --driver remote tcp://$f:1234
+		has_x86=1
+		break
+	fi
+done
 
 arch="linux/arm64"
 if [ $has_x86 -eq 1 ]; then
 	arch="$arch,linux/amd64"
 fi
 
-for f in debian alpine; do
-	docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform $arch . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
-	if [ $has_riscv -eq 1 ]; then
-		IMG=danog/madelineproto:8.2-fpm-$f docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform linux/riscv64 . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
-	fi
-	docker push danog/madelineproto:next-$f
+if [ $has_riscv -eq 1 ]; then
+	arch="$arch,linux/riscv64"
+fi
 
-	docker tag danog/madelineproto:next-$f danog/madelineproto:next-$f-$CI_COMMIT_SHA
-	docker push danog/madelineproto:next-$f-$CI_COMMIT_SHA
+echo "Building for $arch"
+
+for f in alpine debian; do
+	content="$(cat tests/dockerfiles/Dockerfile.$f)"
+	content="$content$(cat tests/dockerfiles/Dockerfile.$f | sed "s/FROM .*/FROM danog/php:8.2-fpm-$f")"
+
+	docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform $arch . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
+	docker push danog/madelineproto:next-$f
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
 		docker tag danog/madelineproto:next-$f danog/madelineproto:$f

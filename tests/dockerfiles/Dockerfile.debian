@@ -1,5 +1,4 @@
-ARG IMG=php:fpm-bullseye
-FROM ${IMG}
+FROM php:8.2-fpm-bullseye
 
 ADD https://raw.githubusercontent.com/danog/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 

@@ -1,6 +1,4 @@
-# Either "" or "danog/" to pull the risc-v images
-ARG IMG="php:fpm-alpine"
-FROM ${IMG}
+FROM php:8.2-fpm-alpine
 
 RUN apk add make g++ && \
     curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
