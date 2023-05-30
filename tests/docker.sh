@@ -40,16 +40,17 @@ for f in alpine debian; do
 		fi
 		docker buildx build --platform linux/$arch . \
 			-f Dockerfile.$arch \
-			-t danog/madelineproto:$arch-next-$f \
+			-t danog/madelineproto:next-$f-$arch \
 			--cache-from danog/madelineproto:next-$f \
 			--cache-to type=inline \
-			--load &
+			--push &
 		
-		manifest="danog/madelineproto:$arch-next-$f $manifest"
+		manifest="danog/madelineproto:next-$f-$arch $manifest"
 	done
 	wait
 
-	docker manifest create --insecure danog/madelineproto:next-$f $manifest
+	docker pull $manifest
+	docker manifest create danog/madelineproto:next-$f $manifest
 	docker manifest push danog/madelineproto:next-$f
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
