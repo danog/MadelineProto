@@ -24,23 +24,23 @@ fi
 for f in debian alpine; do
 	docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform $arch . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
 	if [ $has_riscv -eq 1 ]; then
-		IMG=danog/php:8.2-fpm-$f docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform linux/riscv64 . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
+		IMG=danog/madelineproto:8.2-fpm-$f docker buildx build -f tests/dockerfiles/Dockerfile.$f  --platform linux/riscv64 . -t danog/madelineproto:next-$f --cache-from danog/madelineproto:next-$f --cache-to type=inline
 	fi
-	docker push danog/php:next-$f
+	docker push danog/madelineproto:next-$f
 
-	docker tag danog/php:next-$f danog/php:next-$f-$CI_COMMIT_HASH
-	docker push danog/php:next-$f-$CI_COMMIT_HASH
+	docker tag danog/madelineproto:next-$f danog/madelineproto:next-$f-$CI_COMMIT_SHA
+	docker push danog/madelineproto:next-$f-$CI_COMMIT_SHA
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
-		docker tag danog/php:next-$f danog/php:$f
-		docker push danog/php:$f
+		docker tag danog/madelineproto:next-$f danog/madelineproto:$f
+		docker push danog/madelineproto:$f
 	fi
 done
 
-docker tag danog/php:next-debian danog/php:next
-docker push danog/php:next
+docker tag danog/madelineproto:next-debian danog/madelineproto:next
+docker push danog/madelineproto:next
 
 if [ "$CI_COMMIT_TAG" != "" ]; then
-	docker tag danog/php:next danog/php:latest
-	docker push danog/php:latest
+	docker tag danog/madelineproto:next danog/madelineproto:latest
+	docker push danog/madelineproto:latest
 fi
