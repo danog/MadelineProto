@@ -20,6 +20,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
+      - apk add bash
       - tests/docker.sh
     when:
       event:
