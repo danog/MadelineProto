@@ -49,7 +49,7 @@ for f in alpine debian; do
 	done
 	wait
 
-	docker pull $manifest
+	for m in $manifest; do docker pull $m; done
 	docker manifest create danog/madelineproto:next-$f $manifest
 	docker manifest push danog/madelineproto:next-$f
 
