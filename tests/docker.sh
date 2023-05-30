@@ -35,6 +35,7 @@ for f in alpine debian; do
 	for arch in $arches; do
 		cp tests/dockerfiles/Dockerfile.$f Dockerfile.$arch
 		if [ "$arch" == "riscv64" ]; then
+			if [ "$f" == "debian" ]; then continue; fi
 			sed "s|FROM .*|FROM danog/php:8.2-fpm-$f|" -i Dockerfile.$arch
 		fi
 		docker buildx build --platform linux/$arch . \
@@ -44,11 +45,11 @@ for f in alpine debian; do
 			--cache-to type=inline \
 			--load &
 		
-		manifest="$manifest danog/madelineproto:$arch-next-$f"
+		manifest="danog/madelineproto:$arch-next-$f $manifest"
 	done
 	wait
 
-	docker manifest create danog/madelineproto:next-$f $manifest
+	docker manifest create --insecure danog/madelineproto:next-$f $manifest
 	docker manifest push danog/madelineproto:next-$f
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
@@ -57,7 +58,7 @@ for f in alpine debian; do
 	fi
 done
 
-docker tag danog/madelineproto:next-debian danog/madelineproto:next
+docker tag danog/madelineproto:next-alpine danog/madelineproto:next
 docker push danog/madelineproto:next
 
 if [ "$CI_COMMIT_TAG" != "" ]; then

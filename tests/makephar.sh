@@ -7,10 +7,7 @@ php composer-setup.php
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
-apt-get update
-apt-get -y install procps git unzip gh
+apk add procps git unzip github-cli
 
 echo "$TAG" | grep -q '\.9999' && exit 0 || true
 echo "$TAG" | grep -q '\.9998' && exit 0 || true
