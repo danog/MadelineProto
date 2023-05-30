@@ -33,17 +33,19 @@ echo "Building for $arches"
 for f in alpine debian; do
 	manifest=""
 	for arch in $arches; do
-		cp tests/dockerfiles/Dockerfile.$f Dockerfile
+		cp tests/dockerfiles/Dockerfile.$f Dockerfile.$arch
 		if [ "$arch" == "riscv64" ]; then
-			sed "s|FROM .*|FROM danog/php:8.2-fpm-$f|" -i Dockerfile
+			sed "s|FROM .*|FROM danog/php:8.2-fpm-$f|" -i Dockerfile.$arch
 		fi
 		docker buildx build --platform linux/$arch . \
+			-f Dockerfile.$arch \
 			-t danog/madelineproto:$arch-next-$f \
 			--cache-from danog/madelineproto:next-$f \
-			--cache-to type=inline
+			--cache-to type=inline &
 		
 		manifest="$manifest danog/madelineproto:$arch-next-$f"
 	done
+	wait
 
 	docker manifest create danog/madelineproto:next-$f $manifest
 	docker manifest push danog/madelineproto:next-$f
