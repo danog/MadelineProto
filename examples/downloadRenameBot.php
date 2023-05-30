@@ -234,7 +234,6 @@ class MyEventHandler extends EventHandler
 
 $settings = new Settings;
 $settings->getConnection()
-    ->setMinMediaSocketCount(20)
     ->setMaxMediaSocketCount(1000);
 
 // IMPORTANT: for security reasons, upload by URL will still be allowed
