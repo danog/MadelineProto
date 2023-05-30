@@ -17,4 +17,4 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
-CMD ["php"]
+CMD ["php", "/app/bot.php"]
