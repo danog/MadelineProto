@@ -41,7 +41,8 @@ for f in alpine debian; do
 			-f Dockerfile.$arch \
 			-t danog/madelineproto:$arch-next-$f \
 			--cache-from danog/madelineproto:next-$f \
-			--cache-to type=inline &
+			--cache-to type=inline \
+			--load &
 		
 		manifest="$manifest danog/madelineproto:$arch-next-$f"
 	done
