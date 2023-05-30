@@ -30,6 +30,14 @@ fi
 
 echo "Building for $arches"
 
+join_images() {
+	if [ "$1" == "debian" ]; then
+		docker buildx imagetools create -t danog/madelineproto:$2 danog/madelineproto:next-$1-{arm,amd}64
+	else
+		docker buildx imagetools create -t danog/madelineproto:$2 danog/madelineproto:next-$1-{arm,amd,riscv}64
+	fi
+}
+
 for f in alpine debian; do
 	for arch in $arches; do
 		cp tests/dockerfiles/Dockerfile.$f Dockerfile.$arch
@@ -46,23 +54,15 @@ for f in alpine debian; do
 	done
 	wait
 
-	if [ "$f" == "debian" ]; then
-		docker buildx imagetools create -t danog/madelineproto:next-$f danog/madelineproto:next-$f-{arm,amd}64
-	else
-		docker buildx imagetools create -t danog/madelineproto:next-$f danog/madelineproto:next-$f-{arm,amd,riscv}64
-	fi
-	docker pull danog/madelineproto:next-$f
+	join_images $f next-$f
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
-		docker tag danog/madelineproto:next-$f danog/madelineproto:$f
-		docker push danog/madelineproto:$f
+		join_images $f $f
 	fi
 done
 
-docker tag danog/madelineproto:next-alpine danog/madelineproto:next
-docker push danog/madelineproto:next
+join_images alpine next
 
 if [ "$CI_COMMIT_TAG" != "" ]; then
-	docker tag danog/madelineproto:next danog/madelineproto:latest
-	docker push danog/madelineproto:latest
+	join_images alpine latest
 fi
