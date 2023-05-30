@@ -3,7 +3,6 @@ matrix:
     - "8.1"
   platform:
     - linux/arm64
-    - linux/riscv64
 
 platform: ${platform}
 

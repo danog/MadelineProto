@@ -1,0 +1,31 @@
+platform: linux/arm64
+
+clone:
+  git:
+    when:
+      event:
+        - tag
+        - push
+    image: woodpeckerci/plugin-git:v1.5.0
+    settings:
+      depth: 1
+      lfs: false
+      recursive: false
+      tags: true
+
+pipeline:
+  variants:
+    image: docker:cli
+    secrets: [docker_username, docker_password]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - apk add bash
+      - tests/docker.sh deploy
+    when:
+      event:
+        - tag
+        - push
+
+depends_on:
+  - build

@@ -56,13 +56,13 @@ for f in alpine debian; do
 
 	join_images $f next-$f
 
-	if [ "$CI_COMMIT_TAG" != "" ]; then
+	if [ "$1" == "deploy" ]; then
 		join_images $f $f
 	fi
 done
 
 join_images alpine next
 
-if [ "$CI_COMMIT_TAG" != "" ]; then
+if [ "$1" == "deploy" ]; then
 	join_images alpine latest
 fi
