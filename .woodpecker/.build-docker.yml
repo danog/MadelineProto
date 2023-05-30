@@ -1,11 +1,4 @@
-matrix:
-  variant:
-    - "debian"
-    - "alpine"
-  platform:
-    - linux/arm64
-
-platform: ${platform}
+platform: linux/arm64
 
 clone:
   git:
@@ -22,63 +15,11 @@ clone:
 
 pipeline:
   variants:
-    image: woodpeckerci/plugin-docker-buildx
+    image: docker:cli
     secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
-      platforms: linux/arm64,linux/amd64
-      tag: next-${variant},next-${variant}-${CI_COMMIT_SHA}
-      cache_from: danog/madelineproto:next-${variant}
-      cache_to: type=inline
+    commands:
+      - tests/docker.sh
     when:
       event:
         - tag
         - push
-  
-  variants-tag:
-    image: woodpeckerci/plugin-docker-buildx
-    secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.${variant}"
-      platforms: linux/arm64,linux/amd64
-      tag: ${variant}
-      cache_from: danog/madelineproto:next-${variant}
-      cache_to: type=inline
-    when:
-      event:
-        - tag
-
-  alias:
-    image: woodpeckerci/plugin-docker-buildx
-    secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.debian"
-      platforms: linux/arm64,linux/amd64
-      tag: next
-      cache_from: danog/madelineproto:next-${variant}
-      cache_to: type=inline
-    when:
-      event:
-        - tag
-        - push
-      matrix:
-        variant: "debian"
-
-  alias-tag:
-    image: woodpeckerci/plugin-docker-buildx
-    secrets: [docker_username, docker_password]
-    settings:
-      repo: danog/madelineproto
-      dockerfile: "tests/dockerfiles/Dockerfile.debian"
-      platforms: linux/arm64,linux/amd64
-      tag: latest
-      cache_from: danog/madelineproto:next-${variant}
-      cache_to: type=inline
-    when:
-      event:
-        - tag
-      matrix:
-        variant: "debian"
