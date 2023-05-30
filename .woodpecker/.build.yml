@@ -3,6 +3,7 @@ matrix:
     - "8.1"
   platform:
     - linux/arm64
+    - linux/riscv64
 
 platform: ${platform}
 
@@ -36,6 +37,7 @@ pipeline:
       - DEPLOY_KEY
     environment:
       - PHP_VERSION=${php}
+      - PLATFORM=${platform}
       - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
