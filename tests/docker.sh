@@ -41,7 +41,7 @@ for f in alpine debian; do
 		docker buildx build --platform linux/$arch . \
 			-f Dockerfile.$arch \
 			-t danog/madelineproto:next-$f-$arch \
-			--cache-from danog/madelineproto:next-$f \
+			--cache-from danog/madelineproto:next-$f-$arch \
 			--cache-to type=inline \
 			--push &
 		
@@ -49,8 +49,7 @@ for f in alpine debian; do
 	done
 	wait
 
-	docker manifest create danog/madelineproto:next-$f $manifest
-	docker manifest push danog/madelineproto:next-$f
+	docker buildx imagetools create -t danog/madelineproto:next-$f $manifest
 
 	if [ "$CI_COMMIT_TAG" != "" ]; then
 		docker tag danog/madelineproto:next-$f danog/madelineproto:$f
