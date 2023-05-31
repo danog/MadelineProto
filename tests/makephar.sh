@@ -8,7 +8,7 @@ php composer-setup.php
 php -r "unlink('composer-setup.php');"
 mv composer.phar /usr/local/bin/composer
 
-apk add procps git unzip github-cli
+apk add procps git unzip github-cli openssh
 
 echo "$TAG" | grep -q '\.9999' && exit 0 || true
 echo "$TAG" | grep -q '\.9998' && exit 0 || true
