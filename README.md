@@ -80,6 +80,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Changing 2FA password](https://docs.madelineproto.xyz/docs/LOGIN.html#changing-2fa-password)
 * [Features](https://docs.madelineproto.xyz/docs/FEATURES.html)
 * [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html)
+* [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html)
 * [Installation](https://docs.madelineproto.xyz/docs/INSTALLATION.html)
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)

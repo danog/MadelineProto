@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 # Configure
-sed 's/;phar.readonly = On/phar.readonly = 0/g' -i /usr/local/etc/php/php.ini
+echo >> /usr/local/etc/php/php.ini
+echo 'phar.readonly = 0' >> /usr/local/etc/php/php.ini
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
@@ -197,12 +198,10 @@ rm "madeline81.phar"
 gh release edit --prerelease=false "$TAG"
 gh release edit --latest=true "$TAG"
 
-if [ "$DEPLOY_KEY" != "" ]; then
-    mkdir -p $HOME/.ssh
-    ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
-    echo "$DEPLOY_KEY" > $HOME/.ssh/id_rsa
-    chmod 0600 $HOME/.ssh/id_rsa
-fi
+mkdir -p $HOME/.ssh
+ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
+echo "$DEPLOY_KEY" > $HOME/.ssh/id_rsa
+chmod 0600 $HOME/.ssh/id_rsa
 
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"

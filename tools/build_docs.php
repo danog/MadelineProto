@@ -79,6 +79,7 @@ $order = [
     'LOGIN',
     'FEATURES',
     'REQUIREMENTS',
+    'DOCKER',
     'INSTALLATION',
     'BROADCAST',
     'UPDATES',
