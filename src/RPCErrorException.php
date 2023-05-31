@@ -46,6 +46,27 @@ class RPCErrorException extends \Exception
     private string $caller = '';
     private ?string $localized = null;
 
+    private static function isBad(string $error, int $code): bool
+    {
+        return \in_array($error, ['PEER_FLOOD', 'INPUT_CONSTRUCTOR_INVALID_X', 'USER_DEACTIVATED_BAN', 'INPUT_METHOD_INVALID', 'INPUT_FETCH_ERROR', 'AUTH_KEY_UNREGISTERED', 'SESSION_REVOKED', 'USER_DEACTIVATED', 'RPC_SEND_FAIL', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'INTERDC_5_CALL_ERROR', 'INTERDC_4_CALL_ERROR', 'INTERDC_3_CALL_ERROR', 'INTERDC_2_CALL_ERROR', 'INTERDC_1_CALL_ERROR', 'INTERDC_5_CALL_RICH_ERROR', 'INTERDC_4_CALL_RICH_ERROR', 'INTERDC_3_CALL_RICH_ERROR', 'INTERDC_2_CALL_RICH_ERROR', 'INTERDC_1_CALL_RICH_ERROR', 'AUTH_KEY_DUPLICATED', 'CONNECTION_NOT_INITED', 'LOCATION_NOT_AVAILABLE', 'AUTH_KEY_INVALID', 'LANG_CODE_EMPTY', 'memory limit exit', 'memory limit(?)', 'INPUT_REQUEST_TOO_LONG', 'SESSION_PASSWORD_NEEDED', 'INPUT_FETCH_FAIL',
+            'CONNECTION_SYSTEM_EMPTY',
+            'BOT_POLLS_DISABLED', 'TEMPNAM_FAILED', 'MSG_WAIT_TIMEOUT',
+            'CHAT_FROM_CALL_CHANGED', 'MTPROTO_CLUSTER_INVALID',
+            'CONNECTION_DEVICE_MODEL_EMPTY', 'AUTH_KEY_PERM_EMPTY', 'UNKNOWN_METHOD', 'ENCRYPTION_OCCUPY_FAILED', 'ENCRYPTION_OCCUPY_ADMIN_FAILED', 'CHAT_OCCUPY_USERNAME_FAILED', 'REG_ID_GENERATE_FAILED',
+            'CONNECTION_LANG_PACK_INVALID', 'MSGID_DECREASE_RETRY', 'API_CALL_ERROR', 'STORAGE_CHECK_FAILED', 'INPUT_LAYER_INVALID', 'NEED_MEMBER_INVALID', 'NEED_CHAT_INVALID', 'HISTORY_GET_FAILED', 'CHP_CALL_FAIL', 'IMAGE_ENGINE_DOWN', 'MSG_RANGE_UNSYNC', 'PTS_CHANGE_EMPTY',
+            'CONNECTION_SYSTEM_LANG_CODE_EMPTY', 'WORKER_BUSY_TOO_LONG_RETRY', 'WP_ID_GENERATE_FAILED', 'ARR_CAS_FAILED', 'CHANNEL_ADD_INVALID', 'CHANNEL_ADMINS_INVALID', 'CHAT_OCCUPY_LOC_FAILED', 'GROUPED_ID_OCCUPY_FAILED', 'GROUPED_ID_OCCUPY_FAULED', 'LOG_WRAP_FAIL', 'MEMBER_FETCH_FAILED', 'MEMBER_OCCUPY_PRIMARY_LOC_FAILED', 'MEMBER_FETCH_FAILED', 'MEMBER_NO_LOCATION', 'MEMBER_OCCUPY_USERNAME_FAILED', 'MT_SEND_QUEUE_TOO_LONG', 'POSTPONED_TIMEOUT', 'RPC_CONNECT_FAILED', 'SHORTNAME_OCCUPY_FAILED', 'STORE_INVALID_OBJECT_TYPE', 'STORE_INVALID_SCALAR_TYPE', 'TMSG_ADD_FAILED', 'UNKNOWN_ERROR', 'UPLOAD_NO_VOLUME', 'USER_NOT_AVAILABLE', 'VOLUME_LOC_NOT_FOUND', ])
+                || \str_contains($error, 'Received bad_msg_notification')
+                || \str_contains($error, 'FLOOD_WAIT_')
+                || \str_contains($error, '_MIGRATE_')
+                || \str_contains($error, 'INPUT_METHOD_INVALID')
+                || \str_contains($error, 'INPUT_CONSTRUCTOR_INVALID')
+                || \str_contains($error, 'https://telegram.org/dl')
+                || \str_starts_with($error, 'Received bad_msg_notification')
+                || \str_starts_with($error, 'No workers running')
+                || \str_starts_with($error, 'All workers are busy. Active_queries ')
+                || \preg_match('/FILE_PART_\d*_MISSING/', $error);
+    }
+
     public static function localizeMessage($method, int $code, string $error): string
     {
         if (!$method || !$code || !$error) {
@@ -56,6 +77,8 @@ class RPCErrorException extends \Exception
         if (
             !isset(self::$fetchedError[$error])
             && (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]))
+            && !self::isBad($error, $code)
+            && !($error === 'Timeout' && !\in_array(\strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults']))
         ) {
             EventLoop::queue(function () use ($method, $code, $error): void {
                 try {
