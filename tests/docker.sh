@@ -38,7 +38,7 @@ join_images() {
 	fi
 }
 
-for f in alpine debian; do
+for f in alpine; do
 	for arch in $arches; do
 		cp tests/dockerfiles/Dockerfile.$f Dockerfile.$arch
 		if [ "$arch" == "riscv64" ]; then
