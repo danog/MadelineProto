@@ -334,7 +334,8 @@ final class Connection
             }
         } elseif ($method === 'messages.sendMultiMedia') {
             foreach ($arguments['multi_media'] as &$singleMedia) {
-                if ($singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
+                if (is_string($singleMedia['media'])
+                    || $singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
                     || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
                 ) {
                     $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
