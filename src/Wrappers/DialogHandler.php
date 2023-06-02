@@ -20,11 +20,17 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\CancelledException;
 use Amp\Sync\LocalMutex;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
+
+use function Amp\async;
+use function Amp\delay;
 
 /**
  * Dialog handler.
@@ -76,10 +82,18 @@ trait DialogHandler
                         $state['pts_total_limit'] = 2147483647;
                         while ($bottom <= $top) {
                             $state['pts'] = ($bottom+$top)>>1;
-                            $result = $this->methodCallAsyncRead(
-                                'updates.getDifference',
-                                $state
-                            )['_'];
+                            while (1) {
+                                try {
+                                    $result = $this->methodCallAsyncRead(
+                                        'updates.getDifference',
+                                        $state
+                                    )['_'];
+                                    break;
+                                } catch (Throwable $e) {
+                                    $this->logger->logger("Got {$e->getMessage()} while getting difference, retrying...");
+                                    delay(1.0);
+                                }
+                            }
                             $this->logger("$bottom, {$state['pts']}, $top");
                             $this->logger($result);
                             if ($result === 'updates.differenceTooLong') {

@@ -171,7 +171,8 @@ trait CallHandler
             $methodInfo['type'],
             true,
             !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect',
-            $response
+            $response,
+            $aargs['cancellation'] ?? null
         );
         if (isset($aargs['queue'])) {
             $message->setQueueId($aargs['queue']);

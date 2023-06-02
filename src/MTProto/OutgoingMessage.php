@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use danog\MadelineProto\Exception;
@@ -139,6 +141,8 @@ class OutgoingMessage extends Message
      */
     private int $tries = 0;
 
+    private ?Cancellation $cancellation = null;
+
     /**
      * Create outgoing message.
      *
@@ -149,7 +153,7 @@ class OutgoingMessage extends Message
      * @param boolean                 $unencrypted Is this an unencrypted message?
      * @param null|DeferredFuture         $deferred    Response deferred
      */
-    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null)
+    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null, ?Cancellation $cancellation = null)
     {
         $this->body = $body;
         $this->constructor = $constructor;
@@ -161,6 +165,15 @@ class OutgoingMessage extends Message
         }
 
         $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$constructor]);
+        $this->cancellation = $cancellation;
+        $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(fn () => throw $e));
+    }
+
+    /**
+     * Whether cancellation is requested.
+     */
+    public function isCancellationRequested(): bool {
+        return $this->cancellation?->isRequested() ?? false;
     }
 
     /**

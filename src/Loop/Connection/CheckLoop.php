@@ -96,8 +96,14 @@ final class CheckLoop extends Loop
                             case 4:
                                 if ($chr & 32) {
                                     if ($message->getSent() + $this->resendTimeout < \time()) {
-                                        $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                        $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
+                                        if ($message->isCancellationRequested()) {
+                                            unset($this->connection->new_outgoing[$message_id]);
+                                            unset($this->connection->outgoing_messages[$message_id]);
+                                            $this->logger->logger("Cancelling $message...", Logger::ERROR);
+                                        } else {
+                                            $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
+                                            $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
+                                        }
                                     } else {
                                         $this->logger->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                     }

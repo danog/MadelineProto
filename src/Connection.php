@@ -334,7 +334,7 @@ final class Connection
             }
         } elseif ($method === 'messages.sendMultiMedia') {
             foreach ($arguments['multi_media'] as &$singleMedia) {
-                if (is_string($singleMedia['media'])
+                if (\is_string($singleMedia['media'])
                     || $singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
                     || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
                 ) {
