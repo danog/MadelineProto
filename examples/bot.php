@@ -201,7 +201,7 @@ class MyEventHandler extends EventHandler
             }
             $this->broadcastForwardMessages(
                 from_peer: $update,
-                ids: [$update['message']['reply_to']['reply_to_msg_id']],
+                message_ids: [$update['message']['reply_to']['reply_to_msg_id']],
                 drop_author: true,
             );
             return;
