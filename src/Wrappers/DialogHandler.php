@@ -20,17 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
-use Amp\CancelledException;
 use Amp\Sync\LocalMutex;
 use Amp\TimeoutCancellation;
-use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
-
-use function Amp\async;
-use function Amp\delay;
 
 /**
  * Dialog handler.
@@ -75,24 +70,21 @@ trait DialogHandler
                         $this->botDialogsUpdatesState = $result['intermediate_state'];
                         break;
                     case 'updates.differenceTooLong':
-                        // Binary search for working PTS
                         $bottom = $this->botDialogsUpdatesState['pts'];
                         $top = $result['pts'];
                         $state = $this->botDialogsUpdatesState;
                         $state['pts_total_limit'] = 2147483647;
                         while ($bottom <= $top) {
                             $state['pts'] = ($bottom+$top)>>1;
-                            while (1) {
-                                try {
-                                    $result = $this->methodCallAsyncRead(
-                                        'updates.getDifference',
-                                        $state
-                                    )['_'];
-                                    break;
-                                } catch (Throwable $e) {
-                                    $this->logger->logger("Got {$e->getMessage()} while getting difference, retrying...");
-                                    delay(1.0);
-                                }
+                            try {
+                                $result = $this->methodCallAsyncRead(
+                                    'updates.getDifference',
+                                    $state,
+                                    ['cancellation' => new TimeoutCancellation(60.0)]
+                                )['_'];
+                            } catch (Throwable $e) {
+                                $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");
+                                $result = 'updates.differenceTooLong';
                             }
                             $this->logger("$bottom, {$state['pts']}, $top");
                             $this->logger($result);

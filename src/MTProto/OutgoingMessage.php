@@ -172,7 +172,8 @@ class OutgoingMessage extends Message
     /**
      * Whether cancellation is requested.
      */
-    public function isCancellationRequested(): bool {
+    public function isCancellationRequested(): bool
+    {
         return $this->cancellation?->isRequested() ?? false;
     }
 

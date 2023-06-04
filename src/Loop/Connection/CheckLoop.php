@@ -97,8 +97,8 @@ final class CheckLoop extends Loop
                                 if ($chr & 32) {
                                     if ($message->getSent() + $this->resendTimeout < \time()) {
                                         if ($message->isCancellationRequested()) {
-                                            unset($this->connection->new_outgoing[$message_id]);
-                                            unset($this->connection->outgoing_messages[$message_id]);
+                                            unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
+
                                             $this->logger->logger("Cancelling $message...", Logger::ERROR);
                                         } else {
                                             $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
