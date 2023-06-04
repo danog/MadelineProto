@@ -26,6 +26,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * Dialog handler.
@@ -43,6 +44,9 @@ trait DialogHandler
     ];
     private bool $cachedAllBotUsers = false;
     private ?LocalMutex $cachingAllBotUsers = null;
+    private bool $searchingRightPts = false;
+    private int $bottomPts = 0;
+    private int $topPts = 0;
 
     private function cacheAllBotUsers(): void
     {
@@ -52,6 +56,9 @@ trait DialogHandler
         $this->cachingAllBotUsers ??= new LocalMutex;
         $lock = $this->cachingAllBotUsers->acquire();
         try {
+            if ($this->searchingRightPts) {
+                $this->searchRightPts();
+            }
             while (true) {
                 $result = $this->methodCallAsyncRead(
                     'updates.getDifference',
@@ -70,32 +77,10 @@ trait DialogHandler
                         $this->botDialogsUpdatesState = $result['intermediate_state'];
                         break;
                     case 'updates.differenceTooLong':
-                        $bottom = $this->botDialogsUpdatesState['pts'];
-                        $top = $result['pts'];
-                        $state = $this->botDialogsUpdatesState;
-                        $state['pts_total_limit'] = 2147483647;
-                        while ($bottom <= $top) {
-                            $state['pts'] = ($bottom+$top)>>1;
-                            try {
-                                $result = $this->methodCallAsyncRead(
-                                    'updates.getDifference',
-                                    $state,
-                                    ['cancellation' => new TimeoutCancellation(60.0)]
-                                )['_'];
-                            } catch (Throwable $e) {
-                                $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");
-                                $result = 'updates.differenceTooLong';
-                            }
-                            $this->logger("$bottom, {$state['pts']}, $top");
-                            $this->logger($result);
-                            if ($result === 'updates.differenceTooLong') {
-                                $bottom = $state['pts']+1;
-                            } else {
-                                $top = $state['pts']-1;
-                            }
-                        }
-                        $this->botDialogsUpdatesState['pts'] = $bottom;
-                        $this->logger("Found PTS $bottom");
+                        $this->bottomPts = $this->botDialogsUpdatesState['pts'];
+                        $this->topPts = $result['pts'];
+                        $this->searchingRightPts = true;
+                        $this->searchRightPts();
                         break;
                     default:
                         throw new Exception('Unrecognized update difference received: '.\var_export($result, true));
@@ -104,6 +89,39 @@ trait DialogHandler
             $this->cachedAllBotUsers = true;
         } finally {
             $lock->release();
+        }
+    }
+    private function searchRightPts(): void
+    {
+        Assert::true($this->searchingRightPts);
+        $this->logger->logger("Searching for the right PTS (will take a loooong time...)...");
+        try {
+            $state = $this->botDialogsUpdatesState;
+            $state['pts_total_limit'] = 2147483647;
+            while ($this->bottomPts <= $this->topPts) {
+                $state['pts'] = ($this->bottomPts+$this->topPts)>>1;
+                try {
+                    $result = $this->methodCallAsyncRead(
+                        'updates.getDifference',
+                        $state,
+                        ['cancellation' => new TimeoutCancellation(15.0)]
+                    )['_'];
+                } catch (Throwable $e) {
+                    $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");
+                    $result = 'updates.differenceTooLong';
+                }
+                $this->logger("{$this->bottomPts}, {$state['pts']}, {$this->topPts}");
+                $this->logger($result);
+                if ($result === 'updates.differenceTooLong') {
+                    $this->bottomPts = $state['pts']+1;
+                } else {
+                    $this->topPts = $state['pts']-1;
+                }
+            }
+            $this->botDialogsUpdatesState['pts'] = $this->bottomPts;
+            $this->logger("Found PTS {$this->bottomPts}");
+        } finally {
+            $this->searchingRightPts = false;
         }
     }
     /**

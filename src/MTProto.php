@@ -139,7 +139,7 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @var string
      */
-    const RELEASE = '8.0.0-beta88';
+    const RELEASE = '8.0.0-beta89';
     /**
      * We're not logged in.
      *
@@ -692,6 +692,9 @@ final class MTProto implements TLCallback, LoggerGetter
             'tmpDbPrefix',
 
             // Misc caching
+            'searchingRightPts',
+            'bottomPts',
+            'topPts',
             'botDialogsUpdatesState',
             'cachedAllBotUsers',
             'dialog_params',
