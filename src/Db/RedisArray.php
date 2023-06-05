@@ -74,7 +74,7 @@ class RedisArray extends DriverArray
     {
         return 'va:'.$this->table.'*';
     }
-    public function set(string|int $index, mixed $value): void
+    public function set(string|int $key, mixed $value): void
     {
         if ($this->hasCache($index) && $this->getCache($index) === $value) {
             return;
