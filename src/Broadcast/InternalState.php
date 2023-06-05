@@ -42,6 +42,7 @@ final class InternalState
     private int $failCount = 0;
     private StatusInternal $status = StatusInternal::IDLING_BEFORE_GATHERING_PEERS;
     private DeferredCancellation $cancellation;
+    private bool $cancelled = false;
     public function __construct(
         private int $broadcastId,
         private MTProto $API,
@@ -60,6 +61,7 @@ final class InternalState
             StatusInternal::BROADCASTING => StatusInternal::IDLING_BEFORE_BROADCASTING,
             default => $vars['status']
         };
+        unset($vars['cancellation']);
         return $vars;
     }
     public function __unserialize(array $data): void
@@ -67,9 +69,14 @@ final class InternalState
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
+        $this->cancellation = new DeferredCancellation;
+        if ($this->cancelled) {
+            $this->cancel();
+        }
     }
     public function cancel(): void
     {
+        $this->cancelled = true;
         $this->cancellation->cancel(new BroadcastCancelledException());
     }
     public function resume(): void
