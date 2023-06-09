@@ -43,8 +43,23 @@ class AbstractAPI
      */
     public function __call(string $name, array $arguments)
     {
-        if ($arguments && !isset($arguments[0])) {
-            $arguments = [$arguments];
+        if (!isset($arguments[0])) {
+            // Named arguments
+            $args = $arguments;
+            $aargs = [];
+        } else {
+            // Legacy arguments
+            $args = $arguments[0] ?? [];
+            $aargs = $arguments[1] ?? [];
+            if (!\array_is_list($arguments)
+                || \count($arguments) > 2
+                || !\is_array($args)
+                || !\is_array($aargs)
+                || isset($args['_'])
+                || (isset($args[0]) && !isset($aargs['multiple']))
+            ) {
+                throw new InvalidArgumentException('Parameter names must be provided!');
+            }
         }
 
         $name = $this->namespace.'.'.$name;
@@ -52,11 +67,6 @@ class AbstractAPI
             throw new Exception(Blacklist::BLACKLIST[$name]);
         }
 
-        $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
-        $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-        if (isset($args[0]) && !isset($args['multiple'])) {
-            throw new InvalidArgumentException('Parameter names must be provided!');
-        }
         return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
     }
 }
