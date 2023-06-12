@@ -33,7 +33,6 @@ pipeline:
       - API_HASH
       - BOT_TOKEN
       - DEST
-      - DEPLOY_KEY
     environment:
       - PHP_VERSION=${php}
       - PLATFORM=${platform}
