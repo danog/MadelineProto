@@ -193,7 +193,12 @@ if [ "$PLATFORM" == "linux/arm64" ]; then :; else exit 0; fi
 cp "$input/madeline$php$branch.phar" "madeline81.phar"
 git remote add hub https://github.com/danog/MadelineProto
 gh release upload "$TAG" "madeline81.phar"
-rm "madeline81.phar"
+
+echo -n "$COMMIT-$php" > release
+
+gh release upload "$TAG" "release"
+
+rm "madeline81.phar" release
 
 gh release edit --prerelease=false "$TAG"
 gh release edit --latest=true "$TAG"
