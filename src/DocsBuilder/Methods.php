@@ -20,10 +20,17 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use AssertionError;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
+use danog\PhpDoc\PhpDoc;
+use danog\PhpDoc\PhpDoc\MethodDoc;
+use phpDocumentor\Reflection\DocBlockFactory;
+use ReflectionClass;
+use ReflectionMethod;
 
 use const PHP_EOL;
 
@@ -257,6 +264,34 @@ trait Methods
             \file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
         $this->logger->logger('Generating methods index...', Logger::NOTICE);
+        $reflection = new ReflectionClass(API::class);
+        $phpdoc = PhpDoc::fromNamespace(\danog\MadelineProto::class);
+        $phpdoc->resolveAliases();
+        $builder = DocBlockFactory::createInstance();
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $name = $method->getName();
+            if (\in_array(\strtolower($name), ['update2fa', 'getdialogids', 'getdialogs', 'getfulldialogs', 'getpwrchat', 'getfullinfo', 'getinfo', 'getid', 'getself', '__magic_construct', '__construct', '__destruct', '__sleep', '__wakeup'], true)) {
+                continue;
+            }
+            $doc = $method->getDocComment();
+            if (\str_contains($doc, '@internal') || \str_contains($doc, '@deprecated')) {
+                continue;
+            }
+            if ($doc) {
+                $doc = $builder->create($doc);
+                $doc = \explode("\n", $doc->getSummary())[0];
+            }
+            if (!$doc) {
+                throw new AssertionError($name);
+            }
+            $doc = \trim($doc, '.');
+            $method = new MethodDoc($phpdoc, $method);
+            $anchor = $method->getSignatureAnchor();
+            $this->human_docs_methods["$doc: $name"] = '* <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#'.$anchor.'" name="'.$name.'">'.$doc.': '.$name.'</a>
+
+';
+        }
+
         \ksort($this->docs_methods);
         \ksort($this->human_docs_methods);
         $last_namespace = '';

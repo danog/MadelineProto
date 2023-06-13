@@ -118,10 +118,16 @@ final class API extends AbstractAPI
      */
     private $unlock = null;
 
+    /**
+     * Obtain the API ID UI template.
+     */
     public function getWebAPITemplate(): string
     {
         return $this->wrapper->getWebApiTemplate();
     }
+    /**
+     * Set the API ID UI template.
+     */
     public function setWebApiTemplate(string $template): void
     {
         $this->wrapper->setWebApiTemplate($template);

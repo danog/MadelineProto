@@ -143,15 +143,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->acceptSecretChat($params);
     }
     /**
-     * Add user info.
-     *
-     * @param array $user User info
-     */
-    public function addUser(array $user): void
-    {
-        $this->wrapper->getAPI()->addUser($user);
-    }
-    /**
      * Call promise $b after promise $a.
      *
      * @deprecated Coroutines are deprecated since amp v3
@@ -394,15 +385,6 @@ abstract class InternalDoc
     public function confirmCall(array $params)
     {
         return $this->wrapper->getAPI()->confirmCall($params);
-    }
-    /**
-     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
-     *
-     * @param boolean $reconnectAll Whether to reconnect to all DCs
-     */
-    public function connectToAllDcs(bool $reconnectAll = true): void
-    {
-        $this->wrapper->getAPI()->connectToAllDcs($reconnectAll);
     }
     /**
      * Discard call.
@@ -1032,18 +1014,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getUpdates($params);
     }
     /**
-     * Accesses a private variable from an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     * @psalm-suppress InvalidScope
-     * @access public
-     */
-    public static function getVar(object $obj, string $var)
-    {
-        return \danog\MadelineProto\Tools::getVar($obj, $var);
-    }
-    /**
      * Get a message to show to the user when starting the bot.
      */
     public function getWebMessage(string $message): string
@@ -1056,13 +1026,6 @@ abstract class InternalDoc
     public function getWebTemplate(): string
     {
         return $this->wrapper->getAPI()->getWebTemplate();
-    }
-    /**
-     * Checks whether all datacenters are authorized.
-     */
-    public function hasAllAuth(): bool
-    {
-        return $this->wrapper->getAPI()->hasAllAuth();
     }
     /**
      * Check if an event handler instance is present.
@@ -1086,18 +1049,6 @@ abstract class InternalDoc
     public function hasSecretChat(array|int $chat): bool
     {
         return $this->wrapper->getAPI()->hasSecretChat($chat);
-    }
-    /**
-     * Checks private property exists in an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     * @psalm-suppress InvalidScope
-     * @access public
-     */
-    public static function hasVar(object $obj, string $var): bool
-    {
-        return \danog\MadelineProto\Tools::hasVar($obj, $var);
     }
     /**
      * Import authorization.
@@ -1463,19 +1414,6 @@ abstract class InternalDoc
     public function setReportPeers(array|string|int $userOrId): void
     {
         $this->wrapper->getAPI()->setReportPeers($userOrId);
-    }
-    /**
-     * Sets a private variable in an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     * @param mixed  $val Attribute value
-     * @psalm-suppress InvalidScope
-     * @access public
-     */
-    public static function setVar(object $obj, string $var, mixed &$val): void
-    {
-        \danog\MadelineProto\Tools::setVar($obj, $var, $val);
     }
     /**
      * Set web template.

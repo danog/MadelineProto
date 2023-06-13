@@ -82,6 +82,8 @@ trait PeerHandler
     /**
      * Set support info.
      *
+     * @internal
+     *
      * @param array $support Support info
      * @internal
      */
@@ -92,6 +94,8 @@ trait PeerHandler
 
     /**
      * Add user info.
+     *
+     * @internal
      *
      * @param array $user User info
      */

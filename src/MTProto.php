@@ -139,7 +139,7 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @var string
      */
-    const RELEASE = '8.0.0-beta93';
+    const RELEASE = '8.0.0-beta94';
     /**
      * We're not logged in.
      *
@@ -1342,6 +1342,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Checks whether all datacenters are authorized.
+     *
+     * @internal
      */
     public function hasAllAuth(): bool
     {
@@ -1368,6 +1370,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
+     *
+     * @internal
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
      */

@@ -186,7 +186,9 @@ foreach ($orderedfiles as $key => $filename) {
                     if (str_contains($match, 'You cannot use this method directly')) {
                         continue;
                     }
-                    $match = str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
+                    if (!str_contains($match, 'href="https://docs.madelineproto.xyz')) {
+                        $match = str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);
+                    }
                     $index .= "$spaces* ".$match."\n";
                 }
             }

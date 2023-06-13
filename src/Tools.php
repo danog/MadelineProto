@@ -491,23 +491,9 @@ abstract class Tools extends AsyncTools
         return Magic::$altervista;
     }
     /**
-     * Checks private property exists in an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     * @psalm-suppress InvalidScope
-     * @access public
-     */
-    public static function hasVar(object $obj, string $var): bool
-    {
-        return Closure::bind(
-            fn () => isset($this->{$var}),
-            $obj,
-            $obj::class,
-        )->__invoke();
-    }
-    /**
      * Accesses a private variable from an object.
+     *
+     * @internal
      *
      * @param object $obj Object
      * @param string $var Attribute name
@@ -524,6 +510,8 @@ abstract class Tools extends AsyncTools
     }
     /**
      * Sets a private variable in an object.
+     *
+     * @internal
      *
      * @param object $obj Object
      * @param string $var Attribute name
