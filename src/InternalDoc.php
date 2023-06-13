@@ -354,7 +354,7 @@ abstract class InternalDoc
      *
      * @param string $password Password
      */
-    public function complete2faLogin(string $password)
+    public function complete2faLogin(string $password): array
     {
         return $this->wrapper->getAPI()->complete2faLogin($password);
     }
@@ -382,7 +382,7 @@ abstract class InternalDoc
      * @param string $first_name First name
      * @param string $last_name  Last name
      */
-    public function completeSignup(string $first_name, string $last_name = '')
+    public function completeSignup(string $first_name, string $last_name = ''): array
     {
         return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
@@ -1105,7 +1105,7 @@ abstract class InternalDoc
      * @param array<int, string> $authorization Authorization info
      * @param int $mainDcID Main DC ID
      */
-    public function importAuthorization(array $authorization, int $mainDcID)
+    public function importAuthorization(array $authorization, int $mainDcID): array
     {
         return $this->wrapper->getAPI()->importAuthorization($authorization, $mainDcID);
     }

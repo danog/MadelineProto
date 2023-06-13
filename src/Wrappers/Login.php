@@ -151,7 +151,7 @@ trait Login
      * @param array<int, string> $authorization Authorization info
      * @param int $mainDcID Main DC ID
      */
-    public function importAuthorization(array $authorization, int $mainDcID)
+    public function importAuthorization(array $authorization, int $mainDcID): array
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
@@ -207,7 +207,7 @@ trait Login
      * @param string $first_name First name
      * @param string $last_name  Last name
      */
-    public function completeSignup(string $first_name, string $last_name = '')
+    public function completeSignup(string $first_name, string $last_name = ''): array
     {
         if ($this->authorized !== MTProto::WAITING_SIGNUP) {
             throw new Exception(Lang::$current_lang['signup_uncalled']);
@@ -228,7 +228,7 @@ trait Login
      *
      * @param string $password Password
      */
-    public function complete2faLogin(string $password)
+    public function complete2faLogin(string $password): array
     {
         if ($this->authorized !== MTProto::WAITING_PASSWORD) {
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
