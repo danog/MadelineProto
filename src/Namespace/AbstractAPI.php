@@ -56,7 +56,7 @@ class AbstractAPI
                 || !\is_array($args)
                 || !\is_array($aargs)
                 || isset($args['_'])
-                || (isset($args[0]) && !isset($aargs['multiple']))
+                || (isset($args[0]) && !isset($args['multiple']))
             ) {
                 throw new InvalidArgumentException('Parameter names must be provided!');
             }
