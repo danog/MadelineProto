@@ -109,6 +109,8 @@ abstract class StrTools extends Extension
     /**
      * Escape string for markdown.
      *
+     * @internal
+     *
      * @param string $hwat String to escape
      */
     public static function markdownEscape(string $hwat): string
@@ -117,6 +119,8 @@ abstract class StrTools extends Extension
     }
     /**
      * Escape type name.
+     *
+     * @internal
      *
      * @param string $type String to escape
      */
@@ -127,6 +131,8 @@ abstract class StrTools extends Extension
     }
     /**
      * Escape method name.
+     *
+     * @internal
      *
      * @param string $method Method name
      */
