@@ -386,7 +386,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.finishTakeoutSession.html" name="account.finishTakeoutSession">Finish account takeout session: account.finishTakeoutSession</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastforwardmessages-mixed-from_peer-list-int-message_ids-bool-drop_author-danog-madelineproto-broadcast-filter-filter-int" name="broadcastForwardMessages">Forwards a list of messages to all peers (users, chats, channels) of the bot: broadcastForwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.forwardMessages.html" name="messages.forwardMessages">Forwards messages by their IDs: messages.forwardMessages</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genvectorhash-array-ints-string-vector-hash" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genvectorhash-array-ints-string" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportLoginToken.html" name="auth.exportLoginToken">Generate a login token, for login via QR code.  : auth.exportLoginToken</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.exportInvoice.html" name="payments.exportInvoice">Generate an invoice deep link: payments.exportInvoice</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.exportContactToken.html" name="contacts.exportContactToken">Generates a temporary profile link for the currently logged-in user: contacts.exportContactToken</a>
@@ -513,7 +513,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getWebPagePreview.html" name="messages.getWebPagePreview">Get preview of webpage: messages.getWebPagePreview</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getPrivacy.html" name="account.getPrivacy">Get privacy settings of current account: account.getPrivacy</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#randomint-int-modulus-int" name="randomInt">Get random integer: randomInt</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#random-int-length-string-random-string" name="random">Get random string of specified length: random</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getRecentStickers.html" name="messages.getRecentStickers">Get recent stickers: messages.getRecentStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getRecentEmojiStatuses.html" name="account.getRecentEmojiStatuses">Get recently used emoji statuses: account.getRecentEmojiStatuses</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getRecentReactions.html" name="messages.getRecentReactions">Get recently used message reactions: messages.getRecentReactions</a>
@@ -525,6 +524,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getScheduledMessages.html" name="messages.getScheduledMessages">Get scheduled messages: messages.getScheduledMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#secretchatstatus-int-chat-int-one-of-mtproto-secret_empty-mtproto-secret_requested-mtproto-secret_ready" name="secretChatStatus">Get secret chat status: secretChatStatus</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsecretchat-array-int-chat-array" name="getSecretChat">Get secret chat: getSecretChat</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#random-int-length-string" name="random">Get secure random string of specified length: random</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContentSettings.html" name="account.getContentSettings">Get sensitive content settings: account.getContentSettings</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsponsoredmessages-int-string-array-peer-array" name="getSponsoredMessages">Get sponsored messages for channel: getSponsoredMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAttachedStickers.html" name="messages.getAttachedStickers">Get stickers attached to a photo or video: messages.getAttachedStickers</a>
@@ -560,7 +560,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.initHistoryImport.html" name="messages.initHistoryImport">Import chat history from a foreign chat app into a specific Telegram chat, click here for more info about imported chats »: messages.initHistoryImport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.importContacts.html" name="contacts.importContacts">Imports contacts: saves a full list on the server, adds already registered contacts to the contact list, returns added contacts and their info: contacts.importContacts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.prolongWebView.html" name="messages.prolongWebView">Indicate to the server (from the user side) that the user is still using a web app: messages.prolongWebView</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#inflatestripped-string-stripped-string-jpg-payload" name="inflateStripped">Inflate stripped photosize to full JPG payload: inflateStripped</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#inflatestripped-string-stripped-string" name="inflateStripped">Inflate stripped photosize to full JPG payload: inflateStripped</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.assignAppStoreTransaction.html" name="payments.assignAppStoreTransaction">Informs server about a purchase made through the App Store: for official applications only: payments.assignAppStoreTransaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.assignPlayMarketTransaction.html" name="payments.assignPlayMarketTransaction">Informs server about a purchase made through the Play Store: for official applications only: payments.assignPlayMarketTransaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.setBotUpdatesStatus.html" name="help.setBotUpdatesStatus">Informs the server about the number of pending bot updates if they haven't been processed for a long time; for bots only: help.setBotUpdatesStatus</a>
@@ -643,7 +643,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getMessages.html" name="channels.getMessages">Please use the event handler: channels.getMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getHistory.html" name="messages.getHistory">Please use the event handler: messages.getHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessages.html" name="messages.getMessages">Please use the event handler: messages.getMessages</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#posmod-int-a-int-b-int-modulo" name="posmod">Positive modulo: posmod</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#posmod-int-a-int-b-int" name="posmod">Positive modulo: posmod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotCallbackAnswer.html" name="messages.getBotCallbackAnswer">Press an inline callback button and get a callback answer from the bot: messages.getBotCallbackAnswer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html" name="messages.getInlineBotResults">Query an inline bot: messages.getInlineBotResults</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.rateTranscribedAudio.html" name="messages.rateTranscribedAudio">Rate transcribed voice message: messages.rateTranscribedAudio</a>

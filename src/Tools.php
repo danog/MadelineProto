@@ -120,8 +120,9 @@ abstract class Tools extends AsyncTools
     /**
      * Generate MTProto vector hash.
      *
+     * Returns a vector hash.
+     *
      * @param array $ints IDs
-     * @return string Vector hash
      */
     public static function genVectorHash(array $ints): string
     {
@@ -158,10 +159,9 @@ abstract class Tools extends AsyncTools
         return ($number & PHP_INT_MAX) % $modulus;
     }
     /**
-     * Get random string of specified length.
+     * Get secure random string of specified length.
      *
      * @param integer $length Length
-     * @return string Random string
      */
     public static function random(int $length): string
     {
@@ -173,7 +173,6 @@ abstract class Tools extends AsyncTools
      *
      * @param int $a A
      * @param int $b B
-     * @return int Modulo
      */
     public static function posmod(int $a, int $b): int
     {
@@ -409,7 +408,6 @@ abstract class Tools extends AsyncTools
      * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
-     * @return string JPG payload
      */
     public static function inflateStripped(string $stripped): string
     {
