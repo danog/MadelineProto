@@ -12,7 +12,7 @@ RUN apk add make g++ && \
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions ffi pq ev-beta eio-beta intl gmp mbstring pdo_mysql xml dom zip opcache && \
+    install-php-extensions ffi pq uv-beta memprof intl gmp mbstring pdo_mysql xml dom zip opcache && \
     rm /usr/local/bin/install-php-extensions
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
