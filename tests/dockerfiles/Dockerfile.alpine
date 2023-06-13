@@ -11,10 +11,10 @@ RUN apk add --no-cache make g++ && \
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN apk add --no-cache libuv libuv-dev && chmod +x /usr/local/bin/install-php-extensions && \
+RUN apk add --no-cache libuv libuv-dev autoconf automake gcc musl-dev make && chmod +x /usr/local/bin/install-php-extensions && \
     curl -L https://github.com/amphp/ext-uv/archive/refs/heads/master.tar.gz | tar -xz && \
     cd ext-uv-master && phpize && ./configure && make -j$(nproc) && cd .. \
-    rm -r ext-uv-master && apk del libuv-dev && \
+    rm -r ext-uv-master && apk del libuv-dev autoconf automake gcc musl-dev make && \
     install-php-extensions ffi pq memprof intl gmp mbstring pdo_mysql xml dom zip opcache && \
     rm /usr/local/bin/install-php-extensions
 
