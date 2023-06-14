@@ -89,33 +89,33 @@ final class WebRunner extends RunnerAbstract
             'cwd' => Magic::getcwd(),
         ];
 
-        $params = \http_build_query($params);
+        self::selfStart(self::$runPath.'?'.\http_build_query($params));
 
-        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
-            try {
-                $address = $proto.'://'.$_SERVER['SERVER_NAME'];
-                $port = $_SERVER['SERVER_PORT'];
-                $res = \fsockopen($address, (int) $port);
-                break;
-            } catch (Throwable $e) {
-                Logger::log("Error while connecting to ourselves: $e");
+        return true;
+    }
+
+    public static function selfStart(string $uri): void {
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
+
+        foreach ([(int) $_SERVER['SERVER_PORT'], null] as $portSuggested) {
+            foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
+                $port = $portSuggested ?? ($proto === 'tls' ? 443 : 80);
+                try {
+                    $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                    $res = \fsockopen($address, (int) $port);
+                    Logger::log("Successfully connected to {$address}:{$port}!");
+                    Logger::log("Sending payload: $payload");
+                    // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
+                    // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
+                    \fwrite($res, $payload);
+                    self::$resources []= $res;
+                } catch (Throwable $e) {
+                    Logger::log("Error while sending to {$address}:{$port}: $e");
+                }
             }
         }
         if (!isset($res)) {
             throw new Exception('Could not connect to ourselves, please check the server configuration!');
         }
-
-        $uri = self::$runPath.'?'.$params;
-
-        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
-
-        Logger::log("Sending payload: $payload");
-
-        // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
-        // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-        \fwrite($res, $payload);
-        self::$resources []= $res;
-
-        return true;
     }
 }
