@@ -1146,15 +1146,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->loop($callback);
     }
     /**
-     * Escape string for markdown.
-     *
-     * @param string $hwat String to escape
-     */
-    public static function markdownEscape(string $hwat): string
-    {
-        return \danog\MadelineProto\StrTools::markdownEscape($hwat);
-    }
-    /**
      * Telegram UTF-8 multibyte split.
      *
      * @param string  $text   Text
@@ -1184,15 +1175,6 @@ abstract class InternalDoc
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
-    }
-    /**
-     * Escape method name.
-     *
-     * @param string $method Method name
-     */
-    public static function methodEscape(string $method): string
-    {
-        return \danog\MadelineProto\StrTools::methodEscape($method);
     }
     /**
      * Convert double to binary version.
@@ -1576,15 +1558,6 @@ abstract class InternalDoc
     public static function toSupergroup(int $id): int
     {
         return \danog\MadelineProto\MTProto::toSupergroup($id);
-    }
-    /**
-     * Escape type name.
-     *
-     * @param string $type String to escape
-     */
-    public static function typeEscape(string $type): string
-    {
-        return \danog\MadelineProto\StrTools::typeEscape($type);
     }
     /**
      * Unpack binary double.

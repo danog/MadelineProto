@@ -76,14 +76,14 @@ class RedisArray extends DriverArray
     }
     public function set(string|int $key, mixed $value): void
     {
-        if ($this->hasCache($index) && $this->getCache($index) === $value) {
+        if ($this->hasCache($key) && $this->getCache($key) === $value) {
             return;
         }
 
-        $this->setCache($index, $value);
+        $this->setCache($key, $value);
 
-        $this->db->set($this->rKey($index), ($this->serializer)($value));
-        $this->setCache($index, $value);
+        $this->db->set($this->rKey($key), ($this->serializer)($value));
+        $this->setCache($key, $value);
     }
 
     public function offsetGet(mixed $offset): mixed

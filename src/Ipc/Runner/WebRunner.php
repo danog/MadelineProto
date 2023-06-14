@@ -94,11 +94,12 @@ final class WebRunner extends RunnerAbstract
         return true;
     }
 
-    public static function selfStart(string $uri): void {
+    public static function selfStart(string $uri): void
+    {
         $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
 
         foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
-            foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
+            foreach (\array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
                 try {
                     $address = $proto.'://'.$_SERVER['SERVER_NAME'];
                     $res = \fsockopen($address, (int) $port);

@@ -367,9 +367,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleAntiSpam.html" name="channels.toggleAntiSpam">Enable or disable the native antispam system: channels.toggleAntiSpam</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleTopPeers.html" name="contacts.toggleTopPeers">Enable/disable top peers: contacts.toggleTopPeers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleSignatures.html" name="channels.toggleSignatures">Enable/disable message signatures in channels: channels.toggleSignatures</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#methodescape-string-method-string" name="methodEscape">Escape method name: methodEscape</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdownescape-string-hwat-string" name="markdownEscape">Escape string for markdown: markdownEscape</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#typeescape-string-type-string" name="typeEscape">Escape type name: typeEscape</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastcustom-action-action-danog-madelineproto-broadcast-filter-filter-int" name="broadcastCustom">Executes a custom broadcast action with all peers (users, chats, channels) of the bot: broadcastCustom</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.exportChatlistInvite.html" name="chatlists.exportChatlistInvite">Export a folder », creating a chat folder deep link »: chatlists.exportChatlistInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.exportChatInvite.html" name="messages.exportChatInvite">Export an invite link for a chat: messages.exportChatInvite</a>
