@@ -300,6 +300,16 @@ final class Magic
                 return;
             }
         }
+        $result = Tools::testFibers(100);
+        if ($result['maxFibers'] < 100) {
+            $message = "The maximum number of startable fibers is smaller than 100 ({$result['maxFibers']}): follow the instructions in https://t.me/MadelineProto/596 to fix.";
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+                echo $message.'<br>';
+            }
+            $file = 'MadelineProto';
+            $line = 1;
+            return new Exception($message, 0, null, $file, $line);
+        }
         foreach (['gmp', 'xml', 'dom', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
             if (!\extension_loaded($extension)) {
                 throw Exception::extension($extension);

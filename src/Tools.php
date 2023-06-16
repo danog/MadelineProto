@@ -82,10 +82,9 @@ abstract class Tools extends AsyncTools
             if (\file_exists("/proc/$pid/maps")) {
                 return \substr_count(@\file_get_contents("/proc/$pid/maps"), "\n")-1;
             }
-            return null;
         } catch (\Throwable) {
-            return null;
         }
+        return null;
     }
     /**
      * Get maximum number of memory-mapped regions, UNIX only.
@@ -94,10 +93,12 @@ abstract class Tools extends AsyncTools
     public static function getMaxMaps(): ?int
     {
         try {
-            return ((int) @\file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
+            if (\file_exists('/proc/sys/vm/max_map_count')) {
+                return ((int) @\file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
+            }
         } catch (\Throwable) {
-            return null;
         }
+        return null;
     }
     /**
      * Sanify TL obtained from JSON for TL serialization.
