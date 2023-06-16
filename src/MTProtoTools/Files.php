@@ -994,10 +994,6 @@ trait Files
                     Tools::sleep(1);
                     continue;
                 } catch (RPCErrorException $e) {
-                    if ($e->rpc === '-503') {
-                        Tools::sleep(1);
-                        continue;
-                    }
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
                             $cdn = false;
