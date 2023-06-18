@@ -255,7 +255,7 @@ trait Start
                     x.onload = function() {
                         var res = JSON.parse(this.responseText);
                         if (res.logged_in) {
-                            location.reload();
+                            window.location = window.location;
                         } else {
                             document.getElementById("qr-code-container").style = "";
                             document.getElementById("qr-code").innerHTML = res.svg;
