@@ -291,7 +291,7 @@ trait Start
         $title = \htmlentities($title);
         $message = \htmlentities($message);
         getOutputBufferStream()->write(\sprintf(
-            $this->settings->getTemplates()->getHtmlTemplate(),
+            $this->getSettings()->getTemplates()->getHtmlTemplate(),
             $message,
             $form,
             Lang::$current_lang['go'],
