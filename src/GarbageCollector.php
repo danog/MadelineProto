@@ -81,8 +81,8 @@ final class GarbageCollector
                     $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
                         ->getBody()
                         ->buffer();
-                    
-                    if (!str_starts_with($contents, '<?php')) {
+
+                    if (!\str_starts_with($contents, '<?php')) {
                         throw new AssertionError("phar.php is not a PHP file!");
                     }
 

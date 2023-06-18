@@ -131,7 +131,8 @@ final class Client extends ClientAbstract
     }
 
     /** @internal */
-    public function getQrLoginCancellation(): Cancellation {
+    public function getQrLoginCancellation(): Cancellation
+    {
         $c = new DeferredCancellation;
         async($this->__call(...), 'waitQrLogin', [])->map($c->cancel(...));
         return $c->getCancellation();

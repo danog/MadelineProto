@@ -635,6 +635,8 @@ abstract class InternalDoc
     }
     /**
      * Get authorization info.
+     *
+     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN
      */
     public function getAuthorization(): int
     {
@@ -1022,13 +1024,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getWebMessage($message);
     }
     /**
-     * Get web template.
-     */
-    public function getWebTemplate(): string
-    {
-        return $this->wrapper->getAPI()->getWebTemplate();
-    }
-    /**
      * Check if an event handler instance is present.
      */
     public function hasEventHandler(): bool
@@ -1243,6 +1238,17 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::posmod($a, $b);
     }
     /**
+     * Initiates QR code login.
+     *
+     * Returns a QR code login helper object, that can be used to render the QR code, display the link directly, wait for login, QR code expiration and much more.
+     *
+     * Returns null if we're already logged in, or if we're waiting for a password (use getAuthorization to distinguish between the two cases).
+     */
+    public function qrLogin(): ?\danog\MadelineProto\TL\Types\LoginQrCode
+    {
+        return $this->wrapper->getAPI()->qrLogin();
+    }
+    /**
      * Get secure random string of specified length.
      *
      * @param integer $length Length
@@ -1265,9 +1271,9 @@ abstract class InternalDoc
      *
      * @param string $prompt Prompt
      */
-    public static function readLine(string $prompt = ''): string
+    public static function readLine(string $prompt = '', ?\Amp\Cancellation $cancel = null): string
     {
-        return \danog\MadelineProto\AsyncTools::readLine($prompt);
+        return \danog\MadelineProto\AsyncTools::readLine($prompt, $cancel);
     }
     /**
      * Refresh full peer cache for a certain peer.
@@ -1394,15 +1400,6 @@ abstract class InternalDoc
     public function setReportPeers(array|string|int $userOrId): void
     {
         $this->wrapper->getAPI()->setReportPeers($userOrId);
-    }
-    /**
-     * Set web template.
-     *
-     * @param string $template Template
-     */
-    public function setWebTemplate(string $template): void
-    {
-        $this->wrapper->getAPI()->setWebTemplate($template);
     }
     /**
      * Set webhook update handler.

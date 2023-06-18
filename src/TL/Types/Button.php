@@ -58,7 +58,7 @@ final class Button implements JsonSerializable, ArrayAccess
     private array|int $peer;
     /**
      * Constructor function.
-     * 
+     *
      * @internal
      *
      * @param MTProto $API     API instance

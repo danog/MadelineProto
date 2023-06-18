@@ -55,7 +55,7 @@ trait Templates
                     $form = "<input type='text' name='token' placeholder='$token' required/>";
                 }
             } elseif (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
-                header('Content-type: application/json');
+                \header('Content-type: application/json');
                 try {
                     /** @var ?LoginQrCode */
                     $qr = $this->qrLogin();
@@ -69,14 +69,14 @@ trait Templates
                 if ($qr) {
                     $result = [
                         'logged_in' => false,
-                        'svg' => $qr->getQRSvg()
+                        'svg' => $qr->getQRSvg(400, 2)
                     ];
                 } else {
                     $result = [
                         'logged_in' => true,
                     ];
                 }
-                getOutputBufferStream()->write(json_encode($result));
+                getOutputBufferStream()->write(\json_encode($result));
                 return;
             } else {
                 $title = Lang::$current_lang['loginChoosePromptWeb'];
@@ -84,7 +84,7 @@ trait Templates
                 $optionUser = \htmlentities(Lang::$current_lang['loginOptionUser']);
                 $trailer = '
                 <div id="qr-code-container" style="display: none">
-                    <p>'.htmlentities(Lang::$current_lang['loginWebQr']).'</p>
+                    <p>'.\htmlentities(Lang::$current_lang['loginWebQr']).'</p>
                     <div id="qr-code"></div>
                 </div>
 

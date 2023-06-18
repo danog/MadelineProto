@@ -1637,8 +1637,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Get authorization info.
-     * 
-     * @return API::NOT_LOGGED_IN|API::WAITING_CODE|API::WAITING_SIGNUP|API::WAITING_PASSWORD|API::LOGGED_IN
+     *
+     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN
      */
     public function getAuthorization(): int
     {

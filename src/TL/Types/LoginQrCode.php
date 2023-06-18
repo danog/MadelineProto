@@ -25,7 +25,6 @@ use Amp\CancelledException;
 use Amp\CompositeCancellation;
 use Amp\DeferredFuture;
 use Amp\TimeoutCancellation;
-use Amp\TimeoutException;
 use AssertionError;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
@@ -35,13 +34,12 @@ use BaconQrCode\Writer;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use JsonSerializable;
-use Webmozart\Assert\Assert;
 
 /**
  * Represents a login QR code.
  */
-final class LoginQrCode implements JsonSerializable {
-
+final class LoginQrCode implements JsonSerializable
+{
     private string $session;
 
     /** @internal */
@@ -75,8 +73,9 @@ final class LoginQrCode implements JsonSerializable {
     /**
      * Returns true if the QR code has expired and a new one should be fetched.
      */
-    public function isExpired(): bool {
-        return $this->expiry <= time();
+    public function isExpired(): bool
+    {
+        return $this->expiry <= \time();
     }
 
     /**
@@ -84,34 +83,37 @@ final class LoginQrCode implements JsonSerializable {
      *
      * @return non-negative-int
      */
-    public function expiresIn(): int {
-        return max(0, $this->expiry - time());
+    public function expiresIn(): int
+    {
+        return \max(0, $this->expiry - \time());
     }
 
-    public function getExpirationCancellation(): Cancellation {
+    public function getExpirationCancellation(): Cancellation
+    {
         return new TimeoutCancellation((float) $this->expiresIn(), "The QR code expired!");
     }
 
-
-    public function getLoginCancellation(): Cancellation {
+    public function getLoginCancellation(): Cancellation
+    {
         $this->API ??= Client::giveInstanceBySession($this->session);
         return $this->API->getQrLoginCancellation();
     }
 
     /**
      * Waits for the user to login or for the QR code to expire.
-     * 
+     *
      * If the user logins, null is returned.
-     * 
+     *
      * If the QR code expires, the new QR code is returned.
-     * 
+     *
      * If cancellation is requested externally through $cancellation, a CancelledException is thrown.
-     * 
+     *
      * @throws CancelledException
      *
      * @param Cancellation|null $customCancellation Optional additional cancellation
      */
-    public function waitForLoginOrQrCodeExpiration(?Cancellation $customCancellation = null): ?self {
+    public function waitForLoginOrQrCodeExpiration(?Cancellation $customCancellation = null): ?self
+    {
         $expire = $this->getExpirationCancellation();
         if ($customCancellation) {
             $cancellation = new CompositeCancellation($expire, $customCancellation);
@@ -132,9 +134,10 @@ final class LoginQrCode implements JsonSerializable {
     /**
      * Render and return SVG version of QR code.
      */
-    public function getQRSvg(): string {
+    public function getQRSvg(int $size = 400, int $margin = 4): string
+    {
         $writer = new Writer(new ImageRenderer(
-            new RendererStyle(400),
+            new RendererStyle($size, $margin),
             new SvgImageBackEnd
         ));
         return $writer->writeString($this->link);
@@ -142,10 +145,11 @@ final class LoginQrCode implements JsonSerializable {
 
     /**
      * Render and return plain text version of QR code.
-     * 
+     *
      * @param non-negative-int $margin Text margin
      */
-    public function getQRText(int $margin = 2): string {
+    public function getQRText(int $margin = 2): string
+    {
         $writer = new Writer(new PlainTextRenderer($margin));
         return $writer->writeString($this->link);
     }

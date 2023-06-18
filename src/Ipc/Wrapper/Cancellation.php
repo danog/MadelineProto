@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
-use danog\MadelineProto\FileCallbackInterface;
 
 /**
  * @internal
@@ -21,7 +20,8 @@ final class Cancellation extends Obj implements AmpCancellation
      *
      * @return string Identifier that can be used to cancel the subscription.
      */
-    public function subscribe(\Closure $callback): string {
+    public function subscribe(\Closure $callback): string
+    {
         return $this->__call('unsubscribe', [$callback]);
     }
 
@@ -30,14 +30,16 @@ final class Cancellation extends Obj implements AmpCancellation
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
      */
-    public function unsubscribe(string $id): void {
-        return $this->__call('unsubscribe', [$id]);
+    public function unsubscribe(string $id): void
+    {
+        $this->__call('unsubscribe', [$id]);
     }
 
     /**
      * Returns whether cancellation has been requested yet.
      */
-    public function isRequested(): bool {
+    public function isRequested(): bool
+    {
         return $this->__call('isRequested');
     }
 
@@ -46,7 +48,8 @@ final class Cancellation extends Obj implements AmpCancellation
      *
      * @throws CancelledException
      */
-    public function throwIfRequested(): void {
+    public function throwIfRequested(): void
+    {
         $this->__call('throwIfRequested');
     }
 }

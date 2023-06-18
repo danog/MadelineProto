@@ -22,8 +22,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
-use Amp\TimeoutCancellation;
-use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
@@ -33,9 +31,9 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
 
-use function Amp\ByteStream\getStdout;
-
 use const PHP_SAPI;
+
+use function Amp\ByteStream\getStdout;
 
 /**
  * Manages simple logging in and out.
@@ -87,7 +85,7 @@ trait Start
                         $stdout->write(PHP_EOL."The QR code expired, generating a new one...".PHP_EOL);
                     }
                 } while (true);
-                if (str_contains($result, ':')) {
+                if (\str_contains($result, ':')) {
                     $this->botLogin($result);
                 } else {
                     $this->phoneLogin($result);

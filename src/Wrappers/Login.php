@@ -22,11 +22,9 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
-use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use AssertionError;
-use BaconQrCode\Encoder\QrCode;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -37,7 +35,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
-use Webmozart\Assert\Assert;
 
 /**
  * Manages logging in and out.
@@ -74,12 +71,13 @@ trait Login
     private ?DeferredCancellation $qrLoginDeferred = null;
     /**
      * Initiates QR code login.
-     * 
+     *
      * Returns a QR code login helper object, that can be used to render the QR code, display the link directly, wait for login, QR code expiration and much more.
-     * 
+     *
      * Returns null if we're already logged in, or if we're waiting for a password (use getAuthorization to distinguish between the two cases).
      */
-    public function qrLogin(): ?LoginQrCode {
+    public function qrLogin(): ?LoginQrCode
+    {
         if ($this->authorized === MTProto::LOGGED_IN) {
             return null;
         } elseif ($this->authorized === MTProto::WAITING_PASSWORD) {
@@ -134,7 +132,8 @@ trait Login
     /**
      * @internal
      */
-    public function getQrLoginCancellation(): Cancellation {
+    public function getQrLoginCancellation(): Cancellation
+    {
         if ($this->qrLoginDeferred) {
             return $this->qrLoginDeferred->getCancellation();
         }
@@ -143,13 +142,15 @@ trait Login
         return $c->getCancellation();
     }
     /** @internal */
-    public function waitQrLogin(): void {
+    public function waitQrLogin(): void
+    {
         if (!$this->qrLoginDeferred) {
             return;
         }
         try {
             (new DeferredFuture)->getFuture()->await($this->getQrLoginCancellation());
-        } catch (CancelledException) {}
+        } catch (CancelledException) {
+        }
     }
     /**
      * Login as user.
@@ -309,7 +310,8 @@ trait Login
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         return $this->processAuthorization($this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]));
     }
-    private function processAuthorization(array $authorization): array {
+    private function processAuthorization(array $authorization): array
+    {
         if ($this->authorized === MTProto::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
