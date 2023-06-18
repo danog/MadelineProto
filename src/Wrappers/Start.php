@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
@@ -33,6 +34,7 @@ use danog\MadelineProto\Tools;
 
 use const PHP_SAPI;
 
+use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdout;
 
 /**
@@ -190,5 +192,110 @@ trait Start
         } catch (Exception $e) {
             $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
+    }
+
+    /**
+     * Echo page to console.
+     *
+     * @param string $message Error message
+     */
+    private function webEcho(string $message = ''): void
+    {
+        $auth = $this->getAuthorization();
+        $form = null;
+        $trailer = '';
+        if ($auth === MTProto::NOT_LOGGED_IN) {
+            if (isset($_POST['type'])) {
+                if ($_POST['type'] === 'phone') {
+                    $title = \str_replace(':', '', Lang::$current_lang['loginUser']);
+                    $phone = \htmlentities(Lang::$current_lang['loginUserPhoneWeb']);
+                    $form = "<input type='text' name='phone_number' placeholder='$phone' required/>";
+                } else {
+                    $title = \str_replace(':', '', Lang::$current_lang['loginBot']);
+                    $token = \htmlentities(Lang::$current_lang['loginBotTokenWeb']);
+                    $form = "<input type='text' name='token' placeholder='$token' required/>";
+                }
+            } elseif (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
+                \header('Content-type: application/json');
+                try {
+                    /** @var ?LoginQrCode */
+                    $qr = $this->qrLogin();
+                    if (isset($_GET['waitQrCodeOrLogin'])) {
+                        $qr = $qr?->waitForLoginOrQrCodeExpiration(new TimeoutCancellation(5.0));
+                    }
+                } catch (CancelledException) {
+                    /** @var ?LoginQrCode */
+                    $qr = $this->qrLogin();
+                }
+                if ($qr) {
+                    $result = [
+                        'logged_in' => false,
+                        'svg' => $qr->getQRSvg(400, 2)
+                    ];
+                } else {
+                    $result = [
+                        'logged_in' => true,
+                    ];
+                }
+                getOutputBufferStream()->write(\json_encode($result));
+                return;
+            } else {
+                $title = Lang::$current_lang['loginChoosePromptWeb'];
+                $optionBot = \htmlentities(Lang::$current_lang['loginOptionBot']);
+                $optionUser = \htmlentities(Lang::$current_lang['loginOptionUser']);
+                $trailer = '
+                <div id="qr-code-container" style="display: none">
+                    <p>'.\htmlentities(Lang::$current_lang['loginWebQr']).'</p>
+                    <div id="qr-code"></div>
+                </div>
+
+                <script>
+                function longPollQr(query) {
+                    var x = new XMLHttpRequest();
+                    x.onload = function() {
+                        var res = JSON.parse(this.responseText);
+                        if (res.logged_in) {
+                            location.reload();
+                        } else {
+                            document.getElementById("qr-code-container").style = "";
+                            document.getElementById("qr-code").innerHTML = res.svg;
+                            longPollQr("waitQrCodeOrLogin");
+                        }
+                    };
+                    x.open("GET", "'.(\explode('?', $_SERVER['REQUEST_URI'], 2)[0] ?? '').'?"+query, true);
+                    x.send();
+                }
+                longPollQr("getQrCode");
+                </script>';
+                $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
+            }
+        } elseif ($auth === MTProto::WAITING_CODE) {
+            $title = \str_replace(':', '', Lang::$current_lang['loginUserCode']);
+            $phone = \htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
+            $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
+        } elseif ($auth === MTProto::WAITING_PASSWORD) {
+            $title = Lang::$current_lang['loginUserPassWeb'];
+            $hint = \htmlentities(\sprintf(
+                Lang::$current_lang['loginUserPassHint'],
+                $this->getHint(),
+            ));
+            $form = "<input type='password' name='password' placeholder='$hint' required/>";
+        } elseif ($auth === MTProto::WAITING_SIGNUP) {
+            $title = Lang::$current_lang['signupWeb'];
+            $firstName = Lang::$current_lang['signupFirstNameWeb'];
+            $lastName = Lang::$current_lang['signupLastNameWeb'];
+            $form = "<input type='text' name='first_name' placeholder='$firstName' required/><input type='text' name='last_name' placeholder='$lastName'/>";
+        } else {
+            return;
+        }
+        $title = \htmlentities($title);
+        $message = \htmlentities($message);
+        getOutputBufferStream()->write(\sprintf(
+            $this->settings->getTemplates()->getHtmlTemplate(),
+            $message,
+            $form,
+            Lang::$current_lang['go'],
+            $trailer
+        ));
     }
 }

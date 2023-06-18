@@ -29,7 +29,6 @@ use Amp\SignalException;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
-use danog\MadelineProto\ApiWrappers\Templates;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
@@ -103,7 +102,6 @@ final class API extends AbstractAPI
      */
     const SECRET_READY = MTProto::SECRET_READY;
     use Start;
-    use Templates;
     /**
      * Session paths.
      *

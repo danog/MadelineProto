@@ -63,7 +63,6 @@ use danog\MadelineProto\Wrappers\Events;
 use danog\MadelineProto\Wrappers\Login;
 use danog\MadelineProto\Wrappers\Loop;
 use danog\MadelineProto\Wrappers\Start;
-use danog\MadelineProto\Wrappers\Templates;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -101,7 +100,6 @@ final class MTProto implements TLCallback, LoggerGetter
     use Login;
     use Loop;
     use Start;
-    use Templates;
     use DbPropertiesTrait;
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;

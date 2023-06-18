@@ -19,6 +19,7 @@ use danog\MadelineProto\Settings\Peer;
 use danog\MadelineProto\Settings\RPC;
 use danog\MadelineProto\Settings\SecretChats;
 use danog\MadelineProto\Settings\Serialization;
+use danog\MadelineProto\Settings\Templates;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\Settings\VoIP;
 
@@ -76,6 +77,10 @@ final class Settings extends SettingsAbstract
      */
     protected DatabaseAbstract $db;
     /**
+     * Template settings.
+     */
+    protected Templates $templates;
+    /**
      * VoIP settings.
      */
     protected VoIP $voip;
@@ -130,6 +135,7 @@ final class Settings extends SettingsAbstract
         $this->serialization = new Serialization;
         $this->schema = new TLSchema;
         $this->db = new DatabaseMemory;
+        $this->templates = new Templates;
         $this->ipc = new IPc;
         $this->voip = new VoIP;
     }
@@ -207,6 +213,8 @@ final class Settings extends SettingsAbstract
                 $this->schema->merge($settings);
             } elseif ($settings instanceof Ipc) {
                 $this->ipc->merge($settings);
+            } elseif ($settings instanceof Templates) {
+                $this->templates->merge($settings);
             } elseif ($settings instanceof VoIP) {
                 $this->voip->merge($settings);
             } elseif ($settings instanceof DatabaseAbstract) {
@@ -229,6 +237,7 @@ final class Settings extends SettingsAbstract
         $this->serialization->merge($settings->serialization);
         $this->schema->merge($settings->schema);
         $this->ipc->merge($settings->ipc);
+        $this->templates->merge($settings->templates);
         $this->voip->merge($settings->voip);
 
         if (!$this->db instanceof $settings->db) {
@@ -485,6 +494,26 @@ final class Settings extends SettingsAbstract
                 $setting->applyChanges();
             }
         }
+        return $this;
+    }
+
+    /**
+     * Get template settings.
+     */
+    public function getTemplates(): Templates
+    {
+        return $this->templates;
+    }
+
+    /**
+     * Set template settings.
+     *
+     * @param Templates $templates Template settings
+     */
+    public function setTemplates(Templates $templates): self
+    {
+        $this->templates = $templates;
+
         return $this;
     }
 

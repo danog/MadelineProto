@@ -31,7 +31,6 @@ use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\Wrappers\Start;
-use danog\MadelineProto\Wrappers\Templates;
 use Generator;
 use Revolt\EventLoop;
 use Throwable;
@@ -46,7 +45,6 @@ use function Amp\async;
 final class Client extends ClientAbstract
 {
     use Start;
-    use Templates;
     use FilesLogic;
 
     /**
