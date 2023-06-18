@@ -174,6 +174,9 @@ final class Lang
         'en' =>
         [
             'go' => 'Go',
+            'loginChoosePromptWeb' => 'Do you want to login as a user or as a bot?',
+            'loginOptionBot' => 'Bot',
+            'loginOptionUser' => 'User',
             'apiChooseManualAutoTip' => 'Note that you can also provide the API ID/hash directly in the code using the settings: %s',
             'apiChooseManualAutoTipWeb' => 'Note that you can also provide the API ID/hash directly in the code using the <a target="_blank" href="%s">settings</a>.',
             'apiChoosePrompt' => 'Your choice (m/a): ',

@@ -54,7 +54,7 @@ trait Templates
                     $token = \htmlentities(Lang::$current_lang['loginBotTokenWeb']);
                     $form = "<input type='text' name='token' placeholder='$token' required/>";
                 }
-            } elseif (isset($_POST['waitQrCodeOrLogin'])) {
+            } elseif (isset($_GET['waitQrCodeOrLogin'])) {
                 header('Content-type: application/json');
                 try {
                     /** @var ?LoginQrCode */

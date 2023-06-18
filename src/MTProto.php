@@ -715,9 +715,6 @@ final class MTProto implements TLCallback, LoggerGetter
 
             'updateHandlerType',
 
-            // Web login template
-            'webTemplate',
-
             // Settings
             'settings',
             'config',

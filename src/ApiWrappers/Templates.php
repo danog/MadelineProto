@@ -29,7 +29,7 @@ use function Amp\ByteStream\getOutputBufferStream;
  */
 trait Templates
 {
-    private const TEMPLATE = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
+    private const TEMPLATE = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form></body></html>';
     /**
      * Generate page from template.
      *
