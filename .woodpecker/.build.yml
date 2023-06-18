@@ -39,7 +39,7 @@ pipeline:
       - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - /bin/bash tests/makephar.sh
+      - /bin/bash -e tests/makephar.sh
 
 services:
   mariadb:
