@@ -112,36 +112,12 @@ trait Templates
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
-        getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>$qr", $form, $trailer));
-    }
-    /**
-     * Web template.
-     */
-    private string $webTemplate = '';
-    /**
-     * Format message according to template.
-     *
-     * @param string $message Message
-     * @param string $form    Form contents
-     */
-    private function webEchoTemplate(string $message, string $form, string $trailer): string
-    {
-        return \sprintf($this->webTemplate, $message, $form, Lang::$current_lang['go'], $trailer);
-    }
-    /**
-     * Get web template.
-     */
-    private function getWebTemplate(): string
-    {
-        return $this->webTemplate;
-    }
-    /**
-     * Set web template.
-     *
-     * @param string $template Template
-     */
-    private function setWebTemplate(string $template): void
-    {
-        $this->webTemplate = $template;
+        getOutputBufferStream()->write(\sprintf(
+            '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>',
+            $message,
+            $form,
+            Lang::$current_lang['go'],
+            $trailer
+        ));
     }
 }

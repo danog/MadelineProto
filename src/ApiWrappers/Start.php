@@ -48,9 +48,6 @@ trait Start
         if (Magic::$isIpcWorker) {
             throw new Exception('Not inited!');
         }
-        if (!$this->getWebAPITemplate()) {
-            $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
-        }
         $app = [];
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();

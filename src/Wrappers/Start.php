@@ -54,10 +54,6 @@ trait Start
         if ($this->getAuthorization() === MTProto::LOGGED_IN) {
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
-        if (!$this->getWebTemplate()) {
-            $settings = $this->getSettings();
-            $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());
-        }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
                 $stdout = getStdout();

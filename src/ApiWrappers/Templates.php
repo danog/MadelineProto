@@ -29,6 +29,7 @@ use function Amp\ByteStream\getOutputBufferStream;
  */
 trait Templates
 {
+    private const TEMPLATE = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
     /**
      * Generate page from template.
      *
@@ -37,16 +38,8 @@ trait Templates
      */
     private function webAPIEchoTemplate(string $message, string $form): string
     {
-        return \sprintf($this->getWebAPITemplate(), $message, $form, Lang::$current_lang['go']);
+        return \sprintf(self::TEMPLATE, $message, $form, Lang::$current_lang['go']);
     }
-    /**
-     * Get web API login HTML template string.
-     */
-    abstract public function getWebAPITemplate(): string;
-    /**
-     * Set web API login HTML template string.
-     */
-    abstract public function setWebAPITemplate(string $template): void;
     /**
      * Echo to browser.
      *
