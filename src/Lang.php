@@ -156,6 +156,7 @@ final class Lang
             'signupWeb' => 'Registrazione',
             'go' => 'Vai',
             'loginChoosePromptWeb' => 'Vuoi effettuare il login come utente o come bot?',
+            'loginWebQr' => 'Puoi anche effettuare il login automaticamente scansionando il seguente codice QR:',
             'loginOptionBot' => 'Bot',
             'loginOptionUser' => 'Utente',
             'loginBotTokenWeb' => 'Token del bot',
@@ -175,6 +176,7 @@ final class Lang
         [
             'go' => 'Go',
             'loginChoosePromptWeb' => 'Do you want to login as a user or as a bot?',
+            'loginWebQr' => 'You can also login automatically by scanning the following QR code:',
             'loginOptionBot' => 'Bot',
             'loginOptionUser' => 'User',
             'apiChooseManualAutoTip' => 'Note that you can also provide the API ID/hash directly in the code using the settings: %s',

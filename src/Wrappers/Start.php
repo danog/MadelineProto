@@ -123,7 +123,7 @@ trait Start
             if (isset($_POST['password'])) {
                 $this->webComplete2faLogin();
             } else {
-                $this->webEcho(Lang::$current_lang['loginNoPass']);
+                $this->webEcho(Lang::$current_lang['loginUserPassWeb']);
             }
         } elseif ($this->getAuthorization() === MTProto::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {

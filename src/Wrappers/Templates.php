@@ -54,13 +54,14 @@ trait Templates
                     $token = \htmlentities(Lang::$current_lang['loginBotTokenWeb']);
                     $form = "<input type='text' name='token' placeholder='$token' required/>";
                 }
-            } elseif (isset($_GET['waitQrCodeOrLogin'])) {
+            } elseif (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
                 header('Content-type: application/json');
                 try {
                     /** @var ?LoginQrCode */
-                    $qr = $this->qrLogin()?->waitForLoginOrQrCodeExpiration(new TimeoutCancellation(
-                        5.0
-                    ));
+                    $qr = $this->qrLogin();
+                    if (isset($_GET['waitQrCodeOrLogin'])) {
+                        $qr = $qr?->waitForLoginOrQrCodeExpiration(new TimeoutCancellation(5.0));
+                    }
                 } catch (CancelledException) {
                     /** @var ?LoginQrCode */
                     $qr = $this->qrLogin();
@@ -81,13 +82,29 @@ trait Templates
                 $title = Lang::$current_lang['loginChoosePromptWeb'];
                 $optionBot = \htmlentities(Lang::$current_lang['loginOptionBot']);
                 $optionUser = \htmlentities(Lang::$current_lang['loginOptionUser']);
-                $trailer = '<div id="qr-code"></div><script>
-                var x = new XMLHttpRequest();
-                x.onload = function() {
-                    document.getElementById("demo").innerHTML = this.responseText;
-                    }
-                x.open("GET", "?waitQrCodeOrLogin", true);
-                x.send();
+                $trailer = '
+                <div id="qr-code-container" style="display: none">
+                    <p>'.htmlentities(Lang::$current_lang['loginWebQr']).'</p>
+                    <div id="qr-code"></div>
+                </div>
+
+                <script>
+                function longPollQr(query) {
+                    var x = new XMLHttpRequest();
+                    x.onload = function() {
+                        var res = JSON.parse(this.responseText);
+                        if (res.logged_in) {
+                            location.reload();
+                        } else {
+                            document.getElementById("qr-code-container").style = "";
+                            document.getElementById("qr-code").innerHTML = res.svg;
+                            longPollQr("waitQrCodeOrLogin");
+                        }
+                    };
+                    x.open("GET", "'.(\explode('?', $_SERVER['REQUEST_URI'], 2)[0] ?? '').'?"+query, true);
+                    x.send();
+                }
+                longPollQr("getQrCode");
                 </script>';
                 $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
             }
