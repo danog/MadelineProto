@@ -307,7 +307,7 @@ abstract class AsyncTools extends StrTools
      *
      * @param string $prompt Prompt
      */
-    public static function readLine(string $prompt = ''): string
+    public static function readLine(string $prompt = '', ?Cancellation $cancel = null): string
     {
         try {
             Magic::togglePeriodicLogging();
@@ -317,7 +317,7 @@ abstract class AsyncTools extends StrTools
                 $stdout->write($prompt);
             }
             static $lines = [''];
-            while (\count($lines) < 2 && ($chunk = $stdin->read()) !== null) {
+            while (\count($lines) < 2 && ($chunk = $stdin->read($cancel)) !== null) {
                 $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
                 $lines[\count($lines) - 1] .= \array_shift($chunk);
                 $lines = \array_merge($lines, $chunk);

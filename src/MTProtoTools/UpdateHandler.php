@@ -497,6 +497,39 @@ trait UpdateHandler
             $this->config['expires'] = 0;
             $this->getConfig();
         }
+        if ($update['_'] === 'updateLoginToken') {
+            try {
+                $authorization = $this->methodCallAsyncRead(
+                    'auth.exportLoginToken',
+                    [
+                        'api_id' => $this->settings->getAppInfo()->getApiId(),
+                        'api_hash' => $this->settings->getAppInfo()->getApiHash(),
+                    ],
+                );
+                if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
+                    $authorization = $this->methodCallAsyncRead(
+                        'auth.importLoginToken',
+                        $authorization,
+                        ['datacenter' => $authorization['dc_id']]
+                    );
+                }
+                $this->processAuthorization($authorization['authorization']);
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
+                    $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
+                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
+                    if (!isset($this->authorization['hint'])) {
+                        $this->authorization['hint'] = '';
+                    }
+                    $this->authorized = MTProto::WAITING_PASSWORD;
+                    $this->qrLoginDeferred?->cancel();
+                    $this->qrLoginDeferred = null;
+                    return;
+                }
+                throw $e;
+            }
+            return;
+        }
         if (
             \in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])
             || (

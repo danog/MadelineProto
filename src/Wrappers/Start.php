@@ -20,13 +20,20 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\CancelledException;
+use Amp\CompositeCancellation;
+use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
+
+use function Amp\ByteStream\getStdout;
 
 use const PHP_SAPI;
 
@@ -53,10 +60,41 @@ trait Start
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
-                if (\strpos(Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {
-                    $this->botLogin(Tools::readLine(Lang::$current_lang['loginBot']));
+                $stdout = getStdout();
+                do {
+                    /** @var ?LoginQrCode */
+                    $qr = $this->qrLogin();
+                    if (!$qr) {
+                        $this->serialize();
+                        return $this->fullGetSelf();
+                    }
+                    $stdout->write($qr->getQRText(2));
+
+                    $expire = $qr->getExpirationCancellation();
+                    $login = $qr->getLoginCancellation();
+
+                    $cancel = new CompositeCancellation($expire, $login);
+
+                    try {
+                        $result = Tools::readLine(Lang::$current_lang['loginQr'].PHP_EOL.Lang::$current_lang['loginManual'], $cancel);
+                        break;
+                    } catch (CancelledException) {
+                        if ($login->isRequested()) {
+                            $stdout->write(PHP_EOL.PHP_EOL."QR code login successful!".PHP_EOL);
+                            if ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
+                                $this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+                            }
+                            $this->serialize();
+                            return $this->fullGetSelf();
+                        }
+
+                        $stdout->write(PHP_EOL."The QR code expired, generating a new one...".PHP_EOL);
+                    }
+                } while (true);
+                if (str_contains($result, ':')) {
+                    $this->botLogin($result);
                 } else {
-                    $this->phoneLogin(Tools::readLine(Lang::$current_lang['loginUser']));
+                    $this->phoneLogin($result);
                 }
             }
             if ($this->getAuthorization() === MTProto::WAITING_CODE) {

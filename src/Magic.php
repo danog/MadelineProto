@@ -308,7 +308,7 @@ final class Magic
             }
             $file = 'MadelineProto';
             $line = 1;
-            return new Exception($message, 0, null, $file, $line);
+            throw new Exception($message, 0, null, $file, $line);
         }
         foreach (['gmp', 'xml', 'dom', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
             if (!\extension_loaded($extension)) {

@@ -58,7 +58,8 @@
         "amphp/websocket-client": "^2",
         "psr/http-factory": "^1.0",
         "psr/log": "^3",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^1.11",
+        "bacon/bacon-qr-code": "^2.0"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "dev-master",
@@ -76,9 +77,8 @@
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
         "ext-ffi": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
-        "ext-pdo": "Install the pdo extension to store session data on MySQL or PostgreSQL",
-        "ext-openssl": "Install the openssl extension for faster crypto",
-        "ext-gmp": "Install the gmp extension for faster crypto"
+        "ext-pdo": "Install the pdo extension to store session data on MySQL",
+        "ext-openssl": "Install the openssl extension for faster crypto"
     },
     "authors": [
         {

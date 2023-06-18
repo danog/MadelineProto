@@ -29,6 +29,7 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\TL\Types\Bytes;
+use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
 use Webmozart\Assert\Assert;
 

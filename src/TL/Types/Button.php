@@ -58,6 +58,8 @@ final class Button implements JsonSerializable, ArrayAccess
     private array|int $peer;
     /**
      * Constructor function.
+     * 
+     * @internal
      *
      * @param MTProto $API     API instance
      * @param array   $message Message
@@ -94,9 +96,7 @@ final class Button implements JsonSerializable, ArrayAccess
      */
     public function click(bool $donotwait = true)
     {
-        if (!isset($this->API)) {
-            $this->API = Client::giveInstanceBySession($this->session);
-        }
+        $this->API ??= Client::giveInstanceBySession($this->session);
         switch ($this->button['_']) {
             default:
                 return false;

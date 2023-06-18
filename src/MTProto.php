@@ -55,6 +55,7 @@ use danog\MadelineProto\TL\Conversion\BotAPIFiles;
 use danog\MadelineProto\TL\Conversion\TD;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -400,6 +401,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * IPC server.
      */
     private ?Server $ipcServer = null;
+    private ?LoginQrCode $loginQrCode = null;
     /**
      * Feeder loops.
      *
@@ -702,6 +704,7 @@ final class MTProto implements TLCallback, LoggerGetter
             'qres',
             'supportUser',
             'broadcasts',
+            'loginQrCode',
 
             // Event handler
             'event_handler',
@@ -1637,6 +1640,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Get authorization info.
+     * 
+     * @return API::NOT_LOGGED_IN|API::WAITING_CODE|API::WAITING_SIGNUP|API::WAITING_PASSWORD|API::LOGGED_IN
      */
     public function getAuthorization(): int
     {

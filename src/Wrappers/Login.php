@@ -20,6 +20,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Cancellation;
+use Amp\CancelledException;
+use Amp\CompositeCancellation;
+use Amp\DeferredCancellation;
+use Amp\DeferredFuture;
+use AssertionError;
+use BaconQrCode\Encoder\QrCode;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -28,12 +35,15 @@ use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\TL\Types\LoginQrCode;
+use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages logging in and out.
  *
  * @property Settings $settings Settings
- *
+ * @property ?LoginQrCode $loginQrCode
  * @internal
  */
 trait Login
@@ -51,21 +61,95 @@ trait Login
         $callbacks = [$this, $this->referenceDatabase];
         $this->TL->updateCallbacks($callbacks);
         $this->logger->logger(Lang::$current_lang['login_bot'], Logger::NOTICE);
-        $this->authorization = $this->methodCallAsyncRead(
+        return $this->processAuthorization($this->methodCallAsyncRead(
             'auth.importBotAuthorization',
             [
                 'bot_auth_token' => $token,
                 'api_id' => $this->settings->getAppInfo()->getApiId(),
                 'api_hash' => $this->settings->getAppInfo()->getApiHash(),
             ],
-        );
-        $this->authorized = MTProto::LOGGED_IN;
-        $this->authorized_dc = $this->datacenter->currentDatacenter;
-        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
-        $this->initAuthorization();
-        $this->startUpdateSystem();
-        $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
-        return $this->authorization;
+        ));
+    }
+
+    private ?DeferredCancellation $qrLoginDeferred = null;
+    /**
+     * Initiates QR code login.
+     * 
+     * Returns a QR code login helper object, that can be used to render the QR code, display the link directly, wait for login, QR code expiration and much more.
+     * 
+     * Returns null if we're already logged in, or if we're waiting for a password (use getAuthorization to distinguish between the two cases).
+     */
+    public function qrLogin(): ?LoginQrCode {
+        if ($this->authorized === MTProto::LOGGED_IN) {
+            return null;
+        } elseif ($this->authorized === MTProto::WAITING_PASSWORD) {
+            return null;
+        } elseif ($this->authorized !== MTProto::NOT_LOGGED_IN) {
+            throw new AssertionError("Unexpected state {$this->authorized}!");
+        }
+        $this->qrLoginDeferred ??= new DeferredCancellation;
+        if (!$this->loginQrCode || $this->loginQrCode->isExpired()) {
+            try {
+                $authorization = $this->methodCallAsyncRead(
+                    'auth.exportLoginToken',
+                    [
+                        'api_id' => $this->settings->getAppInfo()->getApiId(),
+                        'api_hash' => $this->settings->getAppInfo()->getApiHash(),
+                    ],
+                );
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
+                    $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
+                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
+                    if (!isset($this->authorization['hint'])) {
+                        $this->authorization['hint'] = '';
+                    }
+                    $this->authorized = MTProto::WAITING_PASSWORD;
+                    $this->qrLoginDeferred?->cancel();
+                    $this->qrLoginDeferred = null;
+                    return null;
+                }
+                throw $e;
+            }
+            if ($authorization['_'] === 'auth.loginToken') {
+                return $this->loginQrCode = new LoginQrCode(
+                    $this,
+                    "tg://login?token=".Tools::base64urlEncode((string) $authorization['token']),
+                    $authorization['expires']
+                );
+            }
+
+            if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
+                $authorization = $this->methodCallAsyncRead(
+                    'auth.importLoginToken',
+                    $authorization,
+                    ['datacenter' => $authorization['dc_id']]
+                );
+            }
+            $this->processAuthorization($authorization['authorization']);
+            return null;
+        }
+        return $this->loginQrCode;
+    }
+    /**
+     * @internal
+     */
+    public function getQrLoginCancellation(): Cancellation {
+        if ($this->qrLoginDeferred) {
+            return $this->qrLoginDeferred->getCancellation();
+        }
+        $c = new DeferredCancellation;
+        $c->cancel();
+        return $c->getCancellation();
+    }
+    /** @internal */
+    public function waitQrLogin(): void {
+        if (!$this->qrLoginDeferred) {
+            return;
+        }
+        try {
+            (new DeferredFuture)->getFuture()->await($this->getQrLoginCancellation());
+        } catch (CancelledException) {}
     }
     /**
      * Login as user.
@@ -136,14 +220,7 @@ trait Login
             $authorization['_'] = 'account.needSignup';
             return $authorization;
         }
-        $this->authorized = MTProto::LOGGED_IN;
-        $this->authorization = $authorization;
-        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
-        $this->initAuthorization();
-        $this->getPhoneConfig();
-        $this->startUpdateSystem();
-        $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
-        return $this->authorization;
+        return $this->processAuthorization($authorization);
     }
     /**
      * Import authorization.
@@ -185,6 +262,9 @@ trait Login
         }
         $this->TL->updateCallbacks($callbacks);
         $this->startUpdateSystem();
+        $this->qrLoginDeferred?->cancel();
+        $this->qrLoginDeferred = null;
+        $this->fullGetSelf();
         return $res;
     }
     /**
@@ -214,14 +294,7 @@ trait Login
         }
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(Lang::$current_lang['signing_up'], Logger::NOTICE);
-        $this->authorization = $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]);
-        $this->authorized = MTProto::LOGGED_IN;
-        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
-        $this->initAuthorization();
-        $this->getPhoneConfig();
-        $this->logger->logger(Lang::$current_lang['signup_ok'], Logger::NOTICE);
-        $this->startUpdateSystem();
-        return $this->authorization;
+        return $this->processAuthorization($this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]));
     }
     /**
      * Complete 2FA login.
@@ -234,14 +307,22 @@ trait Login
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
         }
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
-        $this->authorization = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]);
+        return $this->processAuthorization($this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]));
+    }
+    private function processAuthorization(array $authorization): array {
+        if ($this->authorized === MTProto::LOGGED_IN) {
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
+        }
+        $this->qrLoginDeferred?->cancel();
+        $this->qrLoginDeferred = null;
+        $this->authorization = $authorization;
         $this->authorized = MTProto::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
         $this->initAuthorization();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         $this->getPhoneConfig();
         $this->startUpdateSystem();
-        return $this->authorization;
+        return $authorization;
     }
     /**
      * Update the 2FA password.

@@ -20,8 +20,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\CancelledException;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\LoginQrCode;
 
 use function Amp\ByteStream\getOutputBufferStream;
 
@@ -39,6 +42,7 @@ trait Templates
     {
         $auth = $this->getAuthorization();
         $form = null;
+        $trailer = '';
         if ($auth === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'phone') {
@@ -50,10 +54,41 @@ trait Templates
                     $token = \htmlentities(Lang::$current_lang['loginBotTokenWeb']);
                     $form = "<input type='text' name='token' placeholder='$token' required/>";
                 }
+            } elseif (isset($_POST['waitQrCodeOrLogin'])) {
+                header('Content-type: application/json');
+                try {
+                    /** @var ?LoginQrCode */
+                    $qr = $this->qrLogin()?->waitForLoginOrQrCodeExpiration(new TimeoutCancellation(
+                        5.0
+                    ));
+                } catch (CancelledException) {
+                    /** @var ?LoginQrCode */
+                    $qr = $this->qrLogin();
+                }
+                if ($qr) {
+                    $result = [
+                        'logged_in' => false,
+                        'svg' => $qr->getQRSvg()
+                    ];
+                } else {
+                    $result = [
+                        'logged_in' => true,
+                    ];
+                }
+                getOutputBufferStream()->write(json_encode($result));
+                return;
             } else {
                 $title = Lang::$current_lang['loginChoosePromptWeb'];
                 $optionBot = \htmlentities(Lang::$current_lang['loginOptionBot']);
                 $optionUser = \htmlentities(Lang::$current_lang['loginOptionUser']);
+                $trailer = '<div id="qr-code"></div><script>
+                var x = new XMLHttpRequest();
+                x.onload = function() {
+                    document.getElementById("demo").innerHTML = this.responseText;
+                    }
+                x.open("GET", "?waitQrCodeOrLogin", true);
+                x.send();
+                </script>';
                 $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
             }
         } elseif ($auth === MTProto::WAITING_CODE) {
@@ -77,11 +112,10 @@ trait Templates
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
-        getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
+        getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>$qr", $form, $trailer));
     }
     /**
      * Web template.
-     *
      */
     private string $webTemplate = '';
     /**
@@ -90,14 +124,14 @@ trait Templates
      * @param string $message Message
      * @param string $form    Form contents
      */
-    private function webEchoTemplate(string $message, string $form): string
+    private function webEchoTemplate(string $message, string $form, string $trailer): string
     {
-        return \sprintf($this->webTemplate, $message, $form, Lang::$current_lang['go']);
+        return \sprintf($this->webTemplate, $message, $form, Lang::$current_lang['go'], $trailer);
     }
     /**
      * Get web template.
      */
-    public function getWebTemplate(): string
+    private function getWebTemplate(): string
     {
         return $this->webTemplate;
     }
@@ -106,7 +140,7 @@ trait Templates
      *
      * @param string $template Template
      */
-    public function setWebTemplate(string $template): void
+    private function setWebTemplate(string $template): void
     {
         $this->webTemplate = $template;
     }

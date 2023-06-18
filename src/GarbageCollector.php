@@ -7,6 +7,7 @@ namespace danog\MadelineProto;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\SignalException;
+use AssertionError;
 use ReflectionFiber;
 use Revolt\EventLoop;
 use Throwable;
@@ -66,30 +67,32 @@ final class GarbageCollector
         }
         $client = HttpClientBuilder::buildDefault();
         $request = new Request(MADELINE_RELEASE_URL);
-        $madelinePhpContents = null;
 
         $id = null;
-        $cb = function () use ($client, $request, &$madelinePhpContents, &$id): void {
+        $cb = function () use ($client, $request, &$id): void {
             try {
-                $madelinePhpContents ??= read(MADELINE_PHP);
-                $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
-                    ->getBody()
-                    ->buffer();
-
-                if ($contents !== $madelinePhpContents) {
-                    $unlock = Tools::flock(MADELINE_PHP.'.lock', LOCK_EX);
-                    write(MADELINE_PHP.'.temp.php', $contents);
-                    move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
-                    $unlock();
-                    $madelinePhpContents = $contents;
-                }
-
                 $latest = $client->request($request);
                 Magic::$version_latest = \trim($latest->getBody()->buffer());
                 if (Magic::$version !== Magic::$version_latest) {
                     $old = Magic::$version;
                     $new = Magic::$version_latest;
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
+
+                    $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
+                        ->getBody()
+                        ->buffer();
+                    
+                    if (!str_starts_with($contents, '<?php')) {
+                        throw new AssertionError("phar.php is not a PHP file!");
+                    }
+
+                    if ($contents !== read(MADELINE_PHP)) {
+                        $unlock = Tools::flock(MADELINE_PHP.'.lock', LOCK_EX);
+                        write(MADELINE_PHP.'.temp.php', $contents);
+                        move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
+                        $unlock();
+                    }
+
                     write(MADELINE_PHAR_VERSION, '');
                     if (Magic::$isIpcWorker) {
                         throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');

@@ -244,6 +244,10 @@ final class FeedLoop extends Loop
             }
         }
         $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);
+        if ($update['_'] === 'updateLoginToken') {
+            $this->API->saveUpdate($update);
+            return $this->channelId;
+        }
         $this->incomingUpdates[] = $update;
         return $this->channelId;
     }

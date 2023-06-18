@@ -22,13 +22,16 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\DeferredFuture;
 use Amp\Future;
+use Amp\SignalException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 use Generator;
+use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_SAPI;
@@ -138,7 +141,10 @@ trait Loop
     public function restart(): void
     {
         if (!$this->hasEventHandler()) {
-            throw new Exception("Can't use this method if no event handler is running!");
+            if (Magic::$isIpcWorker) {
+                EventLoop::defer(fn () => throw new SignalException('Restarting IPC daemon!'));
+            }
+            return;
         }
         $deferred = $this->stopDeferred ?? new DeferredFuture;
         $this->stopDeferred = null;

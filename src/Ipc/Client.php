@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Cancellation;
+use Amp\DeferredCancellation;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
@@ -128,6 +130,12 @@ final class Client extends ClientAbstract
         return true;
     }
 
+    /** @internal */
+    public function getQrLoginCancellation(): Cancellation {
+        $c = new DeferredCancellation;
+        async($this->__call(...), 'waitQrLogin', [])->map($c->cancel(...));
+        return $c->getCancellation();
+    }
     /**
      * Upload file from URL.
      *

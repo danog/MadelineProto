@@ -6,9 +6,11 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
+use Amp\Cancellation;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Context\Internal\ExitFailure;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
@@ -105,6 +107,8 @@ final class Wrapper extends ClientAbstract
                 $class = \method_exists($callback, 'seek') ? ReadableStream::class : SeekableReadableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
+            } elseif ($callback instanceof Cancellation) {
+                $class = WrapperCancellation::class;
             }
             $callback = [$class, $ids]; // Will be re-filled later
             $this->callbackIds[] = &$callback;

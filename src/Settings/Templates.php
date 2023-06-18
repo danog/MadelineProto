@@ -14,7 +14,7 @@ final class Templates extends SettingsAbstract
     /**
      * Web template used for querying app information.
      */
-    protected string $htmlTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form></body></html>';
+    protected string $htmlTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
 
     /**
      * Get web template used for querying app information.
