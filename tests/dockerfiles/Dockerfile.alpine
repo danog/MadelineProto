@@ -12,7 +12,7 @@ RUN apk add --no-cache make g++ && \
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions uv-beta ffi pq memprof intl gmp mbstring pdo_mysql xml dom zip opcache && \
+    install-php-extensions uv-beta ffi pq memprof intl gmp mbstring pdo_mysql xml dom iconv zip opcache && \
     rm /usr/local/bin/install-php-extensions
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini

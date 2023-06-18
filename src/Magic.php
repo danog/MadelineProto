@@ -310,7 +310,7 @@ final class Magic
             $line = 1;
             throw new Exception($message, 0, null, $file, $line);
         }
-        foreach (['gmp', 'xml', 'dom', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
+        foreach (['iconv', 'gmp', 'xml', 'dom', 'fileinfo', 'json', 'mbstring', 'filter', 'hash', 'zlib'] as $extension) {
             if (!\extension_loaded($extension)) {
                 throw Exception::extension($extension);
             }

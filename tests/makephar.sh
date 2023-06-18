@@ -134,8 +134,7 @@ n
 runTest()
 {
     {
-        echo "b
-$BOT_TOKEN
+        echo "$BOT_TOKEN
 n
 n
 n

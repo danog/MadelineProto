@@ -146,3 +146,6 @@ app.json
 config.json
 
 /Dockerfile
+
+/docker-compose.yml
+/Caddyfile
