@@ -315,6 +315,7 @@ trait Login
         if ($this->authorized === MTProto::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
+        $this->authorized_dc = $this->datacenter->currentDatacenter;
         $this->qrLoginDeferred?->cancel();
         $this->qrLoginDeferred = null;
         $this->authorization = $authorization;
