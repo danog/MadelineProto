@@ -404,7 +404,9 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function flush(): void
     {
-        if (!isset($this->datacenter)) return;
+        if (!isset($this->datacenter)) {
+            return;
+        }
         $this->API->logger->logger("Flushing pending messages, DC {$this->datacenter}", Logger::NOTICE);
         foreach ($this->connections as $socket) {
             $socket->flush();
