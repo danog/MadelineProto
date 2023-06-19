@@ -159,7 +159,7 @@ tail -F MadelineProto.log &
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
-runTestOld
+runTest
 db mysql serialize
 k
 
