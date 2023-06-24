@@ -57,8 +57,6 @@
     "serialization_ofd": "Serialization is out of date, reconstructing object!",
     "api_not_set": "You must provide an api key and an api id, get your own @ my.telegram.org",
     "session_corrupted": "The session is corrupted!",
-    "length_not_4": "The specified base256 32-bit integer must be exactly 4 bytes long.",
-    "length_not_8": "The specified base256 64-bit integer must be exactly 8 bytes long.",
     "value_bigger_than_2147483647": "Provided value %s is bigger than 2147483647",
     "value_smaller_than_2147483648": "Provided value %s is smaller than -2147483648",
     "value_bigger_than_9223372036854775807": "Provided value %s is bigger than 9223372036854775807",

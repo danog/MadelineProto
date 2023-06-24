@@ -3,8 +3,6 @@
     "serialization_ofd": "La serializzazione non \u00e8 aggiornata, reistanziamento dell'oggetto in corso!",
     "api_not_set": "Devi specificare una chiave ed un ID API, ottienili su https:\/\/my.telegram.org",
     "session_corrupted": "La sessione si \u00e8 corrotta!",
-    "length_not_4": "The specified base256 32-bit integer must be exactly 4 bytes long.",
-    "length_not_8": "The specified base256 64-bit integer must be exactly 8 bytes long.",
     "value_bigger_than_2147483647": "Il valore fornito (%s) \u00e8 maggiore di 2147483647",
     "value_smaller_than_2147483648": "Il valore fornito (%s) \u00e8 minore di -2147483648",
     "value_bigger_than_9223372036854775807": "Il valore fornito (%s) \u00e8 maggiore di 9223372036854775807",

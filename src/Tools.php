@@ -188,7 +188,7 @@ abstract class Tools extends AsyncTools
     public static function unpackSignedInt(string $value): int
     {
         if (\strlen($value) !== 4) {
-            throw new TL\Exception(Lang::$current_lang['length_not_4']);
+            throw new TL\Exception("Length is not 4");
         }
         return \unpack('l', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
@@ -200,7 +200,7 @@ abstract class Tools extends AsyncTools
     public static function unpackSignedLong(string $value): int
     {
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(Lang::$current_lang['length_not_8']);
+            throw new TL\Exception("Length is not 8");
         }
         return \unpack('q', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
@@ -218,7 +218,7 @@ abstract class Tools extends AsyncTools
             $value = \pack('l2', $value);
         }
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(Lang::$current_lang['length_not_8']);
+            throw new TL\Exception("Length is not 8");
         }
         return (string) self::unpackSignedLong($value);
     }
@@ -283,7 +283,7 @@ abstract class Tools extends AsyncTools
     public static function unpackDouble(string $value): float
     {
         if (\strlen($value) !== 8) {
-            throw new TL\Exception(Lang::$current_lang['length_not_8']);
+            throw new TL\Exception("Length is not 8");
         }
         return \unpack('d', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
