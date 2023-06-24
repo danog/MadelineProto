@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-use danog\MadelineProto\Lang;
-
-require 'vendor/autoload.php';
+`wget https://weblate.madelineproto.xyz/download/madelineproto/madelineproto/?format=zip -O langs.zip`;
+`unzip -o langs.zip`;
+`mv madelineproto/madelineproto/langs/* langs`;
+`rm -rf madelineproto langs.zip`;
 
 $template = '<?php
 /**
@@ -26,53 +27,16 @@ namespace danog\MadelineProto;
 /** @internal */
 final class Lang
 {
-    public static $lang = %s;
+    public static array $lang = %s;
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
-    public static $current_lang = %s;
+    public static array $current_lang = %s;
 }';
 
-foreach (Lang::$lang as $code => &$currentLang) {
-    if ($code === 'en') {
-        file_put_contents("langs/$code.json", json_encode($currentLang, JSON_PRETTY_PRINT));
-        continue;
-    }
-    $currentLang = array_intersect_key($currentLang, Lang::$lang['en']);
-    file_put_contents("langs/$code.json", json_encode($currentLang, JSON_PRETTY_PRINT));
+$langs = [];
+foreach (glob("langs/*.json") as $lang) {
+    $code = basename($lang, '.json');
+    $langs[$code] = json_decode(file_get_contents($lang), true);
 }
 
-$lang_code = readline('Enter the language you whish to localize: ');
-if ($lang_code === '') {
-    file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
-    echo 'OK. edit src/Lang.php to fix mistakes.'.PHP_EOL;
-    die;
-}
-
-if (!isset(Lang::$lang[$lang_code])) {
-    Lang::$lang[$lang_code] = Lang::$current_lang;
-    echo 'New language detected!'.PHP_EOL.PHP_EOL;
-} else {
-    echo 'Completing localization of existing language'.PHP_EOL.PHP_EOL;
-}
-$count = count(Lang::$lang[$lang_code]);
-$curcount = 0;
-ksort(Lang::$current_lang);
-foreach (Lang::$current_lang as $key => $value) {
-    if (!(Lang::$lang[$lang_code][$key] ?? '')) {
-        Lang::$lang[$lang_code][$key] = $value;
-    }
-
-    if (Lang::$lang[$lang_code][$key] === '' || (Lang::$lang[$lang_code][$key] === Lang::$lang['en'][$key] && Lang::$lang[$lang_code][$key] !== 'Bot')) {
-        $value = Lang::$lang[$lang_code][$key];
-        if ($value == '') {
-            $value = $key;
-        }
-        Lang::$lang[$lang_code][$key] = readline($value.' => ');
-        Lang::$lang[$lang_code][$key] = ucfirst(Lang::$lang[$lang_code][$key]);
-        file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
-        echo 'OK, '.($curcount * 100 / $count).'% done. edit src/Lang.php to fix mistakes.'.PHP_EOL;
-    }
-    $curcount++;
-}
-file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
-echo 'OK. edit src/Lang.php to fix mistakes.'.PHP_EOL;
+file_put_contents('src/Lang.php', sprintf($template, var_export($langs, true), var_export($langs['en'], true)));

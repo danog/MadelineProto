@@ -76,7 +76,7 @@ trait Start
                         break;
                     } catch (CancelledException) {
                         if ($login->isRequested()) {
-                            $stdout->write(PHP_EOL.PHP_EOL."QR code login successful!".PHP_EOL);
+                            $stdout->write(PHP_EOL.PHP_EOL.Lang::$current_lang['loginQrCodeSuccessful'].PHP_EOL);
                             if ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
                                 $this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
                             }
@@ -84,7 +84,7 @@ trait Start
                             return $this->fullGetSelf();
                         }
 
-                        $stdout->write(PHP_EOL."The QR code expired, generating a new one...".PHP_EOL);
+                        $stdout->write(PHP_EOL.Lang::$current_lang['loginQrCodeExpired'].PHP_EOL);
                     }
                 } while (true);
                 if (\str_contains($result, ':')) {
