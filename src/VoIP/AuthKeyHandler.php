@@ -89,9 +89,9 @@ trait AuthKeyHandler
         $user = $user['InputUser'];
         $this->logger->logger(\sprintf('Calling %s...', $user['user_id']), Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
-        $this->logger->logger(Lang::$current_lang['generating_a'], Logger::VERBOSE);
+        $this->logger->logger('Generating a...', Logger::VERBOSE);
         $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
-        $this->logger->logger(Lang::$current_lang['generating_g_a'], Logger::VERBOSE);
+        $this->logger->logger('Generating g_a...', Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         Crypt::checkG($g_a, $dh_config['p']);
         $controller = new VoIP(true, $user['user_id'], $this, VoIP::CALL_STATE_REQUESTED);
@@ -118,7 +118,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger(\sprintf(Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
-        $this->logger->logger(Lang::$current_lang['generating_b'], Logger::VERBOSE);
+        $this->logger->logger('Generating b...', Logger::VERBOSE);
         $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
@@ -203,7 +203,7 @@ trait AuthKeyHandler
         $this->logger->logger(\sprintf(Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
         if (\hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
-            throw new SecurityException(Lang::$current_lang['invalid_g_a']);
+            throw new SecurityException('Invalid g_a!');
         }
         $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
         Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
@@ -274,11 +274,11 @@ trait AuthKeyHandler
             }
         }
         if (!empty($rating)) {
-            $this->logger->logger(\sprintf(Lang::$current_lang['call_set_rating'], $call['id']), Logger::VERBOSE);
+            $this->logger->logger(\sprintf('Setting rating for call %s...', $call['id']), Logger::VERBOSE);
             $this->methodCallAsyncRead('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
         }
         if ($need_debug && isset($this->calls[$call['id']])) {
-            $this->logger->logger(\sprintf(Lang::$current_lang['call_debug_saving'], $call['id']), Logger::VERBOSE);
+            $this->logger->logger(\sprintf('Saving debug data for call %s...', $call['id']), Logger::VERBOSE);
             $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
         }
         $c = $this->calls[$call['id']];

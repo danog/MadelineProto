@@ -1133,7 +1133,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->getFullDialogsInternal(false);
         }
         if ($this->authorized === self::LOGGED_IN) {
-            $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
+            $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
             $this->updaters[UpdateLoop::GENERIC]->resume();
         }
         $this->updaters[UpdateLoop::GENERIC]->start();
@@ -1549,7 +1549,7 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config) : $config;
         $this->parseConfig();
-        $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
+        $this->logger->logger('Updated config!', Logger::NOTICE);
         return $this->config;
     }
     /**

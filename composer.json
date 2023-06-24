@@ -32,7 +32,6 @@
         "ext-json": "*",
         "ext-xml": "*",
         "ext-dom": "*",
-        "ext-gmp": "*",
         "ext-filter": "*",
         "ext-hash": "*",
         "ext-zlib": "*",
@@ -78,7 +77,8 @@
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
         "ext-ffi": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
         "ext-pdo": "Install the pdo extension to store session data on MySQL",
-        "ext-openssl": "Install the openssl extension for faster crypto"
+        "ext-openssl": "Install the openssl extension for faster crypto",
+        "ext-gmp": "Install the gmp extension to speed up authorization"
     },
     "authors": [
         {

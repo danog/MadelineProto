@@ -162,7 +162,7 @@ final class TL
      */
     public function init(TLSchema $files, array $objects = []): void
     {
-        $this->API?->logger?->logger(Lang::$current_lang['TL_loading'], Logger::VERBOSE);
+        $this->API?->logger?->logger('Loading TL schemes...', Logger::VERBOSE);
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
@@ -265,7 +265,7 @@ final class TL
                     if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', STR_PAD_LEFT);
                         if ($id !== $nid) {
-                            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), Logger::ERROR);
+                            $this->API?->logger?->logger(\sprintf('CRC32 mismatch (%s, %s) for %s', $id, $nid, $line), Logger::ERROR);
                         }
                         $id = $nid;
                     }
@@ -310,14 +310,14 @@ final class TL
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception(Lang::$current_lang['src_file_invalid'].$file);
             }
-            $this->API?->logger?->logger(Lang::$current_lang['translating_obj'], Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger('Translating objects...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
                 $this->{$scheme_type === 'td' ? 'tdConstructors' : 'constructors'}->add($elem, $scheme_type);
             }
-            $this->API?->logger?->logger(Lang::$current_lang['translating_methods'], Logger::ULTRA_VERBOSE);
+            $this->API?->logger?->logger('Translating methods...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{$scheme_type === 'td' ? 'tdMethods' : 'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
@@ -1038,7 +1038,7 @@ final class TL
             $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'random_bytes') {
                 if (\strlen((string) $x[$arg['name']]) < 15) {
-                    throw new SecurityException(Lang::$current_lang['rand_bytes_too_small']);
+                    throw new SecurityException('Random_bytes is too small!');
                 }
                 unset($x[$arg['name']]);
             }

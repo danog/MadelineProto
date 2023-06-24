@@ -109,12 +109,12 @@ trait MessageHandler
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
                     $this->discardSecretChat($message['message']['chat_id']);
-                    throw new SecurityException(Lang::$current_lang['fingerprint_mismatch']);
+                    throw new SecurityException('Key fingerprint mismatch');
                 }
                 $old = true;
             } else {
                 $this->discardSecretChat($message['message']['chat_id']);
-                throw new SecurityException(Lang::$current_lang['fingerprint_mismatch']);
+                throw new SecurityException('Key fingerprint mismatch');
             }
         }
         $message_key = \substr($message['message']['bytes'], 8, 16);
@@ -162,7 +162,7 @@ trait MessageHandler
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
         $message_data = \substr($decrypted_data, 4, $message_data_length);
         if ($message_data_length > \strlen($decrypted_data)) {
-            throw new SecurityException(Lang::$current_lang['msg_data_length_too_big']);
+            throw new SecurityException('message_data_length is too big');
         }
         if ($message_key != \substr(\sha1(\substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
             throw new SecurityException('Msg_key mismatch');
@@ -171,7 +171,7 @@ trait MessageHandler
             throw new SecurityException('difference between message_data_length and the length of the remaining decrypted buffer is too big');
         }
         if (\strlen($decrypted_data) % 16 != 0) {
-            throw new SecurityException(Lang::$current_lang['length_not_divisible_16']);
+            throw new SecurityException("Length of decrypted data is not divisible by 16");
         }
         return $message_data;
     }
@@ -186,7 +186,7 @@ trait MessageHandler
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
         $message_data = \substr($decrypted_data, 4, $message_data_length);
         if ($message_data_length > \strlen($decrypted_data)) {
-            throw new SecurityException(Lang::$current_lang['msg_data_length_too_big']);
+            throw new SecurityException('message_data_length is too big');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length < 12) {
             throw new SecurityException('padding is too small');
@@ -195,7 +195,7 @@ trait MessageHandler
             throw new SecurityException('padding is too big');
         }
         if (\strlen($decrypted_data) % 16 != 0) {
-            throw new SecurityException(Lang::$current_lang['length_not_divisible_16']);
+            throw new SecurityException("Length of decrypted data is not divisible by 16");
         }
         return $message_data;
     }

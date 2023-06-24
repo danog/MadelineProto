@@ -23,23 +23,14 @@ $template = '<?php
 
 namespace danog\MadelineProto;
 
-class Lang
+/** @internal */
+final class Lang
 {
     public static $lang = %s;
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = %s;
 }';
-function fromCamelCase($input)
-{
-    preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-    $ret = $matches[0];
-    foreach ($ret as &$match) {
-        $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
-    }
-
-    return implode(' ', $ret);
-}
 
 foreach (Lang::$lang as $code => &$currentLang) {
     if ($code === 'en') {
@@ -49,6 +40,11 @@ foreach (Lang::$lang as $code => &$currentLang) {
 }
 
 $lang_code = readline('Enter the language you whish to localize: ');
+if ($lang_code === '') {
+    file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
+    echo 'OK. edit src/Lang.php to fix mistakes.'.PHP_EOL;
+    die;
+}
 
 if (!isset(Lang::$lang[$lang_code])) {
     Lang::$lang[$lang_code] = Lang::$current_lang;
@@ -66,54 +62,11 @@ foreach (Lang::$current_lang as $key => $value) {
 
     if (Lang::$lang[$lang_code][$key] === '' || (Lang::$lang[$lang_code][$key] === Lang::$lang['en'][$key] && Lang::$lang[$lang_code][$key] !== 'Bot')) {
         $value = Lang::$lang[$lang_code][$key];
-        if (in_array($key, ['v_error', 'v_tgerror'])) {
-            $value = hex2bin($value);
-        }
         if ($value == '') {
             $value = $key;
         }
         Lang::$lang[$lang_code][$key] = readline($value.' => ');
-        /*
-        if ($param_name === 'nonce' && $param_type === 'int128') {
-            Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
-        } elseif ($param_name === 'server_nonce' && $param_type === 'int128') {
-            Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security, given by server';
-        } elseif ($param_name === 'random_id' && $param_type === 'long') {
-            Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
-        } else elseif (\strpos($value, 'Update ') === 0) {
-            if (!$param_name && \strpos($key, 'object_') === 0) {
-                $value = \str_replace('Update ', '', $value).' update';
-            }
-            //} elseif (ctype_lower($value[0])) {
-        } else {
-            Lang::$lang[$lang_code][$key] = \readline($value.' => ');
-            if (Lang::$lang[$lang_code][$key] === '') {
-                if ($param_name) {
-                    $l = \str_replace('_', ' ', $param_name);
-                } else {
-                    $l = \explode('.', $method_name);
-                    $l = fromCamelCase(\end($l));
-                }
-                $l = \ucfirst(\strtolower($l));
-                if (\preg_match('/ empty$/', $l)) {
-                    $l = 'Empty '.\strtolower(\preg_replace('/ empty$/', '', $l));
-                }
-                foreach (['id', 'url', 'dc'] as $upper) {
-                    $l = \str_replace([\ucfirst($upper), ' '.$upper], [\strtoupper($upper), ' '.\strtoupper($upper)], $l);
-                }
-
-                if (\in_array($param_type, ['Bool', 'true', 'false'])) {
-                    $l .= '?';
-                }
-
-                Lang::$lang[$lang_code][$key] = $l;
-                echo 'Using default value '.Lang::$lang[$lang_code][$key].PHP_EOL;
-            }
-        }*/
         Lang::$lang[$lang_code][$key] = ucfirst(Lang::$lang[$lang_code][$key]);
-        if (in_array($key, ['v_error', 'v_tgerror'])) {
-            Lang::$lang[$lang_code][$key] = bin2hex(Lang::$lang[$lang_code][$key]);
-        }
         file_put_contents('src/Lang.php', sprintf($template, var_export(Lang::$lang, true), var_export(Lang::$lang['en'], true)));
         echo 'OK, '.($curcount * 100 / $count).'% done. edit src/Lang.php to fix mistakes.'.PHP_EOL;
     }

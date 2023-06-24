@@ -158,7 +158,7 @@ final class DataCenterConnection implements JsonSerializable
             $pfs = $this->API->settings->getAuth()->getPfs();
             if (!$this->hasTempAuthKey() || !$this->hasPermAuthKey() || !$this->isBound()) {
                 if (!$this->hasPermAuthKey() && !$cdn && !$media) {
-                    $logger->logger(\sprintf(Lang::$current_lang['gen_perm_auth_key'], $this->datacenter), Logger::NOTICE);
+                    $logger->logger(\sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                     $this->setPermAuthKey($connection->createAuthKey(false));
                 }
                 if ($media) {
@@ -169,14 +169,14 @@ final class DataCenterConnection implements JsonSerializable
                 }
                 if ($pfs) {
                     if (!$cdn) {
-                        $logger->logger(\sprintf(Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), Logger::NOTICE);
+                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey(null);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                         $this->bindTempAuthKey();
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf(Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), Logger::NOTICE);
+                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 } else {
@@ -185,7 +185,7 @@ final class DataCenterConnection implements JsonSerializable
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf(Lang::$current_lang['gen_temp_auth_key'], $this->datacenter), Logger::NOTICE);
+                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 }

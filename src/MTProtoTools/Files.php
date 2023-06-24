@@ -26,7 +26,6 @@ use Amp\Future;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
-use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
@@ -1015,10 +1014,10 @@ trait Files
                     $this->config['expires'] = -1;
                     $this->getConfig();
                 }
-                $this->logger->logger(Lang::$current_lang['stored_on_cdn'], Logger::NOTICE);
+                $this->logger->logger('File is stored on CDN!', Logger::NOTICE);
                 continue;
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
-                $this->logger->logger(Lang::$current_lang['cdn_reupload'], Logger::NOTICE);
+                $this->logger->logger('File is not stored on CDN, requesting reupload!', Logger::NOTICE);
                 $this->config['expires'] = 0;
                 $this->getConfig();
                 try {

@@ -292,7 +292,7 @@ trait Start
         $message = \htmlentities($message);
         getOutputBufferStream()->write(\sprintf(
             $this->getSettings()->getTemplates()->getHtmlTemplate(),
-            $message,
+            "$title<br><b>$message</b>",
             $form,
             Lang::$current_lang['go'],
             $trailer
