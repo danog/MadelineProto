@@ -34,9 +34,11 @@ final class Lang
 
 foreach (Lang::$lang as $code => &$currentLang) {
     if ($code === 'en') {
+        file_put_contents("langs/$code.json", json_encode($currentLang, JSON_PRETTY_PRINT));
         continue;
     }
     $currentLang = array_intersect_key($currentLang, Lang::$lang['en']);
+    file_put_contents("langs/$code.json", json_encode($currentLang, JSON_PRETTY_PRINT));
 }
 
 $lang_code = readline('Enter the language you whish to localize: ');

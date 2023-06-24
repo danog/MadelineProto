@@ -99,6 +99,7 @@ trait Methods
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $param[$type_or_subtype] = '$'.$param[$type_or_subtype];
                 $params .= $param['name'].': '.(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             if (!isset($this->tdDescriptions['methods'][$method])) {
@@ -189,7 +190,7 @@ trait Methods
                     $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : '$'.$ptype;
                 $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
                 $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
                 $params .= $param['name'].': ';
