@@ -116,5 +116,7 @@
     "apiManualWeb": "Inserisci il tuo API ID e API hash",
     "apiAppInstructionsAutoTypeOther": "Altro (specificare nella descrizione)",
     "apiAppWeb": "Inserire informazioni API",
-    "apiChooseManualAutoTipWeb": "Nota che puoi anche fornire i parametri API direttamente nelle <a target=\"_blank\" href=\"%s\">impostazioni</a>."
+    "apiChooseManualAutoTipWeb": "Nota che puoi anche fornire i parametri API direttamente nelle <a target=\"_blank\" href=\"%s\">impostazioni</a>.",
+    "loginQrCodeSuccessful": "Il login con codice QR è stato effettuato correttamente!",
+    "loginQrCodeExpired": "Il codice QR è scaduto, generazione di un nuovo codice QR in corso..."
 }

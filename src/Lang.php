@@ -60,6 +60,8 @@ final class Lang
             'loginBot' => 'Enter your bot token: ',
             'loginUser' => 'Enter your phone number: ',
             'loginQr' => 'Scan the above QR code to login automatically.',
+            'loginQrCodeSuccessful' => 'QR code login successful!',
+            'loginQrCodeExpired' => 'The QR code expired, generating a new one...',
             'loginManual' => 'Alternatively, you can also enter a bot token or phone number to login manually: ',
             'loginUserCode' => 'Enter the code: ',
             'loginUserPass' => 'Enter your password (hint %s): ',
@@ -262,6 +264,8 @@ final class Lang
             'apiAppInstructionsAutoTypeOther' => 'Altro (specificare nella descrizione)',
             'apiAppWeb' => 'Inserire informazioni API',
             'apiChooseManualAutoTipWeb' => 'Nota che puoi anche fornire i parametri API direttamente nelle <a target="_blank" href="%s">impostazioni</a>.',
+            'loginQrCodeSuccessful' => 'Il login con codice QR è stato effettuato correttamente!',
+            'loginQrCodeExpired' => 'Il codice QR è scaduto, generazione di un nuovo codice QR in corso...',
         ],
     ];
 
@@ -304,6 +308,8 @@ final class Lang
         'loginBot' => 'Enter your bot token: ',
         'loginUser' => 'Enter your phone number: ',
         'loginQr' => 'Scan the above QR code to login automatically.',
+        'loginQrCodeSuccessful' => 'QR code login successful!',
+        'loginQrCodeExpired' => 'The QR code expired, generating a new one...',
         'loginManual' => 'Alternatively, you can also enter a bot token or phone number to login manually: ',
         'loginUserCode' => 'Enter the code: ',
         'loginUserPass' => 'Enter your password (hint %s): ',
