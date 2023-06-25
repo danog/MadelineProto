@@ -84,14 +84,14 @@ abstract class EventHandler extends AbstractAPI
      */
     final public function internalStart(APIWrapper $MadelineProto, array $pluginsPrev, array &$pluginsNew, bool $main = true): ?array
     {
+        if ($this->startedInternal) {
+            return null;
+        }
         $this->startMutex ??= new LocalMutex;
         $this->startDeferred ??= new DeferredFuture;
         $startDeferred = $this->startDeferred;
         $lock = $this->startMutex->acquire();
         try {
-            if ($this->startedInternal) {
-                return null;
-            }
             $this->wrapper = $MadelineProto;
             $this->exportNamespaces();
 
