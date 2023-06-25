@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use __PHP_Incomplete_Class;
+use AssertionError;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 
 /**
@@ -56,20 +56,9 @@ trait Events
      * @var array<string, callable>
      */
     private array $eventHandlerMethods = [];
-    /**
-     * Initialize event handler.
-     *
-     * @param class-string<EventHandler> $eventHandler
-     */
-    private function initEventHandler(string $eventHandler): void
-    {
-        $this->event_handler = $eventHandler;
-        if (!$this->event_handler_instance instanceof $this->event_handler) {
-            $class_name = $this->event_handler;
-            $this->event_handler_instance = new $class_name($this->wrapper);
-        }
-        $this->event_handler_instance->initInternal($this->wrapper);
-    }
+
+    /** @var array<class-string<EventHandler>, EventHandler> */
+    private array $pluginInstances = [];
     /**
      * Set event handler.
      *
@@ -82,30 +71,55 @@ trait Events
         if (!\is_subclass_of($eventHandler, EventHandler::class)) {
             throw new Exception('Wrong event handler was defined');
         }
-        $this->initEventHandler($eventHandler);
-        $this->eventHandlerMethods = [];
-        foreach (\get_class_methods($this->event_handler) as $method) {
-            if ($method === 'onAny') {
-                foreach ($this->getTL()->getConstructors()->by_id as $constructor) {
-                    if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
-                        $this->eventHandlerMethods[$constructor['predicate']] = $this->event_handler_instance->onAny(...);
-                    }
-                }
-            } else {
-                $method_name = \lcfirst(\substr($method, 2));
-                if (($constructor = $this->getTL()->getConstructors()->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
-                    $this->eventHandlerMethods[$method_name] = $this->event_handler_instance->$method(...);
-                }
-            }
+        $this->event_handler = $eventHandler;
+        if (!$this->event_handler_instance instanceof $this->event_handler) {
+            $class_name = $this->event_handler;
+            $this->event_handler_instance = new $class_name;
         }
-        $this->setReportPeers(Tools::call($this->event_handler_instance->getReportPeers())->await());
-        Tools::call($this->event_handler_instance->startInternal())->await();
+
+        $pluginsNew = [];
+        $methods = $this->event_handler_instance->internalStart(
+            $this->wrapper,
+            $this->pluginInstances,
+            $pluginsNew
+        );
+        if ($methods === null) {
+            // Already started event handler
+            return;
+        }
+        $this->eventHandlerMethods = $methods;
+        $this->pluginInstances = $pluginsNew;
 
         $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
         \array_map($this->handleUpdate(...), $this->updates);
         $this->updates = [];
         $this->updates_key = 0;
         $this->startUpdateSystem();
+    }
+    /**
+     * Check if a certain event handler plugin is installed.
+     *
+     * @param class-string<EventHandler> $class
+     */
+    final public function hasPluginInstance(string $class): bool
+    {
+        return isset($this->pluginInstances[$class]);
+    }
+    /**
+     * Obtain a certain event handler plugin instance.
+     *
+     * @template T as EventHandler
+     *
+     * @param class-string<T> $class
+     *
+     * return T
+     */
+    final public function getPluginInstance(string $class): EventHandler
+    {
+        if (!isset($this->pluginInstances[$class]) || !$this->pluginInstances[$class] instanceof EventHandler) {
+            throw new AssertionError("Plugin instance for $class not found!");
+        }
+        return $this->pluginInstances[$class];
     }
     /**
      * Unset event handler.
@@ -116,6 +130,7 @@ trait Events
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->pluginInstances = [];
         $this->setNoop();
     }
     /**

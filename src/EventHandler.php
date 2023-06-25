@@ -25,6 +25,10 @@ use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use Generator;
+use ReflectionClass;
+use ReflectionMethod;
+use Revolt\EventLoop;
+use Webmozart\Assert\Assert;
 
 /**
  * Event handler.
@@ -62,20 +66,10 @@ abstract class EventHandler extends AbstractAPI
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
     }
-    protected function reconnectFull(): bool
+    /** @internal */
+    final protected function reconnectFull(): bool
     {
         return true;
-    }
-    /**
-     * Internal constructor.
-     *
-     * @internal
-     * @param APIWrapper $MadelineProto MadelineProto instance
-     */
-    public function initInternal(APIWrapper $MadelineProto): void
-    {
-        $this->wrapper = $MadelineProto;
-        $this->exportNamespaces();
     }
     /**
      * Whether the event handler was started.
@@ -88,7 +82,7 @@ abstract class EventHandler extends AbstractAPI
      *
      * @internal
      */
-    public function startInternal(): void
+    final public function internalStart(APIWrapper $MadelineProto, array $pluginsPrev, array &$pluginsNew, bool $main = true): ?array
     {
         $this->startMutex ??= new LocalMutex;
         $this->startDeferred ??= new DeferredFuture;
@@ -96,10 +90,16 @@ abstract class EventHandler extends AbstractAPI
         $lock = $this->startMutex->acquire();
         try {
             if ($this->startedInternal) {
-                return;
+                return null;
             }
+            $this->wrapper = $MadelineProto;
+            $this->exportNamespaces();
+
             if (isset(static::$dbProperties)) {
                 $this->internalInitDb($this->wrapper->getAPI());
+            }
+            if ($main) {
+                $this->setReportPeers(Tools::call($this->getReportPeers())->await());
             }
             if (\method_exists($this, 'onStart')) {
                 $r = $this->onStart();
@@ -110,7 +110,58 @@ abstract class EventHandler extends AbstractAPI
                     $r = $r->await();
                 }
             }
+            if ($main) {
+                $this->setReportPeers(Tools::call($this->getReportPeers())->await());
+            }
+
+            $constructors = $this->getTL()->getConstructors();
+            $methods = [];
+            $has_any = false;
+            foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
+                $method = $methodRefl->getName();
+                if ($method === 'onAny') {
+                    $has_any = true;
+                    continue;
+                }
+                $method_name = \lcfirst(\substr($method, 2));
+                if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
+                    $methods[$method_name] = $this->$method(...);
+                }
+            }
+            if ($has_any) {
+                foreach ($constructors->by_id as $constructor) {
+                    if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {
+                        $methods[$constructor['predicate']] = $this->onAny(...);
+                    }
+                }
+            }
+
+            $plugins = \array_values(\array_unique($this->getPlugins()));
+            Assert::allSubclassOf($plugins, self::class);
+            foreach ($plugins as $class => $_) {
+                $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
+                $pluginsNew[$class] = $plugin;
+                foreach ($plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [] as $update => $method) {
+                    if (isset($methods[$update])) {
+                        $oldMethod = $methods[$update];
+                        $methods[$update] = function (array $update) use ($oldMethod, $method): void {
+                            EventLoop::queue(function () use ($update, $method): void {
+                                $r = $method($update);
+                                if ($r instanceof Generator) {
+                                    Tools::consumeGenerator($r);
+                                }
+                            });
+                            $r = $oldMethod($update);
+                            if ($r instanceof Generator) {
+                                Tools::consumeGenerator($r);
+                            }
+                        };
+                    }
+                }
+            }
+
             $this->startedInternal = true;
+            return $methods;
         } finally {
             $this->startDeferred = null;
             $startDeferred->complete();
@@ -120,7 +171,7 @@ abstract class EventHandler extends AbstractAPI
     /**
      * @internal
      */
-    public function waitForStartInternal(): ?Future
+    final public function waitForInternalStart(): ?Future
     {
         if (!$this->startedInternal && !$this->startDeferred) {
             $this->startDeferred = new DeferredFuture;
@@ -133,6 +184,15 @@ abstract class EventHandler extends AbstractAPI
      * @return string|int|array<string|int>
      */
     public function getReportPeers()
+    {
+        return [];
+    }
+    /**
+     * Obtain a list of plugin event handlers.
+     *
+     * @return array<class-string<EventHandler>>
+     */
+    public function getPlugins(): array
     {
         return [];
     }

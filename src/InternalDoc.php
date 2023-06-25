@@ -917,6 +917,19 @@ abstract class InternalDoc
         return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromFile($file);
     }
     /**
+     * Obtain a certain event handler plugin instance.
+     *
+     * @template T as EventHandler
+     *
+     * @param class-string<T> $class
+     *
+     * return T
+     */
+    public function getPluginInstance(string $class): \danog\MadelineProto\EventHandler
+    {
+        return $this->wrapper->getAPI()->getPluginInstance($class);
+    }
+    /**
      * Get download info of the propic of a user
      * Returns an array with the following structure:.
      *
@@ -1032,6 +1045,15 @@ abstract class InternalDoc
     public function hasEventHandler(): bool
     {
         return $this->wrapper->getAPI()->hasEventHandler();
+    }
+    /**
+     * Check if a certain event handler plugin is installed.
+     *
+     * @param class-string<EventHandler> $class
+     */
+    public function hasPluginInstance(string $class): bool
+    {
+        return $this->wrapper->getAPI()->hasPluginInstance($class);
     }
     /**
      * Check if has report peers.

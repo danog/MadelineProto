@@ -707,6 +707,7 @@ final class MTProto implements TLCallback, LoggerGetter
             // Event handler
             'event_handler',
             'event_handler_instance',
+            'pluginInstances',
             'updates',
             'updates_key',
             'webhookUrl',
@@ -1687,11 +1688,14 @@ final class MTProto implements TLCallback, LoggerGetter
     }
 
     /**
-     * Set peer(s) where to send errors occurred in the event loop.
+     * Sanitize peer(s) where to send errors occurred in the event loop.
      *
+     * @internal
      * @param int|string|array<int|string> $userOrId Username(s) or peer ID(s)
+     *
+     * @return array<int>
      */
-    public function setReportPeers(int|string|array $userOrId): void
+    public function sanitizeReportPeers(int|string|array $userOrId): array
     {
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
@@ -1713,7 +1717,16 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         /** @var array<int> $userOrId */
-        $this->reportDest = $userOrId;
+        return $userOrId;
+    }
+    /**
+     * Set peer(s) where to send errors occurred in the event loop.
+     *
+     * @param int|string|array<int|string> $userOrId Username(s) or peer ID(s)
+     */
+    public function setReportPeers(int|string|array $userOrId): void
+    {
+        $this->reportDest = $this->sanitizeReportPeers($userOrId);
     }
     private ?LocalMutex $reportMutex = null;
     /**

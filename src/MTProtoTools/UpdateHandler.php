@@ -76,6 +76,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->pluginInstances = [];
         $this->startUpdateSystem();
     }
     /**
@@ -97,6 +98,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->pluginInstances = [];
         $this->startUpdateSystem();
     }
 
@@ -107,13 +109,10 @@ trait UpdateHandler
      */
     private function eventUpdateHandler(array $update): void
     {
-        if (!isset($this->eventHandlerMethods[$update['_']])) {
-            return;
-        }
         if ($update['_'] === 'updateBroadcastProgress') {
             $update = $update['progress'];
         }
-        if ($f = $this->event_handler_instance->waitForStartInternal()) {
+        if ($f = $this->event_handler_instance->waitForInternalStart()) {
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using EventLoop::queue to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
             $f->map(function (): void {
@@ -121,6 +120,9 @@ trait UpdateHandler
                 $this->updates = [];
                 $this->updates_key = 0;
             });
+            return;
+        }
+        if (!isset($this->eventHandlerMethods[$update['_']])) {
             return;
         }
         $r = $this->eventHandlerMethods[$update['_']]($update);
@@ -187,6 +189,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->pluginInstances = [];
 
         [
             'offset' => $offset,
