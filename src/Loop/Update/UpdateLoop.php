@@ -89,7 +89,7 @@ final class UpdateLoop extends Loop
                 }
                 $request_pts = $state->pts();
                 try {
-                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->currentDatacenter, 'postpone' => $this->first]);
+                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->currentDatacenter, 'postpone' => $this->first, 'FloodWaitLimit' => 86400]);
                 } catch (RPCErrorException $e) {
                     if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'])) {
                         $this->feeder->stop();
