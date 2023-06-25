@@ -394,7 +394,10 @@ trait ResponseHandler
                     EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
                     return null;
                 }
-                return fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
+                if (\str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
+                    return fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
+                }
+                // no break
             default:
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }

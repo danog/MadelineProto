@@ -99,6 +99,7 @@ $order = [
     'SECRET_CHATS',
     'PROXY',
     'ASYNC',
+    'FAQ',
     'USING_METHODS',
     'CONTRIB',
     'TEMPLATES',

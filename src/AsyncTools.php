@@ -203,23 +203,26 @@ abstract class AsyncTools extends StrTools
         } while (true);
     }
     /**
-     * Call promise in background.
+     * Fork a new green thread and execute the passed function in the background.
      *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise Promise to resolve
-     * @param ?\Generator|Future $actual  Promise to resolve instead of $promise
-     * @param string              $file    File
+     * @template T
+     *
+     * @param \Closure(...):T $closure Function to execute
+     * @param mixed ...$args Arguments forwarded to the function when forking the thread.
+     *
+     * @return Future<T>
+     *
      * @psalm-suppress InvalidScope
      */
-    public static function callFork(Generator|Future $promise, $actual = null, string $file = ''): mixed
+    public static function callFork(callable|Generator|Future $callable, ...$args): Future
     {
-        if ($actual) {
-            $promise = $actual;
+        if (\is_callable($callable)) {
+            $callable = async($callable, ...$args);
         }
-        if ($promise instanceof Generator) {
-            $promise = self::call($promise);
+        if ($callable instanceof Generator) {
+            $callable = self::call($callable);
         }
-        return $promise;
+        return $callable;
     }
     /**
      * Call promise in background, deferring execution.

@@ -291,17 +291,20 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::call($promise);
     }
     /**
-     * Call promise in background.
+     * Fork a new green thread and execute the passed function in the background.
      *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise Promise to resolve
-     * @param ?\Generator|Future $actual  Promise to resolve instead of $promise
-     * @param string              $file    File
+     * @template T
+     *
+     * @param \Closure(...):T $closure Function to execute
+     * @param mixed ...$args Arguments forwarded to the function when forking the thread.
+     *
+     * @return Future<T>
+     *
      * @psalm-suppress InvalidScope
      */
-    public static function callFork(\Generator|\Amp\Future $promise, $actual = null, string $file = ''): mixed
+    public static function callFork(\Generator|\Amp\Future|callable $promise, ...$args): \Amp\Future
     {
-        return \danog\MadelineProto\AsyncTools::callFork($promise, $actual, $file);
+        return \danog\MadelineProto\AsyncTools::callFork($promise, ...$args);
     }
     /**
      * Call promise in background, deferring execution.
