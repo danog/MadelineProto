@@ -25,6 +25,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
 
@@ -99,15 +100,12 @@ final class UpdateLoop extends Loop
                         return self::STOP;
                     }
                     throw $e;
-                } catch (Exception $e) {
-                    if (\in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
-                        $this->feeder->stop();
-                        $this->API->getChannelStates()->remove($this->channelId);
-                        unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
-                        $this->logger->logger("Channel private, exiting {$this}");
-                        return self::STOP;
-                    }
-                    throw $e;
+                } catch (PeerNotInDbException) {
+                    $this->feeder->stop();
+                    $this->API->getChannelStates()->remove($this->channelId);
+                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                    $this->logger->logger("Channel private, exiting {$this}");
+                    return self::STOP;
                 } catch (PTSException $e) {
                     $this->feeder->stop();
                     $this->API->getChannelStates()->remove($this->channelId);

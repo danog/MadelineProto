@@ -26,6 +26,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\VoIP;
@@ -84,7 +85,7 @@ trait AuthKeyHandler
         }
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
-            throw new Exception(Lang::$current_lang['peer_not_in_db']);
+            throw new PeerNotInDbException();
         }
         $user = $user['InputUser'];
         $this->logger->logger(\sprintf('Calling %s...', $user['user_id']), Logger::VERBOSE);

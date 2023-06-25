@@ -29,6 +29,7 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -634,7 +635,7 @@ trait PeerHandler
             }
             $chat = $this->chats[$id];
             if (!$chat) {
-                throw new Exception('This peer is not present in the internal peer database');
+                throw new PeerNotInDbException();
             }
             if (($chat['min'] ?? false)
                 && $this->minDatabase->hasPeer($id)
@@ -658,10 +659,8 @@ trait PeerHandler
             }
             try {
                 return $this->genAll($chat, $folder_id, $type);
-            } catch (Exception $e) {
-                if ($e->getMessage() === 'This peer is not present in the internal peer database') {
-                    unset($this->chats[$id]);
-                }
+            } catch (PeerNotInDbException) {
+                unset($this->chats[$id]);
                 throw $e;
             }
         }
@@ -693,7 +692,7 @@ trait PeerHandler
         if ($bot_api_id = $this->resolveUsername($id)) {
             return $this->getInfo($bot_api_id, $type);
         }
-        throw new Exception('This peer is not present in the internal peer database');
+        throw new PeerNotInDbException();
     }
     /**
      * @param array $constructor
@@ -759,7 +758,7 @@ trait PeerHandler
                     $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                     $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                 } else {
-                    throw new Exception('This peer is not present in the internal peer database');
+                    throw new PeerNotInDbException();
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
                 $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
@@ -784,7 +783,7 @@ trait PeerHandler
                 break;
             case 'channel':
                 if (!isset($constructor['access_hash'])) {
-                    throw new Exception('This peer is not present in the internal peer database');
+                    throw new PeerNotInDbException();
                 }
                 $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
@@ -798,7 +797,7 @@ trait PeerHandler
                 $res['type'] = $constructor['megagroup'] ?? false ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':
-                throw new Exception('This peer is not present in the internal peer database');
+                throw new PeerNotInDbException();
             default:
                 throw new Exception('Invalid constructor given '.$constructor['_']);
         }

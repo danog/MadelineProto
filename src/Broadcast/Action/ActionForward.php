@@ -22,8 +22,8 @@ namespace danog\MadelineProto\Broadcast\Action;
 
 use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 
 /** @internal */
@@ -65,11 +65,8 @@ final class ActionForward implements Action
                 return;
             }
             throw $e;
-        } catch (Exception $e) {
-            if ($e->getMessage() === 'This peer is not present in the internal peer database') {
-                return;
-            }
-            throw $e;
+        } catch (PeerNotInDbException) {
+            return;
         }
     }
 }

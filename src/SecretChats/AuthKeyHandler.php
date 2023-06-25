@@ -20,12 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -117,7 +117,7 @@ trait AuthKeyHandler
     {
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser'])) {
-            throw new Exception('This peer is not present in the internal peer database');
+            throw new PeerNotInDbException();
         }
         $user = $user['InputUser'];
         $this->logger->logger('Creating secret chat with '.$user['user_id'].'...', Logger::VERBOSE);

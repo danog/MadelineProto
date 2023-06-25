@@ -32,6 +32,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -544,10 +545,7 @@ trait UpdateHandler
                 } else {
                     $this->refreshPeerCache($update);
                 }
-            } catch (Exception $e) {
-                if ($e->getMessage() !== 'This peer is not present in the internal peer database') {
-                    throw $e;
-                }
+            } catch (PeerNotInDbException) {
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'CHANNEL_PRIVATE' && $e->rpc !== 'MSG_ID_INVALID') {
                     throw $e;
