@@ -295,16 +295,16 @@ abstract class InternalDoc
      *
      * @template T
      *
-     * @param \Closure(...):T $closure Function to execute
+     * @param \Closure(...):T $callable Function to execute
      * @param mixed ...$args Arguments forwarded to the function when forking the thread.
      *
      * @return Future<T>
      *
      * @psalm-suppress InvalidScope
      */
-    public static function callFork(\Generator|\Amp\Future|callable $promise, ...$args): \Amp\Future
+    public static function callFork(\Generator|\Amp\Future|callable $callable, ...$args): \Amp\Future
     {
-        return \danog\MadelineProto\AsyncTools::callFork($promise, ...$args);
+        return \danog\MadelineProto\AsyncTools::callFork($callable, ...$args);
     }
     /**
      * Call promise in background, deferring execution.

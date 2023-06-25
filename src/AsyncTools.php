@@ -207,7 +207,7 @@ abstract class AsyncTools extends StrTools
      *
      * @template T
      *
-     * @param \Closure(...):T $closure Function to execute
+     * @param \Closure(...):T $callable Function to execute
      * @param mixed ...$args Arguments forwarded to the function when forking the thread.
      *
      * @return Future<T>
