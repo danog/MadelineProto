@@ -33,10 +33,13 @@ final class Lang
     public static array $current_lang = %s;
 }';
 
+$base = json_decode(file_get_contents("langs/en.json"), true);
+
 $langs = [];
 foreach (glob("langs/*.json") as $lang) {
     $code = basename($lang, '.json');
-    $langs[$code] = json_decode(file_get_contents($lang), true);
+    $langs[$code] = array_merge($base, json_decode(file_get_contents($lang), true));
+    ksort($langs[$code]);
 }
 
 file_put_contents('src/Lang.php', sprintf($template, var_export($langs, true), var_export($langs['en'], true)));

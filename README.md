@@ -162,6 +162,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getInfo)
   * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getId)
 * [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html)
+  * [Dialog ID list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogIds)
   * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs)
   * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs)
 * [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html)

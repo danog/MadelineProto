@@ -94,6 +94,9 @@ class MysqlArray extends SqlArray
         $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
         $host = $config->getHost();
         $port = $config->getPort();
+        if (!\extension_loaded('pdo_mysql')) {
+            throw Exception::extension('pdo_mysql');
+        }
         $this->pdo = new PDO(
             "mysql:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
