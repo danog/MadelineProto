@@ -93,14 +93,14 @@ trait Constructors
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
-            if (!isset($this->TL->getDescriptions()['constructors'][$constructor])) {
+            if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor])) {
                 $this->addToLang('object_'.$constructor);
                 if (Lang::$lang['en']['object_'.$constructor] !== '') {
                     /** @psalm-suppress InvalidArrayAssignment */
-                    $this->TL->getDescriptions()['constructors'][$constructor]['description'] = Lang::$lang['en']['object_'.$constructor];
+                    $this->TL->getDescriptionsRef()['constructors'][$constructor]['description'] = Lang::$lang['en']['object_'.$constructor];
                 }
             }
-            if (isset($this->TL->getDescriptions()['constructors'][$constructor]) && !empty($data['params'])) {
+            if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]) && !empty($data['params'])) {
                 $table = '### Attributes:
 
 | Name     |    Type       | Required | Description |
@@ -157,15 +157,15 @@ trait Constructors
                     $human_ptype = 'File path or '.$ptype;
                 }
                 $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
-                if (!isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']])) {
+                if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
-                    if (isset($this->TL->getDescriptions()['constructors'][$constructor]['description'])) {
+                    if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['description'])) {
                         /** @psalm-suppress InvalidArrayAssignment */
-                        $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']] = Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
+                        $this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']] = Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
-                if (isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) && $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) {
-                    $table .= $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']].'|';
+                if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']]) && $this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']]) {
+                    $table .= $this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -191,7 +191,7 @@ trait Constructors
             $params = "['_' => '".$constructor."'".$params.']';
             $lua_params = "{_='".$constructor."'".$lua_params.'}';
             $pwr_params = '{"_": "'.$constructor.'"'.$pwr_params.'}';
-            $description = isset($this->TL->getDescriptions()['constructors'][$constructor]) ? $this->TL->getDescriptions()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
+            $description = isset($this->TL->getDescriptionsRef()['constructors'][$constructor]) ? $this->TL->getDescriptionsRef()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
             $symFile = \str_replace('.', '_', $constructor.$layer);
             $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/{$symFile}.html" : '';
             $description = \str_replace('"', "'", Tools::toString(\rtrim(\explode("\n", $description)[0], ':')));
@@ -211,8 +211,8 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
 
 
 ';
-            if (isset($this->TL->getDescriptions()['constructors'][$constructor])) {
-                $header .= $this->TL->getDescriptions()['constructors'][$constructor]['description'].PHP_EOL.PHP_EOL;
+            if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor])) {
+                $header .= $this->TL->getDescriptionsRef()['constructors'][$constructor]['description'].PHP_EOL.PHP_EOL;
             }
             $type = '### Type: ['.StrTools::markdownEscape($php_type).'](/API_docs/types/'.$php_type.'.md)
 

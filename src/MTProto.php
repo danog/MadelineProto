@@ -55,6 +55,7 @@ use danog\MadelineProto\TL\Conversion\BotAPIFiles;
 use danog\MadelineProto\TL\Conversion\TD;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
@@ -461,8 +462,9 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * TL serializer.
      *
+     * @var TL
      */
-    private TL $TL;
+    private $TL;
 
     /**
      * Snitch.
@@ -853,7 +855,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Get TL serializer.
      */
-    public function getTL(): TL
+    public function getTL(): TLInterface
     {
         return $this->TL;
     }

@@ -50,7 +50,7 @@ use function Amp\Future\awaitAll;
  *
  * @internal
  */
-final class TL
+final class TL implements TLInterface
 {
     /**
      * Highest available secret chat layer version.
@@ -67,16 +67,6 @@ final class TL
      *
      */
     private TLMethods $methods;
-    /**
-     * TD Constructors.
-     *
-     */
-    private TLConstructors $tdConstructors;
-    /**
-     * TD Methods.
-     *
-     */
-    private TLMethods $tdMethods;
     /**
      * Descriptions.
      *
@@ -109,8 +99,6 @@ final class TL
             'secretLayer',
             'constructors',
             'methods',
-            'tdConstructors',
-            'tdMethods',
             'tdDescriptions',
             'API',
         ];
@@ -136,21 +124,28 @@ final class TL
     /**
      * Get constructors.
      */
-    public function getConstructors(bool $td = false): TLConstructors
+    public function getConstructors(): TLConstructors
     {
-        return $td ? $this->tdConstructors : $this->constructors;
+        return $this->constructors;
     }
     /**
      * Get methods.
      */
-    public function getMethods(bool $td = false): TLMethods
+    public function getMethods(): TLMethods
     {
-        return $td ? $this->tdMethods : $this->methods;
+        return $this->methods;
     }
     /**
      * Get TL descriptions.
      */
-    public function &getDescriptions(): array
+    public function getDescriptions(): array
+    {
+        return $this->tdDescriptions;
+    }
+    /**
+     * Get TL descriptions.
+     */
+    public function &getDescriptionsRef(): array
     {
         return $this->tdDescriptions;
     }
@@ -166,8 +161,6 @@ final class TL
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
-        $this->tdConstructors = new TLConstructors();
-        $this->tdMethods = new TLMethods();
         $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach (\array_filter([
             'api' => $files->getAPISchema(),
@@ -315,18 +308,18 @@ final class TL
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
-                $this->{$scheme_type === 'td' ? 'tdConstructors' : 'constructors'}->add($elem, $scheme_type);
+                $this->constructors->add($elem, $scheme_type);
             }
             $this->API?->logger?->logger('Translating methods...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->{$scheme_type === 'td' ? 'tdMethods' : 'methods'}->add($elem);
+                $this->methods->add($elem);
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
             }
         }
         if (isset($files->getOther()['td'])) {
-            foreach ($this->tdConstructors->by_id as $id => $data) {
+            foreach ($this->constructors->by_id as $id => $data) {
                 $name = $data['predicate'];
                 if ($this->constructors->findById($id) === false) {
                     unset($this->tdDescriptions['constructors'][$name]);
@@ -339,7 +332,7 @@ final class TL
                     }
                 }
             }
-            foreach ($this->tdMethods->by_id as $id => $data) {
+            foreach ($this->methods->by_id as $id => $data) {
                 $name = $data['method'];
                 if ($this->methods->findById($id) === false) {
                     unset($this->tdDescriptions['methods'][$name]);

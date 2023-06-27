@@ -243,7 +243,7 @@ trait BotAPI
                 }
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
-                    if (\in_array($photo['_'], ['photoCachedSize', 'photoSize', 'photoSizeProgressive'])) {
+                    if (\in_array($photo['_'], ['photoCachedSize', 'photoSize', 'photoSizeProgressive'], true)) {
                         $res['photo'][$key] = $this->photosizeToBotAPI($photo, $data['photo']);
                     }
                 }
