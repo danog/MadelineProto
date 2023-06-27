@@ -109,7 +109,6 @@ final class Logger
     private readonly PsrLogger $psr;
     /**
      * Default logger instance.
-     *
      */
     public static ?self $default = null;
     /**

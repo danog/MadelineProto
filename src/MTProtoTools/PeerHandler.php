@@ -24,6 +24,7 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -72,7 +73,7 @@ trait PeerHandler
         return (-$id) + Magic::ZERO_CHANNEL_ID;
     }
     /**
-     * Check whether provided bot API ID is a channel.
+     * Check whether provided bot API ID is a channel or supergroup.
      *
      * @param int $id Bot API ID
      */
@@ -552,7 +553,7 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      *
-     * @return 'user'|'bot'|'chat'|'supergroup'|'channel'
+     * @return \danog\MadelineProto\API::PEER_TYPE_*
      */
     public function getType(mixed $id): string
     {

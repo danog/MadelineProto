@@ -138,37 +138,67 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @var string
      */
-    const RELEASE = '8.0.0-beta99';
+    public const RELEASE = '8.0.0-beta99';
     /**
      * We're not logged in.
      *
      * @var int
      */
-    const NOT_LOGGED_IN = 0;
+    public const NOT_LOGGED_IN = 0;
     /**
      * We're waiting for the login code.
      *
      * @var int
      */
-    const WAITING_CODE = 1;
+    public const WAITING_CODE = 1;
     /**
      * We're waiting for parameters to sign up.
      *
      * @var int
      */
-    const WAITING_SIGNUP = -1;
+    public const WAITING_SIGNUP = -1;
     /**
      * We're waiting for the 2FA password.
      *
      * @var int
      */
-    const WAITING_PASSWORD = 2;
+    public const WAITING_PASSWORD = 2;
     /**
      * We're logged in.
      *
      * @var int
      */
-    const LOGGED_IN = 3;
+    public const LOGGED_IN = 3;
+    /**
+     * This peer is a user.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_USER = 'user';
+    /**
+     * This peer is a bot.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_BOT = 'bot';
+    /**
+     * This peer is a normal group.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_GROUP = 'chat';
+    /**
+     * This peer is a supergroup.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_SUPERGROUP = 'supergroup';
+    /**
+     * This peer is a channel.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_CHANNEL = 'channel';
     /**
      * Bad message error codes.
      *

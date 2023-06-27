@@ -136,7 +136,7 @@ trait DialogHandler
             $this->cacheAllBotUsers();
             $res = [];
             foreach ($this->chats as $id => $_) {
-                $res []= $id;
+                $res []= (int) $id;
             }
             return $res;
         }

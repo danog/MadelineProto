@@ -96,7 +96,7 @@ final class ReadLoop extends Loop
                     $this->connection->reconnect();
                 } else {
                     $this->connection->reconnect();
-                    throw new RPCErrorException($error, $error);
+                    throw new RPCErrorException((string) $error, $error);
                 }
             });
             return self::STOP;

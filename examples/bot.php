@@ -41,7 +41,7 @@ if (file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  *
- * All properties are automatically stored in the database.
+ * All properties returned by __sleep are automatically stored in the database.
  */
 class MyEventHandler extends EventHandler
 {

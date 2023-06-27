@@ -37,8 +37,6 @@ use JsonSerializable;
 
 /**
  * Represents a login QR code.
- * The `link` public readonly property contains the [QR code login link](https://core.telegram.org/api/links#qr-code-login-links).
- * The `expiry` public readonly property contains the expiry date of the link.
  */
 final class LoginQrCode implements JsonSerializable
 {

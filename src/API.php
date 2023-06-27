@@ -52,55 +52,85 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    const RELEASE = MTProto::RELEASE;
+    public const RELEASE = MTProto::RELEASE;
     /**
      * We're not logged in.
      *
      * @var int
      */
-    const NOT_LOGGED_IN = MTProto::NOT_LOGGED_IN;
+    public const NOT_LOGGED_IN = MTProto::NOT_LOGGED_IN;
     /**
      * We're waiting for the login code.
      *
      * @var int
      */
-    const WAITING_CODE = MTProto::WAITING_CODE;
+    public const WAITING_CODE = MTProto::WAITING_CODE;
     /**
      * We're waiting for parameters to sign up.
      *
      * @var int
      */
-    const WAITING_SIGNUP = MTProto::WAITING_SIGNUP;
+    public const WAITING_SIGNUP = MTProto::WAITING_SIGNUP;
     /**
      * We're waiting for the 2FA password.
      *
      * @var int
      */
-    const WAITING_PASSWORD = MTProto::WAITING_PASSWORD;
+    public const WAITING_PASSWORD = MTProto::WAITING_PASSWORD;
     /**
      * We're logged in.
      *
      * @var int
      */
-    const LOGGED_IN = MTProto::LOGGED_IN;
+    public const LOGGED_IN = MTProto::LOGGED_IN;
     /**
      * Secret chat was not found.
      *
      * @var int
      */
-    const SECRET_EMPTY = MTProto::SECRET_EMPTY;
+    public const SECRET_EMPTY = MTProto::SECRET_EMPTY;
     /**
      * Secret chat was requested.
      *
      * @var int
      */
-    const SECRET_REQUESTED = MTProto::SECRET_REQUESTED;
+    public const SECRET_REQUESTED = MTProto::SECRET_REQUESTED;
     /**
      * Secret chat was found.
      *
      * @var int
      */
-    const SECRET_READY = MTProto::SECRET_READY;
+    public const SECRET_READY = MTProto::SECRET_READY;
+    /**
+     * This peer is a user.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_USER = MTProto::PEER_TYPE_USER;
+    /**
+     * This peer is a bot.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_BOT = MTProto::PEER_TYPE_BOT;
+    /**
+     * This peer is a normal group.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_GROUP = MTProto::PEER_TYPE_GROUP;
+    /**
+     * This peer is a supergroup.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_SUPERGROUP = MTProto::PEER_TYPE_SUPERGROUP;
+    /**
+     * This peer is a channel.
+     *
+     * @var string
+     */
+    public const PEER_TYPE_CHANNEL = MTProto::PEER_TYPE_CHANNEL;
     use Start;
     /**
      * Session paths.
@@ -132,7 +162,7 @@ final class API extends AbstractAPI
     }
 
     /**
-     * Magic constructor function.
+     * Constructor function.
      *
      * @param string                 $session  Session name
      * @param array|SettingsAbstract $settings Settings

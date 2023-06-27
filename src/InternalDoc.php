@@ -1015,7 +1015,7 @@ abstract class InternalDoc
      *
      * @param mixed $id Peer
      *
-     * @return 'user'|'bot'|'chat'|'supergroup'|'channel'
+     * @return \danog\MadelineProto\API::PEER_TYPE_*
      */
     public function getType(mixed $id): string
     {
@@ -1135,7 +1135,7 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isPremium();
     }
     /**
-     * Check whether provided bot API ID is a channel.
+     * Check whether provided bot API ID is a channel or supergroup.
      *
      * @param int $id Bot API ID
      */
