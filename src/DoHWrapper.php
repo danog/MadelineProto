@@ -148,7 +148,7 @@ final class DoHWrapper
                             [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                             $first[] = [$proxy, $extra];
                             $combo = \array_merge($first, $second);
-                        } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class])) {
+                        } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
                             [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                             $first[] = [BufferedRawStream::class, []];
                             $first[] = [$proxy, $extra];

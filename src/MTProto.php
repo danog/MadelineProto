@@ -105,26 +105,6 @@ final class MTProto implements TLCallback, LoggerGetter
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
-    private const RSA_KEYS = [
-        "-----BEGIN RSA PUBLIC KEY-----\n".
-        "MIIBCgKCAQEA6LszBcC1LGzyr992NzE0ieY+BSaOW622Aa9Bd4ZHLl+TuFQ4lo4g\n".
-        "5nKaMBwK/BIb9xUfg0Q29/2mgIR6Zr9krM7HjuIcCzFvDtr+L0GQjae9H0pRB2OO\n".
-        "62cECs5HKhT5DZ98K33vmWiLowc621dQuwKWSQKjWf50XYFw42h21P2KXUGyp2y/\n".
-        "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n".
-        "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n".
-        "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n".
-        '-----END RSA PUBLIC KEY-----',
-    ];
-    private const TEST_RSA_KEYS = [
-        "-----BEGIN RSA PUBLIC KEY-----\n".
-        "MIIBCgKCAQEAyMEdY1aR+sCR3ZSJrtztKTKqigvO/vBfqACJLZtS7QMgCGXJ6XIR\n".
-        "yy7mx66W0/sOFa7/1mAZtEoIokDP3ShoqF4fVNb6XeqgQfaUHd8wJpDWHcR2OFwv\n".
-        "plUUI1PLTktZ9uW2WE23b+ixNwJjJGwBDJPQEQFBE+vfmH0JP503wr5INS1poWg/\n".
-        "j25sIWeYPHYeOrFp/eXaqhISP6G+q2IeTaWTXpwZj4LzXq5YOpk4bYEQ6mvRq7D1\n".
-        "aHWfYmlEGepfaYR8Q0YqvvhYtMte3ITnuSJs171+GDqpdKcSwHnd6FudwGO4pcCO\n".
-        "j4WcDuXc2CTHgH8gFTNhp/Y8/SpDOhvn9QIDAQAB\n".
-        '-----END RSA PUBLIC KEY-----',
-    ];
     /**
      * Internal version of MadelineProto.
      *
@@ -461,10 +441,8 @@ final class MTProto implements TLCallback, LoggerGetter
     public Logger $logger;
     /**
      * TL serializer.
-     *
-     * @var TL
      */
-    private $TL;
+    private TL $TL;
 
     /**
      * Snitch.
@@ -648,12 +626,12 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         // Load rsa keys
         $this->rsa_keys = [];
-        foreach (self::RSA_KEYS as $key) {
+        foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
             $key = RSA::load($this->TL, $key);
             $this->rsa_keys[$key->fp] = $key;
         }
         $this->test_rsa_keys = [];
-        foreach (self::TEST_RSA_KEYS as $key) {
+        foreach ($this->settings->getConnection()->getTestRSAKeys() as $key) {
             $key = RSA::load($this->TL, $key);
             $this->test_rsa_keys[$key->fp] = $key;
         }

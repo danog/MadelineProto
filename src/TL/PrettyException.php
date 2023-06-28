@@ -86,7 +86,7 @@ trait PrettyException
         }
         $tl = false;
         foreach (\array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
-            if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'])) {
+            if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'], true)) {
                 if (($frame['args'][2] ?? '') !== '') {
                     $this->tlTrace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
                     $tl = true;

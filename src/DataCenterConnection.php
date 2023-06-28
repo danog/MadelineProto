@@ -685,7 +685,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function isHttp(): bool
     {
-        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class]);
+        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class], true);
     }
     /**
      * Check if is connected directly by IP address.

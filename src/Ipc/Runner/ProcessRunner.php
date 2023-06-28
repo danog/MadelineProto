@@ -93,7 +93,7 @@ final class ProcessRunner extends RunnerAbstract
             'cwd' => Magic::getcwd(),
         ];
         $envVars = \array_merge(
-            \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS), ARRAY_FILTER_USE_BOTH),
+            \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
             ['QUERY_STRING' => \http_build_query($params)],
         );
 

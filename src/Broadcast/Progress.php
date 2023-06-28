@@ -49,7 +49,7 @@ final class Progress implements JsonSerializable
     {
         return \get_object_vars($this);
     }
-    public function __toString()
+    public function __toString(): string
     {
         return "Progress for {$this->broadcastId}: {$this->percent}%, status {$this->status->value}, sent to {$this->successCount} peers, failed sending to {$this->failCount} peers, {$this->pendingCount} peers left.";
     }

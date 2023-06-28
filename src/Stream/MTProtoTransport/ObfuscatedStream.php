@@ -51,7 +51,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
         }
         do {
             $random = Tools::random(64);
-        } while (\in_array(\substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', \str_repeat(\chr(238), 4), \str_repeat(\chr(221), 4)]) || $random[0] === \chr(0xef) || \substr($random, 4, 4) === "\0\0\0\0");
+        } while (\in_array(\substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', \str_repeat(\chr(238), 4), \str_repeat(\chr(221), 4)], true) || $random[0] === \chr(0xef) || \substr($random, 4, 4) === "\0\0\0\0");
         if (\strlen($header) === 1) {
             $header = \str_repeat($header, 4);
         }

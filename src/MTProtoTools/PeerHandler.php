@@ -1056,7 +1056,7 @@ trait PeerHandler
                 $res['participants'][$key] = $newres;
             }
         }
-        if (!isset($res['participants']) && $fullfetch && \in_array($res['type'], ['supergroup', 'channel'])) {
+        if (!isset($res['participants']) && $fullfetch && \in_array($res['type'], ['supergroup', 'channel'], true)) {
             $total_count = ($res['participants_count'] ?? 0) + ($res['admins_count'] ?? 0) + ($res['kicked_count'] ?? 0) + ($res['banned_count'] ?? 0);
             $res['participants'] = [];
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];

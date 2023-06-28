@@ -129,7 +129,7 @@ final class FeedLoop extends Loop
                     $this->incomingUpdates = [];
                     continue;
                 }
-                if (isset($update['message']['id'], $update['message']['peer_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
+                if (isset($update['message']['id'], $update['message']['peer_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'], true)) {
                     if (!$this->API->checkMsgId($update['message'])) {
                         $logger('MSGID duplicate');
                         continue;

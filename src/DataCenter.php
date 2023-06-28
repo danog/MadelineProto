@@ -302,10 +302,10 @@ final class DataCenter
             UdpBufferedStream::class =>
                 [[DefaultStream::class, []], [UdpBufferedStream::class, []]],
         };
-        if ($this->settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+        if ($this->settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
         }
-        if ($this->settings->getTransport() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+        if ($this->settings->getTransport() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             switch ($this->settings->getTransport()) {
                 case DefaultStream::class:
                     if ($this->settings->getObfuscated()) {
@@ -335,7 +335,7 @@ final class DataCenter
             $proxyCombos = [];
             foreach ($this->settings->getProxies() as $proxy => $extras) {
                 foreach ($extras as $extra) {
-                    if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34])) {
+                    if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
                         $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
                     }
                     foreach ($combos as $orig) {
@@ -354,7 +354,7 @@ final class DataCenter
                                 [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                                 $first[] = [$proxy, $extra];
                                 $combo = \array_merge($first, $second);
-                            } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class])) {
+                            } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
                                 [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                                 $first[] = [BufferedRawStream::class, []];
                                 $first[] = [$proxy, $extra];
@@ -433,7 +433,7 @@ final class DataCenter
                             if ($stream[0] === DefaultStream::class && $stream[1] === []) {
                                 $stream[1] = $useDoH ? new DoHConnector($this->dohWrapper, $ctx) : $this->dohWrapper->dnsConnector;
                             }
-                            if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
+                            if (\in_array($stream[0], [WsStream::class, WssStream::class], true) && $stream[1] === []) {
                                 $stream[1] = $this->dohWrapper->webSocketConnector;
                             }
                             /** @var array{0: class-string, 1: mixed} $stream */

@@ -199,7 +199,7 @@ trait MessageHandler
             $payload .= Tools::packUnsignedInt($ack_mask);
             $payload .= \chr(0);
             $payload .= $message;
-        } elseif (\in_array($this->voip_state, [VoIP::STATE_WAIT_INIT, VoIP::STATE_WAIT_INIT_ACK])) {
+        } elseif (\in_array($this->voip_state, [VoIP::STATE_WAIT_INIT, VoIP::STATE_WAIT_INIT_ACK], true)) {
             $payload = $this->TLID_DECRYPTED_AUDIO_BLOCK;
             $payload .= Tools::random(8);
             $payload .= \chr(7);

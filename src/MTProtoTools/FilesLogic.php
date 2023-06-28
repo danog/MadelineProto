@@ -95,7 +95,7 @@ trait FilesLogic
         }
         \http_response_code($result->getCode());
 
-        if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT])) {
+        if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
@@ -199,7 +199,7 @@ trait FilesLogic
             $pipe = new Pipe(1024 * 1024);
             EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
             $body = $pipe->getSource();
-        } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT])) {
+        } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();
         }
 

@@ -61,6 +61,6 @@ final class SecretChats extends SettingsAbstract
         if ($this->accept === true) {
             return true;
         }
-        return \in_array($id, $this->accept);
+        return \in_array($id, $this->accept, true);
     }
 }

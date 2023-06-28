@@ -80,12 +80,12 @@ trait Methods
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['methods' => [], 'constructors' => []];
             }
-            if (!\in_array($data, $this->types[$php_type]['methods'])) {
+            if (!\in_array($data, $this->types[$php_type]['methods'], true)) {
                 $this->types[$php_type]['methods'][] = $data;
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
@@ -96,7 +96,7 @@ trait Methods
                     $param['type'] = 'InputPeer';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
+                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $param[$type_or_subtype] = '$'.$param[$type_or_subtype];
@@ -138,7 +138,7 @@ trait Methods
             $hasreplymarkup = false;
             $hasmessage = false;
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
@@ -165,34 +165,34 @@ trait Methods
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (\in_array($ptype, ['InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Update, Message or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMessage'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedChat'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
+                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
                 if (isset($this->tdDescriptions['methods'][$method])) {
                     $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
                     $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : '$'.$ptype;
-                $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
-                $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
+                $pptype = \in_array($ptype, ['string', 'bytes'], true) ? "'".$ptype."'" : '$'.$ptype;
+                $ppptype = \in_array($ptype, ['string'], true) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = \in_array($ptype, ['bytes'], true) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
                 $params .= $param['name'].': ';
                 $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
@@ -223,7 +223,7 @@ trait Methods
             if ($this->td) {
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
             }
-            if (\in_array($method, ['messages.getHistory', 'messages.getMessages', 'channels.getMessages'])) {
+            if (\in_array($method, ['messages.getHistory', 'messages.getMessages', 'channels.getMessages'], true)) {
                 $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
                 $header .= "# Warning: non-realtime results\n**Warning: this method is not suitable for receiving messages in real-time from chats and users, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
                 $header .= "# Warning: this is probably NOT what you need\nYou probably need to use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven) :)\n\n";
@@ -235,7 +235,7 @@ trait Methods
             $return = '### Return type: ['.StrTools::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)
 
 ';
-            $bot = !\in_array($method, $bots);
+            $bot = !\in_array($method, $bots, true);
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";

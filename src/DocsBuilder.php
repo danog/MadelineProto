@@ -120,7 +120,7 @@ final class DocsBuilder
             $header = '';
             if (!isset($this->settings['td'])) {
                 foreach (self::DEFAULT_TEMPLATES as $template => $types) {
-                    if (\in_array($type, $types)) {
+                    if (\in_array($type, $types, true)) {
                         $header .= $this->template($template, $type);
                     }
                 }

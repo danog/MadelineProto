@@ -100,7 +100,7 @@ trait AuthKeyHandler
                  * Find our key in the server_public_key_fingerprints vector
                  */
                 foreach ($this->API->getRsaKeys($test, $cdn) as $curkey) {
-                    if (\in_array($curkey->fp, $ResPQ['server_public_key_fingerprints'])) {
+                    if (\in_array($curkey->fp, $ResPQ['server_public_key_fingerprints'], true)) {
                         $key = $curkey;
                     }
                 }

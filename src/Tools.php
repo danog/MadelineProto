@@ -536,7 +536,7 @@ abstract class Tools extends AsyncTools
      */
     public static function absolute(string $file): string
     {
-        if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(\substr($file, 0, 4), ['phar', 'http'])) {
+        if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(\substr($file, 0, 4), ['phar', 'http'], true)) {
             $file = Magic::getcwd().DIRECTORY_SEPARATOR.$file;
         }
         return $file;

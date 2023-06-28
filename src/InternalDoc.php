@@ -1006,7 +1006,7 @@ abstract class InternalDoc
     /**
      * Get TL serializer.
      */
-    public function getTL(): \danog\MadelineProto\TL\TL
+    public function getTL(): \danog\MadelineProto\TL\TLInterface
     {
         return $this->wrapper->getAPI()->getTL();
     }

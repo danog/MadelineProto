@@ -109,7 +109,7 @@ trait TD
             return $params;
         }
         $newparams = ['_' => $params['_']];
-        if (\in_array($params['_'], self::TD_IGNORE)) {
+        if (\in_array($params['_'], self::TD_IGNORE, true)) {
             return $params;
         }
         foreach (self::TD_PARAMS_CONVERSION[$params['_']] as $td => $mtproto) {

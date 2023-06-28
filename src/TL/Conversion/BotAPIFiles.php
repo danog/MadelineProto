@@ -91,7 +91,7 @@ trait BotAPIFiles
         $fileId = FileId::fromBotAPI($fileId);
 
         $this->logger("Got file ID with version {$fileId->getVersion()}.{$fileId->getSubVersion()}");
-        if (!\in_array($fileId->getVersion(), [2, 4])) {
+        if (!\in_array($fileId->getVersion(), [2, 4], true)) {
             throw new Exception("Invalid bot API file ID version {$fileId->getVersion()}");
         }
 

@@ -248,7 +248,7 @@ final class Blacklist {
     {
         $newParams = [];
         foreach ($params as $param) {
-            if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+            if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                 continue;
             }
             if ($method) {
@@ -263,7 +263,7 @@ final class Blacklist {
                 $param['name'] = 'decrypted_message';
                 $param['type'] = 'DecryptedMessage';
             }
-            if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
+            if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'], true)) {
                 continue;
             }
             if ($param['name'] === 'chat_id' && $method !== 'messages.discardEncryption') {
@@ -274,7 +274,7 @@ final class Blacklist {
                 $param['type'] = 'Vector t';
                 $param['subtype'] = 'int';
             }
-            if (\in_array($param['type'], ['int', 'long', 'string', 'bytes'])) {
+            if (\in_array($param['type'], ['int', 'long', 'string', 'bytes'], true)) {
                 $param['pow'] = 'optional';
             }
             $param['array'] = isset($param['subtype']);
@@ -331,7 +331,7 @@ final class Blacklist {
                 continue;
             }
             [$namespace, $method] = \explode('.', $data['method']);
-            if (!\in_array($namespace, $this->TL->getMethodNamespaces())) {
+            if (!\in_array($namespace, $this->TL->getMethodNamespaces(), true)) {
                 continue;
             }
             if (isset($this->blacklist[$data['method']])) {

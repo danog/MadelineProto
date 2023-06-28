@@ -59,12 +59,12 @@ trait Constructors
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['constructors' => [], 'methods' => []];
             }
-            if (!\in_array($data, $this->types[$php_type]['constructors'])) {
+            if (!\in_array($data, $this->types[$php_type]['constructors'], true)) {
                 $this->types[$php_type]['constructors'][] = $data;
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
@@ -72,7 +72,7 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
+                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
                     $param[$type_or_subtype] = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
@@ -113,14 +113,14 @@ trait Constructors
             $hasreplymarkup = false;
             $hasentities = false;
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
+                if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'], true)) {
                     unset(Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
@@ -128,7 +128,7 @@ trait Constructors
                 if (\preg_match('/%/', $ptype)) {
                     $ptype = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
-                $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
+                $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true)) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
                 if (\substr($ptype, -1) === '>') {
                     $ptype = \substr($ptype, 0, -1);
                 }
@@ -138,25 +138,25 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer']) && !isset($this->settings['td'])) {
+                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto']) && !isset($this->settings['td'])) {
+                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMessage'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedChat'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
                 if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['description'])) {
@@ -168,9 +168,9 @@ trait Constructors
                     $table .= $this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
-                $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
+                $pptype = \in_array($ptype, ['string', 'bytes'], true) ? "'".$ptype."'" : $ptype;
+                $ppptype = \in_array($ptype, ['string'], true) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = \in_array($ptype, ['bytes'], true) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
                 $params .= ", '".$param['name']."' => ";
                 $params .= isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype;
                 $lua_params .= ', '.$param['name'].'=';
