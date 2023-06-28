@@ -398,7 +398,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getpsrlogger-psr-log-loggerinterface" name="getPsrLogger">Get PSR logger: getPsrLogger</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamRtmpUrl.html" name="phone.getGroupCallStreamRtmpUrl">Get RTMP URL and stream key for RTMP livestreams. Can be used even before creating the actual RTMP livestream with phone.createGroupCall (the rtmp_stream flag must be set): phone.getGroupCallStreamRtmpUrl</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getmethodnamespaces-array" name="getMethodNamespaces">Get TL namespaces: getMethodNamespaces</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gettl-danog-madelineproto-tl-tl" name="getTL">Get TL serializer: getTL</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gettl-danog-madelineproto-tl-tlinterface" name="getTL">Get TL serializer: getTL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPremiumPromo.html" name="help.getPremiumPromo">Get Telegram Premium promotion information: help.getPremiumPromo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mbstrlen-string-text-int" name="mbStrlen">Get Telegram UTF-8 length of string: mbStrlen</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastStats.html" name="stats.getBroadcastStats">Get channel statistics: stats.getBroadcastStats</a>

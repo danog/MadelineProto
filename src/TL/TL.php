@@ -700,7 +700,7 @@ final class TL implements TLInterface
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt($modulus = 3)), 'random_bytes');
+                    $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt(modulus: 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true) && isset($arguments['message'])) {

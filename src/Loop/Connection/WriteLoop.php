@@ -97,7 +97,7 @@ final class WriteLoop extends Loop
                 $message_id = $message->getMsgId() ?? $this->connection->msgIdHandler->generateMessageId();
                 $length = \strlen($message->getSerializedBody());
                 $pad_length = -$length & 15;
-                $pad_length += 16 * Tools::randomInt($modulus = 16);
+                $pad_length += 16 * Tools::randomInt(modulus: 16);
                 $pad = Tools::random($pad_length);
                 $buffer = $this->connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
                 $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);

@@ -29,7 +29,7 @@ use danog\MadelineProto\Stream\Transport\WsStream;
 final class Connection extends SettingsAbstract
 {
     /**
-     * RSA keys
+     * RSA keys.
      */
     protected array $rsaKeys = [
         "-----BEGIN RSA PUBLIC KEY-----\n".
@@ -42,7 +42,7 @@ final class Connection extends SettingsAbstract
         '-----END RSA PUBLIC KEY-----',
     ];
     /**
-     * Test RSA keys
+     * Test RSA keys.
      */
     protected array $testRsaKeys =  [
         "-----BEGIN RSA PUBLIC KEY-----\n".
@@ -638,9 +638,8 @@ final class Connection extends SettingsAbstract
     }
 
     /**
-     * Get RSA keys
+     * Get RSA keys.
      *
-     * @return array
      */
     public function getRsaKeys(): array
     {
@@ -648,11 +647,10 @@ final class Connection extends SettingsAbstract
     }
 
     /**
-     * Set RSA keys
+     * Set RSA keys.
      *
      * @param array $rsaKeys RSA keys
      *
-     * @return self
      */
     public function setRsaKeys(array $rsaKeys): self
     {
@@ -662,9 +660,8 @@ final class Connection extends SettingsAbstract
     }
 
     /**
-     * Get test RSA keys
+     * Get test RSA keys.
      *
-     * @return array
      */
     public function getTestRsaKeys(): array
     {
@@ -672,11 +669,10 @@ final class Connection extends SettingsAbstract
     }
 
     /**
-     * Set test RSA keys
+     * Set test RSA keys.
      *
      * @param array $testRsaKeys Test RSA keys
      *
-     * @return self
      */
     public function setTestRsaKeys(array $testRsaKeys): self
     {
