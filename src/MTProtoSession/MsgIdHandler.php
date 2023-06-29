@@ -24,7 +24,6 @@ use danog\MadelineProto\Connection;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
-use danog\MadelineProto\Tools;
 
 /**
  * Manages message ids.
@@ -61,13 +60,9 @@ final class MsgIdHandler
 
     /**
      * Check validity of given message ID.
-     *
-     * @param int|string $newMessageId New message ID
-     * @param array  $aargs        Params
      */
-    public function checkMessageId(int|string $newMessageId, array $aargs): void
+    public function checkMessageId(int $newMessageId, bool $outgoing, bool $container = false): void
     {
-        $newMessageId = \is_integer($newMessageId) ? $newMessageId : Tools::unpackSignedLong($newMessageId);
         $minMessageId = (\time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
             $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', Logger::WARNING);
@@ -76,7 +71,7 @@ final class MsgIdHandler
         if ($newMessageId > $maxMessageId) {
             throw new Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
         }
-        if ($aargs['outgoing']) {
+        if ($outgoing) {
             if ($newMessageId % 4) {
                 throw new Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
             }
@@ -89,7 +84,7 @@ final class MsgIdHandler
                 throw new Exception('message id mod 4 != 1 or 3');
             }
             $key = $this->maxIncomingId;
-            if ($aargs['container']) {
+            if ($container) {
                 if ($newMessageId >= $key) {
                     $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
                 }
@@ -104,14 +99,16 @@ final class MsgIdHandler
     /**
      * Generate message ID.
      */
-    public function generateMessageId(): string
+    public function generateMessageId(): int
     {
         $messageId = (\time() + $this->session->time_delta) << 32;
+        $messageId += \hrtime(true) % 1000_000;
+        $messageId += 4 - ($messageId % 4);
         if ($messageId <= $this->maxOutgoingId) {
             $messageId = $this->maxOutgoingId + 4;
         }
-        $this->checkMessageId($messageId, ['outgoing' => true, 'container' => false]);
-        return Tools::packSignedLong($messageId);
+        $this->checkMessageId($messageId, outgoing: true, container: false);
+        return $messageId;
     }
     /**
      * Get maximum message ID.
@@ -134,12 +131,5 @@ final class MsgIdHandler
         if ($cleaned && !Magic::$suspendPeriodicLogging) {
             $this->session->API->logger->logger("Zend hashmap reallocation done. Cleaned memory: $cleaned Mb", Logger::VERBOSE);
         }
-    }
-    /**
-     * Get readable representation of message ID.
-     */
-    public static function toString(string $messageId): string
-    {
-        return (string) Tools::unpackSignedLong($messageId);
     }
 }

@@ -70,7 +70,7 @@ final class CheckLoop extends Loop
                     foreach (\str_split($result['info']) as $key => $chr) {
                         $message_id = $message_ids[$key];
                         if (!isset($this->connection->outgoing_messages[$message_id])) {
-                            $this->logger->logger('Already got response for and forgot about message ID '.MsgIdHandler::toString($message_id));
+                            $this->logger->logger("Already got response for and forgot about message ID $message_id");
                             continue;
                         }
                         if (!isset($this->connection->new_outgoing[$message_id])) {

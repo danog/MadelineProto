@@ -28,7 +28,6 @@ use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
-use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -83,7 +82,7 @@ trait ResponseHandler
                     break;
                 case 'msg_container':
                     foreach ($message->read()['messages'] as $message) {
-                        $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
+                        $this->msgIdHandler->checkMessageId($message['msg_id'], outgoing: false, container: true);
                         $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
                         $newMessage->setSeqNo($message['seqno']);
                         $newMessage->setSideEffects($message['sideEffects']);
@@ -100,7 +99,7 @@ trait ResponseHandler
                     if (isset($this->incoming_messages[$referencedMsgId])) {
                         $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
                     } else {
-                        $this->msgIdHandler->checkMessageId($referencedMsgId, ['outgoing' => false, 'container' => true]);
+                        $this->msgIdHandler->checkMessageId($referencedMsgId, outgoing: false, container: true);
                         $message = new IncomingMessage($content['orig_message'], $referencedMsgId);
                         $message->setSideEffects($side);
                         $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
@@ -186,7 +185,6 @@ trait ResponseHandler
         $requestId ??= $message->getRequestId();
         $response = $message->read();
         if (!isset($this->outgoing_messages[$requestId])) {
-            $requestId = MsgIdHandler::toString($requestId);
             $this->logger->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
             return;
         }
@@ -225,7 +223,7 @@ trait ResponseHandler
                     return;
                 case 16:
                 case 17:
-                    $this->time_delta = (int) (new BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new BigInteger(\time()))->toString();
+                    $this->time_delta = ($message->getMsgId() >> 32) - \time();
                     $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);

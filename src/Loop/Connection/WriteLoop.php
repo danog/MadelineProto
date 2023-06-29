@@ -100,7 +100,7 @@ final class WriteLoop extends Loop
                 $pad_length += 16 * Tools::randomInt(modulus: 16);
                 $pad = Tools::random($pad_length);
                 $buffer = $this->connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
-                $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
+                $buffer->bufferWrite("\0\0\0\0\0\0\0\0".Tools::packSignedLong($message_id).Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
                 $this->connection->httpSent();
 
                 $this->logger->logger("Sent $message as unencrypted message to DC $this->datacenter!", Logger::ULTRA_VERBOSE);
@@ -292,7 +292,7 @@ final class WriteLoop extends Loop
                 return true;
             }
             unset($messages);
-            $plaintext = $this->shared->getTempAuthKey()->getServerSalt().$this->connection->session_id.$message_id.\pack('VV', $seq_no, $message_data_length).$message_data;
+            $plaintext = $this->shared->getTempAuthKey()->getServerSalt().$this->connection->session_id.Tools::packSignedLong($message_id).\pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;

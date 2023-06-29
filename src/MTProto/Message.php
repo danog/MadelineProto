@@ -62,7 +62,7 @@ abstract class Message
     /**
      * My message ID.
      */
-    protected $msgId = null;
+    protected ?int $msgId = null;
 
     /**
      * Sequence number.
@@ -85,17 +85,15 @@ abstract class Message
     /**
      * Get my message ID.
      */
-    public function getMsgId()
+    public function getMsgId(): ?int
     {
         return $this->msgId;
     }
 
     /**
      * Set my message ID.
-     *
-     * @param mixed $msgId My message ID
      */
-    public function setMsgId(mixed $msgId): self
+    public function setMsgId(int $msgId): self
     {
         $this->msgId = $msgId;
 

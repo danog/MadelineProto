@@ -78,7 +78,7 @@ final class IncomingMessage extends Message
      * @param array   $content       Content
      * @param boolean $fromContainer Whether this message was in a container
      */
-    public function __construct(array $content, string $msgId, bool $fromContainer = false)
+    public function __construct(array $content, int $msgId, bool $fromContainer = false)
     {
         $this->content = $content;
         $this->fromContainer = $fromContainer;
@@ -175,7 +175,7 @@ final class IncomingMessage extends Message
     /**
      * Get ID of message to which this message replies.
      */
-    public function getRequestId(): string
+    public function getRequestId(): int
     {
         return $this->content[self::RESPONSE_ID_MAP[$this->content['_']]];
     }

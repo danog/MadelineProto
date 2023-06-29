@@ -29,11 +29,15 @@ final class Container extends OutgoingMessage
 {
     /**
      * Message IDs.
+     *
+     * @var list<int>
      */
     private array $ids = [];
 
     /**
      * Constructor.
+     *
+     * @param list<int> $ids
      */
     public function __construct(array $ids)
     {

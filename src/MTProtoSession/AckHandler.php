@@ -37,10 +37,8 @@ trait AckHandler
 {
     /**
      * Acknowledge outgoing message ID.
-     *
-     * @param string|int $message_id Message Id
      */
-    public function ackOutgoingMessageId(string|int $message_id): bool
+    public function ackOutgoingMessageId(int $message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {

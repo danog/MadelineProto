@@ -855,9 +855,6 @@ final class TL implements TLInterface
             case '#':
                 return \unpack('V', \stream_get_contents($stream, 4))[1];
             case 'long':
-                if (isset($type['idstrlong'])) {
-                    return \stream_get_contents($stream, 8);
-                }
                 return isset($type['strlong']) ? \stream_get_contents($stream, 8) : Tools::unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
                 return Tools::unpackDouble(\stream_get_contents($stream, 8));
@@ -1006,9 +1003,7 @@ final class TL implements TLInterface
                         }
                 }
             }
-            if (\in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'], true)) {
-                $arg['idstrlong'] = true;
-            } elseif (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'], true)) {
+            if (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'], true)) {
                 $arg['strlong'] = true;
             } elseif (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'], true)) {
                 $arg['type'] = 'string';

@@ -25,7 +25,6 @@ use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -450,8 +449,7 @@ class OutgoingMessage extends Message
             $state = 'pending';
         }
         if ($this->msgId) {
-            $msgId = MsgIdHandler::toString($this->msgId);
-            return "{$this->constructor} with message ID $msgId $state";
+            return "{$this->constructor} with message ID {$this->msgId} $state";
         }
         return "{$this->constructor} $state";
     }

@@ -135,8 +135,8 @@ final class ReadLoop extends Loop
             $seq_no = null;
             $auth_key_id = $buffer->bufferRead(8);
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-                $message_id = $buffer->bufferRead(8);
-                $this->connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
+                $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
+                $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
                 $message_length = \unpack('V', $buffer->bufferRead(4))[1];
                 $message_data = $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
@@ -172,8 +172,8 @@ final class ReadLoop extends Loop
                     $this->connection->resetSession();
                     throw new NothingInTheSocketException();
                 }
-                $message_id = \substr($decrypted_data, 16, 8);
-                $this->connection->msgIdHandler->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
+                $message_id = Tools::unpackSignedLong(\substr($decrypted_data, 16, 8));
+                $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
                 $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
                 $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {

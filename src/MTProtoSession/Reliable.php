@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 
 /**
@@ -86,7 +85,6 @@ trait Reliable
     {
         foreach ($content['msg_ids'] as $key => $msg_id) {
             $info = \ord($content['info'][$key]);
-            $msg_id = MsgIdHandler::toString($msg_id);
             $status = 'Status for message id '.$msg_id.': ';
             /*if ($info & 4) {
              *$this->gotResponseForOutgoingMessageId($msg_id);
@@ -103,21 +101,21 @@ trait Reliable
     /**
      * Send state info for message IDs.
      *
-     * @param array      $msg_ids    Message IDs to send info about
-     * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
+     * @param array $msg_ids    Message IDs to send info about
+     * @param int   $req_msg_id Message ID of msgs_state_req that initiated this
      */
-    public function sendMsgsStateInfo(array $msg_ids, string|int $req_msg_id): void
+    public function sendMsgsStateInfo(array $msg_ids, int $req_msg_id): void
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!isset($this->incoming_messages[$msg_id])) {
-                $msg_id = new BigInteger(\strrev($msg_id), 256);
-                if ((new BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
+                $shifted = $msg_id >> 32;
+                if ($shifted > (\time() + $this->time_delta + 30)) {
                     $this->logger->logger("Do not know anything about {$msg_id} and it is too big");
                     $cur_info |= 3;
-                } elseif ((new BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
+                } elseif ($shifted < (\time() + $this->time_delta - 300)) {
                     $this->logger->logger("Do not know anything about {$msg_id} and it is too small");
                     $cur_info |= 1;
                 } else {
