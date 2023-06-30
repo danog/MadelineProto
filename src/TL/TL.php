@@ -491,6 +491,8 @@ final class TL implements TLInterface
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
                 return Tools::packUnsignedInt($object);
+            case 'strlong':
+                return $object;
             case 'long':
                 if (\is_object($object)) {
                     return \str_pad(\strrev($object->toBytes()), 8, \chr(0));
@@ -854,8 +856,10 @@ final class TL implements TLInterface
                 return Tools::unpackSignedInt(\stream_get_contents($stream, 4));
             case '#':
                 return \unpack('V', \stream_get_contents($stream, 4))[1];
+            case 'strlong':
+                return \stream_get_contents($stream, 8);
             case 'long':
-                return isset($type['strlong']) ? \stream_get_contents($stream, 8) : Tools::unpackSignedLong(\stream_get_contents($stream, 8));
+                return Tools::unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
                 return Tools::unpackDouble(\stream_get_contents($stream, 8));
             case 'int128':
@@ -1003,11 +1007,6 @@ final class TL implements TLInterface
                         }
                 }
             }
-            if (\in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'], true)) {
-                $arg['strlong'] = true;
-            } elseif (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'], true)) {
-                $arg['type'] = 'string';
-            }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
                 /** @var OutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
@@ -1017,8 +1016,6 @@ final class TL implements TLInterface
                 if ($message->getType() && \str_contains($message->getType(), '<')) {
                     $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
                 }
-            } elseif ($x['_'] === 'msg_container' && $arg['name'] === 'messages') {
-                $arg['splitSideEffects'] = true;
             }
             if (isset($type['connection'])) {
                 $arg['connection'] = $type['connection'];

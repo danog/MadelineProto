@@ -93,7 +93,7 @@ abstract class Message
     /**
      * Set my message ID.
      */
-    public function setMsgId(int $msgId): self
+    public function setMsgId(?int $msgId): self
     {
         $this->msgId = $msgId;
 

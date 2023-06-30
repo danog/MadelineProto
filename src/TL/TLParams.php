@@ -25,7 +25,7 @@ namespace danog\MadelineProto\TL;
  */
 trait TLParams
 {
-    public function parseParams($key, $mtproto = false): void
+    public function parseParams(string $key, bool $mtproto, string $predicate): void
     {
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
             if (\preg_match('/([^.]+)\\.(\\d+)\\?(.+)/', $param['type'], $matches)) {
@@ -41,6 +41,19 @@ trait TLParams
             }
             $param['type'] = ($mtproto && $param['type'] === 'Message' ? 'MT' : '').$param['type'];
             $param['type'] = $mtproto && $param['type'] === '%Message' ? '%MTMessage' : $param['type'];
+
+            if (\in_array($param['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'ping_id', 'exchange_id'], true)) {
+                $param['type'] = 'strlong';
+            } elseif (\in_array($param['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'], true)) {
+                $param['type'] = 'string';
+            } elseif ($param['name'] === 'server_public_key_fingerprints') {
+                $param['subtype'] = 'strlong';
+            }
+
+            if ($predicate === 'msg_container' && $param['name'] === 'messages') {
+                $param['splitSideEffects'] = true;
+            }
+
             $this->by_id[$key]['params'][$kkey] = $param;
         }
     }

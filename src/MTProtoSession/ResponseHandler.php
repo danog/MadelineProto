@@ -178,9 +178,8 @@ trait ResponseHandler
      * Handle RPC response.
      *
      * @param IncomingMessage $message   Incoming message
-     * @param string          $requestId Request ID
      */
-    private function handleResponse(IncomingMessage $message, ?string $requestId = null): void
+    private function handleResponse(IncomingMessage $message, ?int $requestId = null): void
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();

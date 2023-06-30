@@ -113,7 +113,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 167;
+    const V = 168;
     /**
      * Release version.
      *
