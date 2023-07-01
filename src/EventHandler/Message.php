@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 
@@ -16,11 +17,19 @@ abstract class Message extends Update
     public readonly string $message;
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
-    /** ID of the peer from where the message was forwarded */
-    public readonly ?int $forwardedFromId;
+    /** ID of the message to which this message is replying */
+    public readonly ?int $replyToMsgId;
     /** When was the message sent */
     public readonly int $date;
 
+    /** ID of the forum topic where the message was sent */
+    public readonly ?int $topicId;
+
+    /** ID of the message thread where the message was sent */
+    public readonly ?int $threadId;
+
+    /** Whether this is a reply to a scheduled message */
+    public readonly bool $replyToScheduled;
     /** Whether we were mentioned in this message */
     public readonly bool $mentioned;
     /** Whether this message was sent without any notification (silently) */
@@ -43,7 +52,7 @@ abstract class Message extends Update
     /** Inline or reply keyboard. */
     public readonly ?Keyboard $keyboard;
 
-    // Todo media, albums, reactions, replies, reply_to, fwd_from
+    // Todo media, albums, reactions, replies, fwd_from
 
     /** @internal */
     protected function __construct(
@@ -51,10 +60,11 @@ abstract class Message extends Update
         array $rawMessage
     ) {
         parent::__construct($API);
+        $info = $this->API->getInfo($rawMessage);
 
         $this->id = $rawMessage['id'];
         $this->message = $rawMessage['message'] ?? '';
-        $this->chatId = $this->API->getId($rawMessage);
+        $this->chatId = $info['bot_api_id'];
         $this->date = $rawMessage['date'];
         $this->mentioned = $rawMessage['mentioned'];
         $this->silent = $rawMessage['silent'];
@@ -68,6 +78,39 @@ abstract class Message extends Update
         $this->keyboard = isset($rawMessage['reply_markup'])
             ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
             : null;
+
+        if (isset($rawMessage['reply_to'])) {
+            $replyTo = $rawMessage['reply_to'];
+            $this->replyToScheduled = $replyTo['reply_to_scheduled'];
+            if ($replyTo['forum_topic']) {
+                if (isset($replyTo['reply_to_top_id'])) {
+                    $this->topicId = $replyTo['reply_to_top_id'];
+                    $this->replyToMsgId = $replyTo['reply_to_msg_id'];
+                } else {
+                    $this->topicId = $replyTo['reply_to_msg_id'];
+                    $this->replyToMsgId = null;
+                }
+                $this->threadId = null;
+            } elseif ($info['Chat']['forum'] ?? false) {
+                $this->topicId = 1;
+                $this->replyToMsgId = $replyTo['reply_to_msg_id'];
+                $this->threadId = $replyTo['reply_to_top_id'] ?? null;
+            } else {
+                $this->topicId = null;
+                $this->replyToMsgId = $replyTo['reply_to_msg_id'];
+                $this->threadId = $replyTo['reply_to_top_id'] ?? null;
+            }
+        } elseif ($info['Chat']['forum'] ?? false) {
+            $this->topicId = 1;
+            $this->replyToMsgId = null;
+            $this->threadId = null;
+            $this->replyToScheduled = false;
+        } else {
+            $this->topicId = null;
+            $this->replyToMsgId = null;
+            $this->threadId = null;
+            $this->replyToScheduled = false;
+        }
     }
 
     private readonly string $html;

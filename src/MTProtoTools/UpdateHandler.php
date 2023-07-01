@@ -327,7 +327,11 @@ trait UpdateHandler
         if ($message['_'] !== 'message') {
             return null;
         }
-        return match ($this->getType($message)) {
+        $info = $this->getInfo($message, MTProto::INFO_TYPE_CONSTRUCTOR);
+        if (strtolower($info['username'] ?? '') === 'replies') {
+            return null;
+        }
+        return match ($info['type']) {
             MTProto::PEER_TYPE_BOT, MTProto::PEER_TYPE_USER => $message['out']
                 ? new OutgoingPrivateMessage($this, $message)
                 : new IncomingPrivateMessage($this, $message),
