@@ -3,6 +3,8 @@
 namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
+use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 
@@ -53,7 +55,7 @@ abstract class Message extends Update
     public readonly ?int $ttlPeriod;
 
     /** Inline or reply keyboard. */
-    public readonly ?Keyboard $keyboard;
+    public readonly InlineKeyboard|ReplyKeyboard|null $keyboard;
 
     /** Whether this message was [imported from a foreign chat service](https://core.telegram.org/api/import) */
     public readonly bool $imported;
