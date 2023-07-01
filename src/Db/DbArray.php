@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Iterator;
 use ArrayAccess;
 use Countable;
 

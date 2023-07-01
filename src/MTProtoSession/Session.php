@@ -25,8 +25,6 @@ use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\Tools;
 
-use function time;
-
 /**
  * Manages MTProto session-specific data.
  *

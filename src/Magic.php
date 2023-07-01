@@ -39,7 +39,6 @@ use const SIG_DFL;
 use const SIGINT;
 use const SIGTERM;
 use function Amp\Log\hasColorSupport;
-use function define;
 use function function_exists;
 
 /**

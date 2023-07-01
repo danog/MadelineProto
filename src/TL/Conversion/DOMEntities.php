@@ -12,23 +12,29 @@ use DOMNode;
 use DOMText;
 use Throwable;
 
+/**
+ * Class that converts HTML to a message + set of entities.
+ */
 final class DOMEntities
 {
+    /** Converted entities */
+    public readonly array $entities;
+    /** Converted message */
+    public readonly string $message;
     /**
-     * @readonly-allow-private-mutation
+     * @param string $html HTML to parse
      */
-    public array $entities = [];
-    /**
-     * @readonly-allow-private-mutation
-     */
-    public string $message = '';
     public function __construct(string $html)
     {
         try {
             $dom = new DOMDocument();
             $html = \preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
             $dom->loadxml('<body>' . \trim($html) . '</body>');
-            $this->parseNode($dom->getElementsByTagName('body')->item(0), 0);
+            $message = '';
+            $entities = [];
+            self::parseNode($dom->getElementsByTagName('body')->item(0), 0, $message, $entities);
+            $this->message = $message;
+            $this->entities = $entities;
         } catch (Throwable $e) {
             throw new Exception("An error occurred while parsing $html: {$e->getMessage()}", $e->getCode());
         }
@@ -36,14 +42,14 @@ final class DOMEntities
     /**
      * @return integer Length of the node
      */
-    private function parseNode(DOMNode|DOMText $node, int $offset): int
+    private static function parseNode(DOMNode|DOMText $node, int $offset, string &$message, array &$entities): int
     {
         if ($node instanceof DOMText) {
-            $this->message .= $node->wholeText;
+            $message .= $node->wholeText;
             return StrTools::mbStrlen($node->wholeText);
         }
         if ($node->nodeName === 'br') {
-            $this->message .= "\n";
+            $message .= "\n";
             return 1;
         }
         /** @var DOMElement $node */
@@ -58,20 +64,20 @@ final class DOMEntities
             'pre' => ['_' => 'messageEntityPre', 'language' => $node->getAttribute('language') ?? ''],
             'tg-emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('emoji-id')],
             'emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('id')],
-            'a' => $this->handleA($node),
+            'a' => self::handleA($node),
             default => null,
         };
         $length = 0;
         foreach ($node->childNodes as $sub) {
-            $length += $this->parseNode($sub, $offset+$length);
+            $length += self::parseNode($sub, $offset+$length, $message, $entities);
         }
         if ($entity !== null) {
             $lengthReal = $length;
-            for ($x = \strlen($this->message)-1; $x >= 0; $x--) {
+            for ($x = \strlen($message)-1; $x >= 0; $x--) {
                 if (!(
-                    $this->message[$x] === ' '
-                    || $this->message[$x] === "\r"
-                    || $this->message[$x] === "\n"
+                    $message[$x] === ' '
+                    || $message[$x] === "\r"
+                    || $message[$x] === "\n"
                 )) {
                     break;
                 }
@@ -80,13 +86,13 @@ final class DOMEntities
             if ($lengthReal > 0) {
                 $entity['offset'] = $offset;
                 $entity['length'] = $lengthReal;
-                $this->entities []= $entity;
+                $entities []= $entity;
             }
         }
         return $length;
     }
 
-    private function handleA(DOMElement $node): array
+    private static function handleA(DOMElement $node): array
     {
         $href = $node->getAttribute('href');
         if (\preg_match('|^mention:(.+)|', $href, $matches) || \preg_match('|^tg://user\\?id=(.+)|', $href, $matches)) {

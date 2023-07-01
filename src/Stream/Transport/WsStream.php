@@ -30,7 +30,6 @@ use Amp\Websocket\Client\WebsocketConnection;
 use Amp\Websocket\Client\WebsocketConnector;
 use Amp\Websocket\Client\WebsocketHandshake;
 use Amp\Websocket\ClosedException;
-use Amp\Websocket\Message;
 use Amp\Websocket\WebsocketMessage;
 use AssertionError;
 use danog\MadelineProto\Stream\ConnectionContext;

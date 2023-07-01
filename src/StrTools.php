@@ -84,6 +84,79 @@ abstract class StrTools extends Extension
         return $result;
     }
     /**
+     * Convert HTML to a message and a set of entities.
+     *
+     * @return DOMEntities Object containing message and entities
+     */
+    public static function htmlToMessageEntities(string $html): DOMEntities
+    {
+        return new DOMEntities($html);
+    }
+    /**
+     * Convert markdown to a message and a set of entities.
+     *
+     * @return DOMEntities Object containing message and entities
+     */
+    public static function markdownToMessageEntities(string $markdown): DOMEntities
+    {
+        return new DOMEntities(Parsedown::instance()->line($markdown));
+    }
+    /**
+     * Convert a message and a set of entities to HTML.
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like <tg-spoiler>, <tg-emoji>, mention links and so on...
+     */
+    public static function messageEntitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
+    {
+        $insertions = [];
+        foreach ($entities as $entity) {
+            ['_' => $type, 'offset' => $offset, 'length' => $length] = $entity;
+            $insertions[$offset] ??= '';
+            $insertions[$offset] .= match ($type) {
+                'messageEntityBold' => '<b>',
+                'messageEntityItalic' => '<i>',
+                'messageEntityCode' => '<code>',
+                'messageEntityPre' => $entity['language'] !== '' ? '<pre language="'.$entity['language'].'">' : '<pre>',
+                'messageEntityTextUrl' => '<a href="'.$entity['url'].'">',
+                'messageEntityStrike' => '<s>',
+                'messageEntityUnderline' => '<u>',
+                'messageEntityBlockquote' => '<blockquote>',
+                'messageEntityUrl' => '<a href="'.self::mbSubstr($message, $offset, $length).'">',
+                'messageEntityEmail' => '<a href="mailto:'.self::mbSubstr($message, $offset, $length).'">',
+                'messageEntityPhone' => '<a href="phone:'.self::mbSubstr($message, $offset, $length).'">',
+                'messageEntityMention' => '<a href="https://t.me/'.self::mbSubstr($message, $offset+1, $length-1).'">',
+                'messageEntitySpoiler' => $allowTelegramTags ? '<tg-spoiler>' : '',
+                'messageEntityCustomEmoji' => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity['document_id'].'">' : '',
+                'messageEntityMentionName' => $allowTelegramTags ? '<a href="tg://user?id='.$entity['user_id'].'">' : '',
+                default => '',
+            };
+            $offset += $length;
+            $insertions[$offset] = match ($type) {
+                'messageEntityBold' => '</b>',
+                'messageEntityItalic' => '</i>',
+                'messageEntityCode' => '</code>',
+                'messageEntityPre' => '</pre>',
+                'messageEntityTextUrl', 'messageEntityUrl', 'messageEntityEmail', 'messageEntityMention', 'messageEntityPhone' => '</a>',
+                'messageEntityStrike' => '</s>',
+                'messageEntityUnderline' => '</u>',
+                'messageEntityBlockquote' => '</blockquote>',
+                'messageEntitySpoiler' => $allowTelegramTags ? '</tg-spoiler>' : '',
+                'messageEntityCustomEmoji' => $allowTelegramTags ? "</tg-emoji>" : '',
+                'messageEntityMentionName' => $allowTelegramTags ? '</a>' : '',
+                default => '',
+            } . ($insertions[$offset] ?? '');
+        }
+        \ksort($insertions);
+        $final = '';
+        $pos = 0;
+        foreach ($insertions as $offset => $insertion) {
+            $final .= StrTools::mbSubstr($message, $pos, $offset-$pos);
+            $final .= $insertion;
+            $pos = $offset;
+        }
+        return \str_replace("\n", "<br>", $final.StrTools::mbSubstr($message, $pos));
+    }
+    /**
      * Convert to camelCase.
      *
      * @param string $input String

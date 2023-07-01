@@ -105,6 +105,7 @@ final class Blacklist {
             'bytes' => 'string',
             'int' => 'int',
             'long' => 'int',
+            'strlong' => 'int',
             'double' => 'float',
             'float' => 'float',
             'Bool' => 'bool',
@@ -125,6 +126,7 @@ final class Blacklist {
             'bytes' => 'string',
             'int' => 'int',
             'long' => 'int',
+            'strlong' => 'int',
             'double' => 'float',
             'float' => 'float',
             'Bool' => 'bool',
@@ -210,6 +212,7 @@ final class Blacklist {
             'bytes' => "''",
             'int' => '0',
             'long' => '0',
+            'strlong' => '0',
             'double' => '0.0',
             'float' => '0.0',
             'Bool' => 'false',
@@ -232,6 +235,7 @@ final class Blacklist {
             'bytes' => $description,
             'int' => $description,
             'long' => $description,
+            'strlong' => $description,
             'double' => $description,
             'float' => $description,
             'Bool' => $description,
@@ -274,7 +278,7 @@ final class Blacklist {
                 $param['type'] = 'Vector t';
                 $param['subtype'] = 'int';
             }
-            if (\in_array($param['type'], ['int', 'long', 'string', 'bytes'], true)) {
+            if (\in_array($param['type'], ['int', 'long', 'strlong', 'string', 'bytes'], true)) {
                 $param['pow'] = 'optional';
             }
             $param['array'] = isset($param['subtype']);

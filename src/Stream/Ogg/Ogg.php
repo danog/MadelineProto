@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Ogg;
 
-use Amp\Emitter;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedStreamInterface;

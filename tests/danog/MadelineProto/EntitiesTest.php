@@ -28,12 +28,23 @@ class EntitiesTest extends MadelineTestCase
     /**
      * @dataProvider provideEntities
      */
-    public function testEntities(string $mode, string $html, string $bare, array $entities): void
+    public function testEntities(string $mode, string $html, string $bare, array $entities, ?string $htmlReverse = null): void
     {
-        $result = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
-        $result = self::$MadelineProto->MTProtoToBotAPI($result);
+        $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
+        $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
+        $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
         $this->assertEquals($bare, $result['text']);
         $this->assertEquals($entities, $result['entities']);
+        if (\strtolower($mode) === 'html') {
+            $this->assertEquals(
+                \str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
+                StrTools::messageToHtml(
+                    $resultMTProto['message'],
+                    $resultMTProto['entities'],
+                    true
+                ),
+            );
+        }
     }
     public function provideEntities(): array
     {
@@ -135,6 +146,76 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'bold',
                     ],
                 ],
+            ],
+            [
+                'html',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler>',
+                "test\ntest test test test strikethrough underline blockquote https://google.com daniil@daniil.it +39398172758722 @daniilgentili spoiler",
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'bold',
+                    ],
+                    [
+                        'offset' => 5,
+                        'length' => 4,
+                        'type' => 'italic',
+                    ],
+                    [
+                        'offset' => 10,
+                        'length' => 4,
+                        'type' => 'code',
+                    ],
+                    [
+                        'offset' => 15,
+                        'length' => 4,
+                        'language' => 'html',
+                        'type' => 'pre',
+                    ],
+                    [
+                        'offset' => 20,
+                        'length' => 4,
+                        'url' => 'https://example.com/',
+                        'type' => 'text_url',
+                    ],
+                    [
+                        'offset' => 25,
+                        'length' => 13,
+                        'type' => 'strikethrough',
+                    ],
+                    [
+                        'offset' => 39,
+                        'length' => 9,
+                        'type' => 'underline',
+                    ],
+                    [
+                        'offset' => 60,
+                        'length' => 18,
+                        'type' => 'url',
+                    ],
+                    [
+                        'offset' => 79,
+                        'length' => 16,
+                        'type' => 'email',
+                    ],
+                    [
+                        'offset' => 96,
+                        'length' => 15,
+                        'type' => 'phone_number',
+                    ],
+                    [
+                        'offset' => 112,
+                        'length' => 14,
+                        'type' => 'mention',
+                    ],
+                    [
+                        'offset' => 127,
+                        'length' => 7,
+                        'type' => 'spoiler',
+                    ],
+                ],
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> blockquote <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler>'
             ],
             [
                 'markdown',

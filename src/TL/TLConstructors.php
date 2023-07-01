@@ -48,7 +48,7 @@ final class TLConstructors
             $json_dict['layer'] = '';
         }
         $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
-        $this->parseParams($json_dict['id'], $scheme_type === 'mtproto');
+        $this->parseParams($json_dict['id'], $scheme_type === 'mtproto', $json_dict['predicate']);
     }
     public function findByType(string $type)
     {

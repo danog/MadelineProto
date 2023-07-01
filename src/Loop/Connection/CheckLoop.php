@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use danog\Loop\Loop;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use Revolt\EventLoop;
 use Throwable;
 

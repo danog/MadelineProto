@@ -13,7 +13,7 @@ abstract class MadelineTestCase extends TestCase
     /**
      * MadelineProto instance.
      */
-    protected static API $MadelineProto;
+    protected static ?API $MadelineProto = null;
 
     /**
      * Setup MadelineProto instance.
@@ -27,7 +27,7 @@ abstract class MadelineTestCase extends TestCase
             'testing.madeline',
             [
                 'app_info' => [
-                    'api_id' => \getenv('API_ID'),
+                    'api_id' => (int) \getenv('API_ID'),
                     'api_hash' => \getenv('API_HASH'),
                 ],
                 'logger' => [

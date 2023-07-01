@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Http\Client\Request;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;

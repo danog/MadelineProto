@@ -38,8 +38,6 @@ use const LOCK_EX;
 use function Amp\File\exists;
 use function Amp\Ipc\connect;
 
-use function unserialize;
-
 /**
  * Manages serialization of the MadelineProto instance.
  *

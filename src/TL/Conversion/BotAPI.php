@@ -179,6 +179,15 @@ trait BotAPI
                     $newd = \array_merge($newd, $this->MTProtoToBotAPI($data['media']));
                 }
                 return $newd;
+            case 'messageEntityCustomEmoji':
+                $data['type'] = 'custom_emoji';
+                $data['custom_emoji_id'] = $data['document_id'];
+                unset($data['_'], $data['document_id']);
+                return $data;
+            case 'messageEntityPhone':
+                unset($data['_']);
+                $data['type'] = 'phone_number';
+                return $data;
             case 'messageEntityMention':
                 unset($data['_']);
                 $data['type'] = 'mention';

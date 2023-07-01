@@ -64,10 +64,10 @@ final class ExitFailure
             $exception = new RuntimeException($this->message, $this->code, $previous);
         }
 
-        if ($this->tlTrace) {
+        if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {
             $exception->setTLTrace($this->tlTrace);
         }
-        if ($this->localized) {
+        if ($this->localized && \method_exists($exception, 'setLocalization')) {
             $exception->setLocalization($this->localized);
         }
         return $exception;

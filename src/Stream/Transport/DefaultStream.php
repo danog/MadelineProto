@@ -34,7 +34,6 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-use function Amp\Socket\connector;
 use function Amp\Socket\socketConnector;
 
 /**

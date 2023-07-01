@@ -97,7 +97,7 @@ abstract class InternalDoc
         $this->chatlists ??= new \danog\MadelineProto\Namespace\AbstractAPI('chatlists');
         $this->chatlists->setWrapper($this->wrapper);
     }
-/**
+    /**
          * Convert MTProto parameters to bot API parameters.
          *
          * @param array $data Data
@@ -1072,6 +1072,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->hasSecretChat($chat);
     }
     /**
+     * Convert HTML to a message and a set of entities.
+     *
+     * @return DOMEntities Object containing message and entities
+     */
+    public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
+    {
+        return \danog\MadelineProto\StrTools::htmlToMessageEntities($html);
+    }
+    /**
      * Import authorization.
      *
      * @param array<int, string> $authorization Authorization info
@@ -1166,6 +1175,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->loop($callback);
     }
     /**
+     * Convert markdown to a message and a set of entities.
+     *
+     * @return DOMEntities Object containing message and entities
+     */
+    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\DOMEntities
+    {
+        return \danog\MadelineProto\StrTools::markdownToMessageEntities($markdown);
+    }
+    /**
      * Telegram UTF-8 multibyte split.
      *
      * @param string  $text   Text
@@ -1195,6 +1213,15 @@ abstract class InternalDoc
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
+    }
+    /**
+     * Convert a message and a set of entities to HTML.
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like <tg-spoiler>, <tg-emoji>, mention links and so on...
+     */
+    public static function messageEntitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
+    {
+        return \danog\MadelineProto\StrTools::messageEntitiesToHtml($message, $entities, $allowTelegramTags);
     }
     /**
      * Convert double to binary version.
@@ -1753,5 +1780,21 @@ abstract class InternalDoc
     public static function wait(\Generator|\Amp\Future $promise)
     {
         return \danog\MadelineProto\AsyncTools::wait($promise);
+    }
+    /**
+     * Wrap a Message constructor into an abstract Message object.
+     *
+     */
+    public function wrapMessage(array $message): ?\danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->wrapMessage($message);
+    }
+    /**
+     * Wrap an Update constructor into an abstract Update object.
+     *
+     */
+    public function wrapUpdate(array $update): ?\danog\MadelineProto\EventHandler\Update
+    {
+        return $this->wrapper->getAPI()->wrapUpdate($update);
     }
 }

@@ -41,7 +41,7 @@ final class TLMethods
         if (isset($namespace[1])) {
             $this->method_namespace[] = [$namespace[0] => $namespace[1]];
         }
-        $this->parseParams($json_dict['id']);
+        $this->parseParams($json_dict['id'], false, $json_dict['method']);
     }
     public function findById(string $id)
     {
