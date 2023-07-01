@@ -14,7 +14,7 @@ abstract class Update
     protected MTProto|Client|null $API;
 
     /** @internal */
-    public function __construct(
+    protected function __construct(
         MTProto $API,
     ) {
         $this->API = $API;

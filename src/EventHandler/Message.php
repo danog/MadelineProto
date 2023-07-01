@@ -4,7 +4,6 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
-use danog\MadelineProto\TL\Types\Button;
 
 /**
  * Represents an incoming or outgoing message.
@@ -42,10 +41,10 @@ abstract class Message extends Update
     /** Inline or reply keyboard. */
     public readonly ?Keyboard $keyboard;
 
-    // Todo media, albums, reactions, replies, reply_to, fwd_from, incoming/outgoing
+    // Todo media, albums, reactions, replies, reply_to, fwd_from
 
     /** @internal */
-    public function __construct(
+    protected function __construct(
         MTProto $API,
         public readonly array $rawMessage
     ) {

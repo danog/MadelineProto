@@ -27,9 +27,12 @@ use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\ChannelMessage;
-use danog\MadelineProto\EventHandler\Message\GroupMessage;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
+use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
+use danog\MadelineProto\EventHandler\Message\IncomingPrivateMessage;
+use danog\MadelineProto\EventHandler\Message\OutgoingChannelMessage;
+use danog\MadelineProto\EventHandler\Message\OutgoingGroupMessage;
+use danog\MadelineProto\EventHandler\Message\OutgoingPrivateMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -325,9 +328,15 @@ trait UpdateHandler
             return null;
         }
         return match ($this->getType($message)) {
-            MTProto::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message),
-            MTProto::PEER_TYPE_BOT, MTProto::PEER_TYPE_USER => new PrivateMessage($this, $message),
-            MTProto::PEER_TYPE_GROUP, MTProto::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message)
+            MTProto::PEER_TYPE_BOT, MTProto::PEER_TYPE_USER => $message['out']
+                ? new OutgoingPrivateMessage($this, $message)
+                : new IncomingPrivateMessage($this, $message),
+            MTProto::PEER_TYPE_GROUP, MTProto::PEER_TYPE_SUPERGROUP => $message['out']
+                ? new OutgoingGroupMessage($this, $message)
+                : new IncomingGroupMessage($this, $message),
+            MTProto::PEER_TYPE_CHANNEL => $message['out']
+                ? new OutgoingChannelMessage($this, $message)
+                : new IncomingChannelMessage($this, $message),
         };
     }
     /**

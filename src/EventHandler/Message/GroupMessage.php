@@ -8,13 +8,13 @@ use danog\MadelineProto\MTProto;
 /**
  * Represents an incoming or outgoing group message.
  */
-class GroupMessage extends Message
+abstract class GroupMessage extends Message
 {
     /** ID of the sender of the message (equal to the chatId for anonymous admins) */
     public readonly int $senderId;
 
     /** @internal */
-    public function __construct(
+    protected function __construct(
         MTProto $API,
         array $rawMessage
     ) {

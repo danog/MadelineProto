@@ -8,7 +8,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Represents an incoming or outgoing channel message.
  */
-final class ChannelMessage extends Message
+abstract class ChannelMessage extends Message
 {
     /** View counter */
     public readonly int $views;
@@ -16,7 +16,7 @@ final class ChannelMessage extends Message
     public readonly ?string $signature;
 
     /** @internal */
-    public function __construct(
+    protected function __construct(
         MTProto $API,
         array $rawMessage
     ) {
