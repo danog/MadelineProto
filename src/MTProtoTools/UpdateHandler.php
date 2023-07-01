@@ -26,6 +26,11 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -298,6 +303,32 @@ trait UpdateHandler
         $data = $this->methodCallAsyncRead('updates.getState', []);
         $this->getCdnConfig();
         return $data;
+    }
+    /**
+     * Wrap an Update constructor into an abstract Update object.
+     *
+     */
+    public function wrapUpdate(array $update): ?Update
+    {
+        return match ($update['_']) {
+            'updateNewChannelMessage', 'updateNewMessage' => $this->wrapMessage($update['message']),
+            default => null
+        };
+    }
+    /**
+     * Wrap a Message constructor into an abstract Message object.
+     *
+     */
+    public function wrapMessage(array $message): ?Message
+    {
+        if ($message['_'] !== 'message') {
+            return null;
+        }
+        return match ($this->getType($message)) {
+            MTProto::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message),
+            MTProto::PEER_TYPE_BOT, MTProto::PEER_TYPE_USER => new PrivateMessage($this, $message),
+            MTProto::PEER_TYPE_GROUP, MTProto::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message)
+        };
     }
     /**
      * Extract a message ID from an Updates constructor.
