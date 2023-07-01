@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\StrTools;
 
 /**
  * Represents an incoming or outgoing message.
@@ -37,6 +38,8 @@ abstract class Message extends Update
     /** Time-to-live of the message */
     public readonly ?int $ttlPeriod;
 
+    private readonly array $entities;
+
     // Todo media, reactions, parse_mode, replies, reply_to, reply_markup, fwd_from, incoming/outgoing
 
     /** @internal */
@@ -58,5 +61,16 @@ abstract class Message extends Update
         $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
+        $this->entities = $rawMessage['entities'];
+    }
+
+    /**
+     * Get an HTML version of the message.
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     */
+    public function getHTML(bool $allowTelegramTags = false): string
+    {
+        return StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
     }
 }

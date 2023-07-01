@@ -1072,7 +1072,12 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->hasSecretChat($chat);
     }
     /**
-     * Convert HTML to a message and a set of entities.
+     * Manually convert HTML to a message and a set of entities.
+     *
+     * NOTE: You don't have to use this method to send HTML messages.
+     * This method is already called automatically by using parse_mode: "HTML" in messages.sendMessage, messages.sendMedia, et cetera...
+     *
+     * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
      * @return DOMEntities Object containing message and entities
      */
@@ -1175,7 +1180,12 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->loop($callback);
     }
     /**
-     * Convert markdown to a message and a set of entities.
+     * Manually convert markdown to a message and a set of entities.
+     *
+     * NOTE: You don't have to use this method to send Markdown messages.
+     * This method is already called automatically by using parse_mode: "Markdown" in messages.sendMessage, messages.sendMedia, et cetera...
+     *
+     * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
      * @return DOMEntities Object containing message and entities
      */
@@ -1217,7 +1227,7 @@ abstract class InternalDoc
     /**
      * Convert a message and a set of entities to HTML.
      *
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like <tg-spoiler>, <tg-emoji>, mention links and so on...
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function messageEntitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
