@@ -21,7 +21,7 @@ abstract class GroupMessage extends Message
         parent::__construct($API, $rawMessage);
 
         $this->senderId = isset($rawMessage['from_id'])
-            ? $this->API->getId($rawMessage['from_id'])
+            ? $this->API->getIdInternal($rawMessage['from_id'])
             : $this->chatId;
     }
 }

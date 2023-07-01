@@ -22,6 +22,9 @@ abstract class Message extends Update
     /** When was the message sent */
     public readonly int $date;
 
+    /** Info about a forwarded message */
+    public readonly ?ForwardedInfo $fwdInfo;
+
     /** ID of the forum topic where the message was sent */
     public readonly ?int $topicId;
 
@@ -52,7 +55,13 @@ abstract class Message extends Update
     /** Inline or reply keyboard. */
     public readonly ?Keyboard $keyboard;
 
-    // Todo media, albums, reactions, replies, fwd_from
+    /** Whether this message was [imported from a foreign chat service](https://core.telegram.org/api/import) */
+    public readonly bool $imported;
+
+    /** For Public Service Announcement messages, the PSA type */
+    public readonly string $psaType;
+
+    // Todo media, albums, reactions, replies
 
     /** @internal */
     protected function __construct(
@@ -62,6 +71,7 @@ abstract class Message extends Update
         parent::__construct($API);
         $info = $this->API->getInfo($rawMessage);
 
+        $this->entities = $rawMessage['entities'] ?? null;
         $this->id = $rawMessage['id'];
         $this->message = $rawMessage['message'] ?? '';
         $this->chatId = $info['bot_api_id'];
@@ -111,10 +121,32 @@ abstract class Message extends Update
             $this->threadId = null;
             $this->replyToScheduled = false;
         }
+
+        if (isset($rawMessage['fwd_from'])) {
+            $fwdFrom = $rawMessage['fwd_from'];
+            $this->fwdInfo = new ForwardedInfo(
+                $fwdFrom['date'],
+                isset($fwdFrom['from_id'])
+                    ? $this->API->getIdInternal($fwdFrom['from_id'])
+                    : null,
+                $fwdFrom['from_name'] ?? null,
+                $fwdFrom['channel_post'] ?? null,
+                $fwdFrom['post_author'] ?? null,
+                isset($fwdFrom['saved_from_peer'])
+                    ? $this->API->getIdInternal($fwdFrom['saved_from_peer'])
+                    : null,
+                $fwdFrom['saved_from_msg_id'] ?? null
+            );
+            $this->psaType = $fwdFrom['psa_type'] ?? null;
+        } else {
+            $this->fwdInfo = null;
+            $this->psaType = null;
+        }
     }
 
     private readonly string $html;
     private readonly string $htmlTelegram;
+    private readonly ?array $entities;
     /**
      * Get an HTML version of the message.
      *
@@ -122,9 +154,12 @@ abstract class Message extends Update
      */
     public function getHTML(bool $allowTelegramTags = false): string
     {
-        if ($allowTelegramTags) {
-            return $this->htmlTelegram ??= StrTools::messageEntitiesToHtml($this->message, $this->rawMessage['entities'], $allowTelegramTags);
+        if (!$this->entities) {
+            return htmlentities($this->message);
         }
-        return $this->html ??= StrTools::messageEntitiesToHtml($this->message, $this->rawMessage['entities'], $allowTelegramTags);
+        if ($allowTelegramTags) {
+            return $this->htmlTelegram ??= StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
+        }
+        return $this->html ??= StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
     }
 }
