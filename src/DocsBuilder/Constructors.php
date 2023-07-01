@@ -64,6 +64,9 @@ trait Constructors
             }
             $params = '';
             foreach ($data['params'] as $param) {
+                if ($param['type'] === 'strlong') {
+                    $param['type'] = 'long';
+                }
                 if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
@@ -113,6 +116,9 @@ trait Constructors
             $hasreplymarkup = false;
             $hasentities = false;
             foreach ($data['params'] as $param) {
+                if ($param['type'] === 'strlong') {
+                    $param['type'] = 'long';
+                }
                 if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }

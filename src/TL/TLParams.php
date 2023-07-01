@@ -42,7 +42,7 @@ trait TLParams
             $param['type'] = ($mtproto && $param['type'] === 'Message' ? 'MT' : '').$param['type'];
             $param['type'] = $mtproto && $param['type'] === '%Message' ? '%MTMessage' : $param['type'];
 
-            if (\in_array($param['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'ping_id', 'exchange_id'], true)) {
+            if (\in_array($param['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'ping_id', 'exchange_id'], true) && $param['type'] === 'long') {
                 $param['type'] = 'strlong';
             } elseif (\in_array($param['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'], true)) {
                 $param['type'] = 'string';
