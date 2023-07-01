@@ -150,11 +150,11 @@ abstract class StrTools extends Extension
         $final = '';
         $pos = 0;
         foreach ($insertions as $offset => $insertion) {
-            $final .= StrTools::mbSubstr($message, $pos, $offset-$pos);
+            $final .= \htmlspecialchars(StrTools::mbSubstr($message, $pos, $offset-$pos));
             $final .= $insertion;
             $pos = $offset;
         }
-        return \str_replace("\n", "<br>", $final.StrTools::mbSubstr($message, $pos));
+        return \str_replace("\n", "<br>", $final.\htmlspecialchars(StrTools::mbSubstr($message, $pos)));
     }
     /**
      * Convert to camelCase.
