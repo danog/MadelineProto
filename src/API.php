@@ -131,6 +131,27 @@ final class API extends AbstractAPI
      * @var string
      */
     public const PEER_TYPE_CHANNEL = MTProto::PEER_TYPE_CHANNEL;
+    /**
+     * Whether to generate only peer information.
+     */
+    public const INFO_TYPE_PEER = MTProto::INFO_TYPE_PEER;
+    /**
+     * Whether to generate only constructor information.
+     */
+    public const INFO_TYPE_CONSTRUCTOR = MTProto::INFO_TYPE_CONSTRUCTOR;
+    /**
+     * Whether to generate only ID information.
+     */
+    public const INFO_TYPE_ID = MTProto::INFO_TYPE_ID;
+    /**
+     * Whether to generate all information.
+     */
+    public const INFO_TYPE_ALL = MTProto::INFO_TYPE_ALL;
+    /**
+     * Whether to generate all usernames.
+     */
+    public const INFO_TYPE_USERNAMES = MTProto::INFO_TYPE_USERNAMES;
+
     use Start;
     /**
      * Session paths.

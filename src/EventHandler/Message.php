@@ -16,6 +16,8 @@ abstract class Message extends Update
     public readonly string $message;
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
+    /** ID of the peer from where the message was forwarded */
+    public readonly ?int $forwardedFromId;
     /** When was the message sent */
     public readonly int $date;
 
@@ -46,7 +48,7 @@ abstract class Message extends Update
     /** @internal */
     protected function __construct(
         MTProto $API,
-        public readonly array $rawMessage
+        array $rawMessage
     ) {
         parent::__construct($API);
 

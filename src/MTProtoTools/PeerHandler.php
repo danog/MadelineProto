@@ -95,6 +95,14 @@ trait PeerHandler
     }
 
     /**
+     * Check if the specified peer is a forum.
+     *
+     */
+    public function isForum(mixed $peer): bool
+    {
+        return $this->getInfo($peer, MTProto::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+    }
+    /**
      * Add user info.
      *
      * @internal
@@ -564,9 +572,9 @@ trait PeerHandler
      * Get info about peer, returns an Info object.
      *
      * @param mixed                $id        Peer
-     * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
+     * @param \danog\MadelineProto\API::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
-     * @return ($type is MTProto::INFO_TYPE_ALL ? array{
+     * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
      *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
@@ -580,7 +588,7 @@ trait PeerHandler
      *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * } : ($type is MTProto::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
+     * } : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
     public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL): array|int
     {
@@ -697,8 +705,8 @@ trait PeerHandler
     }
     /**
      * @param array $constructor
-     * @param MTProto::INFO_TYPE_* $type
-     * @return ($type is MTProto::INFO_TYPE_ALL ? (array{
+     * @param \danog\MadelineProto\API::INFO_TYPE_* $type
+     * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? (array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
      *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},

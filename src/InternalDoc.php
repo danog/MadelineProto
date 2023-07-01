@@ -1075,6 +1075,7 @@ abstract class InternalDoc
      * Manually convert HTML to a message and a set of entities.
      *
      * NOTE: You don't have to use this method to send HTML messages.
+     *
      * This method is already called automatically by using parse_mode: "HTML" in messages.sendMessage, messages.sendMedia, et cetera...
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
@@ -1126,6 +1127,14 @@ abstract class InternalDoc
     public static function isArrayOrAlike(mixed $var): bool
     {
         return \danog\MadelineProto\Tools::isArrayOrAlike($var);
+    }
+    /**
+     * Check if the specified peer is a forum.
+     *
+     */
+    public function isForum(mixed $peer): bool
+    {
+        return $this->wrapper->getAPI()->isForum($peer);
     }
     /**
      * Whether we're an IPC client instance.
@@ -1183,6 +1192,7 @@ abstract class InternalDoc
      * Manually convert markdown to a message and a set of entities.
      *
      * NOTE: You don't have to use this method to send Markdown messages.
+     *
      * This method is already called automatically by using parse_mode: "Markdown" in messages.sendMessage, messages.sendMedia, et cetera...
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
