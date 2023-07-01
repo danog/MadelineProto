@@ -32,6 +32,8 @@ use JsonSerializable;
  */
 final class Button implements JsonSerializable, ArrayAccess
 {
+    /** Button label */
+    public readonly string $label;
     /**
      * Button data.
      *
@@ -77,6 +79,7 @@ final class Button implements JsonSerializable, ArrayAccess
         } else {
             $this->peer = $message['from_id'];
         }
+        $this->label = $button['text'];
         $this->button = $button;
         $this->id = $message['id'];
         $this->API = $API;

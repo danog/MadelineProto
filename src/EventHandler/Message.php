@@ -4,6 +4,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Types\Button;
 
 /**
  * Represents an incoming or outgoing message.
@@ -38,9 +39,10 @@ abstract class Message extends Update
     /** Time-to-live of the message */
     public readonly ?int $ttlPeriod;
 
-    private readonly array $entities;
+    /** Inline or reply keyboard. */
+    public readonly ?Keyboard $keyboard;
 
-    // Todo media, reactions, parse_mode, replies, reply_to, reply_markup, fwd_from, incoming/outgoing
+    // Todo media, albums, reactions, replies, reply_to, fwd_from, incoming/outgoing
 
     /** @internal */
     public function __construct(
@@ -61,9 +63,14 @@ abstract class Message extends Update
         $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
-        $this->entities = $rawMessage['entities'];
+
+        $this->keyboard = isset($rawMessage['reply_markup'])
+            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
+            : null;
     }
 
+    private readonly string $html;
+    private readonly string $htmlTelegram;
     /**
      * Get an HTML version of the message.
      *
@@ -71,6 +78,9 @@ abstract class Message extends Update
      */
     public function getHTML(bool $allowTelegramTags = false): string
     {
-        return StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
+        if ($allowTelegramTags) {
+            return $this->htmlTelegram ??= StrTools::messageEntitiesToHtml($this->message, $this->rawMessage['entities'], $allowTelegramTags);
+        }
+        return $this->html ??= StrTools::messageEntitiesToHtml($this->message, $this->rawMessage['entities'], $allowTelegramTags);
     }
 }

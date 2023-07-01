@@ -87,6 +87,7 @@ abstract class StrTools extends Extension
      * Manually convert HTML to a message and a set of entities.
      *
      * NOTE: You don't have to use this method to send HTML messages.
+     * 
      * This method is already called automatically by using parse_mode: "HTML" in messages.sendMessage, messages.sendMedia, et cetera...
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
@@ -101,6 +102,7 @@ abstract class StrTools extends Extension
      * Manually convert markdown to a message and a set of entities.
      *
      * NOTE: You don't have to use this method to send Markdown messages.
+     * 
      * This method is already called automatically by using parse_mode: "Markdown" in messages.sendMessage, messages.sendMedia, et cetera...
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
@@ -131,10 +133,10 @@ abstract class StrTools extends Extension
                 'messageEntityStrike' => '<s>',
                 'messageEntityUnderline' => '<u>',
                 'messageEntityBlockquote' => '<blockquote>',
-                'messageEntityUrl' => '<a href="'.self::mbSubstr($message, $offset, $length).'">',
-                'messageEntityEmail' => '<a href="mailto:'.self::mbSubstr($message, $offset, $length).'">',
-                'messageEntityPhone' => '<a href="phone:'.self::mbSubstr($message, $offset, $length).'">',
-                'messageEntityMention' => '<a href="https://t.me/'.self::mbSubstr($message, $offset+1, $length-1).'">',
+                'messageEntityUrl' => '<a href="'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                'messageEntityEmail' => '<a href="mailto:'.htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                'messageEntityPhone' => '<a href="phone:'.htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                'messageEntityMention' => '<a href="https://t.me/'.htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
                 'messageEntitySpoiler' => $allowTelegramTags ? '<tg-spoiler>' : '',
                 'messageEntityCustomEmoji' => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity['document_id'].'">' : '',
                 'messageEntityMentionName' => $allowTelegramTags ? '<a href="tg://user?id='.$entity['user_id'].'">' : '',

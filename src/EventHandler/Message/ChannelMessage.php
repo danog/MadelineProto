@@ -10,7 +10,7 @@ use danog\MadelineProto\MTProto;
  */
 final class ChannelMessage extends Message
 {
-    /** Post view counter */
+    /** View counter */
     public readonly int $views;
     /** Author of the post, if signatures are enabled */
     public readonly ?string $signature;
