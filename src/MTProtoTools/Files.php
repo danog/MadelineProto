@@ -24,6 +24,17 @@ use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
 use Amp\Future;
 use Amp\Http\Client\Request;
+use danog\MadelineProto\EventHandler\Media\Audio;
+use danog\MadelineProto\EventHandler\Media\CustomEmoji;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
+use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
@@ -36,6 +47,7 @@ use danog\MadelineProto\Tools;
 use Generator;
 use Revolt\EventLoop;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use const LOCK_EX;
 use function Amp\async;
@@ -530,6 +542,55 @@ trait Files
         return $info;
     }
     /**
+     * Wrap a media constructor into an abstract Media object.
+     */
+    public function wrapMedia(array $media): Media
+    {
+        if ($media['_'] === 'messageMediaPhoto'){
+            return new Photo($this, $media);
+        }
+        Assert::eq($media['_'], 'messageMediaDocument');
+        $has_video = null;
+        $has_animated = false;
+        foreach ($media['attributes'] as $attr) {
+            $t = $attr['_'];
+            if ($t === 'documentAttributeImageSize') {
+                return new DocumentPhoto($this, $media, $attr);
+            }
+            if ($t === 'documentAttributeAnimated') {
+                $has_animated = true;
+                continue;
+            }
+            if ($t === 'documentAttributeSticker') {
+                return $attr['mask']
+                    ? new MaskSticker($this, $media, $attr)
+                    : new Sticker($this, $media, $attr);
+            }
+            if ($t === 'documentAttributeVideo') {
+                $has_video = $attr;
+                continue;
+            }
+            if ($t === 'documentAttributeAudio') {
+                return $attr['voice']
+                    ? new Voice($this, $media, $attr)
+                    : new Audio($this, $media, $attr);
+            }
+            if ($t === 'documentAttributeCustomEmoji') {
+                return new CustomEmoji($this, $media, $attr);
+            }
+        }
+        if ($has_animated) {
+            Assert::notNull($has_video);
+            return new Gif($this, $media, $has_video);
+        }
+        if ($has_video) {
+            return $attr['round_message']
+                ? new RoundVideo($this, $media, $has_video)
+                : new Video($this, $media, $has_video);
+        }
+        return new Document($this, $media);
+    }
+    /**
      * Get download info of file
      * Returns an array with the following structure:.
      *
@@ -539,6 +600,14 @@ trait Files
      * `$info['size']` - The file size
      *
      * @param mixed $messageMedia File ID
+     * 
+     * @return array{
+     *      ext: string,
+     *      name: string,
+     *      mime: string,
+     *      size: int,
+     *      InputFileLocation: array
+     * }
      */
     public function getDownloadInfo(mixed $messageMedia): array
     {
@@ -637,10 +706,8 @@ trait Files
                 return $this->getDownloadInfo($messageMedia['document']);
                 // Photos
             case 'photo':
+                $messageMedia = ['_' => 'messageMediaPhoto', 'photo' => $messageMedia, 'ttl_seconds' => 0];
             case 'messageMediaPhoto':
-                if ($messageMedia['_'] == 'photo') {
-                    $messageMedia = ['_' => 'messageMediaPhoto', 'photo' => $messageMedia, 'ttl_seconds' => 0];
-                }
                 $res['MessageMedia'] = $messageMedia;
                 $messageMedia = $messageMedia['photo'];
                 $size = Tools::maxSize($messageMedia['sizes']);

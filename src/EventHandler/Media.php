@@ -2,16 +2,22 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\Ipc\IpcCapable;
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a generic media.
  */
-abstract class Media
+abstract class Media extends IpcCapable
 {
     /** Media filesize */
     public readonly int $size;
 
     /** Media file name */
     public readonly string $fileName;
+
+    /** Media file extension */
+    public readonly string $fileExt;
 
     /** Media creation date */
     public readonly bool $creationDate;
@@ -22,27 +28,35 @@ abstract class Media
     /** Time-to-live of media */
     public readonly ?int $ttl;
 
-    /** @var list<Media> Thumbnails */
+    /** @var list<array> Thumbnails */
     public readonly array $thumbs;
 
-    /** @var list<Media> Video thumbnails */
+    /** @var list<array> Video thumbnails */
     public readonly array $videoThumbs;
 
     /** Whether the media should be hidden behind a spoiler */
     public readonly bool $spoiler;
 
-    /** If true, the current media has attached mask stickers. */
-    public readonly bool $hasStickers;
+    /** Media location */
+    private readonly array $location;
 
-    /** Media ID */
-    private readonly int $documentId;
+    /** @internal */
+    public function __construct(
+        MTProto $API,
+        array $rawMedia,
+    ) {
+        parent::__construct($API);
+        [
+            'name' => $name,
+            'ext' => $this->fileExt,
+            'mime' => $this->mimeType,
+            'size' => $this->size,
+            'InputFileLocation' => $this->location
+        ] = $API->getDownloadInfo($rawMedia);
+        $this->fileName = "$name.".$this->fileExt;
 
-    /** Media access hash */
-    private readonly int $documentAccessHash;
-
-    /** Media file reference */
-    private readonly int $fileReference;
-
-    /** DC ID */
-    private readonly int $dcId;
+        $this->creationDate = $rawMedia['date'];
+        $this->ttl = $rawMedia['ttl_seconds'] ?? null;
+        $this->spoiler = $rawMedia['spoiler'] ?? false;
+    }
 }

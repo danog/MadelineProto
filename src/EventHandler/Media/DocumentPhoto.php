@@ -5,19 +5,16 @@ namespace danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media;
 
 /**
- * Represents a generic video.
+ * Represents a photo uploaded as a document.
  */
-abstract class AbstractVideo extends Media
+final class DocumentPhoto extends Media
 {
-    /** Video duration in seconds */
-    public readonly int $duration;
-    /** Whether the video supports streaming */
-    public readonly bool $supportsStreaming;
-    /** Video width */
-    public readonly int $width;
-    /** Video height */
-    public readonly int $height;
+    /** If true; the current media has attached mask stickers. */
+    public readonly bool $hasStickers;
 
+    public readonly int $width;
+    public readonly int $height;
+    
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -26,9 +23,15 @@ abstract class AbstractVideo extends Media
     ) {
     {
         parent::__construct($API, $rawMedia);
-        $this->duration = $attribute['duration'];
-        $this->supportsStreaming = $attribute['supports_streaming'];
         $this->width = $attribute['w'];
         $this->height = $attribute['h'];
+        $hasStickers = false;
+        foreach ($rawMedia['attributes'] as ['_' => $t]) {
+            if ($t === 'documentAttributeHasStickers') {
+                $hasStickers = true;
+                break;
+            }
+        }
+        $this->hasStickers = $hasStickers;
     }
 }

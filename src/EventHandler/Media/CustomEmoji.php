@@ -11,4 +11,16 @@ final class CustomEmoji extends AbstractSticker
     public readonly bool $free;
     /** Whether the color of this TGS custom emoji should be changed to the text color when used in messages, the accent color if used as emoji status, white on chat photos, or another appropriate color based on context. */
     public readonly bool $textColor;
+
+    /** @internal */
+    public function __construct(
+        MTProto $API,
+        array $rawMedia,
+        array $stickerAttribute
+    ) {
+    {
+        parent::__construct($API, $rawMedia, $stickerAttribute);
+        $this->free = $stickerAttribute['free'];
+        $this->textColor = $stickerAttribute['text_color'];
+    }
 }

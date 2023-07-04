@@ -32,6 +32,9 @@ abstract class Message extends Update
     /** ID of the message thread where the message was sent */
     public readonly ?int $threadId;
 
+    /** Attached media */
+    public readonly ?Media $media;
+
     /** Whether this is a reply to a scheduled message */
     public readonly bool $replyToScheduled;
     /** Whether we were mentioned in this message */
@@ -65,7 +68,7 @@ abstract class Message extends Update
     // Todo media, albums, reactions, replies
 
     /** @internal */
-    protected function __construct(
+    public function __construct(
         MTProto $API,
         array $rawMessage,
         /** Whether the message is outgoing */

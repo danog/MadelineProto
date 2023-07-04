@@ -565,7 +565,7 @@ trait PeerHandler
      */
     public function getType(mixed $id): string
     {
-        return $this->getInfo($id)['type'];
+        return $this->getInfo($id, API::INFO_TYPE_TYPE);
     }
 
     /**
@@ -588,7 +588,7 @@ trait PeerHandler
      *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * } : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
+     * } : ($type is API::INFO_TYPE_TYPE ? string : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool})))
      */
     public function getInfo(mixed $id, int $type = \danog\MadelineProto\API::INFO_TYPE_ALL): array|int
     {
@@ -752,6 +752,17 @@ trait PeerHandler
             }
             if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
                 return -$constructor['id'];
+            }
+        }
+        if ($type === \danog\MadelineProto\API::INFO_TYPE_TYPE) {
+            if ($constructor['_'] === 'user') {
+                return $constructor['bot'] ?? false ? 'bot' : 'user';
+            }
+            if ($constructor['_'] === 'channel') {
+                return $constructor['megagroup'] ?? false ? 'supergroup' : 'channel';
+            }
+            if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
+                return 'chat';
             }
         }
         if ($type === \danog\MadelineProto\API::INFO_TYPE_USERNAMES) {

@@ -26,6 +26,7 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
 use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
@@ -309,7 +310,6 @@ trait UpdateHandler
     }
     /**
      * Wrap an Update constructor into an abstract Update object.
-     *
      */
     public function wrapUpdate(array $update): ?Update
     {
@@ -320,7 +320,6 @@ trait UpdateHandler
     }
     /**
      * Wrap a Message constructor into an abstract Message object.
-     *
      */
     public function wrapMessage(array $message): ?Message
     {
