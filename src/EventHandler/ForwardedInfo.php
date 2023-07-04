@@ -2,11 +2,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use AssertionError;
-use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
-use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
-use danog\MadelineProto\TL\Types\Button;
-
 /**
  * Info about a forwarded message.
  */
@@ -28,8 +23,6 @@ final class ForwardedInfo
         public readonly ?int $savedFromId,
         /** Only for messages forwarded to Saved Messages, ID of the message that was forwarded from the original user/channel */
         public readonly ?int $savedFromMsgId,
-    )
-    {
-        
+    ) {
     }
 }

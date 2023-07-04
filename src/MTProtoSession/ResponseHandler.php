@@ -76,7 +76,7 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
+                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
                         $this->API->updaters[UpdateLoop::GENERIC]->resume();
                     }
                     break;
@@ -340,7 +340,7 @@ trait ResponseHandler
                         return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
-                        if ($this->API->authorized !== MTProto::LOGGED_IN) {
+                        if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
                             EventLoop::queue(function () use ($request, $response): void {
                                 $this->API->initAuthorization();
@@ -352,7 +352,7 @@ trait ResponseHandler
                         $this->shared->setTempAuthKey(null);
                         $this->shared->setPermAuthKey(null);
                         $this->logger->logger("Auth key not registered in DC {$this->datacenter} with RPC error {$response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
-                        if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
+                        if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN) {
                             $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
                             $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);

@@ -9,14 +9,11 @@ use danog\MadelineProto\MTProto;
  */
 final class OutgoingGroupMessage extends GroupMessage implements Outgoing
 {
-    public readonly bool $out;
-
     /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage
     ) {
-        parent::__construct($API, $rawMessage);
-        $this->out = true;
+        parent::__construct($API, $rawMessage, true);
     }
 }

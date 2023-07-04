@@ -18,9 +18,10 @@ abstract class ChannelMessage extends Message
     /** @internal */
     protected function __construct(
         MTProto $API,
-        array $rawMessage
+        array $rawMessage,
+        bool $out
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $out);
 
         $this->views = $rawMessage['views'];
         $this->signature = $rawMessage['post_author'] ?? null;

@@ -52,105 +52,110 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = MTProto::RELEASE;
-    /**
-     * We're not logged in.
-     *
-     * @var int
-     */
-    public const NOT_LOGGED_IN = MTProto::NOT_LOGGED_IN;
-    /**
-     * We're waiting for the login code.
-     *
-     * @var int
-     */
-    public const WAITING_CODE = MTProto::WAITING_CODE;
-    /**
-     * We're waiting for parameters to sign up.
-     *
-     * @var int
-     */
-    public const WAITING_SIGNUP = MTProto::WAITING_SIGNUP;
-    /**
-     * We're waiting for the 2FA password.
-     *
-     * @var int
-     */
-    public const WAITING_PASSWORD = MTProto::WAITING_PASSWORD;
-    /**
-     * We're logged in.
-     *
-     * @var int
-     */
-    public const LOGGED_IN = MTProto::LOGGED_IN;
+    public const RELEASE = '8.0.0-beta99';
     /**
      * Secret chat was not found.
      *
      * @var int
      */
-    public const SECRET_EMPTY = MTProto::SECRET_EMPTY;
+    public const SECRET_EMPTY = 0;
     /**
      * Secret chat was requested.
      *
      * @var int
      */
-    public const SECRET_REQUESTED = MTProto::SECRET_REQUESTED;
+    public const SECRET_REQUESTED = 1;
     /**
      * Secret chat was found.
      *
      * @var int
      */
-    public const SECRET_READY = MTProto::SECRET_READY;
+    public const SECRET_READY = 2;
+
+    /**
+     * We're not logged in.
+     *
+     * @var int
+     */
+    public const NOT_LOGGED_IN = 0;
+    /**
+     * We're waiting for the login code.
+     *
+     * @var int
+     */
+    public const WAITING_CODE = 1;
+    /**
+     * We're waiting for parameters to sign up.
+     *
+     * @var int
+     */
+    public const WAITING_SIGNUP = -1;
+    /**
+     * We're waiting for the 2FA password.
+     *
+     * @var int
+     */
+    public const WAITING_PASSWORD = 2;
+    /**
+     * We're logged in.
+     *
+     * @var int
+     */
+    public const LOGGED_IN = 3;
     /**
      * This peer is a user.
      *
      * @var string
      */
-    public const PEER_TYPE_USER = MTProto::PEER_TYPE_USER;
+    public const PEER_TYPE_USER = 'user';
     /**
      * This peer is a bot.
      *
      * @var string
      */
-    public const PEER_TYPE_BOT = MTProto::PEER_TYPE_BOT;
+    public const PEER_TYPE_BOT = 'bot';
     /**
      * This peer is a normal group.
      *
      * @var string
      */
-    public const PEER_TYPE_GROUP = MTProto::PEER_TYPE_GROUP;
+    public const PEER_TYPE_GROUP = 'chat';
     /**
      * This peer is a supergroup.
      *
      * @var string
      */
-    public const PEER_TYPE_SUPERGROUP = MTProto::PEER_TYPE_SUPERGROUP;
+    public const PEER_TYPE_SUPERGROUP = 'supergroup';
     /**
      * This peer is a channel.
      *
      * @var string
      */
-    public const PEER_TYPE_CHANNEL = MTProto::PEER_TYPE_CHANNEL;
+    public const PEER_TYPE_CHANNEL = 'channel';
     /**
      * Whether to generate only peer information.
      */
-    public const INFO_TYPE_PEER = MTProto::INFO_TYPE_PEER;
+    public const INFO_TYPE_PEER = 0;
     /**
      * Whether to generate only constructor information.
      */
-    public const INFO_TYPE_CONSTRUCTOR = MTProto::INFO_TYPE_CONSTRUCTOR;
+    public const INFO_TYPE_CONSTRUCTOR = 1;
     /**
      * Whether to generate only ID information.
      */
-    public const INFO_TYPE_ID = MTProto::INFO_TYPE_ID;
+    public const INFO_TYPE_ID = 2;
     /**
      * Whether to generate all information.
      */
-    public const INFO_TYPE_ALL = MTProto::INFO_TYPE_ALL;
+    public const INFO_TYPE_ALL = 3;
     /**
      * Whether to generate all usernames.
      */
-    public const INFO_TYPE_USERNAMES = MTProto::INFO_TYPE_USERNAMES;
+    public const INFO_TYPE_USERNAMES = 4;
+    /**
+     * Whether to generate just type info.
+     */
+    public const INFO_TYPE_TYPE = 5;
 
     use Start;
     /**
@@ -420,7 +425,7 @@ final class API extends AbstractAPI
 
         $prev = EventLoop::getErrorHandler();
         EventLoop::setErrorHandler(
-            $cb = function (\Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
+            $cb = function (Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
                 if ($e instanceof UnhandledFutureError) {
                     $e = $e->getPrevious();
                 }

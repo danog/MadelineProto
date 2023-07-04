@@ -12,6 +12,7 @@ use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
+use Amp\File\Whence;
 use Amp\Http\HttpStatus;
 use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
@@ -32,7 +33,6 @@ use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 
 use const FILTER_VALIDATE_URL;
-use const SEEK_END;
 
 use function Amp\async;
 use function Amp\File\exists;
@@ -343,7 +343,7 @@ trait FilesLogic
             $seekable = false;
         }
         if (!$size && $seekable && \method_exists($stream, 'tell')) {
-            $stream->seek(0, SEEK_END);
+            $stream->seek(0, Whence::End);
             $size = $stream->tell();
             $stream->seek(0);
         } elseif (!$size) {

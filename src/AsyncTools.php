@@ -51,7 +51,7 @@ abstract class AsyncTools extends StrTools
     /**
      * Rethrow exception into event loop.
      */
-    public static function rethrow(\Throwable $e): void
+    public static function rethrow(Throwable $e): void
     {
         EventLoop::queue(fn () => throw $e);
     }

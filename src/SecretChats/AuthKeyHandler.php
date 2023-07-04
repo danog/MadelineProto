@@ -23,7 +23,6 @@ namespace danog\MadelineProto\SecretChats;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
@@ -298,17 +297,17 @@ trait AuthKeyHandler
      * Get secret chat status.
      *
      * @param int $chat Chat ID
-     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
+     * @return int One of \danog\MadelineProto\API::SECRET_EMPTY, \danog\MadelineProto\API::SECRET_REQUESTED, \danog\MadelineProto\API::SECRET_READY
      */
     public function secretChatStatus(int $chat): int
     {
         if (isset($this->secret_chats[$chat])) {
-            return MTProto::SECRET_READY;
+            return \danog\MadelineProto\API::SECRET_READY;
         }
         if (isset($this->temp_requested_secret_chats[$chat])) {
-            return MTProto::SECRET_REQUESTED;
+            return \danog\MadelineProto\API::SECRET_REQUESTED;
         }
-        return MTProto::SECRET_EMPTY;
+        return \danog\MadelineProto\API::SECRET_EMPTY;
     }
     /**
      * Get secret chat.

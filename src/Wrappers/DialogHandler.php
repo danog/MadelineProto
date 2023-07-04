@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Wrappers;
 use Amp\Sync\LocalMutex;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -154,7 +153,7 @@ trait DialogHandler
             $res = [];
             foreach ($this->chats as $chat) {
                 try {
-                    $res[] = $this->genAll($chat, null, MTProto::INFO_TYPE_ALL)['Peer'];
+                    $res[] = $this->genAll($chat, null, \danog\MadelineProto\API::INFO_TYPE_ALL)['Peer'];
                 } catch (Throwable $e) {
                     continue;
                 }

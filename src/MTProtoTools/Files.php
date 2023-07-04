@@ -27,7 +27,6 @@ use Amp\Http\Client\Request;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
@@ -505,7 +504,7 @@ trait Files
      */
     public function getPropicInfo($data): array
     {
-        return $this->getDownloadInfo($this->chats[$this->getInfo($data, MTProto::INFO_TYPE_ID)]);
+        return $this->getDownloadInfo($this->chats[$this->getInfo($data, \danog\MadelineProto\API::INFO_TYPE_ID)]);
     }
     /**
      * Extract file info from bot API message.
@@ -680,9 +679,9 @@ trait Files
                 if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
                     // bot API file ID
                     $messageMedia['min'] = false;
-                    $peer = $this->genAll($messageMedia, null, MTProto::INFO_TYPE_PEER);
+                    $peer = $this->genAll($messageMedia, null, \danog\MadelineProto\API::INFO_TYPE_PEER);
                 } else {
-                    $peer = $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
+                    $peer = $this->getInfo($messageMedia, \danog\MadelineProto\API::INFO_TYPE_PEER);
                 }
                 $res['InputFileLocation'] = [
                     '_' => 'inputPeerPhotoFileLocation',

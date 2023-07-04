@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\MTProto;
@@ -68,7 +67,9 @@ abstract class Message extends Update
     /** @internal */
     protected function __construct(
         MTProto $API,
-        array $rawMessage
+        array $rawMessage,
+        /** Whether the message is outgoing */
+        public readonly bool $out
     ) {
         parent::__construct($API);
         $info = $this->API->getInfo($rawMessage);
@@ -157,7 +158,7 @@ abstract class Message extends Update
     public function getHTML(bool $allowTelegramTags = false): string
     {
         if (!$this->entities) {
-            return htmlentities($this->message);
+            return \htmlentities($this->message);
         }
         if ($allowTelegramTags) {
             return $this->htmlTelegram ??= StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);

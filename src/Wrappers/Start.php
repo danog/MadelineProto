@@ -23,10 +23,10 @@ namespace danog\MadelineProto\Wrappers;
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
 use Amp\TimeoutCancellation;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
@@ -51,11 +51,11 @@ trait Start
      */
     public function start()
     {
-        if ($this->getAuthorization() === MTProto::LOGGED_IN) {
+        if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
+            if ($this->getAuthorization() === API::NOT_LOGGED_IN) {
                 $stdout = getStdout();
                 do {
                     /** @var ?LoginQrCode */
@@ -77,7 +77,7 @@ trait Start
                     } catch (CancelledException) {
                         if ($login->isRequested()) {
                             $stdout->write(PHP_EOL.PHP_EOL.Lang::$current_lang['loginQrCodeSuccessful'].PHP_EOL);
-                            if ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
+                            if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
                                 $this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
                             }
                             $this->serialize();
@@ -93,19 +93,19 @@ trait Start
                     $this->phoneLogin($result);
                 }
             }
-            if ($this->getAuthorization() === MTProto::WAITING_CODE) {
+            if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_CODE) {
                 $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode']));
             }
-            if ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
+            if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
                 $this->complete2faLogin(Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
             }
-            if ($this->getAuthorization() === MTProto::WAITING_SIGNUP) {
+            if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
                 $this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName']));
             }
             $this->serialize();
             return $this->fullGetSelf();
         }
-        if ($this->getAuthorization() === MTProto::NOT_LOGGED_IN) {
+        if ($this->getAuthorization() === API::NOT_LOGGED_IN) {
             if (isset($_POST['phone_number'])) {
                 $this->webPhoneLogin();
             } elseif (isset($_POST['token'])) {
@@ -113,26 +113,26 @@ trait Start
             } else {
                 $this->webEcho();
             }
-        } elseif ($this->getAuthorization() === MTProto::WAITING_CODE) {
+        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_CODE) {
             if (isset($_POST['phone_code'])) {
                 $this->webCompletePhoneLogin();
             } else {
                 $this->webEcho(Lang::$current_lang['loginNoCode']);
             }
-        } elseif ($this->getAuthorization() === MTProto::WAITING_PASSWORD) {
+        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
                 $this->webComplete2faLogin();
             } else {
                 $this->webEcho(Lang::$current_lang['loginUserPassWeb']);
             }
-        } elseif ($this->getAuthorization() === MTProto::WAITING_SIGNUP) {
+        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
                 $this->webCompleteSignup();
             } else {
                 $this->webEcho(Lang::$current_lang['loginNoName']);
             }
         }
-        if ($this->getAuthorization() === MTProto::LOGGED_IN) {
+        if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
             $this->serialize();
             return $this->fullGetSelf();
         }
@@ -204,7 +204,7 @@ trait Start
         $auth = $this->getAuthorization();
         $form = null;
         $trailer = '';
-        if ($auth === MTProto::NOT_LOGGED_IN) {
+        if ($auth === API::NOT_LOGGED_IN) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'phone') {
                     $title = \str_replace(':', '', Lang::$current_lang['loginUser']);
@@ -269,18 +269,18 @@ trait Start
                 </script>';
                 $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
             }
-        } elseif ($auth === MTProto::WAITING_CODE) {
+        } elseif ($auth === \danog\MadelineProto\API::WAITING_CODE) {
             $title = \str_replace(':', '', Lang::$current_lang['loginUserCode']);
             $phone = \htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
             $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
-        } elseif ($auth === MTProto::WAITING_PASSWORD) {
+        } elseif ($auth === \danog\MadelineProto\API::WAITING_PASSWORD) {
             $title = Lang::$current_lang['loginUserPassWeb'];
             $hint = \htmlentities(\sprintf(
                 Lang::$current_lang['loginUserPassHint'],
                 $this->getHint(),
             ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
-        } elseif ($auth === MTProto::WAITING_SIGNUP) {
+        } elseif ($auth === \danog\MadelineProto\API::WAITING_SIGNUP) {
             $title = Lang::$current_lang['signupWeb'];
             $firstName = Lang::$current_lang['signupFirstNameWeb'];
             $lastName = Lang::$current_lang['signupLastNameWeb'];

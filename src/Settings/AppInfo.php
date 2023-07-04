@@ -74,7 +74,7 @@ final class AppInfo extends SettingsAbstract
             $this->setLangCode(\explode('_', $_SERVER['LANG'])[0]);
         }
         $this->init();
-        $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
+        $this->appVersion = \danog\MadelineProto\API::RELEASE.' ('.MTProto::V.', '.Magic::$version.')';
     }
     public function __wakeup(): void
     {

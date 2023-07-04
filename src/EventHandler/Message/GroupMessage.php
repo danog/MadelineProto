@@ -16,9 +16,10 @@ abstract class GroupMessage extends Message
     /** @internal */
     protected function __construct(
         MTProto $API,
-        array $rawMessage
+        array $rawMessage,
+        bool $outgoing
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $outgoing);
 
         $this->senderId = isset($rawMessage['from_id'])
             ? $this->API->getIdInternal($rawMessage['from_id'])

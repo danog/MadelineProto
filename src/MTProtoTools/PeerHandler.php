@@ -100,7 +100,7 @@ trait PeerHandler
      */
     public function isForum(mixed $peer): bool
     {
-        return $this->getInfo($peer, MTProto::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+        return $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
     }
     /**
      * Add user info.
@@ -381,7 +381,7 @@ trait PeerHandler
      */
     public function getId(mixed $id): int
     {
-        return $this->getInfo($id, MTProto::INFO_TYPE_ID);
+        return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_ID);
     }
 
     /**
@@ -541,7 +541,7 @@ trait PeerHandler
      */
     public function getInputPeer(mixed $id)
     {
-        return $this->getInfo($id, MTProto::INFO_TYPE_PEER);
+        return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_PEER);
     }
     /**
      * Get InputUser/InputChannel object.
@@ -551,7 +551,7 @@ trait PeerHandler
      */
     public function getInputConstructor(mixed $id)
     {
-        return $this->getInfo($id, MTProto::INFO_TYPE_CONSTRUCTOR);
+        return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR);
     }
 
     public array $caching_full_info = [];
@@ -590,7 +590,7 @@ trait PeerHandler
      *      type: string
      * } : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
      */
-    public function getInfo(mixed $id, int $type = MTProto::INFO_TYPE_ALL): array|int
+    public function getInfo(mixed $id, int $type = \danog\MadelineProto\API::INFO_TYPE_ALL): array|int
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -654,9 +654,9 @@ trait PeerHandler
                 $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                 try {
                     if ($id < 0) {
-                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($chat, $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($chat, $folder_id, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
                     } else {
-                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($chat, $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($chat, $folder_id, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
                     }
                 } catch (Exception $e) {
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
@@ -724,7 +724,7 @@ trait PeerHandler
      */
     private function genAll($constructor, $folder_id, int $type): array|int
     {
-        if ($type === MTProto::INFO_TYPE_CONSTRUCTOR) {
+        if ($type === \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR) {
             if ($constructor['_'] === 'user') {
                 return ($constructor['self'] ?? false) ? ['_' => 'inputUserSelf'] : ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
@@ -732,7 +732,7 @@ trait PeerHandler
                 return ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
         }
-        if ($type === MTProto::INFO_TYPE_PEER) {
+        if ($type === \danog\MadelineProto\API::INFO_TYPE_PEER) {
             if ($constructor['_'] === 'user') {
                 return ($constructor['self'] ?? false) ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
@@ -743,7 +743,7 @@ trait PeerHandler
                 return ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
             }
         }
-        if ($type === MTProto::INFO_TYPE_ID) {
+        if ($type === \danog\MadelineProto\API::INFO_TYPE_ID) {
             if ($constructor['_'] === 'user') {
                 return $constructor['id'];
             }
@@ -754,7 +754,7 @@ trait PeerHandler
                 return -$constructor['id'];
             }
         }
-        if ($type === MTProto::INFO_TYPE_USERNAMES) {
+        if ($type === \danog\MadelineProto\API::INFO_TYPE_USERNAMES) {
             return $this->getUsernames($constructor);
         }
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];

@@ -327,18 +327,18 @@ trait UpdateHandler
         if ($message['_'] !== 'message') {
             return null;
         }
-        $info = $this->getInfo($message, MTProto::INFO_TYPE_CONSTRUCTOR);
-        if (strtolower($info['username'] ?? '') === 'replies') {
+        $id = $this->getIdInternal($message);
+        if (($this->chats[$id]['username'] ?? '') === 'replies') {
             return null;
         }
-        return match ($info['type']) {
-            MTProto::PEER_TYPE_BOT, MTProto::PEER_TYPE_USER => $message['out']
+        return match ($this->getType($id)) {
+            \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
                 ? new OutgoingPrivateMessage($this, $message)
                 : new IncomingPrivateMessage($this, $message),
-            MTProto::PEER_TYPE_GROUP, MTProto::PEER_TYPE_SUPERGROUP => $message['out']
+            \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
                 ? new OutgoingGroupMessage($this, $message)
                 : new IncomingGroupMessage($this, $message),
-            MTProto::PEER_TYPE_CHANNEL => $message['out']
+            \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
                 ? new OutgoingChannelMessage($this, $message)
                 : new IncomingChannelMessage($this, $message),
         };
@@ -390,7 +390,7 @@ trait UpdateHandler
             case 'updateShort':
                 return [$updates['update']];
             case 'updateShortSentMessage':
-                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], \danog\MadelineProto\API::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -400,8 +400,8 @@ trait UpdateHandler
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = $this->getInfo($from_id, MTProto::INFO_TYPE_PEER);
-                $message['peer_id'] = $this->getInfo($to_id, MTProto::INFO_TYPE_PEER);
+                $message['from_id'] = $this->getInfo($from_id, \danog\MadelineProto\API::INFO_TYPE_PEER);
+                $message['peer_id'] = $this->getInfo($to_id, \danog\MadelineProto\API::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
             default:
@@ -466,7 +466,7 @@ trait UpdateHandler
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], \danog\MadelineProto\API::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -511,7 +511,7 @@ trait UpdateHandler
      */
     public function subscribeToUpdates(mixed $channel): bool
     {
-        $channelId = $this->getInfo($channel, MTProto::INFO_TYPE_ID);
+        $channelId = $this->getInfo($channel, \danog\MadelineProto\API::INFO_TYPE_ID);
         if (!MTProto::isSupergroup($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
@@ -569,7 +569,7 @@ trait UpdateHandler
                     if (!isset($this->authorization['hint'])) {
                         $this->authorization['hint'] = '';
                     }
-                    $this->authorized = MTProto::WAITING_PASSWORD;
+                    $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
                     $this->qrLoginDeferred?->cancel();
                     $this->qrLoginDeferred = null;
                     return;

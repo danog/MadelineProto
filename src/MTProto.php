@@ -115,72 +115,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     const V = 168;
     /**
-     * Release version.
-     *
-     * @var string
-     */
-    public const RELEASE = '8.0.0-beta99';
-    /**
-     * We're not logged in.
-     *
-     * @var int
-     */
-    public const NOT_LOGGED_IN = 0;
-    /**
-     * We're waiting for the login code.
-     *
-     * @var int
-     */
-    public const WAITING_CODE = 1;
-    /**
-     * We're waiting for parameters to sign up.
-     *
-     * @var int
-     */
-    public const WAITING_SIGNUP = -1;
-    /**
-     * We're waiting for the 2FA password.
-     *
-     * @var int
-     */
-    public const WAITING_PASSWORD = 2;
-    /**
-     * We're logged in.
-     *
-     * @var int
-     */
-    public const LOGGED_IN = 3;
-    /**
-     * This peer is a user.
-     *
-     * @var string
-     */
-    public const PEER_TYPE_USER = 'user';
-    /**
-     * This peer is a bot.
-     *
-     * @var string
-     */
-    public const PEER_TYPE_BOT = 'bot';
-    /**
-     * This peer is a normal group.
-     *
-     * @var string
-     */
-    public const PEER_TYPE_GROUP = 'chat';
-    /**
-     * This peer is a supergroup.
-     *
-     * @var string
-     */
-    public const PEER_TYPE_SUPERGROUP = 'supergroup';
-    /**
-     * This peer is a channel.
-     *
-     * @var string
-     */
-    public const PEER_TYPE_CHANNEL = 'channel';
-    /**
      * Bad message error codes.
      *
      * @internal
@@ -195,24 +129,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
     /**
-     * Secret chat was not found.
-     *
-     * @var int
-     */
-    const SECRET_EMPTY = 0;
-    /**
-     * Secret chat was requested.
-     *
-     * @var int
-     */
-    const SECRET_REQUESTED = 1;
-    /**
-     * Secret chat was found.
-     *
-     * @var int
-     */
-    const SECRET_READY = 2;
-    /**
      * @internal
      */
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['peer_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
@@ -224,26 +140,6 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      */
     const TD_IGNORE = ['updateMessageID'];
-    /**
-     * Whether to generate only peer information.
-     */
-    const INFO_TYPE_PEER = 0;
-    /**
-     * Whether to generate only constructor information.
-     */
-    const INFO_TYPE_CONSTRUCTOR = 1;
-    /**
-     * Whether to generate only ID information.
-     */
-    const INFO_TYPE_ID = 2;
-    /**
-     * Whether to generate all information.
-     */
-    const INFO_TYPE_ALL = 3;
-    /**
-     * Whether to generate all usernames.
-     */
-    const INFO_TYPE_USERNAMES = 4;
     /**
      * @internal
      */
@@ -290,9 +186,9 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Whether we're authorized.
      *
-     * @var self::NOT_LOGGED_IN|self::WAITING_*|self::LOGGED_IN
+     * @var API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN
      */
-    public int $authorized = self::NOT_LOGGED_IN;
+    public int $authorized = API::NOT_LOGGED_IN;
     /**
      * Main authorized DC ID.
      *
@@ -1035,7 +931,7 @@ final class MTProto implements TLCallback, LoggerGetter
 
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-            if ($this->authorized === self::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
+            if ($this->authorized === API::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
                 $socket->bind();
                 $socket->authorized(true);
             }
@@ -1127,7 +1023,7 @@ final class MTProto implements TLCallback, LoggerGetter
         // Connect to all DCs, start internal loops
         $this->connectToAllDcs();
         if ($this->fullGetSelf()) {
-            $this->authorized = self::LOGGED_IN;
+            $this->authorized = API::LOGGED_IN;
             $this->setupLogger();
             $this->startLoops();
             $this->getCdnConfig();
@@ -1140,10 +1036,10 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->setEventHandler($this->event_handler);
         }
         $this->startUpdateSystem(true);
-        if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
+        if ($this->authorized === API::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
             $this->getFullDialogsInternal(false);
         }
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === API::LOGGED_IN) {
             $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
             $this->updaters[UpdateLoop::GENERIC]->resume();
         }
@@ -1519,7 +1415,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function getPhoneConfig(mixed $watcherId = null): void
     {
-        if ($this->authorized === self::LOGGED_IN
+        if ($this->authorized === API::LOGGED_IN
             && \class_exists(VoIPServerConfigInternal::class)
             && !$this->authorization['user']['bot']
             && $this->datacenter->getDataCenterConnection($this->authorized_dc)->hasTempAuthKey()) {
@@ -1658,7 +1554,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function getHint(): string
     {
-        if ($this->authorized !== self::WAITING_PASSWORD) {
+        if ($this->authorized !== API::WAITING_PASSWORD) {
             throw new Exception('Not waiting for the password!');
         }
         Assert::string($this->authorization['hint']);
