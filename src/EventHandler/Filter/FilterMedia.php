@@ -2,18 +2,16 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that always returns the specified boolean.
+ * Filter any media messages.
  */
-final class FilterConstant extends Filter
+final class FilterMedia extends Filter
 {
-    public function __construct(private readonly bool $result)
-    {
-    }
     public function apply(Update $update): bool
     {
-        return $this->result;
+        return $update instanceof Message && $update->media !== null;
     }
 }

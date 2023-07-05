@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace danog\MadelineProto\EventHandler\Filter;
+namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 
+use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
@@ -11,7 +12,7 @@ use Webmozart\Assert\Assert;
 final class FiltersOr extends Filter
 {
     /** @var array<Filter> */
-    public readonly array $filters;
+    private readonly array $filters;
     public function __construct(Filter ...$filters)
     {
         Assert::notEmpty($filters);

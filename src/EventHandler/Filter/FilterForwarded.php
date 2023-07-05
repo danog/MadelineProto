@@ -2,18 +2,16 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that always returns the specified boolean.
+ * Filter only forwarded messages.
  */
-final class FilterConstant extends Filter
+final class FilterForwarded extends Filter
 {
-    public function __construct(private readonly bool $result)
-    {
-    }
     public function apply(Update $update): bool
     {
-        return $this->result;
+        return $update instanceof Message && $update->fwdInfo !== null;
     }
 }

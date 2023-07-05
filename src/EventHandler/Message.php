@@ -42,6 +42,18 @@ abstract class Message extends Update
     /** ID of the message thread where the message was sent */
     public readonly ?int $threadId;
 
+    /** Bot command (if present) */
+    public readonly ?string $command;
+    /** @var list<string> Bot command arguments (if present) */
+    public readonly ?array $commandArgs;
+
+    /**
+     * @readonly
+     *
+     * @var list<string> Regex matches, if a filter regex is present
+     */
+    public ?array $matches = null;
+
     /**
      * Attached media.
      *
@@ -79,7 +91,7 @@ abstract class Message extends Update
     /** For Public Service Announcement messages, the PSA type */
     public readonly string $psaType;
 
-    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies
+    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies, games eventually, service messages
 
     /** @internal */
     public function __construct(
@@ -166,6 +178,25 @@ abstract class Message extends Update
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'])
             : null;
+
+        if (
+            $this->entities
+            && $this->entities[0]['_'] === 'messageEntityBotCommand'
+            && $this->entities[0]['offset'] === 0
+        ) {
+            $this->command = StrTools::mbSubstr(
+                $this->message,
+                1,
+                $this->entities[0]['length']-1
+            );
+            $this->commandArgs = \explode(
+                ' ',
+                StrTools::mbSubstr($this->message, $this->entities[0]['length']+1)
+            );
+        } else {
+            $this->command = null;
+            $this->commandArgs = null;
+        }
     }
 
     private readonly string $html;
