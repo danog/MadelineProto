@@ -546,7 +546,7 @@ trait Files
      */
     public function wrapMedia(array $media): Media
     {
-        if ($media['_'] === 'messageMediaPhoto'){
+        if ($media['_'] === 'messageMediaPhoto') {
             return new Photo($this, $media);
         }
         Assert::eq($media['_'], 'messageMediaDocument');
@@ -600,7 +600,7 @@ trait Files
      * `$info['size']` - The file size
      *
      * @param mixed $messageMedia File ID
-     * 
+     *
      * @return array{
      *      ext: string,
      *      name: string,
@@ -707,6 +707,7 @@ trait Files
                 // Photos
             case 'photo':
                 $messageMedia = ['_' => 'messageMediaPhoto', 'photo' => $messageMedia, 'ttl_seconds' => 0];
+                // no break
             case 'messageMediaPhoto':
                 $res['MessageMedia'] = $messageMedia;
                 $messageMedia = $messageMedia['photo'];

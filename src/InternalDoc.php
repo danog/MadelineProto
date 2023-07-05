@@ -733,6 +733,14 @@ abstract class InternalDoc
      * `$info['size']` - The file size
      *
      * @param mixed $messageMedia File ID
+     *
+     * @return array{
+     *      ext: string,
+     *      name: string,
+     *      mime: string,
+     *      size: int,
+     *      InputFileLocation: array
+     * }
      */
     public function getDownloadInfo(mixed $messageMedia): array
     {
@@ -846,7 +854,7 @@ abstract class InternalDoc
      *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
-     * } : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool}))
+     * } : ($type is API::INFO_TYPE_TYPE ? string : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool})))
      */
     public function getInfo(mixed $id, int $type = \danog\MadelineProto\API::INFO_TYPE_ALL): array|int
     {
@@ -1080,7 +1088,7 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return DOMEntities Object containing message and entities
+     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
      */
     public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
     {
@@ -1197,7 +1205,7 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return DOMEntities Object containing message and entities
+     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
      */
     public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\DOMEntities
     {
@@ -1802,8 +1810,14 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::wait($promise);
     }
     /**
+     * Wrap a media constructor into an abstract Media object.
+     */
+    public function wrapMedia(array $media): \danog\MadelineProto\MTProtoTools\Media
+    {
+        return $this->wrapper->getAPI()->wrapMedia($media);
+    }
+    /**
      * Wrap a Message constructor into an abstract Message object.
-     *
      */
     public function wrapMessage(array $message): ?\danog\MadelineProto\EventHandler\Message
     {
@@ -1811,7 +1825,6 @@ abstract class InternalDoc
     }
     /**
      * Wrap an Update constructor into an abstract Update object.
-     *
      */
     public function wrapUpdate(array $update): ?\danog\MadelineProto\EventHandler\Update
     {

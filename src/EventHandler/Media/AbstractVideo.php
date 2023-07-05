@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\MTProto;
 
 /**
  * Represents a generic video.
@@ -24,7 +25,6 @@ abstract class AbstractVideo extends Media
         array $rawMedia,
         array $attribute
     ) {
-    {
         parent::__construct($API, $rawMedia);
         $this->duration = $attribute['duration'];
         $this->supportsStreaming = $attribute['supports_streaming'];

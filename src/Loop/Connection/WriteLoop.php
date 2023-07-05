@@ -24,7 +24,7 @@ use Amp\ByteStream\StreamException;
 use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\Container;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
@@ -88,7 +88,7 @@ final class WriteLoop extends Loop
                 if ($message->isEncrypted()) {
                     continue;
                 }
-                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
                     continue;
                 }
@@ -146,7 +146,7 @@ final class WriteLoop extends Loop
                 if ($message->isUnencrypted()) {
                     continue;
                 }
-                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
                     $this->logger->logger("Skipping resending of $message, we already got a reply in DC $this->datacenter");
                     continue;

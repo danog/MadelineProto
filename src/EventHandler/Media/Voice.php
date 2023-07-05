@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a voice message.
  */
@@ -20,7 +22,6 @@ final class Voice extends AbstractAudio
         array $rawMedia,
         array $audioAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia, $audioAttribute);
         //$this->waveform = $audioAttribute['waveform'];
     }

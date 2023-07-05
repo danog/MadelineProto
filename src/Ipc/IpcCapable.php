@@ -2,11 +2,12 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 
 /**
  * Represents an IPC-capable object.
+ *
+ * @internal
  */
 abstract class IpcCapable
 {

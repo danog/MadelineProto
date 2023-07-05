@@ -24,7 +24,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -555,7 +555,7 @@ final class DataCenterConnection implements JsonSerializable
         $this->backup = [];
         $count = \count($backup);
         $this->API->logger->logger("Restoring {$count} messages to DC {$this->datacenter}");
-        /** @var OutgoingMessage */
+        /** @var MTProtoOutgoingMessage */
         foreach ($backup as $message) {
             if ($message->hasSeqno()) {
                 $message->setSeqno(null);
@@ -563,7 +563,7 @@ final class DataCenterConnection implements JsonSerializable
             if ($message->hasMsgId()) {
                 $message->setMsgId(null);
             }
-            if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
+            if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
                 EventLoop::queue($this->getConnection()->sendMessage(...), $message, false);
             }
         }

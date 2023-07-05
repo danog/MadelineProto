@@ -27,7 +27,7 @@ use Amp\Future;
  *
  * @internal
  */
-final class IncomingMessage extends Message
+final class MTProtoIncomingMessage extends MTProtoMessage
 {
     /**
      * We have received this message.
@@ -86,7 +86,7 @@ final class IncomingMessage extends Message
 
         $this->received = \time();
 
-        $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$content['_']]);
+        $this->contentRelated = !isset(MTProtoMessage::NOT_CONTENT_RELATED[$content['_']]);
         if (!$this->contentRelated) {
             $this->state |= 16; // message not requiring acknowledgment
         }

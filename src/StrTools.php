@@ -92,9 +92,9 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return DOMEntities Object containing message and entities
+     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
      */
-    public static function htmlToMessageEntities(string $html): DOMEntities
+    public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
     {
         return new DOMEntities($html);
     }
@@ -107,9 +107,9 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return DOMEntities Object containing message and entities
+     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
      */
-    public static function markdownToMessageEntities(string $markdown): DOMEntities
+    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\DOMEntities
     {
         return new DOMEntities(Parsedown::instance()->line($markdown));
     }

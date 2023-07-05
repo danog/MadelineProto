@@ -25,7 +25,7 @@ namespace danog\MadelineProto\MTProto;
  *
  * @internal
  */
-abstract class Message
+abstract class MTProtoMessage
 {
     public const NOT_CONTENT_RELATED = [
         //'rpc_result' => true,

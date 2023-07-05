@@ -23,8 +23,8 @@ namespace danog\MadelineProto\MTProtoSession;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto\IncomingMessage;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 
 /**
  * Manages acknowledgement of messages.
@@ -50,17 +50,15 @@ trait AckHandler
     /**
      * We have gotten a response for an outgoing message.
      */
-    public function gotResponseForOutgoingMessage(OutgoingMessage $outgoingMessage): void
+    public function gotResponseForOutgoingMessage(MTProtoOutgoingMessage $outgoingMessage): void
     {
         // The server acknowledges that it received my message
         unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
     }
     /**
      * Acknowledge incoming message ID.
-     *
-     * @param IncomingMessage $message Message
      */
-    public function ackIncomingMessage(IncomingMessage $message): void
+    public function ackIncomingMessage(MTProtoIncomingMessage $message): void
     {
         // Not exactly true, but we don't care
         $message->ack();
@@ -79,7 +77,7 @@ trait AckHandler
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
-        /** @var OutgoingMessage */
+        /** @var MTProtoOutgoingMessage */
         foreach ($this->new_outgoing as $message) {
             if ($message->wasSent()
                 && $message->getSent() + $timeout < \time()
@@ -107,7 +105,7 @@ trait AckHandler
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
         $result = [];
-        /** @var OutgoingMessage $message */
+        /** @var MTProtoOutgoingMessage $message */
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->wasSent()
                 && $message->getSent() + $timeout < \time()
@@ -124,7 +122,7 @@ trait AckHandler
                     $this->handleReject($message, fn () => new Exception('Request timeout'));
                     continue;
                 }
-                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     $this->logger->logger("Already replied to message $message, but still in new_outgoing");
                     unset($this->new_outgoing[$message_id]);
                     continue;

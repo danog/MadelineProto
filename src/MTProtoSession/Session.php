@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto\IncomingMessage;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\Tools;
 
 /**
@@ -41,31 +41,31 @@ trait Session
     /**
      * Incoming message array.
      *
-     * @var array<IncomingMessage>
+     * @var array<MTProtoIncomingMessage>
      */
     public array $incoming_messages = [];
     /**
      * Outgoing message array.
      *
-     * @var array<OutgoingMessage>
+     * @var array<MTProtoOutgoingMessage>
      */
     public array $outgoing_messages = [];
     /**
      * New incoming message ID array.
      *
-     * @var array<IncomingMessage>
+     * @var array<MTProtoIncomingMessage>
      */
     public array $new_incoming = [];
     /**
      * New outgoing message array.
      *
-     * @var array<OutgoingMessage>
+     * @var array<MTProtoOutgoingMessage>
      */
     public array $new_outgoing = [];
     /**
      * Pending outgoing messages.
      *
-     * @var array<OutgoingMessage>
+     * @var array<MTProtoOutgoingMessage>
      */
     public array $pendingOutgoing = [];
     /**
@@ -164,7 +164,7 @@ trait Session
     /**
      * Backup eventual unsent messages before session deletion.
      *
-     * @return array<OutgoingMessage>
+     * @return array<MTProtoOutgoingMessage>
      */
     public function backupSession(): array
     {

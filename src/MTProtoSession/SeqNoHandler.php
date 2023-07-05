@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto\IncomingMessage;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 
 /**
  * Manages sequence number.
@@ -41,7 +41,7 @@ trait SeqNoHandler
         //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
-    public function checkInSeqNo(IncomingMessage $message): void
+    public function checkInSeqNo(MTProtoIncomingMessage $message): void
     {
         if ($message->hasSeqNo()) {
             $seq_no = $this->generateInSeqNo($message->isContentRelated());

@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a sticker.
  */
@@ -16,7 +18,6 @@ final class Sticker extends AbstractSticker
         array $rawMedia,
         array $stickerAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia, $stickerAttribute);
         $this->premiumSticker = !$rawMedia['nopremium'];
     }

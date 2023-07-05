@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\MTProto;
 
 /**
  * Represents a generic audio file.
@@ -18,7 +19,6 @@ abstract class AbstractAudio extends Media
         array $rawMedia,
         array $audioAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia);
         $this->duration = $audioAttribute['duration'];
     }

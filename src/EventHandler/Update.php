@@ -2,9 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\IpcCapable;
-use danog\MadelineProto\MTProto;
 
 /**
  * Represents a generic update.

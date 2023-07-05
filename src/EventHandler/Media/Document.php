@@ -4,6 +4,8 @@ namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a document.
  */
@@ -14,7 +16,6 @@ final class Document extends Media
         MTProto $API,
         array $rawMedia
     ) {
-    {
         parent::__construct($API, $rawMedia);
     }
 }

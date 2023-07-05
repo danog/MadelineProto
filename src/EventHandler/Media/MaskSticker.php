@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a mask sticker.
  */
@@ -36,7 +38,6 @@ final class MaskSticker extends AbstractSticker
         array $rawMedia,
         array $stickerAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia, $stickerAttribute);
         $coords = $stickerAttribute['mask_coords'];
         $this->position = match ($coords['n']) {

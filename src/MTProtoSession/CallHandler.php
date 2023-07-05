@@ -22,7 +22,7 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
 use danog\MadelineProto\MTProto\Container;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
@@ -59,7 +59,7 @@ trait CallHandler
             if (isset($this->outgoing_messages[$message_id])
                 && !$this->outgoing_messages[$message_id]->canGarbageCollect()) {
                 if ($datacenter) {
-                    /** @var OutgoingMessage */
+                    /** @var MTProtoOutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
                     $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
@@ -69,7 +69,7 @@ trait CallHandler
                             ->sendMessage($message, false);
                     });
                 } else {
-                    /** @var OutgoingMessage */
+                    /** @var MTProtoOutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
@@ -165,7 +165,7 @@ trait CallHandler
             throw new Exception("Could not find method $method!");
         }
         $response = new DeferredFuture;
-        $message = new OutgoingMessage(
+        $message = new MTProtoOutgoingMessage(
             $args,
             $method,
             $methodInfo['type'],
@@ -206,7 +206,7 @@ trait CallHandler
      */
     public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): void
     {
-        $message = new OutgoingMessage(
+        $message = new MTProtoOutgoingMessage(
             $args,
             $object,
             '',

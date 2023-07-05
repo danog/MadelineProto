@@ -24,7 +24,7 @@ use Amp\Future;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
@@ -1008,7 +1008,7 @@ final class TL implements TLInterface
                 }
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
-                /** @var OutgoingMessage */
+                /** @var MTProtoOutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
                 foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
                     $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());

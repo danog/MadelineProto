@@ -23,8 +23,8 @@ namespace danog\MadelineProto\MTProtoSession;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\IncomingMessage;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
@@ -46,7 +46,7 @@ trait ResponseHandler
             \reset($this->new_incoming);
             $current_msg_id = \key($this->new_incoming);
 
-            /** @var IncomingMessage */
+            /** @var MTProtoIncomingMessage */
             $message = $this->new_incoming[$current_msg_id];
             unset($this->new_incoming[$current_msg_id]);
 
@@ -83,7 +83,7 @@ trait ResponseHandler
                 case 'msg_container':
                     foreach ($message->read()['messages'] as $message) {
                         $this->msgIdHandler->checkMessageId($message['msg_id'], outgoing: false, container: true);
-                        $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
+                        $newMessage = new MTProtoIncomingMessage($message['body'], $message['msg_id'], true);
                         $newMessage->setSeqNo($message['seqno']);
                         $newMessage->setSideEffects($message['sideEffects']);
                         $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
@@ -100,7 +100,7 @@ trait ResponseHandler
                         $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
                     } else {
                         $this->msgIdHandler->checkMessageId($referencedMsgId, outgoing: false, container: true);
-                        $message = new IncomingMessage($content['orig_message'], $referencedMsgId);
+                        $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId);
                         $message->setSideEffects($side);
                         $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
                         unset($message);
@@ -168,7 +168,7 @@ trait ResponseHandler
     /**
      * @param callable(): \Throwable $data
      */
-    private function handleReject(OutgoingMessage $message, callable $data): void
+    private function handleReject(MTProtoOutgoingMessage $message, callable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
         $message->reply($data);
@@ -176,10 +176,8 @@ trait ResponseHandler
 
     /**
      * Handle RPC response.
-     *
-     * @param IncomingMessage $message   Incoming message
      */
-    private function handleResponse(IncomingMessage $message, ?int $requestId = null): void
+    private function handleResponse(MTProtoIncomingMessage $message, ?int $requestId = null): void
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();
@@ -187,9 +185,9 @@ trait ResponseHandler
             $this->logger->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
             return;
         }
-        /** @var OutgoingMessage */
+        /** @var MTProtoOutgoingMessage */
         $request = $this->outgoing_messages[$requestId];
-        if ($request->getState() & OutgoingMessage::STATE_REPLIED) {
+        if ($request->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
             $this->logger->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
         }
@@ -274,7 +272,7 @@ trait ResponseHandler
     /**
      * @return (callable(): Throwable)|null
      */
-    private function handleRpcError(OutgoingMessage $request, array $response): ?callable
+    private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
         if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);

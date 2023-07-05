@@ -4,6 +4,16 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
+use danog\MadelineProto\EventHandler\Media\Audio;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
+use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 
@@ -32,7 +42,11 @@ abstract class Message extends Update
     /** ID of the message thread where the message was sent */
     public readonly ?int $threadId;
 
-    /** Attached media */
+    /**
+     * Attached media.
+     *
+     * @var Audio|Document|DocumentPhoto|Gif|MaskSticker|Photo|RoundVideo|Sticker|Video|Voice|null
+     */
     public readonly ?Media $media;
 
     /** Whether this is a reply to a scheduled message */
@@ -65,7 +79,7 @@ abstract class Message extends Update
     /** For Public Service Announcement messages, the PSA type */
     public readonly string $psaType;
 
-    // Todo media, albums, reactions, replies
+    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies
 
     /** @internal */
     public function __construct(
@@ -148,6 +162,10 @@ abstract class Message extends Update
             $this->fwdInfo = null;
             $this->psaType = null;
         }
+
+        $this->media = isset($rawMessage['media'])
+            ? $API->wrapMedia($rawMessage['media'])
+            : null;
     }
 
     private readonly string $html;

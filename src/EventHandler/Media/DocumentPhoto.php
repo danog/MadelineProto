@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\MTProto;
 
 /**
  * Represents a photo uploaded as a document.
@@ -14,14 +15,13 @@ final class DocumentPhoto extends Media
 
     public readonly int $width;
     public readonly int $height;
-    
+
     /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMedia,
         array $attribute
     ) {
-    {
         parent::__construct($API, $rawMedia);
         $this->width = $attribute['w'];
         $this->height = $attribute['h'];

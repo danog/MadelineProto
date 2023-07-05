@@ -20,11 +20,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 
 /**
  * @psalm-type TBeforeMethodResponseDeserialization=Closure(string): void
- * @psalm-type TAfterMethodResponseDeserialization=Closure(OutgoingMessage, array): void
+ * @psalm-type TAfterMethodResponseDeserialization=Closure(MTProtoOutgoingMessage, array): void
  *
  * @psalm-type TBeforeConstructorSerialization=Closure(array): mixed
  * @psalm-type TBeforeConstructorDeserialization=Closure(string): void

@@ -28,7 +28,7 @@ use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\PingLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -275,7 +275,7 @@ final class Connection
         }
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->isUnencrypted()) {
-                if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
+                if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
                     $message->reply(fn () => new Exception('Restart because we were reconnected'));
                 }
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
@@ -402,10 +402,9 @@ final class Connection
     /**
      * Send an MTProto message.
      *
-     * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
      */
-    public function sendMessage(OutgoingMessage $message, bool $flush = true): void
+    public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {
         $message->trySend();
         $promise = $message->getSendPromise();

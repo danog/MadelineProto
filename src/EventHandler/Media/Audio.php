@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents an audio file.
  */
@@ -18,7 +20,6 @@ final class Audio extends AbstractAudio
         array $rawMedia,
         array $audioAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia);
         $this->title = $audioAttribute['title'] ?? null;
         $this->performer = $audioAttribute['performer'] ?? null;

@@ -25,7 +25,7 @@ use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
 use Webmozart\Assert\Assert;
@@ -317,7 +317,7 @@ final class ReferenceDatabase implements TLCallback
         //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethod(OutgoingMessage $data, array $res): void
+    public function addOriginMethod(MTProtoOutgoingMessage $data, array $res): void
     {
         $key = \count($this->cacheContexts) - 1;
         $constructor = $data->getConstructor();

@@ -35,7 +35,7 @@ use function time;
  *
  * @internal
  */
-class OutgoingMessage extends Message
+class MTProtoOutgoingMessage extends MTProtoMessage
 {
     /**
      * The message was created.
@@ -163,7 +163,7 @@ class OutgoingMessage extends Message
             $this->resultDeferred = $deferred;
         }
 
-        $this->contentRelated = !isset(Message::NOT_CONTENT_RELATED[$constructor]);
+        $this->contentRelated = !isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]);
         $this->cancellation = $cancellation;
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(fn () => throw $e));
     }

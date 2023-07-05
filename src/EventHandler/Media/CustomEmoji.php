@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a custom emoji sticker.
  */
@@ -18,7 +20,6 @@ final class CustomEmoji extends AbstractSticker
         array $rawMedia,
         array $stickerAttribute
     ) {
-    {
         parent::__construct($API, $rawMedia, $stickerAttribute);
         $this->free = $stickerAttribute['free'];
         $this->textColor = $stickerAttribute['text_color'];

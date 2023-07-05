@@ -26,7 +26,6 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
-use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
 use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
@@ -187,7 +186,11 @@ trait UpdateHandler
     }
 
     /**
-     * Get updates.
+     * Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**.
+     *
+     * `getUpdates` will **greatly slow down your bot** if used directly inside of PHP code.
+     *
+     * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
      * @param array{offset?: int, limit?: int, timeout?: float} $params Params
      * @return list<array{update_id: mixed, update: mixed}>

@@ -25,7 +25,7 @@ use Amp\ByteStream\StreamException;
 use Amp\Websocket\ClosedException;
 use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto\IncomingMessage;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\RPCErrorException;
@@ -200,7 +200,7 @@ final class ReadLoop extends Loop
 
             $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
             $sideEffects = $this->API->getTL()->getSideEffects();
-            $message = new IncomingMessage($deserialized, $message_id);
+            $message = new MTProtoIncomingMessage($deserialized, $message_id);
             $message->setSideEffects($sideEffects);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
