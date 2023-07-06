@@ -344,7 +344,10 @@ trait UpdateHandler
                     $message['action']['title']
                 ),
                 'messageActionChatEditPhoto' => new DialogPhotoChanged(
-                    $this->wrapMedia($message['action']['photo'])
+                    $this->wrapMedia([
+                        '_' => 'messageMediaPhoto',
+                        'photo' => $message['action']['photo']
+                    ])
                 ),
                 'messageActionChatDeletePhoto' => new DialogPhotoChanged(null),
                 'messageActionChatAddUser' => new DialogMembersJoined(

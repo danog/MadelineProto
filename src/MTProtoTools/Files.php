@@ -24,6 +24,7 @@ use Amp\DeferredFuture;
 use Amp\File\Driver\BlockingFile;
 use Amp\Future;
 use Amp\Http\Client\Request;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\CustomEmoji;
 use danog\MadelineProto\EventHandler\Media\Document;
@@ -545,12 +546,20 @@ trait Files
     /**
      * Wrap a media constructor into an abstract Media object.
      */
-    public function wrapMedia(array $media): Media
+    public function wrapMedia(array $media): ?Media
     {
         if ($media['_'] === 'messageMediaPhoto') {
+            if (!isset($media['photo'])) {
+                return null;
+            }
             return new Photo($this, $media);
         }
-        Assert::eq($media['_'], 'messageMediaDocument');
+        if ($media['_'] !== 'messageMediaDocument') {
+            return null;
+        }
+        if (!isset($media['document'])) {
+            return null;
+        }
         $has_video = null;
         $has_animated = false;
         foreach ($media['attributes'] as $attr) {

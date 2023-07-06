@@ -5,15 +5,15 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that always returns the specified boolean.
+ * Filter that always allows all updates.
  */
-final class FilterConstant extends Filter
+final class Handler extends Filter
 {
-    public function __construct(private readonly bool $result)
+    public function __construct()
     {
     }
     public function apply(Update $update): bool
     {
-        return $this->result;
+        return true;
     }
 }

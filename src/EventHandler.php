@@ -24,7 +24,9 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\EventHandler\Filter\Filter;
 use Generator;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Revolt\EventLoop;
@@ -126,7 +128,18 @@ abstract class EventHandler extends AbstractAPI
                 $method_name = \lcfirst(\substr($method, 2));
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
                     $methods[$method_name] = $this->$method(...);
+                    continue;
                 }
+                $filter = $methodRefl->getAttributes(
+                    Filter::class,
+                    ReflectionAttribute::IS_INSTANCEOF
+                )[0] ?? null;
+                if (!$filter) {
+                    return $filter;
+                }
+                $filter = $filter->newInstance();
+                $filter->initialize($this);
+                
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);
