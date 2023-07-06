@@ -26,7 +26,6 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
-use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
 use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
@@ -330,27 +329,13 @@ trait UpdateHandler
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
-    public function wrapMessage(array $message): ?AbstractMessage
+    public function wrapMessage(array $message): ?Message
     {
-        if ($message['_'] === 'message') {
-            $id = $this->getIdInternal($message);
-            if (($this->chats[$id]['username'] ?? '') === 'replies') {
-                return null;
-            }
-            return match ($this->getType($id)) {
-                \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
-                    ? new OutgoingPrivateMessage($this, $message)
-                    : new IncomingPrivateMessage($this, $message),
-                \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
-                    ? new OutgoingGroupMessage($this, $message)
-                    : new IncomingGroupMessage($this, $message),
-                \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
-                    ? new OutgoingChannelMessage($this, $message)
-                    : new IncomingChannelMessage($this, $message),
-            };
+        if ($message['_'] === 'messageEmpty') {
+            return null;
         }
         if ($message['_'] === 'messageService') {
-            return match ($message['action']['_']) {
+            $action = match ($message['action']['_']) {
                 'messageActionChatCreate' => new DialogCreated(
                     $message['action']['title'],
                     $message['action']['users'],
@@ -368,8 +353,26 @@ trait UpdateHandler
                 'messageActionChatDeleteUser' => new DialogMemberLeft($message['action']['user_id']),
                 default => null
             };
+            if (!$action) {
+                return null;
+            }
+            $message['action'] = $action;
         }
-        return null;
+        $id = $this->getIdInternal($message);
+        if (($this->chats[$id]['username'] ?? '') === 'replies') {
+            return null;
+        }
+        return match ($this->getType($id)) {
+            \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
+                ? new OutgoingPrivateMessage($this, $message)
+                : new IncomingPrivateMessage($this, $message),
+            \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
+                ? new OutgoingGroupMessage($this, $message)
+                : new IncomingGroupMessage($this, $message),
+            \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
+                ? new OutgoingChannelMessage($this, $message)
+                : new IncomingChannelMessage($this, $message),
+        };
     }
     /**
      * Extract a message ID from an Updates constructor.

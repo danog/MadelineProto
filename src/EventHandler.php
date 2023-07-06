@@ -129,9 +129,10 @@ abstract class EventHandler extends AbstractAPI
                 }
             }
             if ($has_any) {
+                $onAny = $this->onAny(...);
                 foreach ($constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {
-                        $methods[$constructor['predicate']] = $this->onAny(...);
+                        $methods[$constructor['predicate']] = $onAny;
                     }
                 }
             }

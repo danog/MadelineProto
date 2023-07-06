@@ -91,6 +91,9 @@ abstract class Message extends Update
     /** For Public Service Announcement messages, the PSA type */
     public readonly string $psaType;
 
+    /** Service information, for service messages */
+    public readonly ?Service $service;
+
     // Todo media (waveform, photosizes, thumbs), albums, reactions, replies, games eventually, service messages
 
     /** @internal */
@@ -197,6 +200,8 @@ abstract class Message extends Update
             $this->command = null;
             $this->commandArgs = null;
         }
+
+        $this->service = $rawMessage['action'] ?? null;
     }
 
     private readonly string $html;
