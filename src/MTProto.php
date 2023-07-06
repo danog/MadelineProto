@@ -1652,7 +1652,9 @@ final class MTProto implements TLCallback, LoggerGetter
             $file = null;
             if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
                 && $path = $this->settings->getLogger()->getExtra()) {
-                \touch($path);
+                $temp = \tempnam(\sys_get_temp_dir(), 'madelinelog');
+                \copy($path, $temp);
+                $path = $temp;
                 if (!getSize($path)) {
                     $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
                 } else {
@@ -1669,6 +1671,7 @@ final class MTProto implements TLCallback, LoggerGetter
                             ],
                         ],
                     );
+                    \unlink($path);
                 }
             }
             $sent = false;

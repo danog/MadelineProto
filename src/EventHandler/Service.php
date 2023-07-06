@@ -5,6 +5,6 @@ namespace danog\MadelineProto\EventHandler;
 /**
  * Represents info about a service message.
  */
-abstract class Service
+abstract class Service extends Update
 {
 }

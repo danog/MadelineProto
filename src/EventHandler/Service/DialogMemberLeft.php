@@ -9,6 +9,9 @@ use danog\MadelineProto\EventHandler\Service;
  */
 final class DialogMemberLeft extends Service
 {
-    /** ID of the user that left the channel */
-    public readonly int $left;
+    public function __construct(
+        /** ID of the user that left the channel */
+        public readonly int $left,
+    ) {
+    }
 }

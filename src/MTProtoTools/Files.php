@@ -151,6 +151,7 @@ trait Files
         $part_size = 512 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
         $part_total_num = (int) \ceil($size / $part_size);
+        Assert::notEq($part_total_num, 0);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');

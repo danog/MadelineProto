@@ -10,6 +10,9 @@ use danog\MadelineProto\EventHandler\Service;
  */
 final class DialogPhotoChanged extends Service
 {
-    /** New photo (or no photo if it was deleted) */
-    public readonly ?Photo $photo;
+    public function __construct(
+        /** New photo (or no photo if it was deleted) */
+        public readonly ?Photo $photo
+    ) {
+    }
 }

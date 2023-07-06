@@ -26,6 +26,7 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
 use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
@@ -33,6 +34,11 @@ use danog\MadelineProto\EventHandler\Message\IncomingPrivateMessage;
 use danog\MadelineProto\EventHandler\Message\OutgoingChannelMessage;
 use danog\MadelineProto\EventHandler\Message\OutgoingGroupMessage;
 use danog\MadelineProto\EventHandler\Message\OutgoingPrivateMessage;
+use danog\MadelineProto\EventHandler\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Service\DialogMemberLeft;
+use danog\MadelineProto\EventHandler\Service\DialogMembersJoined;
+use danog\MadelineProto\EventHandler\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -324,26 +330,46 @@ trait UpdateHandler
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
-    public function wrapMessage(array $message): ?Message
+    public function wrapMessage(array $message): ?AbstractMessage
     {
-        if ($message['_'] !== 'message') {
-            return null;
+        if ($message['_'] === 'message') {
+            $id = $this->getIdInternal($message);
+            if (($this->chats[$id]['username'] ?? '') === 'replies') {
+                return null;
+            }
+            return match ($this->getType($id)) {
+                \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
+                    ? new OutgoingPrivateMessage($this, $message)
+                    : new IncomingPrivateMessage($this, $message),
+                \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
+                    ? new OutgoingGroupMessage($this, $message)
+                    : new IncomingGroupMessage($this, $message),
+                \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
+                    ? new OutgoingChannelMessage($this, $message)
+                    : new IncomingChannelMessage($this, $message),
+            };
         }
-        $id = $this->getIdInternal($message);
-        if (($this->chats[$id]['username'] ?? '') === 'replies') {
-            return null;
+        if ($message['_'] === 'messageService') {
+            return match ($message['action']['_']) {
+                'messageActionChatCreate' => new DialogCreated(
+                    $message['action']['title'],
+                    $message['action']['users'],
+                ),
+                'messageActionChatEditTitle' => new DialogTitleChanged(
+                    $message['action']['title']
+                ),
+                'messageActionChatEditPhoto' => new DialogPhotoChanged(
+                    $this->wrapMedia($message['action']['photo'])
+                ),
+                'messageActionChatDeletePhoto' => new DialogPhotoChanged(null),
+                'messageActionChatAddUser' => new DialogMembersJoined(
+                    $message['action']['users']
+                ),
+                'messageActionChatDeleteUser' => new DialogMemberLeft($message['action']['user_id']),
+                default => null
+            };
         }
-        return match ($this->getType($id)) {
-            \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
-                ? new OutgoingPrivateMessage($this, $message)
-                : new IncomingPrivateMessage($this, $message),
-            \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
-                ? new OutgoingGroupMessage($this, $message)
-                : new IncomingGroupMessage($this, $message),
-            \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
-                ? new OutgoingChannelMessage($this, $message)
-                : new IncomingChannelMessage($this, $message),
-        };
+        return null;
     }
     /**
      * Extract a message ID from an Updates constructor.

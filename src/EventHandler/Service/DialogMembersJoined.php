@@ -9,6 +9,9 @@ use danog\MadelineProto\EventHandler\Service;
  */
 final class DialogMembersJoined extends Service
 {
-    /** @var list<int> List of IDs of the user that joined the chat or channel. */
-    public readonly array $joined;
+    public function __construct(
+        /** @var list<int> List of IDs of the user that joined the chat or channel. */
+        public readonly array $joined
+    ) {
+    }
 }

@@ -9,6 +9,9 @@ use danog\MadelineProto\EventHandler\Service;
  */
 final class DialogTitleChanged extends Service
 {
-    /** New title */
-    public readonly string $title;
+    public function __construct(
+        /** New title */
+        public readonly string $title
+    ) {
+    }
 }
