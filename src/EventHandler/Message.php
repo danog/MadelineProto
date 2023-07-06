@@ -20,27 +20,13 @@ use danog\MadelineProto\StrTools;
 /**
  * Represents an incoming or outgoing message.
  */
-abstract class Message extends Update
+abstract class Message extends AbstractMessage
 {
-    /** Message ID */
-    public readonly int $id;
     /** Content of the message */
     public readonly string $message;
-    /** ID of the chat where the message was sent */
-    public readonly int $chatId;
-    /** ID of the message to which this message is replying */
-    public readonly ?int $replyToMsgId;
-    /** When was the message sent */
-    public readonly int $date;
 
     /** Info about a forwarded message */
     public readonly ?ForwardedInfo $fwdInfo;
-
-    /** ID of the forum topic where the message was sent */
-    public readonly ?int $topicId;
-
-    /** ID of the message thread where the message was sent */
-    public readonly ?int $threadId;
 
     /** Bot command (if present) */
     public readonly ?string $command;
@@ -61,12 +47,6 @@ abstract class Message extends Update
      */
     public readonly ?Media $media;
 
-    /** Whether this is a reply to a scheduled message */
-    public readonly bool $replyToScheduled;
-    /** Whether we were mentioned in this message */
-    public readonly bool $mentioned;
-    /** Whether this message was sent without any notification (silently) */
-    public readonly bool $silent;
     /** Whether this message is a sent scheduled message */
     public readonly bool $fromScheduled;
     /** Whether this message is a pinned message */
@@ -78,9 +58,6 @@ abstract class Message extends Update
 
     /** Last edit date of the message */
     public readonly ?int $editDate;
-
-    /** Time-to-live of the message */
-    public readonly ?int $ttlPeriod;
 
     /** Inline or reply keyboard. */
     public readonly InlineKeyboard|ReplyKeyboard|null $keyboard;
@@ -97,62 +74,21 @@ abstract class Message extends Update
     public function __construct(
         MTProto $API,
         array $rawMessage,
-        /** Whether the message is outgoing */
-        public readonly bool $out
+        bool $out
     ) {
-        parent::__construct($API);
-        $info = $this->API->getInfo($rawMessage);
+        parent::__construct($API, $rawMessage, $out);
 
         $this->entities = $rawMessage['entities'] ?? null;
-        $this->id = $rawMessage['id'];
         $this->message = $rawMessage['message'] ?? '';
-        $this->chatId = $info['bot_api_id'];
-        $this->date = $rawMessage['date'];
-        $this->mentioned = $rawMessage['mentioned'];
-        $this->silent = $rawMessage['silent'];
         $this->fromScheduled = $rawMessage['from_scheduled'];
-        $this->pinned = $rawMessage['pinned'];
-        $this->protected = $rawMessage['noforwards'];
+        $this->pinned = $rawMessage['pinned'] ?? false;
+        $this->protected = $rawMessage['noforwards'] ?? false;
         $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
-        $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
 
         $this->keyboard = isset($rawMessage['reply_markup'])
             ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
             : null;
-
-        if (isset($rawMessage['reply_to'])) {
-            $replyTo = $rawMessage['reply_to'];
-            $this->replyToScheduled = $replyTo['reply_to_scheduled'];
-            if ($replyTo['forum_topic']) {
-                if (isset($replyTo['reply_to_top_id'])) {
-                    $this->topicId = $replyTo['reply_to_top_id'];
-                    $this->replyToMsgId = $replyTo['reply_to_msg_id'];
-                } else {
-                    $this->topicId = $replyTo['reply_to_msg_id'];
-                    $this->replyToMsgId = null;
-                }
-                $this->threadId = null;
-            } elseif ($info['Chat']['forum'] ?? false) {
-                $this->topicId = 1;
-                $this->replyToMsgId = $replyTo['reply_to_msg_id'];
-                $this->threadId = $replyTo['reply_to_top_id'] ?? null;
-            } else {
-                $this->topicId = null;
-                $this->replyToMsgId = $replyTo['reply_to_msg_id'];
-                $this->threadId = $replyTo['reply_to_top_id'] ?? null;
-            }
-        } elseif ($info['Chat']['forum'] ?? false) {
-            $this->topicId = 1;
-            $this->replyToMsgId = null;
-            $this->threadId = null;
-            $this->replyToScheduled = false;
-        } else {
-            $this->topicId = null;
-            $this->replyToMsgId = null;
-            $this->threadId = null;
-            $this->replyToScheduled = false;
-        }
 
         if (isset($rawMessage['fwd_from'])) {
             $fwdFrom = $rawMessage['fwd_from'];

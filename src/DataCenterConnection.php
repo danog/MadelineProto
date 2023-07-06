@@ -738,10 +738,4 @@ final class DataCenterConnection implements JsonSerializable
     {
         return $this->linkedDc ? ['linkedDc', 'tempAuthKey'] : ['permAuthKey', 'tempAuthKey'];
     }
-    public function __wakeup(): void
-    {
-        if (isset($this->linked) && \is_int($this->linked)) {
-            $this->linkedDc = $this->linked;
-        }
-    }
 }

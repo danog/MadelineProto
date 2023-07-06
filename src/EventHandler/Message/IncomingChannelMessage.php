@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
+use danog\MadelineProto\EventHandler\BasicFilter\Incoming;
 use danog\MadelineProto\MTProto;
 
 /**

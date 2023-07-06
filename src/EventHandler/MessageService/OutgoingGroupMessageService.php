@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\MessageService;
 
 use danog\MadelineProto\EventHandler\BasicFilter\Outgoing;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents an outgoing group message.
+ * Represents an outgoing group service message.
  */
-final class OutgoingGroupMessage extends GroupMessage implements Outgoing
+final class OutgoingGroupMessageService extends GroupMessageService implements Outgoing
 {
     /** @internal */
     public function __construct(

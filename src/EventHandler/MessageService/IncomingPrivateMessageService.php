@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\MessageService;
 
 use danog\MadelineProto\EventHandler\BasicFilter\Incoming;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents an incoming private message.
+ * Represents an incoming private service message.
  */
-final class IncomingPrivateMessage extends PrivateMessage implements Incoming
+final class IncomingPrivateMessageService extends PrivateMessageService implements Incoming
 {
     /** @internal */
     public function __construct(
