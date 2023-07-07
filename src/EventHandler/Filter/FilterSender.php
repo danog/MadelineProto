@@ -7,7 +7,7 @@ use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter incoming or outgoing group messages made by a certain sender.
+ * Allow incoming or outgoing group messages made by a certain sender.
  */
 final class FilterSender extends Filter
 {

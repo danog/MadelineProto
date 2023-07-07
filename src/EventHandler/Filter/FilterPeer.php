@@ -7,7 +7,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter messages coming from or sent to a certain peer.
+ * Allow messages coming from or sent to a certain peer.
  */
 final class FilterPeer extends Filter
 {

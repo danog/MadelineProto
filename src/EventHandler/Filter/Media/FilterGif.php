@@ -8,7 +8,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that only matches GIFs.
+ * Allow that only matches GIFs.
  */
 final class FilterGif extends Filter
 {

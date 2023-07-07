@@ -6,7 +6,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter only forwarded messages.
+ * Allow only forwarded messages.
  */
 final class FilterForwarded extends Filter
 {

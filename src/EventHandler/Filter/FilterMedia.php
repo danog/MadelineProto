@@ -6,7 +6,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter any media messages.
+ * Allow any media messages.
  */
 final class FilterMedia extends Filter
 {

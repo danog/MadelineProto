@@ -6,7 +6,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter text-only messages.
+ * Allow text-only messages.
  */
 final class FilterText extends Filter
 {

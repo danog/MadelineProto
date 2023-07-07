@@ -2,18 +2,16 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that always allows all updates.
+ * Allow only outgoing messages.
  */
-final class Handler extends Filter
+final class FilterOutgoing extends Filter
 {
-    public function __construct()
-    {
-    }
     public function apply(Update $update): bool
     {
-        return true;
+        return $update instanceof AbstractMessage && $update->out;
     }
 }

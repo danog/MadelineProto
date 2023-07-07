@@ -6,7 +6,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter messages that reply to other messages.
+ * Allow messages that reply to other messages.
  */
 final class FilterReply extends Filter
 {

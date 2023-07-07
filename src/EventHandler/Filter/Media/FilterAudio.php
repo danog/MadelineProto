@@ -8,7 +8,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that only matches audio files.
+ * Allow that only matches audio files.
  */
 final class FilterAudio extends Filter
 {

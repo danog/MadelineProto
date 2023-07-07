@@ -8,7 +8,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Filter that only matches round videos.
+ * Allow that only matches round videos.
  */
 final class FilterRoundVideo extends Filter
 {

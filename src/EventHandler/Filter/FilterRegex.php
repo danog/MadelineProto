@@ -7,7 +7,7 @@ use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
 /**
- * Filter only messages matching the specified regex.
+ * Allow only messages matching the specified regex.
  */
 final class FilterRegex extends Filter
 {

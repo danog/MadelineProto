@@ -7,7 +7,7 @@ use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
 /**
- * Filter only messages containing the specified command.
+ * Allow only messages containing the specified command.
  */
 final class FilterCommand extends Filter
 {
