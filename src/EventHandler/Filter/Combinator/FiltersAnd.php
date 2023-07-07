@@ -4,6 +4,7 @@ namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Filter;
+use danog\MadelineProto\EventHandler\Filter\Handler;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
@@ -23,7 +24,18 @@ final class FiltersAnd extends Filter
     {
         $final = [];
         foreach ($this->filters as $filter) {
-            $final []= $filter->initialize($API);
+            $filter = $filter->initialize($API) ?? $filter;
+            if ($filter instanceof self) {
+                $final = \array_merge($final, $filter->filters);
+            }
+        }
+        $final = \array_filter(
+            $final,
+            fn (Filter $f): bool => !$f instanceof Handler,
+        );
+        $final = \array_values($final);
+        if (\count($final) === 1) {
+            return $final[0];
         }
         return new self(...$final);
     }

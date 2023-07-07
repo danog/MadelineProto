@@ -15,10 +15,10 @@ final class FilterPeer extends Filter
     public function __construct(private readonly string|int $peer)
     {
     }
-    public function initialize(EventHandler $API): Filter
+    public function initialize(EventHandler $API): ?Filter
     {
         $this->peerResolved = $API->getId($this->peer);
-        return $this;
+        return null;
     }
     public function apply(Update $update): bool
     {

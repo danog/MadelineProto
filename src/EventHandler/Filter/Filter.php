@@ -10,8 +10,9 @@ use danog\MadelineProto\EventHandler\Update;
 abstract class Filter
 {
     abstract public function apply(Update $update): bool;
-    public function initialize(EventHandler $API): Filter
+    /** Run some initialization logic, optionally returning a new filter to replace the current one. */
+    public function initialize(EventHandler $API): ?Filter
     {
-        return $this;
+        return null;
     }
 }

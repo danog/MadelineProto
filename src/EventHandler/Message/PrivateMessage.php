@@ -7,6 +7,6 @@ use danog\MadelineProto\EventHandler\Message;
 /**
  * Represents an incoming or outgoing private message.
  */
-abstract class PrivateMessage extends Message
+final class PrivateMessage extends Message
 {
 }

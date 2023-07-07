@@ -14,10 +14,16 @@ final class FilterNot extends Filter
     public function __construct(private readonly Filter $filter)
     {
     }
-    public function initialize(EventHandler $API): Filter
+    public function initialize(EventHandler $API): ?Filter
     {
-        $this->filter->initialize($API);
-        return $this;
+        $filter = $this->filter->initialize($API);
+        if ($filter === null) {
+            return $this;
+        }
+        if ($filter instanceof self) {
+            return $filter->filter;
+        }
+        return new self($filter);
     }
 
     public function apply(Update $update): bool

@@ -26,13 +26,11 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\IncomingChannelMessage;
-use danog\MadelineProto\EventHandler\Message\IncomingGroupMessage;
-use danog\MadelineProto\EventHandler\Message\IncomingPrivateMessage;
-use danog\MadelineProto\EventHandler\Message\OutgoingChannelMessage;
-use danog\MadelineProto\EventHandler\Message\OutgoingGroupMessage;
-use danog\MadelineProto\EventHandler\Message\OutgoingPrivateMessage;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Service\DialogMemberLeft;
 use danog\MadelineProto\EventHandler\Service\DialogMembersJoined;
@@ -335,46 +333,52 @@ trait UpdateHandler
             return null;
         }
         if ($message['_'] === 'messageService') {
-            $action = match ($message['action']['_']) {
+            return match ($message['action']['_']) {
                 'messageActionChatCreate' => new DialogCreated(
+                    $this,
+                    $message,
                     $message['action']['title'],
                     $message['action']['users'],
                 ),
                 'messageActionChatEditTitle' => new DialogTitleChanged(
+                    $this,
+                    $message,
                     $message['action']['title']
                 ),
                 'messageActionChatEditPhoto' => new DialogPhotoChanged(
+                    $this,
+                    $message,
                     $this->wrapMedia([
                         '_' => 'messageMediaPhoto',
                         'photo' => $message['action']['photo']
                     ])
                 ),
-                'messageActionChatDeletePhoto' => new DialogPhotoChanged(null),
+                'messageActionChatDeletePhoto' => new DialogPhotoChanged(
+                    $this,
+                    $message,
+                    null
+                ),
                 'messageActionChatAddUser' => new DialogMembersJoined(
+                    $this,
+                    $message,
                     $message['action']['users']
                 ),
-                'messageActionChatDeleteUser' => new DialogMemberLeft($message['action']['user_id']),
+                'messageActionChatDeleteUser' => new DialogMemberLeft(
+                    $this,
+                    $message,
+                    $message['action']['user_id']
+                ),
                 default => null
             };
-            if (!$action) {
-                return null;
-            }
-            $message['action'] = $action;
         }
         $id = $this->getIdInternal($message);
         if (($this->chats[$id]['username'] ?? '') === 'replies') {
             return null;
         }
         return match ($this->getType($id)) {
-            \danog\MadelineProto\API::PEER_TYPE_BOT, \danog\MadelineProto\API::PEER_TYPE_USER => $message['out']
-                ? new OutgoingPrivateMessage($this, $message)
-                : new IncomingPrivateMessage($this, $message),
-            \danog\MadelineProto\API::PEER_TYPE_GROUP, \danog\MadelineProto\API::PEER_TYPE_SUPERGROUP => $message['out']
-                ? new OutgoingGroupMessage($this, $message)
-                : new IncomingGroupMessage($this, $message),
-            \danog\MadelineProto\API::PEER_TYPE_CHANNEL => $message['out']
-                ? new OutgoingChannelMessage($this, $message)
-                : new IncomingChannelMessage($this, $message),
+            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message),
+            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message),
+            API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message),
         };
     }
     /**
@@ -424,7 +428,7 @@ trait UpdateHandler
             case 'updateShort':
                 return [$updates['update']];
             case 'updateShortSentMessage':
-                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], \danog\MadelineProto\API::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], API::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -434,8 +438,8 @@ trait UpdateHandler
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = $this->getInfo($from_id, \danog\MadelineProto\API::INFO_TYPE_PEER);
-                $message['peer_id'] = $this->getInfo($to_id, \danog\MadelineProto\API::INFO_TYPE_PEER);
+                $message['from_id'] = $this->getInfo($from_id, API::INFO_TYPE_PEER);
+                $message['peer_id'] = $this->getInfo($to_id, API::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
             default:
@@ -500,7 +504,7 @@ trait UpdateHandler
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], \danog\MadelineProto\API::INFO_TYPE_ID);
+                $updates['user_id'] = $this->getInfo($updates['request']['body']['peer'], API::INFO_TYPE_ID);
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
@@ -545,7 +549,7 @@ trait UpdateHandler
      */
     public function subscribeToUpdates(mixed $channel): bool
     {
-        $channelId = $this->getInfo($channel, \danog\MadelineProto\API::INFO_TYPE_ID);
+        $channelId = $this->getInfo($channel, API::INFO_TYPE_ID);
         if (!MTProto::isSupergroup($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
@@ -603,7 +607,7 @@ trait UpdateHandler
                     if (!isset($this->authorization['hint'])) {
                         $this->authorization['hint'] = '';
                     }
-                    $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
+                    $this->authorized = API::WAITING_PASSWORD;
                     $this->qrLoginDeferred?->cancel();
                     $this->qrLoginDeferred = null;
                     return;
