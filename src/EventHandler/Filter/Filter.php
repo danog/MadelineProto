@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Update;
 

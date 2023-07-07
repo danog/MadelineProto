@@ -218,8 +218,8 @@ abstract class Message extends Update
             return \htmlentities($this->message);
         }
         if ($allowTelegramTags) {
-            return $this->htmlTelegram ??= StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
+            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
         }
-        return $this->html ??= StrTools::messageEntitiesToHtml($this->message, $this->entities, $allowTelegramTags);
+        return $this->html ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
     }
 }

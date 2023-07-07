@@ -118,7 +118,6 @@ custom.md
 .php_cs.cache
 coverage
 tempConv
-extracted.json
 
 ponyScripts
 

@@ -512,6 +512,15 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::end($what);
     }
     /**
+     * Convert a message and a set of entities to HTML.
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     */
+    public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
+    {
+        return \danog\MadelineProto\StrTools::entitiesToHtml($message, $entities, $allowTelegramTags);
+    }
+    /**
      * Export authorization.
      *
      * @return array{0: (int|string), 1: string}
@@ -1030,7 +1039,11 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getType($id);
     }
     /**
-     * Get updates.
+     * Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**.
+     *
+     * `getUpdates` will **greatly slow down your bot** if used directly inside of PHP code.
+     *
+     * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
      * @param array{offset?: int, limit?: int, timeout?: float} $params Params
      * @return list<array{update_id: mixed, update: mixed}>
@@ -1241,15 +1254,6 @@ abstract class InternalDoc
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
-    }
-    /**
-     * Convert a message and a set of entities to HTML.
-     *
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
-     */
-    public static function messageEntitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
-    {
-        return \danog\MadelineProto\StrTools::messageEntitiesToHtml($message, $entities, $allowTelegramTags);
     }
     /**
      * Convert double to binary version.
@@ -1812,7 +1816,7 @@ abstract class InternalDoc
     /**
      * Wrap a media constructor into an abstract Media object.
      */
-    public function wrapMedia(array $media): \danog\MadelineProto\MTProtoTools\Media
+    public function wrapMedia(array $media): ?\danog\MadelineProto\EventHandler\Media
     {
         return $this->wrapper->getAPI()->wrapMedia($media);
     }

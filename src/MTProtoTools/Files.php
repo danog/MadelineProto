@@ -180,11 +180,15 @@ trait Files
         };
         $callable = static function (int $part_num) use ($size, $file_id, $part_total_num, $part_size, $callable, $ige) {
             static $offset = 0;
-            $bytes = $callable(
-                $offset,
-                $offset + $part_size > $size ? ($size % $part_size) : $part_size
-            );
+            $oldOffset = $offset;
+            $size = $offset + $part_size > $size ? ($size % $part_size) : $part_size;
             $offset += $part_size;
+
+            $bytes = $callable(
+                $oldOffset,
+                $part_size
+            );
+
             if ($bytes instanceof Generator) {
                 $bytes = Tools::consumeGenerator($bytes);
             }

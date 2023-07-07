@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Update;
@@ -16,9 +15,10 @@ final class FilterSender extends Filter
     public function __construct(private readonly string|int $peer)
     {
     }
-    public function initialize(EventHandler|API $API): void
+    public function initialize(EventHandler $API): self
     {
         $this->peerResolved = $API->getId($this->peer);
+        return $this;
     }
     public function apply(Update $update): bool
     {

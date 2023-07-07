@@ -118,7 +118,7 @@ abstract class StrTools extends Extension
      *
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
-    public static function messageEntitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
+    public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
         $insertions = [];
         foreach ($entities as $entity) {

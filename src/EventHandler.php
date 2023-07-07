@@ -129,7 +129,7 @@ abstract class EventHandler extends AbstractAPI
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
                     $methods[$method_name] = $this->$method(...);
                     continue;
-                }
+                }/*
                 $filter = $methodRefl->getAttributes(
                     Filter::class,
                     ReflectionAttribute::IS_INSTANCEOF
@@ -138,7 +138,7 @@ abstract class EventHandler extends AbstractAPI
                     return $filter;
                 }
                 $filter = $filter->newInstance();
-                $filter->initialize($this);
+                //$filter->initialize($this);*/
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);
