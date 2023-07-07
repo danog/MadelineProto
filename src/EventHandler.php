@@ -139,7 +139,6 @@ abstract class EventHandler extends AbstractAPI
                 }
                 $filter = $filter->newInstance();
                 $filter->initialize($this);
-                
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);

@@ -11,7 +11,8 @@ use danog\MadelineProto\EventHandler\Update;
 abstract class Filter
 {
     abstract public function apply(Update $update): bool;
-    public function initialize(EventHandler|API $API): void
+    public function initialize(EventHandler $API): Filter
     {
+        return $this;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 
+use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
@@ -17,6 +18,14 @@ final class FiltersOr extends Filter
     {
         Assert::notEmpty($filters);
         $this->filters = $filters;
+    }
+    public function initialize(EventHandler $API): Filter
+    {
+        $final = [];
+        foreach ($this->filters as $filter) {
+            $final []= $filter->initialize($API);
+        }
+        return new self(...$final);
     }
     public function apply(Update $update): bool
     {
