@@ -36,6 +36,10 @@ use ReflectionMethod;
 use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
+use function Amp\File\isDirectory;
+use function Amp\File\isFile;
+use function Amp\File\listFiles;
+
 /**
  * Event handler.
  */
@@ -44,6 +48,7 @@ abstract class EventHandler extends AbstractAPI
     use DbPropertiesTrait {
         DbPropertiesTrait::initDb as private internalInitDb;
     }
+    private static bool $includingPlugins = false;
     /**
      * Start MadelineProto and the event handler.
      *
@@ -51,9 +56,14 @@ abstract class EventHandler extends AbstractAPI
      *
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
+     * 
+     * @return class-string<static>
      */
-    final public static function startAndLoop(string $session, SettingsAbstract $settings): void
+    final public static function startAndLoop(string $session, SettingsAbstract $settings): string
     {
+        if (self::$includingPlugins) {
+            return static::class;
+        }
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
     }
@@ -65,9 +75,14 @@ abstract class EventHandler extends AbstractAPI
      * @param string $session Session name
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
+     * 
+     * @return class-string<static>
      */
-    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
+    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): string
     {
+        if (self::$includingPlugins) {
+            return static::class;
+        }
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
@@ -141,7 +156,7 @@ abstract class EventHandler extends AbstractAPI
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
                     $methods[$method_name] = [
                         function (array $update) use ($basic_handler, $closure): void {
-                            $basic_handler($update, $closure);
+                            EventLoop::queue($basic_handler, $update, $closure);
                         }
                     ];
                     continue;
@@ -176,9 +191,8 @@ abstract class EventHandler extends AbstractAPI
                 }
             }
 
-            $plugins = \array_values(\array_unique($this->getPlugins()));
-            Assert::allSubclassOf($plugins, self::class);
-            foreach ($plugins as $class => $_) {
+            $plugins = $this->internalGetPlugins();
+            foreach ($plugins as $class) {
                 $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
                 $pluginsNew[$class] = $plugin;
                 [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
@@ -217,12 +231,68 @@ abstract class EventHandler extends AbstractAPI
         return [];
     }
     /**
-     * Obtain a list of plugin event handlers.
+     * Obtain a path or a list of paths that will be recursively searched for plugins.
+     * 
+     * Plugin filenames end with .madeline.php, and will be included automatically.
+     *
+     * @return non-empty-string|non-empty-list<non-empty-string>|null
+     */
+    public function getPluginPaths(): string|array|null {
+        return null;
+    }
+    /**
+     * Obtain a list of plugin event handlers to use, in addition with those found by getPluginPath.
      *
      * @return array<class-string<EventHandler>>
      */
     public function getPlugins(): array
     {
         return [];
+    }
+
+    /**
+     * Obtain a list of plugin event handlers.
+     */
+    final private function internalGetPlugins(): array {
+        $paths = $this->getPluginPaths();
+        if (is_string($paths)) {
+            $paths = [$paths];
+        } elseif ($paths === null) {
+            $paths = [];
+        }
+
+        $recurse = static function (string $path) use (&$recurse): \Generator {
+            foreach (listFiles($path) as $file) {
+                if (isDirectory($file)) {
+                    yield from $recurse($file);
+                } elseif (isFile($file) && str_ends_with($file, ".madeline.php")) {
+                    yield require $file;
+                }
+            }
+        };
+
+        $plugins = $this->getPlugins();
+        $plugins = \array_values(\array_unique($plugins));
+
+        self::$includingPlugins = true;
+        try {
+            foreach ($paths as $path) {
+                foreach ($recurse($path) as $plugin) {
+                    $plugins []= $plugin;
+                }
+            }
+        } finally {
+            self::$includingPlugins = false;
+        }
+
+        $plugins = \array_values(\array_unique($plugins));
+
+        foreach ($plugins as $plugin) {
+            Assert::classExists($plugin);
+            Assert::true(is_subclass_of($plugin, self::class), "$plugin must extend ".self::class);
+            Assert::notEq($plugin, self::class);
+        }
+
+        return $plugins;
     }
 }

@@ -196,7 +196,7 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
 // For users or bots
-MyEventHandler::startAndLoop('bot.madeline', $settings);
+return MyEventHandler::startAndLoop('bot.madeline', $settings);
 
 // For bots only
-// MyEventHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);
+// return MyEventHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);

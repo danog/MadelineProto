@@ -116,7 +116,6 @@
     "constructor_not_found": "Constructor not found for type: ",
     "botapi_conversion_error": "Can't convert %s to a bot API object",
     "non_text_conversion": "Can't convert non text messages yet!",
-    "last_byte_invalid": "Invalid last byte",
     "file_type_invalid": "Invalid file type detected (%s)",
     "secret_chat_skipping": "I do not have the secret chat %s in the database, skipping message..."
 }

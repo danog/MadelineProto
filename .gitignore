@@ -148,3 +148,4 @@ config.json
 
 /docker-compose.yml
 /Caddyfile
+/tt.php
