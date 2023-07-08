@@ -79,35 +79,25 @@ class MyEventHandler extends EventHandler
      * @var array
      */
     private $states = [];
-    /**
-     * Constructor.
-     *
-     * @param ?API $API API
-     */
-    public function __construct(?APIWrapper $API)
-    {
-        $this->UPLOAD = class_exists(HttpServer::class);
-        parent::__construct($API);
-    }
     public function onStart()
     {
-        $this->adminId = yield $this->getInfo(self::ADMIN)['bot_api_id'];
+        $this->adminId = $this->getInfo(self::ADMIN)['bot_api_id'];
     }
     /**
      * Handle updates from channels and supergroups.
      *
      * @param array $update Update
      */
-    public function onUpdateNewChannelMessage(array $update): Generator
+    public function onUpdateNewChannelMessage(array $update)
     {
-        //yield $this->onUpdateNewMessage($update);
+        //$this->onUpdateNewMessage($update);
     }
     /**
      * Handle updates from users.
      *
      * @param array $update Update
      */
-    public function onUpdateNewMessage(array $update): Generator
+    public function onUpdateNewMessage(array $update)
     {
         if ($update['message']['out'] ?? false) {
             return;
@@ -117,34 +107,19 @@ class MyEventHandler extends EventHandler
         }
 
         try {
-            $peer = yield $this->getInfo($update);
+            $peer = $this->getInfo($update);
             $peerId = $peer['bot_api_id'];
             $messageId = $update['message']['id'];
 
-            if ($this->UPLOAD && $update['message']['message'] === '/getUrl') {
-                yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a file: ', 'reply_to_msg_id' => $messageId]);
-                $this->states[$peerId] = $this->UPLOAD;
-                return;
-            }
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if ($update['message']['message'] === '/report' && $peerId === $this->adminId) {
-                memprof_dump_callgrind($stm = fopen("php://memory", "w"));
-                fseek($stm, 0);
-                yield $this->messages->sendMedia(['peer' => $peerId, 'media' => ['_' => 'inputMediaUploadedDocument', 'file' => $stm, 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'callgrind.out']]]]);
-                fclose($stm);
+                $this->reportMemoryProfile();
                 return;
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-                if ($this->UPLOAD && ($this->states[$peerId] ?? false) === $this->UPLOAD) {
-                    unset($this->states[$peerId]);
-                    $update = Files::extractBotAPIFile(yield $this->MTProtoToBotAPI($update));
-                    $file = [$update['file_size'], $update['mime_type']];
-                    var_dump($update['file_id'].'.'.Tools::base64urlEncode(json_encode($file))."/".$update['file_name']);
-                    return;
-                }
-                yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
+                $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
                 $this->states[$peerId] = $update['message']['media'];
 
                 return;
@@ -164,7 +139,7 @@ class MyEventHandler extends EventHandler
                     $url = "http://$url";
                 }
             }
-            $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId]);
+            $id = $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId]);
             if (!isset($id['id'])) {
                 $this->report(json_encode($id));
                 foreach ($id['updates'] as $updat) {
@@ -189,31 +164,29 @@ class MyEventHandler extends EventHandler
                     }
                     $prev = $now;
                     try {
-                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"], ['FloodWaitLimit' => 0]);
+                        $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"], ['FloodWaitLimit' => 0]);
                     } catch (RPCErrorException $e) {
                     }
                 },
             );
-            yield $this->messages->sendMedia(
-                [
-                    'peer' => $peerId,
-                    'reply_to_msg_id' => $messageId,
-                    'media' => [
-                        '_' => 'inputMediaUploadedDocument',
-                        'file' => $url,
-                        'attributes' => [
-                            ['_' => 'documentAttributeFilename', 'file_name' => $name],
-                        ],
+            $this->messages->sendMedia(
+                peer: $peerId,
+                reply_to_msg_id: $messageId,
+                media: [
+                    '_' => 'inputMediaUploadedDocument',
+                    'file' => $url,
+                    'attributes' => [
+                        ['_' => 'documentAttributeFilename', 'file_name' => $name],
                     ],
-                    'message' => 'Powered by @MadelineProto!',
-                    'parse_mode' => 'Markdown',
                 ],
+                message: 'Powered by @MadelineProto!',
+                parse_mode: 'Markdown',
             );
 
             if (in_array($peer['type'], ['channel', 'supergroup'])) {
-                yield $this->channels->deleteMessages(['channel' => $peerId, 'id' => [$id]]);
+                $this->channels->deleteMessages(['channel' => $peerId, 'id' => [$id]]);
             } else {
-                yield $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
+                $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
             }
         } catch (Throwable $e) {
             if (strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && strpos($e->getMessage(), 'URI') === false) {
@@ -224,7 +197,7 @@ class MyEventHandler extends EventHandler
                 $this->report(json_encode($url));
             }
             try {
-                yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);
+                $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);
             } catch (Throwable $e) {
                 $this->logger((string) $e, Logger::FATAL_ERROR);
             }
