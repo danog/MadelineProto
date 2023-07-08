@@ -668,7 +668,7 @@ trait PeerHandler
             }
             try {
                 return $this->genAll($chat, $folder_id, $type);
-            } catch (PeerNotInDbException) {
+            } catch (PeerNotInDbException $e) {
                 unset($this->chats[$id]);
                 throw $e;
             }
