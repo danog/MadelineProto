@@ -583,7 +583,7 @@ final class TL implements TLInterface
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
                     $object = \base64_decode($object['bytes']);
                 }
-                if (\is_array($object) && \count($object) === 100) {
+                if (\is_array($object)) {
                     $object = self::compressWaveform($object);
                 }
                 if ($object instanceof Bytes) {
@@ -890,7 +890,9 @@ final class TL implements TLInterface
      */
     public static function compressWaveform(array $x): string
     {
-        Assert::count($x, 100);
+        if (\count($x) !== 100) {
+            throw new Exception("The waveform array must have 100 values!");
+        }
         $values = \array_fill(0, 63, 0);
         $bitPos = 0;
         foreach ($x as $value) {
