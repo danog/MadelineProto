@@ -49,6 +49,9 @@ abstract class EventHandler extends AbstractAPI
         DbPropertiesTrait::initDb as private internalInitDb;
     }
     private static bool $includingPlugins = false;
+    final public static function isPluginMode(): bool {
+        return self::$includingPlugins;
+    }
     /**
      * Start MadelineProto and the event handler.
      *
@@ -56,17 +59,11 @@ abstract class EventHandler extends AbstractAPI
      *
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
-     *
-     * @return class-string|never The current class name will only be returned if we're currently including plugins.
      */
-    final public static function startAndLoop(string $session, SettingsAbstract $settings): string
+    final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
-        if (self::$includingPlugins) {
-            return static::class;
-        }
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
-        return static::class;
     }
     /**
      * Start MadelineProto as a bot and the event handler.
@@ -76,18 +73,12 @@ abstract class EventHandler extends AbstractAPI
      * @param string $session Session name
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
-     *
-     * @return class-string|never The current class name will only be returned if we're currently including plugins.
      */
-    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): string
+    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
     {
-        if (self::$includingPlugins) {
-            return static::class;
-        }
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
-        return static::class;
     }
     /** @internal */
     final protected function reconnectFull(): bool

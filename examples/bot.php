@@ -187,6 +187,10 @@ class MyEventHandler extends EventHandler
     }
 }
 
+if (MyEventHandler::isPluginMode()) {
+    return MyEventHandler::class;
+}
+
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
