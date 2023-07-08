@@ -2,8 +2,6 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**

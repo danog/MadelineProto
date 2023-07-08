@@ -24,16 +24,17 @@ abstract class Filter
         return null;
     }
 
-    public static function fromReflectionType(ReflectionType $type): Filter {
+    public static function fromReflectionType(ReflectionType $type): Filter
+    {
         return match (true) {
             $type instanceof ReflectionUnionType => new FiltersOr(
-                ...array_map(
+                ...\array_map(
                     self::fromReflectionType(...),
                     $type->getTypes()
                 )
             ),
             $type instanceof ReflectionIntersectionType => new FiltersAnd(
-                ...array_map(
+                ...\array_map(
                     self::fromReflectionType(...),
                     $type->getTypes()
                 )

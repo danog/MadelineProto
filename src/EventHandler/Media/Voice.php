@@ -12,9 +12,9 @@ final class Voice extends AbstractAudio
     /**
      * 100 values from 0 to 31, representing a waveform.
      *
-     * @var list<int>|null
+     * @var list<int<0, 31>>|null
      */
-    //public readonly ?array $waveform;
+    public readonly ?array $waveform;
 
     /** @internal */
     public function __construct(
@@ -23,6 +23,6 @@ final class Voice extends AbstractAudio
         array $audioAttribute
     ) {
         parent::__construct($API, $rawMedia, $audioAttribute);
-        //$this->waveform = $audioAttribute['waveform'];
+        $this->waveform = $audioAttribute['waveform'];
     }
 }

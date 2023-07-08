@@ -543,7 +543,6 @@ final class TL implements TLInterface
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
                 }
-                //$object = \pack('C*', ...\unpack('C*', $object));
                 $l = \strlen($object);
                 $concat = '';
                 if ($l <= 253) {
@@ -561,10 +560,38 @@ final class TL implements TLInterface
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
                     $object = \base64_decode($object['bytes']);
                 }
-                if (!\is_string($object) && !$object instanceof Bytes) {
+                if ($object instanceof Bytes) {
+                    $object = (string) $object;
+                }
+                if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
                 }
-                $object = (string) $object;
+                $l = \strlen($object);
+                $concat = '';
+                if ($l <= 253) {
+                    $concat .= \chr($l);
+                    $concat .= $object;
+                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
+                } else {
+                    $concat .= \chr(254);
+                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
+                    $concat .= $object;
+                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
+                }
+                return $concat;
+            case 'waveform':
+                if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
+                    $object = \base64_decode($object['bytes']);
+                }
+                if (\is_array($object) && \count($object) === 100) {
+                    $object = self::compressWaveform($object);
+                }
+                if ($object instanceof Bytes) {
+                    $object = (string) $object;
+                }
+                if (!\is_string($object)) {
+                    throw new Exception("You didn't provide a valid string");
+                }
                 $l = \strlen($object);
                 $concat = '';
                 if ($l <= 253) {
@@ -834,6 +861,53 @@ final class TL implements TLInterface
         return async(awaitAll(...), $sideEffects);
     }
     /**
+     * Extracts a waveform.
+     *
+     * @internal Don't use this manually.
+     */
+    public static function extractWaveform(string $x): array
+    {
+        $values = \array_values(\unpack('C*', $x));
+        $result = \array_fill(0, 100, 0);
+        $bitPos = 0;
+        foreach ($result as &$value) {
+            $start = $bitPos & 7;
+            $bytePos = $bitPos >> 3;
+            $value = $values[$bytePos] >> $start;
+            if ($start > 3) {
+                $value |= $values[$bytePos+1] << (8 - $start);
+            }
+            $value &= 31;
+
+            $bitPos += 5;
+        }
+        return $result;
+    }
+    /**
+     * Compresses a waveform.
+     *
+     * @internal Don't use this manually, just pass an array of integers to $attribute['waveform'].
+     */
+    public static function compressWaveform(array $x): string
+    {
+        Assert::count($x, 100);
+        $values = \array_fill(0, 63, 0);
+        $bitPos = 0;
+        foreach ($x as $value) {
+            if (!\is_int($value) || $value < 0 || $value > 31) {
+                throw new Exception("An integer value between 0 and 31 is expected!");
+            }
+            $start = $bitPos & 7;
+            $bytePos = $bitPos >> 3;
+            $values[$bytePos] |= ($value << $start) & 0xFF;
+            if ($start > 3) {
+                $values[$bytePos+1] |= $value >> (8 - $start);
+            }
+            $bitPos += 5;
+        }
+        return \pack('C63', ...$values);
+    }
+    /**
      * Deserialize TL object.
      *
      * @param string|resource $stream    Stream
@@ -868,6 +942,7 @@ final class TL implements TLInterface
                 return \stream_get_contents($stream, 32);
             case 'int512':
                 return \stream_get_contents($stream, 64);
+            case 'waveform':
             case 'string':
             case 'bytes':
                 $l = \ord(\stream_get_contents($stream, 1));
@@ -891,7 +966,13 @@ final class TL implements TLInterface
                 if (!\is_string($x)) {
                     throw new Exception("Generated value isn't a string");
                 }
-                return $type['type'] === 'bytes' ? new Types\Bytes($x) : $x;
+                if ($type['type'] === 'bytes') {
+                    return new Types\Bytes($x);
+                }
+                if ($type['type'] === 'waveform') {
+                    return self::extractWaveform($x);
+                }
+                return $x;
             case 'Vector t':
                 $id = \stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->findById($id);

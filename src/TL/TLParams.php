@@ -54,6 +54,10 @@ trait TLParams
                 $param['splitSideEffects'] = true;
             }
 
+            if ($predicate === 'documentAttributeAudio' && $param['name'] === 'waveform') {
+                $param['type'] = 'waveform';
+            }
+
             $this->by_id[$key]['params'][$kkey] = $param;
         }
     }

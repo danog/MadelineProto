@@ -5,7 +5,6 @@ namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
-use danog\MadelineProto\EventHandler\Filter\Handler;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
