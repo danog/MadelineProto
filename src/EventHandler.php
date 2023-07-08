@@ -56,8 +56,8 @@ abstract class EventHandler extends AbstractAPI
      *
      * @param string $session Session name
      * @param SettingsAbstract $settings Settings
-     * 
-     * @return class-string<static>
+     *
+     * @return class-string|never The current class name will only be returned if we're currently including plugins.
      */
     final public static function startAndLoop(string $session, SettingsAbstract $settings): string
     {
@@ -66,6 +66,7 @@ abstract class EventHandler extends AbstractAPI
         }
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
+        return static::class;
     }
     /**
      * Start MadelineProto as a bot and the event handler.
@@ -75,8 +76,8 @@ abstract class EventHandler extends AbstractAPI
      * @param string $session Session name
      * @param string $token Bot token
      * @param SettingsAbstract $settings Settings
-     * 
-     * @return class-string<static>
+     *
+     * @return class-string|never The current class name will only be returned if we're currently including plugins.
      */
     final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): string
     {
@@ -86,6 +87,7 @@ abstract class EventHandler extends AbstractAPI
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
+        return static::class;
     }
     /** @internal */
     final protected function reconnectFull(): bool
@@ -232,12 +234,13 @@ abstract class EventHandler extends AbstractAPI
     }
     /**
      * Obtain a path or a list of paths that will be recursively searched for plugins.
-     * 
-     * Plugin filenames end with .madeline.php, and will be included automatically.
+     *
+     * Plugin filenames end with .plugin.php, and will be included automatically.
      *
      * @return non-empty-string|non-empty-list<non-empty-string>|null
      */
-    public function getPluginPaths(): string|array|null {
+    public function getPluginPaths(): string|array|null
+    {
         return null;
     }
     /**
@@ -253,34 +256,31 @@ abstract class EventHandler extends AbstractAPI
     /**
      * Obtain a list of plugin event handlers.
      */
-    final private function internalGetPlugins(): array {
+    private function internalGetPlugins(): array
+    {
         $paths = $this->getPluginPaths();
-        if (is_string($paths)) {
+        if (\is_string($paths)) {
             $paths = [$paths];
         } elseif ($paths === null) {
             $paths = [];
         }
 
-        $recurse = static function (string $path) use (&$recurse): \Generator {
+        $plugins = $this->getPlugins();
+        $plugins = \array_values(\array_unique($plugins));
+
+        $recurse = static function (string $path) use (&$recurse, &$plugins): void {
             foreach (listFiles($path) as $file) {
                 if (isDirectory($file)) {
-                    yield from $recurse($file);
-                } elseif (isFile($file) && str_ends_with($file, ".madeline.php")) {
-                    yield require $file;
+                    $recurse($file);
+                } elseif (isFile($file) && \str_ends_with($file, ".plugin.php")) {
+                    $plugins []= require $file;
                 }
             }
         };
 
-        $plugins = $this->getPlugins();
-        $plugins = \array_values(\array_unique($plugins));
-
-        self::$includingPlugins = true;
         try {
-            foreach ($paths as $path) {
-                foreach ($recurse($path) as $plugin) {
-                    $plugins []= $plugin;
-                }
-            }
+            self::$includingPlugins = true;
+            \array_map($recurse, $paths);
         } finally {
             self::$includingPlugins = false;
         }
@@ -289,7 +289,7 @@ abstract class EventHandler extends AbstractAPI
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
-            Assert::true(is_subclass_of($plugin, self::class), "$plugin must extend ".self::class);
+            Assert::true(\is_subclass_of($plugin, self::class), "$plugin must extend ".self::class);
             Assert::notEq($plugin, self::class);
         }
 

@@ -117,6 +117,5 @@
     "src_file_invalid": "منبع فایل نامعتبری لحاظ گردیده: ",
     "bool_error": "نمی‌توان‌ boolean را استخراج کرد",
     "sec_peer_not_in_db": "این peer مخفی در پایگاه داده (دیتابیس) داخلی peer وجود ندارد",
-    "last_byte_invalid": "last byte نامعتبر است",
     "stream_handle_invalid": "یک کنترل‌کننده جریان (استریم هندل) نامعتبر لحاظ گردیده."
 }

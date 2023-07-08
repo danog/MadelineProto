@@ -53,7 +53,6 @@
     "long_not_16": "La valeur donnée ne fait pas 16 octets",
     "long_not_32": "La valeur donnée ne fait pas 32 octets",
     "long_not_64": "La valeur donnée ne fait pas 64 octets",
-    "last_byte_invalid": "Dernier octet invalide",
     "call_error_3": "Impossible de trouver et de terminer l'appel %s",
     "call_completing": "Fin de l'appel de %s...",
     "call_confirming": "Confirmation de l'appel de %s...",

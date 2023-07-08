@@ -4,7 +4,6 @@
     "apiChooseManualAutoTipWeb": "تێبینی بکە کە دەتوانیت API ID/hash ڕاستەوخۆ لە کۆدەکەدا دابین بکەیت بە بەکارهێنانی <a target=\"_blank\" href=\"%s\">ڕێکخستنەکان</a>.",
     "constructor_not_found": "Constructor نەدۆزرایەوە بۆ جۆری: ",
     "botapi_conversion_error": "ناتوانرێت %s بگۆڕێت بۆ ئۆبجێکتی API بۆت",
-    "last_byte_invalid": "دوا بایتی نادروستە",
     "file_type_invalid": "جۆری پەڕگەی نادروست دۆزراوەتەوە (%s)",
     "apiManualInstructions2": "کلیک لەسەر create application بکە",
     "signupLastNameWeb": "ناوی کۆتایی",

@@ -132,27 +132,6 @@ final class AppInfo extends SettingsAbstract
     public function setApiId(int $apiId): self
     {
         $this->apiId = $apiId;
-        if ($apiId === 6) {
-            // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
-            // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
-            // This makes usage of all MTProto libraries very difficult, at least for new users.
-            // To help a bit, when the android API ID is used, the android app infos are spoofed too.
-            // THE ANDROID API HASH IS NOT PRESENT IN THIS REPOSITORY, AND WILL NOT BE GIVEN TO EVERYONE.
-            // This measure was NOT created with the intent to aid spammers, flooders, and other scum.
-            //
-            // I understand that automated account registration through headless libraries may indicate the creation of a botnet,
-            // ...and I understand why these automatic bans were implemented in the first place.
-            // Manual requests to activate numbers through recover@telegram.org will still be required for the majority of users of this library,
-            // ...those that choose to user their own API ID for their application.
-            //
-            // To be honest, I wrote this feature just for me, since I honestly don't want to
-            // ...go through the hassle of registering => recovering => logging in to every account I use for my services (mainly webradios and test userbots)
-            $this->deviceModel = 'LGENexus 5';
-            $this->systemVersion = 'SDK 28';
-            $this->appVersion = '4.9.1 (13613)';
-            $this->langPack = 'android';
-        }
-
         return $this;
     }
 

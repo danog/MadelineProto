@@ -60,7 +60,6 @@
     "constructor_not_found": "Costruttore non trovato per tipo: ",
     "botapi_conversion_error": "Non sono risucito a convertire %s in un oggetto bot API",
     "non_text_conversion": "Non posso ancora convertire messaggi media!",
-    "last_byte_invalid": "L'ultimo byte non è valido",
     "file_type_invalid": "È stato fornito un tipo file errato",
     "secret_chat_skipping": "Non ho la chat segreta %s nel database, ignorando messaggio...",
     "done": "Fatto!",
