@@ -133,17 +133,17 @@ trait UpdateHandler
             });
             return;
         }
-        if (isset($this->eventHandlerMethods[$update['_']])) {
-            foreach ($this->eventHandlerMethods[$update['_']] as $closure) {
-                $closure($update);
-            }
-        }
         if (\count($this->eventHandlerHandlers) !== 0) {
             $update = $this->wrapUpdate($update);
             if ($update !== null) {
                 foreach ($this->eventHandlerHandlers as $closure) {
                     $closure($update);
                 }
+            }
+        }
+        if (isset($this->eventHandlerMethods[$update['_']])) {
+            foreach ($this->eventHandlerMethods[$update['_']] as $closure) {
+                $closure($update);
             }
         }
     }
