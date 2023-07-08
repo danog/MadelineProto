@@ -121,6 +121,15 @@ final class InternalState
         $this->setStatus(StatusInternal::GATHERING_PEERS);
         async(function (): void {
             $peers = $this->API->getDialogIds();
+            if (\is_array($this->filter->whitelist)) {
+                foreach ($this->filter->whitelist as $id) {
+                    try {
+                        $this->API->getInfo($id);
+                    } catch (Throwable $e) {
+                        $this->API->logger->logger("An error occurred while getting info about whitelisted peer $id: $e", Logger::ERROR);
+                    }
+                }
+            }
             $peers = \array_filter($peers, function (int $peer): bool {
                 if (\in_array($peer, $this->filter->blacklist, true)) {
                     return false;

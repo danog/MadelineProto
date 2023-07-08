@@ -608,6 +608,7 @@ final class MTProto implements TLCallback, LoggerGetter
             'qres',
             'supportUser',
             'broadcasts',
+            'broadcastId',
             'loginQrCode',
 
             // Event handler

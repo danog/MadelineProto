@@ -103,6 +103,7 @@ final class Blacklist {
         return match ($type) {
             'string' => 'string',
             'bytes' => 'string',
+            'waveform' => 'array',
             'int' => 'int',
             'long' => 'int',
             'strlong' => 'int',
@@ -124,6 +125,7 @@ final class Blacklist {
         $base = match ($type) {
             'string' => 'string',
             'bytes' => 'string',
+            'waveform' => 'non-empty-list<int<0, 31>>',
             'int' => 'int',
             'long' => 'int',
             'strlong' => 'int',
@@ -233,6 +235,7 @@ final class Blacklist {
         return match ($type) {
             'string' => $description,
             'bytes' => $description,
+            'waveform' => $description,
             'int' => $description,
             'long' => $description,
             'strlong' => $description,

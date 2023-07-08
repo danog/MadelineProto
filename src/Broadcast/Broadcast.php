@@ -32,6 +32,8 @@ trait Broadcast
 {
     /** @var array<int, InternalState> */
     private array $broadcasts = [];
+    // Start from the top to avoid conflicts with broadcasts that used the previous ID naming scheme
+    private int $broadcastId = PHP_INT_MAX;
 
     /**
      * Sends a list of messages to all peers (users, chats, channels) of the bot.
@@ -93,7 +95,7 @@ trait Broadcast
         // Ensure it can be serialized
         \serialize($action);
 
-        $id = \count($this->broadcasts);
+        $id = $this->broadcastId--;
         $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default());
         return $id;
     }

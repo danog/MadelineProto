@@ -6,9 +6,9 @@ use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
 /**
- * A member left the chat or channel.
+ * The title of a channel or group has changed.
  */
-final class DialogMemberLeft extends ServiceMessage
+final class DialogTitleChanged extends ServiceMessage
 {
     public function __construct(
         MTProto $API,

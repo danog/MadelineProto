@@ -26,24 +26,19 @@ use JsonSerializable;
 /**
  * Bytes wrapper.
  *
+ * Cast this object to a string ((string) $bytes) to obtain the inner bytes.
+ *
  * @implements ArrayAccess<int, string>
  */
 final class Bytes implements JsonSerializable, ArrayAccess
 {
     /**
-     * Bytes.
-     *
-     * @var string Bytes
-     */
-    private string $bytes;
-    /**
      * Constructor function.
      *
      * @param string $bytes Contents
      */
-    public function __construct(string $bytes)
+    public function __construct(private readonly string $bytes)
     {
-        $this->bytes = $bytes;
     }
     /**
      * Sleep function.
