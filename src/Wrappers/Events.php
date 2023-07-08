@@ -56,6 +56,12 @@ trait Events
      * @var array<string, callable>
      */
     private array $eventHandlerMethods = [];
+    /**
+     * Event handler handler list.
+     *
+     * @var array<string, callable>
+     */
+    private array $eventHandlerHandlers = [];
 
     /** @var array<class-string<EventHandler>, EventHandler> */
     private array $pluginInstances = [];
@@ -87,7 +93,7 @@ trait Events
             // Already started event handler
             return;
         }
-        $this->eventHandlerMethods = $methods;
+        [$this->eventHandlerMethods, $this->eventHandlerHandlers] = $methods;
         $this->pluginInstances = $pluginsNew;
 
         $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
@@ -130,6 +136,7 @@ trait Events
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->eventHandlerHandlers = [];
         $this->pluginInstances = [];
         $this->setNoop();
     }

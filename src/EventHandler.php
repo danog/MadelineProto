@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
+use Closure;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
@@ -123,15 +124,26 @@ abstract class EventHandler extends AbstractAPI
             $methods = [];
             $handlers = [];
             $has_any = false;
+            $basic_handler = static function (array $update, Closure $closure): void {
+                $r = $closure($update);
+                if ($r instanceof Generator) {
+                    Tools::consumeGenerator($r);
+                }
+            };
             foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
                 $method = $methodRefl->getName();
                 if ($method === 'onAny') {
                     $has_any = true;
                     continue;
                 }
+                $closure = $this->$method(...);
                 $method_name = \lcfirst(\substr($method, 2));
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
-                    $methods[$method_name] = $this->$method(...);
+                    $methods[$method_name] = [
+                        function (array $update) use ($basic_handler, $closure): void {
+                            $basic_handler($update, $closure);
+                        }
+                    ];
                     continue;
                 }
                 if (!($handler = $methodRefl->getAttributes(Handler::class))) {
@@ -149,61 +161,17 @@ abstract class EventHandler extends AbstractAPI
                     Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
                 );
                 $filter = $filter->initialize($this) ?? $filter;
-                $handlers []= [
-                    $method,
-                    $handler,
-                    $filter
-                ];
-            }
-            $prevClosure = null;
-            /** @var Filter $filter */
-            foreach ($handlers as [$method, $handler, $filter]) {
-                $closure = $this->$method(...);
-                if ($prevClosure) {
-                    $prevClosure = function (Update $update) use ($prevClosure, $closure, $filter): void {
-                        if ($filter->apply($update)) {
-                            EventLoop::queue($closure, $update);
-                        }
-                        $prevClosure();
-                    };
-                } else {
-                    $prevClosure = function (Update $update) use ($closure, $filter): void {
-                        if ($filter->apply($update)) {
-                            EventLoop::queue($closure, $update);
-                        }
-                    };
-                }
-            }
-            if ($prevClosure) {
-                foreach (['updateNewMessage', 'updateNewChannelMessage'] as $update) {
-                    if (isset($methods[$update])) {
-                        $old = $methods[$update];
-                        $methods[$update] = function (array $update) use ($old, $prevClosure): void {
-                            $obj = $this->wrapUpdate($update);
-                            if ($obj === null) {
-                                $r = $old($update);
-                                if ($r instanceof Generator) {
-                                    Tools::consumeGenerator($r);
-                                }
-                            } else {
-                                $prevClosure($obj);
-                            }
-                        };
-                    } else {
-                        $methods[$update] = function (array $update) use ($prevClosure): void {
-                            $obj = $this->wrapUpdate($update);
-                            if ($obj !== null) {
-                                $prevClosure($obj);
-                            }
-                        };
+                $handlers []= function (Update $update) use ($closure, $filter): void {
+                    if ($filter->apply($update)) {
+                        EventLoop::queue($closure, $update);
                     }
-                }
+                };
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);
                 foreach ($constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {
-                        $methods[$constructor['predicate']] = $onAny;
+                        $methods[$constructor['predicate']] = [$onAny];
                     }
                 }
             }
@@ -213,27 +181,16 @@ abstract class EventHandler extends AbstractAPI
             foreach ($plugins as $class => $_) {
                 $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
                 $pluginsNew[$class] = $plugin;
-                foreach ($plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [] as $update => $method) {
-                    if (isset($methods[$update])) {
-                        $oldMethod = $methods[$update];
-                        $methods[$update] = function (array $update) use ($oldMethod, $method): void {
-                            EventLoop::queue(function () use ($update, $method): void {
-                                $r = $method($update);
-                                if ($r instanceof Generator) {
-                                    Tools::consumeGenerator($r);
-                                }
-                            });
-                            $r = $oldMethod($update);
-                            if ($r instanceof Generator) {
-                                Tools::consumeGenerator($r);
-                            }
-                        };
-                    }
+                [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
+                foreach ($newMethods as $update => $method) {
+                    $methods[$update] ??= [];
+                    $methods[$update][] = $method;
                 }
+                $handlers = \array_merge($handler, $newHandlers);
             }
 
             $this->startedInternal = true;
-            return $methods;
+            return [$methods, $handlers];
         } finally {
             $this->startDeferred = null;
             $startDeferred->complete();

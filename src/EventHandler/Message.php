@@ -63,7 +63,7 @@ abstract class Message extends AbstractMessage
     public readonly bool $imported;
 
     /** For Public Service Announcement messages, the PSA type */
-    public readonly string $psaType;
+    public readonly ?string $psaType;
 
     // Todo media (photosizes, thumbs), albums, reactions, replies, games eventually
 

@@ -590,7 +590,7 @@ trait PeerHandler
      *      type: string
      * } : ($type is API::INFO_TYPE_TYPE ? string : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool})))
      */
-    public function getInfo(mixed $id, int $type = \danog\MadelineProto\API::INFO_TYPE_ALL): array|int
+    public function getInfo(mixed $id, int $type = \danog\MadelineProto\API::INFO_TYPE_ALL): array|int|string
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -722,7 +722,7 @@ trait PeerHandler
      *      type: string
      * }&array) : array|int)
      */
-    private function genAll($constructor, $folder_id, int $type): array|int
+    private function genAll($constructor, $folder_id, int $type): array|int|string
     {
         if ($type === \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR) {
             if ($constructor['_'] === 'user') {

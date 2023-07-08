@@ -49,10 +49,8 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
-use Generator;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -87,6 +85,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->eventHandlerHandlers = [];
         $this->pluginInstances = [];
         $this->startUpdateSystem();
     }
@@ -109,6 +108,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->eventHandlerHandlers = [];
         $this->pluginInstances = [];
         $this->startUpdateSystem();
     }
@@ -124,7 +124,7 @@ trait UpdateHandler
             $update = $update['progress'];
         }
         if ($f = $this->event_handler_instance->waitForInternalStart()) {
-            $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using EventLoop::queue to fix this)...", Logger::NOTICE);
+            $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
             $f->map(function (): void {
                 \array_map($this->handleUpdate(...), $this->updates);
@@ -133,12 +133,18 @@ trait UpdateHandler
             });
             return;
         }
-        if (!isset($this->eventHandlerMethods[$update['_']])) {
-            return;
+        if (isset($this->eventHandlerMethods[$update['_']])) {
+            foreach ($this->eventHandlerMethods[$update['_']] as $closure) {
+                $closure($update);
+            }
         }
-        $r = $this->eventHandlerMethods[$update['_']]($update);
-        if ($r instanceof Generator) {
-            Tools::consumeGenerator($r);
+        if (\count($this->eventHandlerHandlers) !== 0) {
+            $update = $this->wrapUpdate($update);
+            if ($update !== null) {
+                foreach ($this->eventHandlerHandlers as $closure) {
+                    $closure($update);
+                }
+            }
         }
     }
 
@@ -204,6 +210,7 @@ trait UpdateHandler
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
+        $this->eventHandlerHandlers = [];
         $this->pluginInstances = [];
 
         [

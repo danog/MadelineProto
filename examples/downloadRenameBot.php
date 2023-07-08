@@ -18,16 +18,11 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use Amp\Http\Server\HttpServer;
-use danog\MadelineProto\API;
-use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tools;
 use League\Uri\Contracts\UriException;
 
 /*
@@ -79,7 +74,7 @@ class MyEventHandler extends EventHandler
      * @var array
      */
     private $states = [];
-    public function onStart()
+    public function onStart(): void
     {
         $this->adminId = $this->getInfo(self::ADMIN)['bot_api_id'];
     }
@@ -88,7 +83,7 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      */
-    public function onUpdateNewChannelMessage(array $update)
+    public function onUpdateNewChannelMessage(array $update): void
     {
         //$this->onUpdateNewMessage($update);
     }
@@ -154,7 +149,7 @@ class MyEventHandler extends EventHandler
 
             $url = new FileCallback(
                 $url,
-                function ($progress, $speed, $time) use ($peerId, $id) {
+                function ($progress, $speed, $time) use ($peerId, $id): void {
                     $this->logger("Upload progress: $progress%");
 
                     static $prev = 0;
