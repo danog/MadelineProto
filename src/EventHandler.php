@@ -26,6 +26,8 @@ use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
+use danog\MadelineProto\EventHandler\Handler;
+use danog\MadelineProto\EventHandler\Update;
 use Generator;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -119,6 +121,7 @@ abstract class EventHandler extends AbstractAPI
 
             $constructors = $this->getTL()->getConstructors();
             $methods = [];
+            $handlers = [];
             $has_any = false;
             foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
                 $method = $methodRefl->getName();
@@ -129,6 +132,9 @@ abstract class EventHandler extends AbstractAPI
                 $method_name = \lcfirst(\substr($method, 2));
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
                     $methods[$method_name] = $this->$method(...);
+                    continue;
+                }
+                if (!($handler = $methodRefl->getAttributes(Handler::class))) {
                     continue;
                 }
                 $filter = $methodRefl->getAttributes(
@@ -143,7 +149,55 @@ abstract class EventHandler extends AbstractAPI
                     Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
                 );
                 $filter = $filter->initialize($this) ?? $filter;
-                
+                $handlers []= [
+                    $method,
+                    $handler,
+                    $filter
+                ];
+            }
+            $prevClosure = null;
+            /** @var Filter $filter */
+            foreach ($handlers as [$method, $handler, $filter]) {
+                $closure = $this->$method(...);
+                if ($prevClosure) {
+                    $prevClosure = function (Update $update) use ($prevClosure, $closure, $filter): void {
+                        if ($filter->apply($update)) {
+                            EventLoop::queue($closure, $update);
+                        }
+                        $prevClosure();
+                    };
+                } else {
+                    $prevClosure = function (Update $update) use ($closure, $filter): void {
+                        if ($filter->apply($update)) {
+                            EventLoop::queue($closure, $update);
+                        }
+                    };
+                }
+            }
+            if ($prevClosure) {
+                foreach (['updateNewMessage', 'updateNewChannelMessage'] as $update) {
+                    if (isset($methods[$update])) {
+                        $old = $methods[$update];
+                        $methods[$update] = function (array $update) use ($old, $prevClosure): void {
+                            $obj = $this->wrapUpdate($update);
+                            if ($obj === null) {
+                                $r = $old($update);
+                                if ($r instanceof Generator) {
+                                    Tools::consumeGenerator($r);
+                                }
+                            } else {
+                                $prevClosure($obj);
+                            }
+                        };
+                    } else {
+                        $methods[$update] = function (array $update) use ($prevClosure): void {
+                            $obj = $this->wrapUpdate($update);
+                            if ($obj !== null) {
+                                $prevClosure($obj);
+                            }
+                        };
+                    }
+                }
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);

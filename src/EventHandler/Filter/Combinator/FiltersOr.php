@@ -4,6 +4,7 @@ namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Filter;
+use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
 use danog\MadelineProto\EventHandler\Filter\Handler;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
@@ -30,7 +31,7 @@ final class FiltersOr extends Filter
             }
         }
         foreach ($final as $f) {
-            if ($f instanceof Handler) {
+            if ($f instanceof FilterAllowAll) {
                 return $f;
             }
         }

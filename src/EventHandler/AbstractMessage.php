@@ -38,8 +38,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /** Time-to-live of the message */
     public readonly ?int $ttlPeriod;
 
-    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies, games eventually, service messages
-
     /** @internal */
     public function __construct(
         MTProto $API,

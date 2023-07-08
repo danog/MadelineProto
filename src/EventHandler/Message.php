@@ -65,7 +65,7 @@ abstract class Message extends AbstractMessage
     /** For Public Service Announcement messages, the PSA type */
     public readonly string $psaType;
 
-    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies, games eventually, service messages
+    // Todo media (waveform, photosizes, thumbs), albums, reactions, replies, games eventually
 
     /** @internal */
     public function __construct(

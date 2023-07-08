@@ -41,6 +41,7 @@ abstract class Filter
             $type instanceof ReflectionNamedType => match ($type->getName()) {
                 Incoming::class => new FilterIncoming,
                 Outgoing::class => new FilterOutgoing,
+                Update::class => new FilterAllowAll,
                 default => new FilterClass($type->getName())
             }
         };
