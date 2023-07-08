@@ -215,7 +215,9 @@ trait UpdateHandler
         if (!$this->updates) {
             try {
                 $this->update_deferred = new DeferredFuture();
-                $this->update_deferred->getFuture()->await(new TimeoutCancellation($timeout));
+                $this->update_deferred->getFuture()->await(
+                    $timeout === INF ? null : new TimeoutCancellation($timeout)
+                );
             } catch (CancelledException $e) {
                 if (!$e->getPrevious() instanceof TimeoutException) {
                     throw $e;

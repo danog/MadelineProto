@@ -1396,6 +1396,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->report($message, $parseMode);
     }
     /**
+     * Report memory profile with memprof.
+     */
+    public function reportMemoryProfile(): void
+    {
+        $this->wrapper->getAPI()->reportMemoryProfile();
+    }
+    /**
      * Request VoIP call.
      *
      * @param mixed $user User
@@ -1717,12 +1724,12 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean                            $encrypted Whether to encrypt file for secret chats
+     * @param FileCallbackInterface|string|array|resource $file      File, URL or Telegram file to upload
+     * @param string                                      $fileName  File name
+     * @param callable                                    $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                                     $encrypted Whether to encrypt file for secret chats
      */
-    public function upload(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
     }

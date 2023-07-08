@@ -1696,6 +1696,37 @@ final class MTProto implements TLCallback, LoggerGetter
         }
     }
     /**
+     * Report memory profile with memprof.
+     */
+    public function reportMemoryProfile(): void
+    {
+        if (!\extension_loaded('memprof')) {
+            throw Exception::extension('memprof');
+        }
+        if (!\memprof_enabled()) {
+            throw new Exception("Memory profiling is not enabled in the database settings, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
+        }
+
+        $current = "Current memory usage: ".\round(\memory_get_usage()/1024/1024, 1) . " MB";
+        $file = \fopen('php://memory', 'r+');
+        \memprof_dump_pprof($file);
+        \fseek($file, 0);
+        $file = [
+            '_' => 'inputMediaUploadedDocument',
+            'file' => $file,
+            'attributes' => [
+                ['_' => 'documentAttributeFilename', 'file_name' => 'report.pprof'],
+            ],
+        ];
+        foreach ($this->reportDest as $id) {
+            try {
+                $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'message' => $current, 'media' => $file]);
+            } catch (Throwable $e) {
+                $this->logger("While reporting memory profile to $id: $e", Logger::FATAL_ERROR);
+            }
+        }
+    }
+    /**
      * Get full list of MTProto and API methods.
      */
     public function getAllMethods(): array
