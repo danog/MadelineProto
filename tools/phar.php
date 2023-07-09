@@ -7,7 +7,7 @@ if (\defined('MADELINE_PHP')) {
 }
 
 if (!\defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\ClassLoader::class)) {
-    throw new \Exception('Composer autoloader detected: madeline.php is incompatible with Composer, please require \'danog/madelineproto:^7\' using composer.');
+    throw new \Exception('Composer autoloader detected: madeline.php is incompatible with Composer, please install MadelineProto using composer: https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project');
 }
 
 \define('MADELINE_PHP', __FILE__);
@@ -169,11 +169,7 @@ class Installer
             self::$lock = \fopen("$phar.lock", 'c');
         }
         \flock(self::$lock, LOCK_SH);
-        $result = require_once $phar;
-        if (\defined('MADELINE_WORKER_TYPE') && \constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
-            require_once "phar://$phar/vendor/danog/madelineproto/src/Ipc/Runner/entry.php";
-        }
-        return $result;
+        return require_once $phar;
     }
 
     /**
