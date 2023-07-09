@@ -21,3 +21,4 @@ Fixes:
 - Now uploadMedia, sendMedia and upload can upload files from string buffers created using `ReadableBuffer`.
 - Reduce memory usage during flood waits by tweaking config defaults.
 - Reduce memory usage by clearing the min database automatically as needed.
+- Automatically try caching all dialogs if a peer not found error is about to be thrown
