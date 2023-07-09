@@ -540,6 +540,9 @@ final class TL implements TLInterface
             case 'double':
                 return Tools::packDouble($object);
             case 'string':
+                if ($object instanceof Bytes || is_int($object) || is_float($object)) {
+                    $object = (string) $object;
+                }
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
                 }
@@ -560,7 +563,7 @@ final class TL implements TLInterface
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
                     $object = \base64_decode($object['bytes']);
                 }
-                if ($object instanceof Bytes) {
+                if ($object instanceof Bytes || is_int($object) || is_float($object)) {
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
