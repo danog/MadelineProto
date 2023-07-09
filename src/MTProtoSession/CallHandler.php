@@ -40,16 +40,11 @@ trait CallHandler
 {
     /**
      * Recall method.
-     *
-     * @param array  $args      Args
      */
-    public function methodRecall(array $args): void
+    public function methodRecall(int $message_id, bool $postpone = false, ?int $datacenter = null): void
     {
-        $message_id = $args['message_id'];
-        $postpone = $args['postpone'] ?? false;
-        $datacenter = $args['datacenter'] ?? false;
         if ($datacenter === $this->datacenter) {
-            $datacenter = false;
+            $datacenter = null;
         }
         $message = $this->outgoing_messages[$message_id] ?? null;
         $message_ids = $message instanceof Container

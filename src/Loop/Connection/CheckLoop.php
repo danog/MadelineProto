@@ -90,7 +90,7 @@ final class CheckLoop extends Loop
                                     break;
                                 }
                                 $this->logger->logger("Message $message not received by server, resending...", Logger::ERROR);
-                                $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
+                                $this->connection->methodRecall(message_id: $message_id, postpone: true);
                                 break;
                             case 4:
                                 if ($chr & 32) {
@@ -101,7 +101,7 @@ final class CheckLoop extends Loop
                                             $this->logger->logger("Cancelling $message...", Logger::ERROR);
                                         } else {
                                             $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                            $this->connection->methodRecall(['message_id' => $message_id, 'postpone' => true]);
+                                            $this->connection->methodRecall(message_id: $message_id, postpone: true);
                                         }
                                     } else {
                                         $this->logger->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
@@ -138,7 +138,7 @@ final class CheckLoop extends Loop
                     && $message->isUnencrypted()
                 ) {
                     $this->logger->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);
-                    $this->connection->methodRecall(['message_id' => $message->getMsgId(), 'postpone' => true]);
+                    $this->connection->methodRecall(message_id: $message->getMsgId(), postpone: true);
                 }
             }
             $this->connection->flush();

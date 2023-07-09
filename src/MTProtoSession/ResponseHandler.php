@@ -211,12 +211,12 @@ trait ResponseHandler
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(message_id: $requestId, postpone: true);
                     return;
                 case 20:
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $this->methodRecall(['message_id' => $requestId, 'postpone' => true]);
+                    $this->methodRecall(message_id: $requestId, postpone: true);
                     return;
                 case 16:
                 case 17:
@@ -226,7 +226,7 @@ trait ResponseHandler
                     $this->shared->setTempAuthKey(null);
                     EventLoop::queue(function () use ($requestId): void {
                         $this->API->initAuthorization();
-                        $this->methodRecall(['message_id' => $requestId]);
+                        $this->methodRecall(message_id: $requestId);
                     });
                     return;
             }
@@ -290,7 +290,7 @@ trait ResponseHandler
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
-            $this->methodRecall(['message_id' => $msgId, 'postpone' => true]);
+            $this->methodRecall(message_id: $msgId, postpone: true);
             return null;
         }
 
@@ -300,12 +300,12 @@ trait ResponseHandler
             case -503:
                 if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                     $this->call_queue[$request->getQueueId()] = [];
-                    $this->methodRecall(['message_id' => $request->getMsgId(), 'postpone' => true]);
+                    $this->methodRecall(message_id: $request->getMsgId(), postpone: true);
                     return null;
                 }
                 if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->getConstructor(), ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
                     || (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'], true))) {
-                    EventLoop::delay(1.0, fn () => $this->methodRecall(['message_id' => $request->getMsgId()]));
+                    EventLoop::delay(1.0, fn () => $this->methodRecall(message_id: $request->getMsgId()));
                     return null;
                 }
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
@@ -317,7 +317,7 @@ trait ResponseHandler
                 if ($request->isUserRelated()) {
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
-                EventLoop::queue($this->methodRecall(...), ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
+                EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId(), datacenter: $datacenter);
                 return null;
             case 401:
                 switch ($response['error_message']) {
@@ -363,7 +363,7 @@ trait ResponseHandler
                         }
                         EventLoop::queue(function () use ($request): void {
                             $this->API->initAuthorization();
-                            $this->methodRecall(['message_id' => $request->getMsgId()]);
+                            $this->methodRecall($request->getMsgId());
                         });
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
@@ -371,7 +371,7 @@ trait ResponseHandler
                         $this->shared->setTempAuthKey(null);
                         EventLoop::queue(function () use ($request): void {
                             $this->API->initAuthorization();
-                            $this->methodRecall(['message_id' => $request->getMsgId()]);
+                            $this->methodRecall($request->getMsgId());
                         });
                         return null;
                 }
@@ -386,7 +386,7 @@ trait ResponseHandler
                     $request->setSent(\time() + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    EventLoop::delay((float) $seconds, fn () => $this->methodRecall(['message_id' => $msgId]));
+                    EventLoop::delay((float) $seconds, fn () => $this->methodRecall($msgId));
                     return null;
                 }
                 if (\str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {

@@ -64,7 +64,7 @@ trait Reliable
         }
         if ($ok) {
             foreach ($content['msg_ids'] as $msg_id) {
-                $this->methodRecall(['message_id' => $msg_id, 'postpone' => true]);
+                $this->methodRecall(message_id: $msg_id, postpone: true);
             }
         } else {
             $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);

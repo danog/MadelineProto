@@ -31,6 +31,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -1291,9 +1292,11 @@ trait PeerHandler
             $result = $this->getIdInternal(
                 ($this->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
             );
+        } catch (FloodWaitError $e) {
+            throw $e;
         } catch (RPCErrorException $e) {
             $this->logger->logger('Username resolution failed with error '.$e->getMessage(), Logger::ERROR);
-            if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
+            if ($e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
                 throw $e;
             }
         } finally {

@@ -56,13 +56,13 @@ final class RPC extends SettingsAbstract
      */
     public function getRpcDropTimeout(): int
     {
-        return \max($this->rpcDropTimeout, $this->getFloodTimeout()+1);
+        return $this->rpcDropTimeout;
     }
 
     /**
      * Set RPC drop timeout.
      *
-     * @param int $rpcDropTimeout RPC timeout, must be bigger than the flood timeout.
+     * @param int $rpcDropTimeout RPC timeout
      */
     public function setRpcDropTimeout(int $rpcDropTimeout): self
     {
@@ -102,7 +102,7 @@ final class RPC extends SettingsAbstract
     /**
      * Set flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
      *
-     * Must be smaller than the drop timeout and bigger than 5.
+     * Must be bigger than 5.
      *
      * @param int $floodTimeout Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously
      */

@@ -18,3 +18,4 @@ Fixes:
 - Improve background broadcasting with the broadcast API using a pre-defined list of `whitelist` IDs!
 - Broadcast IDs are now unique across multiple broadcasts, even if previous broadcasts already completed their ID will never be re-used.
 - Now uploadMedia, sendMedia and upload directly accept PHP memory stream resources, to upload files from buffers.
+- Reduce memory usage during flood waits by tweaking config defaults.
