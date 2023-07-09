@@ -957,12 +957,20 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
 
-        foreach ($this->chats as $id => $chat) {
-            $id = (int) $id;
-            if (!($chat['min'] ?? false)) {
-                $this->minDatabase->clearPeer($id);
+        async(function() {
+            $counter = 0;
+            foreach ($this->chats as $id => $chat) {
+                $id = (int) $id;
+                $counter ++;
+                if ($counter % 1000 === 0) {
+                    $this->logger->logger("Upgrading chats: $counter", Logger::WARNING);
+                }
+
+                if (!($chat['min'] ?? false)) {
+                    $this->minDatabase->clearPeer($id);
+                }
             }
-        }
+        });
     }
     /**
      * Post-deserialization initialization function.
