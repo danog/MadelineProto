@@ -18,12 +18,12 @@ final class RPC extends SettingsAbstract
     /**
      * RPC drop timeout.
      */
-    protected int $rpcDropTimeout = 5*60;
+    protected int $rpcDropTimeout = 60;
 
     /**
      * Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
      */
-    protected int $floodTimeout = 10*60;
+    protected int $floodTimeout = 30;
 
     /**
      * Maximum number of message IDs to consider when using call queues.
@@ -56,13 +56,13 @@ final class RPC extends SettingsAbstract
      */
     public function getRpcDropTimeout(): int
     {
-        return $this->rpcDropTimeout;
+        return \max($this->rpcDropTimeout, $this->getFloodTimeout()+1);
     }
 
     /**
      * Set RPC drop timeout.
      *
-     * @param int $rpcDropTimeout RPC timeout.
+     * @param int $rpcDropTimeout RPC timeout, must be bigger than the flood timeout.
      */
     public function setRpcDropTimeout(int $rpcDropTimeout): self
     {
@@ -96,11 +96,13 @@ final class RPC extends SettingsAbstract
      */
     public function getFloodTimeout(): int
     {
-        return $this->floodTimeout;
+        return \max(5, $this->floodTimeout);
     }
 
     /**
      * Set flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
+     *
+     * Must be smaller than the drop timeout and bigger than 5.
      *
      * @param int $floodTimeout Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously
      */

@@ -291,7 +291,7 @@ abstract class EventHandler extends AbstractAPI
             Assert::classExists($plugin);
             Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
             Assert::notEq($plugin, PluginEventHandler::class);
-            Assert::true(str_contains(ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
+            Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
         }
 
         return $plugins;

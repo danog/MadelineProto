@@ -23,6 +23,6 @@ namespace danog\MadelineProto;
 /**
  * Plugin event handler class.
  */
-abstract class PluginEventHandler extends EventHandler {
-
+abstract class PluginEventHandler extends EventHandler
+{
 }
