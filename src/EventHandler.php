@@ -31,6 +31,17 @@ use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Handler;
 use danog\MadelineProto\EventHandler\Update;
 use Generator;
+use mysqli;
+use PDO;
+use PhpParser\Node;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Name;
+use PhpParser\NodeFinder;
+use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\ParserFactory;
+use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
@@ -40,6 +51,7 @@ use Webmozart\Assert\Assert;
 use function Amp\File\isDirectory;
 use function Amp\File\isFile;
 use function Amp\File\listFiles;
+use function Amp\File\read;
 
 /**
  * Event handler.
@@ -302,8 +314,47 @@ abstract class EventHandler extends AbstractAPI
             Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
             Assert::notEq($plugin, PluginEventHandler::class);
             Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
+            self::validatePlugin($plugin);
         }
 
         return $plugins;
+    }
+
+    private const BANNED_FUNCTIONS = [
+        'file_get_contents',
+        'file_put_contents',
+        'curl_exec',
+        'mysqli_connect',
+        'fopen',
+        'fsockopen'
+    ];
+    private const BANNED_CLASSES = [
+        PDO::class,
+        mysqli::class,
+    ];
+    private static function validatePlugin(string $class): void {
+        $file = read((new ReflectionClass($class))->getFileName());
+        $file = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($file);
+        Assert::notNull($file);
+        $traverser = new NodeTraverser([new NameResolver()]);
+        $file = $traverser->traverse($file);
+
+        /** @var FuncCall $call */
+        foreach ((new NodeFinder)->findInstanceOf($file, FuncCall::class) as $call) {
+            if ($call->name instanceof Name 
+                && in_array($name = $call->name->toLowerString(), self::BANNED_FUNCTIONS, true)
+            ) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking function $name!");
+            }
+        }
+
+        /** @var New_ $call */
+        foreach ((new NodeFinder)->findInstanceOf($file, New_::class) as $new) {
+            if ($new->class instanceof Name
+                && in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
+            ) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking class $name!");
+            }
+        }
     }
 }

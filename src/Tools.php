@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableBuffer;
 use ArrayAccess;
 use Closure;
 use Countable;
@@ -99,6 +100,12 @@ abstract class Tools extends AsyncTools
         } catch (\Throwable) {
         }
         return null;
+    }
+    /**
+     * Converts a string into an async amphp stream.
+     */
+    public static function stringToStream(string $str): ReadableBuffer {
+        return new ReadableBuffer($str);
     }
     /**
      * Sanify TL obtained from JSON for TL serialization.
