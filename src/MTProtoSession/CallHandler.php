@@ -165,7 +165,7 @@ trait CallHandler
             $method,
             $methodInfo['type'],
             true,
-            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false && $method !== 'ping_delay_disconnect',
+            !$this->shared->hasTempAuthKey() && !\str_contains($method, '.') && $method !== 'ping_delay_disconnect',
             $response,
             $aargs['cancellation'] ?? null
         );

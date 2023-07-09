@@ -227,14 +227,14 @@ final class TL implements TLInterface
                         $layer = (int) $matches[1];
                         continue;
                     }
-                    if (\strpos($line, 'vector#') === 0) {
+                    if (\str_starts_with($line, 'vector#')) {
                         continue;
                     }
-                    if (\strpos($line, ' ?= ') !== false) {
+                    if (\str_contains($line, ' ?= ')) {
                         continue;
                     }
                     $line = \preg_replace(['/[(]([\\w\\.]+) ([\\w\\.]+)[)]/', '/\\s+/'], ['$1<$2>', ' '], $line);
-                    if (\strpos($line, ';') === false) {
+                    if (!\str_contains($line, ';')) {
                         $lineBuf .= $line;
                         continue;
                     } elseif ($lineBuf) {

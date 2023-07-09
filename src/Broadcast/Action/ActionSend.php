@@ -29,7 +29,7 @@ use danog\MadelineProto\RPCErrorException;
 /** @internal */
 final class ActionSend implements Action
 {
-    public function __construct(private readonly MTProto $API, public readonly array $messages)
+    public function __construct(private readonly MTProto $API, private readonly array $messages, private readonly bool $pin)
     {
     }
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void
@@ -39,12 +39,19 @@ final class ActionSend implements Action
                 if ($cancellation->isRequested()) {
                     return;
                 }
-                $this->API->methodCallAsyncRead(
+                $id = $this->API->extractMessageId($this->API->methodCallAsyncRead(
                     isset($message['media']['_']) &&
                         $message['media']['_'] !== 'messageMediaWebPage'
                         ? 'messages.sendMedia'
                         : 'messages.sendMessage',
                     \array_merge($message, ['peer' => $peer]),
+                    ['FloodWaitLimit' => 2*86400]
+                ));
+            }
+            if ($this->pin) {
+                $this->API->methodCallAsyncRead(
+                    'messages.updatePinnedMessage',
+                    ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
                     ['FloodWaitLimit' => 2*86400]
                 );
             }

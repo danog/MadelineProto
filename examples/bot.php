@@ -164,7 +164,7 @@ class MyEventHandler extends EventHandler
         }
 
         // We can broadcast messages to all users.
-        if ($update['message']['message'] === '/broadcast'
+        if (($update['message']['message'] ?? '') === '/broadcast'
             && $from_id === $this->adminId
         ) {
             if (!isset($update['message']['reply_to']['reply_to_msg_id'])) {
@@ -179,6 +179,7 @@ class MyEventHandler extends EventHandler
                 from_peer: $update,
                 message_ids: [$update['message']['reply_to']['reply_to_msg_id']],
                 drop_author: true,
+                pin: true,
             );
             return;
         }

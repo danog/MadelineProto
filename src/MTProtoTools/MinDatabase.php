@@ -228,7 +228,8 @@ final class MinDatabase implements TLCallback
     /**
      * Remove location info for peer.
      */
-    public function clearPeer(int $id): void {
+    public function clearPeer(int $id): void
+    {
         unset($this->db[$id]);
     }
     public function __debugInfo()

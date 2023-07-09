@@ -29,13 +29,13 @@ use danog\MadelineProto\RPCErrorException;
 /** @internal */
 final class ActionForward implements Action
 {
-    public function __construct(private readonly MTProto $API, private readonly int $from_peer, private readonly array $ids, private readonly bool $drop_author)
+    public function __construct(private readonly MTProto $API, private readonly int $from_peer, private readonly array $ids, private readonly bool $drop_author, private readonly bool $pin)
     {
     }
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void
     {
         try {
-            $this->API->methodCallAsyncRead(
+            $updates = $this->API->methodCallAsyncRead(
                 'messages.forwardMessages',
                 [
                     'from_peer' => $this->from_peer,
@@ -45,6 +45,20 @@ final class ActionForward implements Action
                 ],
                 ['FloodWaitLimit' => 2*86400]
             );
+            if ($this->pin) {
+                $updates = $this->API->extractUpdates($updates);
+                $id = 0;
+                foreach ($updates as $update) {
+                    if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage'], true)) {
+                        $id = max($id, $update['message']['id']);
+                    }
+                }
+                $this->API->methodCallAsyncRead(
+                    'messages.updatePinnedMessage',
+                    ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
+                    ['FloodWaitLimit' => 2*86400]
+                );
+            }
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'INPUT_USER_DEACTIVATED') {
                 return;

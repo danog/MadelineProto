@@ -120,6 +120,7 @@ trait UpdateHandler
      */
     private function eventUpdateHandler(array $update): void
     {
+        $updateType = $update['_'];
         if ($update['_'] === 'updateBroadcastProgress') {
             $update = $update['progress'];
         }
@@ -133,7 +134,7 @@ trait UpdateHandler
             });
             return;
         }
-        if (\count($this->eventHandlerHandlers) !== 0) {
+        if (\count($this->eventHandlerHandlers) !== 0 && \is_array($update)) {
             $update = $this->wrapUpdate($update);
             if ($update !== null) {
                 foreach ($this->eventHandlerHandlers as $closure) {
@@ -141,8 +142,8 @@ trait UpdateHandler
                 }
             }
         }
-        if (isset($this->eventHandlerMethods[$update['_']])) {
-            foreach ($this->eventHandlerMethods[$update['_']] as $closure) {
+        if (isset($this->eventHandlerMethods[$updateType])) {
+            foreach ($this->eventHandlerMethods[$updateType] as $closure) {
                 $closure($update);
             }
         }

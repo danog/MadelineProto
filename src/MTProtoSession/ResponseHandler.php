@@ -283,7 +283,7 @@ trait ResponseHandler
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
         }
-        if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
+        if (\str_starts_with($response['error_message'], 'FILE_REFERENCE_')) {
             $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
             $this->gotResponseForOutgoingMessage($request);
             $msgId = $request->getMsgId();

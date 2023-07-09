@@ -118,7 +118,7 @@ final class ReadLoop extends Loop
             $buffer = $this->connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
             $this->logger->logger($e->getReason());
-            if (\strpos($e->getReason(), '       ') === 0) {
+            if (\str_starts_with($e->getReason(), '       ')) {
                 $payload = -((int) \substr($e->getReason(), 7));
                 $this->logger->logger("Received {$payload} from DC ".$this->datacenter, Logger::ERROR);
                 return $payload;
