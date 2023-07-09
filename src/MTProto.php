@@ -49,6 +49,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\SecretChats\MessageHandler;
 use danog\MadelineProto\SecretChats\ResponseHandler;
 use danog\MadelineProto\SecretChats\SeqNoHandler;
+use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -412,7 +413,7 @@ final class MTProto implements TLCallback, LoggerGetter
         'full_chats' => ['innerMadelineProto' => true],
         'sponsoredMessages' => ['innerMadelineProto' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
-        'usernames' => ['innerMadelineProto' => true],
+        'usernames' => ['innerMadelineProto' => true, 'innerMadelineProtoSerializer' => SerializerType::STRING],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
 

@@ -33,11 +33,11 @@ use danog\MadelineProto\EventHandler\Update;
 use Generator;
 use mysqli;
 use PDO;
-use PhpParser\Node;
-use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
@@ -326,32 +326,56 @@ abstract class EventHandler extends AbstractAPI
         'curl_exec',
         'mysqli_connect',
         'fopen',
-        'fsockopen'
+        'fsockopen',
+    ];
+    private const BANNED_FILE_FUNCTIONS = [
+        'amp\\file\\read',
+        'amp\\file\\write',
+        'amp\\file\\get',
+        'amp\\file\\put',
     ];
     private const BANNED_CLASSES = [
         PDO::class,
         mysqli::class,
     ];
-    private static function validatePlugin(string $class): void {
+    private static function validatePlugin(string $class): void
+    {
         $file = read((new ReflectionClass($class))->getFileName());
         $file = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($file);
         Assert::notNull($file);
         $traverser = new NodeTraverser([new NameResolver()]);
         $file = $traverser->traverse($file);
+        $finder = new NodeFinder;
+
+        /** @var DeclareDeclare|null $call */
+        $declare = $finder->findFirstInstanceOf($file, DeclareDeclare::class);
+        Assert::true(
+            $declare !== null
+            && $declare->key->name === 'strict_types'
+            && $declare->value instanceof LNumber
+            && $declare->value->value === 1,
+            "An error occurred while analyzing plugin $class: the first statement of a plugin must be declare(strict_types=1);"
+        );
 
         /** @var FuncCall $call */
-        foreach ((new NodeFinder)->findInstanceOf($file, FuncCall::class) as $call) {
-            if ($call->name instanceof Name 
-                && in_array($name = $call->name->toLowerString(), self::BANNED_FUNCTIONS, true)
-            ) {
+        foreach ($finder->findInstanceOf($file, FuncCall::class) as $call) {
+            if (!$call->name instanceof Name) {
+                continue;
+            }
+
+            $name = $call->name->toLowerString();
+            if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
                 throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking function $name!");
+            }
+            if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
             }
         }
 
         /** @var New_ $call */
-        foreach ((new NodeFinder)->findInstanceOf($file, New_::class) as $new) {
+        foreach ($finder->findInstanceOf($file, New_::class) as $new) {
             if ($new->class instanceof Name
-                && in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
+                && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
             ) {
                 throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking class $name!");
             }

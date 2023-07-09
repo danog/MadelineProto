@@ -54,9 +54,12 @@ final class DbPropertiesFactory
                 && $config['serializer'] !== SerializerType::IGBINARY
                 && $config['serializer'] !== SerializerType::SERIALIZE
             ) {
-                $config['serializer'] = Magic::$can_use_igbinary
-                    ? SerializerType::IGBINARY
-                    : SerializerType::SERIALIZE;
+                $config['serializer'] = $config['innerMadelineProtoSerializer']
+                    ?? (
+                        Magic::$can_use_igbinary
+                        ? SerializerType::IGBINARY
+                        : SerializerType::SERIALIZE
+                    );
             }
 
             $class = $dbSettings instanceof DriverDatabaseAbstract && (!($config['enableCache'] ?? true) || !$config['cacheTtl'])

@@ -104,7 +104,8 @@ abstract class Tools extends AsyncTools
     /**
      * Converts a string into an async amphp stream.
      */
-    public static function stringToStream(string $str): ReadableBuffer {
+    public static function stringToStream(string $str): ReadableBuffer
+    {
         return new ReadableBuffer($str);
     }
     /**
