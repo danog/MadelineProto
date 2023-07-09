@@ -57,14 +57,15 @@ abstract class EventHandler extends AbstractAPI
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
      * @param string $session Session name
-     * @param SettingsAbstract $settings Settings
+     * @param ?SettingsAbstract $settings Settings
      */
-    final public static function startAndLoop(string $session, SettingsAbstract $settings): void
+    final public static function startAndLoop(string $session, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
             Fiber::suspend(static::class);
             throw new AssertionError("Unreachable!");
         }
+        $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
     }
@@ -75,14 +76,15 @@ abstract class EventHandler extends AbstractAPI
      *
      * @param string $session Session name
      * @param string $token Bot token
-     * @param SettingsAbstract $settings Settings
+     * @param ?SettingsAbstract $settings Settings
      */
-    final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
+    final public static function startAndLoopBot(string $session, string $token, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
             Fiber::suspend(static::class);
             throw new AssertionError("Unreachable!");
         }
+        $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
@@ -287,8 +289,9 @@ abstract class EventHandler extends AbstractAPI
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
-            Assert::true(\is_subclass_of($plugin, self::class), "$plugin must extend ".self::class);
-            Assert::notEq($plugin, self::class);
+            Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
+            Assert::notEq($plugin, PluginEventHandler::class);
+            Assert::true(str_contains(ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
         }
 
         return $plugins;
