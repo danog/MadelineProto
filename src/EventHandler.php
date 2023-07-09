@@ -23,12 +23,14 @@ namespace danog\MadelineProto;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use Closure;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Handler;
 use danog\MadelineProto\EventHandler\Update;
+use Fiber;
 use Generator;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -49,9 +51,6 @@ abstract class EventHandler extends AbstractAPI
         DbPropertiesTrait::initDb as private internalInitDb;
     }
     private static bool $includingPlugins = false;
-    final public static function isPluginMode(): bool {
-        return self::$includingPlugins;
-    }
     /**
      * Start MadelineProto and the event handler.
      *
@@ -62,6 +61,10 @@ abstract class EventHandler extends AbstractAPI
      */
     final public static function startAndLoop(string $session, SettingsAbstract $settings): void
     {
+        if (self::$includingPlugins) {
+            Fiber::suspend(static::class);
+            throw new AssertionError("Unreachable!");
+        }
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
     }
@@ -76,6 +79,10 @@ abstract class EventHandler extends AbstractAPI
      */
     final public static function startAndLoopBot(string $session, string $token, SettingsAbstract $settings): void
     {
+        if (self::$includingPlugins) {
+            Fiber::suspend(static::class);
+            throw new AssertionError("Unreachable!");
+        }
         $API = new API($session, $settings);
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
@@ -256,15 +263,15 @@ abstract class EventHandler extends AbstractAPI
             $paths = [];
         }
 
-        $plugins = $this->getPlugins();
-        $plugins = \array_values(\array_unique($plugins));
+        $plugins = \array_values($this->getPlugins());
 
         $recurse = static function (string $path) use (&$recurse, &$plugins): void {
             foreach (listFiles($path) as $file) {
                 if (isDirectory($file)) {
                     $recurse($file);
                 } elseif (isFile($file) && \str_ends_with($file, ".plugin.php")) {
-                    $plugins []= require $file;
+                    $f = new Fiber(fn () => require $file);
+                    $plugins []= $f->start();
                 }
             }
         };
@@ -276,7 +283,7 @@ abstract class EventHandler extends AbstractAPI
             self::$includingPlugins = false;
         }
 
-        $plugins = \array_values(\array_unique($plugins));
+        $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);

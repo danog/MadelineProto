@@ -187,10 +187,6 @@ class MyEventHandler extends EventHandler
     }
 }
 
-if (MyEventHandler::isPluginMode()) {
-    return MyEventHandler::class;
-}
-
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
@@ -200,7 +196,7 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
 // For users or bots
-return MyEventHandler::startAndLoop('bot.madeline', $settings);
+MyEventHandler::startAndLoop('bot.madeline', $settings);
 
 // For bots only
-// return MyEventHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);
+// MyEventHandler::startAndLoopBot('bot.madeline', 'bot token', $settings);
