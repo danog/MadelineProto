@@ -50,14 +50,16 @@ class MyEventHandler extends EventHandler
      */
     const ADMIN = "@me"; // !!! Change this to your username !!!
 
+    private int $adminId;
+
     /**
      * @var array<int, bool>
      */
-    protected array $notifiedChats = [];
+    private array $notifiedChats = [];
 
-    private int $adminId;
-
-    /** Which properties to save in the database */
+    /**
+     * Returns a list of names for properties that will be automatically saved to the session database (MySQL/postgres/redis if configured, the session file otherwise).
+     */
     public function __sleep(): array
     {
         return ['notifiedChats'];

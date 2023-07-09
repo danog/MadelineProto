@@ -126,6 +126,7 @@ trait PeerHandler
             if (isset($existingChat['access_hash'])) {
                 $this->logger->logger("No access hash with user {$user['id']}, using backup");
                 $user['access_hash'] = $existingChat['access_hash'];
+                $user['min'] = false;
             } else {
                 Assert::null($existingChat);
                 try {
@@ -165,6 +166,9 @@ trait PeerHandler
                 ];
             }
             $this->chats->set($user['id'], $user);
+            if (!($user['min'] ?? false)) {
+                $this->minDatabase->clearPeer($user['id']);
+            }
         }
     }
     /**
@@ -248,6 +252,9 @@ trait PeerHandler
                 ];
             }
             $this->chats->set($bot_api_id, $chat);
+            if (!($chat['min'] ?? false)) {
+                $this->minDatabase->clearPeer($bot_api_id);
+            }
         }
     }
 

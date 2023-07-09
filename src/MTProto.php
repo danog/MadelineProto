@@ -954,6 +954,13 @@ final class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
+
+        foreach ($this->chats as $id => $chat) {
+            $id = (int) $id;
+            if (!($chat['min'] ?? false)) {
+                $this->minDatabase->clearPeer($id);
+            }
+        }
     }
     /**
      * Post-deserialization initialization function.
