@@ -198,7 +198,13 @@ final class ReadLoop extends Loop
             }
             $this->logger->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
 
-            $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
+            try {
+                $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
+            } catch (\Throwable $e) {
+                Logger::log('Error during deserializing message (base64): ' .  base64_encode($message_data), Logger::ERROR);
+                throw $e;
+            }
+
             $sideEffects = $this->API->getTL()->getSideEffects();
             $message = new MTProtoIncomingMessage($deserialized, $message_id);
             $message->setSideEffects($sideEffects);
