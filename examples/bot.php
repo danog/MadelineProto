@@ -23,7 +23,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Attributes\Periodic;
+use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
@@ -97,9 +97,9 @@ class MyEventHandler extends EventHandler
     }
 
     /**
-     * This function will be executed every 60 seconds.
+     * This cron function will be executed forever, every 60 seconds.
      */
-    #[Periodic(period: 60.0)]
+    #[Cron(period: 60.0)]
     public function cron1(): void
     {
         $this->messages->sendMessage(

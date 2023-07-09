@@ -6,7 +6,7 @@ Features:
 - You can now automatically pin messages broadcasted using `broadcastMessages`, `broadcastForwardMessages` by using the new `pin: true` parameter!
 - You can now use `@admin` to send messages to the bot's admin, which will be the first peer returned by `getReportPeers`.
 - Added `wrapUpdate`, `wrapMessage`, `wrapMedia`
-- Added `Periodic`
+- Added `Cron`
 - Added plugins, filters, simple filters
 - The `waveform` attribute of `Voice` objects is now automatically encoded and decoded to an array of 100 integer values!
 - Added a custom PeerNotInDbException class for "This peer is not present in the internal peer database" errors

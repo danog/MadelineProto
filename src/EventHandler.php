@@ -27,6 +27,7 @@ use AssertionError;
 use Closure;
 use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Periodic;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
@@ -178,7 +179,7 @@ abstract class EventHandler extends AbstractAPI
                     ];
                     continue;
                 }
-                if ($periodic = $methodRefl->getAttributes(Periodic::class)) {
+                if ($periodic = $methodRefl->getAttributes(Cron::class)) {
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
                         function (PeriodicLoop $loop) use ($closure): bool {

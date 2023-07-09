@@ -6,7 +6,7 @@ use Attribute;
 
 /** Attribute that enables periodic execution of a certain method. */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class Periodic
+final class Cron
 {
     public function __construct(
         public readonly float $period
