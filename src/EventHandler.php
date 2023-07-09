@@ -30,7 +30,6 @@ use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Handler;
 use danog\MadelineProto\EventHandler\Update;
-use Fiber;
 use Generator;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -62,8 +61,7 @@ abstract class EventHandler extends AbstractAPI
     final public static function startAndLoop(string $session, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
-            Fiber::suspend(static::class);
-            throw new AssertionError("Unreachable!");
+            throw new PluginRegistration(static::class);
         }
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
@@ -81,8 +79,7 @@ abstract class EventHandler extends AbstractAPI
     final public static function startAndLoopBot(string $session, string $token, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
-            Fiber::suspend(static::class);
-            throw new AssertionError("Unreachable!");
+            throw new PluginRegistration(static::class);
         }
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
@@ -273,16 +270,16 @@ abstract class EventHandler extends AbstractAPI
                 if (isDirectory($file)) {
                     $recurse($file);
                 } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
-                    $file = realpath($file);
+                    $file = \realpath($file);
                     if (isset(self::$includedPaths[$file])) {
                         continue;
                     }
                     self::$includedPaths[$file] = true;
                     try {
-                        require_once $file;
+                        require $file;
                     } catch (PluginRegistration $e) {
-                        $name = substr($e->plugin, strrpos($e->plugin, '\\')+1);
-                        Assert::eq($name, basename($file, '.php'));
+                        $name = \substr($e->plugin, \strrpos($e->plugin, '\\')+1);
+                        Assert::eq($name, \basename($file, '.php'));
                         $plugins []= $e->plugin;
                         continue;
                     }

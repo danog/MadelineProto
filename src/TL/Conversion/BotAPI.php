@@ -53,9 +53,9 @@ trait BotAPI
             foreach ($row as $button) {
                 $newrows[$key]['buttons'][$button_key] = ['_' => 'keyboardButton', 'text' => $button['text']];
                 if (isset($button['url'])) {
-                    if (str_starts_with($button['url'], 'tg://user?id=')) {
+                    if (\str_starts_with($button['url'], 'tg://user?id=')) {
                         $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUserProfile';
-                        $newrows[$key]['buttons'][$button_key]['user_id'] = str_replace(
+                        $newrows[$key]['buttons'][$button_key]['user_id'] = \str_replace(
                             'tg://user?id=',
                             '',
                             $button['url']
