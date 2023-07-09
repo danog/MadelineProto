@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\Sync\LocalMutex;
 use Amp\TimeoutCancellation;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
 use Throwable;
@@ -177,6 +178,22 @@ trait DialogHandler
     {
         return $this->getFullDialogsInternal(true);
     }
+    private bool $fetchedFullDialogs = false;
+    private ?LocalMutex $cacheFullDialogsMutex = null;
+    private function cacheFullDialogs(): bool
+    {
+        if ($this->authorized === API::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup() && !$this->fetchedFullDialogs) {
+            $this->cacheFullDialogsMutex ??= new LocalMutex;
+            $lock = $this->cacheFullDialogsMutex->acquire();
+            try {
+                $this->getFullDialogsInternal(false);
+            } finally {
+                $lock->release();
+            }
+            return true;
+        }
+        return false;
+    }
     /**
      * Get full info of all dialogs.
      *
@@ -237,6 +254,7 @@ trait DialogHandler
                 break;
             }
         }
+        $this->fetchedFullDialogs = true;
         return $dialogs;
     }
 }

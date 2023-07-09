@@ -611,6 +611,7 @@ final class MTProto implements TLCallback, LoggerGetter
             'broadcasts',
             'broadcastId',
             'loginQrCode',
+            'fetchedFullDialogs',
 
             // Event handler
             'event_handler',
@@ -1045,9 +1046,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->setEventHandler($this->event_handler);
         }
         $this->startUpdateSystem(true);
-        if ($this->authorized === API::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
-            $this->getFullDialogsInternal(false);
-        }
+        $this->cacheFullDialogs();
         if ($this->authorized === API::LOGGED_IN) {
             $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
             $this->updaters[UpdateLoop::GENERIC]->resume();

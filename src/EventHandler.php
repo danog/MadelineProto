@@ -25,7 +25,9 @@ use Amp\Future;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use Closure;
+use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\EventHandler\Attributes\Periodic;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Handler;
@@ -110,6 +112,10 @@ abstract class EventHandler extends AbstractAPI
     private ?LocalMutex $startMutex = null;
     private ?DeferredFuture $startDeferred = null;
     /**
+     * @var array<PeriodicLoop>
+     */
+    private array $periodicLoops = [];
+    /**
      * Start method handler.
      *
      * @internal
@@ -172,6 +178,15 @@ abstract class EventHandler extends AbstractAPI
                     ];
                     continue;
                 }
+                if (!($periodic = $methodRefl->getAttributes(Periodic::class))) {
+                    $periodic = $periodic[0]->newInstance();
+                    $this->periodicLoops[$method] = new PeriodicLoop(
+                        $closure,
+                        $method,
+                        $periodic->period
+                    );
+                    continue;
+                }
                 if (!($handler = $methodRefl->getAttributes(Handler::class))) {
                     continue;
                 }
@@ -221,6 +236,15 @@ abstract class EventHandler extends AbstractAPI
             $startDeferred->complete();
             $lock->release();
         }
+    }
+    /**
+     * Obtain a PeriodicLoop instance created by the Periodic attribute.
+     *
+     * @param string $name Method name
+     */
+    final public function getPeriodicLoop(string $name): PeriodicLoop
+    {
+        return $this->periodicLoops[$name];
     }
     /**
      * @internal
@@ -325,6 +349,7 @@ abstract class EventHandler extends AbstractAPI
         'file_put_contents',
         'curl_exec',
         'mysqli_connect',
+        'mysql_connect',
         'fopen',
         'fsockopen',
     ];
@@ -354,7 +379,7 @@ abstract class EventHandler extends AbstractAPI
             && $declare->key->name === 'strict_types'
             && $declare->value instanceof LNumber
             && $declare->value->value === 1,
-            "An error occurred while analyzing plugin $class: the first statement of a plugin must be declare(strict_types=1);"
+            "An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);"
         );
 
         /** @var FuncCall $call */
@@ -365,10 +390,10 @@ abstract class EventHandler extends AbstractAPI
 
             $name = $call->name->toLowerString();
             if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking function $name!");
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking function $name!");
             }
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
             }
         }
 
@@ -377,7 +402,7 @@ abstract class EventHandler extends AbstractAPI
             if ($new->class instanceof Name
                 && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
             ) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: plugins may not use the non-async blocking class $name!");
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking class $name!");
             }
         }
     }

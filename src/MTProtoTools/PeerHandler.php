@@ -652,6 +652,9 @@ trait PeerHandler
             }
             $chat = $this->chats[$id];
             if (!$chat) {
+                if ($this->cacheFullDialogs()) {
+                    return $this->getInfo($id, $type);
+                }
                 throw new PeerNotInDbException();
             }
             if (($chat['min'] ?? false)
@@ -708,6 +711,9 @@ trait PeerHandler
         }
         if ($bot_api_id = $this->resolveUsername($id)) {
             return $this->getInfo($bot_api_id, $type);
+        }
+        if ($this->cacheFullDialogs()) {
+            return $this->getInfo($id, $type);
         }
         throw new PeerNotInDbException();
     }
@@ -786,6 +792,7 @@ trait PeerHandler
                     $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                     $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                 } else {
+                    $this->cacheFullDialogs();
                     throw new PeerNotInDbException();
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
@@ -811,6 +818,7 @@ trait PeerHandler
                 break;
             case 'channel':
                 if (!isset($constructor['access_hash'])) {
+                    $this->cacheFullDialogs();
                     throw new PeerNotInDbException();
                 }
                 $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
