@@ -23,6 +23,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\Attributes\Periodic;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
@@ -51,7 +52,7 @@ class MyEventHandler extends EventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "@me"; // !!! Change this to your username !!!
+    const ADMIN = "@danogentili"; // !!! Change this to your username !!!
 
     private int $adminId;
 
@@ -90,9 +91,25 @@ class MyEventHandler extends EventHandler
             return;
         }
         $this->messages->sendMessage(
-            peer: self::ADMIN,
+            peer: '@admin', // You can also use self::ADMIN, which does the same thing
             message: "The bot was started!"
         );
+    }
+
+    /**
+     * This function will be executed every 60 seconds.
+     */
+    #[Periodic(period: 60.0)]
+    public function cron1(): bool
+    {
+        $stop = false;
+
+        $this->messages->sendMessage(
+            peer: '@admin',
+            message: "The bot is online, current time ".date(DATE_RFC850)."!"
+        );
+
+        return $stop;
     }
 
     private int $lastLog = 0;
@@ -104,7 +121,7 @@ class MyEventHandler extends EventHandler
         if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
             $this->lastLog = time();
             $this->messages->sendMessage(
-                peer: self::ADMIN,
+                peer: 'admin',
                 message: (string) $progress
             );
         }

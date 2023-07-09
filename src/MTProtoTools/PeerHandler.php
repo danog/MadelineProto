@@ -700,6 +700,12 @@ trait PeerHandler
         if ($id === 'me') {
             return $this->getInfo($this->authorization['user']['id'], $type);
         }
+        if ($id === 'admin') {
+            if (!isset($this->reportDest[0])) {
+                throw new Exception("No report peers were configured, can't send a message to the bot admin!");
+            }
+            return $this->getInfo($this->reportDest[0], $type);
+        }
         if ($id === 'support') {
             if (!$this->supportUser) {
                 $this->methodCallAsyncRead('help.getSupport', []);

@@ -178,13 +178,14 @@ abstract class EventHandler extends AbstractAPI
                     ];
                     continue;
                 }
-                if (!($periodic = $methodRefl->getAttributes(Periodic::class))) {
+                if ($periodic = $methodRefl->getAttributes(Periodic::class)) {
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
                         $closure,
                         $method,
                         $periodic->period
                     );
+                    $this->periodicLoops[$method]->start();
                     continue;
                 }
                 if (!($handler = $methodRefl->getAttributes(Handler::class))) {

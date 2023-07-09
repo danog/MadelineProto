@@ -1571,7 +1571,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * IDs of peers where to report errors.
      *
-     * @var array<int>
+     * @var list<int>
      */
     private array $reportDest = [];
     /**
@@ -1631,7 +1631,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         /** @var array<int> $userOrId */
-        return $userOrId;
+        return \array_values($userOrId);
     }
     /**
      * Set peer(s) where to send errors occurred in the event loop.
