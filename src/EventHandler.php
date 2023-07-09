@@ -181,7 +181,9 @@ abstract class EventHandler extends AbstractAPI
                 if ($periodic = $methodRefl->getAttributes(Periodic::class)) {
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
-                        $closure,
+                        function (PeriodicLoop $loop) use ($closure): bool {
+                            return $closure($loop) ?? false;
+                        },
                         $method,
                         $periodic->period
                     );

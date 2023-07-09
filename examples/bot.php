@@ -100,16 +100,12 @@ class MyEventHandler extends EventHandler
      * This function will be executed every 60 seconds.
      */
     #[Periodic(period: 60.0)]
-    public function cron1(): bool
+    public function cron1(): void
     {
-        $stop = false;
-
         $this->messages->sendMessage(
             peer: '@admin',
             message: "The bot is online, current time ".date(DATE_RFC850)."!"
         );
-
-        return $stop;
     }
 
     private int $lastLog = 0;
