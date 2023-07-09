@@ -235,7 +235,7 @@ abstract class EventHandler extends AbstractAPI
     /**
      * Obtain a path or a list of paths that will be recursively searched for plugins.
      *
-     * Plugin filenames end with .plugin.php, and will be included automatically.
+     * Plugin filenames end with Plugin.php, and will be included automatically.
      *
      * @return non-empty-string|non-empty-list<non-empty-string>|null
      */
@@ -253,6 +253,7 @@ abstract class EventHandler extends AbstractAPI
         return [];
     }
 
+    private static array $includedPaths = [];
     /**
      * Obtain a list of plugin event handlers.
      */
@@ -271,9 +272,21 @@ abstract class EventHandler extends AbstractAPI
             foreach (listFiles($path) as $file) {
                 if (isDirectory($file)) {
                     $recurse($file);
-                } elseif (isFile($file) && \str_ends_with($file, ".plugin.php")) {
-                    $f = new Fiber(fn () => require $file);
-                    $plugins []= $f->start();
+                } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
+                    $file = realpath($file);
+                    if (isset(self::$includedPaths[$file])) {
+                        continue;
+                    }
+                    self::$includedPaths[$file] = true;
+                    try {
+                        require_once $file;
+                    } catch (PluginRegistration $e) {
+                        $name = substr($e->plugin, strrpos($e->plugin, '\\')+1);
+                        Assert::eq($name, basename($file, '.php'));
+                        $plugins []= $e->plugin;
+                        continue;
+                    }
+                    throw new AssertionError("No plugin was registered after including $file!");
                 }
             }
         };

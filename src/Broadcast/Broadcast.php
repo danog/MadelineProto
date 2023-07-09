@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Broadcast;
 
 use danog\MadelineProto\Broadcast\Action\ActionForward;
 use danog\MadelineProto\Broadcast\Action\ActionSend;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages broadcasts.
@@ -95,7 +96,7 @@ trait Broadcast
     public function broadcastCustom(Action $action, ?Filter $filter = null): int
     {
         // Ensure it can be serialized
-        \serialize($action);
+        Assert::eq(unserialize(\serialize($action))::class, $action::class);
 
         $id = $this->broadcastId--;
         $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default());
