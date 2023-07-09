@@ -11,6 +11,7 @@ Features:
 - Added `entitiesToHtml` method to convert a message and a set of Telegram entities to an HTML string!	
 - Added `wrapUpdate`, `wrapMessage`, `wrapMedia`
 - You can now use `reportMemoryProfile()` to generate and send a `pprof` memory profile to all report peers to debug the causes of high memory usage.
+- Added support for `pay`, `login_url`, `web_app` and `tg://user?id=` buttons in bot API syntax!
 
 Fixes:
 - Fixed file uploads with ext-uv!

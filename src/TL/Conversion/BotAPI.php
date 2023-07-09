@@ -43,7 +43,7 @@ trait BotAPI
     /**
      * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
      */
-    private function parseButtons($rows): array
+    private function parseButtons(array $rows, bool $inline): array
     {
         $newrows = [];
         $key = 0;
@@ -53,19 +53,60 @@ trait BotAPI
             foreach ($row as $button) {
                 $newrows[$key]['buttons'][$button_key] = ['_' => 'keyboardButton', 'text' => $button['text']];
                 if (isset($button['url'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonUrl';
-                    $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
+                    if (str_starts_with($button['url'], 'tg://user?id=')) {
+                        $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUserProfile';
+                        $newrows[$key]['buttons'][$button_key]['user_id'] = str_replace(
+                            'tg://user?id=',
+                            '',
+                            $button['url']
+                        );
+                    } else {
+                        $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonUrl';
+                        $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
+                    }
+                } elseif (isset($button['pay'])) {
+                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonBuy';
                 } elseif (isset($button['callback_data'])) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonCallback';
                     $newrows[$key]['buttons'][$button_key]['data'] = $button['callback_data'];
+                } elseif (isset($button['login_url'])) {
+                    $button = $button['login_url'];
+                    $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUrlAuth';
+                    $newrows[$key]['buttons'][$button_key]['request_write_access'] = $button['request_write_access'] ?? false;
+                    $newrows[$key]['buttons'][$button_key]['fwd_text'] = $button['forward_text'] ?? false;
+                    $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
+                    if (isset($button['bot_username'])) {
+                        $newrows[$key]['buttons'][$button_key]['bot'] = $button['bot_username'];
+                    }
+                } elseif (isset($button['web_app'])) {
+                    $newrows[$key]['buttons'][$button_key]['_'] = $inline
+                        ? 'keyboardButtonWebView'
+                        : 'keyboardButtonSimpleWebView';
+                    $newrows[$key]['buttons'][$button_key]['url'] = $button['web_app']['url'];
                 } elseif (isset($button['switch_inline_query'])) {
+                    $button = $button['switch_inline_query'];
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
                     $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query'];
+                    $newrows[$key]['buttons'][$button_key]['query'] = $button['query'] ?? '';
+                    $peer_types = [];
+                    if ($button['allow_user_chats'] ?? false) {
+                        $peer_types []= ['_' => 'inlineQueryPeerTypePM'];
+                    }
+                    if ($button['allow_bot_chats'] ?? false) {
+                        $peer_types []= ['_' => 'inlineQueryPeerTypeBotPM'];
+                    }
+                    if ($button['allow_group_chats'] ?? false) {
+                        $peer_types []= ['_' => 'inlineQueryPeerTypeChat'];
+                        $peer_types []= ['_' => 'inlineQueryPeerTypeMegagroup'];
+                    }
+                    if ($button['allow_channel_chats'] ?? false) {
+                        $peer_types []= ['_' => 'inlineQueryPeerTypeBroadcast'];
+                    }
+                    $newrows[$key]['buttons'][$button_key]['peer_types'] = $peer_types;
                 } elseif (isset($button['switch_inline_query_current_chat'])) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
                     $newrows[$key]['buttons'][$button_key]['same_peer'] = true;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'];
+                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'] ?? '';
                 } elseif (isset($button['callback_game'])) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonGame';
                     $newrows[$key]['buttons'][$button_key]['text'] = $button['callback_game'];
@@ -100,12 +141,12 @@ trait BotAPI
                 $markup['single_use'] = $markup['one_time_keyboard'];
                 unset($markup['one_time_keyboard']);
             }
-            $markup['rows'] = $this->parseButtons($markup['keyboard']);
+            $markup['rows'] = $this->parseButtons($markup['keyboard'], false);
             unset($markup['keyboard']);
         }
         if (isset($markup['inline_keyboard'])) {
             $markup['_'] = 'replyInlineMarkup';
-            $markup['rows'] = $this->parseButtons($markup['inline_keyboard']);
+            $markup['rows'] = $this->parseButtons($markup['inline_keyboard'], true);
             unset($markup['inline_keyboard']);
         }
         return $markup;
