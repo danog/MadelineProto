@@ -303,7 +303,6 @@ abstract class EventHandler extends AbstractAPI
         return [];
     }
 
-    private static array $includedPaths = [];
     /**
      * Obtain a list of plugin event handlers.
      *
@@ -326,6 +325,7 @@ abstract class EventHandler extends AbstractAPI
         return $plugins;
     }
 
+    private static array $checkedPaths = [];
     private function internalGetDirectoryPlugins(array &$plugins): void
     {
         if ($this instanceof PluginEventHandler) {
@@ -337,11 +337,15 @@ abstract class EventHandler extends AbstractAPI
             $paths = [$paths];
         } elseif ($paths === null) {
             $paths = [];
+        } else {
+            $paths = \array_values($paths);
         }
+        $paths = \array_map(realpath(...), $paths);
+        $paths = \array_diff($paths, self::$checkedPaths);
+
         if (!$paths) {
             return;
         }
-        $paths = \array_map(realpath(...), $paths);
 
         $recurse = static function (string $path, string $namespace = 'MadelinePlugin') use (&$recurse, &$plugins): void {
             foreach (listFiles($path) as $file) {
@@ -349,10 +353,6 @@ abstract class EventHandler extends AbstractAPI
                     $recurse($file, $namespace.'\\'.\basename($file));
                 } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
                     $file = \realpath($file);
-                    if (isset(self::$includedPaths[$file])) {
-                        continue;
-                    }
-                    self::$includedPaths[$file] = true;
                     try {
                         require $file;
                     } catch (PluginRegistration $e) {
@@ -385,6 +385,8 @@ abstract class EventHandler extends AbstractAPI
                 }
             }
         });
+
+        self::$checkedPaths = \array_merge(self::$checkedPaths, $paths);
     }
 
     private const BANNED_FUNCTIONS = [
