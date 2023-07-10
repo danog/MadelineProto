@@ -1,4 +1,11 @@
 {
+    "noReportPeers": "Warning: no report peers are set, please add the following method to your event handler",
+    "manualAdminActionRequired": "!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!",
+    "mmapError": "The maximum number of mmap'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.\nTo fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count\nTo persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf\nOn Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.",
+    "extensionRequired": "MadelineProto requires the %s extension to run. %s",
+    "extensionRequiredInstallWithApt": "Try running sudo apt-get install %s.",
+    "extensionRequiredInstallWithCustomInstructions": "Follow the instructions at %s to install it.",
+    "extensionRecommended": "Warning: the %s extension is not installed, please install it to speed up MadelineProto!",
     "go": "Go",
     "apiChooseManualAutoTip": "Note that you can also provide the API ID\/hash directly in the code using the settings: %s",
     "apiChooseManualAutoTipWeb": "Note that you can also provide the API ID\/hash directly in the code using the <a target=\"_blank\" href=\"%s\">settings<\/a>.",

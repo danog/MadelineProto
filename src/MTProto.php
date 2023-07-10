@@ -25,6 +25,7 @@ use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
@@ -1582,14 +1583,28 @@ final class MTProto implements TLCallback, LoggerGetter
         Logger::log($message);
 
         $warning = '';
-        if (!$this->hasReportPeers() && $this->hasEventHandler()) {
-            Logger::log('!!! Warning: no report peers are set, please add the following method to your event handler !!!', Logger::FATAL_ERROR);
-            Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
-            $warning .= "<h2 style='color:red;'>Warning: no report peers are set, please add the following method to your event handler:</h2>";
-            $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+        if ($this->hasEventHandler()) {
+            if (!$this->hasReportPeers()) {
+                Logger::log('!!! '.Lang::$current_lang['noReportPeers'].' !!!', Logger::FATAL_ERROR);
+                Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
+                $warning .= "<h2 style='color:red;'>".\htmlentities(Lang::$current_lang['noReportPeers'])."</h2>";
+                $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+            }
+            if ($this->event_handler_instance instanceof EventHandler) {
+                try {
+                    EventHandler::validateEventHandler($this->event_handler_instance::class);
+                } catch (AssertionError $e) {
+                    Logger::log($e->getMessage(), Logger::FATAL_ERROR);
+                    $e = \htmlentities($e->getMessage());
+                    $warning .= "<h2 style='color:red;'>{$e}</h2>";
+                }
+            }
         }
         if (!Magic::$hasOpenssl) {
-            $warning .= "<h2 style='color:red;'>Warning: the openssl extension is not installed, please install it to speed up MadelineProto</h2>";
+            $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
+        }
+        if (!\extension_loaded('gmp')) {
+            $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
         }
         return "<html><body><h1>$message</h1>$warning</body></html>";
     }

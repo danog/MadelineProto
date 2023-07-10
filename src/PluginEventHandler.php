@@ -25,4 +25,11 @@ namespace danog\MadelineProto;
  */
 abstract class PluginEventHandler extends EventHandler
 {
+    /**
+     * Plugins can require other plugins ONLY with the getPlugins() method.
+     */
+    final public function getPluginPaths(): string|array|null
+    {
+        return null;
+    }
 }

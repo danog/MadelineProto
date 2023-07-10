@@ -346,7 +346,7 @@ abstract class EventHandler extends AbstractAPI
             Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
             Assert::notEq($plugin, PluginEventHandler::class);
             Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
-            self::validatePlugin($plugin);
+            self::validateEventHandler($plugin);
         }
 
         return $plugins;
@@ -373,7 +373,14 @@ abstract class EventHandler extends AbstractAPI
         PDO::class,
         mysqli::class,
     ];
-    private static function validatePlugin(string $class): void
+    /**
+     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
+     *
+     * @param class-string<EventHandler> $class Class name
+     *
+     * @throws AssertionError If validation fails.
+     */
+    final public static function validateEventHandler(string $class): void
     {
         $file = read((new ReflectionClass($class))->getFileName());
         $file = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($file);
@@ -384,13 +391,13 @@ abstract class EventHandler extends AbstractAPI
 
         /** @var DeclareDeclare|null $call */
         $declare = $finder->findFirstInstanceOf($file, DeclareDeclare::class);
-        Assert::true(
-            $declare !== null
-            && $declare->key->name === 'strict_types'
-            && $declare->value instanceof LNumber
-            && $declare->value->value === 1,
-            "An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);"
-        );
+        if ($declare === null
+            || $declare->key->name !== 'strict_types'
+            || !$declare->value instanceof LNumber
+            || $declare->value->value !== 1
+        ) {
+            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
+        }
 
         /** @var FuncCall $call */
         foreach ($finder->findInstanceOf($file, FuncCall::class) as $call) {

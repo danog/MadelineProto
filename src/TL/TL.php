@@ -870,7 +870,7 @@ final class TL implements TLInterface
      */
     public static function extractWaveform(string $x): array
     {
-        $values = array_pad(\array_values(\unpack('C*', $x)), 63, 0);
+        $values = \array_pad(\array_values(\unpack('C*', $x)), 63, 0);
 
         $result = \array_fill(0, 100, 0);
         $bitPos = 0;

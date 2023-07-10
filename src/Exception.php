@@ -59,15 +59,16 @@ class Exception extends \Exception
      */
     public static function extension(string $extensionName): self
     {
-        $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName.'.';
         if ($extensionName === 'libtgvoip') {
-            $additional = 'Follow the instructions @ https://voip.madelineproto.xyz to install it.';
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
         } elseif ($extensionName === 'prime') {
-            $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
+        } else {
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
         }
-        $message = 'MadelineProto requires the '.$extensionName.' extension to run. '.$additional;
+        $message = \sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            echo $message.'<br>';
+            echo \htmlentities($message).'<br>';
         }
         $file = 'MadelineProto';
         $line = 1;
@@ -106,26 +107,22 @@ class Exception extends \Exception
         if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
             || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
         ) {
-            $maps = "";
+            $maps = "?";
             try {
                 $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
                 $pid = \getmypid();
                 $maps = '~'.\substr_count(\file_get_contents("/proc/$pid/maps"), "\n");
             } catch (\Throwable) {
             }
-            if ($maps !== '') {
-                $maps = " ($maps)";
+            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
+            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
+            Logger::log(Lang::$current_lang['manualAdminActionRequired']);
+            foreach (\explode("\n", \trim(Lang::$current_lang['mmapError'])) as $line) {
+                Logger::log(\sprintf($line, $maps), Logger::FATAL_ERROR);
             }
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
-            Logger::log("The maximum number of mmap'ed regions was reached$maps: please increase the vm.max_map_count kernel config to 262144 to fix.");
-            Logger::log("To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count");
-            Logger::log("To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf");
-            Logger::log("On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.");
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
-            Logger::log("!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!", Logger::FATAL_ERROR);
+            Logger::log(Lang::$current_lang['manualAdminActionRequired']);
+            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
+            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
         }
         Logger::log($exception, Logger::FATAL_ERROR);
         die(1);
