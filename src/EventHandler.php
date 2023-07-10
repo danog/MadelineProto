@@ -155,6 +155,7 @@ abstract class EventHandler extends AbstractAPI
                 $this->setReportPeers(Tools::call($this->getReportPeers())->await());
             }
 
+            $old = true;
             $constructors = $this->getTL()->getConstructors();
             $methods = [];
             $handlers = [];
@@ -191,6 +192,7 @@ abstract class EventHandler extends AbstractAPI
                         $periodic->period
                     );
                     $this->periodicLoops[$method]->start();
+                    $old = false;
                     continue;
                 }
                 $filter = $methodRefl->getAttributes(
@@ -215,6 +217,10 @@ abstract class EventHandler extends AbstractAPI
                         EventLoop::queue($closure, $update);
                     }
                 };
+                $old = false;
+            }
+            if (!$old) {
+                self::validateEventHandler(static::class);
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);

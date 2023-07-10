@@ -117,9 +117,10 @@ class Exception extends \Exception
             Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
             Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
             Logger::log(Lang::$current_lang['manualAdminActionRequired']);
-            foreach (\explode("\n", \trim(Lang::$current_lang['mmapError'])) as $line) {
-                Logger::log(\sprintf($line, $maps), Logger::FATAL_ERROR);
-            }
+            Logger::log(sprintf(Lang::$current_lang['mmapError1'], $maps), Logger::FATAL_ERROR);
+            Logger::log(sprintf(Lang::$current_lang['mmapError2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'), Logger::FATAL_ERROR);
+            Logger::log(sprintf(Lang::$current_lang['mmapError3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'), Logger::FATAL_ERROR);
+            Logger::log(Lang::$current_lang['mmapError4'], Logger::FATAL_ERROR);
             Logger::log(Lang::$current_lang['manualAdminActionRequired']);
             Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
             Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
