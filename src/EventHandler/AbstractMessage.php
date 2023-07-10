@@ -95,12 +95,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
 
     /**
      * Get replied-to message.
-     * 
+     *
      * May return null if the replied-to message was deleted.
      *
      * @return ?self
      */
-    public function getReply(): ?self {
+    public function getReply(): ?self
+    {
         if ($this->replyToMsgId === null) {
             throw new AssertionError("This message doesn't reply to any other message!");
         }

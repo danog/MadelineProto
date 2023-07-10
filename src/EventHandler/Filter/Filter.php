@@ -5,15 +5,32 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterAudio;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterDocument;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterDocumentPhoto;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterGif;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterPhoto;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterRoundVideo;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterSticker;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterVideo;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterVoice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
-use danog\MadelineProto\EventHandler\SimpleFilter\Forwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasDocumentPhoto;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasGif;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasNoMedia;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasPhoto;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasRoundVideo;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasVideo;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasVoice;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
@@ -63,7 +80,16 @@ abstract class Filter
                 IsReplyToSelf::class => new IsReplyToSelf,
                 HasMedia::class => new FilterMedia,
                 HasNoMedia::class => new FilterNoMedia,
-                FromAdmin::class => new FilterFromAdmin
+                FromAdmin::class => new FilterFromAdmin,
+                HasAudio::class => new FilterAudio,
+                HasDocument::class => new FilterDocument,
+                HasDocumentPhoto::class => new FilterDocumentPhoto,
+                HasGif::class => new FilterGif,
+                HasPhoto::class => new FilterPhoto,
+                HasRoundVideo::class => new FilterRoundVideo,
+                HasSticker::class => new FilterSticker,
+                HasVideo::class => new FilterVideo,
+                HasVoice::class => new FilterVoice,
             }
         };
     }
