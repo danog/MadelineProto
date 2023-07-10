@@ -641,6 +641,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::genVectorHash($ints);
     }
     /**
+     * Obtain the ID of the admin of the bot (equal to the first user ID returned by getReportPeers).
+     */
+    public function getAdmin(): int
+    {
+        return $this->wrapper->getAPI()->getAdmin();
+    }
+    /**
      * Get full list of MTProto and API methods.
      */
     public function getAllMethods(): array

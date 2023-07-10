@@ -201,7 +201,7 @@ final class ReadLoop extends Loop
             try {
                 $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
             } catch (\Throwable $e) {
-                Logger::log('Error during deserializing message (base64): ' .  base64_encode($message_data), Logger::ERROR);
+                Logger::log('Error during deserializing message (base64): ' .  \base64_encode($message_data), Logger::ERROR);
                 throw $e;
             }
 

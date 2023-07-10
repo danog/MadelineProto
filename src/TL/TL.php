@@ -540,7 +540,7 @@ final class TL implements TLInterface
             case 'double':
                 return Tools::packDouble($object);
             case 'string':
-                if ($object instanceof Bytes || is_int($object) || is_float($object)) {
+                if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
@@ -563,7 +563,7 @@ final class TL implements TLInterface
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
                     $object = \base64_decode($object['bytes']);
                 }
-                if ($object instanceof Bytes || is_int($object) || is_float($object)) {
+                if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
@@ -871,10 +871,10 @@ final class TL implements TLInterface
     public static function extractWaveform(string $x): array
     {
         $values = \array_values(\unpack('C*', $x));
-        $valuesLength = count($values);
+        $valuesLength = \count($values);
         if ($valuesLength < 63) {
             $addCount = 63 - $valuesLength;
-            array_push($values, ...\array_fill(0, $addCount, 0));
+            \array_push($values, ...\array_fill(0, $addCount, 0));
         }
 
         $result = \array_fill(0, 100, 0);

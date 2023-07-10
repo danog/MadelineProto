@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use AssertionError;
+use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -89,5 +91,25 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             $this->threadId = null;
             $this->replyToScheduled = false;
         }
+    }
+
+    /**
+     * Get replied-to message.
+     * 
+     * May return null if the replied-to message was deleted.
+     *
+     * @return ?self
+     */
+    public function getReply(): ?self {
+        if ($this->replyToMsgId === null) {
+            throw new AssertionError("This message doesn't reply to any other message!");
+        }
+        return $this->API->wrapMessage($this->API->methodCallAsyncRead(
+            API::isSupergroup($this->senderId) ? 'channels.getMessages' : 'messages.getMessages',
+            [
+                'channel' => $this->chatId,
+                'id' => [$this->replyToMsgId]
+            ]
+        )['messages'][0]);
     }
 }

@@ -38,6 +38,7 @@ use Generator;
 use mysqli;
 use PDO;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
@@ -354,7 +355,9 @@ abstract class EventHandler extends AbstractAPI
     private const BANNED_FUNCTIONS = [
         'file_get_contents',
         'file_put_contents',
+        'unlink',
         'curl_exec',
+        'mysqli_query',
         'mysqli_connect',
         'mysql_connect',
         'fopen',
@@ -411,6 +414,10 @@ abstract class EventHandler extends AbstractAPI
             ) {
                 throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking class $name!");
             }
+        }
+
+        if ($finder->findFirstInstanceOf($file, Include_::class)) {
+            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
         }
     }
 }
