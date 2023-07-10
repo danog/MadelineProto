@@ -241,7 +241,7 @@ final class API extends AbstractAPI
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && (($this->hasEventHandler()) || !($this->isIpcWorker()))) {
                     $this->wrapper->logger('Restarting to full instance: the bot is already running!');
-                    Tools::closeConnection($this->getWebMessage('The bot is already running!'));
+                    Tools::closeConnection($this->getWebMessage(Lang::$current_lang['botAlreadyRunning']));
                     return false;
                 }
                 $this->wrapper->logger('Restarting to full instance: stopping IPC server...');

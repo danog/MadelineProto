@@ -5,6 +5,7 @@
     "mmapErrorPart2": "To fix, run the following command as root: %s",
     "mmapErrorPart3": "To persist the change across reboots: %s",
     "mmapErrorPart4": "On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.",
+    "botAlreadyRunning": "The bot is already running!",
     "extensionRequired": "MadelineProto requires the %s extension to run. %s",
     "extensionRequiredInstallWithApt": "Try running sudo apt-get install %s.",
     "extensionRequiredInstallWithCustomInstructions": "Follow the instructions at %s to install it.",
