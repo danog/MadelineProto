@@ -928,10 +928,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function upgradeMadelineProto(): void
     {
-        if (isset($this->hook_url) && \is_string($this->hook_url)) {
-            $this->webhookUrl = $this->hook_url;
-        }
-
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
             if ($this->authorized === API::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
@@ -956,21 +952,6 @@ final class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
-
-        async(function (): void {
-            $counter = 0;
-            foreach ($this->chats as $id => $chat) {
-                $id = (int) $id;
-                $counter ++;
-                if ($counter % 1000 === 0) {
-                    $this->logger->logger("Upgrading chats: $counter", Logger::WARNING);
-                }
-
-                if (!($chat['min'] ?? false)) {
-                    $this->minDatabase->clearPeer($id);
-                }
-            }
-        });
     }
     /**
      * Post-deserialization initialization function.

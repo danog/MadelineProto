@@ -61,6 +61,11 @@ final class MinDatabase implements TLCallback
      *
      */
     private bool $clean = false;
+    /**
+     * Whether we synced ourselves with the peer database.
+     *
+     */
+    private bool $synced = false;
 
     /**
      * List of properties stored in database (memory or external).
@@ -77,7 +82,7 @@ final class MinDatabase implements TLCallback
     }
     public function __sleep()
     {
-        return ['db', 'API', 'clean'];
+        return ['db', 'API', 'clean', 'synced'];
     }
     public function init(): void
     {
@@ -85,17 +90,33 @@ final class MinDatabase implements TLCallback
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             $this->db->clear();
         }
-        if ($this->clean) {
-            return;
-        }
-        EventLoop::queue(function (): void {
-            foreach ($this->db as $id => $origin) {
-                if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                    unset($this->db[$id]);
+        if (!$this->clean) {
+            EventLoop::queue(function (): void {
+                foreach ($this->db as $id => $origin) {
+                    if (!isset($origin['peer']) || $origin['peer'] === $id) {
+                        unset($this->db[$id]);
+                    }
                 }
-            }
-            $this->clean = true;
-        });
+                $this->clean = true;
+            });
+        }
+        if (!$this->synced) {
+            EventLoop::queue(function (): void {
+                $counter = 0;
+                foreach ($this->API->chats as $id => $chat) {
+                    $id = (int) $id;
+                    $counter++;
+                    if ($counter % 1000 === 0) {
+                        $this->API->logger->logger("Upgrading chats: $counter", Logger::WARNING);
+                    }
+
+                    if (!($chat['min'] ?? false)) {
+                        $this->clearPeer($id);
+                    }
+                }
+                $this->synced = true;
+            });
+        }
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
