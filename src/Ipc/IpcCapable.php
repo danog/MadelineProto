@@ -16,10 +16,14 @@ abstract class IpcCapable
 
     /** @internal */
     protected function __construct(
-        MTProto $API,
+        MTProto|Client $API,
     ) {
         $this->API = $API;
-        $this->session = $API->wrapper->getSession()->getSessionDirectoryPath();
+        if ($API instanceof MTProto) {
+            $this->session = $API->wrapper->getSession()->getSessionDirectoryPath();
+        } else {
+            $this->session = $API->getSession()->getSessionDirectoryPath();
+        }
     }
 
     /** @internal */

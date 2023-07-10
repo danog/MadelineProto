@@ -21,9 +21,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use __PHP_Incomplete_Class;
-use AssertionError;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Ipc\PluginEventHandlerProxy;
+use danog\MadelineProto\PluginEventHandler;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\UpdateHandlerType;
 
@@ -107,7 +108,7 @@ trait Events
      *
      * @param class-string<EventHandler> $class
      */
-    final public function hasPluginInstance(string $class): bool
+    final public function hasPlugin(string $class): bool
     {
         return isset($this->pluginInstances[$class]);
     }
@@ -118,14 +119,11 @@ trait Events
      *
      * @param class-string<T> $class
      *
-     * return T
+     * return T|null
      */
-    final public function getPluginInstance(string $class): EventHandler
+    final public function getPlugin(string $class): PluginEventHandler|PluginEventHandlerProxy|null
     {
-        if (!isset($this->pluginInstances[$class]) || !$this->pluginInstances[$class] instanceof EventHandler) {
-            throw new AssertionError("Plugin instance for $class not found!");
-        }
-        return $this->pluginInstances[$class];
+        return $this->pluginInstances[$class] ?? null;
     }
     /**
      * Unset event handler.
@@ -153,5 +151,30 @@ trait Events
     public function hasEventHandler(): bool
     {
         return isset($this->event_handler_instance);
+    }
+    /** @internal */
+    public function callPluginMethod(string $class, string $method, array $args): mixed
+    {
+        return $this->pluginInstances[$class]->$method(...$args);
+    }
+    /** @internal */
+    public function setPluginProperty(string $class, string $property, mixed $value): void
+    {
+        $this->pluginInstances[$class]->$property = $value;
+    }
+    /** @internal */
+    public function getPluginProperty(string $class, string $property): mixed
+    {
+        return $this->pluginInstances[$class]->$property;
+    }
+    /** @internal */
+    public function issetPluginProperty(string $class, string $property): bool
+    {
+        return isset($this->pluginInstances[$class]->$property);
+    }
+    /** @internal */
+    public function unsetPluginProperty(string $class, string $property): void
+    {
+        unset($this->pluginInstances[$class]->$property);
     }
 }

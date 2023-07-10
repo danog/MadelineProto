@@ -78,6 +78,11 @@ final class Client extends ClientAbstract
         self::$instances[$session->getSessionDirectoryPath()] = $this;
         EventLoop::queue($this->loopInternal(...));
     }
+    /** @internal */
+    public function getSession(): SessionPaths
+    {
+        return $this->session;
+    }
     /**
      * Run the provided async callable.
      *
@@ -315,5 +320,9 @@ final class Client extends ClientAbstract
     public function getEventHandler(mixed ...$params): void
     {
         throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
+    }
+    public function getPlugin(string $class): ?PluginEventHandlerProxy
+    {
+        return $this->hasPlugin($class) ? new PluginEventHandlerProxy($class, $this) : null;
     }
 }

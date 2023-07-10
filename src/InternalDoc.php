@@ -949,11 +949,11 @@ abstract class InternalDoc
      *
      * @param class-string<T> $class
      *
-     * return T
+     * return T|null
      */
-    public function getPluginInstance(string $class): \danog\MadelineProto\EventHandler
+    public function getPlugin(string $class): \danog\MadelineProto\PluginEventHandler|\danog\MadelineProto\Ipc\PluginEventHandlerProxy|null
     {
-        return $this->wrapper->getAPI()->getPluginInstance($class);
+        return $this->wrapper->getAPI()->getPlugin($class);
     }
     /**
      * Get download info of the propic of a user
@@ -1081,9 +1081,9 @@ abstract class InternalDoc
      *
      * @param class-string<EventHandler> $class
      */
-    public function hasPluginInstance(string $class): bool
+    public function hasPlugin(string $class): bool
     {
-        return $this->wrapper->getAPI()->hasPluginInstance($class);
+        return $this->wrapper->getAPI()->hasPlugin($class);
     }
     /**
      * Check if has report peers.
