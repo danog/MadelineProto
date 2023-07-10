@@ -31,11 +31,11 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
-use danog\MadelineProto\EventHandler\Service\DialogCreated;
-use danog\MadelineProto\EventHandler\Service\DialogMemberLeft;
-use danog\MadelineProto\EventHandler\Service\DialogMembersJoined;
-use danog\MadelineProto\EventHandler\Service\DialogPhotoChanged;
-use danog\MadelineProto\EventHandler\Service\DialogTitleChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -390,6 +390,60 @@ trait UpdateHandler
             API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message),
             API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message),
         };
+    }
+    /**
+     * Sends a message.
+     *
+     * @param integer|string $peer Destination peer or username.
+     * @param string $message Message to send
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param integer|null $replyToMsgId ID of message to reply to.
+     * @param integer|null $topMsgId ID of thread where to send the message.
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
+    public function sendMessage(
+        int|string $peer,
+        string $message,
+        ?string $parseMode = null,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $noWebpage = false,
+        bool $updateStickersetsOrder = false,
+    ): Message {
+        return $this->wrapMessage($this->extractMessage($this->methodCallAsyncRead(
+            'messages.sendMessage',
+            [
+                'peer' => $peer,
+                'message' => $message,
+                'parse_mode' => $parseMode,
+                'reply_to_msg_id' => $replyToMsgId,
+                'top_msg_id' => $topMsgId,
+                'reply_markup' => $replyMarkup,
+                'send_as' => $sendAs,
+                'schedule_date' => $scheduleDate,
+                'silent' => $silent,
+                'noforwards' => $noForwards,
+                'background' => $background,
+                'clear_draft' => $clearDraft,
+                'no_webpage' => $noWebpage,
+                'update_stickersets_order' => $updateStickersetsOrder
+            ]
+        )));
     }
     /**
      * Extract a message ID from an Updates constructor.

@@ -155,7 +155,6 @@ abstract class EventHandler extends AbstractAPI
                 $this->setReportPeers(Tools::call($this->getReportPeers())->await());
             }
 
-            $old = true;
             $constructors = $this->getTL()->getConstructors();
             $methods = [];
             $handlers = [];
@@ -182,6 +181,9 @@ abstract class EventHandler extends AbstractAPI
                     ];
                     continue;
                 }
+                if (!$this instanceof SimpleEventHandler) {
+                    continue;
+                }
                 if ($periodic = $methodRefl->getAttributes(Cron::class)) {
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
@@ -192,7 +194,6 @@ abstract class EventHandler extends AbstractAPI
                         $periodic->period
                     );
                     $this->periodicLoops[$method]->start();
-                    $old = false;
                     continue;
                 }
                 $filter = $methodRefl->getAttributes(
@@ -217,9 +218,8 @@ abstract class EventHandler extends AbstractAPI
                         EventLoop::queue($closure, $update);
                     }
                 };
-                $old = false;
             }
-            if (!$old) {
+            if ($this instanceof SimpleEventHandler) {
                 self::validateEventHandler(static::class);
             }
             if ($has_any) {
@@ -236,6 +236,9 @@ abstract class EventHandler extends AbstractAPI
                 $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
                 $pluginsNew[$class] = $plugin;
                 [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
+                if (!$plugin->isPluginEnabled()) {
+                    continue;
+                }
                 foreach ($newMethods as $update => $method) {
                     $methods[$update] ??= [];
                     $methods[$update][] = $method;
@@ -303,22 +306,47 @@ abstract class EventHandler extends AbstractAPI
     private static array $includedPaths = [];
     /**
      * Obtain a list of plugin event handlers.
+     *
+     * @return list<class-string<PluginEventHandler>>
      */
     private function internalGetPlugins(): array
     {
+        $plugins = $this->getPlugins();
+        $this->internalGetDirectoryPlugins($plugins);
+        $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
+
+        foreach ($plugins as $plugin) {
+            Assert::classExists($plugin);
+            Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
+            Assert::notEq($plugin, PluginEventHandler::class);
+            Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
+            self::validateEventHandler($plugin);
+        }
+
+        return $plugins;
+    }
+
+    private function internalGetDirectoryPlugins(array &$plugins): void
+    {
+        if ($this instanceof PluginEventHandler) {
+            return;
+        }
+
         $paths = $this->getPluginPaths();
         if (\is_string($paths)) {
             $paths = [$paths];
         } elseif ($paths === null) {
             $paths = [];
         }
+        if (!$paths) {
+            return;
+        }
+        $paths = \array_map(realpath(...), $paths);
 
-        $plugins = \array_values($this->getPlugins());
-
-        $recurse = static function (string $path) use (&$recurse, &$plugins): void {
+        $recurse = static function (string $path, string $namespace = 'MadelinePlugin') use (&$recurse, &$plugins): void {
             foreach (listFiles($path) as $file) {
                 if (isDirectory($file)) {
-                    $recurse($file);
+                    $recurse($file, $namespace.'\\'.\basename($file));
                 } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
                     $file = \realpath($file);
                     if (isset(self::$includedPaths[$file])) {
@@ -328,8 +356,7 @@ abstract class EventHandler extends AbstractAPI
                     try {
                         require $file;
                     } catch (PluginRegistration $e) {
-                        $name = \substr($e->plugin, \strrpos($e->plugin, '\\')+1);
-                        Assert::eq($name, \basename($file, '.php'));
+                        Assert::eq($e->plugin, $namespace.'\\'.\basename($file, '.php'));
                         $plugins []= $e->plugin;
                         continue;
                     }
@@ -345,17 +372,19 @@ abstract class EventHandler extends AbstractAPI
             self::$includingPlugins = false;
         }
 
-        $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
-
-        foreach ($plugins as $plugin) {
-            Assert::classExists($plugin);
-            Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
-            Assert::notEq($plugin, PluginEventHandler::class);
-            Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
-            self::validateEventHandler($plugin);
-        }
-
-        return $plugins;
+        \spl_autoload_register(function (string $class) use ($paths): void {
+            if (!\str_starts_with($class, 'MadelinePlugin\\')) {
+                return;
+            }
+            // Has leading /
+            $file = \str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
+            foreach ($paths as $path) {
+                if (\file_exists($path.$file)) {
+                    require $path.$file;
+                    Assert::classExists($class);
+                }
+            }
+        });
     }
 
     private const BANNED_FUNCTIONS = [

@@ -113,4 +113,50 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         )['messages'][0]);
     }
+
+    /**
+     * Replies to the message.
+     *
+     * @param string $message Message to send
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
+    public function reply(
+        string $message,
+        ?string $parseMode = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $noWebpage = false,
+        bool $updateStickersetsOrder = false,
+    ): Message {
+        return $this->API->sendMessage(
+            peer: $this->chatId,
+            message: $message,
+            parseMode: $parseMode,
+            replyToMsgId: $this->id,
+            topMsgId: $this->topicId === 1 ? null : $this->topicId,
+            replyMarkup: $replyMarkup,
+            sendAs: $sendAs,
+            scheduleDate: $scheduleDate,
+            silent: $silent,
+            noForwards: $noForwards,
+            background: $background,
+            clearDraft: $clearDraft,
+            noWebpage: $noWebpage,
+            updateStickersetsOrder: $updateStickersetsOrder
+        );
+    }
 }

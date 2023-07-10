@@ -767,7 +767,7 @@ abstract class InternalDoc
     /**
      * Get event handler.
      */
-    public function getEventHandler(): \danog\MadelineProto\EventHandler|\__PHP_Incomplete_Class|null
+    public function getEventHandler(): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
     {
         return $this->wrapper->getAPI()->getEventHandler();
     }
@@ -951,7 +951,7 @@ abstract class InternalDoc
      *
      * return T|null
      */
-    public function getPlugin(string $class): \danog\MadelineProto\PluginEventHandler|\danog\MadelineProto\Ipc\PluginEventHandlerProxy|null
+    public function getPlugin(string $class): \danog\MadelineProto\PluginEventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|null
     {
         return $this->wrapper->getAPI()->getPlugin($class);
     }
@@ -1486,6 +1486,28 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->sendCustomEvent($payload);
     }
     /**
+     * Sends a message.
+     *
+     * @param integer|string $peer Destination peer or username.
+     * @param string $message Message to send
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param integer|null $replyToMsgId ID of message to reply to.
+     * @param integer|null $topMsgId ID of thread where to send the message.
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
+    public function sendMessage(string|int $peer, string $message, ?string $parseMode = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder);
+    }
+    /**
      * Set NOOP update handler, ignoring all updates.
      */
     public function setNoop(): void
@@ -1740,10 +1762,10 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|string|array|resource $file      File, URL or Telegram file to upload
-     * @param string                                      $fileName  File name
-     * @param callable                                    $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean                                     $encrypted Whether to encrypt file for secret chats
+     * @param FileCallbackInterface|LocalFile|string|array|resource $file      File, URL or Telegram file to upload
+     * @param string                                                $fileName  File name
+     * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
     public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {

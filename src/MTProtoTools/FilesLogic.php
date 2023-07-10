@@ -21,6 +21,7 @@ use Amp\Sync\Lock;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
@@ -229,10 +230,10 @@ trait FilesLogic
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|string|array|resource $file      File, URL or Telegram file to upload
-     * @param string                                      $fileName  File name
-     * @param callable                                    $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean                                     $encrypted Whether to encrypt file for secret chats
+     * @param FileCallbackInterface|LocalFile|string|array|resource $file      File, URL or Telegram file to upload
+     * @param string                                                $fileName  File name
+     * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
     public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
@@ -250,10 +251,14 @@ trait FilesLogic
         if (\is_resource($file) || (\is_object($file) && $file instanceof ReadableStream)) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
-        $settings = $this->getSettings();
-        /** @var Settings $settings */
-        if (!$settings->getFiles()->getAllowAutomaticUpload()) {
-            return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+        if ($file instanceof LocalFile) {
+            $file = $file->file;
+        } else {
+            /** @var Settings $settings */
+            $settings = $this->getSettings();
+            if (!$settings->getFiles()->getAllowAutomaticUpload()) {
+                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+            }
         }
         $file = Tools::absolute($file);
         if (!exists($file)) {

@@ -101,7 +101,8 @@ final class MinDatabase implements TLCallback
             });
         }
     }
-    public function sync(): void {
+    public function sync(): void
+    {
         if (!$this->synced) {
             EventLoop::queue(function (): void {
                 $counter = 0;

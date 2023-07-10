@@ -23,7 +23,7 @@ namespace danog\MadelineProto\Wrappers;
 use __PHP_Incomplete_Class;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Ipc\PluginEventHandlerProxy;
+use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\PluginEventHandler;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\UpdateHandlerType;
@@ -121,7 +121,7 @@ trait Events
      *
      * return T|null
      */
-    final public function getPlugin(string $class): PluginEventHandler|PluginEventHandlerProxy|null
+    final public function getPlugin(string $class): PluginEventHandler|EventHandlerProxy|null
     {
         return $this->pluginInstances[$class] ?? null;
     }
@@ -141,7 +141,7 @@ trait Events
     /**
      * Get event handler.
      */
-    public function getEventHandler(): EventHandler|__PHP_Incomplete_Class|null
+    public function getEventHandler(): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
     {
         return $this->event_handler_instance;
     }
@@ -153,28 +153,33 @@ trait Events
         return isset($this->event_handler_instance);
     }
     /** @internal */
-    public function callPluginMethod(string $class, string $method, array $args): mixed
+    public function callPluginMethod(?string $class, string $method, array $args): mixed
     {
-        return $this->pluginInstances[$class]->$method(...$args);
+        $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
+        return $obj->$method(...$args);
     }
     /** @internal */
-    public function setPluginProperty(string $class, string $property, mixed $value): void
+    public function setPluginProperty(?string $class, string $property, mixed $value): void
     {
-        $this->pluginInstances[$class]->$property = $value;
+        $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
+        $obj->$property = $value;
     }
     /** @internal */
-    public function getPluginProperty(string $class, string $property): mixed
+    public function getPluginProperty(?string $class, string $property): mixed
     {
-        return $this->pluginInstances[$class]->$property;
+        $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
+        return $obj->$property;
     }
     /** @internal */
-    public function issetPluginProperty(string $class, string $property): bool
+    public function issetPluginProperty(?string $class, string $property): bool
     {
-        return isset($this->pluginInstances[$class]->$property);
+        $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
+        return isset($obj->$property);
     }
     /** @internal */
-    public function unsetPluginProperty(string $class, string $property): void
+    public function unsetPluginProperty(?string $class, string $property): void
     {
-        unset($this->pluginInstances[$class]->$property);
+        $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
+        unset($obj->$property);
     }
 }

@@ -5,7 +5,7 @@ namespace danog\MadelineProto\Ipc;
 /**
  * Plugin event handler proxy object, for use through the IPC API.
  */
-final class PluginEventHandlerProxy extends IpcCapable
+final class EventHandlerProxy extends IpcCapable
 {
     public function __construct(
         private readonly ?string $__plugin,

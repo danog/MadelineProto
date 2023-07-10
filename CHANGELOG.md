@@ -17,6 +17,7 @@ Features:
 - Added support for `pay`, `login_url`, `web_app` and `tg://user?id=` buttons in bot API syntax!
 - Added a `getAdmin` function that returns the ID of the admin of the bot (which is equal to the first peer returned by getReportPeers in the event handler).
 - getPlugin can now be used from IPC clients!
+- `getReply`, `sendMessage`, `reply`
 
 Fixes:
 - Fixed file uploads with ext-uv!

@@ -21,22 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 /**
- * Plugin event handler class.
+ * Simple event handler class: by extending this class, you can use filters, crons and the simplified event handler API.
  */
-abstract class PluginEventHandler extends SimpleEventHandler
+abstract class SimpleEventHandler extends EventHandler
 {
-    /**
-     * Plugins can require other plugins ONLY with the getPlugins() method.
-     */
-    final public function getPluginPaths(): string|array|null
-    {
-        return null;
-    }
-    /**
-     * Whether the plugin is enabled.
-     */
-    public function isPluginEnabled(): bool
-    {
-        return true;
-    }
 }

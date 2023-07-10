@@ -312,17 +312,12 @@ final class Client extends ClientAbstract
     {
         throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
-    /**
-     * Placeholder.
-     *
-     * @param mixed ...$params Params
-     */
-    public function getEventHandler(mixed ...$params): void
+    public function getEventHandler(): EventHandlerProxy
     {
-        throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
+        return $this->hasEventHandler() ? new EventHandlerProxy(null, $this) : null;
     }
-    public function getPlugin(string $class): ?PluginEventHandlerProxy
+    public function getPlugin(string $class): ?EventHandlerProxy
     {
-        return $this->hasPlugin($class) ? new PluginEventHandlerProxy($class, $this) : null;
+        return $this->hasPlugin($class) ? new EventHandlerProxy($class, $this) : null;
     }
 }
