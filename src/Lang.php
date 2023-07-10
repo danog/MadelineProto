@@ -55,6 +55,7 @@ final class Lang
             'api_not_set' => 'پێویستە کلیلی api و api id دابین بکەیت، خۆت @ my.telegram.org بەدەست بهێنە',
             'array_invalid' => 'تۆ ڕیزبەندییەکی دروستت دابین نەکردووە',
             'bool_error' => 'نەتوانرا boolean دەربهێنرێت',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'ناتوانرێت %s بگۆڕێت بۆ ئۆبجێکتی API بۆت',
             'call_already_accepted' => 'پەیوەندی %s پێشتر وەرگیراوە',
             'call_already_declined' => 'پەیوەندی %s پێشتر ڕەتکراوەتەوە',
@@ -117,10 +118,10 @@ final class Lang
             'madelineproto_ready' => 'MadelineProto ئامادەیە!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'نەتوانرا شێواز بدۆزرێتەوە: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'ئێمە لە %s داین، نزیکترین DC %d ە.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'هێشتا ناتوانرێت نامە نا کورتەکان بگۆڕدرێت!',
@@ -187,6 +188,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'You must provide an api key and an api id, get your own @ my.telegram.org',
             'array_invalid' => 'You didn\'t provide a valid array',
             'bool_error' => 'Could not extract boolean',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'Can\'t convert %s to a bot API object',
             'call_already_accepted' => 'Call %s already accepted',
             'call_already_declined' => 'Call %s already declined',
@@ -249,10 +251,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto is ready!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'Could not find method: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'We\'re in %s, nearest DC is %d.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'Can\'t convert non text messages yet!',
@@ -319,6 +321,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'شما باید یک api key و یک api id وارد کنید، @ خوتان را از my.telegram.org بگیرید',
             'array_invalid' => 'شما یک آرایه معتبر وارد نکردید',
             'bool_error' => 'نمی‌توان‌ boolean را استخراج کرد',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'نمیتوان %s را به شی ربات API تبدیل کرد',
             'call_already_accepted' => 'تماس %s از قبل پذیرفته شده',
             'call_already_declined' => 'تماس %s از قبل رد شده',
@@ -381,10 +384,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto آماده است!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'تابع پیدا نشد: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'ما در %s هستیم، نزدیک ترین دیتاسنتر %d است.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'فعلا نمی‌توان پیام‌های غیرمتنی را تبدیل کرد!',
@@ -451,6 +454,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'You must provide an api key and an api id, get your own @ my.telegram.org',
             'array_invalid' => 'Vous n\'avez pas fourni de tableau valide',
             'bool_error' => 'Could not extract boolean',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'Can\'t convert %s to a bot API object',
             'call_already_accepted' => 'Call %s already accepted',
             'call_already_declined' => 'Call %s already declined',
@@ -513,10 +517,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto est prêt!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'Could not find method: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'We\'re in %s, nearest DC is %d.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'Impossible de convertir des messages non textuels pour le moment!',
@@ -583,6 +587,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'עליך להזין api key ו- api id משלך, קבל אחד בקישור @ my.telegram.org',
             'array_invalid' => 'לא סיפקת מערך חוקי',
             'bool_error' => 'לא ניתן היה לחלץ בוליאני',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'לא ניתן להמיר את %s לאובייקט bot API',
             'call_already_accepted' => 'שיחה %s כבר התקבלה',
             'call_already_declined' => 'שיחה %s כבר נדחתה',
@@ -645,10 +650,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto מוכן!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'הפונקציה לא נמצא: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'אנחנו ב %s, חוות שרתי ה DC הקרובה היא %d.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'עדיין לא ניתן להמיר הודעות שאינן טקסט!',
@@ -715,6 +720,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'Devi specificare una chiave ed un ID API, ottienili su https://my.telegram.org',
             'array_invalid' => 'Il valore fornito non è un array',
             'bool_error' => 'Non sono riuscito ad estrarre un booleano',
+            'botAlreadyRunning' => 'Il bot è già in esecuzione!',
             'botapi_conversion_error' => 'Non sono risucito a convertire %s in un oggetto bot API',
             'call_already_accepted' => 'La chiamata %s è già stata accettata',
             'call_already_declined' => 'La chiamata %s è già stata annullata',
@@ -728,10 +734,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'deserialization_error' => 'C\'è stato un errore durante la deserializzazione',
             'done' => 'Fatto!',
             'encode_double_error' => 'Non sono riuscito a codificare il numero a virgola mobile fornito',
-            'extensionRecommended' => 'Warning: the %s extension is not installed, please install it to speed up MadelineProto!',
-            'extensionRequired' => 'MadelineProto requires the %s extension to run. %s',
-            'extensionRequiredInstallWithApt' => 'Try running sudo apt-get install %s.',
-            'extensionRequiredInstallWithCustomInstructions' => 'Follow the instructions at %s to install it.',
+            'extensionRecommended' => 'Attenzione: l\'estensione %s non è installata, si prega di installarla per velocizzare MadelineProto!',
+            'extensionRequired' => 'MadelineProto richiede l\'estensione %s. %s',
+            'extensionRequiredInstallWithApt' => 'Provate ad avviare sudo apt-get install %s.',
+            'extensionRequiredInstallWithCustomInstructions' => 'Seguire le istruzioni su %s per installarla.',
             'file_not_exist' => 'Il file specificato non esiste',
             'file_parsing' => 'Leggendo %s...',
             'file_type_invalid' => 'È stato fornito un tipo file errato',
@@ -775,14 +781,14 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'long_not_32' => 'Il valore fornito non è lungo 32 byte',
             'long_not_64' => 'Il valore fornito non è lungo 64 byte',
             'madelineproto_ready' => 'MadelineProto è pronto!',
-            'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
+            'manualAdminActionRequired' => '!!!!!!!!! È NECESSARIO L\'INTERVENTO DELL\'AMMINISTRATORE DI SISTEMA !!!!!!!!!',
             'method_not_found' => 'Impossibile trovare il seguente metodo: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'È stato raggiunto il limite massimo di regioni di memoria mappate (%s): è necessario incrementare il parametro di configurazione del kernel vm.max_map_count a 262144 per correggere l\'errore.',
+            'mmapErrorPart2' => 'Per correggere l\'errore, avviare il seguente comando come root: %s',
+            'mmapErrorPart3' => 'Per correggere l\'errore in modo permanente, anche dopo un riavvio: %s',
+            'mmapErrorPart4' => 'Su Windows e WSL, potrebbe aiutare l\'incremento della dimensione del file di paginazione; passare a Linux nativo se il problema persiste.',
             'nearest_dc' => 'Siamo in %s, il DC più vicino è %d.',
-            'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
+            'noReportPeers' => 'Attenzione: non è stato impostato alcun peer per la segnalazione errori, per favore aggiungi il seguente metodo all\'event handler',
             'non_text_conversion' => 'Non posso ancora convertire messaggi media!',
             'not_loggedIn' => 'Non ho ancora fatto il login!',
             'not_numeric' => 'Il valore fornito non è numerico',
@@ -847,6 +853,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'You must provide an api key and an api id, get your own @ my.telegram.org',
             'array_invalid' => 'You didn\'t provide a valid array',
             'bool_error' => 'Could not extract boolean',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => 'Can\'t convert %s to a bot API object',
             'call_already_accepted' => 'Call %s already accepted',
             'call_already_declined' => 'Call %s already declined',
@@ -909,10 +916,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto is ready!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'Could not find method: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'Вы в %s, ближайший ДЦ: %d.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'Can\'t convert non text messages yet!',
@@ -979,6 +986,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'api_not_set' => 'Siz api kaliti va api ID taqdim etishingiz kerak, o\'zingiz @ my.telegram.org manzilidan oling',
             'array_invalid' => 'Siz toʻgʻri massiv taqdim qilmadingiz',
             'bool_error' => 'Mantiqiy natija chiqarib bo\'lmadi',
+            'botAlreadyRunning' => 'The bot is already running!',
             'botapi_conversion_error' => '%s bot API obyektiga aylantirib bo‘lmadi',
             'call_already_accepted' => '%s chaqiruvi allaqachon qabul qilingan',
             'call_already_declined' => '%s qo‘ng‘iroqlari allaqachon rad etilgan',
@@ -1041,10 +1049,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
             'madelineproto_ready' => 'MadelineProto tayyor!',
             'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
             'method_not_found' => 'Metodni topib bo\'lmadi: ',
-            'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+            'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+            'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+            'mmapErrorPart3' => 'To persist the change across reboots: %s',
+            'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'Biz %s ichidamiz, eng yaqin shahar %d.',
             'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
             'non_text_conversion' => 'Matnli boʻlmagan xabarlarni oʻzgartirib boʻlmaydi!',
@@ -1113,6 +1121,7 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
         'api_not_set' => 'You must provide an api key and an api id, get your own @ my.telegram.org',
         'array_invalid' => 'You didn\'t provide a valid array',
         'bool_error' => 'Could not extract boolean',
+        'botAlreadyRunning' => 'The bot is already running!',
         'botapi_conversion_error' => 'Can\'t convert %s to a bot API object',
         'call_already_accepted' => 'Call %s already accepted',
         'call_already_declined' => 'Call %s already declined',
@@ -1175,10 +1184,10 @@ On Windows and WSL, increasing the size of the pagefile might help; please switc
         'madelineproto_ready' => 'MadelineProto is ready!',
         'manualAdminActionRequired' => '!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!',
         'method_not_found' => 'Could not find method: ',
-        'mmapError' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.
-To fix, run the following command as root: echo 262144 | sudo tee /proc/sys/vm/max_map_count
-To persist the change across reboots: echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf
-On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
+        'mmapErrorPart1' => 'The maximum number of mmap\'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.',
+        'mmapErrorPart2' => 'To fix, run the following command as root: %s',
+        'mmapErrorPart3' => 'To persist the change across reboots: %s',
+        'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
         'nearest_dc' => 'We\'re in %s, nearest DC is %d.',
         'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
         'non_text_conversion' => 'Can\'t convert non text messages yet!',

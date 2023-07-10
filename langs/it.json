@@ -117,5 +117,16 @@
     "apiAppWeb": "Inserire informazioni API",
     "apiChooseManualAutoTipWeb": "Nota che puoi anche fornire i parametri API direttamente nelle <a target=\"_blank\" href=\"%s\">impostazioni</a>.",
     "loginQrCodeSuccessful": "Il login con codice QR è stato effettuato correttamente!",
-    "loginQrCodeExpired": "Il codice QR è scaduto, generazione di un nuovo codice QR in corso..."
+    "loginQrCodeExpired": "Il codice QR è scaduto, generazione di un nuovo codice QR in corso...",
+    "noReportPeers": "Attenzione: non è stato impostato alcun peer per la segnalazione errori, per favore aggiungi il seguente metodo all'event handler",
+    "manualAdminActionRequired": "!!!!!!!!! È NECESSARIO L'INTERVENTO DELL'AMMINISTRATORE DI SISTEMA !!!!!!!!!",
+    "mmapErrorPart2": "Per correggere l'errore, avviare il seguente comando come root: %s",
+    "mmapErrorPart3": "Per correggere l'errore in modo permanente, anche dopo un riavvio: %s",
+    "mmapErrorPart4": "Su Windows e WSL, potrebbe aiutare l'incremento della dimensione del file di paginazione; passare a Linux nativo se il problema persiste.",
+    "extensionRequired": "MadelineProto richiede l'estensione %s. %s",
+    "extensionRequiredInstallWithApt": "Provate ad avviare sudo apt-get install %s.",
+    "extensionRequiredInstallWithCustomInstructions": "Seguire le istruzioni su %s per installarla.",
+    "extensionRecommended": "Attenzione: l'estensione %s non è installata, si prega di installarla per velocizzare MadelineProto!",
+    "mmapErrorPart1": "È stato raggiunto il limite massimo di regioni di memoria mappate (%s): è necessario incrementare il parametro di configurazione del kernel vm.max_map_count a 262144 per correggere l'errore.",
+    "botAlreadyRunning": "Il bot è già in esecuzione!"
 }
