@@ -1,7 +1,7 @@
 {
     "noReportPeers": "Warning: no report peers are set, please add the following method to your event handler",
     "manualAdminActionRequired": "!!!!!!!!! MANUAL SYSTEM ADMIN ACTION REQUIRED !!!!!!!!!",
-    "mmapErrorPart1": "The maximum number of mmap'ed regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.",
+    "mmapErrorPart1": "The maximum number of memory mapped (mmap) regions was reached (%s): please increase the vm.max_map_count kernel config to 262144 to fix.",
     "mmapErrorPart2": "To fix, run the following command as root: %s",
     "mmapErrorPart3": "To persist the change across reboots: %s",
     "mmapErrorPart4": "On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.",
