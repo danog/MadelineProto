@@ -311,8 +311,8 @@ abstract class EventHandler extends AbstractAPI
     private function internalGetPlugins(): array
     {
         $plugins = $this->getPlugins();
-        $this->internalGetDirectoryPlugins($plugins);
         $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
+        $plugins = array_merge($plugins, $this->internalGetDirectoryPlugins($plugins));
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
@@ -326,10 +326,10 @@ abstract class EventHandler extends AbstractAPI
     }
 
     private static array $checkedPaths = [];
-    private function internalGetDirectoryPlugins(array &$plugins): void
+    private function internalGetDirectoryPlugins(): array
     {
         if ($this instanceof PluginEventHandler) {
-            return;
+            return [];
         }
 
         $paths = $this->getPluginPaths();
@@ -341,13 +341,13 @@ abstract class EventHandler extends AbstractAPI
             $paths = \array_values($paths);
         }
         $paths = \array_map(realpath(...), $paths);
-        $paths = \array_diff($paths, self::$checkedPaths);
 
         if (!$paths) {
-            return;
+            return [];
         }
 
-        $recurse = static function (string $path, string $namespace = 'MadelinePlugin') use (&$recurse, &$plugins): void {
+        $pluginsTemp = [];
+        $recurse = static function (string $path, string $namespace = 'MadelinePlugin') use (&$recurse, &$pluginsTemp): void {
             foreach (listFiles($path) as $file) {
                 if (isDirectory($file)) {
                     $recurse($file, $namespace.'\\'.\basename($file));
@@ -357,7 +357,7 @@ abstract class EventHandler extends AbstractAPI
                         require $file;
                     } catch (PluginRegistration $e) {
                         Assert::eq($e->plugin, $namespace.'\\'.\basename($file, '.php'));
-                        $plugins []= $e->plugin;
+                        $pluginsTemp []= $e->plugin;
                         continue;
                     }
                     throw new AssertionError("No plugin was registered after including $file!");
@@ -365,28 +365,37 @@ abstract class EventHandler extends AbstractAPI
             }
         };
 
+        $plugins = [];
         try {
             self::$includingPlugins = true;
-            \array_map($recurse, $paths);
+            foreach ($paths as $path) {
+                if (isset(self::$checkedPaths[$path])) {
+                    $plugins = array_merge($plugins, self::$checkedPaths[$path]);
+                    continue;
+                }
+
+                $recurse($path);
+                self::$checkedPaths[$path] = $pluginsTemp;
+                $plugins = array_merge($plugins, $pluginsTemp);
+                $pluginsTemp = [];
+
+                \spl_autoload_register(function (string $class) use ($path): void {
+                    if (!\str_starts_with($class, 'MadelinePlugin\\')) {
+                        return;
+                    }
+                    // Has leading /
+                    $file = \str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
+                    if (\file_exists($path.$file)) {
+                        require $path.$file;
+                        Assert::classExists($class);
+                    }
+                });
+            }
         } finally {
             self::$includingPlugins = false;
         }
 
-        \spl_autoload_register(function (string $class) use ($paths): void {
-            if (!\str_starts_with($class, 'MadelinePlugin\\')) {
-                return;
-            }
-            // Has leading /
-            $file = \str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
-            foreach ($paths as $path) {
-                if (\file_exists($path.$file)) {
-                    require $path.$file;
-                    Assert::classExists($class);
-                }
-            }
-        });
-
-        self::$checkedPaths = \array_merge(self::$checkedPaths, $paths);
+        return $plugins;
     }
 
     private const BANNED_FUNCTIONS = [
