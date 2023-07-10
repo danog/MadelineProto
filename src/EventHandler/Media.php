@@ -4,11 +4,12 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use JsonSerializable;
 
 /**
  * Represents a generic media.
  */
-abstract class Media extends IpcCapable
+abstract class Media extends IpcCapable implements JsonSerializable
 {
     /** Media filesize */
     public readonly int $size;
@@ -20,7 +21,7 @@ abstract class Media extends IpcCapable
     public readonly string $fileExt;
 
     /** Media creation date */
-    public readonly bool $creationDate;
+    public readonly int $creationDate;
 
     /** Media MIME type */
     public readonly string $mimeType;
@@ -55,8 +56,16 @@ abstract class Media extends IpcCapable
         ] = $API->getDownloadInfo($rawMedia);
         $this->fileName = "$name.".$this->fileExt;
 
-        $this->creationDate = $rawMedia['date'];
+        $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'])['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        $v = \get_object_vars($this);
+        unset($v['API'], $v['session']);
+        $v['_'] = static::class;
+        return $v;
     }
 }

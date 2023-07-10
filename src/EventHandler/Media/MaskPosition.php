@@ -2,11 +2,18 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use JsonSerializable;
+
 /** Position of the mask */
-enum MaskPosition
+enum MaskPosition: int implements JsonSerializable
 {
-    case Forehead;
-    case Eyes;
-    case Mouth;
-    case Chin;
+    case Forehead = 0;
+    case Eyes = 1;
+    case Mouth = 2;
+    case Chin = 3;
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->value;
+    }
 }

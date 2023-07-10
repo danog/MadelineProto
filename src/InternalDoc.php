@@ -1545,6 +1545,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->stop();
     }
     /**
+     * Converts a string into an async amphp stream.
+     */
+    public static function stringToStream(string $str): \Amp\ByteStream\ReadableBuffer
+    {
+        return \danog\MadelineProto\Tools::stringToStream($str);
+    }
+    /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.
      *
      * @param mixed $channel Channel/supergroup to subscribe to

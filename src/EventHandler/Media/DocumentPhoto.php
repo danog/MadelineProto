@@ -26,7 +26,7 @@ final class DocumentPhoto extends Media
         $this->width = $attribute['w'];
         $this->height = $attribute['h'];
         $hasStickers = false;
-        foreach ($rawMedia['attributes'] as ['_' => $t]) {
+        foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
             if ($t === 'documentAttributeHasStickers') {
                 $hasStickers = true;
                 break;

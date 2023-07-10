@@ -20,7 +20,7 @@ final class Gif extends AbstractVideo
     ) {
         parent::__construct($API, $rawMedia, $attribute);
         $hasStickers = false;
-        foreach ($rawMedia['attributes'] as ['_' => $t]) {
+        foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
             if ($t === 'documentAttributeHasStickers') {
                 $hasStickers = true;
                 break;

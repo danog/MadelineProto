@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter\Combinator;
 
+use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Update;
@@ -9,6 +10,7 @@ use danog\MadelineProto\EventHandler\Update;
 /**
  * NOTs a filter.
  */
+#[Attribute(Attribute::TARGET_METHOD)]
 final class FilterNot extends Filter
 {
     public function __construct(private readonly Filter $filter)

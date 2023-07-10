@@ -566,7 +566,7 @@ trait Files
         }
         $has_video = null;
         $has_animated = false;
-        foreach ($media['attributes'] as $attr) {
+        foreach ($media['document']['attributes'] as $attr) {
             $t = $attr['_'];
             if ($t === 'documentAttributeImageSize') {
                 return new DocumentPhoto($this, $media, $attr);

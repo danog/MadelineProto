@@ -21,7 +21,7 @@ final class Photo extends Media
     ) {
         parent::__construct($API, $rawMedia);
         $hasStickers = false;
-        foreach ($rawMedia['attributes'] as ['_' => $t]) {
+        foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
             if ($t === 'documentAttributeHasStickers') {
                 $hasStickers = true;
                 break;

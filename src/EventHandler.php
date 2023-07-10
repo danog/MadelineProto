@@ -28,10 +28,11 @@ use Closure;
 use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Attributes\Periodic;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
-use danog\MadelineProto\EventHandler\Handler;
+use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
 use danog\MadelineProto\EventHandler\Update;
 use Generator;
 use mysqli;
@@ -191,18 +192,20 @@ abstract class EventHandler extends AbstractAPI
                     $this->periodicLoops[$method]->start();
                     continue;
                 }
-                if (!($handler = $methodRefl->getAttributes(Handler::class))) {
-                    continue;
-                }
                 $filter = $methodRefl->getAttributes(
                     Filter::class,
                     ReflectionAttribute::IS_INSTANCEOF
                 )[0] ?? null;
                 if (!$filter) {
-                    continue;
+                    if (!($handler = $methodRefl->getAttributes(Handler::class))) {
+                        continue;
+                    }
+                    $filter = new FilterAllowAll;
+                } else {
+                    $filter = $filter->newInstance();
                 }
                 $filter = new FiltersAnd(
-                    $filter->newInstance(),
+                    $filter,
                     Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
                 );
                 $filter = $filter->initialize($this) ?? $filter;

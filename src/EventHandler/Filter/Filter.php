@@ -2,11 +2,10 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\BasicFilter\Incoming;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
+use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
 use danog\MadelineProto\EventHandler\Update;
 use ReflectionIntersectionType;
@@ -14,7 +13,6 @@ use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
-#[Attribute(Attribute::TARGET_METHOD)]
 abstract class Filter
 {
     abstract public function apply(Update $update): bool;

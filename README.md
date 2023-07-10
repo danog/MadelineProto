@@ -309,6 +309,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tocamelcase-string-input-string" name="toCamelCase">Convert to camelCase: toCamelCase</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tosnakecase-string-input-string" name="toSnakeCase">Convert to snake_case: toSnakeCase</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#packunsignedint-int-value-string" name="packUnsignedInt">Convert value to unsigned base256 int: packUnsignedInt</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#stringtostream-string-str-amp-bytestream-readablebuffer" name="stringToStream">Converts a string into an async amphp stream: stringToStream</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.createForumTopic.html" name="channels.createForumTopic">Create a forum topic; requires manage_topics rights: channels.createForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.createChannel.html" name="channels.createChannel">Create a supergroup/channel: channels.createChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.createGroupCall.html" name="phone.createGroupCall">Create a group call or livestream: phone.createGroupCall</a>

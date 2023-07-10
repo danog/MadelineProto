@@ -24,6 +24,11 @@ use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Filter\FilterText;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
@@ -124,85 +129,68 @@ class MyEventHandler extends EventHandler
     }
 
     /**
-     * Handle updates from supergroups and channels.
-     *
-     * @param array $update Update
-     */
-    public function onUpdateNewChannelMessage(array $update): void
-    {
-        $this->onUpdateNewMessage($update);
-    }
-
-    /**
-     * Handle updates from users.
+     * Handle incoming updates from users, chats and channels.
      *
      * 100+ other types of onUpdate... method types are available, see https://docs.madelineproto.xyz/API_docs/types/Update.html for the full list.
      * You can also use onAny to catch all update types (only for debugging)
      * A special onUpdateCustomEvent method can also be defined, to send messages to the event handler from an API instance, using the sendCustomEvent method.
-     *
-     * @param array $update Update
      */
-    public function onUpdateNewMessage(array $update): void
+    #[Handler]
+    public function handleMessage(Incoming&Message $message): void
     {
-        if ($update['message']['_'] === 'messageEmpty') {
-            return;
-        }
-
-        $this->logger($update);
-
-        // Chat ID
-        $id = $this->getId($update);
-
-        // Sender ID, not always present
-        $from_id = isset($update['message']['from_id'])
-            ? $this->getId($update['message']['from_id'])
-            : null;
+        $this->logger($message);
 
         // In this example code, send the "This userbot is powered by MadelineProto!" message only once per chat.
         // Ignore all further messages coming from this chat.
-        if (!isset($this->notifiedChats[$id])) {
-            $this->notifiedChats[$id] = true;
+        if (!isset($this->notifiedChats[$message->chatId])) {
+            $this->notifiedChats[$message->chatId] = true;
 
             $this->messages->sendMessage(
-                peer: $update,
+                peer: $message->chatId,
                 message: "This userbot is powered by [MadelineProto](https://t.me/MadelineProto)!",
-                reply_to_msg_id: $update['message']['id'] ?? null,
+                reply_to_msg_id: $message->id,
                 parse_mode: 'Markdown'
             );
         }
+    }
 
+    #[FilterCommand('restart')]
+    public function restartCommand(Incoming&Message $message): void
+    {
         // If the message is a /restart command from an admin, restart to reload changes to the event handler code.
-        if (($update['message']['message'] ?? '') === '/restart'
-            && $from_id === $this->adminId
-        ) {
+        if ($message->senderId === $this->adminId) {
             // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
             $this->restart();
         }
+    }
 
+    #[FilterCommand('broadcast')]
+    public function broadcastCommand(Incoming&Message $message): void
+    {
         // We can broadcast messages to all users.
-        if (($update['message']['message'] ?? '') === '/broadcast'
-            && $from_id === $this->adminId
-        ) {
-            if (!isset($update['message']['reply_to']['reply_to_msg_id'])) {
+        if ($message->senderId === $this->adminId) {
+            if (!$message->replyToMsgId) {
                 $this->messages->sendMessage(
-                    peer: $update,
+                    peer: $message->senderId,
                     message: "You should reply to the message you want to broadcast.",
-                    reply_to_msg_id: $update['message']['id'] ?? null,
+                    reply_to_msg_id: $message->id,
                 );
                 return;
             }
             $this->broadcastForwardMessages(
-                from_peer: $update,
-                message_ids: [$update['message']['reply_to']['reply_to_msg_id']],
+                from_peer: $message->senderId,
+                message_ids: [$message->replyToMsgId],
                 drop_author: true,
                 pin: true,
             );
             return;
         }
+    }
 
-        if (($update['message']['message'] ?? '') === 'ping') {
-            $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
-        }
+    #[FilterText('ping')]
+    public function pingCommand(Incoming&Message $message): void
+    {
+        $this->messages->sendMessage(['message' => 'pong', 'peer' => $message->chatId]);
     }
 }
 

@@ -30,6 +30,8 @@ abstract class Message extends AbstractMessage
 
     /** Bot command (if present) */
     public readonly ?string $command;
+    /** Bot command type (if present) */
+    public readonly ?CommandType $commandType;
     /** @var list<string> Bot command arguments (if present) */
     public readonly ?array $commandArgs;
 
@@ -110,23 +112,22 @@ abstract class Message extends AbstractMessage
             ? $API->wrapMedia($rawMessage['media'])
             : null;
 
-        if (
-            $this->entities
-            && $this->entities[0]['_'] === 'messageEntityBotCommand'
-            && $this->entities[0]['offset'] === 0
-        ) {
-            $this->command = StrTools::mbSubstr(
-                $this->message,
-                1,
-                $this->entities[0]['length']-1
-            );
+        if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {
+            $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
+            $this->command = \substr($this->message, 1, $space-1);
             $this->commandArgs = \explode(
                 ' ',
-                StrTools::mbSubstr($this->message, $this->entities[0]['length']+1)
+                \substr($this->message, $space+1)
             );
+            $this->commandType = match ($this->message[0]) {
+                '.' => CommandType::DOT,
+                '/' => CommandType::SLASH,
+                '!' => CommandType::BANG,
+            };
         } else {
             $this->command = null;
             $this->commandArgs = null;
+            $this->commandType = null;
         }
     }
 

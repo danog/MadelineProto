@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter\Media;
 
+use Attribute;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Media\AbstractSticker;
 use danog\MadelineProto\EventHandler\Message;
@@ -10,6 +11,7 @@ use danog\MadelineProto\EventHandler\Update;
 /**
  * Allow that only matches stickers.
  */
+#[Attribute(Attribute::TARGET_METHOD)]
 final class FilterSticker extends Filter
 {
     public function apply(Update $update): bool

@@ -135,10 +135,10 @@ trait UpdateHandler
             return;
         }
         if (\count($this->eventHandlerHandlers) !== 0 && \is_array($update)) {
-            $update = $this->wrapUpdate($update);
-            if ($update !== null) {
+            $obj = $this->wrapUpdate($update);
+            if ($obj !== null) {
                 foreach ($this->eventHandlerHandlers as $closure) {
-                    $closure($update);
+                    $closure($obj);
                 }
             }
         }

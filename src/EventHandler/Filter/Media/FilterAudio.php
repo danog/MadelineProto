@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter\Media;
 
+use Attribute;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Message;
@@ -10,6 +11,7 @@ use danog\MadelineProto\EventHandler\Update;
 /**
  * Allow that only matches audio files.
  */
+#[Attribute(Attribute::TARGET_METHOD)]
 final class FilterAudio extends Filter
 {
     public function apply(Update $update): bool

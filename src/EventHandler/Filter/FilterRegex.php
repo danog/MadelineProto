@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
+use Attribute;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
@@ -9,6 +10,7 @@ use Webmozart\Assert\Assert;
 /**
  * Allow only messages matching the specified regex.
  */
+#[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRegex extends Filter
 {
     public function __construct(private readonly string $regex)
