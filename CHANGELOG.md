@@ -17,15 +17,17 @@ Features:
 - Added support for `pay`, `login_url`, `web_app` and `tg://user?id=` buttons in bot API syntax!
 - Added a `getAdmin` function that returns the ID of the admin of the bot (which is equal to the first peer returned by getReportPeers in the event handler).
 - getPlugin can now be used from IPC clients!
-- `getReply`, `sendMessage`, `reply`
+- `getReply`, `sendMessage`, `sendDocument`, `sendPhoto`, `reply`, `delete`
 
 Fixes:
 - Fixed file uploads with ext-uv!
-- Many performance improvements and bugfixes!
+- Fixed file re-uploads!
 - Improve background broadcasting with the broadcast API using a pre-defined list of `whitelist` IDs!
+- Fixed a bug that caused updates to get paused if an exception is thrown during onStart.
 - Broadcast IDs are now unique across multiple broadcasts, even if previous broadcasts already completed their ID will never be re-used.
 - Now uploadMedia, sendMedia and upload can upload files from string buffers created using `ReadableBuffer`.
 - Reduce memory usage during flood waits by tweaking config defaults.
 - Reduce memory usage by clearing the min database automatically as needed.
 - Automatically try caching all dialogs if a peer not found error is about to be thrown
 - Fix some issues with pure phar installs
+- And many performance improvements and bugfixes!

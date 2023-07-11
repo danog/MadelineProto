@@ -42,6 +42,7 @@ use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeVisitor\NameResolver;
@@ -470,7 +471,11 @@ abstract class EventHandler extends AbstractAPI
             }
         }
 
-        if ($finder->findFirstInstanceOf($file, Include_::class)) {
+        /** @var Include_ $include */
+        $include = $finder->findFirstInstanceOf($file, Include_::class);
+        if ($include
+            && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
+        ) {
             throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
         }
     }

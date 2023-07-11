@@ -487,8 +487,11 @@ final class MTProto implements TLCallback, LoggerGetter
 
         $initDeferred = new DeferredFuture;
         $this->initPromise = $initDeferred->getFuture();
-        $this->initialize($settings);
-        $initDeferred->complete();
+        try {
+            $this->initialize($settings);
+        } finally {
+            $initDeferred->complete();
+        }
     }
 
     /**
@@ -976,80 +979,82 @@ final class MTProto implements TLCallback, LoggerGetter
         $deferred = new DeferredFuture;
         $this->initPromise = $deferred->getFuture();
 
-        // Cleanup old properties, init new stuffs
-        $this->cleanupProperties();
+        try {
+            // Cleanup old properties, init new stuffs
+            $this->cleanupProperties();
 
-        // Re-set TL closures
-        $callbacks = [$this];
-        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
-            $callbacks []= $this->referenceDatabase;
-        }
-        if (!($this->authorization['user']['bot'] ?? false) && $this->settings->getDb()->getEnableMinDb()) {
-            $callbacks[] = $this->minDatabase;
-        }
-
-        $this->TL->updateCallbacks($callbacks);
-
-        // Clean up phone call array
-        foreach ($this->calls as $id => $controller) {
-            if (!\is_object($controller)) {
-                unset($this->calls[$id]);
-            } elseif ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
-                $controller->setMadeline($this);
-                $controller->discard();
-            } else {
-                $controller->setMadeline($this);
+            // Re-set TL closures
+            $callbacks = [$this];
+            if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+                $callbacks []= $this->referenceDatabase;
             }
-        }
+            if (!($this->authorization['user']['bot'] ?? false) && $this->settings->getDb()->getEnableMinDb()) {
+                $callbacks[] = $this->minDatabase;
+            }
 
-        $this->settings->getConnection()->init();
-        // Setup logger
-        $this->setupLogger();
-        // Setup language
-        Lang::$current_lang =& Lang::$lang['en'];
-        if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
-            Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()];
-        }
-        // Reset MTProto session (not related to user session)
-        $this->resetMTProtoSession();
-        // Update settings from constructor
-        $this->updateSettings($settings);
-        // Update TL callbacks
-        $callbacks = [$this];
-        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
-            $callbacks[] = $this->referenceDatabase;
-        }
-        if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
-            $callbacks[] = $this->minDatabase;
-        }
-        // Connect to all DCs, start internal loops
-        $this->connectToAllDcs();
-        if ($this->fullGetSelf()) {
-            $this->authorized = API::LOGGED_IN;
+            $this->TL->updateCallbacks($callbacks);
+
+            // Clean up phone call array
+            foreach ($this->calls as $id => $controller) {
+                if (!\is_object($controller)) {
+                    unset($this->calls[$id]);
+                } elseif ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
+                    $controller->setMadeline($this);
+                    $controller->discard();
+                } else {
+                    $controller->setMadeline($this);
+                }
+            }
+
+            $this->settings->getConnection()->init();
+            // Setup logger
             $this->setupLogger();
-            $this->startLoops();
-            $this->getCdnConfig();
-            $this->initAuthorization();
-        } else {
-            $this->startLoops();
-        }
-        // onStart event handler
-        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
-            $this->setEventHandler($this->event_handler);
-        }
-        $this->startUpdateSystem(true);
-        $this->cacheFullDialogs();
-        if ($this->authorized === API::LOGGED_IN) {
-            $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
-            $this->updaters[UpdateLoop::GENERIC]->resume();
-        }
-        $this->updaters[UpdateLoop::GENERIC]->start();
+            // Setup language
+            Lang::$current_lang =& Lang::$lang['en'];
+            if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
+                Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()];
+            }
+            // Reset MTProto session (not related to user session)
+            $this->resetMTProtoSession();
+            // Update settings from constructor
+            $this->updateSettings($settings);
+            // Update TL callbacks
+            $callbacks = [$this];
+            if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+                $callbacks[] = $this->referenceDatabase;
+            }
+            if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
+                $callbacks[] = $this->minDatabase;
+            }
+            // Connect to all DCs, start internal loops
+            $this->connectToAllDcs();
+            if ($this->fullGetSelf()) {
+                $this->authorized = API::LOGGED_IN;
+                $this->setupLogger();
+                $this->startLoops();
+                $this->getCdnConfig();
+                $this->initAuthorization();
+            } else {
+                $this->startLoops();
+            }
+            // onStart event handler
+            if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
+                $this->setEventHandler($this->event_handler);
+            }
+            $this->startUpdateSystem(true);
+            $this->cacheFullDialogs();
+            if ($this->authorized === API::LOGGED_IN) {
+                $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
+                $this->updaters[UpdateLoop::GENERIC]->resume();
+            }
+            $this->updaters[UpdateLoop::GENERIC]->start();
 
-        foreach ($this->broadcasts as $broadcast) {
-            $broadcast->resume();
+            foreach ($this->broadcasts as $broadcast) {
+                $broadcast->resume();
+            }
+        } finally {
+            $deferred->complete();
         }
-
-        $deferred->complete();
     }
     /**
      * Unreference instance, allowing destruction.
