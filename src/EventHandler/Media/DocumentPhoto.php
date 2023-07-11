@@ -20,9 +20,10 @@ final class DocumentPhoto extends Media
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $attribute
+        array $attribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $protected);
         $this->width = $attribute['w'];
         $this->height = $attribute['h'];
         $hasStickers = false;

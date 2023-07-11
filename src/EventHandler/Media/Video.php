@@ -16,9 +16,10 @@ final class Video extends AbstractVideo
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $attribute
+        array $attribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia, $attribute);
+        parent::__construct($API, $rawMedia, $attribute, $protected);
         $hasStickers = false;
         foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
             if ($t === 'documentAttributeHasStickers') {

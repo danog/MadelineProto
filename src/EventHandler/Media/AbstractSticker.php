@@ -20,9 +20,10 @@ abstract class AbstractSticker extends Media
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $stickerAttribute
+        array $stickerAttribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $protected);
         $this->emoji = $stickerAttribute['alt'];
         $this->stickerset = $stickerAttribute['stickerset'];
     }

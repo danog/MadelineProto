@@ -115,7 +115,24 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
-     * Replies to the message.
+     * Delete the message.
+     *
+     * @param boolean $revoke Whether to delete the message for all participants of the chat.
+     */
+    public function delete(bool $revoke = true): void
+    {
+        $this->API->methodCallAsyncRead(
+            API::isSupergroup($this->senderId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            [
+                'channel' => $this->chatId,
+                'id' => [$this->id],
+                'revoke' => $revoke,
+            ]
+        );
+    }
+
+    /**
+     * Reply to the message.
      *
      * @param string $message Message to send
      * @param "html"|"markdown"|null $parseMode Parse mode

@@ -23,9 +23,10 @@ abstract class AbstractVideo extends Media
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $attribute
+        array $attribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $protected);
         $this->duration = $attribute['duration'];
         $this->supportsStreaming = $attribute['supports_streaming'];
         $this->width = $attribute['w'];

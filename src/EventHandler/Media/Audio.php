@@ -18,9 +18,10 @@ final class Audio extends AbstractAudio
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $audioAttribute
+        array $audioAttribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $audioAttribute, $protected);
         $this->title = $audioAttribute['title'] ?? null;
         $this->performer = $audioAttribute['performer'] ?? null;
     }

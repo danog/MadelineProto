@@ -434,7 +434,7 @@ abstract class InternalDoc
      *
      * @param mixed                          $messageMedia  File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                       $cb            Status callback
      * @param bool                           $seekable      Whether the callable can be called out of order
      * @param int                            $offset        Offset where to start downloading
      * @param int                            $end           Offset where to stop downloading (inclusive)
@@ -449,7 +449,7 @@ abstract class InternalDoc
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToDir(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $dir, ?callable $cb = null)
     {
@@ -460,7 +460,7 @@ abstract class InternalDoc
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToFile(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $file, ?callable $cb = null): string|false
     {
@@ -1486,6 +1486,33 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->sendCustomEvent($payload);
     }
     /**
+     * Sends a document.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string $peer Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb Optional: Thumbnail to upload
+     * @param string $caption Caption of document
+     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param integer|null $replyToMsgId ID of message to reply to.
+     * @param integer|null $topMsgId ID of thread where to send the message.
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
+    public function sendDocument(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', ?string $parseMode = null, ?callable $callback = null, ?string $fileName = null, ?string $mimeType = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->sendDocument($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $mimeType, $ttl, $spoiler, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder);
+    }
+    /**
      * Sends a message.
      *
      * @param integer|string $peer Destination peer or username.
@@ -1506,6 +1533,32 @@ abstract class InternalDoc
     public function sendMessage(string|int $peer, string $message, ?string $parseMode = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
     {
         return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder);
+    }
+    /**
+     * Sends a document.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string $peer Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
+     * @param string $caption Caption of document
+     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param integer|null $replyToMsgId ID of message to reply to.
+     * @param integer|null $topMsgId ID of thread where to send the message.
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
+    public function sendPhoto(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $caption = '', ?string $parseMode = null, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->sendPhoto($peer, $file, $caption, $parseMode, $callback, $fileName, $ttl, $spoiler, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -1762,12 +1815,12 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|string|array|resource $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|array|string $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
     }
@@ -1792,7 +1845,7 @@ abstract class InternalDoc
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
@@ -1818,7 +1871,7 @@ abstract class InternalDoc
      * Reupload telegram file.
      *
      * @param mixed    $media     Telegram file
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
@@ -1831,7 +1884,7 @@ abstract class InternalDoc
      * @param string|FileCallbackInterface $url       URL of file
      * @param integer                      $size      Size of file
      * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -1861,9 +1914,9 @@ abstract class InternalDoc
     /**
      * Wrap a media constructor into an abstract Media object.
      */
-    public function wrapMedia(array $media): ?\danog\MadelineProto\EventHandler\Media
+    public function wrapMedia(array $media, bool $protected): ?\danog\MadelineProto\EventHandler\Media
     {
-        return $this->wrapper->getAPI()->wrapMedia($media);
+        return $this->wrapper->getAPI()->wrapMedia($media, $protected);
     }
     /**
      * Wrap a Message constructor into an abstract Message object.

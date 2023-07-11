@@ -20,9 +20,10 @@ final class Voice extends AbstractAudio
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $audioAttribute
+        array $audioAttribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia, $audioAttribute);
+        parent::__construct($API, $rawMedia, $audioAttribute, $protected);
         $this->waveform = $audioAttribute['waveform'];
     }
 }

@@ -17,9 +17,10 @@ abstract class AbstractAudio extends Media
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $audioAttribute
+        array $audioAttribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $protected);
         $this->duration = $audioAttribute['duration'];
     }
 }

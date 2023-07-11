@@ -14,8 +14,9 @@ final class Document extends Media
     /** @internal */
     public function __construct(
         MTProto $API,
-        array $rawMedia
+        array $rawMedia,
+        bool $protected
     ) {
-        parent::__construct($API, $rawMedia);
+        parent::__construct($API, $rawMedia, $protected);
     }
 }

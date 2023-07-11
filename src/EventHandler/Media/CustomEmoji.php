@@ -18,9 +18,10 @@ final class CustomEmoji extends AbstractSticker
     public function __construct(
         MTProto $API,
         array $rawMedia,
-        array $stickerAttribute
+        array $stickerAttribute,
+        bool $protected,
     ) {
-        parent::__construct($API, $rawMedia, $stickerAttribute);
+        parent::__construct($API, $rawMedia, $stickerAttribute, $protected);
         $this->free = $stickerAttribute['free'];
         $this->textColor = $stickerAttribute['text_color'];
     }

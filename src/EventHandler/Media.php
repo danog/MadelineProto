@@ -38,13 +38,22 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** Whether the media should be hidden behind a spoiler */
     public readonly bool $spoiler;
 
-    /** Media location */
-    private readonly array $location;
+    /** File ID in bot API format (always present even for users) */
+    public readonly string $botApiFileId;
+
+    /** Unique file ID in bot API format (always present even for users) */
+    public readonly string $botApiFileUniqueId;
+
+    /** @internal Media location */
+    public readonly array $location;
 
     /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMedia,
+
+        /** Whether this media is protected */
+        public readonly bool $protected
     ) {
         parent::__construct($API);
         [
@@ -55,6 +64,11 @@ abstract class Media extends IpcCapable implements JsonSerializable
             'InputFileLocation' => $this->location
         ] = $API->getDownloadInfo($rawMedia);
         $this->fileName = "$name.".$this->fileExt;
+
+        [
+            'file_id' => $this->botApiFileId,
+            'file_unique_id' => $this->botApiFileUniqueId
+        ] = $API->extractBotAPIFile($API->MTProtoToBotAPI($rawMedia));
 
         $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'])['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;

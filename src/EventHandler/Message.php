@@ -35,6 +35,9 @@ abstract class Message extends AbstractMessage
     /** @var list<string> Bot command arguments (if present) */
     public readonly ?array $commandArgs;
 
+    /** Whether this message is protected */
+    public readonly bool $protected;
+
     /**
      * @readonly
      *
@@ -108,8 +111,10 @@ abstract class Message extends AbstractMessage
             $this->psaType = null;
         }
 
+        $this->protected = $rawMessage['noforwards'];
+
         $this->media = isset($rawMessage['media'])
-            ? $API->wrapMedia($rawMessage['media'])
+            ? $API->wrapMedia($rawMessage['media'], $this->protected)
             : null;
 
         if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {

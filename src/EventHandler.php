@@ -312,7 +312,7 @@ abstract class EventHandler extends AbstractAPI
     {
         $plugins = $this->getPlugins();
         $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
-        $plugins = array_merge($plugins, $this->internalGetDirectoryPlugins($plugins));
+        $plugins = \array_merge($plugins, $this->internalGetDirectoryPlugins($plugins));
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
@@ -353,10 +353,11 @@ abstract class EventHandler extends AbstractAPI
                     $recurse($file, $namespace.'\\'.\basename($file));
                 } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
                     $file = \realpath($file);
+                    $class = $namespace.'\\'.\basename($file, '.php');
                     try {
                         require $file;
                     } catch (PluginRegistration $e) {
-                        Assert::eq($e->plugin, $namespace.'\\'.\basename($file, '.php'));
+                        Assert::eq($e->plugin, $class);
                         $pluginsTemp []= $e->plugin;
                         continue;
                     }
@@ -370,14 +371,9 @@ abstract class EventHandler extends AbstractAPI
             self::$includingPlugins = true;
             foreach ($paths as $path) {
                 if (isset(self::$checkedPaths[$path])) {
-                    $plugins = array_merge($plugins, self::$checkedPaths[$path]);
+                    $plugins = \array_merge($plugins, self::$checkedPaths[$path]);
                     continue;
                 }
-
-                $recurse($path);
-                self::$checkedPaths[$path] = $pluginsTemp;
-                $plugins = array_merge($plugins, $pluginsTemp);
-                $pluginsTemp = [];
 
                 \spl_autoload_register(function (string $class) use ($path): void {
                     if (!\str_starts_with($class, 'MadelinePlugin\\')) {
@@ -390,6 +386,11 @@ abstract class EventHandler extends AbstractAPI
                         Assert::classExists($class);
                     }
                 });
+
+                $recurse($path);
+                self::$checkedPaths[$path] = $pluginsTemp;
+                $plugins = \array_merge($plugins, $pluginsTemp);
+                $pluginsTemp = [];
             }
         } finally {
             self::$includingPlugins = false;

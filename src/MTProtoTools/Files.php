@@ -25,17 +25,7 @@ use Amp\File\Driver\BlockingFile;
 use Amp\Future;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\EventHandler\Media\Audio;
-use danog\MadelineProto\EventHandler\Media\CustomEmoji;
-use danog\MadelineProto\EventHandler\Media\Document;
-use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
-use danog\MadelineProto\EventHandler\Media\Gif;
-use danog\MadelineProto\EventHandler\Media\MaskSticker;
-use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\EventHandler\Media\RoundVideo;
-use danog\MadelineProto\EventHandler\Media\Sticker;
-use danog\MadelineProto\EventHandler\Media\Video;
-use danog\MadelineProto\EventHandler\Media\Voice;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
@@ -68,13 +58,14 @@ use function Amp\Future\awaitFirst;
 trait Files
 {
     use FilesLogic;
+    use FilesAbstraction;
     /**
      * Upload file from URL.
      *
      * @param string|FileCallbackInterface $url       URL of file
      * @param integer                      $size      Size of file
      * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -118,7 +109,7 @@ trait Files
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
@@ -271,7 +262,7 @@ trait Files
      * Reupload telegram file.
      *
      * @param mixed    $media     Telegram file
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
@@ -548,63 +539,6 @@ trait Files
         return $info;
     }
     /**
-     * Wrap a media constructor into an abstract Media object.
-     */
-    public function wrapMedia(array $media): ?Media
-    {
-        if ($media['_'] === 'messageMediaPhoto') {
-            if (!isset($media['photo'])) {
-                return null;
-            }
-            return new Photo($this, $media);
-        }
-        if ($media['_'] !== 'messageMediaDocument') {
-            return null;
-        }
-        if (!isset($media['document'])) {
-            return null;
-        }
-        $has_video = null;
-        $has_animated = false;
-        foreach ($media['document']['attributes'] as $attr) {
-            $t = $attr['_'];
-            if ($t === 'documentAttributeImageSize') {
-                return new DocumentPhoto($this, $media, $attr);
-            }
-            if ($t === 'documentAttributeAnimated') {
-                $has_animated = true;
-                continue;
-            }
-            if ($t === 'documentAttributeSticker') {
-                return $attr['mask']
-                    ? new MaskSticker($this, $media, $attr)
-                    : new Sticker($this, $media, $attr);
-            }
-            if ($t === 'documentAttributeVideo') {
-                $has_video = $attr;
-                continue;
-            }
-            if ($t === 'documentAttributeAudio') {
-                return $attr['voice']
-                    ? new Voice($this, $media, $attr)
-                    : new Audio($this, $media, $attr);
-            }
-            if ($t === 'documentAttributeCustomEmoji') {
-                return new CustomEmoji($this, $media, $attr);
-            }
-        }
-        if ($has_animated) {
-            Assert::notNull($has_video);
-            return new Gif($this, $media, $has_video);
-        }
-        if ($has_video) {
-            return $attr['round_message']
-                ? new RoundVideo($this, $media, $has_video)
-                : new Video($this, $media, $has_video);
-        }
-        return new Document($this, $media);
-    }
-    /**
      * Get download info of file
      * Returns an array with the following structure:.
      *
@@ -625,6 +559,18 @@ trait Files
      */
     public function getDownloadInfo(mixed $messageMedia): array
     {
+        if ($messageMedia instanceof Message) {
+            $messageMedia = $messageMedia->media;
+        }
+        if ($messageMedia instanceof Media) {
+            return [
+                'name' => \basename($messageMedia->fileName, $messageMedia->fileExt),
+                'ext' => $messageMedia->fileExt,
+                'mime' => $messageMedia->mimeType,
+                'size' => $messageMedia->size,
+                'InputFileLocation' => $messageMedia->location
+            ];
+        }
         if (\is_string($messageMedia)) {
             $messageMedia = $this->unpackFileId($messageMedia);
             if (isset($messageMedia['InputFileLocation'])) {
@@ -853,7 +799,7 @@ trait Files
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
@@ -869,7 +815,7 @@ trait Files
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null): false|string
     {
@@ -904,7 +850,7 @@ trait Files
      *
      * @param mixed                          $messageMedia  File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                       $cb            Status callback
      * @param bool                           $seekable      Whether the callable can be called out of order
      * @param int                            $offset        Offset where to start downloading
      * @param int                            $end           Offset where to stop downloading (inclusive)

@@ -18,11 +18,13 @@ use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
+use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
@@ -230,16 +232,22 @@ trait FilesLogic
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|string|array|resource $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload(FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
             $file = $file->getFile();
+        }
+        if ($file instanceof RemoteUrl) {
+            $file = $file->url;
+        }
+        if ($file instanceof BotApiFileId) {
+            $file = $file->fileId;
         }
         if (\is_string($file) || \is_object($file) && \method_exists($file, '__toString')) {
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
@@ -248,7 +256,7 @@ trait FilesLogic
         } elseif (\is_array($file)) {
             return $this->uploadFromTgfile($file, $cb, $encrypted);
         }
-        if (\is_resource($file) || (\is_object($file) && $file instanceof ReadableStream)) {
+        if ($file instanceof ReadableStream) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
         if ($file instanceof LocalFile) {
