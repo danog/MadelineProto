@@ -2,16 +2,11 @@
 
 namespace MadelinePlugin\Danog;
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
-use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\PluginEventHandler;
-use danog\MadelineProto\Settings\Database\Mysql;
-use danog\MadelineProto\Settings\Database\Postgres;
-use danog\MadelineProto\Settings\Database\Redis;
 
 /**
  * Plugin event handler class.

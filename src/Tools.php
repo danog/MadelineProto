@@ -27,6 +27,8 @@ use Closure;
 use Countable;
 use Exception;
 use Fiber;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
@@ -592,18 +594,18 @@ abstract class Tools extends AsyncTools
     public static function validateEventHandlerClass(string $class): void
     {
         $file = read((new ReflectionClass($class))->getFileName());
-        self::validateEventHandlerCode($file, is_subclass_of($class, PluginEventHandler::class));
+        self::validateEventHandlerCode($file, \is_subclass_of($class, PluginEventHandler::class));
     }
     private const BANNED_FUNCTIONS = [
-        'file_get_contents',
-        'file_put_contents',
-        'unlink',
-        'curl_exec',
-        'mysqli_query',
-        'mysqli_connect',
-        'mysql_connect',
-        'fopen',
-        'fsockopen',
+        'file_get_contents' => 'please use https://github.com/amphp/file or https://github.com/amphp/http-client, instead',
+        'file_put_contents' => 'please use https://github.com/amphp/file, instead',
+        'unlink' => 'please use https://github.com/amphp/http-client, instead',
+        'curl_exec' => 'please use https://github.com/amphp/http-client, instead',
+        'mysqli_query' => 'please use https://github.com/amphp/mysql, instead',
+        'mysqli_connect' => 'please use https://github.com/amphp/mysql, instead',
+        'mysql_connect' => 'please use https://github.com/amphp/mysql, instead',
+        'fopen' => 'please use https://github.com/amphp/file, instead',
+        'fsockopen' => 'please use https://github.com/amphp/socket, instead',
     ];
     private const BANNED_FILE_FUNCTIONS = [
         'amp\\file\\read',
@@ -612,8 +614,8 @@ abstract class Tools extends AsyncTools
         'amp\\file\\put',
     ];
     private const BANNED_CLASSES = [
-        PDO::class,
-        mysqli::class,
+        'pdo' => 'please use https://github.com/amphp/mysql, instead',
+        'mysqli' => 'please use https://github.com/amphp/mysql, instead',
     ];
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
@@ -655,8 +657,9 @@ abstract class Tools extends AsyncTools
             }
 
             $name = $call->name->toLowerString();
-            if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking function $name!");
+            if (isset(self::BANNED_FUNCTIONS[$name])) {
+                $explanation = self::BANNED_FUNCTIONS[$name];
+                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking function $name, $explanation!");
             }
             if ($plugin && \in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
                 throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
@@ -665,10 +668,13 @@ abstract class Tools extends AsyncTools
 
         /** @var New_ $call */
         foreach ($finder->findInstanceOf($code, New_::class) as $new) {
-            if ($new->class instanceof Name
-                && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
-            ) {
-                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking class $name!");
+            if (!$new->class instanceof Name) {
+                continue;
+            }
+            $name = $new->class->toLowerString();
+            if (isset(self::BANNED_CLASSES[$name])) {
+                $explanation = self::BANNED_CLASSES[$name];
+                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking class $name, $explanation!");
             }
         }
 

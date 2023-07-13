@@ -1925,12 +1925,13 @@ abstract class InternalDoc
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
      *
      * @param string $code Code of the class.
+     * @param bool $plugin Whether the class is a plugin or normal event handler class.
      *
      * @throws AssertionError If validation fails.
      */
-    public static function validateEventHandlerCode(string $code): void
+    public static function validateEventHandlerCode(string $code, bool $plugin = true): void
     {
-        \danog\MadelineProto\Tools::validateEventHandlerCode($code);
+        \danog\MadelineProto\Tools::validateEventHandlerCode($code, $plugin);
     }
     /**
      * Mark sponsored message as read.
