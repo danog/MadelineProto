@@ -22,11 +22,23 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableBuffer;
 use ArrayAccess;
+use AssertionError;
 use Closure;
 use Countable;
 use Exception;
 use Fiber;
+use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassLike;
+use PhpParser\Node\Stmt\DeclareDeclare;
+use PhpParser\NodeFinder;
+use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\ParserFactory;
 use phpseclib3\Crypt\Random;
+use PHPStan\PhpDocParser\Ast\NodeTraverser;
+use ReflectionClass;
 use Throwable;
 use Traversable;
 use Webmozart\Assert\Assert;
@@ -36,6 +48,8 @@ use const DIRECTORY_SEPARATOR;
 use const PHP_INT_MAX;
 use const PHP_SAPI;
 use const STR_PAD_RIGHT;
+
+use function Amp\File\read;
 use function unpack;
 
 /**
@@ -566,5 +580,103 @@ abstract class Tools extends AsyncTools
             return [!!$matches[1], $matches[2]];
         }
         return null;
+    }
+
+    /**
+     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
+     *
+     * @param class-string<EventHandler> $class Class name
+     *
+     * @throws AssertionError If validation fails.
+     */
+    public static function validateEventHandlerClass(string $class): void
+    {
+        $file = read((new ReflectionClass($class))->getFileName());
+        self::validateEventHandlerCode($file);
+    }
+    private const BANNED_FUNCTIONS = [
+        'file_get_contents',
+        'file_put_contents',
+        'unlink',
+        'curl_exec',
+        'mysqli_query',
+        'mysqli_connect',
+        'mysql_connect',
+        'fopen',
+        'fsockopen',
+    ];
+    private const BANNED_FILE_FUNCTIONS = [
+        'amp\\file\\read',
+        'amp\\file\\write',
+        'amp\\file\\get',
+        'amp\\file\\put',
+    ];
+    private const BANNED_CLASSES = [
+        PDO::class,
+        mysqli::class,
+    ];
+    /**
+     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
+     *
+     * @param string $code Code of the class.
+     *
+     * @throws AssertionError If validation fails.
+     */
+    public static function validateEventHandlerCode(string $code): void
+    {
+        $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
+        Assert::notNull($code);
+        $traverser = new NodeTraverser([new NameResolver()]);
+        $code = $traverser->traverse($code);
+        $finder = new NodeFinder;
+
+        $class = $finder->findInstanceOf($code, ClassLike::class);
+        $class = \array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
+        if (\count($class) !== 1 || !$class[0] instanceof Class_) {
+            throw new AssertionError("A file must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically.");
+        }
+        $class = $class[0]->name->toString();
+
+        /** @var DeclareDeclare|null $call */
+        $declare = $finder->findFirstInstanceOf($code, DeclareDeclare::class);
+        if ($declare === null
+            || $declare->key->name !== 'strict_types'
+            || !$declare->value instanceof LNumber
+            || $declare->value->value !== 1
+        ) {
+            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
+        }
+
+        /** @var FuncCall $call */
+        foreach ($finder->findInstanceOf($code, FuncCall::class) as $call) {
+            if (!$call->name instanceof Name) {
+                continue;
+            }
+
+            $name = $call->name->toLowerString();
+            if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking function $name!");
+            }
+            if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
+            }
+        }
+
+        /** @var New_ $call */
+        foreach ($finder->findInstanceOf($code, New_::class) as $new) {
+            if ($new->class instanceof Name
+                && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
+            ) {
+                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking class $name!");
+            }
+        }
+
+        /** @var Include_ $include */
+        $include = $finder->findFirstInstanceOf($code, Include_::class);
+        if ($include
+            && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
+        ) {
+            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
+        }
     }
 }

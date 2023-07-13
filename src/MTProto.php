@@ -1603,7 +1603,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
             if ($this->event_handler_instance instanceof EventHandler) {
                 try {
-                    EventHandler::validateEventHandler($this->event_handler_instance::class);
+                    Tools::validateEventHandlerClass($this->event_handler_instance::class);
                 } catch (AssertionError $e) {
                     Logger::log($e->getMessage(), Logger::FATAL_ERROR);
                     $e = \htmlentities($e->getMessage());

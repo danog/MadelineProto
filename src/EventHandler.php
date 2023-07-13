@@ -35,19 +35,7 @@ use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
 use danog\MadelineProto\EventHandler\Update;
 use Generator;
-use mysqli;
-use PDO;
-use PhpParser\Node\Expr\FuncCall;
-use PhpParser\Node\Expr\Include_;
-use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\LNumber;
-use PhpParser\Node\Scalar\String_;
-use PhpParser\Node\Stmt\DeclareDeclare;
-use PhpParser\NodeFinder;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\ParserFactory;
-use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
@@ -57,7 +45,6 @@ use Webmozart\Assert\Assert;
 use function Amp\File\isDirectory;
 use function Amp\File\isFile;
 use function Amp\File\listFiles;
-use function Amp\File\read;
 
 /**
  * Event handler.
@@ -81,6 +68,7 @@ abstract class EventHandler extends AbstractAPI
         if (self::$includingPlugins) {
             return;
         }
+        static::internalGetDirectoryPlugins();
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
@@ -99,6 +87,7 @@ abstract class EventHandler extends AbstractAPI
         if (self::$includingPlugins) {
             return;
         }
+        static::internalGetDirectoryPlugins();
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->botLogin($token);
@@ -221,7 +210,7 @@ abstract class EventHandler extends AbstractAPI
                 };
             }
             if ($this instanceof SimpleEventHandler) {
-                self::validateEventHandler(static::class);
+                Tools::validateEventHandlerClass(static::class);
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);
@@ -290,7 +279,7 @@ abstract class EventHandler extends AbstractAPI
      *
      * @return non-empty-string|non-empty-list<non-empty-string>|null
      */
-    public function getPluginPaths(): string|array|null
+    public static function getPluginPaths(): string|array|null
     {
         return null;
     }
@@ -299,7 +288,7 @@ abstract class EventHandler extends AbstractAPI
      *
      * @return array<class-string<EventHandler>>
      */
-    public function getPlugins(): array
+    public static function getPlugins(): array
     {
         return [];
     }
@@ -309,31 +298,31 @@ abstract class EventHandler extends AbstractAPI
      *
      * @return list<class-string<PluginEventHandler>>
      */
-    private function internalGetPlugins(): array
+    private static function internalGetPlugins(): array
     {
-        $plugins = $this->getPlugins();
+        $plugins = static::getPlugins();
         $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
-        $plugins = \array_merge($plugins, $this->internalGetDirectoryPlugins($plugins));
+        $plugins = \array_merge($plugins, static::internalGetDirectoryPlugins());
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
             Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
             Assert::notEq($plugin, PluginEventHandler::class);
             Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
-            self::validateEventHandler($plugin);
+            Tools::validateEventHandlerClass($plugin);
         }
 
         return $plugins;
     }
 
     private static array $checkedPaths = [];
-    private function internalGetDirectoryPlugins(): array
+    private static function internalGetDirectoryPlugins(): array
     {
-        if ($this instanceof PluginEventHandler) {
+        if (is_subclass_of(static::class, PluginEventHandler::class)) {
             return [];
         }
 
-        $paths = $this->getPluginPaths();
+        $paths = static::getPluginPaths();
         if (\is_string($paths)) {
             $paths = [$paths];
         } elseif ($paths === null) {
@@ -414,85 +403,5 @@ abstract class EventHandler extends AbstractAPI
         }
 
         return $plugins;
-    }
-
-    private const BANNED_FUNCTIONS = [
-        'file_get_contents',
-        'file_put_contents',
-        'unlink',
-        'curl_exec',
-        'mysqli_query',
-        'mysqli_connect',
-        'mysql_connect',
-        'fopen',
-        'fsockopen',
-    ];
-    private const BANNED_FILE_FUNCTIONS = [
-        'amp\\file\\read',
-        'amp\\file\\write',
-        'amp\\file\\get',
-        'amp\\file\\put',
-    ];
-    private const BANNED_CLASSES = [
-        PDO::class,
-        mysqli::class,
-    ];
-    /**
-     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
-     *
-     * @param class-string<EventHandler> $class Class name
-     *
-     * @throws AssertionError If validation fails.
-     */
-    final public static function validateEventHandler(string $class): void
-    {
-        $file = read((new ReflectionClass($class))->getFileName());
-        $file = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($file);
-        Assert::notNull($file);
-        $traverser = new NodeTraverser([new NameResolver()]);
-        $file = $traverser->traverse($file);
-        $finder = new NodeFinder;
-
-        /** @var DeclareDeclare|null $call */
-        $declare = $finder->findFirstInstanceOf($file, DeclareDeclare::class);
-        if ($declare === null
-            || $declare->key->name !== 'strict_types'
-            || !$declare->value instanceof LNumber
-            || $declare->value->value !== 1
-        ) {
-            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
-        }
-
-        /** @var FuncCall $call */
-        foreach ($finder->findInstanceOf($file, FuncCall::class) as $call) {
-            if (!$call->name instanceof Name) {
-                continue;
-            }
-
-            $name = $call->name->toLowerString();
-            if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking function $name!");
-            }
-            if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
-            }
-        }
-
-        /** @var New_ $call */
-        foreach ($finder->findInstanceOf($file, New_::class) as $new) {
-            if ($new->class instanceof Name
-                && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
-            ) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking class $name!");
-            }
-        }
-
-        /** @var Include_ $include */
-        $include = $finder->findFirstInstanceOf($file, Include_::class);
-        if ($include
-            && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
-        ) {
-            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
-        }
     }
 }

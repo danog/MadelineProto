@@ -186,6 +186,11 @@ class MyEventHandler extends SimpleEventHandler
     {
         $message->reply('pong');
     }
+
+    public static function getPluginPaths(): string|array|null
+    {
+        return 'plugins/';
+    }
 }
 
 $settings = new Settings;
