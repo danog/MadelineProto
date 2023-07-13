@@ -381,14 +381,14 @@ trait UpdateHandler
                 default => null
             };
         }
-        $id = $this->getIdInternal($message);
-        if (($this->chats[$id]['username'] ?? '') === 'replies') {
+        $info = $this->getInfo($message);
+        if (($this->chats[$info['bot_api_id']]['username'] ?? '') === 'replies') {
             return null;
         }
-        return match ($this->getType($id)) {
-            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message),
-            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message),
-            API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message),
+        return match ($info['type']) {
+            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
+            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info),
+            API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info),
         };
     }
     /**

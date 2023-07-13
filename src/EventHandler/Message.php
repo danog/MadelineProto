@@ -76,9 +76,9 @@ abstract class Message extends AbstractMessage
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info,
     ) {
-        parent::__construct($API, $rawMessage);
-        $info = $this->API->getInfo($rawMessage);
+        parent::__construct($API, $rawMessage, $info);
 
         $this->entities = $rawMessage['entities'] ?? null;
         $this->message = $rawMessage['message'];

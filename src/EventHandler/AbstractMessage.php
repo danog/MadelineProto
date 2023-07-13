@@ -44,9 +44,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info
     ) {
         parent::__construct($API);
-        $info = $this->API->getInfo($rawMessage);
 
         $this->out = $rawMessage['out'];
         $this->id = $rawMessage['id'];
