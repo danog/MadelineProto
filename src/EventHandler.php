@@ -329,7 +329,7 @@ abstract class EventHandler extends AbstractAPI
      */
     private static function internalGetDirectoryPlugins(string $class): array
     {
-        if (is_subclass_of($class, PluginEventHandler::class)) {
+        if (\is_subclass_of($class, PluginEventHandler::class)) {
             return [];
         }
 

@@ -202,7 +202,7 @@ trait FilesAbstraction
         );
     }
     /**
-     * Sends a document.
+     * Sends a photo.
      *
      * Please use named arguments to call this method.
      *

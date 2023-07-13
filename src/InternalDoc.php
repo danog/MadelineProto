@@ -1399,10 +1399,11 @@ abstract class InternalDoc
      *
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
+     * @param bool   $sendLogs  Whether to also send logs
      */
-    public function report(string $message, string $parseMode = ''): void
+    public function report(string $message, string $parseMode = '', bool $sendLogs = true): void
     {
-        $this->wrapper->getAPI()->report($message, $parseMode);
+        $this->wrapper->getAPI()->report($message, $parseMode, $sendLogs);
     }
     /**
      * Report memory profile with memprof.
@@ -1535,7 +1536,25 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder);
     }
     /**
-     * Sends a document.
+     * Sends a message.
+     *
+     * @param string $message Message to send
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     *
+     * @return list<Message>
+     */
+    public function sendMessageToAdmins(string $message, ?string $parseMode = null, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false): array
+    {
+        return $this->wrapper->getAPI()->sendMessageToAdmins($message, $parseMode, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage);
+    }
+    /**
+     * Sends a photo.
      *
      * Please use named arguments to call this method.
      *
@@ -1890,6 +1909,28 @@ abstract class InternalDoc
     public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted);
+    }
+    /**
+     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
+     *
+     * @param class-string<EventHandler> $class Class name
+     *
+     * @throws AssertionError If validation fails.
+     */
+    public static function validateEventHandlerClass(string $class): void
+    {
+        \danog\MadelineProto\Tools::validateEventHandlerClass($class);
+    }
+    /**
+     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
+     *
+     * @param string $code Code of the class.
+     *
+     * @throws AssertionError If validation fails.
+     */
+    public static function validateEventHandlerCode(string $code): void
+    {
+        \danog\MadelineProto\Tools::validateEventHandlerCode($code);
     }
     /**
      * Mark sponsored message as read.

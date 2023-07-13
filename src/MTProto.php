@@ -1680,12 +1680,55 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     private ?LocalMutex $reportMutex = null;
     /**
+     * Sends a message to all report peers (admins of the bot).
+     *
+     * @param string $message Message to send
+     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     *
+     * @return list<Message>
+     */
+    public function sendMessageToAdmins(
+        string $message,
+        ?string $parseMode = null,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $noWebpage = false,
+    ): array {
+        $result = [];
+        foreach ($this->reportDest as $report) {
+            $result []= $this->sendMessage(
+                peer: $report,
+                message: $message,
+                parseMode: $parseMode,
+                replyMarkup: $replyMarkup,
+                scheduleDate: $scheduleDate,
+                silent: $silent,
+                noForwards: $noForwards,
+                background: $background,
+                clearDraft: $clearDraft,
+                noWebpage: $noWebpage
+            );
+        }
+        return $result;
+    }
+    /**
      * Report an error to the previously set peer.
      *
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
+     * @param bool   $sendLogs  Whether to also send logs
      */
-    public function report(string $message, string $parseMode = ''): void
+    public function report(string $message, string $parseMode = '', bool $sendLogs = true): void
     {
         if (!$this->reportDest) {
             return;
@@ -1694,7 +1737,8 @@ final class MTProto implements TLCallback, LoggerGetter
         $lock = $this->reportMutex->acquire();
         try {
             $file = null;
-            if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
+            if ($sendLogs
+                && $this->settings->getLogger()->getType() === Logger::FILE_LOGGER
                 && $path = $this->settings->getLogger()->getExtra()) {
                 $temp = \tempnam(\sys_get_temp_dir(), 'madelinelog');
                 \copy($path, $temp);

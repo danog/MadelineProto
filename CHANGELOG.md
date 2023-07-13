@@ -1,10 +1,10 @@
 MadelineProto was updated (8.0.0-beta100)!
 
 Features:
-- Thanks to the many translation contributors @ https://weblate.madelineproto.xyz/, MadelineProto is now fully localized in Hebrew, Persian, Kurdish, Uzbek and Italian, with WIP translations in Russian and French!
+- Thanks to the many translation contributors @ https://weblate.madelineproto.xyz/, MadelineProto is now localized in Hebrew, Persian, Kurdish, Uzbek, Russian, French and Italian!
 - You can now use `Tools::callFork` to fork a new green thread!
 - You can now automatically pin messages broadcasted using `broadcastMessages`, `broadcastForwardMessages` by using the new `pin: true` parameter!
-- You can now use `@admin` to send messages to the bot's admin, which will be the first peer returned by `getReportPeers`.
+- You can now use `sendMessageToAdmins` to send messages to the bot's admin (the peers returned by `getReportPeers`).
 - Added `wrapUpdate`, `wrapMessage`, `wrapMedia`
 - Added `Cron`
 - Added plugins, filters, simple filters

@@ -57,7 +57,7 @@ class MyEventHandler extends SimpleEventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "@danogentili"; // !!! Change this to your username !!!
+    const ADMIN = "@me"; // !!! Change this to your username !!!
 
     private int $adminId;
 
@@ -92,13 +92,7 @@ class MyEventHandler extends SimpleEventHandler
         $this->logger($this->getFullInfo('MadelineProto'));
         $this->adminId = $this->getId(self::ADMIN);
 
-        if ($this->getSelf()['bot'] && $this->getSelf()['id'] === $this->adminId) {
-            return;
-        }
-        $this->messages->sendMessage(
-            peer: '@admin', // You can also use self::ADMIN, which does the same thing
-            message: "The bot was started!"
-        );
+        $this->sendMessageToAdmins("The bot was started!");
     }
 
     /**
@@ -107,10 +101,7 @@ class MyEventHandler extends SimpleEventHandler
     #[Cron(period: 60.0)]
     public function cron1(): void
     {
-        $this->messages->sendMessage(
-            peer: '@admin',
-            message: "The bot is online, current time ".date(DATE_RFC850)."!"
-        );
+        $this->sendMessageToAdmins("The bot is online, current time ".date(DATE_RFC850)."!");
     }
 
     private int $lastLog = 0;
@@ -121,10 +112,7 @@ class MyEventHandler extends SimpleEventHandler
     {
         if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
             $this->lastLog = time();
-            $this->messages->sendMessage(
-                peer: 'admin',
-                message: (string) $progress
-            );
+            $this->sendMessageToAdmins((string) $progress);
         }
     }
 
