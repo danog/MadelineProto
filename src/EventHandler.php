@@ -233,7 +233,7 @@ abstract class EventHandler extends AbstractAPI
                     $methods[$update] ??= [];
                     $methods[$update][] = $method;
                 }
-                $handlers = \array_merge($handler, $newHandlers);
+                $handlers = \array_merge($handlers, $newHandlers);
             }
 
             $this->startedInternal = true;

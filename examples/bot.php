@@ -181,10 +181,10 @@ class MyEventHandler extends SimpleEventHandler
         }
     }
 
-    #[FilterText('ping')]
+    #[FilterText('hi')]
     public function pingCommand(Incoming&Message $message): void
     {
-        $message->reply('pong');
+        $message->reply('hello');
     }
 
     public static function getPluginPaths(): string|array|null
