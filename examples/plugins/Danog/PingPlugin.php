@@ -38,20 +38,20 @@ class PingPlugin extends PluginEventHandler
     private string $pongText = 'pong';
 
     /**
-     * You can set a custom pong text from the outside of the plugin:
+     * You can set a custom pong text from the outside of the plugin:.
      *
      * ```
      * if (!file_exists('madeline.php')) {
      *     copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
      * }
      * include 'vendor/autoload.php';
-     * 
+     *
      * $a = new API('bot.madeline');
      * $plugin = $a->getPlugin(PingPlugin::class);
-     * 
+     *
      * $plugin->setPongText('UwU');
      * ```
-     * 
+     *
      * This will automatically connect to the running instance of the plugin and call the specified method.
      */
     public function setPongText(string $pong): void

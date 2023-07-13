@@ -1536,7 +1536,7 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder);
     }
     /**
-     * Sends a message.
+     * Sends a message to all report peers (admins of the bot).
      *
      * @param string $message Message to send
      * @param "html"|"markdown"|null $parseMode Parse mode

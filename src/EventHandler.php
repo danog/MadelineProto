@@ -341,12 +341,14 @@ abstract class EventHandler extends AbstractAPI
         } else {
             $paths = \array_values($paths);
         }
-        foreach ($paths as &$path) {
+        foreach ($paths as $k => &$path) {
             $pathNew = \realpath($path);
             if ($pathNew === false) {
                 $pathNew = \realpath(\dirname((new ReflectionClass($class))->getFileName()).DIRECTORY_SEPARATOR.$path);
                 if ($pathNew === false) {
-                    throw new AssertionError("$path does not exist!");
+                    unset($paths[$k]);
+                    Logger::log("Plugin path $path does not exist!", Logger::FATAL_ERROR);
+                    continue;
                 }
             }
             $path = $pathNew;
