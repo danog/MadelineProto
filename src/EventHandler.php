@@ -79,7 +79,7 @@ abstract class EventHandler extends AbstractAPI
     final public static function startAndLoop(string $session, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
-            throw new PluginRegistration(static::class);
+            return;
         }
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
@@ -97,7 +97,7 @@ abstract class EventHandler extends AbstractAPI
     final public static function startAndLoopBot(string $session, string $token, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
-            throw new PluginRegistration(static::class);
+            return;
         }
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
@@ -341,7 +341,16 @@ abstract class EventHandler extends AbstractAPI
         } else {
             $paths = \array_values($paths);
         }
-        $paths = \array_map(realpath(...), $paths);
+        foreach ($paths as &$path) {
+            $pathNew = \realpath($path);
+            if ($pathNew === false) {
+                $pathNew = \realpath(\dirname((new ReflectionClass(static::class))->getFileName()).DIRECTORY_SEPARATOR.$path);
+                if ($pathNew === false) {
+                    throw new AssertionError("$path does not exist!");
+                }
+            }
+            $path = $pathNew;
+        }
 
         if (!$paths) {
             return [];
@@ -350,19 +359,26 @@ abstract class EventHandler extends AbstractAPI
         $pluginsTemp = [];
         $recurse = static function (string $path, string $namespace = 'MadelinePlugin') use (&$recurse, &$pluginsTemp): void {
             foreach (listFiles($path) as $file) {
+                $file = $path.DIRECTORY_SEPARATOR.$file;
                 if (isDirectory($file)) {
                     $recurse($file, $namespace.'\\'.\basename($file));
-                } elseif (isFile($file) && \str_ends_with($file, "Plugin.php")) {
+                } elseif (isFile($file) && \str_ends_with($file, ".php")) {
                     $file = \realpath($file);
-                    $class = $namespace.'\\'.\basename($file, '.php');
-                    try {
+                    $fileName = \basename($file, '.php');
+                    if ($fileName === 'functions.php') {
                         require $file;
-                    } catch (PluginRegistration $e) {
-                        Assert::eq($e->plugin, $class);
-                        $pluginsTemp []= $e->plugin;
                         continue;
                     }
-                    throw new AssertionError("No plugin was registered after including $file!");
+                    $class = $namespace.'\\'.$fileName;
+                    if (!\class_exists($class)) {
+                        throw new AssertionError("$class was not defined when including $file!");
+                    }
+                    if ((new ReflectionClass($class))->getFileName() !== $file) {
+                        throw new AssertionError("$class was not defined when including $file, the same plugin is present in multiple plugin paths/composer!");
+                    }
+                    if (\is_subclass_of($class, PluginEventHandler::class)) {
+                        $pluginsTemp []= $class;
+                    }
                 }
             }
         };

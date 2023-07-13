@@ -489,6 +489,8 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->initPromise = $initDeferred->getFuture();
         try {
             $this->initialize($settings);
+        } catch (Throwable $e) {
+            $this->report((string) $e);
         } finally {
             $initDeferred->complete();
         }
@@ -1052,6 +1054,8 @@ final class MTProto implements TLCallback, LoggerGetter
             foreach ($this->broadcasts as $broadcast) {
                 $broadcast->resume();
             }
+        } catch (Throwable $e) {
+            $this->report((string) $e);
         } finally {
             $deferred->complete();
         }
