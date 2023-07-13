@@ -68,7 +68,7 @@ abstract class EventHandler extends AbstractAPI
         if (self::$includingPlugins) {
             return;
         }
-        static::internalGetDirectoryPlugins();
+        self::cachePlugins(static::class);
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->startAndLoopInternal(static::class);
@@ -87,7 +87,7 @@ abstract class EventHandler extends AbstractAPI
         if (self::$includingPlugins) {
             return;
         }
-        static::internalGetDirectoryPlugins();
+        self::cachePlugins(static::class);
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
         $API->botLogin($token);
@@ -221,7 +221,7 @@ abstract class EventHandler extends AbstractAPI
                 }
             }
 
-            $plugins = $this->internalGetPlugins();
+            $plugins = self::$pluginCache[static::class];
             foreach ($plugins as $class) {
                 $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
                 $pluginsNew[$class] = $plugin;
@@ -293,16 +293,22 @@ abstract class EventHandler extends AbstractAPI
         return [];
     }
 
+    /** @var array<class-string<EventHandler>, list<class-string<PluginEventHandler>>> */
+    private static array $pluginCache = [];
+
     /**
-     * Obtain a list of plugin event handlers.
+     * Cache a list of plugin event handlers.
      *
-     * @return list<class-string<PluginEventHandler>>
+     * @param class-string<EventHandler> $class
      */
-    private static function internalGetPlugins(): array
+    private static function cachePlugins(string $class): void
     {
-        $plugins = static::getPlugins();
+        if (isset(self::$pluginCache[$class])) {
+            return;
+        }
+        $plugins = $class::getPlugins();
         $plugins = \array_values(\array_unique($plugins, SORT_REGULAR));
-        $plugins = \array_merge($plugins, static::internalGetDirectoryPlugins());
+        $plugins = \array_merge($plugins, self::internalGetDirectoryPlugins($class));
 
         foreach ($plugins as $plugin) {
             Assert::classExists($plugin);
@@ -312,17 +318,22 @@ abstract class EventHandler extends AbstractAPI
             Tools::validateEventHandlerClass($plugin);
         }
 
-        return $plugins;
+        self::$pluginCache[$class] = $plugins;
     }
 
     private static array $checkedPaths = [];
-    private static function internalGetDirectoryPlugins(): array
+    /**
+     * Cache a list of plugin event handlers.
+     *
+     * @param class-string<EventHandler> $class
+     */
+    private static function internalGetDirectoryPlugins(string $class): array
     {
-        if (is_subclass_of(static::class, PluginEventHandler::class)) {
+        if (is_subclass_of($class, PluginEventHandler::class)) {
             return [];
         }
 
-        $paths = static::getPluginPaths();
+        $paths = $class::getPluginPaths();
         if (\is_string($paths)) {
             $paths = [$paths];
         } elseif ($paths === null) {
@@ -333,7 +344,7 @@ abstract class EventHandler extends AbstractAPI
         foreach ($paths as &$path) {
             $pathNew = \realpath($path);
             if ($pathNew === false) {
-                $pathNew = \realpath(\dirname((new ReflectionClass(static::class))->getFileName()).DIRECTORY_SEPARATOR.$path);
+                $pathNew = \realpath(\dirname((new ReflectionClass($class))->getFileName()).DIRECTORY_SEPARATOR.$path);
                 if ($pathNew === false) {
                     throw new AssertionError("$path does not exist!");
                 }
@@ -366,6 +377,7 @@ abstract class EventHandler extends AbstractAPI
                         throw new AssertionError("$class was not defined when including $file, the same plugin is present in multiple plugin paths/composer!");
                     }
                     if (\is_subclass_of($class, PluginEventHandler::class)) {
+                        self::cachePlugins($class);
                         $pluginsTemp []= $class;
                     }
                 }
