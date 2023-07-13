@@ -378,7 +378,7 @@ final class Logger
         if ($param instanceof Throwable) {
             $param = (string) $param;
         } elseif (!\is_string($param)) {
-            $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         }
         if (empty($file)) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');

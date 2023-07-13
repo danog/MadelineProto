@@ -126,8 +126,6 @@ class MyEventHandler extends SimpleEventHandler
     #[Handler]
     public function handleMessage(Incoming&Message $message): void
     {
-        $this->logger($message);
-
         // In this example code, send the "This userbot is powered by MadelineProto!" message only once per chat.
         // Ignore all further messages coming from this chat.
         if (!isset($this->notifiedChats[$message->chatId])) {

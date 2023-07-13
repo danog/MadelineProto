@@ -38,4 +38,11 @@ abstract class IpcCapable
     {
         $this->API = Client::giveInstanceBySession($this->session);
     }
+
+    public function __debugInfo()
+    {
+        $vars = \get_object_vars($this);
+        unset($vars['API']);
+        return $vars;
+    }
 }

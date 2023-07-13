@@ -78,7 +78,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);
-        unset($v['API'], $v['session']);
+        unset($v['API'], $v['session'], $v['location']);
         $v['_'] = static::class;
         return $v;
     }

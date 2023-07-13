@@ -829,11 +829,11 @@ trait UpdateHandler
     private function handleUpdate(array $update): void
     {
         /** @var UpdateHandlerType::EVENT_HANDLER|UpdateHandlerType::WEBHOOK|UpdateHandlerType::GET_UPDATES $this->updateHandlerType */
-        EventLoop::queue(match ($this->updateHandlerType) {
-            UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler(...),
-            UpdateHandlerType::WEBHOOK => $this->pwrWebhook(...),
-            UpdateHandlerType::GET_UPDATES => $this->signalUpdate(...),
-        }, $update);
+        match ($this->updateHandlerType) {
+            UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler($update),
+            UpdateHandlerType::WEBHOOK => EventLoop::queue($this->pwrWebhook(...), $update),
+            UpdateHandlerType::GET_UPDATES => EventLoop::queue($this->signalUpdate(...), $update),
+        };
     }
     /**
      * Sends an updateCustomEvent update to the event handler.
