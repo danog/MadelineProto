@@ -13,19 +13,6 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 
-// MadelineProto is already loaded
-if (\class_exists(API::class)) {
-    // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader
-} elseif (\file_exists('vendor/autoload.php')) {
-    require_once 'vendor/autoload.php';
-} else {
-    // Otherwise download an !!! alpha !!! version of MadelineProto via madeline.php
-    if (!\file_exists('madeline.php')) {
-        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
-    }
-    require_once 'madeline.php';
-}
-
 /**
  * Plugin event handler class.
  *
@@ -93,9 +80,3 @@ class PingPlugin extends PluginEventHandler
         $this->pingCount++;
     }
 }
-
-// For users or bots
-PingPlugin::startAndLoop('bot.madeline');
-
-// For bots only
-// PingPlugin::startAndLoopBot('bot.madeline', 'bot token');

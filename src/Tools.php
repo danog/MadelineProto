@@ -592,7 +592,7 @@ abstract class Tools extends AsyncTools
     public static function validateEventHandlerClass(string $class): void
     {
         $file = read((new ReflectionClass($class))->getFileName());
-        self::validateEventHandlerCode($file);
+        self::validateEventHandlerCode($file, is_subclass_of($class, PluginEventHandler::class));
     }
     private const BANNED_FUNCTIONS = [
         'file_get_contents',
@@ -619,10 +619,11 @@ abstract class Tools extends AsyncTools
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
      *
      * @param string $code Code of the class.
+     * @param bool $plugin Whether the class is a plugin or normal event handler class.
      *
      * @throws AssertionError If validation fails.
      */
-    public static function validateEventHandlerCode(string $code): void
+    public static function validateEventHandlerCode(string $code, bool $plugin = true): void
     {
         $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
         Assert::notNull($code);
@@ -644,7 +645,7 @@ abstract class Tools extends AsyncTools
             || !$declare->value instanceof LNumber
             || $declare->value->value !== 1
         ) {
-            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
+            throw new AssertionError("An error occurred while analyzing $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
         }
 
         /** @var FuncCall $call */
@@ -655,10 +656,10 @@ abstract class Tools extends AsyncTools
 
             $name = $call->name->toLowerString();
             if (\in_array($name, self::BANNED_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking function $name!");
+                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking function $name!");
             }
-            if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
+            if ($plugin && \in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
+                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
             }
         }
 
@@ -667,16 +668,16 @@ abstract class Tools extends AsyncTools
             if ($new->class instanceof Name
                 && \in_array($name = $new->class->toLowerString(), self::BANNED_CLASSES, true)
             ) {
-                throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins may not use the non-async blocking class $name!");
+                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking class $name!");
             }
         }
 
         /** @var Include_ $include */
         $include = $finder->findFirstInstanceOf($code, Include_::class);
-        if ($include
+        if ($plugin && $include
             && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
         ) {
-            throw new AssertionError("An error occurred while analyzing plugin $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
+            throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
         }
     }
 }
