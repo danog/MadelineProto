@@ -1576,10 +1576,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $reportDest = [];
     /**
-     * Admin ID.
-     */
-    private ?int $adminId = null;
-    /**
      * Check if has report peers.
      */
     public function hasReportPeers(): bool
@@ -1660,16 +1656,6 @@ final class MTProto implements TLCallback, LoggerGetter
         return \array_values($userOrId);
     }
     /**
-     * Obtain the ID of the admin of the bot (equal to the first user ID returned by getReportPeers).
-     */
-    public function getAdmin(): int
-    {
-        if (!$this->adminId) {
-            throw new Exception("No admin ID was set!");
-        }
-        return $this->adminId;
-    }
-    /**
      * Set peer(s) where to send errors occurred in the event loop.
      *
      * @param int|string|array<int|string> $userOrId Username(s) or peer ID(s)
@@ -1677,13 +1663,6 @@ final class MTProto implements TLCallback, LoggerGetter
     public function setReportPeers(int|string|array $userOrId): void
     {
         $this->reportDest = $this->sanitizeReportPeers($userOrId);
-        $this->adminId = null;
-        foreach ($this->reportDest as $id) {
-            if ($id > 0) {
-                $this->adminId = $id;
-                break;
-            }
-        }
     }
     private ?LocalMutex $reportMutex = null;
     /**

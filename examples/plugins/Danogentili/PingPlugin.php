@@ -26,7 +26,7 @@ class PingPlugin extends PluginEventHandler
      * if (!file_exists('madeline.php')) {
      *     copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
      * }
-     * include 'vendor/autoload.php';
+     * include 'madeline.php';
      *
      * $a = new API('bot.madeline');
      * $plugin = $a->getPlugin(PingPlugin::class);

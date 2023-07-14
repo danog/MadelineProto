@@ -90,11 +90,24 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 * [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html)
 * [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
+    * [Full example](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
+    * [Bound methods](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods)
+    * [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html)
+      * [Simple filters](https://docs.madelineproto.xyz/docs/FILTERS.html#simple-filters)
+      * [Attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#attribute-filters)
+      * [MTProto filters](https://docs.madelineproto.xyz/docs/FILTERS.html#mtproto-filters)
+    * [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html)
+    * [Cron](https://docs.madelineproto.xyz/docs/UPDATES.html#cron)
+    * [Persisting data and IPC](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc)
+    * [Restarting](https://docs.madelineproto.xyz/docs/UPDATES.html#restarting)
     * [Self-restart on webhosts](https://docs.madelineproto.xyz/docs/UPDATES.html#self-restart-on-webhosts)
-  * [Async Event driven multi-account](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven-multiaccount)
+    * [Multi-account](https://docs.madelineproto.xyz/docs/UPDATES.html#multiaccount)
   * [Webhook (for HTTP APIs)](https://docs.madelineproto.xyz/docs/UPDATES.html#webhook)
   * [getUpdates (only for Javascript APIs)](https://docs.madelineproto.xyz/docs/UPDATES.html#getUpdates)
   * [Noop (default)](https://docs.madelineproto.xyz/docs/UPDATES.html#noop)
+  * [Simple filters &raquo;](https://docs.madelineproto.xyz/docs/FILTERS.html#simple-filters)
+  * [Attribute filters &raquo;](https://docs.madelineproto.xyz/docs/FILTERS.html#attribute-filters)
+  * [MTProto filters &raquo;](https://docs.madelineproto.xyz/docs/FILTERS.html#mtproto-filters)
 * [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html)
   * [Simple filters](https://docs.madelineproto.xyz/docs/FILTERS.html#simple-filters)
   * [Attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#attribute-filters)
@@ -104,10 +117,10 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * [Simple installation](https://docs.madelineproto.xyz/docs/PLUGINS.html#simple-installation)
     * [Composer installation](https://docs.madelineproto.xyz/docs/PLUGINS.html#composer-installation)
   * [Creating plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html#creating-plugins)
+    * [Full plugin example](https://docs.madelineproto.xyz/docs/PLUGINS.html#full-plugin-example)
     * [Limitations](https://docs.madelineproto.xyz/docs/PLUGINS.html#limitations)
     * [Namespace requirements](https://docs.madelineproto.xyz/docs/PLUGINS.html#namespace-requirements)
     * [Distribution](https://docs.madelineproto.xyz/docs/PLUGINS.html#distribution)
-    * [Full plugin example](https://docs.madelineproto.xyz/docs/PLUGINS.html#full-plugin-example)
 * [Database](https://docs.madelineproto.xyz/docs/DATABASE.html)
   * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
   * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
@@ -438,6 +451,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getPaymentForm.html" name="payments.getPaymentForm">Get a payment form: payments.getPaymentForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultGroupPhotoEmojis.html" name="account.getDefaultGroupPhotoEmojis">Get a set of suggested custom emoji stickers that can be used as group picture: account.getDefaultGroupPhotoEmojis</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultProfilePhotoEmojis.html" name="account.getDefaultProfilePhotoEmojis">Get a set of suggested custom emoji stickers that can be used as profile picture: account.getDefaultProfilePhotoEmojis</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getadminids-array" name="getAdminIds">Get admin IDs (equal to the report peers): getAdminIds</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getArchivedStickers.html" name="messages.getArchivedStickers">Get all archived stickers: messages.getArchivedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getChatThemes.html" name="account.getChatThemes">Get all available chat themes: account.getChatThemes</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getSaved.html" name="contacts.getSaved">Get all contacts: contacts.getSaved</a>
@@ -649,7 +663,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.checkChatlistInvite.html" name="chatlists.checkChatlistInvite">Obtain information about a chat folder deep link »: chatlists.checkChatlistInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html" name="messages.getBotApp">Obtain information about a named bot web app: messages.getBotApp</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getwebapitemplate-string" name="getWebAPITemplate">Obtain the API ID UI template: getWebAPITemplate</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getadmin-int" name="getAdmin">Obtain the ID of the admin of the bot (equal to the first user ID returned by getReportPeers): getAdmin</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.importContactToken.html" name="contacts.importContactToken">Obtain user info from a temporary profile link: contacts.importContactToken</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMessagePublicForwards.html" name="stats.getMessagePublicForwards">Obtains a list of messages, indicating to which other public channels was a channel message forwarded.  : stats.getMessagePublicForwards</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getSendAs.html" name="channels.getSendAs">Obtains a list of peers that can be used to send messages in a specific group: channels.getSendAs</a>

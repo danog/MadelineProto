@@ -140,6 +140,9 @@ function printTypes(array $types, string $type): string
     $phpdoc = PhpDoc::fromNamespace();
     $data = '';
     foreach ($types as $class) {
+        if ($type === 'concretefilters' && $class === Update::class) {
+            continue;
+        }
         $refl = new ReflectionClass($class);
         $link = "https://docs.madelineproto.xyz/PHP/".str_replace('\\', '/', $class).'.html';
         $f = $b->create($refl->getDocComment())->getSummary();
@@ -156,7 +159,7 @@ function printTypes(array $types, string $type): string
             continue;
         }
         $data .= "  * [Full property list &raquo;]($link#properties)\n";
-        $data .= "  * [Full method list &raquo;]($link#method-list)\n";
+        $data .= "  * [Full bound method list &raquo;]($link#method-list)\n";
     }
     return $data;
 }
@@ -186,7 +189,9 @@ foreach ($orderedfiles as $key => $filename) {
             $result = array_filter($result, fn (string $class) => (new ReflectionClass($class))->getAttributes());
             $data = printTypes($result, $match);
         } elseif ($match === "mtprotofilters") {
-            $data = '';
+            $data = " * onUpdateCustomEvent: Receives messages sent to the event handler from an API instance using the [`sendCustomEvent` &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendcustomevent-mixed-payload-void) method.\n";
+            $data .= " * onAny: Catch-all filter, if defined catches all updates that aren't catched by any other filter.\n";
+            $data .= " * [onUpdateBroadcastProgress &raquo;](https://docs.madelineproto.xyz/docs/BROADCAST.html#get-progress): Used to receive updates to an in-progress [message broadcast &raquo;](https://docs.madelineproto.xyz/docs/BROADCAST.html)";
             $TL = new TL(null);
             $TL->init(new TLSchema);
             foreach ($TL->getConstructors()->by_id as $cons) {
@@ -260,6 +265,9 @@ foreach ($orderedfiles as $key => $filename) {
                 if (basename($filename) === 'FILTERS.md') {
                     continue;
                 }
+            }
+            if (basename($filename) === 'UPDATES.md' && str_starts_with($url, 'https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler')) {
+                continue;
             }
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {

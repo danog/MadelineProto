@@ -29,7 +29,6 @@ use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
-use danog\MadelineProto\EventHandler\Attributes\Periodic;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
@@ -249,7 +248,7 @@ abstract class EventHandler extends AbstractAPI
         }
     }
     /**
-     * Obtain a PeriodicLoop instance created by the Periodic attribute.
+     * Obtain a PeriodicLoop instance created by the Cron attribute.
      *
      * @param string $name Method name
      */

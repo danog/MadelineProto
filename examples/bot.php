@@ -25,8 +25,10 @@ use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
@@ -57,9 +59,7 @@ class MyEventHandler extends SimpleEventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "@me"; // !!! Change this to your username !!!
-
-    private int $adminId;
+    const ADMIN = "@danogentili"; // !!! Change this to your username !!!
 
     /**
      * @var array<int, bool>
@@ -90,7 +90,6 @@ class MyEventHandler extends SimpleEventHandler
     {
         $this->logger("The bot was started!");
         $this->logger($this->getFullInfo('MadelineProto'));
-        $this->adminId = $this->getId(self::ADMIN);
 
         $this->sendMessageToAdmins("The bot was started!");
     }
@@ -118,10 +117,6 @@ class MyEventHandler extends SimpleEventHandler
 
     /**
      * Handle incoming updates from users, chats and channels.
-     *
-     * 100+ other types of onUpdate... method types are available, see https://docs.madelineproto.xyz/API_docs/types/Update.html for the full list.
-     * You can also use onAny to catch all update types (only for debugging)
-     * A special onUpdateCustomEvent method can also be defined, to send messages to the event handler from an API instance, using the sendCustomEvent method.
      */
     #[Handler]
     public function handleMessage(Incoming&Message $message): void
@@ -139,32 +134,43 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     #[FilterCommand('restart')]
-    public function restartCommand(Incoming&Message $message): void
+    public function restartCommand(Incoming & Message & FromAdmin $message): void
     {
         // If the message is a /restart command from an admin, restart to reload changes to the event handler code.
-        if ($message->senderId === $this->adminId) {
-            // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
-            $this->restart();
-        }
+
+        // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
+        $this->restart();
     }
 
     #[FilterCommand('broadcast')]
-    public function broadcastCommand(Incoming&Message $message): void
+    public function broadcastCommand(Incoming & Message & FromAdmin $message): void
     {
         // We can broadcast messages to all users.
-        if ($message->senderId === $this->adminId) {
-            if (!$message->replyToMsgId) {
-                $message->reply("You should reply to the message you want to broadcast.");
-                return;
-            }
-            $this->broadcastForwardMessages(
-                from_peer: $message->senderId,
-                message_ids: [$message->replyToMsgId],
-                drop_author: true,
-                pin: true,
-            );
+        if (!$message->replyToMsgId) {
+            $message->reply("You should reply to the message you want to broadcast.");
             return;
         }
+        $this->broadcastForwardMessages(
+            from_peer: $message->senderId,
+            message_ids: [$message->replyToMsgId],
+            drop_author: true,
+            pin: true,
+        );
+    }
+
+    #[FilterCommand('echo')]
+    public function echoCmd(Incoming & Message $message): void
+    {
+        // Contains the arguments of the command
+        $args = $message->commandArgs;
+
+        $message->reply($args[0] ?? '');
+    }
+
+    #[FilterRegex('/.*(mt?proto).*/i')]
+    public function testRegex(Incoming & Message $message): void
+    {
+        $message->reply("Did you mean to write MadelineProto instead of ".$message->matches[1].'?');
     }
 
     #[FilterText('hi')]

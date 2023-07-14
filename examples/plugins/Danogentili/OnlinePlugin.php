@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace MadelinePlugin\Danogentili;
+
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Message;
@@ -7,7 +9,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\PluginEventHandler;
 
-class OnlinePlugin extends PluginEventHandler
+final class OnlinePlugin extends PluginEventHandler
 {
     private bool $isOnline = true;
 
