@@ -120,7 +120,7 @@ trait FilesAbstraction
      * @param string $caption Caption of document
      * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Text parse mode for the caption
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.
@@ -212,7 +212,7 @@ trait FilesAbstraction
      * @param string $caption Caption of document
      * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Text parse mode for the caption
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.

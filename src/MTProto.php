@@ -1669,7 +1669,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * Sends a message to all report peers (admins of the bot).
      *
      * @param string $message Message to send
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Parse mode
      * @param array|null $replyMarkup Keyboard information.
      * @param integer|null $scheduleDate Schedule date.
      * @param boolean $silent Whether to send the message silently, without triggering notifications.
@@ -1677,7 +1677,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      *
-     * @return list<\danog\Madelineproto\EventHandler\Message>
+     * @return list<\danog\MadelineProto\EventHandler\Message>
      */
     public function sendMessageToAdmins(
         string $message,

@@ -68,7 +68,9 @@ abstract class Message extends AbstractMessage
     /** For Public Service Announcement messages, the PSA type */
     public readonly ?string $psaType;
 
-    // Todo media (photosizes, thumbs), albums, reactions, replies, games eventually
+    /** @readonly For sent messages, contains the next message in the chain if the original message had to be split. */
+    public ?self $nextSent = null;
+    // Todo media (photosizes, thumbs), albums, reactions, games eventually
 
     /** @internal */
     public function __construct(

@@ -136,7 +136,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Reply to the message.
      *
      * @param string $message Message to send
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Parse mode
      * @param array|null $replyMarkup Keyboard information.
      * @param integer|null $sendAs Peer to send the message as.
      * @param integer|null $scheduleDate Schedule date.

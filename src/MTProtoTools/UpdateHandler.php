@@ -397,7 +397,7 @@ trait UpdateHandler
      *
      * @param integer|string $peer Destination peer or username.
      * @param string $message Message to send
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.
@@ -408,7 +408,6 @@ trait UpdateHandler
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
-     *
      */
     public function sendMessage(
         int|string $peer,
@@ -426,7 +425,7 @@ trait UpdateHandler
         bool $noWebpage = false,
         bool $updateStickersetsOrder = false,
     ): Message {
-        return $this->wrapMessage($this->extractMessage($this->methodCallAsyncRead(
+        $result = $this->methodCallAsyncRead(
             'messages.sendMessage',
             [
                 'peer' => $peer,
@@ -444,7 +443,22 @@ trait UpdateHandler
                 'no_webpage' => $noWebpage,
                 'update_stickersets_order' => $updateStickersetsOrder
             ]
-        )));
+        );
+        if (isset($result['_'])) {
+            return $this->wrapMessage($this->extractMessage($result));
+        }
+
+        $last = null;
+        foreach ($result as $updates) {
+            $new = $this->wrapMessage($this->extractMessage($updates));
+            if ($last) {
+                $last->nextSent = $new;
+            } else {
+                $first = $new;
+            }
+            $last = $new;
+        }
+        return $first;
     }
     /**
      * Extract a message ID from an Updates constructor.

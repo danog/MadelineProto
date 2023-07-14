@@ -1498,7 +1498,7 @@ abstract class InternalDoc
      * @param string $caption Caption of document
      * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Text parse mode for the caption
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.
@@ -1519,7 +1519,7 @@ abstract class InternalDoc
      *
      * @param integer|string $peer Destination peer or username.
      * @param string $message Message to send
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.
@@ -1530,7 +1530,6 @@ abstract class InternalDoc
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
-     *
      */
     public function sendMessage(string|int $peer, string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
     {
@@ -1540,7 +1539,7 @@ abstract class InternalDoc
      * Sends a message to all report peers (admins of the bot).
      *
      * @param string $message Message to send
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Parse mode
      * @param array|null $replyMarkup Keyboard information.
      * @param integer|null $scheduleDate Schedule date.
      * @param boolean $silent Whether to send the message silently, without triggering notifications.
@@ -1548,7 +1547,7 @@ abstract class InternalDoc
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      *
-     * @return list<\danog\Madelineproto\EventHandler\Message>
+     * @return list<\danog\MadelineProto\EventHandler\Message>
      */
     public function sendMessageToAdmins(string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false): array
     {
@@ -1564,7 +1563,7 @@ abstract class InternalDoc
      * @param string $caption Caption of document
      * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param "html"|"markdown"|null $parseMode Parse mode
+     * @param ParseMode $parseMode Text parse mode for the caption
      * @param integer|null $replyToMsgId ID of message to reply to.
      * @param integer|null $topMsgId ID of thread where to send the message.
      * @param array|null $replyMarkup Keyboard information.
