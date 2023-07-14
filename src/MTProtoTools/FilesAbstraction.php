@@ -325,9 +325,9 @@ trait FilesAbstraction
 
         $params['media'] = $base;
 
-        return $this->methodCallAsyncRead(
+        return $this->wrapMessage($this->extractMessage($this->methodCallAsyncRead(
             'messages.sendMedia',
             $params
-        );
+        )));
     }
 }

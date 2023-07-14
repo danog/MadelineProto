@@ -21,13 +21,6 @@ final class Photo extends Media
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $hasStickers = false;
-        foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
-            if ($t === 'documentAttributeHasStickers') {
-                $hasStickers = true;
-                break;
-            }
-        }
-        $this->hasStickers = $hasStickers;
+        $this->hasStickers = $rawMedia['photo']['has_stickers'];
     }
 }
