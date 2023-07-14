@@ -8,6 +8,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use PHPUnit\Framework\TestCase;
 
+/** @internal */
 abstract class MadelineTestCase extends TestCase
 {
     /**

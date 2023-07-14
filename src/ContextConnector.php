@@ -27,6 +27,7 @@ use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
 use Throwable;
 
+/** @internal */
 final class ContextConnector implements SocketConnector
 {
     public function __construct(private DoHWrapper $doHWrapper, private LoggerGetter $loggerGetter, private bool $fromDns = false)

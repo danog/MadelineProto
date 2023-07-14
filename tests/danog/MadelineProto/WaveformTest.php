@@ -8,6 +8,7 @@ use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\TL\TL;
 use PHPUnit\Framework\TestCase;
 
+/** @internal */
 class WaveformTest extends TestCase
 {
     /**

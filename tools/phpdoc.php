@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use danog\MadelineProto\AbstractAPI;
 use danog\MadelineProto\AbstractAPIFactory;
 use danog\MadelineProto\AnnotationsBuilder;
 use danog\MadelineProto\APIFactory;
@@ -15,6 +16,7 @@ use danog\MadelineProto\Doc\NamespaceDoc;
 use danog\MadelineProto\DocsBuilder;
 use danog\MadelineProto\DoHConnector;
 use danog\MadelineProto\GarbageCollector;
+use danog\MadelineProto\InternalDoc;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LightState;
 use danog\MadelineProto\Magic;
@@ -44,6 +46,9 @@ use danog\PhpDoc\PhpDocBuilder;
 require 'vendor/autoload.php';
 
 $ignore = [ // Disallow list
+    AbstractAPI::class,
+    InternalDoc::class,
+
     AnnotationsBuilder::class,
     APIFactory::class,
     APIWrapper::class,
@@ -100,6 +105,7 @@ $filter = function (string $class) use ($ignore): bool {
     || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Update')
     || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
     || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
+    || str_starts_with($class, 'danog\\MadelineProto\\Namespace\\')
     || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
     || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
     || str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
@@ -112,6 +118,8 @@ $filter = function (string $class) use ($ignore): bool {
     $class = new ReflectionClass($class);
     return !$class->isTrait();
 };
+
+shell_exec("rm -rf ".__DIR__.'/../docs/docs/PHP/');
 
 PhpDocBuilder::fromNamespace()
     ->setFilter($filter)

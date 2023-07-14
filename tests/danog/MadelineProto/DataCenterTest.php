@@ -21,6 +21,7 @@ use Generator;
 
 \define('MADELINEPROTO_TEST', 'pony');
 
+/** @internal */
 final class DataCenterTest extends AsyncTestCase
 {
     /**

@@ -6,6 +6,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\StrTools;
 
+/** @internal */
 class EntitiesTest extends MadelineTestCase
 {
     public function testMb(): void

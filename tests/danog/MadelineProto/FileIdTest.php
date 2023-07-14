@@ -12,6 +12,7 @@ use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 
+/** @internal */
 class FileIdTest extends MadelineTestCase
 {
     /**

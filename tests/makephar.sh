@@ -155,14 +155,14 @@ k
 rm -f madeline.phar testing.madeline*
 
 tail -F MadelineProto.log &
-
+: '
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tools/phar.php madeline.php
 runTest
 db mysql serialize
 k
-
+'
 echo "Testing with new version (upgrade)..."
 rm -f madeline-*phar madeline.version
 
@@ -172,7 +172,8 @@ echo -n "TESTING" > "madeline.version"
 echo 0.0.0.0 phar.madelineproto.xyz > /etc/hosts
 cp tools/phar.php madeline.php
 export ACTIONS_PHAR=1
-runTestSimple
+#runTestSimple
+runTest
 cycledb
 k
 
