@@ -87,7 +87,7 @@ interface Phone
      * Invite a set of users to a group call.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
-     * @param list<array|int|string>|array<never, never> $users Array of The users to invite. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param list<array|int|string> $users Array of The users to invite. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function inviteToGroupCall(array $call, array $users = []): array;
@@ -123,8 +123,8 @@ interface Phone
      * Get group call participants.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call Group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
-     * @param list<array|int|string>|array<never, never> $ids Array of If specified, will fetch group participant info about the specified peers @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param list<int>|array<never, never> $sources If specified, will fetch group participant info about the specified WebRTC source IDs
+     * @param list<array|int|string> $ids Array of If specified, will fetch group participant info about the specified peers @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param list<int> $sources If specified, will fetch group participant info about the specified WebRTC source IDs
      * @param string $offset Offset for results, taken from the `next_offset` field of [phone.groupParticipants](https://docs.madelineproto.xyz/API_docs/constructors/phone.groupParticipants.html), initially an empty string. <br>Note: if no more results are available, the method call will return an empty `next_offset`; thus, avoid providing the `next_offset` returned in [phone.groupParticipants](https://docs.madelineproto.xyz/API_docs/constructors/phone.groupParticipants.html) if it is empty, to avoid an infinite loop.
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @return array{_: 'phone.groupParticipants', count: int, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date: int, source: int, volume: int, about: string, raise_hand_rating: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}}>, next_offset: string, chats: list<array|int|string>, users: list<array|int|string>, version: int} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupParticipants.html
@@ -136,7 +136,7 @@ interface Phone
      * Returns an intersection of the source IDs specified in `sources`, and the source IDs currently being forwarded by the SFU.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call Group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
-     * @param list<int>|array<never, never> $sources Source IDs
+     * @param list<int> $sources Source IDs
      * @return list<int>
      */
     public function checkGroupCall(array $call, array $sources = []): array;

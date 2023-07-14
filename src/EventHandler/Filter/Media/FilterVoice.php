@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches voice messages.
+ * Allow only voice messages.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterVoice extends Filter

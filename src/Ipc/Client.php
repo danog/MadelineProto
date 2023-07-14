@@ -312,8 +312,11 @@ final class Client extends ClientAbstract
     {
         throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
-    public function getEventHandler(): EventHandlerProxy
+    public function getEventHandler(?string $class = null): EventHandlerProxy
     {
+        if ($class !== null) {
+            return $this->getPlugin($class);
+        }
         return $this->hasEventHandler() ? new EventHandlerProxy(null, $this) : null;
     }
     public function getPlugin(string $class): ?EventHandlerProxy

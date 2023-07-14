@@ -139,10 +139,15 @@ trait Events
         $this->setNoop();
     }
     /**
-     * Get event handler.
+     * Get event handler (or plugin instance).
+     *
+     * @param ?class-string<PluginEventHandler>
      */
-    public function getEventHandler(): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
+    public function getEventHandler(?string $class = null): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
     {
+        if ($class !== null) {
+            return $this->getPlugin($class);
+        }
         return $this->event_handler_instance;
     }
     /**

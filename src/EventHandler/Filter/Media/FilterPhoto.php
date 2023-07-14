@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches photos.
+ * Allow only photos.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterPhoto extends Filter

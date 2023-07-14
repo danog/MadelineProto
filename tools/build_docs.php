@@ -11,12 +11,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
+use danog\PhpDoc\PhpDoc;
+use danog\PhpDoc\PhpDoc\MethodDoc;
+use phpDocumentor\Reflection\DocBlockFactory;
+
+use function Amp\File\read;
 
 chdir($d=__DIR__.'/..');
 
@@ -85,6 +98,8 @@ $order = [
     'INSTALLATION',
     'BROADCAST',
     'UPDATES',
+    'FILTERS',
+    'PLUGINS',
     'DATABASE',
     'SETTINGS',
     'SELF',
@@ -117,8 +132,80 @@ foreach ($files as $file) {
     }
 }
 ksort($orderedfiles);
+
+/** @internal */
+function printTypes(array $types, string $type): string
+{
+    $b = DocBlockFactory::createInstance();
+    $phpdoc = PhpDoc::fromNamespace();
+    $data = '';
+    foreach ($types as $class) {
+        $refl = new ReflectionClass($class);
+        $link = "https://docs.madelineproto.xyz/PHP/".str_replace('\\', '/', $class).'.html';
+        $f = $b->create($refl->getDocComment())->getSummary();
+        if ($refl->hasMethod('__construct')) {
+            $c = $refl->getMethod('__construct');
+            if ($c->getParameters() && $type === 'attributefilters') {
+                $c = new MethodDoc($phpdoc, $c);
+                $c = $c->getSignature();
+                $class .= str_replace(['__construct', '\danog\MadelineProto\EventHandler\Filter\\'], '', $c);
+            }
+        }
+        $data .= "* [$class &raquo;]($link) - $f\n";
+        if ($type !== 'concretefilters') {
+            continue;
+        }
+        $data .= "  * [Full property list &raquo;]($link#properties)\n";
+        $data .= "  * [Full method list &raquo;]($link#method-list)\n";
+    }
+    return $data;
+}
+
 foreach ($orderedfiles as $key => $filename) {
-    $lines = explode("\n", file_get_contents($filename));
+    $lines = file_get_contents($filename);
+    $lines = preg_replace_callback('/\<\!-- cut_here (\S+) -->.*\<\!-- cut_here_end \1 --\>/sim', function ($matches) {
+        [, $match] = $matches;
+        if ($match === "concretefilters") {
+            $result = [Update::class, AbstractMessage::class, Message::class, ServiceMessage::class];
+            $result = array_merge($result, ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto\EventHandler\Message::class,
+                ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
+            ));
+            $data = printTypes($result, $match);
+        } elseif ($match === "simplefilters") {
+            $result = ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto\EventHandler\SimpleFilter::class,
+                ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
+            );
+            $data = printTypes($result, $match);
+        } elseif ($match === "attributefilters") {
+            $result = ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto\EventHandler\Filter::class,
+                ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
+            );
+            $result = array_filter($result, fn (string $class) => (new ReflectionClass($class))->getAttributes());
+            $data = printTypes($result, $match);
+        } elseif ($match === "mtprotofilters") {
+            $data = '';
+            $TL = new TL(null);
+            $TL->init(new TLSchema);
+            foreach ($TL->getConstructors()->by_id as $cons) {
+                if ($cons['type'] !== 'Update') {
+                    continue;
+                }
+                $predicate = 'on'.ucfirst($cons['predicate']);
+                $predicateRaw = $cons['predicate'];
+                $desc = explode("\n", Lang::$lang['en']["object_$predicateRaw"])[0];
+                $desc = str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], $desc);
+                $data .= "* [$predicate &raquo;](https://docs.madelineproto.xyz/API_docs/constructors/$predicateRaw.html) - $desc\n";
+            }
+        } else {
+            $data = read($match);
+            $data = "```php\n{$data}\n```";
+        }
+        return "<!-- cut_here $match -->\n\n$data\n\n<!-- cut_here_end $match -->";
+    }, $lines);
+    $lines = explode("\n", $lines);
     while (end($lines) === '' || strpos(end($lines), 'Next')) {
         unset($lines[count($lines) - 1]);
     }
@@ -128,19 +215,6 @@ foreach ($orderedfiles as $key => $filename) {
             array_shift($lines);
         }
         array_shift($lines);
-    }
-    if (basename($filename) === 'UPDATES.md') {
-        $idx = array_search('<!-- cut_here -->', $lines, true);
-        $before = array_slice($lines, 0, $idx);
-        $idx = array_search('<!-- cut_here_end -->', $lines, true);
-        $after = array_slice($lines, $idx+1);
-        $lines = array_merge(
-            $before,
-            ['<!-- cut_here -->', '```php'],
-            explode("\n", file_get_contents(__DIR__.'/../examples/bot.php')),
-            ['```', '<!-- cut_here_end -->'],
-            $after
-        );
     }
 
     preg_match('|^# (.*)|', $lines[0], $matches);
@@ -178,8 +252,14 @@ foreach ($orderedfiles as $key => $filename) {
                 $url = $file.$matches[3][$key];
             } elseif (substr($matches[3][$key], 0, 3) === '../') {
                 $url = 'https://docs.madelineproto.xyz/'.str_replace('.md', '.html', substr($matches[3][$key], 3));
+                if (basename($filename) === 'FILTERS.md') {
+                    continue;
+                }
             } else {
                 $url = $matches[3][$key];
+                if (basename($filename) === 'FILTERS.md') {
+                    continue;
+                }
             }
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {

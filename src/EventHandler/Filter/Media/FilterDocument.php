@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches documents.
+ * Allow only documents.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterDocument extends Filter

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MadelinePlugin\Danog;
+namespace MadelinePlugin\Danogentili;
 
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Filter\FilterText;

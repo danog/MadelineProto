@@ -23,7 +23,7 @@ interface Langpack
      *
      * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
      * @param string $lang_code Language code
-     * @param list<string>|array<never, never> $keys Strings to get
+     * @param list<string> $keys Strings to get
      * @return list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackString.html
      */
     public function getStrings(string $lang_pack = '', string $lang_code = '', array $keys = []): array;

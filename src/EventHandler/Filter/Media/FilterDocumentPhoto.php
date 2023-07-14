@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches documents containing an image.
+ * Allow only documents containing an image.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterDocumentPhoto extends Filter

@@ -19,6 +19,9 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\VoIP;
+use Webmozart\Assert\Assert;
+
+use function Amp\File\read;
 
 $loader = false;
 if (getenv('ACTIONS_PHAR')) {
@@ -298,15 +301,35 @@ $MadelineProto->loop(function () use ($MadelineProto) {
                     ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
                 ]]);
             }
+            $fileOrig = read($inputMedia['file']);
             $MadelineProto->logger("Sending $type");
-            yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
+            $dl = $MadelineProto->extractMessage(yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
+
+            $MadelineProto->logger("Downloading $type");
+            $file = yield $MadelineProto->downloadToDir($dl, '/tmp');
+            if ($type !== 'photo') {
+                Assert::eq(read($file), $fileOrig, "Not equal!");
+            }
+
             $MadelineProto->logger("Uploading $type");
             $media = yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+
             $MadelineProto->logger("Downloading $type");
-            yield $MadelineProto->downloadToDir($media, '/tmp');
+            $file = yield $MadelineProto->downloadToDir($media, '/tmp');
+            if ($type !== 'photo') {
+                Assert::eq(read($file), $fileOrig, "Not equal!");
+            }
+
             $MadelineProto->logger("Re-sending $type");
             $inputMedia['file'] = $media;
-            yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+
+            $dl = yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+
+            $MadelineProto->logger("Re-downloading $type");
+            $file = yield $MadelineProto->downloadToDir($dl, '/tmp');
+            if ($type !== 'photo') {
+                Assert::eq(read($file), $fileOrig, "Not equal!");
+            }
         }
     }
 

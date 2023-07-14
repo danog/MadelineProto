@@ -61,6 +61,7 @@ if (defined("MADELINE_REAL_ROOT")) {
             die("MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.".PHP_EOL);
         }
         \define("MADELINE_REAL_ROOT", \dirname($backtrace[0]["file"]));
+        @chdir(\MADELINE_REAL_ROOT);
     }
 }
 

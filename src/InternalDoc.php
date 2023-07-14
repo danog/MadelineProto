@@ -765,11 +765,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getDownloadInfo($messageMedia);
     }
     /**
-     * Get event handler.
+     * Get event handler (or plugin instance).
+     *
+     * @param ?class-string<PluginEventHandler>
      */
-    public function getEventHandler(): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
+    public function getEventHandler(?string $class = null): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
     {
-        return $this->wrapper->getAPI()->getEventHandler();
+        return $this->wrapper->getAPI()->getEventHandler($class);
     }
     /**
      * Get extension from file location.

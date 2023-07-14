@@ -31,7 +31,7 @@ interface Bots
      *
      * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer: array|int|string}|array{_: 'botCommandScopePeerUser', peer: array|int|string, user_id: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
      * @param string $lang_code Language code
-     * @param list<array{_: 'botCommand', command?: string, description?: string}>|array<never, never> $commands Array of Bot commands @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
+     * @param list<array{_: 'botCommand', command?: string, description?: string}> $commands Array of Bot commands @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
      */
     public function setBotCommands(array $scope, string $lang_code = '', array $commands = []): bool;
 
@@ -106,7 +106,7 @@ interface Bots
      * Reorder usernames associated to a bot we own.
      *
      * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
+     * @param list<string> $order The new order for active usernames. All active usernames must be specified.
      */
     public function reorderUsernames(array|int|string $bot, array $order = []): bool;
 

@@ -312,9 +312,6 @@ final class Blacklist {
             $param_var = $type.' $'.$name;
             if (isset($param['pow'])) {
                 $param_var .= ' = '.$this->prepareTLDefault($param['type']);
-                if ($type === 'array') {
-                    $psalmType .= '|array<never, never>';
-                }
             }
             $signature []= $param_var;
             $contents .= "     * @param {$psalmType} \${$name} {$description}\n";

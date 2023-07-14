@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches stickers.
+ * Allow only stickers.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterSticker extends Filter

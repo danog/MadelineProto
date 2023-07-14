@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches videos.
+ * Allow only videos.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterVideo extends Filter

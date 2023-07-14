@@ -14,7 +14,7 @@ final class Files extends SettingsAbstract
     /**
      * Allow automatic upload of files from file paths present in constructors?
      */
-    protected bool $allowAutomaticUpload = false;
+    protected bool $allowAutomaticUpload = true;
     /**
      * Upload parallel chunk count.
      */

@@ -9,7 +9,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow that only matches GIFs.
+ * Allow only GIFs.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterGif extends Filter
