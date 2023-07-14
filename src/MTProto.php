@@ -1681,7 +1681,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function sendMessageToAdmins(
         string $message,
-        ?string $parseMode = null,
+        ParseMode $parseMode = ParseMode::TEXT,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         bool $silent = false,
@@ -1712,9 +1712,8 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
-     * @param bool   $sendLogs  Whether to also send logs
      */
-    public function report(string $message, string $parseMode = '', bool $sendLogs = true): void
+    public function report(string $message, string $parseMode = ''): void
     {
         if (!$this->reportDest) {
             return;
@@ -1723,8 +1722,7 @@ final class MTProto implements TLCallback, LoggerGetter
         $lock = $this->reportMutex->acquire();
         try {
             $file = null;
-            if ($sendLogs
-                && $this->settings->getLogger()->getType() === Logger::FILE_LOGGER
+            if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
                 && $path = $this->settings->getLogger()->getExtra()) {
                 $temp = \tempnam(\sys_get_temp_dir(), 'madelinelog');
                 \copy($path, $temp);

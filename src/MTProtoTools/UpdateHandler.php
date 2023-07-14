@@ -43,6 +43,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\RPCErrorException;
@@ -412,7 +413,7 @@ trait UpdateHandler
     public function sendMessage(
         int|string $peer,
         string $message,
-        ?string $parseMode = null,
+        ParseMode $parseMode = ParseMode::TEXT,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,

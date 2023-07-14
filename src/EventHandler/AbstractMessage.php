@@ -5,6 +5,7 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
 
 /**
  * Represents an incoming or outgoing message.
@@ -148,7 +149,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function reply(
         string $message,
-        ?string $parseMode = null,
+        ParseMode $parseMode = ParseMode::TEXT,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,

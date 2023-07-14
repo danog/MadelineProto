@@ -38,6 +38,7 @@ use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use Webmozart\Assert\Assert;
@@ -136,7 +137,7 @@ trait FilesAbstraction
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb = null,
         string $caption = '',
-        ?string $parseMode = null,
+        ParseMode $parseMode = ParseMode::TEXT,
         ?callable $callback = null,
         ?string $fileName = null,
         ?string $mimeType = null,
@@ -227,7 +228,7 @@ trait FilesAbstraction
         int|string $peer,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
         string $caption = '',
-        ?string $parseMode = null,
+        ParseMode $parseMode = ParseMode::TEXT,
         ?callable $callback = null,
         ?string $fileName = null,
         ?int $ttl = null,

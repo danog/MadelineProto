@@ -607,6 +607,8 @@ abstract class Tools extends AsyncTools
         'mysql_connect' => 'please use https://github.com/amphp/mysql, instead',
         'fopen' => 'please use https://github.com/amphp/file, instead',
         'fsockopen' => 'please use https://github.com/amphp/socket, instead',
+        'amp\\file\\get' => 'please use Amp\\File\\read, instead',
+        'amp\\file\\put' => 'please use Amp\\File\\write, instead',
     ];
     private const BANNED_FILE_FUNCTIONS = [
         'amp\\file\\read',
