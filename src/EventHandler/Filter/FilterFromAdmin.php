@@ -13,14 +13,14 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterFromAdmin extends Filter
 {
-    private readonly int $adminId;
+    private readonly array $adminIds;
     public function initialize(EventHandler $API): ?Filter
     {
-        $this->adminId = $API->getAdmin();
+        $this->adminIds = $API->getAdminIds();
         return null;
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof AbstractMessage && $update->senderId === $this->adminId;
+        return $update instanceof AbstractMessage && \in_array($update->senderId, $this->adminIds, true);
     }
 }

@@ -648,6 +648,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getAdmin();
     }
     /**
+     * Get admin IDs (equal to the report peers).
+     */
+    public function getAdminIds(): array
+    {
+        return $this->wrapper->getAPI()->getAdminIds();
+    }
+    /**
      * Get full list of MTProto and API methods.
      */
     public function getAllMethods(): array

@@ -1587,6 +1587,13 @@ final class MTProto implements TLCallback, LoggerGetter
         return (bool) $this->reportDest;
     }
     /**
+     * Get admin IDs (equal to the report peers).
+     */
+    public function getAdminIds(): array
+    {
+        return $this->reportDest;
+    }
+    /**
      * Get a message to show to the user when starting the bot.
      */
     public function getWebMessage(string $message): string

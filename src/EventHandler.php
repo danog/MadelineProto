@@ -144,6 +144,9 @@ abstract class EventHandler extends AbstractAPI
             if ($main) {
                 $this->setReportPeers(Tools::call($this->getReportPeers())->await());
             }
+            if ($this instanceof PluginEventHandler && !$this->isPluginEnabled()) {
+                return [[], []];
+            }
 
             $constructors = $this->getTL()->getConstructors();
             $methods = [];
@@ -227,6 +230,7 @@ abstract class EventHandler extends AbstractAPI
                 $pluginsNew[$class] = $plugin;
                 [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
                 if (!$plugin->isPluginEnabled()) {
+                    unset($pluginsNew[$class]);
                     continue;
                 }
                 foreach ($newMethods as $update => $method) {
@@ -400,10 +404,10 @@ abstract class EventHandler extends AbstractAPI
                         return;
                     }
                     // Has leading /
-                    $file = \str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
-                    if (\file_exists($path.$file)) {
-                        require $path.$file;
-                        Assert::classExists($class);
+                    $file = $path.\str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
+                    if (\file_exists($file)) {
+                        require $file;
+                        Assert::classExists($class, "The $class class wasn't defined while including $file!");
                     }
                 });
 
