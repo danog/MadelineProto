@@ -75,6 +75,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->spoiler = $rawMedia['spoiler'] ?? false;
     }
 
+    /** @internal */
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);

@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Types;
 
 use ArrayAccess;
+use AssertionError;
 use JsonSerializable;
 
 /**
@@ -69,11 +70,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if ($offset === null) {
-            $this->bytes .= $value;
-        } else {
-            $this->bytes[$offset] = $value;
-        }
+        throw new AssertionError("Cannot modify nested bytes!");
     }
     /**
      * Get char at offset.
@@ -92,7 +89,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      */
     public function offsetUnset(mixed $offset): void
     {
-        unset($this->bytes[$offset]);
+        throw new AssertionError("Cannot modify nested bytes!");
     }
     /**
      * Check if char at offset exists.

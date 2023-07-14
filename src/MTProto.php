@@ -1677,7 +1677,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      *
-     * @return list<Message>
+     * @return list<\danog\Madelineproto\EventHandler\Message>
      */
     public function sendMessageToAdmins(
         string $message,

@@ -28,6 +28,7 @@ use Countable;
 use Exception;
 use Fiber;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
@@ -629,7 +630,8 @@ abstract class Tools extends AsyncTools
     {
         $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
         Assert::notNull($code);
-        $traverser = new NodeTraverser([new NameResolver()]);
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor(new NameResolver());
         $code = $traverser->traverse($code);
         $finder = new NodeFinder;
 
@@ -640,7 +642,7 @@ abstract class Tools extends AsyncTools
         }
         $class = $class[0]->name->toString();
 
-        /** @var DeclareDeclare|null $call */
+        /** @var DeclareDeclare|null $declare */
         $declare = $finder->findFirstInstanceOf($code, DeclareDeclare::class);
         if ($declare === null
             || $declare->key->name !== 'strict_types'

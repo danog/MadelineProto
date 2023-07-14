@@ -47,10 +47,8 @@ abstract class Message extends AbstractMessage
 
     /**
      * Attached media.
-     *
-     * @var Audio|Document|DocumentPhoto|Gif|MaskSticker|Photo|RoundVideo|Sticker|Video|Voice|null
      */
-    public readonly ?Media $media;
+    public readonly Audio|Document|DocumentPhoto|Gif|MaskSticker|Photo|RoundVideo|Sticker|Video|Voice|null $media;
 
     /** Whether this message is a sent scheduled message */
     public readonly bool $fromScheduled;

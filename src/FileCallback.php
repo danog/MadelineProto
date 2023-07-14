@@ -28,14 +28,14 @@ final class FileCallback implements FileCallbackInterface
     /**
      * Callback.
      *
-     * @var callable(float, float, float)
+     * @var callable(float, float, int)
      */
     public readonly mixed $callback;
     /**
      * Construct file callback.
      *
      * @param mixed    $file     File to download/upload
-     * @param callable(float, float, float) $callback Callback
+     * @param callable(float, float, int) $callback Callback
      */
     public function __construct(public readonly mixed $file, callable $callback)
     {

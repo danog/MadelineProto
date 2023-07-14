@@ -899,7 +899,7 @@ trait Files
             $seekable = false;
         }
         if ($offset === $end) {
-            $cb(100, 0, 0);
+            $cb(100.0, 0.0, 0);
             return true;
         }
         $params = [];
@@ -923,11 +923,11 @@ trait Files
             return true;
         }
         $count = \count($params);
-        $time = 0;
-        $speed = 0;
+        $time = 0.0;
+        $speed = 0.0;
         $origCb = $cb;
         $cb = static function () use ($cb, $count, &$time, &$speed): void {
-            static $cur = 0;
+            static $cur = 0.0;
             $cur++;
             $cb($cur * 100 / $count, $time, $speed);
         };
@@ -981,7 +981,7 @@ trait Files
             $this->clearCdnHashes($messageMedia['file_token']);
         }
         if (!isset($messageMedia['size'])) {
-            $origCb(100, $time, $speed);
+            $origCb(100.0, $time, $speed);
         }
         return true;
     }

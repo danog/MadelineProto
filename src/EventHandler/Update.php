@@ -10,6 +10,7 @@ use JsonSerializable;
  */
 abstract class Update extends IpcCapable implements JsonSerializable
 {
+    /** @internal */
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);

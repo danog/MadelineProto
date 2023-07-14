@@ -20,11 +20,14 @@ final class FilterNot extends Filter
     {
         $filter = $this->filter->initialize($API);
         if ($filter === null) {
+            // The nested filter didn't replace itself
             return $this;
         }
         if ($filter instanceof self) {
+            // The nested filter is a FilterNot, optimize !!A => A
             return $filter->filter;
         }
+        // The nested filter replaced itself, re-wrap it
         return new self($filter);
     }
 

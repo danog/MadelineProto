@@ -2,6 +2,8 @@ Introducing MadelineProto's biggest update yet, 8.0.0-beta100!
 
 This version introduces [plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html), [bound methods](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods), [filters](https://docs.madelineproto.xyz/docs/FILTERS.html), [a built-in cron system](https://docs.madelineproto.xyz/docs/UPDATES.html#cron), [IPC support for the event handler](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc) and automatic static analysis for event handler code.
 
+- [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html)
+
 To create a plugin, simply create an event handler that extends PluginEventHandler.  
 
 For example, create a `plugins/Danogentili/PingPlugin.php` file:
@@ -44,9 +46,15 @@ And use a [plugin base](https://raw.githubusercontent.com/danog/MadelineProto/v8
 
 See the [documentation](https://docs.madelineproto.xyz/docs/PLUGINS.html) for more info on how to create MadelineProto plugins!
 
+- [Message](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message.html) objects with bound methods
+
 Both plugins and normal bots can make use of [bound update methods](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods) like `reply()`, `delete()`, `getReply()`, `getHTML()` and simplified properties like `chatId`, `senderId`, `command`, `commandArgs` and many more, see the [documentation](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods) for more info!
 
+- [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html)
+
 Plugins and bots can now use three different filtering systems, to easily receive only updates satisfying certain conditions (incoming/outgoing, from group, channel, private, from an admin or a specific peer, with an audio/sticker/..., satisfying a certain regex or a certain /command, and much more!), [see the documentation](https://docs.madelineproto.xyz/docs/FILTERS.html) for more info!
+
+- [Built-in cron system](https://docs.madelineproto.xyz/docs/UPDATES.html#cron)
 
 All event handler methods marked by the `Cron` attribute are now automatically invoked by MadelineProto every `period` seconds:
 
@@ -68,10 +76,17 @@ class MyEventHandler extends SimpleEventHandler
 
 See the [documentation](https://docs.madelineproto.xyz/docs/UPDATES.html#cron) for more info!
 
+- [IPC support for the event handler](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc)
+
+You can now call event handler and plugin methods from outside of the event handler, using `getEventHandler()` on an `API` instance, see [the docs for more info](https://docs.madelineproto.xyz/docs/PLUGINS.html#limitations)!
+
+- Automatic static analysis of event handler code
+
 Finally, all new bots and plugins will be automatically analyzed by MadelineProto, blocking execution if performance or security issues are detected!
 
 Other features:
 - Thanks to the many translation contributors @ https://weblate.madelineproto.xyz/, MadelineProto is now localized in Hebrew, Persian, Kurdish, Uzbek, Russian, French and Italian!
+- Added simplified `sendMessage`, `sendDocument`, `sendPhoto` methods that return abstract [Message](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message.html) objects with simplified properties and bound methods!
 - You can now use `Tools::callFork` to fork a new green thread!
 - You can now automatically pin messages broadcasted using `broadcastMessages`, `broadcastForwardMessages` by using the new `pin: true` parameter!
 - You can now use `sendMessageToAdmins` to send messages to the bot's admin (the peers returned by `getReportPeers`).
@@ -84,10 +99,6 @@ Other features:
 - You can now use `reportMemoryProfile()` to generate and send a `pprof` memory profile to all report peers to debug the causes of high memory usage.
 - Added support for `pay`, `login_url`, `web_app` and `tg://user?id=` buttons in bot API syntax!
 - Added a `getAdminIds` function that returns the IDs of the admin of the bot (equal to the peers returned by getReportPeers in the event handler).
-- getEventHandler can now be used from IPC clients!
-- Added `Cron`
-- Added plugins, filters, simple filters
-- `getReply`, `sendMessage`, `sendDocument`, `sendPhoto`, `reply`, `delete`
 
 Fixes:
 - Fixed file uploads with ext-uv!

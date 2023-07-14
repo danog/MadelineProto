@@ -166,7 +166,7 @@ function printTypes(array $types, string $type): string
 
 foreach ($orderedfiles as $key => $filename) {
     $lines = file_get_contents($filename);
-    $lines = preg_replace_callback('/\<\!-- cut_here (\S+) -->.*\<\!-- cut_here_end \1 --\>/sim', function ($matches) {
+    $lines = preg_replace_callback('/\<\!--\s+cut_here\s+(\S+)\s+-->.*\<\!--\s+cut_here_end\s+\1\s+--\>/sim', function ($matches) {
         [, $match] = $matches;
         if ($match === "concretefilters") {
             $result = [Update::class, AbstractMessage::class, Message::class, ServiceMessage::class];

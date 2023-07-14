@@ -767,7 +767,7 @@ abstract class InternalDoc
     /**
      * Get event handler (or plugin instance).
      *
-     * @param ?class-string<PluginEventHandler>
+     * @param ?class-string<PluginEventHandler> $class
      */
     public function getEventHandler(?string $class = null): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
     {
@@ -1497,7 +1497,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb Optional: Thumbnail to upload
      * @param string $caption Caption of document
-     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
      * @param "html"|"markdown"|null $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.
@@ -1549,7 +1549,7 @@ abstract class InternalDoc
      * @param boolean $clearDraft Clears the draft field
      * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
      *
-     * @return list<Message>
+     * @return list<\danog\Madelineproto\EventHandler\Message>
      */
     public function sendMessageToAdmins(string $message, ?string $parseMode = null, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false): array
     {
@@ -1563,7 +1563,7 @@ abstract class InternalDoc
      * @param integer|string $peer Destination peer or username.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
      * @param string $caption Caption of document
-     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
      * @param "html"|"markdown"|null $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.
@@ -1958,7 +1958,7 @@ abstract class InternalDoc
     /**
      * Wrap a media constructor into an abstract Media object.
      */
-    public function wrapMedia(array $media, bool $protected): ?\danog\MadelineProto\EventHandler\Media
+    public function wrapMedia(array $media, bool $protected = false): ?\danog\MadelineProto\EventHandler\Media
     {
         return $this->wrapper->getAPI()->wrapMedia($media, $protected);
     }

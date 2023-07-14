@@ -54,7 +54,7 @@ trait FilesAbstraction
     /**
      * Wrap a media constructor into an abstract Media object.
      */
-    public function wrapMedia(array $media, bool $protected): ?Media
+    public function wrapMedia(array $media, bool $protected = false): ?Media
     {
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
@@ -117,7 +117,7 @@ trait FilesAbstraction
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb Optional: Thumbnail to upload
      * @param string $caption Caption of document
-     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
      * @param "html"|"markdown"|null $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.
@@ -209,7 +209,7 @@ trait FilesAbstraction
      * @param integer|string $peer Destination peer or username.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
      * @param string $caption Caption of document
-     * @param ?callable(float, float, float) $callback Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
      * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
      * @param "html"|"markdown"|null $parseMode Parse mode
      * @param integer|null $replyToMsgId ID of message to reply to.

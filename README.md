@@ -111,6 +111,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 * [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html)
   * [Simple filters](https://docs.madelineproto.xyz/docs/FILTERS.html#simple-filters)
   * [Attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#attribute-filters)
+    * [Creating custom attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#creating-custom-attribute-filters)
   * [MTProto filters](https://docs.madelineproto.xyz/docs/FILTERS.html#mtproto-filters)
 * [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html)
   * [Installing plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html#installing-plugins)
