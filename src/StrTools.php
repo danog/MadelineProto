@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
+use danog\MadelineProto\TL\Conversion\MarkdownEntities;
 use Parsedown;
 use Webmozart\Assert\Assert;
 
@@ -107,11 +108,11 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
+     * @return \danog\MadelineProto\TL\Conversion\MarkdownEntities Object containing message and entities
      */
-    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\DOMEntities
+    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
     {
-        return new DOMEntities(Parsedown::instance()->line($markdown));
+        return new MarkdownEntities($markdown);
     }
     /**
      * Convert a message and a set of entities to HTML.

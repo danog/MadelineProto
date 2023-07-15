@@ -15,7 +15,7 @@ use Throwable;
 /**
  * Class that converts HTML to a message + set of entities.
  */
-final class DOMEntities
+final class DOMEntities extends Entities
 {
     /** Converted entities */
     public readonly array $entities;
@@ -52,6 +52,11 @@ final class DOMEntities
             $message .= "\n";
             return 1;
         }
+        $length = 0;
+        if ($node->nodeName === 'li') {
+            $message .= "- ";
+            $length += 2;
+        }
         /** @var DOMElement $node */
         $entity = match ($node->nodeName) {
             's', 'strike', 'del' =>['_' => 'messageEntityStrike'],
@@ -64,10 +69,9 @@ final class DOMEntities
             'pre' => ['_' => 'messageEntityPre', 'language' => $node->getAttribute('language') ?? ''],
             'tg-emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('emoji-id')],
             'emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('id')],
-            'a' => self::handleA($node),
+            'a' => self::handleLink($node->getAttribute('href')),
             default => null,
         };
-        $length = 0;
         foreach ($node->childNodes as $sub) {
             $length += self::parseNode($sub, $offset+$length, $message, $entities);
         }
@@ -90,17 +94,5 @@ final class DOMEntities
             }
         }
         return $length;
-    }
-
-    private static function handleA(DOMElement $node): array
-    {
-        $href = $node->getAttribute('href');
-        if (\preg_match('|^mention:(.+)|', $href, $matches) || \preg_match('|^tg://user\\?id=(.+)|', $href, $matches)) {
-            return ['_' => 'inputMessageEntityMentionName', 'user_id' => $matches[1]];
-        }
-        if (\preg_match('|^emoji:(\d+)$|', $href, $matches) || \preg_match('|^tg://emoji\\?id=(.+)|', $href, $matches)) {
-            return ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $matches[1]];
-        }
-        return ['_' => 'messageEntityTextUrl', 'url' => $href];
     }
 }

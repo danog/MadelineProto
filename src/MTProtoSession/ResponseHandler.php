@@ -298,11 +298,6 @@ trait ResponseHandler
             case 500:
             case -500:
             case -503:
-                if ($response['error_message'] === 'MSG_WAIT_FAILED') {
-                    $this->call_queue[$request->getQueueId()] = [];
-                    $this->methodRecall(message_id: $request->getMsgId(), postpone: true);
-                    return null;
-                }
                 if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->getConstructor(), ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
                     || (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'], true))) {
                     EventLoop::delay(1.0, fn () => $this->methodRecall(message_id: $request->getMsgId()));

@@ -39,7 +39,7 @@ class EntitiesTest extends MadelineTestCase
         if (\strtolower($mode) === 'html') {
             $this->assertEquals(
                 \str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
-                StrTools::messageEntitiesToHtml(
+                StrTools::entitiesToHtml(
                     $resultMTProto['message'],
                     $resultMTProto['entities'],
                     true
@@ -138,7 +138,7 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
-                'test** test**',
+                'test* test*',
                 'test test',
                 [
                     [
@@ -220,7 +220,7 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
-                'test **bold *bold and italic* bold**',
+                'test *bold _bold and italic_ bold*',
                 'test bold bold and italic bold',
                 [
                     [
@@ -233,6 +233,37 @@ class EntitiesTest extends MadelineTestCase
                         'length' => 15,
                         'type' => 'italic',
                     ],
+                ],
+            ],
+            [
+                'markdown',
+                "a\nb\nc",
+                "a\nb\nc",
+                [],
+            ],
+            [
+                'markdown',
+                "a\n\nb\n\nc",
+                "a\n\nb\n\nc",
+                [],
+            ],
+            [
+                'markdown',
+                "a\n\n\nb\n\n\nc",
+                "a\n\n\nb\n\n\nc",
+                [],
+            ],
+            [
+                'markdown',
+                "a\n```php\n<?php\necho 'yay';\n```",
+                "a\n<?php\necho 'yay';\n",
+                [
+                    [
+                        'offset' => 2,
+                        'length' => 17,
+                        'type' => 'pre',
+                        'language' => 'php'
+                    ]
                 ],
             ],
             [
@@ -269,20 +300,74 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
-                '_a b c &lt;b&gt; &amp; &quot; &#039;_',
-                'a b c <b> & " \'',
+                '_a b c <b> & " \' \_ \* \~ \\__',
+                'a b c <b> & " \' _ * ~ _',
                 [
                     [
                         'offset' => 0,
-                        'length' => 15,
+                        'length' => 23,
                         'type' => 'italic',
                     ],
                 ],
             ],
             [
                 'markdown',
-                'test *italic* **bold** <u>underlined</u> ~~strikethrough~~ <pre language="test">pre</pre> <code>code</code> <spoiler>spoiler</spoiler>',
-                'test italic bold underlined strikethrough pre code spoiler',
+                '[link ](https://google.com/)test',
+                'link test',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+            ],
+            [
+                'markdown',
+                '[link ](https://google.com/)',
+                'link ',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+            ],
+            [
+                'html',
+                '<a href="https://google.com/">link </a>test',
+                'link test',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+                '<a href="https://google.com/">link</a> test',
+            ],
+            [
+                'html',
+                '<a href="https://google.com/">link </a>',
+                'link ',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+                '<a href="https://google.com/">link</a> ',
+            ],
+            [
+                'markdown',
+                'test _italic_ *bold* __underlined__ ~strikethrough~ ```test pre``` `code` ||spoiler||',
+                'test italic bold underlined strikethrough  pre code spoiler',
                 [
                     [
                         'offset' => 5,
@@ -306,17 +391,17 @@ class EntitiesTest extends MadelineTestCase
                     ],
                     [
                         'offset' => 42,
-                        'length' => 3,
+                        'length' => 4,
                         'type' => 'pre',
                         'language' => 'test',
                     ],
                     [
-                        'offset' => 46,
+                        'offset' => 47,
                         'length' => 4,
                         'type' => 'code',
                     ],
                     [
-                        'offset' => 51,
+                        'offset' => 52,
                         'length' => 7,
                         'type' => 'spoiler',
                     ],

@@ -415,7 +415,7 @@ trait BotAPI
      * @param array $arguments Arguments
      * @internal
      */
-    public function parseMode(array $arguments): array
+    public static function parseMode(array $arguments): array
     {
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -430,10 +430,11 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $arguments['message'] = Parsedown::instance()->line($arguments['message']);
-            $arguments['parse_mode'] = 'HTML';
-        }
-        if (\stripos($arguments['parse_mode'], 'html') !== false) {
+            $entities = new MarkdownEntities($arguments['message']);
+            $arguments['message'] = $entities->message;
+            $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
+            unset($arguments['parse_mode']);
+        } elseif (\stripos($arguments['parse_mode'], 'html') !== false) {
             $entities = new DOMEntities($arguments['message']);
             $arguments['message'] = $entities->message;
             $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
@@ -470,7 +471,7 @@ trait BotAPI
                     if (\trim($cur) !== '') {
                         $multiple_args[] = [
                             ...$multiple_args_base,
-                            'message' => $cur
+                            'message' => $cur,
                         ];
                     }
                     $cur = $vv;
@@ -481,7 +482,7 @@ trait BotAPI
         if (\trim($cur) !== '') {
             $multiple_args[] = [
                 ...$multiple_args_base,
-                'message' => $cur
+                'message' => $cur,
             ];
         }
 
@@ -500,34 +501,16 @@ trait BotAPI
                     $newentity['length'] = $entity['length'] - (StrTools::mbStrlen($multiple_args[$i]['message']) - $entity['offset']);
                     $entity['length'] = StrTools::mbStrlen($multiple_args[$i]['message']) - $entity['offset'];
                     $offset += $entity['length'];
-                    //StrTools::mbStrlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
-                    $prev_length = StrTools::mbStrlen($multiple_args[$i]['message']);
-                    $multiple_args[$i]['message'] = \rtrim($multiple_args[$i]['message']);
-                    $diff = $prev_length - StrTools::mbStrlen($multiple_args[$i]['message']);
-                    if ($diff) {
-                        $entity['length'] -= $diff;
-                        foreach ($args['entities'] as $key => &$eentity) {
-                            if ($key > $k) {
-                                $eentity['offset'] -= $diff;
-                            }
-                        }
-                    }
+                    $orig = $multiple_args[$i]['message'];
+                    $trimmed = rtrim($orig);
+                    $diff = StrTools::mbStrlen($orig) - StrTools::mbStrlen($trimmed);
+                    $entity['length'] -= $diff;
+                    $multiple_args[$i]['message'] = $trimmed;
                     $multiple_args[$i]['entities'][] = $entity;
                     $i++;
                     $entity = $newentity;
                     continue;
-                }
-                $prev_length = StrTools::mbStrlen($multiple_args[$i]['message']);
-                $multiple_args[$i]['message'] = \rtrim($multiple_args[$i]['message']);
-                $diff = $prev_length - StrTools::mbStrlen($multiple_args[$i]['message']);
-                if ($diff) {
-                    $entity['length'] -= $diff;
-                    foreach ($args['entities'] as $key => &$eentity) {
-                        if ($key > $k) {
-                            $eentity['offset'] -= $diff;
-                        }
-                    }
                 }
                 $multiple_args[$i]['entities'][] = $entity;
                 break;
