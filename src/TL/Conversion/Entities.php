@@ -4,17 +4,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL\Conversion;
 
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\StrTools;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMText;
-use Throwable;
-
 /**
  * Class that converts HTML or markdown to a message + set of entities.
- * 
+ *
  * @internal
  */
 abstract class Entities

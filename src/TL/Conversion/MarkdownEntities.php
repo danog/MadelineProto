@@ -7,10 +7,6 @@ namespace danog\MadelineProto\TL\Conversion;
 use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\StrTools;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMText;
 use Throwable;
 
 /**
@@ -28,18 +24,18 @@ final class MarkdownEntities extends Entities
      */
     public function __construct(string $markdown)
     {
-        $markdown = str_replace("\r\n", "\n", $markdown);
+        $markdown = \str_replace("\r\n", "\n", $markdown);
         try {
             $message = '';
             $messageLen = 0;
             $entities = [];
             $offset = 0;
             $stack = [];
-            while ($offset < strlen($markdown)) {
-                $len = strcspn($markdown, '*_~`[]|\\', $offset);
-                $piece = substr($markdown, $offset, $len);
+            while ($offset < \strlen($markdown)) {
+                $len = \strcspn($markdown, '*_~`[]|!\\', $offset);
+                $piece = \substr($markdown, $offset, $len);
                 $offset += $len;
-                if ($offset === strlen($markdown)) {
+                if ($offset === \strlen($markdown)) {
                     $message .= $piece;
                     break;
                 }
@@ -65,10 +61,19 @@ final class MarkdownEntities extends Entities
                         $messageLen += StrTools::mbStrlen($piece)+1;
                         continue;
                     }
+                } elseif ($char === '!') {
+                    if ($next === '[') {
+                        $offset++;
+                        $char = '](';
+                    } else {
+                        $message .= $piece.$char;
+                        $messageLen += StrTools::mbStrlen($piece)+1;
+                        continue;
+                    }
                 } elseif ($char === '[') {
                     $char = '](';
                 } elseif ($char === ']') {
-                    if (!$stack || end($stack)[0] !== '](') {
+                    if (!$stack || \end($stack)[0] !== '](') {
                         $message .= $piece.$char;
                         $messageLen += StrTools::mbStrlen($piece)+1;
                         continue;
@@ -83,15 +88,15 @@ final class MarkdownEntities extends Entities
                     $messageLen += StrTools::mbStrlen($piece);
 
                     $offset += 2;
-                    $langLen = strcspn($markdown, "\n ", $offset);
-                    $language = substr($markdown, $offset, $langLen);
+                    $langLen = \strcspn($markdown, "\n ", $offset);
+                    $language = \substr($markdown, $offset, $langLen);
                     $offset += $langLen;
                     if ($markdown[$offset] === "\n") {
                         $offset++;
                     }
 
                     $posClose = $offset;
-                    while (($posClose = strpos($markdown, '```', $posClose)) !== false) {
+                    while (($posClose = \strpos($markdown, '```', $posClose)) !== false) {
                         if ($markdown[$posClose-1] === '\\') {
                             $posClose++;
                             continue;
@@ -104,7 +109,7 @@ final class MarkdownEntities extends Entities
 
                     $start = $messageLen;
 
-                    $message .= $piece = substr($markdown, $offset, $posClose-$offset);
+                    $message .= $piece = \substr($markdown, $offset, $posClose-$offset);
                     $pieceLen = StrTools::mbStrlen($piece);
                     $messageLen += $pieceLen;
 
@@ -131,11 +136,11 @@ final class MarkdownEntities extends Entities
                     continue;
                 }
 
-                if ($stack && end($stack)[0] === $char) {
-                    [, $start] = array_pop($stack);
+                if ($stack && \end($stack)[0] === $char) {
+                    [, $start] = \array_pop($stack);
                     if ($char === '](') {
                         $posClose = $offset;
-                        while (($posClose = strpos($markdown, ')', $posClose)) !== false) {
+                        while (($posClose = \strpos($markdown, ')', $posClose)) !== false) {
                             if ($markdown[$posClose-1] === '\\') {
                                 $posClose++;
                                 continue;
@@ -145,7 +150,7 @@ final class MarkdownEntities extends Entities
                         if ($posClose === false) {
                             throw new AssertionError("Unclosed ) opened @ pos $offset!");
                         }
-                        $entity = self::handleLink(substr($markdown, $offset, $posClose-$offset));
+                        $entity = self::handleLink(\substr($markdown, $offset, $posClose-$offset));
                         $offset = $posClose+1;
                     } else {
                         $entity = match ($char) {
@@ -160,9 +165,9 @@ final class MarkdownEntities extends Entities
                     }
                     $message .= $piece;
                     $messageLen += StrTools::mbStrlen($piece);
-                    
+
                     $lengthReal = $messageLen-$start;
-                    for ($x = strlen($message)-1; $x >= 0; $x--) {
+                    for ($x = \strlen($message)-1; $x >= 0; $x--) {
                         if (!(
                             $message[$x] === ' '
                             || $message[$x] === "\r"
@@ -180,6 +185,9 @@ final class MarkdownEntities extends Entities
                     $messageLen += StrTools::mbStrlen($piece);
                     $stack []= [$char, $messageLen];
                 }
+            }
+            if ($stack) {
+                throw new AssertionError("Found unclosed markdown elements ".\implode(', ', \array_column($stack, 0)));
             }
 
             $this->message = $message;

@@ -27,6 +27,7 @@ use Closure;
 use Countable;
 use Exception;
 use Fiber;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
@@ -600,7 +601,7 @@ abstract class Tools extends AsyncTools
     private const BANNED_FUNCTIONS = [
         'file_get_contents' => 'please use https://github.com/amphp/file or https://github.com/amphp/http-client, instead',
         'file_put_contents' => 'please use https://github.com/amphp/file, instead',
-        'unlink' => 'please use https://github.com/amphp/http-client, instead',
+        'unlink' => 'plugins may not access the filesystem',
         'curl_exec' => 'please use https://github.com/amphp/http-client, instead',
         'mysqli_query' => 'please use https://github.com/amphp/mysql, instead',
         'mysqli_connect' => 'please use https://github.com/amphp/mysql, instead',
@@ -662,6 +663,16 @@ abstract class Tools extends AsyncTools
 
             $name = $call->name->toLowerString();
             if (isset(self::BANNED_FUNCTIONS[$name])) {
+                if (!$plugin && $name === 'unlink') {
+                    if ($call->args
+                        && $call->args[0] instanceof Arg
+                        && $call->args[0]->value instanceof String_
+                        && $call->args[0]->value->value === 'MadelineProto.log'
+                    ) {
+                        throw new AssertionError("An error occurred while analyzing $class: the MadelineProto.log must never be deleted, please set a custom max size in the settings, instead!");
+                    }
+                    continue;
+                }
                 $explanation = self::BANNED_FUNCTIONS[$name];
                 throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking function $name, $explanation!");
             }

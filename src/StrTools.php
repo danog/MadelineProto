@@ -23,7 +23,7 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\TL\Conversion\MarkdownEntities;
-use Parsedown;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -236,6 +236,10 @@ abstract class StrTools extends Extension
         if ($markdown === '') {
             return $markdown;
         }
-        return (new DOMEntities(Parsedown::instance()->text($markdown)))->message;
+        try {
+            return (new MarkdownEntities($markdown))->message;
+        } catch (Throwable) {
+            return (new MarkdownEntities(\str_replace('_', '\\_', $markdown)))->message;
+        }
     }
 }

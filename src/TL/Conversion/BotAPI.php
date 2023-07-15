@@ -26,7 +26,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
-use Parsedown;
 use Throwable;
 
 use const danog\Decoder\TYPES_IDS;
@@ -503,7 +502,7 @@ trait BotAPI
                     $offset += $entity['length'];
                     $newentity['offset'] = $offset;
                     $orig = $multiple_args[$i]['message'];
-                    $trimmed = rtrim($orig);
+                    $trimmed = \rtrim($orig);
                     $diff = StrTools::mbStrlen($orig) - StrTools::mbStrlen($trimmed);
                     $entity['length'] -= $diff;
                     $multiple_args[$i]['message'] = $trimmed;

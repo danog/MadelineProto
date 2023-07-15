@@ -317,8 +317,8 @@ final class Blacklist {
             $contents .= "     * @param {$psalmType} \${$name} {$description}\n";
 
             if ($name === 'entities') {
-                $contents .= "     * @param ''|'HTML'|'html'|'Markdown'|'markdown' \$parse_mode Whether to parse HTML or Markdown markup in the message\n";
-                $signature []= "string \$parse_mode = ''";
+                $contents .= "     * @param \\danog\\MadelineProto\\ParseMode \$parse_mode Whether to parse HTML or Markdown markup in the message\n";
+                $signature []= "\\danog\\MadelineProto\\ParseMode \$parse_mode = \\danog\\MadelineProto\\ParseMode::TEXT";
             }
         }
         return [$contents, $signature];
