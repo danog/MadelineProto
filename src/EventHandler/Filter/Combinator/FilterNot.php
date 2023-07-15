@@ -23,7 +23,7 @@ final class FilterNot extends Filter
             // The nested filter is a FilterNot, optimize !!A => A
             return $filter->filter;
         }
-        if ($filter === $this) {
+        if ($filter === $this->filter) {
             // The nested filter didn't replace itself
             return $this;
         }
