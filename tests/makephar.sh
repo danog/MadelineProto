@@ -31,7 +31,7 @@ if [ "$TAG" == "" ]; then
 fi
 
 if [ "$TAG" != "7777" ]; then
-    grep -q "const RELEASE = '$TAG'" src/MTProto.php || {
+    grep -q "const RELEASE = '$TAG'" src/API.php || {
         echo "The RELEASE constant is not up to date!"
         exit 1
     }

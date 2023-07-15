@@ -337,6 +337,19 @@ class EntitiesTest extends MadelineTestCase
                 ],
             ],
             [
+                'markdown',
+                '![link ](https://google.com/)',
+                'link ',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+            ],
+            [
                 'html',
                 '<a href="https://google.com/">link </a>test',
                 'link test',
