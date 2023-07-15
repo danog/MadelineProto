@@ -18,14 +18,14 @@ final class FilterNot extends Filter
     }
     public function initialize(EventHandler $API): ?Filter
     {
-        $filter = $this->filter->initialize($API);
-        if ($filter === null) {
-            // The nested filter didn't replace itself
-            return $this;
-        }
+        $filter = $this->filter->initialize($API) ?? $this;
         if ($filter instanceof self) {
             // The nested filter is a FilterNot, optimize !!A => A
             return $filter->filter;
+        }
+        if ($filter === $this) {
+            // The nested filter didn't replace itself
+            return $this;
         }
         // The nested filter replaced itself, re-wrap it
         return new self($filter);
