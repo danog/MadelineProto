@@ -39,7 +39,6 @@ final class FileCallback implements FileCallbackInterface
      */
     public function __construct(public readonly mixed $file, callable $callback)
     {
-        $this->file = $file;
         $this->callback = $callback;
     }
     /**
