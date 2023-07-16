@@ -140,5 +140,8 @@
     "plugins_do_not_use_require": "به دلایل عملکردی و اجرایی، پلاگین‌ها فقط میتوانند فایل های دیگر را که در پوشه پلاگین هاست با استفاده از راه‌اندازی بارگذار خودکار PSR-4، به صورت خودکار include یا require کنند (بدون require کردن دستی آنها).",
     "static_analysis_minor": "یک مشکل جزئی در طول بررسی استاتیک %s رخ داد: %s",
     "static_analysis_severe": "یک مشکل سمت سرور در طول بررسی استاتیک %s رخ داد: %s",
-    "invalid_dl.php": "%s یک اسکریپت دانلود معتبر نیست. (%s)"
+    "invalid_dl.php": "%s یک اسکریپت دانلود معتبر نیست. (%s)",
+    "cli_need_dl.php_link": "لطفا هنگام استفاده از getDownloadLink روی CLI (محیط ترمینال)، لینک اسکریپت دانلود را مشخص کنید!",
+    "need_dl.php": "اسکریپت دانلود پیشفرض تولید نشد (%s)، لطفا یک فایل dl.php بسیازید و این محتوا را در آن قرار دهید: %s سپس لینک آن فایل را به ورودی دوم getDownloadLink بدهید",
+    "dl.php_powered_by_madelineproto": "سرور دانلود فایل تلگرام (تا حداکثر 4 گیگابایت)، قدرت گرفته از https://t.me/MadelineProto (https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link)!"
 }
