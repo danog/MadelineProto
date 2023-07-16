@@ -56,7 +56,7 @@ trait FileServer
         $API = new API($session);
         $API->downloadToBrowser(
             messageMedia: $_GET['f'],
-            size: $_GET['s'],
+            size: (int) $_GET['s'],
             name: $_GET['n'],
             mime: $_GET['m']
         );
@@ -80,7 +80,7 @@ trait FileServer
                 $scriptUrl = $this->getDefaultDownloadScript();
             } catch (Throwable $e) {
                 $sessionPath = \var_export($this->getSessionName(), true);
-                throw new Exception("Could not generate default download script, please create a dl.php file with the following content: <?php require 'vendor/autoload.php'; \danog\MadelineProto\API::downloadServer($sessionPath); ?> and pass the URL to the second parameter of getDownloadLink: ".$e->getMessage());
+                throw new Exception("Could not generate default download script ({$e->getMessage()}), please create a dl.php file with the following content: <?php require 'vendor/autoload.php'; \danog\MadelineProto\API::downloadServer($sessionPath); ?> and pass the URL to the second parameter of getDownloadLink");
             }
         } else {
             $this->checkDownloadScript($scriptUrl);
@@ -101,7 +101,7 @@ trait FileServer
                 'mime' => $mime,
                 'size' => $size,
             ] = $this->getDownloadInfo($media);
-            $name = "$name.$ext";
+            $name = $name.$ext;
         }
 
         return $scriptUrl."?".\http_build_query([
@@ -187,9 +187,9 @@ trait FileServer
                 return;
             }
             $i = (string) \random_int(PHP_INT_MIN, PHP_INT_MAX);
-            $scriptUrl = $scriptUrl.'?'.\http_build_query(['c' => $scriptUrl, 'i' => $i]);
-            $this->logger->logger("Checking $scriptUrl...");
-            $this->fileGetContents($scriptUrl);
+            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['c' => $scriptUrl, 'i' => $i]);
+            $this->logger->logger("Checking $scriptUrlNew...");
+            $this->fileGetContents($scriptUrlNew);
             if (!isset(self::$checkedScripts[$scriptUrl])) {
                 throw new AssertionError("$scriptUrl is not a valid download script, the check array wasn't populated!");
             }

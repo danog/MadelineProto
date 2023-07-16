@@ -63,7 +63,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
             'size' => $this->size,
             'InputFileLocation' => $this->location
         ] = $API->getDownloadInfo($rawMedia);
-        $this->fileName = "$name.".$this->fileExt;
+        $this->fileName = $name.$this->fileExt;
 
         [
             'file_id' => $this->botApiFileId,
