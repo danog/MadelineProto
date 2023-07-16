@@ -119,7 +119,7 @@ trait FileServer
         ]);
     }
 
-    private static ?LocalMutex $scriptMutex = null;
+    private ?LocalMutex $scriptMutex = null;
     private static array $checkedAutoload = [];
     private const DOWNLOAD_SCRIPT = '<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);';
     private function getDefaultDownloadScript(): string
