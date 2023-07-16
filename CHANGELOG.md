@@ -9,8 +9,9 @@ Features:
 Fixes:
 - Improved the `markdownEscape` function!
 - Translated even more MadelineProto UI elements!
-- Now the same static analysis rules are applied for both plugins and simple event handlers.
+- Improve the static analyzer.
 - Made some fixes to simple filters.
+- Relax markdown parser.
 
 ---
 

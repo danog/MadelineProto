@@ -79,7 +79,10 @@ final class MarkdownEntities extends Entities
                         continue;
                     }
                     if ($next !== '(') {
-                        throw new AssertionError("( expected @ pos $offset!");
+                        [, $start] = \array_pop($stack);
+                        $message .= '['.$piece.$char;
+                        $messageLen += StrTools::mbStrlen($piece)+2;
+                        continue;
                     }
                     $offset++;
                     $char = "](";

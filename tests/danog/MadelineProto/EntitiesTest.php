@@ -350,6 +350,12 @@ class EntitiesTest extends MadelineTestCase
                 ],
             ],
             [
+                'markdown',
+                '[not a link]',
+                '[not a link]',
+                [],
+            ],
+            [
                 'html',
                 '<a href="https://google.com/">link </a>test',
                 'link test',
