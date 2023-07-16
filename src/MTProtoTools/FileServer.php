@@ -20,8 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
+use Amp\Sync\LocalKeyedMutex;
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
@@ -118,6 +119,7 @@ trait FileServer
         ]);
     }
 
+    private static ?LocalMutex $scriptMutex = null;
     private static array $checkedAutoload = [];
     private const DOWNLOAD_SCRIPT = '<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);';
     private function getDefaultDownloadScript(): string
@@ -153,30 +155,36 @@ trait FileServer
         if (isset(self::$checkedAutoload[$autoloadPath])) {
             return self::$checkedAutoload[$autoloadPath];
         }
-        $downloadScript = \sprintf(self::DOWNLOAD_SCRIPT, \var_export($autoloadPath, true));
-        $f = $s.DIRECTORY_SEPARATOR.'dl.php';
-        $recreate = true;
-        if (exists($f)) {
-            $recreate = read($f) !== $downloadScript;
-        }
-        if ($recreate) {
-            $temp = "$f.temp.php";
-            write($temp, $downloadScript);
-            \rename($temp, $f);
-        }
+        $this->scriptMutex ??= new LocalMutex;
+        $lock = $this->scriptMutex->acquire();
+        try {
+            $downloadScript = \sprintf(self::DOWNLOAD_SCRIPT, \var_export($autoloadPath, true));
+            $f = $s.DIRECTORY_SEPARATOR.'dl.php';
+            $recreate = true;
+            if (exists($f)) {
+                $recreate = read($f) !== $downloadScript;
+            }
+            if ($recreate) {
+                $temp = "$f.temp.php";
+                write($temp, $downloadScript);
+                \rename($temp, $f);
+            }
 
-        $f = \realpath($f);
-        $absoluteRootDir = WebRunner::getAbsoluteRootDir();
+            $f = \realpath($f);
+            $absoluteRootDir = WebRunner::getAbsoluteRootDir();
 
-        if (\substr($f, 0, \strlen($absoluteRootDir)) !== $absoluteRootDir) {
-            throw new AssertionError("Process runner is not within readable document root!");
+            if (\substr($f, 0, \strlen($absoluteRootDir)) !== $absoluteRootDir) {
+                throw new AssertionError("Process runner is not within readable document root!");
+            }
+            $f = \substr($f, \strlen($absoluteRootDir)-1);
+            $f = \str_replace(DIRECTORY_SEPARATOR, '/', $f);
+            $f = \str_replace('//', '/', $f);
+            $f = 'https://'.$_SERVER['SERVER_NAME'].$f;
+            $this->checkDownloadScript($f);
+            return self::$checkedAutoload[$autoloadPath] = $f;
+        } finally {
+            $lock->unlock();
         }
-        $f = \substr($f, \strlen($absoluteRootDir)-1);
-        $f = \str_replace(DIRECTORY_SEPARATOR, '/', $f);
-        $f = \str_replace('//', '/', $f);
-        $f = 'https://'.$_SERVER['SERVER_NAME'].$f;
-        $this->checkDownloadScript($f);
-        return self::$checkedAutoload[$autoloadPath] = $f;
     }
 
     private static ?LocalKeyedMutex $checkMutex = null;
