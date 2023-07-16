@@ -87,6 +87,7 @@ class Exception extends \Exception
             || \strpos($errstr, 'headers already sent')
             || \strpos($errstr, 'Creation of dynamic property') !== false
             || \strpos($errstr, 'Legacy nullable type detected') !== false
+            || \str_contains($errstr, '$tdMethods is deprecated')
             || $errfileReplaced && (
                 \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
                 || \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
