@@ -311,9 +311,11 @@ abstract class EventHandler extends AbstractAPI
     /**
      * Cache a list of plugin event handlers.
      *
+     * @internal
+     *
      * @param class-string<EventHandler> $class
      */
-    private static function cachePlugins(string $class): void
+    final public static function cachePlugins(string $class): void
     {
         if (isset(self::$pluginCache[$class])) {
             return;
