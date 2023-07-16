@@ -130,7 +130,6 @@ trait FileServer
 
     private ?LocalMutex $scriptMutex = null;
     private static array $checkedAutoload = [];
-    private const DOWNLOAD_SCRIPT = '<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);';
     private function getDefaultDownloadScript(): string
     {
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
@@ -167,7 +166,7 @@ trait FileServer
         $this->scriptMutex ??= new LocalMutex;
         $lock = $this->scriptMutex->acquire();
         try {
-            $downloadScript = \sprintf(self::DOWNLOAD_SCRIPT, \var_export($autoloadPath, true));
+            $downloadScript = \sprintf('<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);', \var_export($autoloadPath, true));
             $f = $s.DIRECTORY_SEPARATOR.'dl.php';
             $recreate = true;
             if (exists($f)) {
