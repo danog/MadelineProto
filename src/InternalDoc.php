@@ -774,9 +774,9 @@ abstract class InternalDoc
     /**
      * Get download link of media file.
      */
-    public function getDownloadLink(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|array|string $media, ?string $scriptUrl = null): string
+    public function getDownloadLink(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|array|string $media, ?string $scriptUrl = null, ?int $size = null, ?string $name = null, ?string $mime = null): string
     {
-        return $this->wrapper->getAPI()->getDownloadLink($media, $scriptUrl);
+        return $this->wrapper->getAPI()->getDownloadLink($media, $scriptUrl, $size, $name, $mime);
     }
     /**
      * Get event handler (or plugin instance).
