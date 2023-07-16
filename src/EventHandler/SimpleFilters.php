@@ -23,6 +23,6 @@ use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
 /**
  * @internal An internal interface used to avoid type errors when using simple filters.
  */
-interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, Incoming, IsForwarded, IsReply, IsReplyToSelf
+interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, IsForwarded, IsReply, IsReplyToSelf
 {
 }
