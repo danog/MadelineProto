@@ -76,7 +76,7 @@ trait FileServer
     /**
      * Get download link of media file.
      */
-    public function getDownloadLink(array|string|Message|Media $media, ?string $scriptUrl = null): string
+    public function getDownloadLink(array|string|Message|Media $media, ?string $scriptUrl = null, ?int $size = null, ?string $name = null, ?string $mime = null): string
     {
         if ($scriptUrl === null) {
             try {
@@ -101,13 +101,22 @@ trait FileServer
             $mime = $media->mimeType;
             $size = $media->size;
         } else {
+            if (\is_string($media) && ($size === null || $mime === null || $name === null)) {
+                throw new Exception('downloadToBrowser only supports bot file IDs if the file size, file name and MIME type are also specified in the third, fourth and fifth parameters of the method.');
+            }
+
+            $messageMedia = $this->getDownloadInfo($media);
+            $messageMedia['size'] ??= $size;
+            $messageMedia['mime'] ??= $mime;
+            $messageMedia['name'] ??= $name;
+
             $f = $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
             [
                 'name' => $name,
                 'ext' => $ext,
                 'mime' => $mime,
                 'size' => $size,
-            ] = $this->getDownloadInfo($media);
+            ] = $messageMedia;
             $name = $name.$ext;
         }
 
