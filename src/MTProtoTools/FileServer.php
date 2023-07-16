@@ -183,7 +183,7 @@ trait FileServer
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
         } finally {
-            $lock->unlock();
+            $lock->release();
         }
     }
 
