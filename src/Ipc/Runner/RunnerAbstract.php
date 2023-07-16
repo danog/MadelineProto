@@ -6,9 +6,6 @@ namespace danog\MadelineProto\Ipc\Runner;
 
 use Phar;
 
-use const MADELINE_PHAR;
-use const MADELINE_PHP;
-
 /**
  * @internal
  */

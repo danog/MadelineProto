@@ -30,7 +30,6 @@ use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
@@ -184,8 +183,12 @@ class MyEventHandler extends SimpleEventHandler
      * Gets a download link for any file up to 4GB!
      */
     #[FilterCommand('dl')]
-    public function downloadLink(Incoming&Message&IsReply $message): void
+    public function downloadLink(Incoming&Message $message): void
     {
+        if (!$message->replyToMsgId) {
+            $message->reply("This command must reply to a media message!");
+            return;
+        }
         $message = $message->getReply();
         if (!$message instanceof Message || !$message->media) {
             $message->reply("This command must reply to a media message!");

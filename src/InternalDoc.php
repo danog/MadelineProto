@@ -1356,6 +1356,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::posmod($a, $b);
     }
     /**
+     * Internal endpoint used by the download server.
+     */
+    public function processDownloadServerPing(string $path, string $payload): void
+    {
+        $this->wrapper->getAPI()->processDownloadServerPing($path, $payload);
+    }
+    /**
      * Initiates QR code login.
      *
      * Returns a QR code login helper object, that can be used to render the QR code, display the link directly, wait for login, QR code expiration and much more.

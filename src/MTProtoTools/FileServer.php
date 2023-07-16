@@ -45,7 +45,8 @@ trait FileServer
     public static function downloadServer(string $session): void
     {
         if (isset($_GET['c'])) {
-            self::$checkedScripts[$_GET['c']] = $_GET['i'];
+            $API = new API($session);
+            $API->processDownloadServerPing($_GET['c'], $_GET['i']);
             die;
         }
         if (!isset($_GET['f'])) {
@@ -59,6 +60,14 @@ trait FileServer
             name: $_GET['n'],
             mime: $_GET['m']
         );
+    }
+
+    /**
+     * Internal endpoint used by the download server.
+     */
+    public function processDownloadServerPing(string $path, string $payload): void
+    {
+        self::$checkedScripts[$path] = $payload;
     }
 
     /**
@@ -104,17 +113,17 @@ trait FileServer
     }
 
     private static array $checkedAutoload = [];
-    private const DOWNLOAD_SCRIPT = '<?php require "%s"; \danog\MadelineProto\API::downloadServer(__DIR__);';
+    private const DOWNLOAD_SCRIPT = '<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);';
     private function getDefaultDownloadScript(): string
     {
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             throw new AssertionError("Please specify a download script URL when using getDownloadLink via CLI!");
         }
         $s = $this->getSessionName();
-        if (\defined(MADELINE_PHP)) {
-            $autoloadPath = MADELINE_PHP;
-        } elseif (\defined(MADELINE_PHAR)) {
-            $autoloadPath = MADELINE_PHAR;
+        if (\defined('MADELINE_PHP')) {
+            $autoloadPath = \MADELINE_PHP;
+        } elseif (\defined('MADELINE_PHAR')) {
+            $autoloadPath = \MADELINE_PHAR;
         } else {
             $paths = [
                 \dirname(__DIR__, 4).'/autoload.php',
@@ -139,7 +148,7 @@ trait FileServer
             return self::$checkedAutoload[$autoloadPath];
         }
         $downloadScript = \sprintf(self::DOWNLOAD_SCRIPT, \var_export($autoloadPath, true));
-        $f = $s.DIRECTORY_SEPARATOR.\hash('sha256', $autoloadPath);
+        $f = $s.DIRECTORY_SEPARATOR.'dl.php';
         $recreate = true;
         if (exists($f)) {
             $recreate = read($f) !== $downloadScript;
@@ -177,10 +186,16 @@ trait FileServer
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }
-            $i = \random_int(PHP_INT_MIN, PHP_INT_MAX);
-            $this->fileGetContents($scriptUrl.'?'.\http_build_query(['c' => $scriptUrl, 'i' => $i]));
-            if (!isset(self::$checkedScripts[$scriptUrl]) || self::$checkedScripts[$scriptUrl] !== $i) {
-                throw new AssertionError("$scriptUrl is not a valid download script!");
+            $i = (string) \random_int(PHP_INT_MIN, PHP_INT_MAX);
+            $scriptUrl = $scriptUrl.'?'.\http_build_query(['c' => $scriptUrl, 'i' => $i]);
+            $this->logger->logger("Checking $scriptUrl...");
+            $this->fileGetContents($scriptUrl);
+            if (!isset(self::$checkedScripts[$scriptUrl])) {
+                throw new AssertionError("$scriptUrl is not a valid download script, the check array wasn't populated!");
+            }
+            if (self::$checkedScripts[$scriptUrl] !== $i) {
+                $v = self::$checkedScripts[$scriptUrl];
+                throw new AssertionError("$scriptUrl is not a valid download script, the check array contains {$v} instead of $i!");
             }
         } finally {
             $lock->release();
