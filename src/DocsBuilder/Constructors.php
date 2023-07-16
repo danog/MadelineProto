@@ -22,7 +22,6 @@ namespace danog\MadelineProto\DocsBuilder;
 
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 
 use const PHP_EOL;
@@ -84,10 +83,10 @@ trait Constructors
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
                 }
                 $params .= "'".$param['name']."' => ";
-                $param[$type_or_subtype] = '['.Tools::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $param[$type_or_subtype] = '['.self::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            $md_constructor = StrTools::markdownEscape($constructor.$layer);
+            $md_constructor = self::markdownEscape($constructor.$layer);
             $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](/API_docs/constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
@@ -162,7 +161,7 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
                 if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['description'])) {
@@ -207,7 +206,7 @@ description: "'.$description.'"
 nav_exclude: true
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
-# Constructor: '.StrTools::markdownEscape($constructor.$layer).'  
+# Constructor: '.self::markdownEscape($constructor.$layer).'  
 [Back to constructors index](/API_docs/constructors/index.md)
 
 
@@ -220,7 +219,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
             if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor])) {
                 $header .= $this->TL->getDescriptionsRef()['constructors'][$constructor]['description'].PHP_EOL.PHP_EOL;
             }
-            $type = '### Type: ['.StrTools::markdownEscape($php_type).'](/API_docs/types/'.$php_type.'.md)
+            $type = '### Type: ['.self::markdownEscape($php_type).'](/API_docs/types/'.$php_type.'.md)
 
 
 ';

@@ -79,6 +79,10 @@ final class DocsBuilder
      */
     protected array $templates = [];
 
+    protected static function markdownEscape(string $s): string
+    {
+        return \str_replace('_', '\\_', $s);
+    }
     public $types = [];
     public $any = '*';
     public function mkDocs(): void
@@ -100,13 +104,13 @@ final class DocsBuilder
         Logger::log('Generating types documentation...', Logger::NOTICE);
         foreach ($this->types as $otype => $keys) {
             $type = StrTools::typeEscape($otype);
-            $index .= '['.StrTools::markdownEscape($type).'](/API_docs/types/'.$type.'.md)<a name="'.$type.'"></a>  
+            $index .= '['.self::markdownEscape($type).'](/API_docs/types/'.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
                 $predicate = $data['predicate'].(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
-                $md_predicate =  StrTools::markdownEscape($predicate);
+                $md_predicate =  self::markdownEscape($predicate);
                 $constructors .= "[$md_predicate](/API_docs/constructors/$predicate.md)  \n\n";
             }
             $methods = '';
@@ -132,7 +136,7 @@ final class DocsBuilder
                 $this->templates['Type'],
                 $type,
                 $redir,
-                StrTools::markdownEscape($type),
+                self::markdownEscape($type),
                 $header,
                 $constructors,
                 $methods,

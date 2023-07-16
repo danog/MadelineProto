@@ -41,6 +41,7 @@ use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use phpseclib3\Crypt\Random;
 use ReflectionClass;
@@ -588,18 +589,6 @@ abstract class Tools extends AsyncTools
         return null;
     }
 
-    /**
-     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
-     *
-     * @param class-string<EventHandler> $class Class name
-     *
-     * @throws AssertionError If validation fails.
-     */
-    public static function validateEventHandlerClass(string $class): void
-    {
-        $file = read((new ReflectionClass($class))->getFileName());
-        self::validateEventHandlerCode($file, \is_subclass_of($class, PluginEventHandler::class));
-    }
 
     /**
      * Opens a file in append-only mode.
@@ -639,25 +628,35 @@ abstract class Tools extends AsyncTools
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
      *
-     * @param string $code Code of the class.
-     * @param bool $plugin Whether the class is a plugin or normal event handler class.
+     * @param class-string<EventHandler> $class Class name
      *
-     * @throws AssertionError If validation fails.
+     * @return list<EventHandlerIssue>
      */
-    public static function validateEventHandlerCode(string $code, bool $plugin): void
+    public static function validateEventHandlerClass(string $class): array
     {
+        $plugin = \is_subclass_of($class, PluginEventHandler::class);
+        $file = (new ReflectionClass($class))->getFileName();
+        $code = read($file);
         $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
         Assert::notNull($code);
         $traverser = new NodeTraverser;
         $traverser->addVisitor(new NameResolver());
+        $traverser->addVisitor(new ParentConnectingVisitor);
         $code = $traverser->traverse($code);
         $finder = new NodeFinder;
+
+        $issues = [];
 
         if ($plugin) {
             $class = $finder->findInstanceOf($code, ClassLike::class);
             $class = \array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
             if (\count($class) !== 1 || !$class[0] instanceof Class_) {
-                throw new Exception(Lang::$current_lang['plugins_must_have_exactly_one_class']);
+                $issues []= new EventHandlerIssue(
+                    message: Lang::$current_lang['plugins_must_have_exactly_one_class'],
+                    file: $file,
+                    line: 0,
+                    severe: true
+                );
             }
         }
 
@@ -668,7 +667,12 @@ abstract class Tools extends AsyncTools
             || !$declare->value instanceof LNumber
             || $declare->value->value !== 1
         ) {
-            throw new Exception(Lang::$current_lang['must_have_declare_types']);
+            $issues []= new EventHandlerIssue(
+                message: Lang::$current_lang['must_have_declare_types'],
+                file: $file,
+                line: 0,
+                severe: true
+            );
         }
 
         /** @var FuncCall $call */
@@ -680,12 +684,24 @@ abstract class Tools extends AsyncTools
             $name = $call->name->toLowerString();
             if (isset(self::BLOCKING_FUNCTIONS[$name])) {
                 $explanation = self::BLOCKING_FUNCTIONS[$name];
-                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation));
+                $issues []= new EventHandlerIssue(
+                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),
+                    file: $file,
+                    line: $call->getStartLine(),
+                    severe: true
+                );
+                continue;
             }
 
             if (isset(self::DEPRECATED_FUNCTIONS[$name])) {
                 $explanation = self::DEPRECATED_FUNCTIONS[$name];
-                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation));
+                $issues []= new EventHandlerIssue(
+                    message: \sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation),
+                    file: $file,
+                    line: $call->getStartLine(),
+                    severe: true
+                );
+                continue;
             }
 
             if ($name === 'unlink'
@@ -694,18 +710,26 @@ abstract class Tools extends AsyncTools
                 && $call->args[0]->value instanceof String_
                 && $call->args[0]->value->value === 'MadelineProto.log'
             ) {
-                throw new Exception(Lang::$current_lang['do_not_delete_MadelineProto.log']);
+                $issues []= new EventHandlerIssue(
+                    message: Lang::$current_lang['do_not_delete_MadelineProto.log'],
+                    file: $file,
+                    line: $call->getStartLine(),
+                    severe: true
+                );
+                continue;
             }
 
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
-                throw new Exception(\sprintf(
-                    Lang::$current_lang['recommend_not_use_filesystem_function'],
-                    $name
-                ));
+                $issues []= new EventHandlerIssue(
+                    message: Lang::$current_lang['recommend_not_use_filesystem_function'],
+                    file: $file,
+                    line: $call->getStartLine(),
+                    severe: false
+                );
             }
         }
 
-        /** @var New_ $call */
+        /** @var New_ $new */
         foreach ($finder->findInstanceOf($code, New_::class) as $new) {
             if (!$new->class instanceof Name) {
                 continue;
@@ -713,18 +737,35 @@ abstract class Tools extends AsyncTools
             $name = $new->class->toLowerString();
             if (isset(self::BLOCKING_CLASSES[$name])) {
                 $explanation = self::BLOCKING_CLASSES[$name];
-                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation));
+                $issues []= new EventHandlerIssue(
+                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation),
+                    file: $file,
+                    line: $new->getStartLine(),
+                    severe: true
+                );
             }
         }
 
-        if ($plugin) {
-            /** @var Include_ $include */
-            $include = $finder->findFirstInstanceOf($code, Include_::class);
-            if ($include
-                && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
-            ) {
-                throw new Exception(Lang::$current_lang['plugins_do_not_use_require']);
+        /** @var Include_ $include */
+        $include = $finder->findFirstInstanceOf($code, Include_::class);
+        if ($include) {
+            if ($plugin) {
+                $issues []= new EventHandlerIssue(
+                    message: Lang::$current_lang['plugins_do_not_use_require'],
+                    file: $file,
+                    line: $include->getStartLine(),
+                    severe: true
+                );
+            } elseif ($include->getAttribute('parent')) {
+                $issues []= new EventHandlerIssue(
+                    message: Lang::$current_lang['do_not_use_non_root_require_in_event_handler'],
+                    file: $file,
+                    line: $include->getStartLine(),
+                    severe: true
+                );
             }
         }
+        
+        return $issues;
     }
 }

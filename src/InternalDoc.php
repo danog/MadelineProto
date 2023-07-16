@@ -424,7 +424,7 @@ abstract class InternalDoc
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string|FileCallbackInterface|Message $messageMedia File to download
+     * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
      * @param null|callable     $cb           Status callback (can also use FileCallback)
      * @param null|int $size Size of file to download, required for bot API file IDs.
      * @param null|string $mime MIME type of file to download, required for bot API file IDs.
@@ -478,7 +478,7 @@ abstract class InternalDoc
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string|FileCallbackInterface  $messageMedia File to download
+     * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
      * @param null|int          $size         Size of file to download, required for bot API file IDs.
@@ -1285,7 +1285,6 @@ abstract class InternalDoc
      * Opens a file in append-only mode.
      *
      * @param string $path File path.
-     * @return File
      */
     public static function openFileAppendOnly(string $path): \Amp\File\File
     {
