@@ -1939,23 +1939,11 @@ abstract class InternalDoc
      *
      * @param class-string<EventHandler> $class Class name
      *
-     * @throws AssertionError If validation fails.
+     * @return list<EventHandlerIssue>
      */
-    public static function validateEventHandlerClass(string $class): void
+    public static function validateEventHandlerClass(string $class): array
     {
-        \danog\MadelineProto\Tools::validateEventHandlerClass($class);
-    }
-    /**
-     * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
-     *
-     * @param string $code Code of the class.
-     * @param bool $plugin Whether the class is a plugin or normal event handler class.
-     *
-     * @throws AssertionError If validation fails.
-     */
-    public static function validateEventHandlerCode(string $code, bool $plugin): void
-    {
-        \danog\MadelineProto\Tools::validateEventHandlerCode($code, $plugin);
+        return \danog\MadelineProto\Tools::validateEventHandlerClass($class);
     }
     /**
      * Mark sponsored message as read.

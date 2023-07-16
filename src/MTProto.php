@@ -1606,12 +1606,21 @@ final class MTProto implements TLCallback, LoggerGetter
                 $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
             }
             if ($this->event_handler_instance instanceof EventHandler) {
-                try {
-                    Tools::validateEventHandlerClass($this->event_handler_instance::class);
-                } catch (AssertionError $e) {
-                    Logger::log($e->getMessage(), Logger::FATAL_ERROR);
-                    $e = \htmlentities($e->getMessage());
-                    $warning .= "<h2 style='color:red;'>{$e}</h2>";
+                $issues = Tools::validateEventHandlerClass($this->event_handler_instance::class);
+                foreach ($issues as $issue) {
+                    $issue->log();
+                    $issueStr = \htmlentities((string) $issue);
+                    $color = $issue->severe ? 'red' : 'yellow';
+                    $warning .= "<h2 style='color:$color;'>{$issueStr}</h2>";
+                }
+                foreach ($this->pluginInstances as $class => $_) {
+                    $issues = Tools::validateEventHandlerClass($class);
+                    foreach ($issues as $issue) {
+                        $issue->log();
+                        $issueStr = \htmlentities((string) $issue);
+                        $color = $issue->severe ? 'red' : 'yellow';
+                        $warning .= "<h2 style='color:$color;'>{$issueStr}</h2>";
+                    }
                 }
             }
         }

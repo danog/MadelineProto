@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\File\File;
 use ArrayAccess;
-use AssertionError;
 use Closure;
 use Countable;
 use Exception;
@@ -589,7 +588,6 @@ abstract class Tools extends AsyncTools
         return null;
     }
 
-
     /**
      * Opens a file in append-only mode.
      *
@@ -765,7 +763,7 @@ abstract class Tools extends AsyncTools
                 );
             }
         }
-        
+
         return $issues;
     }
 }

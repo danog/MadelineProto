@@ -212,7 +212,16 @@ abstract class EventHandler extends AbstractAPI
                 };
             }
             if ($this instanceof SimpleEventHandler) {
-                Tools::validateEventHandlerClass(static::class);
+                $last = null;
+                foreach (Tools::validateEventHandlerClass(static::class) as $issue) {
+                    if ($issue->severe) {
+                        $last = $issue;
+                    }
+                    $issue->log();
+                }
+                if ($last) {
+                    $last->throw();
+                }
             }
             if ($has_any) {
                 $onAny = $this->onAny(...);
@@ -318,7 +327,16 @@ abstract class EventHandler extends AbstractAPI
             Assert::true(\is_subclass_of($plugin, PluginEventHandler::class), "$plugin must extend ".PluginEventHandler::class);
             Assert::notEq($plugin, PluginEventHandler::class);
             Assert::true(\str_contains(\ltrim($plugin, '\\'), '\\'), "$plugin must be in a namespace!");
-            Tools::validateEventHandlerClass($plugin);
+            $last = null;
+            foreach (Tools::validateEventHandlerClass($plugin) as $issue) {
+                if ($issue->severe) {
+                    $last = $issue;
+                }
+                $issue->log();
+            }
+            if ($last) {
+                $last->throw();
+            }
         }
 
         self::$pluginCache[$class] = $plugins;
