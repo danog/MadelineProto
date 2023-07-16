@@ -38,7 +38,7 @@ final class EventHandlerIssue
     public function getHTML(): string
     {
         $issueStr = \htmlentities((string) $this);
-        $color = $this->severe ? 'red' : 'yellow';
+        $color = $this->severe ? 'red' : 'orange';
         $warning = "<h2 style='color:$color;'>{$issueStr}</h2>";
         return $warning;
     }
