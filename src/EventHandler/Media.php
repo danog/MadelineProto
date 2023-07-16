@@ -75,6 +75,16 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->spoiler = $rawMedia['spoiler'] ?? false;
     }
 
+    /**
+     * Gets a download link for any file up to 4GB.
+     *
+     * @param string|null $scriptUrl Optional path to custom download script (not needed when running via web)
+     */
+    public function getDownloadLink(?string $scriptUrl = null): string
+    {
+        return $this->API->getDownloadLink($this, $scriptUrl);
+    }
+
     /** @internal */
     public function jsonSerialize(): mixed
     {

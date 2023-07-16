@@ -773,9 +773,8 @@ abstract class InternalDoc
     }
     /**
      * Get download link of media file.
-     *
      */
-    public function getDownloadLink(\danog\MadelineProto\EventHandler\Message|array|string $media, ?string $scriptUrl = null): string
+    public function getDownloadLink(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|array|string $media, ?string $scriptUrl = null): string
     {
         return $this->wrapper->getAPI()->getDownloadLink($media, $scriptUrl);
     }

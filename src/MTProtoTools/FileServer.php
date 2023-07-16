@@ -63,9 +63,8 @@ trait FileServer
 
     /**
      * Get download link of media file.
-     *
      */
-    public function getDownloadLink(array|string|Message $media, ?string $scriptUrl = null): string
+    public function getDownloadLink(array|string|Message|Media $media, ?string $scriptUrl = null): string
     {
         if ($scriptUrl === null) {
             try {
@@ -77,15 +76,24 @@ trait FileServer
         } else {
             $this->checkDownloadScript($scriptUrl);
         }
-
-        $f = $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
-        [
-            'name' => $name,
-            'ext' => $ext,
-            'mime' => $mime,
-            'size' => $size,
-        ] = $this->getDownloadInfo($media);
-        $name = "$name.$ext";
+        if ($media instanceof Message) {
+            $media = $media->media;
+        }
+        if ($media instanceof Media) {
+            $f = $media->botApiFileId;
+            $name = $media->fileName;
+            $mime = $media->mimeType;
+            $size = $media->size;
+        } else {
+            $f = $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
+            [
+                'name' => $name,
+                'ext' => $ext,
+                'mime' => $mime,
+                'size' => $size,
+            ] = $this->getDownloadInfo($media);
+            $name = "$name.$ext";
+        }
 
         return $scriptUrl."?".\http_build_query([
             'f' => $f,
