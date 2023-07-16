@@ -25,7 +25,6 @@ use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Amp\Sync\LocalMutex;
-use AssertionError;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
@@ -1609,18 +1608,14 @@ final class MTProto implements TLCallback, LoggerGetter
                 $issues = Tools::validateEventHandlerClass($this->event_handler_instance::class);
                 foreach ($issues as $issue) {
                     $issue->log();
-                    $issueStr = \htmlentities((string) $issue);
-                    $color = $issue->severe ? 'red' : 'yellow';
-                    $warning .= "<h2 style='color:$color;'>{$issueStr}</h2>";
+                    $warning .= $issue->getHTML();
                 }
-                foreach ($this->pluginInstances as $class => $_) {
-                    $issues = Tools::validateEventHandlerClass($class);
-                    foreach ($issues as $issue) {
-                        $issue->log();
-                        $issueStr = \htmlentities((string) $issue);
-                        $color = $issue->severe ? 'red' : 'yellow';
-                        $warning .= "<h2 style='color:$color;'>{$issueStr}</h2>";
-                    }
+            }
+            foreach ($this->pluginInstances as $class => $_) {
+                $issues = Tools::validateEventHandlerClass($class);
+                foreach ($issues as $issue) {
+                    $issue->log();
+                    $warning .= $issue->getHTML();
                 }
             }
         }

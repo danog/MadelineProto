@@ -31,6 +31,7 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
@@ -719,7 +720,7 @@ abstract class Tools extends AsyncTools
 
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
                 $issues []= new EventHandlerIssue(
-                    message: Lang::$current_lang['recommend_not_use_filesystem_function'],
+                    message: sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: false
@@ -745,8 +746,7 @@ abstract class Tools extends AsyncTools
         }
 
         /** @var Include_ $include */
-        $include = $finder->findFirstInstanceOf($code, Include_::class);
-        if ($include) {
+        foreach ($finder->findInstanceOf($code, Include_::class) as $include) {
             if ($plugin) {
                 $issues []= new EventHandlerIssue(
                     message: Lang::$current_lang['plugins_do_not_use_require'],
@@ -755,12 +755,18 @@ abstract class Tools extends AsyncTools
                     severe: true
                 );
             } elseif ($include->getAttribute('parent')) {
-                $issues []= new EventHandlerIssue(
-                    message: Lang::$current_lang['do_not_use_non_root_require_in_event_handler'],
-                    file: $file,
-                    line: $include->getStartLine(),
-                    severe: true
-                );
+                $parent = $include;
+                while ($parent = $parent->getAttribute('parent')) {
+                    if ($parent instanceof FunctionLike) {
+                        $issues []= new EventHandlerIssue(
+                            message: Lang::$current_lang['do_not_use_non_root_require_in_event_handler'],
+                            file: $file,
+                            line: $include->getStartLine(),
+                            severe: true
+                        );
+                        break;
+                    }
+                }
             }
         }
 

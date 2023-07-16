@@ -139,7 +139,7 @@
     "do_not_use_deprecated_function": "the %s function is deprecated, please use %s, instead",
     "do_not_use_non_root_require_in_event_handler": "for performance reasons, you must not use require or include inside of an event handler class, only root-level requires are allowed.",
 
-    "recommend_not_use_filesystem_function": "usage of %s the function is not recommended, because accesses the filesystem and will slow down your bot if used during update handling, please see https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions for a list of alternative ways to store data that will not slow down your bot!",
+    "recommend_not_use_filesystem_function": "usage of %s the function is not recommended, because accessing the filesystem during update handling will slow down your bot, please see https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions for a list of alternative ways to store data that will not slow down your bot!",
 
     "plugins_do_not_use_require": "for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).",
     "plugins_must_have_exactly_one_class": "a plugin must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically."

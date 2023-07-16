@@ -119,5 +119,12 @@
     "sec_peer_not_in_db": "این peer مخفی در پایگاه داده (دیتابیس) داخلی peer وجود ندارد",
     "stream_handle_invalid": "یک کنترل‌کننده جریان (استریم هندل) نامعتبر لحاظ گردیده.",
     "noReportPeers": "هشدار: هیچ peerـی به عنوان peer گزارشات تنظیم نشده، لطفا متود زیر را به ایونت هندلر اضافه کنید",
-    "mmapErrorPart2": "برای حل کردن مشکل، کامند مقابل را با دسترسی root اجرا کنید: %s"
+    "mmapErrorPart2": "برای حل کردن مشکل، کامند مقابل را با دسترسی root اجرا کنید: %s",
+    "mmapErrorPart4": "روی ویندوز و WSL، افزایش سایز pagefile ممکن است کمک کند؛ اگر مشکل پافشاری کرد لطفا سیستم‌عامل خود را به لینوکس تغییر دهید.",
+    "extensionRecommended": "هشدار: افزونه %s نصب نشده است. لطفا برای افزایش سرعت مدلین‌پروتو آن را نصب کنید!",
+    "botAlreadyRunning": "ربات هم اکنون در حال اجرا است!",
+    "extensionRequiredInstallWithApt": "اجرای کامند sudo apt-get install %s را امتحان کنید.",
+    "extensionRequiredInstallWithCustomInstructions": "برای نصب آن، دستورالعمل ها را در %s دنبال کنید.",
+    "extensionRequired": "مدلین برای اجرا نیاز به افزونه %s دارد. %s",
+    "manualAdminActionRequired": "!!!!!!!!! فعالیت دستی ادمین سیستم نیاز است !!!!!!!!!"
 }
