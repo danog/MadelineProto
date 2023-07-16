@@ -110,7 +110,7 @@ trait FileServer
             $messageMedia['mime'] ??= $mime;
             $messageMedia['name'] ??= $name;
 
-            $f = is_string($f) ? $f : $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
+            $f = is_string($media) ? $media : ($this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id']);
             [
                 'name' => $name,
                 'ext' => $ext,
