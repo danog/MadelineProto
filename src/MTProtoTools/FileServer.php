@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use AssertionError;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
@@ -110,7 +110,7 @@ trait FileServer
             $messageMedia['mime'] ??= $mime;
             $messageMedia['name'] ??= $name;
 
-            $f = $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
+            $f = is_string($f) ? $f : $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
             [
                 'name' => $name,
                 'ext' => $ext,
