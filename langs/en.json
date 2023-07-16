@@ -148,6 +148,6 @@
     "invalid_dl.php": "%s is not a valid download script (%s)",
     "need_dl.php": "Could not generate default download script (%s), please create a dl.php file with the following content: %s and pass its URL to the second parameter of getDownloadLink",
 
-    "dl.php_powered_by_madelineproto": "Telegram file download server, powered by https://t.me/MadelineProto (https://docs.madelineproto.xyz)!"
+    "dl.php_powered_by_madelineproto": "Telegram file download server (up to 4GB), powered by https://t.me/MadelineProto (https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link)!"
 
 }

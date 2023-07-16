@@ -82,7 +82,7 @@ trait FileServer
                 $scriptUrl = $this->getDefaultDownloadScript();
             } catch (Throwable $e) {
                 $sessionPath = \var_export($this->getSessionName(), true);
-                throw new Exception(sprintf(
+                throw new Exception(\sprintf(
                     Lang::$current_lang['need_dl.php'],
                     $e->getMessage(),
                     "<?php require 'vendor/autoload.php'; \\danog\\MadelineProto\\API::downloadServer($sessionPath); ?>",
@@ -197,7 +197,7 @@ trait FileServer
             $this->logger->logger("Checking $scriptUrlNew...");
             $this->fileGetContents($scriptUrlNew);
             if (!isset(self::$checkedScripts[$scriptUrl])) {
-                throw new AssertionError(sprintf(
+                throw new AssertionError(\sprintf(
                     Lang::$current_lang['invalid_dl.php'],
                     $scriptUrl,
                     "the check array wasn't populated"
@@ -205,7 +205,7 @@ trait FileServer
             }
             if (self::$checkedScripts[$scriptUrl] !== $i) {
                 $v = self::$checkedScripts[$scriptUrl];
-                throw new AssertionError(sprintf(
+                throw new AssertionError(\sprintf(
                     Lang::$current_lang['invalid_dl.php'],
                     $scriptUrl,
                     "the check array contains {$v} instead of $i"
