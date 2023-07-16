@@ -413,12 +413,13 @@ final class API extends AbstractAPI
     {
         if (\is_string($eventHandler)) {
             Assert::classExists($eventHandler);
+            $eventHandler::cachePlugins($eventHandler);
             $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
         } else {
             Assert::notEmpty($eventHandler);
             Assert::allClassExists($eventHandler);
+            foreach ($eventHandler as $c) { $c::cachePlugins($c); }
         }
-        foreach ($eventHandler as $c) { $c::cachePlugins(); }
 
         $errors = [];
         $started = \array_fill_keys(\array_keys($instances), false);
