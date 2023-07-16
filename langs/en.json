@@ -142,6 +142,12 @@
     "recommend_not_use_filesystem_function": "usage of %s the function is not recommended, because accessing the filesystem during update handling will slow down your bot, please see https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions for a list of alternative ways to store data that will not slow down your bot!",
 
     "plugins_do_not_use_require": "for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).",
-    "plugins_must_have_exactly_one_class": "a plugin must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically."
+    "plugins_must_have_exactly_one_class": "a plugin must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically.",
+
+    "cli_need_dl.php_link": "Please specify a download script URL when using getDownloadLink via CLI!",
+    "invalid_dl.php": "%s is not a valid download script (%s)",
+    "need_dl.php": "Could not generate default download script (%s), please create a dl.php file with the following content: %s and pass its URL to the second parameter of getDownloadLink",
+
+    "dl.php_powered_by_madelineproto": "Telegram file download server, powered by https://t.me/MadelineProto (https://docs.madelineproto.xyz)!"
 
 }

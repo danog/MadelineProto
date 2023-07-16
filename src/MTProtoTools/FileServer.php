@@ -26,6 +26,8 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\Settings\AppInfo;
 use Exception;
 use Throwable;
 
@@ -38,7 +40,6 @@ use function Amp\File\write;
  */
 trait FileServer
 {
-    private const POWERED_BY_MADELINEPROTO = 'Powered by MadelineProto '.API::RELEASE.' (https://docs.madelineproto.xyz)';
     /**
      * Downloads a file to the browser using the specified session file.
      */
@@ -50,7 +51,8 @@ trait FileServer
             die;
         }
         if (!isset($_GET['f'])) {
-            die(self::POWERED_BY_MADELINEPROTO);
+            new AppInfo;
+            die(Lang::$current_lang["dl.php_powered_by_madelineproto"]);
         }
 
         $API = new API($session);
@@ -80,7 +82,11 @@ trait FileServer
                 $scriptUrl = $this->getDefaultDownloadScript();
             } catch (Throwable $e) {
                 $sessionPath = \var_export($this->getSessionName(), true);
-                throw new Exception("Could not generate default download script ({$e->getMessage()}), please create a dl.php file with the following content: <?php require 'vendor/autoload.php'; \danog\MadelineProto\API::downloadServer($sessionPath); ?> and pass the URL to the second parameter of getDownloadLink");
+                throw new Exception(sprintf(
+                    Lang::$current_lang['need_dl.php'],
+                    $e->getMessage(),
+                    "<?php require 'vendor/autoload.php'; \\danog\\MadelineProto\\API::downloadServer($sessionPath); ?>",
+                ));
             }
         } else {
             $this->checkDownloadScript($scriptUrl);
@@ -117,7 +123,7 @@ trait FileServer
     private function getDefaultDownloadScript(): string
     {
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            throw new AssertionError("Please specify a download script URL when using getDownloadLink via CLI!");
+            throw new AssertionError(Lang::$current_lang["cli_need_dl.php_link"]);
         }
         $s = $this->getSessionName();
         if (\defined('MADELINE_PHP')) {
@@ -191,11 +197,19 @@ trait FileServer
             $this->logger->logger("Checking $scriptUrlNew...");
             $this->fileGetContents($scriptUrlNew);
             if (!isset(self::$checkedScripts[$scriptUrl])) {
-                throw new AssertionError("$scriptUrl is not a valid download script, the check array wasn't populated!");
+                throw new AssertionError(sprintf(
+                    Lang::$current_lang['invalid_dl.php'],
+                    $scriptUrl,
+                    "the check array wasn't populated"
+                ));
             }
             if (self::$checkedScripts[$scriptUrl] !== $i) {
                 $v = self::$checkedScripts[$scriptUrl];
-                throw new AssertionError("$scriptUrl is not a valid download script, the check array contains {$v} instead of $i!");
+                throw new AssertionError(sprintf(
+                    Lang::$current_lang['invalid_dl.php'],
+                    $scriptUrl,
+                    "the check array contains {$v} instead of $i"
+                ));
             }
         } finally {
             $lock->release();
