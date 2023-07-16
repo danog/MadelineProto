@@ -26,13 +26,13 @@ use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use InvalidArgumentException;
@@ -615,7 +615,7 @@ trait PeerHandler
                 case 'encryptedMessageService':
                     $id = $id['chat_id'];
                     if (!isset($this->secret_chats[$id])) {
-                        throw new Exception(Lang::$current_lang['sec_peer_not_in_db']);
+                        throw new SecretPeerNotInDbException;
                     }
                     return $this->secret_chats[$id];
             }

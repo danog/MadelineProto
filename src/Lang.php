@@ -389,7 +389,7 @@ final class Lang
             'mmapErrorPart3' => 'To persist the change across reboots: %s',
             'mmapErrorPart4' => 'On Windows and WSL, increasing the size of the pagefile might help; please switch to native Linux if the issue persists.',
             'nearest_dc' => 'ما در %s هستیم، نزدیک ترین دیتاسنتر %d است.',
-            'noReportPeers' => 'Warning: no report peers are set, please add the following method to your event handler',
+            'noReportPeers' => 'هشدار: هیچ peerـی به عنوان peer گزارشات تنظیم نشده، لطفا متود زیر را به ایونت هندلر اضافه کنید',
             'non_text_conversion' => 'فعلا نمی‌توان پیام‌های غیرمتنی را تبدیل کرد!',
             'not_loggedIn' => 'من وارد نشدم!',
             'not_numeric' => 'مقدار ورودی عددی نیست',

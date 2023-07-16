@@ -59,6 +59,7 @@ trait Files
 {
     use FilesLogic;
     use FilesAbstraction;
+    use FileServer;
     /**
      * Upload file from URL.
      *

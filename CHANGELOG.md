@@ -1,3 +1,18 @@
+MadelineProto was updated (8.0.0-beta101)!
+
+After introducing [plugins »](https://docs.madelineproto.xyz/docs/PLUGINS.html), [bound methods »](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods), [filters »](https://docs.madelineproto.xyz/docs/FILTERS.html), [a built-in cron system »](https://docs.madelineproto.xyz/docs/UPDATES.html#cron), [IPC support for the event handler »](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc) and [automatic static analysis for event handler code »](https://docs.madelineproto.xyz/docs/UPDATES.html#automatic-static-analysis) in beta100, beta101 brings some bugfixes and the `getDownloadLink` function!
+
+Features:
+- Added a `getDownloadLink` function, that can be used to fetch a download link for any file up to 4GB!
+- Added an `openFileAppendOnly` function, that can be used to asynchronously open a file in append-only mode!
+
+Fixes:
+- Improved the `markdownEscape` function!
+- Translated even more MadelineProto UI elements!
+- Now the same static analysis rules are applied for both plugins and simple event handlers.
+
+---
+
 Introducing MadelineProto's biggest update yet, 8.0.0-beta100!
 
 This version introduces [plugins »](https://docs.madelineproto.xyz/docs/PLUGINS.html), [bound methods »](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods), [filters »](https://docs.madelineproto.xyz/docs/FILTERS.html), [a built-in cron system »](https://docs.madelineproto.xyz/docs/UPDATES.html#cron), [IPC support for the event handler »](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc) and [automatic static analysis for event handler code »](https://docs.madelineproto.xyz/docs/UPDATES.html#automatic-static-analysis).

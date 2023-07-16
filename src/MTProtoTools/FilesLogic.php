@@ -18,7 +18,9 @@ use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
+use danog\MadelineProto\API;
 use danog\MadelineProto\BotApiFileId;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
@@ -45,6 +47,8 @@ use function Amp\File\openFile;
 
 /**
  * @internal
+ *
+ * @method string getSessionName()
  */
 trait FilesLogic
 {
@@ -53,13 +57,13 @@ trait FilesLogic
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string|FileCallbackInterface $messageMedia File to download
+     * @param array|string|FileCallbackInterface|Message $messageMedia File to download
      * @param null|callable     $cb           Status callback (can also use FileCallback)
      * @param null|int $size Size of file to download, required for bot API file IDs.
      * @param null|string $mime MIME type of file to download, required for bot API file IDs.
      * @param null|string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(array|string|FileCallbackInterface $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -173,7 +177,7 @@ trait FilesLogic
      * @param null|string       $name         Name of file to download, required for bot API file IDs.
      * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(array|string|FileCallbackInterface $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
+    public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;

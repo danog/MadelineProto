@@ -128,5 +128,18 @@
     "botapi_conversion_error": "Can't convert %s to a bot API object",
     "non_text_conversion": "Can't convert non text messages yet!",
     "file_type_invalid": "Invalid file type detected (%s)",
-    "secret_chat_skipping": "I do not have the secret chat %s in the database, skipping message..."
+    "static_analysis": "An error occurred during static analysis of %s: ",
+    "secret_chat_skipping": "I do not have the secret chat %s in the database, skipping message...",
+    "must_have_declare_types": "for performance reasons, the first statement of a plugin must be declare(strict_types=1);",
+    "do_not_delete_MadelineProto.log": "the MadelineProto.log file must never be deleted, please set a custom max size in the settings, instead!",
+    "do_not_remove_MadelineProto.log_phar": "Please do not remove madeline.phar or madeline.php, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup",
+    "do_not_use_blocking_function": "for performance reasons, plugins may not use the non-async blocking function %s, please use %s, instead",
+    "do_not_use_blocking_class": "for performance reasons, plugins may not use the non-async blocking class %s, please use %s, instead",
+    "do_not_use_deprecated_function": "the %s function is deprecated, please use %s, instead",
+
+    "recommend_not_use_filesystem_function": "usage of %s the function is not recommended, because accesses the filesystem and will slow down your bot if used during update handling, please see https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions for a list of alternative ways to store data that will not slow down your bot!",
+
+    "plugins_do_not_use_require": "for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).",
+    "plugins_must_have_exactly_one_class": "a plugin must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically."
+
 }

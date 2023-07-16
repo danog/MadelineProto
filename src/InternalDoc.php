@@ -413,17 +413,24 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->discardSecretChat($chat);
     }
     /**
+     * Downloads a file to the browser using the specified session file.
+     */
+    public static function downloadServer(string $session): void
+    {
+        \danog\MadelineProto\MTProto::downloadServer($session);
+    }
+    /**
      * Download file to browser.
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
-     * @param array|string|FileCallbackInterface $messageMedia File to download
+     * @param array|string|FileCallbackInterface|Message $messageMedia File to download
      * @param null|callable     $cb           Status callback (can also use FileCallback)
      * @param null|int $size Size of file to download, required for bot API file IDs.
      * @param null|string $mime MIME type of file to download, required for bot API file IDs.
      * @param null|string $name Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\EventHandler\Message|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
         $this->wrapper->getAPI()->downloadToBrowser($messageMedia, $cb, $size, $name, $mime);
     }
@@ -478,7 +485,7 @@ abstract class InternalDoc
      * @param null|string       $name         Name of file to download, required for bot API file IDs.
      * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): \Amp\Http\Server\Response
+    public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\EventHandler\Message|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): \Amp\Http\Server\Response
     {
         return $this->wrapper->getAPI()->downloadToResponse($messageMedia, $request, $cb, $size, $mime, $name);
     }
@@ -763,6 +770,14 @@ abstract class InternalDoc
     public function getDownloadInfo(mixed $messageMedia): array
     {
         return $this->wrapper->getAPI()->getDownloadInfo($messageMedia);
+    }
+    /**
+     * Get download link of media file.
+     *
+     */
+    public function getDownloadLink(\danog\MadelineProto\EventHandler\Message|array|string $media, ?string $scriptUrl = null): string
+    {
+        return $this->wrapper->getAPI()->getDownloadLink($media, $scriptUrl);
     }
     /**
      * Get event handler (or plugin instance).
@@ -1265,6 +1280,16 @@ abstract class InternalDoc
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
+    }
+    /**
+     * Opens a file in append-only mode.
+     *
+     * @param string $path File path.
+     * @return File
+     */
+    public static function openFileAppendOnly(string $path): \Amp\File\File
+    {
+        return \danog\MadelineProto\Tools::openFileAppendOnly($path);
     }
     /**
      * Convert double to binary version.
@@ -1929,7 +1954,7 @@ abstract class InternalDoc
      *
      * @throws AssertionError If validation fails.
      */
-    public static function validateEventHandlerCode(string $code, bool $plugin = true): void
+    public static function validateEventHandlerCode(string $code, bool $plugin): void
     {
         \danog\MadelineProto\Tools::validateEventHandlerCode($code, $plugin);
     }

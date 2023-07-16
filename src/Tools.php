@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableBuffer;
+use Amp\File\File;
 use ArrayAccess;
 use AssertionError;
 use Closure;
@@ -53,6 +54,7 @@ use const PHP_INT_MAX;
 use const PHP_SAPI;
 use const STR_PAD_RIGHT;
 
+use function Amp\File\openFile;
 use function Amp\File\read;
 use function unpack;
 
@@ -598,28 +600,41 @@ abstract class Tools extends AsyncTools
         $file = read((new ReflectionClass($class))->getFileName());
         self::validateEventHandlerCode($file, \is_subclass_of($class, PluginEventHandler::class));
     }
-    private const BANNED_FUNCTIONS = [
-        'file_get_contents' => 'please use https://github.com/amphp/file or https://github.com/amphp/http-client, instead',
-        'file_put_contents' => 'please use https://github.com/amphp/file, instead',
-        'unlink' => 'plugins may not access the filesystem',
-        'curl_exec' => 'please use https://github.com/amphp/http-client, instead',
-        'mysqli_query' => 'please use https://github.com/amphp/mysql, instead',
-        'mysqli_connect' => 'please use https://github.com/amphp/mysql, instead',
-        'mysql_connect' => 'please use https://github.com/amphp/mysql, instead',
-        'fopen' => 'please use https://github.com/amphp/file, instead',
-        'fsockopen' => 'please use https://github.com/amphp/socket, instead',
-        'amp\\file\\get' => 'please use Amp\\File\\read, instead',
-        'amp\\file\\put' => 'please use Amp\\File\\write, instead',
+
+    /**
+     * Opens a file in append-only mode.
+     *
+     * @param string $path File path.
+     */
+    public static function openFileAppendOnly(string $path): File
+    {
+        return openFile($path, "a");
+    }
+
+    private const BLOCKING_FUNCTIONS = [
+        'file_get_contents' => 'https://github.com/amphp/file, https://github.com/amphp/http-client',
+        'file_put_contents' => 'https://github.com/amphp/file',
+        'curl_exec' => 'https://github.com/amphp/http-client',
+        'mysqli_query' => 'https://github.com/amphp/mysql',
+        'mysqli_connect' => 'https://github.com/amphp/mysql',
+        'mysql_connect' => 'https://github.com/amphp/mysql',
+        'fopen' => 'https://github.com/amphp/file',
+        'fsockopen' => 'https://github.com/amphp/socket',
     ];
+    private const BLOCKING_CLASSES = [
+        'pdo' => 'https://github.com/amphp/mysql',
+        'mysqli' => 'https://github.com/amphp/mysql',
+    ];
+
+    private const DEPRECATED_FUNCTIONS = [
+        'amp\\file\\get' => 'Amp\\File\\read',
+        'amp\\file\\put' => 'Amp\\File\\write',
+    ];
+
     private const BANNED_FILE_FUNCTIONS = [
         'amp\\file\\read',
         'amp\\file\\write',
-        'amp\\file\\get',
-        'amp\\file\\put',
-    ];
-    private const BANNED_CLASSES = [
-        'pdo' => 'please use https://github.com/amphp/mysql, instead',
-        'mysqli' => 'please use https://github.com/amphp/mysql, instead',
+        'amp\\file\\openFile',
     ];
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
@@ -629,7 +644,7 @@ abstract class Tools extends AsyncTools
      *
      * @throws AssertionError If validation fails.
      */
-    public static function validateEventHandlerCode(string $code, bool $plugin = true): void
+    public static function validateEventHandlerCode(string $code, bool $plugin): void
     {
         $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
         Assert::notNull($code);
@@ -638,12 +653,13 @@ abstract class Tools extends AsyncTools
         $code = $traverser->traverse($code);
         $finder = new NodeFinder;
 
-        $class = $finder->findInstanceOf($code, ClassLike::class);
-        $class = \array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
-        if (\count($class) !== 1 || !$class[0] instanceof Class_) {
-            throw new AssertionError("A file must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically.");
+        if ($plugin) {
+            $class = $finder->findInstanceOf($code, ClassLike::class);
+            $class = \array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
+            if (\count($class) !== 1 || !$class[0] instanceof Class_) {
+                throw new Exception(Lang::$current_lang['plugins_must_have_exactly_one_class']);
+            }
         }
-        $class = $class[0]->name->toString();
 
         /** @var DeclareDeclare|null $declare */
         $declare = $finder->findFirstInstanceOf($code, DeclareDeclare::class);
@@ -652,7 +668,7 @@ abstract class Tools extends AsyncTools
             || !$declare->value instanceof LNumber
             || $declare->value->value !== 1
         ) {
-            throw new AssertionError("An error occurred while analyzing $class: for performance reasons, the first statement of a plugin must be declare(strict_types=1);");
+            throw new Exception(Lang::$current_lang['must_have_declare_types']);
         }
 
         /** @var FuncCall $call */
@@ -662,22 +678,30 @@ abstract class Tools extends AsyncTools
             }
 
             $name = $call->name->toLowerString();
-            if (isset(self::BANNED_FUNCTIONS[$name])) {
-                if (!$plugin && $name === 'unlink') {
-                    if ($call->args
-                        && $call->args[0] instanceof Arg
-                        && $call->args[0]->value instanceof String_
-                        && $call->args[0]->value->value === 'MadelineProto.log'
-                    ) {
-                        throw new AssertionError("An error occurred while analyzing $class: the MadelineProto.log must never be deleted, please set a custom max size in the settings, instead!");
-                    }
-                    continue;
-                }
-                $explanation = self::BANNED_FUNCTIONS[$name];
-                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking function $name, $explanation!");
+            if (isset(self::BLOCKING_FUNCTIONS[$name])) {
+                $explanation = self::BLOCKING_FUNCTIONS[$name];
+                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation));
             }
-            if ($plugin && \in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
-                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the file function $name, please use properties and __sleep to store plugin-related configuration in the session!");
+
+            if (isset(self::DEPRECATED_FUNCTIONS[$name])) {
+                $explanation = self::DEPRECATED_FUNCTIONS[$name];
+                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation));
+            }
+
+            if ($name === 'unlink'
+                && $call->args
+                && $call->args[0] instanceof Arg
+                && $call->args[0]->value instanceof String_
+                && $call->args[0]->value->value === 'MadelineProto.log'
+            ) {
+                throw new Exception(Lang::$current_lang['do_not_delete_MadelineProto.log']);
+            }
+
+            if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
+                throw new Exception(\sprintf(
+                    Lang::$current_lang['recommend_not_use_filesystem_function'],
+                    $name
+                ));
             }
         }
 
@@ -687,18 +711,20 @@ abstract class Tools extends AsyncTools
                 continue;
             }
             $name = $new->class->toLowerString();
-            if (isset(self::BANNED_CLASSES[$name])) {
-                $explanation = self::BANNED_CLASSES[$name];
-                throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins may not use the non-async blocking class $name, $explanation!");
+            if (isset(self::BLOCKING_CLASSES[$name])) {
+                $explanation = self::BLOCKING_CLASSES[$name];
+                throw new Exception(\sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation));
             }
         }
 
-        /** @var Include_ $include */
-        $include = $finder->findFirstInstanceOf($code, Include_::class);
-        if ($plugin && $include
-            && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
-        ) {
-            throw new AssertionError("An error occurred while analyzing $class: for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).");
+        if ($plugin) {
+            /** @var Include_ $include */
+            $include = $finder->findFirstInstanceOf($code, Include_::class);
+            if ($include
+                && !($include->expr instanceof String_ && \in_array($include->expr->value, ['vendor/autoload.php', 'madeline.php', 'madeline.phar'], true))
+            ) {
+                throw new Exception(Lang::$current_lang['plugins_do_not_use_require']);
+            }
         }
     }
 }

@@ -39,29 +39,7 @@ final class WebRunner extends RunnerAbstract
         }
 
         if (!self::$runPath) {
-            $uri = \parse_url('tcp://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (\substr($uri, -1) === '/') { // http://example.com/path/ (assumed index.php)
-                $uri .= 'index'; // Add fake file name
-            }
-            $uri = \str_replace('//', '/', $uri);
-
-            $rootDir = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $rootDir = \end($rootDir)['file'] ?? '';
-            if (!$rootDir) {
-                throw new ContextException('Could not get entry file!');
-            }
-            $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
-            $uriDir = \str_replace('/', DIRECTORY_SEPARATOR, \dirname($uri));
-            if ($uriDir !== '/' && $uriDir !== '\\') {
-                $uriDir .= DIRECTORY_SEPARATOR;
-            }
-
-            if (\substr($rootDir, -\strlen($uriDir)) !== $uriDir) {
-                throw new ContextException("Mismatch between absolute root dir ($rootDir) and URI dir ($uriDir)");
-            }
-
-            // Absolute root of (presumably) readable document root
-            $absoluteRootDir = \substr($rootDir, 0, \strlen($rootDir)-\strlen($uriDir)).DIRECTORY_SEPARATOR;
+            $absoluteRootDir = self::getAbsoluteRootDir();
             $runPath = self::getScriptPath($absoluteRootDir);
 
             if (\substr($runPath, 0, \strlen($absoluteRootDir)) === $absoluteRootDir) { // Process runner is within readable document root
@@ -95,6 +73,38 @@ final class WebRunner extends RunnerAbstract
         self::selfStart(self::$runPath.'?'.\http_build_query($params));
 
         return true;
+    }
+
+    private static ?string $absoluteRootDir = null;
+    final public static function getAbsoluteRootDir(): string
+    {
+        if (self::$absoluteRootDir) {
+            return self::$absoluteRootDir;
+        }
+
+        $uri = \parse_url('tcp://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if (\substr($uri, -1) === '/') { // http://example.com/path/ (assumed index.php)
+            $uri .= 'index'; // Add fake file name
+        }
+        $uri = \str_replace('//', '/', $uri);
+
+        $rootDir = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $rootDir = \end($rootDir)['file'] ?? '';
+        if (!$rootDir) {
+            throw new ContextException('Could not get entry file!');
+        }
+        $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
+        $uriDir = \str_replace('/', DIRECTORY_SEPARATOR, \dirname($uri));
+        if ($uriDir !== '/' && $uriDir !== '\\') {
+            $uriDir .= DIRECTORY_SEPARATOR;
+        }
+
+        if (\substr($rootDir, -\strlen($uriDir)) !== $uriDir) {
+            throw new ContextException("Mismatch between absolute root dir ($rootDir) and URI dir ($uriDir)");
+        }
+
+        // Absolute root of (presumably) readable document root
+        return self::$absoluteRootDir = \substr($rootDir, 0, \strlen($rootDir)-\strlen($uriDir)).DIRECTORY_SEPARATOR;
     }
 
     public static function selfStart(string $uri): void

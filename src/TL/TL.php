@@ -25,6 +25,7 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
+use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
@@ -544,7 +545,7 @@ final class TL implements TLInterface
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
-                    throw new Exception("You didn't provide a valid string");
+                    throw new Exception(Lang::$current_lang['string_required']);
                 }
                 $l = \strlen($object);
                 $concat = '';
@@ -567,7 +568,7 @@ final class TL implements TLInterface
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
-                    throw new Exception("You didn't provide a valid string");
+                    throw new Exception(Lang::$current_lang['string_required']);
                 }
                 $l = \strlen($object);
                 $concat = '';
@@ -593,7 +594,7 @@ final class TL implements TLInterface
                     $object = (string) $object;
                 }
                 if (!\is_string($object)) {
-                    throw new Exception("You didn't provide a valid string");
+                    throw new Exception(Lang::$current_lang['string_required']);
                 }
                 $l = \strlen($object);
                 $concat = '';
@@ -619,7 +620,7 @@ final class TL implements TLInterface
                     throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
+                    throw new Exception(\sprintf(Lang::$current_lang['arrayIsRequired'], $type['subtype']));
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
@@ -647,7 +648,7 @@ final class TL implements TLInterface
             $object = $this->typeMismatch[$type['type']]($object);
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
-                    throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
+                    throw new \danog\MadelineProto\Exception(\sprintf(Lang::$current_lang['could_not_convert_object'], $type['type']));
                 }
                 $object = $object[$type['type']];
             }
@@ -786,7 +787,7 @@ final class TL implements TLInterface
                         $arguments[$current_argument['name']] = null;
                         break;
                     default:
-                        throw new Exception('Missing required parameter '.$current_argument['name']);
+                        throw new Exception(Lang::$current_lang['params_missing'].' '.$current_argument['name']);
                 }
             }
             if (\in_array($current_argument['type'], ['DataJSON', '%DataJSON'], true)) {
@@ -805,7 +806,7 @@ final class TL implements TLInterface
                     $arguments[$current_argument['name']] = ($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
-                        throw new \danog\MadelineProto\Exception(Lang::$current_lang['sec_peer_not_in_db']);
+                        throw new SecretPeerNotInDbException;
                     }
                     $arguments[$current_argument['name']] = $this->API->getSecretChat($arguments[$current_argument['name']])['InputEncryptedChat'];
                 }
@@ -895,13 +896,13 @@ final class TL implements TLInterface
     public static function compressWaveform(array $x): string
     {
         if (\count($x) !== 100) {
-            throw new Exception("The waveform array must have 100 values!");
+            throw new Exception(Lang::$current_lang['waveform_must_have_100_values']);
         }
         $values = \array_fill(0, 63, 0);
         $bitPos = 0;
         foreach ($x as $value) {
             if (!\is_int($value) || $value < 0 || $value > 31) {
-                throw new Exception("An integer value between 0 and 31 is expected!");
+                throw new Exception(Lang::$current_lang['waveform_value']);
             }
             $start = $bitPos & 7;
             $bytePos = $bitPos >> 3;

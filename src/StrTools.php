@@ -197,11 +197,53 @@ abstract class StrTools extends Extension
      *
      * @internal
      *
-     * @param string $hwat String to escape
+     * @param string $what String to escape
      */
-    public static function markdownEscape(string $hwat): string
+    public static function markdownEscape(string $what): string
     {
-        return \str_replace('_', '\\_', $hwat);
+        return \str_replace(
+            [
+                '_',
+                '*',
+                '[',
+                ']',
+                '(',
+                ')',
+                '~',
+                '`',
+                '>',
+                '#',
+                '+',
+                '-',
+                '=',
+                '|',
+                '{',
+                '}',
+                '.',
+                '!',
+            ],
+            [
+                '\\_',
+                '\\*',
+                '\\[',
+                '\\]',
+                '\\(',
+                '\\)',
+                '\\~',
+                '\\`',
+                '\\>',
+                '\\#',
+                '\\+',
+                '\\-',
+                '\\=',
+                '\\|',
+                '\\{',
+                '\\}',
+                '\\.',
+                '\\!',
+            ],
+            $what
+        );
     }
     /**
      * Escape type name.
