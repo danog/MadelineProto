@@ -144,5 +144,5 @@
     "cli_need_dl.php_link": "È necessario specificare l'URL dello script di scaricamente per usare getDownloadLink via CLI!",
     "invalid_dl.php": "%s non è uno script di scaricamento valido (%s)",
     "need_dl.php": "Impossibile generare lo script di scaricamento di default (%s), è necessario creare un file dl.php con il seguente contenuto: %s e passare il suo URL al secondo parametro di getDownloadLink",
-    "dl.php_powered_by_madelineproto": "Server di scaricamento file Telegram (fino a 4GB), creato usando https://t.me/MadelineProto (https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link)!"
+    "dl.php_powered_by_madelineproto": "Server di scaricamento file Telegram (fino a 4GB), creato usando <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Clicca <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">qui</a> per configurare il tuo personale server di scaricamento file Telegram!"
 }
