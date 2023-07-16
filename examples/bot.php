@@ -37,8 +37,6 @@ use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
 
-use function Amp\File\read;
-
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
     // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader

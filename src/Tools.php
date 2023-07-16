@@ -720,7 +720,7 @@ abstract class Tools extends AsyncTools
 
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
                 $issues []= new EventHandlerIssue(
-                    message: sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
+                    message: \sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: false

@@ -128,5 +128,17 @@
     "extensionRequiredInstallWithCustomInstructions": "Seguire le istruzioni su %s per installarla.",
     "extensionRecommended": "Attenzione: l'estensione %s non è installata, si prega di installarla per velocizzare MadelineProto!",
     "mmapErrorPart1": "È stato raggiunto il limite massimo di regioni di memoria mappate (%s): è necessario incrementare il parametro di configurazione del kernel vm.max_map_count a 262144 per correggere l'errore.",
-    "botAlreadyRunning": "Il bot è già in esecuzione!"
+    "botAlreadyRunning": "Il bot è già in esecuzione!",
+    "do_not_remove_MadelineProto.log_phar": "Per favore non rimuovere madeline.phar o madeline.php, o MadelineProto crasherà. Se hai problemi con MadelineProto, segnalali su https://github.com/danog/MadelineProto o https://t.me/pwrtelegramgroup",
+    "do_not_use_blocking_function": "per motivi di performance, gli event handler non possono usare la funzione bloccante non asincrona %s, per favore usa %s",
+    "do_not_use_deprecated_function": "la funzione %s è deprecata, per favore usa %s",
+    "recommend_not_use_filesystem_function": "l'uso della funzione %s non è racommandato, perché l'accesso al filesystem durante la gestione degli update rallenterà il bot, si prega di leggere https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions per una lista di modi alternativi per memorizzare informazioni in modi che non rallenteranno il tuo bot!",
+    "do_not_use_blocking_class": "per motivi di performance, gli event handler non possono usare la classe bloccante non-asincrona %s, per favore usa %s",
+    "must_have_declare_types": "per motivi di performance, la prima riga del file contenente l'event handler deve essere uguale a declare(strict_types=1);",
+    "do_not_delete_MadelineProto.log": "il file MadelineProto.log non deve essere mai eliminato, per favore imposta una dimensione massima nelle impostazioni invece di eliminarlo!",
+    "do_not_use_non_root_require_in_event_handler": "per motivi di performance, non è possibile usare require o include dentro l'event handler, è possibile includere file solo all'esterno della classe.",
+    "static_analysis_minor": "È stato riscontrato un problema minore durante l'analisi statica di %s: %s",
+    "static_analysis_severe": "È stato riscontrato un problema grave durante l'analisi statica di %s: %s",
+    "plugins_must_have_exactly_one_class": "un plugin deve definire esattamente una classe! Per definire più classi, interfacce o trait, si prega di creare file separati, che verranno caricati da MadelineProto automaticamente.",
+    "plugins_do_not_use_require": "per motivi di performance, i plugin possono solo includere altri file presenti nella cartella plugins usando il meccanismo di autocaricamento PSR-4 (non usando require o include)."
 }
