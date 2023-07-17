@@ -46,7 +46,7 @@ if (defined("MADELINE_REAL_ROOT")) {
     @chdir(MADELINE_REAL_ROOT);
 } else {
     $backtrace = \debug_backtrace(0);
-    if (\count($backtrace) === 1) {
+    if (\count($backtrace) === 0) {
         if (isset($GLOBALS["argv"]) && !empty($GLOBALS["argv"])) {
             $arguments = \array_slice($GLOBALS["argv"], 1);
         } elseif (isset($_GET["argv"]) && !empty($_GET["argv"])) {
@@ -60,7 +60,7 @@ if (defined("MADELINE_REAL_ROOT")) {
         } else {
             die("MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.".PHP_EOL);
         }
-        \define("MADELINE_REAL_ROOT", \dirname($backtrace[0]["file"]));
+        \define("MADELINE_REAL_ROOT", \dirname(Phar::running(false)));
         @chdir(\MADELINE_REAL_ROOT);
     }
 }
