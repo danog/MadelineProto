@@ -324,7 +324,7 @@ trait ResponseHandler
                         $this->logger->logger($response['error_message'], Logger::FATAL_ERROR);
                         if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
-                            $this->logger->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->logger->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                     case 'AUTH_KEY_UNREGISTERED':
@@ -344,7 +344,7 @@ trait ResponseHandler
                         if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN) {
                             $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->logger->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->logger->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                             return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
                         }
                         EventLoop::queue(function () use ($request): void {

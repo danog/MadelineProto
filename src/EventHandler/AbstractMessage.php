@@ -95,6 +95,15 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
+     * Check if the current message replies to another message.
+     *
+     * @return boolean
+     */
+    public function isReply(): bool
+    {
+        return $this->replyToMsgId !== null;
+    }
+    /**
      * Get replied-to message.
      *
      * May return null if the replied-to message was deleted.

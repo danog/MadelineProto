@@ -46,10 +46,11 @@ trait FileServer
      */
     public static function downloadServer(string $session): void
     {
-        if (isset($_GET['ping'])) {
+        if (isset($_GET['login'])) {
             $API = new API($session);
+            $API->start();
             $id = (string) $API->getSelf()['id'];
-            header("Content-length: ".strlen($id));
+            \header("Content-length: ".\strlen($id));
             echo $id;
             die;
         }
@@ -210,7 +211,7 @@ trait FileServer
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }
-            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['ping' => 1]);
+            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['login' => 1]);
             $this->logger->logger("Checking $scriptUrlNew...");
             $result = $this->fileGetContents($scriptUrlNew);
             $expected = (string) $this->getSelf()['id'];

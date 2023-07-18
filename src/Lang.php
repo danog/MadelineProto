@@ -25,6 +25,12 @@ final class Lang
         [
             '2fa_uncalled' => 'چاوەڕێی پاسۆردەکە ناکەم! تکایە سەرەتا پەیوەندی بە phoneLogin و شێوازەکانی completePhoneLogin بکەن!',
             'accepting_call' => 'وەرگرتنی پەیوەندی لە %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'ئەم نموونەیەی MadelineProto پێشتر چووەتە ژوورەوە!',
             'apiAppInstructionsAuto0' => 'ناوی ئەپەکە بنووسە، دەتوانێت هەر شتێک بێت: ',
             'apiAppInstructionsAuto1' => 'ناوی کورتی ئەپەکە بنووسە، ئەلفوبێی ژمارەیی، ٥-٣٢ پیت: ',
@@ -86,7 +92,7 @@ final class Lang
             'file_type_invalid' => 'جۆری پەڕگەی نادروست دۆزراوەتەوە (%s)',
             'fingerprint_invalid' => 'پەنجەمۆری کلیل نادروستە!',
             'go' => 'بڕۆ',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'درێژی زۆر گەورەیە',
             'loginBot' => 'تۆکنی بۆتەکەت بنووسە: ',
             'loginBotTokenWeb' => 'بۆت تۆکن',
@@ -174,6 +180,12 @@ final class Lang
         [
             '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
             'accepting_call' => 'Accepting call from %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'This instance of MadelineProto is already logged in!',
             'apiAppInstructionsAuto0' => 'Enter the app\'s name, can be anything: ',
             'apiAppInstructionsAuto1' => 'Enter the app\'s short name, alphanumeric, 5-32 characters: ',
@@ -235,7 +247,7 @@ final class Lang
             'file_type_invalid' => 'Invalid file type detected (%s)',
             'fingerprint_invalid' => 'Invalid key fingerprint!',
             'go' => 'Go',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'Length is too big',
             'loginBot' => 'Enter your bot token: ',
             'loginBotTokenWeb' => 'Bot token',
@@ -323,6 +335,12 @@ final class Lang
         [
             '2fa_uncalled' => 'من منتظر کلمه عبور نیستم! لطفا اول توابع phoneLogin و completePhoneLogin را صدا بزنید!',
             'accepting_call' => 'در حال پذیرش تماس از طرف %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'نمونه‌ی MadelineProto از قبل وارد شده!',
             'apiAppInstructionsAuto0' => 'نام برنامه خود را وارد کنید، میتواند هرچیزی باشد ',
             'apiAppInstructionsAuto1' => 'نام مخفف برنامه‌تان را وارد کنید، 5 تا 32 کاراکتر الفبا اعداد: ',
@@ -384,7 +402,7 @@ final class Lang
             'file_type_invalid' => 'نوع فایل نامعتبر شناسایی شد (%s)',
             'fingerprint_invalid' => 'اثرانگشت کلید نامعتبر است!',
             'go' => 'برو',
-            'invalid_dl.php' => '%s یک اسکریپت دانلود معتبر نیست. (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'طول بسیار بزرگ است',
             'loginBot' => 'توکن ربات‌تان را وارد کنید: ',
             'loginBotTokenWeb' => 'توکن ربات',
@@ -472,6 +490,12 @@ final class Lang
         [
             '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
             'accepting_call' => 'Acceptation de l\'appel de %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'Cette instance de MadelineProto est déjà connectée!',
             'apiAppInstructionsAuto0' => 'Enter the app\'s name, can be anything: ',
             'apiAppInstructionsAuto1' => 'Enter the app\'s short name, alphanumeric, 5-32 characters: ',
@@ -533,7 +557,7 @@ final class Lang
             'file_type_invalid' => 'Invalid file type detected (%s)',
             'fingerprint_invalid' => 'Invalid key fingerprint!',
             'go' => 'Go',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'Length is too big',
             'loginBot' => 'Enter your bot token: ',
             'loginBotTokenWeb' => 'Bot token',
@@ -621,6 +645,12 @@ final class Lang
         [
             '2fa_uncalled' => 'אני לא מחכה לסיסמא! עליך להשתמש בפונקציות phoneLogin ו- completePhoneLogin קודם!',
             'accepting_call' => 'מקבל שיחה מ %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'מופע זה של MadelineProto כבר מחובר!',
             'apiAppInstructionsAuto0' => 'הזן את שם האפליקציה שלך, יכול להיות כל שם: ',
             'apiAppInstructionsAuto1' => 'הזן שם קצר לאפליקציה שלך, אותיות באנגלית בלבד, 5-32 תווים: ',
@@ -682,7 +712,7 @@ final class Lang
             'file_type_invalid' => 'זוהה סוג קובץ לא חוקי (%s)',
             'fingerprint_invalid' => 'טביעת אצבע לא חוקית של מפתח!',
             'go' => 'קדימה',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'האורך גדול מדי',
             'loginBot' => 'הזן את הטוקן של הבוט שלך: ',
             'loginBotTokenWeb' => 'טוקן הבוט',
@@ -770,6 +800,12 @@ final class Lang
         [
             '2fa_uncalled' => 'Non sto aspettando la password, chiama prima le funzioni phoneLogin e completePhoneLogin!',
             'accepting_call' => 'Sto accettando una chiamata da %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'Questa istanza di MadelineProto è già loggata!',
             'apiAppInstructionsAuto0' => 'Inserisci il nome dell\'app, può essere qualsiasi cosa: ',
             'apiAppInstructionsAuto1' => 'Inserisci il nome ridotto dell\'app, caratteri alfanumerici: ',
@@ -831,7 +867,7 @@ final class Lang
             'file_type_invalid' => 'È stato fornito un tipo file errato',
             'fingerprint_invalid' => 'fingerprint della chiave non valido!',
             'go' => 'Vai',
-            'invalid_dl.php' => '%s non è uno script di scaricamento valido (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'Il valore fornito è troppo lungo',
             'loginBot' => 'Inserisci il tuo bot token: ',
             'loginBotTokenWeb' => 'Token del bot',
@@ -919,6 +955,12 @@ final class Lang
         [
             '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
             'accepting_call' => 'Accepting call from %s...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'This instance of MadelineProto is already logged in!',
             'apiAppInstructionsAuto0' => 'Введите имя приложения, может быть что угодно: ',
             'apiAppInstructionsAuto1' => 'Введите короткое имя вашего приложения, латиница и цифры, 5-32 букв: ',
@@ -980,7 +1022,7 @@ final class Lang
             'file_type_invalid' => 'Invalid file type detected (%s)',
             'fingerprint_invalid' => 'Invalid key fingerprint!',
             'go' => 'ОК',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'Length is too big',
             'loginBot' => 'Введите токен бота: ',
             'loginBotTokenWeb' => 'Токен бота',
@@ -1068,6 +1110,12 @@ final class Lang
         [
             '2fa_uncalled' => 'Men parolni kutmayapman! Iltimos, birinchi navbatda phoneLogin va completePhoneLogin metodlarini ishga tushuring!',
             'accepting_call' => '%s qo‘ng‘irog‘i qabul qilinmoqda...',
+            'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
             'already_loggedIn' => 'MadelineProto-ning bu nusxasi allaqachon tizimga kirgan!',
             'apiAppInstructionsAuto0' => 'Ilovangiz nomini kiriting: ',
             'apiAppInstructionsAuto1' => 'Ilovani qisqacha nomini kiriting, harflar va raqamlardan iborat 5-32 belgilar orasida ',
@@ -1129,7 +1177,7 @@ final class Lang
             'file_type_invalid' => 'Yaroqsiz fayl turi aniqlandi (%s)',
             'fingerprint_invalid' => 'Barmoq izi yaroqsiz!',
             'go' => 'Boshlash',
-            'invalid_dl.php' => '%s is not a valid download script (%s)',
+            'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
             'length_too_big' => 'Uzunlik juda katta',
             'loginBot' => 'Bot tokeningizni kiriting ',
             'loginBotTokenWeb' => 'Bot tokeni',
@@ -1219,6 +1267,12 @@ final class Lang
     public static array $current_lang = [
         '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
         'accepting_call' => 'Accepting call from %s...',
+        'account_banned' => '!!!!!!! WARNING !!!!!!!
+Telegram\'s flood prevention system suspended this account.
+To continue, manual verification is required.
+Send an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.
+Then login again.
+If you intentionally deleted this account, ignore this message.',
         'already_loggedIn' => 'This instance of MadelineProto is already logged in!',
         'apiAppInstructionsAuto0' => 'Enter the app\'s name, can be anything: ',
         'apiAppInstructionsAuto1' => 'Enter the app\'s short name, alphanumeric, 5-32 characters: ',
@@ -1280,7 +1334,7 @@ final class Lang
         'file_type_invalid' => 'Invalid file type detected (%s)',
         'fingerprint_invalid' => 'Invalid key fingerprint!',
         'go' => 'Go',
-        'invalid_dl.php' => '%s is not a valid download script (%s)',
+        'invalid_dl.php_session' => '%s is not a valid download script because its session ID is different (expected %s, got %s)',
         'length_too_big' => 'Length is too big',
         'loginBot' => 'Enter your bot token: ',
         'loginBotTokenWeb' => 'Bot token',

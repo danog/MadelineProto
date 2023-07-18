@@ -534,7 +534,7 @@ trait Files
         }
         $info = $info[$method];
         if ($method === 'photo') {
-            $info = array_values($info);
+            $info = \array_values($info);
             $cur = $info[0];
             foreach ($info as $n) {
                 if ($n['width'] * $n['height'] > $cur['width'] * $cur['height']) {
