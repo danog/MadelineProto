@@ -489,7 +489,8 @@ trait UpdateHandler
             }
         }
         if ($result === null) {
-            throw new Exception('Could not find any message in the updates!');
+            $updates = json_encode($updates);
+            throw new Exception("Could not find any message in $updates!");
         }
         return $result;
     }
