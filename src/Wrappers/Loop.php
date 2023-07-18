@@ -70,7 +70,7 @@ trait Loop
             $id = Shutdown::addCallback(static function () use (&$logger): void {
                 $params = $_GET;
                 $params['MadelineSelfRestart'] = Tools::randomInt();
-                $url = \explode('?', $_SERVER['REQUEST_URI'], 2)[0] ?? '';
+                $url = \explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0] ?? '';
                 $query = \http_build_query($params);
 
                 WebRunner::selfStart("$url?$query");
