@@ -148,5 +148,7 @@
     "invalid_dl.php_session": "%s is not a valid download script because its session ID is different (expected %s, got %s)",
     "need_dl.php": "Could not generate default download script (%s), please create a dl.php file with the following content: %s and pass its URL to the second parameter of getDownloadLink",
 
-    "dl.php_powered_by_madelineproto": "Telegram file download server (up to 4GB), powered by <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Click <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">here</a> for more info on how to setup your very own Telegram file download server!"
+    "dl.php_powered_by_madelineproto": "Telegram file download server (up to 4GB), powered by <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Click <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">here</a> for more info on how to setup your very own Telegram file download server!",
+
+    "account_banned": "!!!!!!! WARNING !!!!!!!\nTelegram's flood prevention system suspended this account.\nTo continue, manual verification is required.\nSend an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.\nThen login again.\nIf you intentionally deleted this account, ignore this message."
 }
