@@ -105,6 +105,14 @@ class Exception extends \Exception
      */
     public static function exceptionHandler(\Throwable $exception): void
     {
+        $print = function (string $s) {
+            Logger::log($s, Logger::FATAL_ERROR);
+            if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
+                echo($s.PHP_EOL);
+            } else {
+                echo(str_replace("\n", "<br>", htmlentities($s)).PHP_EOL);
+            }
+        };
         if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
             || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
         ) {
@@ -115,18 +123,18 @@ class Exception extends \Exception
                 $maps = '~'.\substr_count(\file_get_contents("/proc/$pid/maps"), "\n");
             } catch (\Throwable) {
             }
-            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
-            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
-            Logger::log(Lang::$current_lang['manualAdminActionRequired']);
-            Logger::log(\sprintf(Lang::$current_lang['mmapError1'], $maps), Logger::FATAL_ERROR);
-            Logger::log(\sprintf(Lang::$current_lang['mmapError2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'), Logger::FATAL_ERROR);
-            Logger::log(\sprintf(Lang::$current_lang['mmapError3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'), Logger::FATAL_ERROR);
-            Logger::log(Lang::$current_lang['mmapError4'], Logger::FATAL_ERROR);
-            Logger::log(Lang::$current_lang['manualAdminActionRequired']);
-            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
-            Logger::log(Lang::$current_lang['manualAdminActionRequired'], Logger::FATAL_ERROR);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
+            $print(\sprintf(Lang::$current_lang['mmapError1'], $maps));
+            $print(\sprintf(Lang::$current_lang['mmapError2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
+            $print(\sprintf(Lang::$current_lang['mmapError3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
+            $print(Lang::$current_lang['mmapError4']);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
+            $print(Lang::$current_lang['manualAdminActionRequired']);
         }
-        Logger::log($exception, Logger::FATAL_ERROR);
+        $print((string) $exception);
         die(1);
     }
 }
