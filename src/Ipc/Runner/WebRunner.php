@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\Parallel\Context\ContextException;
+use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -45,17 +46,7 @@ final class WebRunner extends RunnerAbstract
             if (\substr($runPath, 0, \strlen($absoluteRootDir)) === $absoluteRootDir) { // Process runner is within readable document root
                 self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
             } else {
-                $contents = \file_get_contents(self::SCRIPT_PATH);
-                $contents = \str_replace('__DIR__', \var_export($absoluteRootDir, true), $contents);
-                $suffix = \bin2hex(\random_bytes(10));
-                $runPath = $absoluteRootDir.'/madeline-ipc-'.$suffix.'.php';
-                \file_put_contents($runPath, $contents);
-
-                self::$runPath = \substr($runPath, \strlen($absoluteRootDir)-1);
-
-                \register_shutdown_function(static function () use ($runPath): void {
-                    @\unlink($runPath);
-                });
+                throw new AssertionError("$runPath is not within absolute document root $absoluteRootDir!");
             }
 
             self::$runPath = \str_replace(DIRECTORY_SEPARATOR, '/', self::$runPath);
