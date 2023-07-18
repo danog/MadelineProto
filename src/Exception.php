@@ -105,12 +105,12 @@ class Exception extends \Exception
      */
     public static function exceptionHandler(\Throwable $exception): void
     {
-        $print = function (string $s) {
+        $print = function (string $s): void {
             Logger::log($s, Logger::FATAL_ERROR);
             if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
                 echo($s.PHP_EOL);
             } else {
-                echo(str_replace("\n", "<br>", htmlentities($s)).PHP_EOL);
+                echo(\str_replace("\n", "<br>", \htmlentities($s)).PHP_EOL);
             }
         };
         if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')

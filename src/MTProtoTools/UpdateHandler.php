@@ -489,7 +489,7 @@ trait UpdateHandler
             }
         }
         if ($result === null) {
-            $updates = json_encode($updates);
+            $updates = \json_encode($updates);
             throw new Exception("Could not find any message in $updates!");
         }
         return $result;

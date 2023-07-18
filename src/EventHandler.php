@@ -379,7 +379,7 @@ abstract class EventHandler extends AbstractAPI
                 $pathNew = \realpath(\dirname((new ReflectionClass($class))->getFileName()).DIRECTORY_SEPARATOR.$path);
                 if ($pathNew === false) {
                     unset($paths[$k]);
-                    Logger::log(sprintf(Lang::$current_lang['plugin_path_does_not_exist'], $path), Logger::FATAL_ERROR);
+                    Logger::log(\sprintf(Lang::$current_lang['plugin_path_does_not_exist'], $path), Logger::FATAL_ERROR);
                     continue;
                 }
             }
@@ -403,7 +403,7 @@ abstract class EventHandler extends AbstractAPI
                         require $file;
                         continue;
                     }
-                    if (str_contains($fileName, '.')) {
+                    if (\str_contains($fileName, '.')) {
                         continue;
                     }
                     $class = $namespace.'\\'.$fileName;
