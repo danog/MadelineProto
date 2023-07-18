@@ -65,6 +65,7 @@ final class WebRunner extends RunnerAbstract
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
             'cwd' => Magic::getcwd(),
+            'MadelineSelfRestart' => 1
         ];
         if (\function_exists('memprof_enabled') && \memprof_enabled()) {
             $params['MEMPROF_PROFILE'] = '1';

@@ -26,7 +26,7 @@ final class FiltersAnd extends Filter
     {
         $final = [];
         foreach ($this->filters as $filter) {
-            $filter = $filter->initialize($API) ?? $filter;
+            $filter = $filter->initialize($API);
             if ($filter instanceof self) {
                 $final = \array_merge($final, $filter->filters);
             } else {

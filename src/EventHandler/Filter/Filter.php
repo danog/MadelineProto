@@ -46,9 +46,9 @@ abstract class Filter
 {
     abstract public function apply(Update $update): bool;
     /** Run some initialization logic, optionally returning a new filter to replace the current one. */
-    public function initialize(EventHandler $API): ?Filter
+    public function initialize(EventHandler $API): Filter
     {
-        return null;
+        return $this;
     }
 
     public static function fromReflectionType(ReflectionType $type): Filter

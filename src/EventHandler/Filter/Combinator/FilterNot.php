@@ -16,9 +16,9 @@ final class FilterNot extends Filter
     public function __construct(private readonly Filter $filter)
     {
     }
-    public function initialize(EventHandler $API): ?Filter
+    public function initialize(EventHandler $API): Filter
     {
-        $filter = $this->filter->initialize($API) ?? $this->filter;
+        $filter = $this->filter->initialize($API);
         if ($filter instanceof self) {
             // The nested filter is a FilterNot, optimize !!A => A
             return $filter->filter;

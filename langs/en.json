@@ -145,9 +145,8 @@
     "plugins_must_have_exactly_one_class": "a plugin must define exactly one class! To define multiple classes, interfaces or traits, create separate files, they will be autoloaded by MadelineProto automatically.",
 
     "cli_need_dl.php_link": "Please specify a download script URL when using getDownloadLink via CLI!",
-    "invalid_dl.php": "%s is not a valid download script (%s)",
+    "invalid_dl.php_session": "%s is not a valid download script because its session ID is different (expected %s, got %s)",
     "need_dl.php": "Could not generate default download script (%s), please create a dl.php file with the following content: %s and pass its URL to the second parameter of getDownloadLink",
 
     "dl.php_powered_by_madelineproto": "Telegram file download server (up to 4GB), powered by <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Click <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">here</a> for more info on how to setup your very own Telegram file download server!"
-
 }

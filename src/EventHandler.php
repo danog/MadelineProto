@@ -266,6 +266,15 @@ abstract class EventHandler extends AbstractAPI
         return $this->periodicLoops[$name];
     }
     /**
+     * Obtain all PeriodicLoop instances created by the Cron attribute.
+     *
+     * @return array<string, PeriodicLoop>
+     */
+    final public function getPeriodicLoops(): array
+    {
+        return $this->periodicLoops;
+    }
+    /**
      * @internal
      */
     final public function waitForInternalStart(): ?Future

@@ -132,7 +132,7 @@
     "do_not_remove_MadelineProto.log_phar": "لطفا madeline.phar یا madeline.php را حذف نکنید، در غیراینصورت مدلین‌پروتو crash خواهد کرد. در صورت داشتن هرگونه مشکل با مدلین‌پروتو، آن را به https://github.com/danog/MadelineProto یا https://t.me/pwrtelegramgroup گزارش کنید",
     "do_not_use_deprecated_function": "تابع %s منسوخ شده، لطفا به جای آن از %s استفاده کنید",
     "mmapErrorPart3": "برای تداوم تغییر در طول راه‌اندازی دوباره: %s",
-    "recommend_not_use_filesystem_function": "استفاده از تابع %s پیشنهاد نمیشود، چراکه دسترسی و کار با فایل های سیستمی موقع پردازش آپدیت باعث کم شدن سرعت ربات شما میشود، لطفا صفحه https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions را ببینید تا با راه‌های جایگزین برای ذخیره اطلاعات که باعث کاهش سرعت نمیشوند آشنا شوید!",
+    "recommend_not_use_filesystem_function": "استفاده از تابع %s پیشنهاد نمیشود، چراکه دسترسی و کار با فایل های سیستمی موقع پردازش آپدیت باعث کم شدن سرعت ربات شما میشود، لطفا صفحه https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions را ببینید تا با راه‌های جایگزین برای ذخیره اطلاعات که باعث کاهش سرعت ربات شما نمیشوند آشنا شوید!",
     "do_not_use_blocking_function": "به دلایل عملکردی و اجرایی، ایونت‌هندلرها نباید از فانکشن %s که async نیست استفاده کنند، لطفا به جای آن از %s استفاده کنید",
     "do_not_use_blocking_class": "به دلایل عملکردی و اجرایی، هندلرها نباید از کلس %s که async نیست استفاده کنند، به جای آن از %s استفاده کنید",
     "do_not_use_non_root_require_in_event_handler": "به دلایل عملکردی و اجرایی، شما نباید از require یا include داخل کلس ایونت‌هندلر استفاده کنید، فقط require های سطح root مجاز هستند.",

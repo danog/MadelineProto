@@ -17,10 +17,10 @@ final class FilterSender extends Filter
     public function __construct(private readonly string|int $peer)
     {
     }
-    public function initialize(EventHandler $API): ?Filter
+    public function initialize(EventHandler $API): Filter
     {
         $this->peerResolved = $API->getId($this->peer);
-        return null;
+        return $this;
     }
     public function apply(Update $update): bool
     {

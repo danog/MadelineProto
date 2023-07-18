@@ -21,14 +21,14 @@ final class FilterFromSenders extends Filter
     {
         $this->peers = \array_unique($idOrUsername);
     }
-    public function initialize(EventHandler $API): ?Filter
+    public function initialize(EventHandler $API): Filter
     {
         $res = [];
         foreach ($this->peers as $peer) {
             $res []= $API->getId($peer);
         }
         $this->peersResolved = $res;
-        return null;
+        return $this;
     }
     public function apply(Update $update): bool
     {

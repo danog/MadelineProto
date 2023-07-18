@@ -46,9 +46,11 @@ trait FileServer
      */
     public static function downloadServer(string $session): void
     {
-        if (isset($_GET['c'])) {
+        if (isset($_GET['ping'])) {
             $API = new API($session);
-            $API->processDownloadServerPing($_GET['c'], $_GET['i']);
+            $id = (string) $API->getSelf()['id'];
+            header("Content-length: ".strlen($id));
+            echo $id;
             die;
         }
         if (!isset($_GET['f'])) {
@@ -110,7 +112,7 @@ trait FileServer
             $messageMedia['mime'] ??= $mime;
             $messageMedia['name'] ??= $name;
 
-            $f = is_string($media) ? $media : ($this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id']);
+            $f = \is_string($media) ? $media : ($this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id']);
             [
                 'name' => $name,
                 'ext' => $ext,
@@ -208,25 +210,20 @@ trait FileServer
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }
-            $i = (string) \random_int(PHP_INT_MIN, PHP_INT_MAX);
-            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['c' => $scriptUrl, 'i' => $i]);
+            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['ping' => 1]);
             $this->logger->logger("Checking $scriptUrlNew...");
-            $this->fileGetContents($scriptUrlNew);
-            if (!isset(self::$checkedScripts[$scriptUrl])) {
+            $result = $this->fileGetContents($scriptUrlNew);
+            $expected = (string) $this->getSelf()['id'];
+            if ($result !== $expected) {
                 throw new AssertionError(\sprintf(
-                    Lang::$current_lang['invalid_dl.php'],
+                    Lang::$current_lang['invalid_dl.php_session'],
                     $scriptUrl,
-                    "the check array wasn't populated"
+                    $expected,
+                    $result,
                 ));
             }
-            if (self::$checkedScripts[$scriptUrl] !== $i) {
-                $v = self::$checkedScripts[$scriptUrl];
-                throw new AssertionError(\sprintf(
-                    Lang::$current_lang['invalid_dl.php'],
-                    $scriptUrl,
-                    "the check array contains {$v} instead of $i"
-                ));
-            }
+
+            self::$checkedScripts[$scriptUrl] = true;
         } finally {
             $lock->release();
         }

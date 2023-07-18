@@ -27,12 +27,6 @@ abstract class RunnerAbstract
         if (\defined('MADELINE_PHP')) {
             return \MADELINE_PHP;
         }
-        /**
-         * If using madeline.phar, simply return madeline.phar path.
-         */
-        if (\defined('MADELINE_PHAR')) {
-            return \MADELINE_PHAR;
-        }
         // Write process runner to external file if inside a PHAR different from madeline.phar,
         // because PHP can't open files inside a PHAR directly except for the stub.
         if (\strpos(self::SCRIPT_PATH, 'phar://') === 0) {

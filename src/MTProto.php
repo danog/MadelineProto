@@ -1654,6 +1654,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 }
             } catch (Throwable $e) {
                 unset($userOrId[$k]);
+                $peer = \json_encode($peer);
                 $this->logger("Could not obtain info about report peer $peer: $e", Logger::FATAL_ERROR);
             }
         }

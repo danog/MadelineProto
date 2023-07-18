@@ -14,10 +14,10 @@ use danog\MadelineProto\EventHandler\Update;
 final class FilterFromAdmin extends Filter
 {
     private readonly array $adminIds;
-    public function initialize(EventHandler $API): ?Filter
+    public function initialize(EventHandler $API): Filter
     {
         $this->adminIds = $API->getAdminIds();
-        return null;
+        return $this;
     }
     public function apply(Update $update): bool
     {

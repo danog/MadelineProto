@@ -418,7 +418,9 @@ final class API extends AbstractAPI
         } else {
             Assert::notEmpty($eventHandler);
             Assert::allClassExists($eventHandler);
-            foreach ($eventHandler as $c) { $c::cachePlugins($c); }
+            foreach ($eventHandler as $c) {
+                $c::cachePlugins($c);
+            }
         }
 
         $errors = [];
