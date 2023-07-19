@@ -161,11 +161,15 @@ final class ResponseInfo
     public function getCodeExplanation(): string
     {
         $reason = HttpStatus::getReason($this->code);
-        $body = "<html lang='en'><body><h1>{$this->code} $reason</h1><br>";
+        $body = "<html lang='en'><body><h1>{$this->code} $reason</h1>";
         if ($this->code === HttpStatus::RANGE_NOT_SATISFIABLE) {
             $body .= '<p>Could not use selected range.</p>';
         }
-        $body .= '<small>'.Lang::$current_lang["dl.php_powered_by_madelineproto"].'</small>';
+        if ($this->code === HttpStatus::BAD_GATEWAY) {
+            $body .= '<small>'.Lang::$current_lang["dl.php_check_logs_make_sure_session_running"].'</small>';
+        } else {
+            $body .= '<small>'.Lang::$current_lang["dl.php_powered_by_madelineproto"].'</small>';
+        }
         $body .= '</body></html>';
         return $body;
     }
