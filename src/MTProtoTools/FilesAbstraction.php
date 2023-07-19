@@ -103,7 +103,7 @@ trait FilesAbstraction
             return new Gif($this, $media, $has_video, $protected);
         }
         if ($has_video) {
-            return $attr['round_message']
+            return $has_video['round_message']
                 ? new RoundVideo($this, $media, $has_video, $protected)
                 : new Video($this, $media, $has_video, $protected);
         }

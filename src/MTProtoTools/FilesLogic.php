@@ -79,10 +79,12 @@ trait FilesLogic
         }
 
         $messageMedia = $this->getDownloadInfo($messageMedia);
-        $messageMedia['size'] ??= $size;
-        $messageMedia['mime'] ??= $mime;
+        $messageMedia['size'] = $size ?? $messageMedia['size'];
+        $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
         if ($name) {
-            $messageMedia['name'] = $name;
+            $name = explode('.', $name, 2);
+            $messageMedia['name'] = $name[0];
+            $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
         }
 
         $result = ResponseInfo::parseHeaders(
