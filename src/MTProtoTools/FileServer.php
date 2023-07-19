@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Http\HttpStatus;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
@@ -28,7 +29,9 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\AppInfo;
+use danog\MadelineProto\Tools;
 use Exception;
 use Throwable;
 
@@ -59,7 +62,18 @@ trait FileServer
             die(Lang::$current_lang["dl.php_powered_by_madelineproto"]);
         }
 
-        $API = new API($session);
+        try {
+            $API = new API($session);
+        } catch (Throwable $e) {
+            Logger::log("An error occurred while instantiating the session: $e");
+            $result = ResponseInfo::error(HttpStatus::BAD_GATEWAY);
+            $result->writeHeaders();
+            if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
+                Tools::echo($result->getCodeExplanation());
+            }
+            die;
+        }
+
         $API->downloadToBrowser(
             messageMedia: $_GET['f'],
             size: (int) $_GET['s'],

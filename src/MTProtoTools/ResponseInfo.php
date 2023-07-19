@@ -56,14 +56,15 @@ final class ResponseInfo
      *
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
-     * @param ?array $messageMedia Media info
+     * @param array|int $messageMedia Media info
      */
-    private function __construct(string $method, array $headers, ?array $messageMedia)
+    private function __construct(string $method, array $headers, array|int $messageMedia)
     {
-        if ($messageMedia === null) {
-            $this->code = HttpStatus::NOT_FOUND;
+        if (\is_int($messageMedia)) {
+            $this->code = $messageMedia;
             $this->serve = false;
             $this->headers = self::NO_CACHE;
+            return;
         }
         if (isset($headers['range'])) {
             $range = \explode('=', $headers['range'], 2);
@@ -133,6 +134,10 @@ final class ResponseInfo
             } else {
                 $this->serveRange = [$seek_start, $seek_end + 1];
             }
+
+            if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
+                $this->headers["Content-Disposition"] = "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"";
+            }
         }
     }
     /**
@@ -142,9 +147,13 @@ final class ResponseInfo
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
      */
-    public static function parseHeaders(string $method, array $headers, ?array $messageMedia): self
+    public static function parseHeaders(string $method, array $headers, array $messageMedia): self
     {
         return new self($method, $headers, $messageMedia);
+    }
+    public static function error(int $code): self
+    {
+        return new self('', [], $code);
     }
     /**
      * Get explanation for HTTP code.
@@ -156,7 +165,7 @@ final class ResponseInfo
         if ($this->code === HttpStatus::RANGE_NOT_SATISFIABLE) {
             $body .= '<p>Could not use selected range.</p>';
         }
-        $body .= Lang::$current_lang["dl.php_powered_by_madelineproto"];
+        $body .= '<small>'.Lang::$current_lang["dl.php_powered_by_madelineproto"].'</small>';
         $body .= '</body></html>';
         return $body;
     }
@@ -199,5 +208,22 @@ final class ResponseInfo
     public function getHeaders(): array
     {
         return $this->headers;
+    }
+
+    /**
+     * Write headers.
+     */
+    public function writeHeaders(): void
+    {
+        \http_response_code($this->getCode());
+        foreach ($this->getHeaders() as $key => $value) {
+            if (\is_array($value)) {
+                foreach ($value as $subValue) {
+                    \header("$key: $subValue", false);
+                }
+            } else {
+                \header("$key: $value");
+            }
+        }
     }
 }

@@ -85,38 +85,26 @@ trait FilesLogic
             $messageMedia['size'] = $size ?? $messageMedia['size'];
             $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
             if ($name) {
-                $name = explode('.', $name, 2);
+                $name = \explode('.', $name, 2);
                 $messageMedia['name'] = $name[0];
                 $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
-            }    
+            }
+
+            $result = ResponseInfo::parseHeaders(
+                $_SERVER['REQUEST_METHOD'],
+                $headers,
+                $messageMedia,
+            );
         } catch (Throwable $e) {
             $this->logger->logger("An error occurred inside of downloadToBrowser: $e", Logger::FATAL_ERROR);
-            $messageMedia = null;
+            $result = ResponseInfo::error(HttpStatus::NOT_FOUND);
         }
-        
-        $result = ResponseInfo::parseHeaders(
-            $_SERVER['REQUEST_METHOD'],
-            $headers,
-            $messageMedia,
-        );
 
-        \http_response_code($result->getCode());
-        foreach ($result->getHeaders() as $key => $value) {
-            if (\is_array($value)) {
-                foreach ($value as $subValue) {
-                    \header("$key: $subValue", false);
-                }
-            } else {
-                \header("$key: $value");
-            }
-        }
+        $result->writeHeaders();
 
         if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
-            if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
-                \header("Content-Disposition: inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
-            }
             if (\ob_get_level()) {
                 \ob_end_flush();
                 \ob_implicit_flush();
@@ -219,15 +207,7 @@ trait FilesLogic
             $body = $result->getCodeExplanation();
         }
 
-        $response = new Response($result->getCode(), $result->getHeaders(), $body);
-        if ($result->shouldServe() && !empty($result->getHeaders()['Content-Length'])) {
-            $response->setHeader('content-length', (string) $result->getHeaders()['Content-Length']);
-            if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
-                $response->setHeader('content-disposition', "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
-            }
-        }
-
-        return $response;
+        return new Response($result->getCode(), $result->getHeaders(), $body);
     }
 
     /**
