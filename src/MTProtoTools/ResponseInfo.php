@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Http\HttpStatus;
+use danog\MadelineProto\Lang;
 
 /**
  * Obtain response information for file to server.
@@ -29,7 +30,6 @@ use Amp\Http\HttpStatus;
  */
 final class ResponseInfo
 {
-    private const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
     private const NO_CACHE = [
         'Cache-Control' => ['no-store, no-cache, must-revalidate, max-age=0', 'post-check=0, pre-check=0'],
         'Pragma' => 'no-cache',
@@ -56,10 +56,15 @@ final class ResponseInfo
      *
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
-     * @param array  $messageMedia Media info
+     * @param ?array $messageMedia Media info
      */
-    private function __construct(string $method, array $headers, array $messageMedia)
+    private function __construct(string $method, array $headers, ?array $messageMedia)
     {
+        if ($messageMedia === null) {
+            $this->code = HttpStatus::NOT_FOUND;
+            $this->serve = false;
+            $this->headers = self::NO_CACHE;
+        }
         if (isset($headers['range'])) {
             $range = \explode('=', $headers['range'], 2);
             if (\count($range) == 1) {
@@ -137,7 +142,7 @@ final class ResponseInfo
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
      */
-    public static function parseHeaders(string $method, array $headers, array $messageMedia): self
+    public static function parseHeaders(string $method, array $headers, ?array $messageMedia): self
     {
         return new self($method, $headers, $messageMedia);
     }
@@ -151,7 +156,7 @@ final class ResponseInfo
         if ($this->code === HttpStatus::RANGE_NOT_SATISFIABLE) {
             $body .= '<p>Could not use selected range.</p>';
         }
-        $body .= self::POWERED_BY;
+        $body .= Lang::$current_lang["dl.php_powered_by_madelineproto"];
         $body .= '</body></html>';
         return $body;
     }

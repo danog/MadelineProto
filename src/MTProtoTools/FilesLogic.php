@@ -25,6 +25,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
@@ -36,6 +37,7 @@ use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
+use Throwable;
 
 use const FILTER_VALIDATE_URL;
 
@@ -78,21 +80,27 @@ trait FilesLogic
             $headers['range'] = $_SERVER['HTTP_RANGE'];
         }
 
-        $messageMedia = $this->getDownloadInfo($messageMedia);
-        $messageMedia['size'] = $size ?? $messageMedia['size'];
-        $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
-        if ($name) {
-            $name = explode('.', $name, 2);
-            $messageMedia['name'] = $name[0];
-            $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
+        try {
+            $messageMedia = $this->getDownloadInfo($messageMedia);
+            $messageMedia['size'] = $size ?? $messageMedia['size'];
+            $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
+            if ($name) {
+                $name = explode('.', $name, 2);
+                $messageMedia['name'] = $name[0];
+                $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
+            }    
+        } catch (Throwable $e) {
+            $this->logger->logger("An error occurred inside of downloadToBrowser: $e", Logger::FATAL_ERROR);
+            $messageMedia = null;
         }
-
+        
         $result = ResponseInfo::parseHeaders(
             $_SERVER['REQUEST_METHOD'],
             $headers,
             $messageMedia,
         );
 
+        \http_response_code($result->getCode());
         foreach ($result->getHeaders() as $key => $value) {
             if (\is_array($value)) {
                 foreach ($value as $subValue) {
@@ -102,7 +110,6 @@ trait FilesLogic
                 \header("$key: $value");
             }
         }
-        \http_response_code($result->getCode());
 
         if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             Tools::echo($result->getCodeExplanation());
