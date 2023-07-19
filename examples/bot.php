@@ -146,7 +146,7 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('broadcast')]
     public function broadcastCommand(Incoming & Message & FromAdmin $message): void
     {
-        // We can broadcast messages to all users.
+        // We can broadcast messages to all users with /broadcast
         if (!$message->replyToMsgId) {
             $message->reply("You should reply to the message you want to broadcast.");
             return;
