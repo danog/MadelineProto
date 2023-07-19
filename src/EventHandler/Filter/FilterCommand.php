@@ -38,6 +38,6 @@ final class FilterCommand extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->command === $this->command && \in_array($update->command, $this->commandTypes, true);
+        return $update instanceof Message && $update->command === $this->command && \in_array($update->commandType, $this->commandTypes, true);
     }
 }

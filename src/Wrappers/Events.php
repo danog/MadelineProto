@@ -145,7 +145,10 @@ trait Events
      */
     public function getEventHandler(?string $class = null): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
     {
-        if ($class !== null) {
+        if ($this->event_handler_instance === null || $this->event_handler_instance instanceof __PHP_Incomplete_Class) {
+            return $this->event_handler_instance;
+        }
+        if ($class !== null && $class !== $this->event_handler_instance::class) {
             return $this->getPlugin($class);
         }
         return $this->event_handler_instance;
