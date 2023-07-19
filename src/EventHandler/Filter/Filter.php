@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
+use AssertionError;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
@@ -90,6 +91,7 @@ abstract class Filter
                 HasSticker::class => new FilterSticker,
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
+                default => throw new AssertionError("Unknown type ".$type->getName())
             }
         };
     }

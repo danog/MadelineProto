@@ -38,7 +38,7 @@ abstract class RunnerAbstract
 
         $contents = \file_get_contents(self::SCRIPT_PATH);
         $contents = \str_replace('__DIR__', \var_export($path, true), $contents);
-        $suffix = API::RELEASE;
+        $suffix = API::RELEASE.'___'.\bin2hex(\random_bytes(10));
         self::$pharScriptPath[$alternateTmpDir] = $scriptPath = $alternateTmpDir.'/madeline-ipc-'.$suffix.'.php';
         \file_put_contents($scriptPath, $contents, LOCK_EX);
         Logger::log("Copied IPC bootstrap file to $scriptPath");
