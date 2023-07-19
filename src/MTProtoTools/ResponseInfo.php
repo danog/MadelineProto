@@ -166,10 +166,9 @@ final class ResponseInfo
             $body .= '<p>Could not use selected range.</p>';
         }
         if ($this->code === HttpStatus::BAD_GATEWAY) {
-            $body .= '<small>'.Lang::$current_lang["dl.php_check_logs_make_sure_session_running"].'</small>';
-        } else {
-            $body .= '<small>'.Lang::$current_lang["dl.php_powered_by_madelineproto"].'</small>';
+            $body .= "<h2 style='color:red;'>".Lang::$current_lang["dl.php_check_logs_make_sure_session_running"].'</h2>';
         }
+        $body .= '<small>'.Lang::$current_lang["dl.php_powered_by_madelineproto"].'</small>';
         $body .= '</body></html>';
         return $body;
     }
