@@ -139,9 +139,9 @@ trait FileServer
 
         return $scriptUrl."?".\http_build_query([
             'f' => $f,
+            's' => $size,
             'n' => $name,
             'm' => $mime,
-            's' => $size
         ]);
     }
 
