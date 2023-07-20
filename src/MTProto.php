@@ -1682,7 +1682,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function setReportPeers(int|string|array $userOrId): void
     {
         $this->reportDest = $this->sanitizeReportPeers($userOrId);
-        $this->admins = array_values(array_filter($this->reportDest, fn (int $v) $v > 0));
+        $this->admins = array_values(array_filter($this->reportDest, fn (int $v) => $v > 0));
     }
     private ?LocalMutex $reportMutex = null;
     /**
