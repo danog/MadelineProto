@@ -116,7 +116,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             throw new AssertionError("This message doesn't reply to any other message!");
         }
         return $this->API->wrapMessage($this->API->methodCallAsyncRead(
-            API::isSupergroup($this->senderId) ? 'channels.getMessages' : 'messages.getMessages',
+            API::isSupergroup($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [$this->replyToMsgId]
