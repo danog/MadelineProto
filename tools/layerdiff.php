@@ -4,6 +4,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\Tools;
 
 /*
 Copyright 2016-2020 Daniil Gentili
@@ -41,7 +42,7 @@ function getTL($layer)
 }
 function getUrl($constructor, $type)
 {
-    $changed = str_replace('.', '_', $constructor);
+    $changed = Tools::markdownEscape(str_replace('.', '_', $constructor));
 
     //return "[$constructor](https://github.com/danog/MadelineProtoDocs/blob/geochats/docs/API_docs/$type/$changed.md)";
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
@@ -83,11 +84,13 @@ foreach (['methods', 'constructors'] as $type) {
             $url = getUrl($name, $type);
             foreach ($final_new_args as $name => $ttype) {
                 if (!isset($final_old_args[$name]) && $name !== 'flags' && $name !== 'flags2') {
+                    $name = Tools::markdownEscape($name);
                     $res .= "Added $name param to $url\n";
                 }
             }
             foreach ($final_old_args as $name => $ttype) {
                 if (!isset($final_new_args[$name]) && $name !== 'flags' && $name !== 'flags2') {
+                    $name = Tools::markdownEscape($name);
                     $res .= "Removed $name param from $url\n";
                 }
             }
@@ -99,6 +102,7 @@ foreach (['methods', 'constructors'] as $type) {
     foreach ($old[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$new[$type]->$finder($name)) {
+            $name = Tools::markdownEscape($name);
             $res .= "- $name\n";
         }
     }

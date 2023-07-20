@@ -53,6 +53,8 @@ abstract class InternalDoc
     public $stats;
     /** @var \danog\MadelineProto\Namespace\Chatlists $chatlists */
     public $chatlists;
+    /** @var \danog\MadelineProto\Namespace\Stories $stories */
+    public $stories;
 
     /**
      * Export APIFactory instance with the specified namespace.
@@ -96,6 +98,8 @@ abstract class InternalDoc
         $this->stats->setWrapper($this->wrapper);
         $this->chatlists ??= new \danog\MadelineProto\Namespace\AbstractAPI('chatlists');
         $this->chatlists->setWrapper($this->wrapper);
+        $this->stories ??= new \danog\MadelineProto\Namespace\AbstractAPI('stories');
+        $this->stories->setWrapper($this->wrapper);
     }
     /**
          * Convert MTProto parameters to bot API parameters.
@@ -1864,12 +1868,12 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
-    public function upload(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|array|string $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
     }

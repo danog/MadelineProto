@@ -200,4 +200,18 @@ interface Contacts
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
     public function importContactToken(string $token = ''): array|int|string;
+
+    /**
+     *
+     *
+     * @param list<int> $id
+     */
+    public function editCloseFriends(array $id = []): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     */
+    public function toggleStoriesHidden(array|int|string $id, bool $hidden): bool;
 }

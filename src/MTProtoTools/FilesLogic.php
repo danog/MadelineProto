@@ -225,12 +225,12 @@ trait FilesLogic
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
-    public function upload(FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array $file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;

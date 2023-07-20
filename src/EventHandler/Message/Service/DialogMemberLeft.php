@@ -13,10 +13,11 @@ final class DialogMemberLeft extends ServiceMessage
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info,
 
         /** ID of the user that left the channel */
         public readonly int $left,
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $info);
     }
 }

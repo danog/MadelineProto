@@ -13,10 +13,11 @@ final class DialogTitleChanged extends ServiceMessage
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info,
 
         /** New title */
         public readonly string $title
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $info);
     }
 }

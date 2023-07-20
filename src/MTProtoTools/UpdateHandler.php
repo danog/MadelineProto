@@ -331,7 +331,7 @@ trait UpdateHandler
     public function wrapUpdate(array $update): ?Update
     {
         return match ($update['_']) {
-            'updateNewChannelMessage', 'updateNewMessage' => $this->wrapMessage($update['message']),
+            'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
             default => null
         };
     }
@@ -343,22 +343,26 @@ trait UpdateHandler
         if ($message['_'] === 'messageEmpty') {
             return null;
         }
+        $info = $this->getInfo($message);
         if ($message['_'] === 'messageService') {
             return match ($message['action']['_']) {
                 'messageActionChatCreate' => new DialogCreated(
                     $this,
                     $message,
+                    $info,
                     $message['action']['title'],
                     $message['action']['users'],
                 ),
                 'messageActionChatEditTitle' => new DialogTitleChanged(
                     $this,
                     $message,
+                    $info,
                     $message['action']['title']
                 ),
                 'messageActionChatEditPhoto' => new DialogPhotoChanged(
                     $this,
                     $message,
+                    $info,
                     $this->wrapMedia([
                         '_' => 'messageMediaPhoto',
                         'photo' => $message['action']['photo']
@@ -367,22 +371,24 @@ trait UpdateHandler
                 'messageActionChatDeletePhoto' => new DialogPhotoChanged(
                     $this,
                     $message,
+                    $info,
                     null
                 ),
                 'messageActionChatAddUser' => new DialogMembersJoined(
                     $this,
                     $message,
+                    $info,
                     $message['action']['users']
                 ),
                 'messageActionChatDeleteUser' => new DialogMemberLeft(
                     $this,
                     $message,
+                    $info,
                     $message['action']['user_id']
                 ),
                 default => null
             };
         }
-        $info = $this->getInfo($message);
         if (($this->chats[$info['bot_api_id']]['username'] ?? '') === 'replies') {
             return null;
         }
@@ -481,7 +487,7 @@ trait UpdateHandler
     {
         $result = null;
         foreach (($this->extractUpdates($updates)) as $update) {
-            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage'], true)) {
+            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage', 'updateNewScheduledMessage'], true)) {
                 if ($result !== null) {
                     throw new Exception('Found more than one update of type message, use extractUpdates to extract all updates');
                 }

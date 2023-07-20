@@ -24,6 +24,6 @@ final class Voice extends AbstractAudio
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $audioAttribute, $protected);
-        $this->waveform = $audioAttribute['waveform'];
+        $this->waveform = $audioAttribute['waveform'] ?? null;
     }
 }

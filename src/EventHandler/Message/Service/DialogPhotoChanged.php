@@ -14,10 +14,11 @@ final class DialogPhotoChanged extends ServiceMessage
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info,
 
         /** New photo (or no photo if it was deleted) */
         public readonly ?Photo $photo
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $info);
     }
 }

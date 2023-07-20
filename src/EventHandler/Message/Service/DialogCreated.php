@@ -13,12 +13,13 @@ final class DialogCreated extends ServiceMessage
     public function __construct(
         MTProto $API,
         array $rawMessage,
+        array $info,
 
         /** Title of the created chat or channel */
         public readonly string $title,
         /** @var list<int> List of group members */
         public readonly array $users,
     ) {
-        parent::__construct($API, $rawMessage);
+        parent::__construct($API, $rawMessage, $info);
     }
 }

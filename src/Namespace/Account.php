@@ -34,7 +34,7 @@ interface Account
      * Edits notification settings from a given user/group, from all users/all groups.
      *
      * @param array|int|string $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
-     * @param array{_: 'inputPeerNotifySettings', show_previews?: bool, silent?: bool, mute_until?: int, sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}} $settings Notification settings @see https://docs.madelineproto.xyz/API_docs/types/InputPeerNotifySettings.html
+     * @param array{_: 'inputPeerNotifySettings', show_previews?: bool, silent?: bool, mute_until?: int, sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}, stories_muted?: bool, stories_hide_sender?: bool, stories_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}} $settings Notification settings @see https://docs.madelineproto.xyz/API_docs/types/InputPeerNotifySettings.html
      */
     public function updateNotifySettings(array|int|string $peer, array $settings): bool;
 
@@ -42,7 +42,7 @@ interface Account
      * Gets current notification settings for a given user/group, from all users/all groups.
      *
      * @param array|int|string $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
-     * @return array{_: 'peerNotifySettings', show_previews?: bool, silent?: bool, mute_until: int, ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}} @see https://docs.madelineproto.xyz/API_docs/types/PeerNotifySettings.html
+     * @return array{_: 'peerNotifySettings', show_previews?: bool, silent?: bool, mute_until: int, ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_muted?: bool, stories_hide_sender?: bool, stories_ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}} @see https://docs.madelineproto.xyz/API_docs/types/PeerNotifySettings.html
      */
     public function getNotifySettings(array|int|string $peer): array;
 
@@ -104,17 +104,17 @@ interface Account
     /**
      * Get privacy settings of current account.
      *
-     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'} $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
-     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'} $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
     public function getPrivacy(array $key): array;
 
     /**
      * Change privacy settings of current account.
      *
-     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'} $key Peers to which the privacy rules apply @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
-     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}> $rules Array of New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
-     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'} $key Peers to which the privacy rules apply @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
+     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueAllowCloseFriends'}> $rules Array of New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
     public function setPrivacy(array $key, array $rules = []): array;
 
@@ -383,7 +383,7 @@ interface Account
      * @param array|int|string $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function getNotifyExceptions(bool $compare_sound = false, array|int|string $peer = []): array;
+    public function getNotifyExceptions(bool $compare_sound = false, bool $compare_stories = false, array|int|string $peer = []): array;
 
     /**
      * Get info about a certain [wallpaper](https://core.telegram.org/api/wallpapers).
@@ -430,14 +430,14 @@ interface Account
     /**
      * Get media autodownload settings.
      *
-     * @return array{_: 'account.autoDownloadSettings', low: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}, medium: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}, high: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int}} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoDownloadSettings.html
+     * @return array{_: 'account.autoDownloadSettings', low: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}, medium: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}, high: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoDownloadSettings.html
      */
     public function getAutoDownloadSettings(): array;
 
     /**
      * Change media autodownload settings.
      *
-     * @param array{_: 'autoDownloadSettings', disabled?: bool, video_preload_large?: bool, audio_preload_next?: bool, phonecalls_less_data?: bool, photo_size_max?: int, video_size_max?: int, file_size_max?: int, video_upload_maxbitrate?: int} $settings Media autodownload settings @see https://docs.madelineproto.xyz/API_docs/types/AutoDownloadSettings.html
+     * @param array{_: 'autoDownloadSettings', disabled?: bool, video_preload_large?: bool, audio_preload_next?: bool, phonecalls_less_data?: bool, stories_preload?: bool, photo_size_max?: int, video_size_max?: int, file_size_max?: int, video_upload_maxbitrate?: int, small_queue_active_operations_max?: int, large_queue_active_operations_max?: int} $settings Media autodownload settings @see https://docs.madelineproto.xyz/API_docs/types/AutoDownloadSettings.html
      * @param bool $low Whether to save media in the low data usage preset
      * @param bool $high Whether to save media in the high data usage preset
      */
@@ -539,15 +539,15 @@ interface Account
     /**
      * Get global privacy settings.
      *
-     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
     public function getGlobalPrivacySettings(): array;
 
     /**
      * Set global privacy settings.
      *
-     * @param array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
-     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @param array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool, keep_archived_unmuted?: bool, keep_archived_folders?: bool} $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
     public function setGlobalPrivacySettings(array $settings): array;
 
@@ -711,4 +711,11 @@ interface Account
      *
      */
     public function deleteAutoSaveExceptions(): bool;
+
+    /**
+     *
+     *
+     * @param list<string> $codes
+     */
+    public function invalidateSignInCodes(array $codes = []): bool;
 }
