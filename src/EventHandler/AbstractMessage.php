@@ -132,7 +132,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public function delete(bool $revoke = true): void
     {
         $this->API->methodCallAsyncRead(
-            API::isSupergroup($this->senderId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            API::isSupergroup($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [$this->id],
