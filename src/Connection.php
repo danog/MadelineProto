@@ -397,6 +397,16 @@ final class Connection
             $arguments['queuePromise'] = new DeferredFuture;
             return $arguments['queuePromise'];
         }
+        if (isset($arguments['reply_to_msg_id'])) {
+            if (isset($arguments['reply_to'])) {
+                throw new Exception("You can't provide a reply_to together with reply_to_msg_id and top_msg_id!");
+            }
+            $arguments['reply_to'] = [
+                '_' => 'inputReplyToMessage',
+                'reply_to_msg_id' => $arguments['reply_to_msg_id'],
+                'top_msg_id' => $arguments['top_msg_id'] ?? null
+            ];
+        }
         return null;
     }
     /**

@@ -761,6 +761,10 @@ final class TL implements TLInterface
                     $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
+                if ($current_argument['type'] === 'double') {
+                    $serialized .= "\0\0\0\0\0\0\0\0";
+                    continue;
+                }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
                     $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
                     continue;
