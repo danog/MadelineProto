@@ -1576,6 +1576,12 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $reportDest = [];
     /**
+     * Admin IDs.
+     *
+     * @var list<int>
+     */
+    private array $admins = [];
+    /**
      * Check if has report peers.
      */
     public function hasReportPeers(): bool
@@ -1583,11 +1589,18 @@ final class MTProto implements TLCallback, LoggerGetter
         return (bool) $this->reportDest;
     }
     /**
-     * Get admin IDs (equal to the report peers).
+     * Check if has admins.
+     */
+    public function hasAdmins(): bool
+    {
+        return (bool) $this->admins;
+    }
+    /**
+     * Get admin IDs (equal to all user report peers).
      */
     public function getAdminIds(): array
     {
-        return $this->reportDest;
+        return $this->admins;
     }
     /**
      * Get a message to show to the user when starting the bot.
@@ -1669,6 +1682,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function setReportPeers(int|string|array $userOrId): void
     {
         $this->reportDest = $this->sanitizeReportPeers($userOrId);
+        $this->admins = array_values(array_filter($this->reportDest, fn (int $v) $v > 0));
     }
     private ?LocalMutex $reportMutex = null;
     /**
@@ -1697,7 +1711,7 @@ final class MTProto implements TLCallback, LoggerGetter
         bool $noWebpage = false,
     ): array {
         $result = [];
-        foreach ($this->reportDest as $report) {
+        foreach ($this->admins as $report) {
             $result []= $this->sendMessage(
                 peer: $report,
                 message: $message,
