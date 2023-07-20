@@ -42,10 +42,10 @@ function getTL($layer)
 }
 function getUrl($constructor, $type)
 {
-    $changed = Tools::markdownEscape(str_replace('.', '_', $constructor));
+    $orig = $constructor;
+    $constructor = Tools::markdownEscape($constructor);
 
-    //return "[$constructor](https://github.com/danog/MadelineProtoDocs/blob/geochats/docs/API_docs/$type/$changed.md)";
-    return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
+    return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$orig.html)";
 }
 $old = getTL($argv[1]);
 $new = getTL($argv[2]);
@@ -108,7 +108,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 }
 
-$bot = new \danog\MadelineProto\API('layer.madeline');
+$bot = new \danog\MadelineProto\API('testing.madeline');
 $bot->start();
 
 foreach (explode("\n\n", $res) as $chunk) {
