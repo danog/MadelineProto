@@ -103,6 +103,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     {
         return $this->replyToMsgId !== null;
     }
+
+    private readonly ?self $replyCache;
+    private bool $replyCached = false;
     /**
      * Get replied-to message.
      *
@@ -115,13 +118,18 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         if ($this->replyToMsgId === null) {
             throw new AssertionError("This message doesn't reply to any other message!");
         }
-        return $this->API->wrapMessage($this->API->methodCallAsyncRead(
+        if ($this->replyCached) {
+            return $this->replyCache;
+        }
+        $this->replyCache = $this->API->wrapMessage($this->API->methodCallAsyncRead(
             API::isSupergroup($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
             ]
         )['messages'][0]);
+        $this->replyCached = true;
+        return $this->replyCache;
     }
 
     /**
