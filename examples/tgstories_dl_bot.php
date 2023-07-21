@@ -41,7 +41,7 @@ if (class_exists(API::class)) {
 // Login as a user
 $u = new API('stories_user.madeline');
 if (!$u->getSelf()) {
-    $u->echo("Please login as a user!");
+    if (!$_GET) $u->echo("Please login as a user!");
     $u->start();
 }
 if (!$u->isSelfUser()) {

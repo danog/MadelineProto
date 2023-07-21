@@ -58,6 +58,7 @@ The following open source projects were created using MadelineProto: you can dir
 
 <!-- * [magnaluna webradio](https://magna.madelineproto.xyz) - Multifeatured Telegram VoIP webradio -->
 * [TelegramApiServer](https://github.com/xtrime-ru/TelegramApiServer) - Fast, simple, async php telegram api server: an HTTP JSON API for MadelineProto!
+* [`tgstories_dl_bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) - Source code of [@tgstories_dl_bot](https://t.me/tgstories_dl_bot) - Bot to download any Telegram Story!
 * [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/downloadRenameBot.php) - Download files by URL and rename Telegram files using this async parallelized bot!
 * [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/secret_bot.php) - Secret chat bot!
 * [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/pipesbot.php) - Creating inline bots and using other inline bots via a userbot!
