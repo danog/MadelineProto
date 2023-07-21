@@ -416,10 +416,11 @@ trait BotAPI
      */
     public static function parseMode(array $arguments): array
     {
-        if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
+        $key = isset($arguments['caption']) ? 'caption' : 'message';
+        if (($arguments[$key] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
         }
-        if (!(\is_string($arguments['message']) || \is_object($arguments['message']) && \method_exists($arguments['message'], '__toString'))) {
+        if (!(\is_string($arguments[$key]) || \is_object($arguments[$key]) && \method_exists($arguments[$key], '__toString'))) {
             throw new Exception('Messages can only be strings');
         }
         if ($arguments['parse_mode'] instanceof \danog\MadelineProto\ParseMode) {
@@ -429,13 +430,13 @@ trait BotAPI
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (\stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $entities = new MarkdownEntities($arguments['message']);
-            $arguments['message'] = $entities->message;
+            $entities = new MarkdownEntities($arguments[$key]);
+            $arguments[$key] = $entities->message;
             $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);
         } elseif (\stripos($arguments['parse_mode'], 'html') !== false) {
-            $entities = new DOMEntities($arguments['message']);
-            $arguments['message'] = $entities->message;
+            $entities = new DOMEntities($arguments[$key]);
+            $arguments[$key] = $entities->message;
             $arguments['entities'] = \array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);
         }

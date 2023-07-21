@@ -112,12 +112,13 @@ trait Methods
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.self::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            if (isset($this->tdDescriptions['methods'][$method])) {
-                $desc = StrTools::toString(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'])[0], '.'));
-                $this->human_docs_methods[$this->tdDescriptions['methods'][$method]['description'].': '.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$method.'</a>
+            $desc = StrTools::toString(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'] ?? '')[0], '.'));
+            if ($desc !== '') {
+                $desc .= ': ';
+            }
+            $this->human_docs_methods[$desc.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.$method.'</a>
 
 ';
-            }
             $params = '';
             $lua_params = '';
             $pwr_params = '';

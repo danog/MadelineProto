@@ -29,6 +29,11 @@ final class Files extends SettingsAbstract
      */
     protected bool $reportBrokenMedia = true;
 
+    /**
+     * Custom download link URL for CLI bots, used by `getDownloadLink`.
+     */
+    protected ?string $downloadLink = null;
+
     public function mergeArray(array $settings): void
     {
         if (isset($settings['upload']['allow_automatic_upload'])) {
@@ -121,6 +126,33 @@ final class Files extends SettingsAbstract
     public function setReportBrokenMedia(bool $reportBrokenMedia): self
     {
         $this->reportBrokenMedia = $reportBrokenMedia;
+
+        return $this;
+    }
+
+    /**
+     * Get custom download link URL for CLI bots, used by `getDownloadLink`.
+     *
+     * @return ?string
+     */
+    public function getDownloadLink(): ?string
+    {
+        return $this->downloadLink;
+    }
+
+    /**
+     * Only needed for CLI bots, not bots started via web.
+     *
+     * Sets custom download link URL for CLI bots, used by `getDownloadLink`.
+     *
+     * Can be null, in which case MadelineProto will automatically generate a download link.
+     *
+     * @param ?string $downloadLink Custom download link URL for CLI bots, used by `getDownloadLink`.
+     *
+     */
+    public function setDownloadLink(?string $downloadLink): self
+    {
+        $this->downloadLink = $downloadLink;
 
         return $this;
     }

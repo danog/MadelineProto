@@ -1530,6 +1530,20 @@ final class MTProto implements TLCallback, LoggerGetter
         return $this->authorization['user'] ?? false;
     }
     /**
+     * Returns whether the current user is a bot.
+     */
+    public function isBot(): bool
+    {
+        return $this->authorization['user']['bot'];
+    }
+    /**
+     * Returns whether the current user is a user.
+     */
+    public function isUser(): bool
+    {
+        return !$this->authorization['user']['bot'];
+    }
+    /**
      * Returns whether the current user is a premium user, cached.
      */
     public function isPremium(): bool

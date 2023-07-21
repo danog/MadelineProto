@@ -30,6 +30,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\AppInfo;
 use danog\MadelineProto\Tools;
 use Exception;
@@ -41,6 +42,8 @@ use function Amp\File\write;
 
 /**
  * @internal
+ *
+ * @method Settings getSettings()
  */
 trait FileServer
 {
@@ -95,6 +98,7 @@ trait FileServer
      */
     public function getDownloadLink(array|string|Message|Media $media, ?string $scriptUrl = null, ?int $size = null, ?string $name = null, ?string $mime = null): string
     {
+        $scriptUrl ??= $this->getSettings()->getFiles()->getDownloadLink();
         if ($scriptUrl === null) {
             try {
                 $scriptUrl = $this->getDefaultDownloadScript();

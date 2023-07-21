@@ -120,10 +120,11 @@ abstract class Message extends AbstractMessage
         if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {
             $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
             $this->command = \substr($this->message, 1, $space-1);
-            $this->commandArgs = \explode(
+            $args = \explode(
                 ' ',
                 \substr($this->message, $space+1)
             );
+            $this->commandArgs = $args === [''] ? [] : $args;
             $this->commandType = match ($this->message[0]) {
                 '.' => CommandType::DOT,
                 '/' => CommandType::SLASH,

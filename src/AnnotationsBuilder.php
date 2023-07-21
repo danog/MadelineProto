@@ -112,7 +112,7 @@ final class Blacklist {
             'Bool' => 'bool',
             'true' => 'bool',
             'InputMessage' => 'array|int',
-            'InputMedia' => 'array|string',
+            'InputMedia' => '\\danog\\MadelineProto\\EventHandler\\Media|array|string',
             'InputCheckPasswordSRP' => 'string|array',
             'DataJSON' => 'mixed',
             'JSONValue' => 'mixed',
@@ -196,7 +196,7 @@ final class Blacklist {
             $base = "int|$base";
         }
         if ($type === 'InputMedia') {
-            $base = "string|$base";
+            $base = "\\danog\\MadelineProto\\EventHandler\\Media|string|$base";
         }
         if ($isVector) {
             $base = "list<$base>";

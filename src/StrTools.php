@@ -195,8 +195,6 @@ abstract class StrTools extends Extension
     /**
      * Escape string for markdown.
      *
-     * @internal
-     *
      * @param string $what String to escape
      */
     public static function markdownEscape(string $what): string

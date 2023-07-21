@@ -109,16 +109,26 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Get replied-to message.
      *
-     * May return null if the replied-to message was deleted.
+     * May return null if the replied-to message was deleted or if the message does not reply to any other message.
      *
-     * @return ?self
+     * @template T as AbstractMessage
+     *
+     * @param class-string<T> $class Only return a reply if it is of the specified type, return null otherwise.
+     *
+     * @return ?T
      */
-    public function getReply(): ?self
+    public function getReply(string $class = AbstractMessage::class): ?self
     {
+        if (!\is_subclass_of($class, AbstractMessage::class)) {
+            throw new AssertionError("A class that extends AbstractMessage was expected.");
+        }
         if ($this->replyToMsgId === null) {
-            throw new AssertionError("This message doesn't reply to any other message!");
+            return null;
         }
         if ($this->replyCached) {
+            if (!$this->replyCache instanceof $class) {
+                return null;
+            }
             return $this->replyCache;
         }
         $this->replyCache = $this->API->wrapMessage($this->API->methodCallAsyncRead(
@@ -129,6 +139,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         )['messages'][0]);
         $this->replyCached = true;
+        if (!$this->replyCache instanceof $class) {
+            return null;
+        }
         return $this->replyCache;
     }
 

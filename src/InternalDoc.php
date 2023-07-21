@@ -1190,6 +1190,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::isArrayOrAlike($var);
     }
     /**
+     * Returns whether the current user is a bot.
+     */
+    public function isBot(): bool
+    {
+        return $this->wrapper->getAPI()->isBot();
+    }
+    /**
      * Check if the specified peer is a forum.
      *
      */
@@ -1228,6 +1235,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\MTProto::isSupergroup($id);
     }
     /**
+     * Returns whether the current user is a user.
+     */
+    public function isUser(): bool
+    {
+        return $this->wrapper->getAPI()->isUser();
+    }
+    /**
      * Logger.
      *
      * @param mixed  $param Parameter
@@ -1248,6 +1262,15 @@ abstract class InternalDoc
     public function loop(?callable $callback = null)
     {
         return $this->wrapper->getAPI()->loop($callback);
+    }
+    /**
+     * Escape string for markdown.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownEscape(string $what): string
+    {
+        return \danog\MadelineProto\StrTools::markdownEscape($what);
     }
     /**
      * Manually convert markdown to a message and a set of entities.

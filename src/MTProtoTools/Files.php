@@ -481,6 +481,9 @@ trait Files
      */
     public function getFileInfo(mixed $constructor): array
     {
+        if ($constructor instanceof Media) {
+            $constructor = $constructor->botApiFileId;
+        }
         if (\is_string($constructor)) {
             $constructor = $this->unpackFileId($constructor);
             if (isset($constructor['MessageMedia'])) {
@@ -611,6 +614,8 @@ trait Files
                 $messageMedia = $messageMedia['message'];
                 // no break
             case 'message':
+                return $this->getDownloadInfo($messageMedia['media']);
+            case 'storyItem':
                 return $this->getDownloadInfo($messageMedia['media']);
             case 'updateNewEncryptedMessage':
                 $messageMedia = $messageMedia['message'];

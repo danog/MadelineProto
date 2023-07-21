@@ -181,6 +181,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Uploading files](https://docs.madelineproto.xyz/docs/FILES.html#uploading-files)
   * [Reusing uploaded files](https://docs.madelineproto.xyz/docs/FILES.html#reusing-uploaded-files)
   * [Renaming files](https://docs.madelineproto.xyz/docs/FILES.html#renaming-files)
+  * [Forwarding protected content](https://docs.madelineproto.xyz/docs/FILES.html#forwarding-protected-content)
   * [Downloading files](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)
     * [Extracting download info](https://docs.madelineproto.xyz/docs/FILES.html#extracting-download-info)
     * [Getting a download link](https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link)
@@ -259,8 +260,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#acceptcall-array-call-bool" name="acceptCall">Accept call: acceptCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#acceptsecretchat-array-params-void" name="acceptSecretChat">Accept secret chat: acceptSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.acceptTermsOfService.html" name="help.acceptTermsOfService">Accept the new terms of service: help.acceptTermsOfService</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleUsername.html" name="channels.toggleUsername">Activate or deactivate a purchased fragment.com username associated to a supergroup or channel we own: channels.toggleUsername</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.toggleUsername.html" name="bots.toggleUsername">Activate or deactivate a purchased fragment.com username associated to a bot we own: bots.toggleUsername</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleUsername.html" name="channels.toggleUsername">Activate or deactivate a purchased fragment.com username associated to a supergroup or channel we own: channels.toggleUsername</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.toggleUsername.html" name="account.toggleUsername">Activate or deactivate a purchased fragment.com username associated to the currently logged-in user: account.toggleUsername</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.saveGif.html" name="messages.saveGif">Add GIF to saved gifs list: messages.saveGif</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.addStickerToSet.html" name="stickers.addStickerToSet">Add a sticker to a stickerset, bots only. The sticker set must have been created by the bot: stickers.addStickerToSet</a>
@@ -302,6 +303,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#hasplugin-class-string-eventhandler-class-bool" name="hasPlugin">Check if a certain event handler plugin is installed: hasPlugin</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.checkUsername.html" name="channels.checkUsername">Check if a username is free and can be assigned to a channel/supergroup: channels.checkUsername</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#haseventhandler-bool" name="hasEventHandler">Check if an event handler instance is present: hasEventHandler</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#hasadmins-bool" name="hasAdmins">Check if has admins: hasAdmins</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#hasreportpeers-bool" name="hasReportPeers">Check if has report peers: hasReportPeers</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isarrayoralike-mixed-var-bool" name="isArrayOrAlike">Check if is array or similar (traversable && countable && arrayAccess): isArrayOrAlike</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#peerisset-mixed-id-bool" name="peerIsset">Check if peer is present in internal peer database: peerIsset</a>
@@ -334,8 +336,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mtprototobotapi-array-data-array" name="MTProtoToBotAPI">Convert MTProto parameters to bot API parameters: MTProtoToBotAPI</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tdtotdcli-mixed-params-mixed" name="tdToTdcli">Convert TD parameters to tdcli: tdToTdcli</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tdtomtproto-array-params-array" name="tdToMTProto">Convert TD to MTProto parameters: tdToMTProto</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.convertToGigagroup.html" name="channels.convertToGigagroup">Convert a supergroup to a gigagroup, when requested by channel suggestions: channels.convertToGigagroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#entitiestohtml-string-message-array-entities-bool-allowtelegramtags-false-string" name="entitiesToHtml">Convert a message and a set of entities to HTML: entitiesToHtml</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.convertToGigagroup.html" name="channels.convertToGigagroup">Convert a supergroup to a gigagroup, when requested by channel suggestions: channels.convertToGigagroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#fromsupergroup-int-id-int" name="fromSupergroup">Convert bot API channel ID to MTProto channel ID: fromSupergroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#botapitomtproto-array-arguments-array" name="botAPIToMTProto">Convert bot API parameters to MTProto parameters: botAPIToMTProto</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#packdouble-float-value-string" name="packDouble">Convert double to binary version: packDouble</a>
@@ -347,16 +349,16 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#packunsignedint-int-value-string" name="packUnsignedInt">Convert value to unsigned base256 int: packUnsignedInt</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#stringtostream-string-str-amp-bytestream-readablebuffer" name="stringToStream">Converts a string into an async amphp stream: stringToStream</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.createForumTopic.html" name="channels.createForumTopic">Create a forum topic; requires manage_topics rights: channels.createForumTopic</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.createChannel.html" name="channels.createChannel">Create a supergroup/channel: channels.createChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.createGroupCall.html" name="phone.createGroupCall">Create a group call or livestream: phone.createGroupCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.createStickerSet.html" name="stickers.createStickerSet">Create a stickerset, bots only: stickers.createStickerSet</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.createChannel.html" name="channels.createChannel">Create a supergroup/channel: channels.createChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.createTheme.html" name="account.createTheme">Create a theme: account.createTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.uploadWallPaper.html" name="account.uploadWallPaper">Create and upload a new wallpaper: account.uploadWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#arr-mixed-params-array" name="arr">Create array: arr</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.createChat.html" name="messages.createChat">Creates a new chat: messages.createChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteChannel.html" name="channels.deleteChannel">Delete a channel/supergroup: channels.deleteChannel</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteChat.html" name="messages.deleteChat">Delete a chat: messages.deleteChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteExportedChatInvite.html" name="messages.deleteExportedChatInvite">Delete a chat invite: messages.deleteExportedChatInvite</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteChat.html" name="messages.deleteChat">Delete a chat: messages.deleteChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.leaveChatlist.html" name="chatlists.leaveChatlist">Delete a folder imported using a chat folder deep link »: chatlists.leaveChatlist</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.deleteExportedInvite.html" name="chatlists.deleteExportedInvite">Delete a previously created chat folder deep link »: chatlists.deleteExportedInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetWallPapers.html" name="account.resetWallPapers">Delete all installed wallpapers, reverting to the default wallpaper set: account.resetWallPapers</a>
@@ -394,10 +396,10 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#downloadtostream-mixed-messagemedia-mixed-filecallbackinterface-resource-amp-bytestream-writablestream-stream-callable-cb-null-int-offset-0-int-end-1-mixed" name="downloadToStream">Download file to stream: downloadToStream</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#downloadtofile-mixed-messagemedia-string-filecallbackinterface-file-callable-cb-null-string-false" name="downloadToFile">Download file: downloadToFile</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#downloadserver-string-session-void" name="downloadServer">Downloads a file to the browser using the specified session file: downloadServer</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.editForumTopic.html" name="channels.editForumTopic">Edit forum topic; requires manage_topics rights: channels.editForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.editExportedInvite.html" name="chatlists.editExportedInvite">Edit a chat folder deep link »: chatlists.editExportedInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editExportedChatInvite.html" name="messages.editExportedChatInvite">Edit an exported chat invite: messages.editExportedChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editInlineBotMessage.html" name="messages.editInlineBotMessage">Edit an inline bot message: messages.editInlineBotMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.editForumTopic.html" name="channels.editForumTopic">Edit forum topic; requires manage_topics rights: channels.editForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.editGroupCallParticipant.html" name="phone.editGroupCallParticipant">Edit information about a given group call participant: phone.editGroupCallParticipant</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.editLocation.html" name="channels.editLocation">Edit location of geogroup: channels.editLocation</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editMessage.html" name="messages.editMessage">Edit message: messages.editMessage</a>
@@ -409,10 +411,11 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateNotifySettings.html" name="account.updateNotifySettings">Edits notification settings from a given user/group, from all users/all groups: account.updateNotifySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleNoForwards.html" name="messages.toggleNoForwards">Enable or disable content protection on a channel or chat: messages.toggleNoForwards</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleForum.html" name="channels.toggleForum">Enable or disable forum functionality in a supergroup: channels.toggleForum</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleBotInAttachMenu.html" name="messages.toggleBotInAttachMenu">Enable or disable web bot attachment menu »: messages.toggleBotInAttachMenu</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleAntiSpam.html" name="channels.toggleAntiSpam">Enable or disable the native antispam system: channels.toggleAntiSpam</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleTopPeers.html" name="contacts.toggleTopPeers">Enable/disable top peers: contacts.toggleTopPeers</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleBotInAttachMenu.html" name="messages.toggleBotInAttachMenu">Enable or disable web bot attachment menu »: messages.toggleBotInAttachMenu</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleSignatures.html" name="channels.toggleSignatures">Enable/disable message signatures in channels: channels.toggleSignatures</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleTopPeers.html" name="contacts.toggleTopPeers">Enable/disable top peers: contacts.toggleTopPeers</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdownescape-string-what-string" name="markdownEscape">Escape string for markdown: markdownEscape</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastcustom-action-action-danog-madelineproto-broadcast-filter-filter-null-int" name="broadcastCustom">Executes a custom broadcast action with all peers (users, chats, channels) of the bot: broadcastCustom</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.exportChatlistInvite.html" name="chatlists.exportChatlistInvite">Export a folder », creating a chat folder deep link »: chatlists.exportChatlistInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.exportChatInvite.html" name="messages.exportChatInvite">Export an invite link for a chat: messages.exportChatInvite</a>
@@ -441,18 +444,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gettl-danog-madelineproto-tl-tlinterface" name="getTL">Get TL serializer: getTL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPremiumPromo.html" name="help.getPremiumPromo">Get Telegram Premium promotion information: help.getPremiumPromo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mbstrlen-string-text-int" name="mbStrlen">Get Telegram UTF-8 length of string: mbStrlen</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastStats.html" name="stats.getBroadcastStats">Get channel statistics: stats.getBroadcastStats</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getAdminedPublicChannels.html" name="channels.getAdminedPublicChannels">Get channels/supergroups/geogroups we're admin in. Usually called when the user exceeds the limit for owned public channels/supergroups/geogroups, and the user is given the choice to remove one of his channels/supergroups/geogroups: channels.getAdminedPublicChannels</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDiscussionMessage.html" name="messages.getDiscussionMessage">Get discussion message from the associated discussion group of a channel to show it on top of the comment section, without actually joining the group: messages.getDiscussionMessage</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDialogFilters.html" name="messages.getDialogFilters">Get folders: messages.getDialogFilters</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getWebPage.html" name="messages.getWebPage">Get instant view page: messages.getWebPage</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessageReactionsList.html" name="messages.getMessageReactionsList">Get message reaction list, along with the sender of each reaction: messages.getMessageReactionsList</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessagesReactions.html" name="messages.getMessagesReactions">Get message reactions »: messages.getMessagesReactions</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMessageStats.html" name="stats.getMessageStats">Get message statistics: stats.getMessageStats</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPassportConfig.html" name="help.getPassportConfig">Get passport configuration: help.getPassportConfig</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSuggestedDialogFilters.html" name="messages.getSuggestedDialogFilters">Get suggested folders: messages.getSuggestedDialogFilters</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMegagroupStats.html" name="stats.getMegagroupStats">Get supergroup statistics: stats.getMegagroupStats</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopics.html" name="channels.getForumTopics">Get topics of a forum: channels.getForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDocumentByHash.html" name="messages.getDocumentByHash">Get a document by its SHA256 hash, mainly used for gifs: messages.getDocumentByHash</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getLeftChannels.html" name="channels.getLeftChannels">Get a list of channels/supergroups we left: channels.getLeftChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultEmojiStatuses.html" name="account.getDefaultEmojiStatuses">Get a list of default suggested emoji statuses: account.getDefaultEmojiStatuses</a>
@@ -462,7 +453,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getPaymentForm.html" name="payments.getPaymentForm">Get a payment form: payments.getPaymentForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultGroupPhotoEmojis.html" name="account.getDefaultGroupPhotoEmojis">Get a set of suggested custom emoji stickers that can be used as group picture: account.getDefaultGroupPhotoEmojis</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultProfilePhotoEmojis.html" name="account.getDefaultProfilePhotoEmojis">Get a set of suggested custom emoji stickers that can be used as profile picture: account.getDefaultProfilePhotoEmojis</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getadminids-array" name="getAdminIds">Get admin IDs (equal to the report peers): getAdminIds</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getadminids-array" name="getAdminIds">Get admin IDs (equal to all user report peers): getAdminIds</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getArchivedStickers.html" name="messages.getArchivedStickers">Get all archived stickers: messages.getArchivedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getChatThemes.html" name="account.getChatThemes">Get all available chat themes: account.getChatThemes</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getSaved.html" name="contacts.getSaved">Get all contacts: contacts.getSaved</a>
@@ -482,6 +473,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callstatus-int-id-int" name="callStatus">Get call status: callStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiKeywordsDifference.html" name="messages.getEmojiKeywordsDifference">Get changed emoji keywords »: messages.getEmojiKeywordsDifference</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getAppChangelog.html" name="help.getAppChangelog">Get changelog of current app.  : help.getAppChangelog</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastStats.html" name="stats.getBroadcastStats">Get channel statistics: stats.getBroadcastStats</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getAdminedPublicChannels.html" name="channels.getAdminedPublicChannels">Get channels/supergroups/geogroups we're admin in. Usually called when the user exceeds the limit for owned public channels/supergroups/geogroups, and the user is given the choice to remove one of his channels/supergroups/geogroups: channels.getAdminedPublicChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getCommonChats.html" name="messages.getCommonChats">Get chats in common with a user: messages.getCommonChats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getCdnConfig.html" name="help.getCdnConfig">Get configuration for CDN file downloads: help.getCdnConfig</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getContactIDs.html" name="contacts.getContactIDs">Get contact by telegram IDs: contacts.getContactIDs</a>
@@ -494,16 +487,18 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getPeerDialogs.html" name="messages.getPeerDialogs">Get dialog info of specified peers: messages.getPeerDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDialogUnreadMarks.html" name="messages.getDialogUnreadMarks">Get dialogs manually marked as unread: messages.getDialogUnreadMarks</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getdhconfig-array" name="getDhConfig">Get diffie-hellman configuration: getDhConfig</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDiscussionMessage.html" name="messages.getDiscussionMessage">Get discussion message from the associated discussion group of a channel to show it on top of the comment section, without actually joining the group: messages.getDiscussionMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getdownloadinfo-mixed-messagemedia-array-ext-string-name-string-mime-string-size-int-inputfilelocation-array" name="getDownloadInfo">Get download info of file: getDownloadInfo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getpropicinfo-mixed-data-array" name="getPropicInfo">Get download info of the propic of a user: getPropicInfo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getdownloadlink-danog-madelineproto-eventhandler-message-danog-madelineproto-eventhandler-media-array-string-media-string-scripturl-null-int-size-null-string-name-null-string-mime-null-string" name="getDownloadLink">Get download link of media file: getDownloadLink</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#geteventhandler-class-string-plugineventhandler-class-null-danog-madelineproto-eventhandler-danog-madelineproto-ipc-eventhandlerproxy-__php_incomplete_class-null" name="getEventHandler">Get event handler (or plugin instance): getEventHandler</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#geteventhandler-class-string-t-null-class-null-t-eventhandlerproxy-__php_incomplete_class-null" name="getEventHandler">Get event handler (or plugin instance): getEventHandler</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getextensionfromlocation-mixed-location-string-default-string" name="getExtensionFromLocation">Get extension from file location: getExtensionFromLocation</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getextensionfrommime-string-mime-string" name="getExtensionFromMime">Get extension from mime type: getExtensionFromMime</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFavedStickers.html" name="messages.getFavedStickers">Get faved stickers: messages.getFavedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFeaturedStickers.html" name="messages.getFeaturedStickers">Get featured stickers: messages.getFeaturedStickers</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#end-array-what-mixed" name="end">Get final element of array: end</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getfolderid-mixed-id-int" name="getFolderId">Get folder ID from object: getFolderId</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDialogFilters.html" name="messages.getDialogFilters">Get folders: messages.getDialogFilters</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopicsByID.html" name="channels.getForumTopicsByID">Get forum topics by their ID: channels.getForumTopicsByID</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getallmethods-array" name="getAllMethods">Get full list of MTProto and API methods: getAllMethods</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getGlobalPrivacySettings.html" name="account.getGlobalPrivacySettings">Get global privacy settings: account.getGlobalPrivacySettings</a>
@@ -512,8 +507,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getGameHighScores.html" name="messages.getGameHighScores">Get highscores of a game: messages.getGameHighScores</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getInactiveChannels.html" name="channels.getInactiveChannels">Get inactive channels and supergroups: channels.getInactiveChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamChannels.html" name="phone.getGroupCallStreamChannels">Get info about RTMP streams in a group call or livestream.  : phone.getGroupCallStreamChannels</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipant.html" name="channels.getParticipant">Get info about a channel/supergroup participant: channels.getParticipant</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPaper.html" name="account.getWallPaper">Get info about a certain wallpaper: account.getWallPaper</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipant.html" name="channels.getParticipant">Get info about a channel/supergroup participant: channels.getParticipant</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getExportedChatInvite.html" name="messages.getExportedChatInvite">Get info about a chat invite: messages.getExportedChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getBankCardData.html" name="payments.getBankCardData">Get info about a credit card: payments.getBankCardData</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCall.html" name="phone.getGroupCall">Get info about a group call: phone.getGroupCall</a>
@@ -530,6 +525,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getExtendedMedia.html" name="messages.getExtendedMedia">Get information about extended media: messages.getExtendedMedia</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMaskStickers.html" name="messages.getMaskStickers">Get installed mask stickers: messages.getMaskStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getThemes.html" name="account.getThemes">Get installed themes: account.getThemes</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getWebPage.html" name="messages.getWebPage">Get instant view page: messages.getWebPage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.exportMessageLink.html" name="channels.exportMessageLink">Get link and embed info of a message in a channel/supergroup: channels.exportMessageLink</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getRecentLocations.html" name="messages.getRecentLocations">Get live location history of a certain user: messages.getRecentLocations</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack.getLangPack.html" name="langpack.getLangPack">Get localization pack strings: langpack.getLangPack</a>
@@ -541,6 +537,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getmaxmaps-int" name="getMaxMaps">Get maximum number of memory-mapped regions, UNIX only: getMaxMaps</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAutoDownloadSettings.html" name="account.getAutoDownloadSettings">Get media autodownload settings: account.getAutoDownloadSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSplitRanges.html" name="messages.getSplitRanges">Get message ranges for saving the user's chat history: messages.getSplitRanges</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessageReactionsList.html" name="messages.getMessageReactionsList">Get message reaction list, along with the sender of each reaction: messages.getMessageReactionsList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessagesReactions.html" name="messages.getMessagesReactions">Get message reactions »: messages.getMessagesReactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMessageStats.html" name="stats.getMessageStats">Get message statistics: stats.getMessageStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getReplies.html" name="messages.getReplies">Get messages in a reply thread: messages.getReplies</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getmimefrombuffer-string-buffer-string" name="getMimeFromBuffer">Get mime type from buffer: getMimeFromBuffer</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getmimefromextension-string-extension-string-default-string" name="getMimeFromExtension">Get mime type from file extension: getMimeFromExtension</a>
@@ -550,6 +549,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getCountriesList.html" name="help.getCountriesList">Get name, ISO code, localized name and phone codes/patterns of all available countries: help.getCountriesList</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getmethodsnamespaced-array" name="getMethodsNamespaced">Get namespaced methods (method => namespace): getMethodsNamespaced</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack.getDifference.html" name="langpack.getDifference">Get new strings in language pack: langpack.getDifference</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPassportConfig.html" name="help.getPassportConfig">Get passport configuration: help.getPassportConfig</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getPaymentReceipt.html" name="payments.getPaymentReceipt">Get payment receipt: payments.getPaymentReceipt</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getPeerSettings.html" name="messages.getPeerSettings">Get peer settings: messages.getPeerSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getCallConfig.html" name="phone.getCallConfig">Get phone call configuration to be passed to libtgvoip's shared config: phone.getCallConfig</a>
@@ -576,12 +576,15 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAttachedStickers.html" name="messages.getAttachedStickers">Get stickers attached to a photo or video: messages.getAttachedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getStickers.html" name="messages.getStickers">Get stickers by emoji: messages.getStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack.getStrings.html" name="langpack.getStrings">Get strings from a language pack: langpack.getStrings</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSuggestedDialogFilters.html" name="messages.getSuggestedDialogFilters">Get suggested folders: messages.getSuggestedDialogFilters</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMegagroupStats.html" name="stats.getMegagroupStats">Get supergroup statistics: stats.getMegagroupStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getTmpPassword.html" name="account.getTmpPassword">Get temporary payment password: account.getTmpPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getAdminLog.html" name="channels.getAdminLog">Get the admin log of a channel/supergroup: channels.getAdminLog</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSearchCounters.html" name="messages.getSearchCounters">Get the number of results that would be found by a messages.search call with the same parameters: messages.getSearchCounters</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipants.html" name="channels.getParticipants">Get the participants of a supergroup/channel: channels.getParticipants</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getbroadcastprogress-int-id-danog-madelineproto-broadcast-progress" name="getBroadcastProgress">Get the progress of a currently running broadcast: getBroadcastProgress</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getTheme.html" name="account.getTheme">Get theme information: account.getTheme</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopics.html" name="channels.getForumTopics">Get topics of a forum: channels.getForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gettype-mixed-id-danog-madelineproto-api-peer_type_" name="getType">Get type of peer: getType</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getUnreadMentions.html" name="messages.getUnreadMentions">Get unread messages where we were mentioned: messages.getUnreadMentions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getUnreadReactions.html" name="messages.getUnreadReactions">Get unread reactions to messages you sent: messages.getUnreadReactions</a>
@@ -613,9 +616,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#initselfrestart-void" name="initSelfRestart">Initialize self-restart hack: initSelfRestart</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetPassword.html" name="account.resetPassword">Initiate a 2FA password reset: can only be used if the user is already logged-in, see here for more info »: account.resetPassword</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#qrlogin-danog-madelineproto-tl-types-loginqrcode" name="qrLogin">Initiates QR code login: qrLogin</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.installWallPaper.html" name="account.installWallPaper">Install wallpaper: account.installWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.installStickerSet.html" name="messages.installStickerSet">Install a stickerset: messages.installStickerSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.installTheme.html" name="account.installTheme">Install a theme: account.installTheme</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.installWallPaper.html" name="account.installWallPaper">Install wallpaper: account.installWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.saveWallPaper.html" name="account.saveWallPaper">Install/uninstall wallpaper: account.saveWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/photos.updateProfilePhoto.html" name="photos.updateProfilePhoto">Installs a previously uploaded photo as a profile photo: photos.updateProfilePhoto</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#processdownloadserverping-string-path-string-payload-void" name="processDownloadServerPing">Internal endpoint used by the download server: processDownloadServerPing</a>
@@ -651,12 +654,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#htmltomessageentities-string-html-danog-madelineproto-tl-conversion-domentities-object-containing-message-and-entities" name="htmlToMessageEntities">Manually convert HTML to a message and a set of entities: htmlToMessageEntities</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdowntomessageentities-string-markdown-danog-madelineproto-tl-conversion-markdownentities-object-containing-message-and-entities" name="markdownToMessageEntities">Manually convert markdown to a message and a set of entities: markdownToMessageEntities</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.markDialogUnread.html" name="messages.markDialogUnread">Manually mark dialog as unread: messages.markDialogUnread</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.viewSponsoredMessage.html" name="channels.viewSponsoredMessage">Mark a specific sponsored message as read: channels.viewSponsoredMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readDiscussion.html" name="messages.readDiscussion">Mark a thread as read: messages.readDiscussion</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.readHistory.html" name="channels.readHistory">Mark channel/supergroup history as read: channels.readHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.readMessageContents.html" name="channels.readMessageContents">Mark channel/supergroup message contents as read: channels.readMessageContents</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readReactions.html" name="messages.readReactions">Mark message reactions » as read: messages.readReactions</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readDiscussion.html" name="messages.readDiscussion">Mark a thread as read: messages.readDiscussion</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.viewSponsoredMessage.html" name="channels.viewSponsoredMessage">Mark a specific sponsored message as read: channels.viewSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readMentions.html" name="messages.readMentions">Mark mentions as read: messages.readMentions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readReactions.html" name="messages.readReactions">Mark message reactions » as read: messages.readReactions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readFeaturedStickers.html" name="messages.readFeaturedStickers">Mark new featured stickers as read: messages.readFeaturedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.faveSticker.html" name="messages.faveSticker">Mark or unmark a sticker as favorite: messages.faveSticker</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#viewsponsoredmessage-int-array-peer-string-array-random_id-string-message-bool" name="viewSponsoredMessage">Mark sponsored message as read: viewSponsoredMessage</a>
@@ -682,9 +685,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkHistoryImport.html" name="messages.checkHistoryImport">Obtains information about a chat export file, generated by a foreign chat app, click here for more info about imported chats »: messages.checkHistoryImport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotPrecheckoutResults.html" name="messages.setBotPrecheckoutResults">Once the user has confirmed their payment and shipping details, the bot receives an updateBotPrecheckoutQuery update.  : messages.setBotPrecheckoutResults</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getupdates-array-offset-int-limit-int-timeout-float-params-list-array-update_id-mixed-update-mixed" name="getUpdates">Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**: getUpdates</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestSimpleWebView.html" name="messages.requestSimpleWebView">Open a bot web app: messages.requestSimpleWebView</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html" name="messages.requestAppWebView">Open a bot web app from a named bot web app deep link, sending over user information after user confirmation: messages.requestAppWebView</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html" name="messages.requestWebView">Open a bot web app, sending over user information after user confirmation: messages.requestWebView</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestSimpleWebView.html" name="messages.requestSimpleWebView">Open a bot web app: messages.requestSimpleWebView</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#openfileappendonly-string-path-amp-file-file" name="openFileAppendOnly">Opens a file in append-only mode: openFileAppendOnly</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.receivedCall.html" name="phone.receivedCall">Optional: notify the server that the user is currently busy in a call: this will automatically refuse all incoming phone calls until the current phone call is ended: phone.receivedCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#updatesettings-settingsabstract-settings-void" name="updateSettings">Parse, update and store settings: updateSettings</a>
@@ -698,8 +701,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#posmod-int-a-int-b-int" name="posmod">Positive modulo: posmod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotCallbackAnswer.html" name="messages.getBotCallbackAnswer">Press an inline callback button and get a callback answer from the bot: messages.getBotCallbackAnswer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html" name="messages.getInlineBotResults">Query an inline bot: messages.getInlineBotResults</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.rateTranscribedAudio.html" name="messages.rateTranscribedAudio">Rate transcribed voice message: messages.rateTranscribedAudio</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.setCallRating.html" name="phone.setCallRating">Rate a call, returns info about the rating message sent to the official VoIP bot: phone.setCallRating</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.rateTranscribedAudio.html" name="messages.rateTranscribedAudio">Rate transcribed voice message: messages.rateTranscribedAudio</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendReaction.html" name="messages.sendReaction">React to message: messages.sendReaction</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshfullpeercache-mixed-id-void" name="refreshFullPeerCache">Refresh full peer cache for a certain peer: refreshFullPeerCache</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshpeercache-mixed-ids-void" name="refreshPeerCache">Refresh peer cache for a certain peer: refreshPeerCache</a>
@@ -707,16 +710,16 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rekey-int-chat-string" name="rekey">Rekey secret chat: rekey</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.removeStickerFromSet.html" name="stickers.removeStickerFromSet">Remove a sticker from the set where it belongs, bots only. The sticker set must have been created by the bot: stickers.removeStickerFromSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.renameStickerSet.html" name="stickers.renameStickerSet">Renames a stickerset, bots only: stickers.renameStickerSet</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateDialogFiltersOrder.html" name="messages.updateDialogFiltersOrder">Reorder folders: messages.updateDialogFiltersOrder</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reorderUsernames.html" name="channels.reorderUsernames">Reorder active usernames: channels.reorderUsernames</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateDialogFiltersOrder.html" name="messages.updateDialogFiltersOrder">Reorder folders: messages.updateDialogFiltersOrder</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reorderStickerSets.html" name="messages.reorderStickerSets">Reorder installed stickersets: messages.reorderStickerSets</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reorderPinnedDialogs.html" name="messages.reorderPinnedDialogs">Reorder pinned dialogs: messages.reorderPinnedDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reorderPinnedForumTopics.html" name="channels.reorderPinnedForumTopics">Reorder pinned forum topics: channels.reorderPinnedForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.reorderUsernames.html" name="bots.reorderUsernames">Reorder usernames associated to a bot we own: bots.reorderUsernames</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.reorderUsernames.html" name="account.reorderUsernames">Reorder usernames associated with the currently logged-in user: account.reorderUsernames</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.report.html" name="messages.report">Report a message in a chat for violation of telegram's Terms of Service: messages.report</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reportReaction.html" name="messages.reportReaction">Report a message reaction: messages.reportReaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reportAntiSpamFalsePositive.html" name="channels.reportAntiSpamFalsePositive">Report a native antispam false positive: channels.reportAntiSpamFalsePositive</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.report.html" name="messages.report">Report a message in a chat for violation of telegram's Terms of Service: messages.report</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reportSpam.html" name="messages.reportSpam">Report a new incoming chat for spam, if the peer settings of the chat allow us to do that: messages.reportSpam</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.reportPeer.html" name="account.reportPeer">Report a peer for violation of telegram's Terms of Service: account.reportPeer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.reportProfilePhoto.html" name="account.reportProfilePhoto">Report a profile photo of a dialog: account.reportProfilePhoto</a>
@@ -724,17 +727,17 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#report-string-message-string-parsemode-void" name="report">Report an error to the previously set peer: report</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#reportmemoryprofile-void" name="reportMemoryProfile">Report memory profile with memprof: reportMemoryProfile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reportSpam.html" name="channels.reportSpam">Reports some messages from a user in a supergroup as spam; requires administrator rights in the supergroup: channels.reportSpam</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiGroups.html" name="messages.getEmojiGroups">Represents a list of emoji categories, to be used when selecting custom emojis: messages.getEmojiGroups</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiStatusGroups.html" name="messages.getEmojiStatusGroups">Represents a list of emoji categories, to be used when selecting custom emojis to set as custom emoji status: messages.getEmojiStatusGroups</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiProfilePhotoGroups.html" name="messages.getEmojiProfilePhotoGroups">Represents a list of emoji categories, to be used when selecting custom emojis to set as profile picture: messages.getEmojiProfilePhotoGroups</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiGroups.html" name="messages.getEmojiGroups">Represents a list of emoji categories, to be used when selecting custom emojis: messages.getEmojiGroups</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#requestcall-mixed-user-mixed" name="requestCall">Request VoIP call: requestCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.requestFirebaseSms.html" name="auth.requestFirebaseSms">Request an SMS code via Firebase: auth.requestFirebaseSms</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.requestPasswordRecovery.html" name="auth.requestPasswordRecovery">Request recovery code of a 2FA password, only for accounts with a recovery email configured: auth.requestPasswordRecovery</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#requestsecretchat-mixed-user-mixed" name="requestSecretChat">Request secret chat: requestSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resendPasswordEmail.html" name="account.resendPasswordEmail">Resend the code to verify an email to use as 2FA recovery method: account.resendPasswordEmail</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.resendCode.html" name="auth.resendCode">Resend the login code via another medium, the phone code type is determined by the return value of the previous auth.sendCode/auth.resendCode: see login for more info: auth.resendCode</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resetTopPeerRating.html" name="contacts.resetTopPeerRating">Reset rating of top peer: contacts.resetTopPeerRating</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetWebAuthorizations.html" name="account.resetWebAuthorizations">Reset all active web telegram login sessions: account.resetWebAuthorizations</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resetTopPeerRating.html" name="contacts.resetTopPeerRating">Reset rating of top peer: contacts.resetTopPeerRating</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.recoverPassword.html" name="auth.recoverPassword">Reset the 2FA password using the recovery code sent using auth.requestPasswordRecovery: auth.recoverPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.resetLoginEmail.html" name="auth.resetLoginEmail">Reset the login email »: auth.resetLoginEmail</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#resetupdatestate-void" name="resetUpdateState">Reset the update state and fetch all updates from the beginning: resetUpdateState</a>
@@ -768,7 +771,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsessionname-string" name="getSessionName">Returns the session name: getSessionName</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getSupport.html" name="help.getSupport">Returns the support user for the "ask a question" feature: help.getSupport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.search.html" name="contacts.search">Returns users found by username substring: contacts.search</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isbot-bool" name="isBot">Returns whether the current user is a bot: isBot</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#ispremium-bool" name="isPremium">Returns whether the current user is a premium user, cached: isPremium</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isuser-bool" name="isUser">Returns whether the current user is a user: isUser</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#uploadfromtgfile-mixed-media-callable-cb-null-bool-encrypted-false-mixed" name="uploadFromTgfile">Reupload telegram file: uploadFromTgfile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.saveDraft.html" name="messages.saveDraft">Save a message draft associated to a chat: messages.saveDraft</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.saveTheme.html" name="account.saveTheme">Save a theme: account.saveTheme</a>
@@ -816,9 +821,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.setStickerSetThumb.html" name="stickers.setStickerSetThumb">Set stickerset thumbnail: stickers.setStickerSetThumb</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#setwebapitemplate-string-template-void" name="setWebApiTemplate">Set the API ID UI template: setWebApiTemplate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotCallbackAnswer.html" name="messages.setBotCallbackAnswer">Set the callback answer to a user button press (bots only): messages.setBotCallbackAnswer</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.saveDefaultGroupCallJoinAs.html" name="phone.saveDefaultGroupCallJoinAs">Set the default peer that will be used to join a group call in a specific dialog: phone.saveDefaultGroupCallJoinAs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.setBotBroadcastDefaultAdminRights.html" name="bots.setBotBroadcastDefaultAdminRights">Set the default suggested admin rights for bots being added as admins to channels, see here for more info on how to handle them »: bots.setBotBroadcastDefaultAdminRights</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.setBotGroupDefaultAdminRights.html" name="bots.setBotGroupDefaultAdminRights">Set the default suggested admin rights for bots being added as admins to groups, see here for more info on how to handle them »: bots.setBotGroupDefaultAdminRights</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.saveDefaultGroupCallJoinAs.html" name="phone.saveDefaultGroupCallJoinAs">Set the default peer that will be used to join a group call in a specific dialog: phone.saveDefaultGroupCallJoinAs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.setAuthorizationTTL.html" name="account.setAuthorizationTTL">Set time-to-live of current session: account.setAuthorizationTTL</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#setwebhook-string-webhookurl-void" name="setWebhook">Set webhook update handler: setWebhook</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleJoinToSend.html" name="channels.toggleJoinToSend">Set whether all users should join a discussion group in order to comment on a post »: channels.toggleJoinToSend</a>
@@ -848,6 +853,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#testfibers-int-fibercount-100000-array-maxfibers-int-realmemorymb-int-maps-int-maxmaps-int" name="testFibers">Test fibers: testFibers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.setContactSignUpNotification.html" name="account.setContactSignUpNotification">Toggle contact sign up notifications: account.setContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleSlowMode.html" name="channels.toggleSlowMode">Toggle supergroup slow mode: if enabled, users will only be able to send one message every seconds seconds: channels.toggleSlowMode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.transcribeAudio.html" name="messages.transcribeAudio">Transcribe voice message: messages.transcribeAudio</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.editCreator.html" name="channels.editCreator">Transfer channel ownership: channels.editCreator</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.translateText.html" name="messages.translateText">Translate a given text: messages.translateText</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.migrateChat.html" name="messages.migrateChat">Turn a basic group into a supergroup: messages.migrateChat</a>
@@ -857,6 +863,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#unpacksignedlong-string-value-int" name="unpackSignedLong">Unpack base256 signed long: unpackSignedLong</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#unpackdouble-string-value-float" name="unpackDouble">Unpack binary double: unpackDouble</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#unpackfileid-string-fileid-array-unpacked-file-id" name="unpackFileId">Unpack bot API file ID: unpackFileId</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.unpinAllMessages.html" name="messages.unpinAllMessages">Unpin all pinned messages: messages.unpinAllMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#unseteventhandler-void" name="unsetEventHandler">Unset event handler: unsetEventHandler</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateDialogFilter.html" name="messages.updateDialogFilter">Update folder: messages.updateDialogFilter</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.changeSticker.html" name="stickers.changeSticker">Update the keywords, emojis or mask coordinates of a sticker, bots only: stickers.changeSticker</a>
@@ -892,14 +899,34 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isaltervista-bool" name="isAltervista">Whether this is altervista: isAltervista</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipc-bool" name="isIpc">Whether we're an IPC client instance: isIpc</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipcworker-bool" name="isIpcWorker">Whether we're an IPC server process (as opposed to an event handler): isIpcWorker</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmessage-array-message-danog-madelineproto-eventhandler-message" name="wrapMessage">Wrap a Message constructor into an abstract Message object: wrapMessage</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmessage-array-message-danog-madelineproto-eventhandler-abstractmessage" name="wrapMessage">Wrap a Message constructor into an abstract Message object: wrapMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmedia-array-media-bool-protected-false-danog-madelineproto-eventhandler-media" name="wrapMedia">Wrap a media constructor into an abstract Media object: wrapMedia</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate-array-update-danog-madelineproto-eventhandler-update" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.transcribeAudio.html" name="messages.transcribeAudio">Transcribe voice message: messages.transcribeAudio</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.unpinAllMessages.html" name="messages.unpinAllMessages">Unpin all pinned messages: messages.unpinAllMessages</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.invalidateSignInCodes.html" name="account.invalidateSignInCodes">account.invalidateSignInCodes</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urldecode-string-data-string" name="base64urlDecode">base64URL decode: base64urlDecode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.clickSponsoredMessage.html" name="channels.clickSponsoredMessage">channels.clickSponsoredMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.editCloseFriends.html" name="contacts.editCloseFriends">contacts.editCloseFriends</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleStoriesHidden.html" name="contacts.toggleStoriesHidden">contacts.toggleStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rledecode-string-string-string" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleencode-string-string-string" name="rleEncode">null-byte RLE encode: rleEncode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.deleteStories.html" name="stories.deleteStories">stories.deleteStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.editStory.html" name="stories.editStory">stories.editStory</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.exportStoryLink.html" name="stories.exportStoryLink">stories.exportStoryLink</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllReadUserStories.html" name="stories.getAllReadUserStories">stories.getAllReadUserStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllStories.html" name="stories.getAllStories">stories.getAllStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPinnedStories.html" name="stories.getPinnedStories">stories.getPinnedStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesArchive.html" name="stories.getStoriesArchive">stories.getStoriesArchive</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesByID.html" name="stories.getStoriesByID">stories.getStoriesByID</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesViews.html" name="stories.getStoriesViews">stories.getStoriesViews</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryViewsList.html" name="stories.getStoryViewsList">stories.getStoryViewsList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getUserStories.html" name="stories.getUserStories">stories.getUserStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.incrementStoryViews.html" name="stories.incrementStoryViews">stories.incrementStoryViews</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.readStories.html" name="stories.readStories">stories.readStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.report.html" name="stories.report">stories.report</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.sendStory.html" name="stories.sendStory">stories.sendStory</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.toggleAllStoriesHidden.html" name="stories.toggleAllStoriesHidden">stories.toggleAllStoriesHidden</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePinned.html" name="stories.togglePinned">stories.togglePinned</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getStoriesMaxIDs.html" name="users.getStoriesMaxIDs">users.getStoriesMaxIDs</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html)
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)

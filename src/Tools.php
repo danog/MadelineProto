@@ -707,14 +707,23 @@ abstract class Tools extends AsyncTools
                 && $call->args
                 && $call->args[0] instanceof Arg
                 && $call->args[0]->value instanceof String_
-                && $call->args[0]->value->value === 'MadelineProto.log'
             ) {
-                $issues []= new EventHandlerIssue(
-                    message: Lang::$current_lang['do_not_delete_MadelineProto.log'],
-                    file: $file,
-                    line: $call->getStartLine(),
-                    severe: true
-                );
+                $arg = $call->args[0]->value->value;
+                if ($arg === 'MadelineProto.log') {
+                    $issues []= new EventHandlerIssue(
+                        message: Lang::$current_lang['do_not_delete_MadelineProto.log'],
+                        file: $file,
+                        line: $call->getStartLine(),
+                        severe: true
+                    );
+                } elseif (\str_starts_with($arg, 'madeline') && \str_ends_with($arg, '.phar')) {
+                    $issues []= new EventHandlerIssue(
+                        message: Lang::$current_lang['do_not_remove_MadelineProto.log_phar'],
+                        file: $file,
+                        line: $call->getStartLine(),
+                        severe: true
+                    );
+                }
                 continue;
             }
 

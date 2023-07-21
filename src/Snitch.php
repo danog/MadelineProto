@@ -71,7 +71,7 @@ final class Snitch
         //Shutdown::removeCallback('restarter');
         $message = Lang::$current_lang["do_not_remove_MadelineProto.log_phar"];
         Logger::log($message, Logger::FATAL_ERROR);
-        \file_put_contents(Magic::$cwd.DIRECTORY_SEPARATOR.'DO_NOT_REMOVE_MADELINEPROTO_LOG_SESSION', $message);
+        \file_put_contents(Magic::$cwd.DIRECTORY_SEPARATOR.'DO_NOT_REMOVE_MADELINEPROTO_LOG_SESSION_'.\random_int(PHP_INT_MIN, PHP_INT_MAX), $message);
         //die("$message\n");
     }
 }
