@@ -6,7 +6,7 @@ Features:
 - Add support for `parse_mode` parsing for story methods.
 - `getReply` now simply returns null if the message doesn't reply to any other message.
 - `getReply` now has an optional parameter that can be used to filter the returned message type.
-- Added `isUser()`, `isBot()` messages to check whether the current user is a user or a bot.
+- Added `isSelfUser()`, `isSelfBot()` messages to check whether the current user is a user or a bot.
 - Improved IDE typehinting.
 - CLI bots: you can now optionally specify a default download link URL (used by `getDownloadLink`) in the settings.
 

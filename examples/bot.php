@@ -151,7 +151,7 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('story')]
     public function storyCommand(Message & FromAdmin $message): void
     {
-        if ($this->isBot()) {
+        if ($this->isSelfBot()) {
             $message->reply("Only users can post Telegram Stories!");
             return;
         }

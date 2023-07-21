@@ -195,8 +195,9 @@ abstract class Serialization
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
+            } elseif (\is_subclass_of($class, EventHandler::class)) {
+                EventHandler::cachePlugins($class);
             }
-            EventHandler::cachePlugins($class);
         }
 
         $tempId = Shutdown::addCallback($unlock = static function () use ($unlock): void {

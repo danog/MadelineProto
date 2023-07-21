@@ -1190,13 +1190,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::isArrayOrAlike($var);
     }
     /**
-     * Returns whether the current user is a bot.
-     */
-    public function isBot(): bool
-    {
-        return $this->wrapper->getAPI()->isBot();
-    }
-    /**
      * Check if the specified peer is a forum.
      *
      */
@@ -1226,6 +1219,20 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isPremium();
     }
     /**
+     * Returns whether the current user is a bot.
+     */
+    public function isSelfBot(): bool
+    {
+        return $this->wrapper->getAPI()->isSelfBot();
+    }
+    /**
+     * Returns whether the current user is a user.
+     */
+    public function isSelfUser(): bool
+    {
+        return $this->wrapper->getAPI()->isSelfUser();
+    }
+    /**
      * Check whether provided bot API ID is a channel or supergroup.
      *
      * @param int $id Bot API ID
@@ -1233,13 +1240,6 @@ abstract class InternalDoc
     public static function isSupergroup(int $id): bool
     {
         return \danog\MadelineProto\MTProto::isSupergroup($id);
-    }
-    /**
-     * Returns whether the current user is a user.
-     */
-    public function isUser(): bool
-    {
-        return $this->wrapper->getAPI()->isUser();
     }
     /**
      * Logger.
