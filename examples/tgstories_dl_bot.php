@@ -23,11 +23,22 @@ use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\SimpleEventHandler;
+use danog\MadelineProto\PluginEventHandler;
 
-require 'vendor/autoload.php';
+// MadelineProto is already loaded
+if (class_exists(API::class)) {
+    // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader
+} elseif (file_exists('vendor/autoload.php')) {
+    require_once 'vendor/autoload.php';
+} else {
+    // Otherwise download an !!! alpha !!! version of MadelineProto via madeline.php
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    }
+    require_once 'madeline.php';
+}
 
-final class StoriesEventHandler extends SimpleEventHandler
+final class StoriesEventHandler extends PluginEventHandler
 {
     private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @username - Download all the stories of a username!";
 
@@ -35,6 +46,7 @@ final class StoriesEventHandler extends SimpleEventHandler
     public function onStart(): void
     {
         // Login as a user
+        $this->echo("Please login as a user!");
         $this->userInstance = new API('stories_user.madeline');
         $this->userInstance->start();
         if (!$this->userInstance->isSelfUser()) {
