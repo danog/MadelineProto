@@ -94,7 +94,11 @@ final class ProcessRunner extends RunnerAbstract
         ];
         $envVars = \array_merge(
             \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
-            ['QUERY_STRING' => \http_build_query($params)],
+            [
+                'QUERY_STRING' => \http_build_query($params),
+                'SERVER_NAME' => Magic::$serverName,
+                'REQUEST_URI' => Magic::$requestUri,
+            ],
         );
 
         self::$resources []= \proc_open(

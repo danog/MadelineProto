@@ -1,4 +1,4 @@
-MadelineProto was updated (8.0.0-beta114)!
+MadelineProto was updated (8.0.0-beta115)!
 
 Features:
 - You can now get direct download links for or **directly download** stories, here's an example:
@@ -9,10 +9,6 @@ Features:
 - Added `isSelfUser()`, `isSelfBot()` messages to check whether the current user is a user or a bot.
 - Improved IDE typehinting.
 - CLI bots: you can now optionally specify a default download link URL (used by `getDownloadLink`) in the settings.
-
-MadelineProto was updated (8.0.0-beta114)!
-
-Features:
 - Added `DialogMessagePinned` service message with a `getPinnedMessage()` method.
 
 Fixes:
@@ -22,6 +18,7 @@ Fixes:
 - Tweaked the default drop timeout on media DCs to avoid timeout errors on slow networks.
 - Now the admin list only contains user report peers.
 - Make `markdownEscape` method accessible
+- Fixed `getDownloadLink` for non-event-handler web IPC instances.
 
 ---
 

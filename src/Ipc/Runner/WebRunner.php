@@ -35,7 +35,7 @@ final class WebRunner extends RunnerAbstract
      */
     public static function start(string $session, int $startupId): bool
     {
-        if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
+        if (!Magic::$serverName) {
             return false;
         }
 
@@ -74,7 +74,7 @@ final class WebRunner extends RunnerAbstract
             return self::$absoluteRootDir;
         }
 
-        $uri = \parse_url('tcp://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $uri = \parse_url('tcp://'.Magic::$serverName.Magic::$requestUri, PHP_URL_PATH);
         if (\substr($uri, -1) === '/') { // http://example.com/path/ (assumed index.php)
             $uri .= 'index'; // Add fake file name
         }
@@ -101,12 +101,13 @@ final class WebRunner extends RunnerAbstract
 
     public static function selfStart(string $uri): void
     {
-        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
+        $serverName = Magic::$serverName;
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$serverName}\r\n\r\n";
 
         foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
-            foreach (\array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
+            foreach (\array_unique([(int) ($_SERVER['SERVER_PORT'] ?? 80), ($proto === 'tls' ? 443 : 80)]) as $port) {
                 try {
-                    $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                    $address = $proto.'://'.$serverName;
                     $res = \fsockopen($address, (int) $port);
                     Logger::log("Successfully connected to {$address}:{$port}!");
                     Logger::log("Sending payload: $payload");
@@ -115,6 +116,10 @@ final class WebRunner extends RunnerAbstract
                     \fwrite($res, $payload);
                     self::$resources []= $res;
                 } catch (Throwable $e) {
+                    if (str_contains($e->getMessage(), 'wrong version number')) {
+                        // HTTP request to HTTPS port
+                        continue;
+                    }
                     Logger::log("Error while sending to {$address}:{$port}: $e");
                 }
             }

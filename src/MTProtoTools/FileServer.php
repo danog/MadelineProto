@@ -30,6 +30,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\AppInfo;
 use danog\MadelineProto\Tools;
@@ -208,7 +209,7 @@ trait FileServer
             $f = \substr($f, \strlen($absoluteRootDir)-1);
             $f = \str_replace(DIRECTORY_SEPARATOR, '/', $f);
             $f = \str_replace('//', '/', $f);
-            $f = 'https://'.$_SERVER['SERVER_NAME'].$f;
+            $f = 'https://'.Magic::$serverName.$f;
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
         } finally {
