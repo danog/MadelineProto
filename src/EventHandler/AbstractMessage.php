@@ -60,7 +60,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $this->silent = $rawMessage['silent'];
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
 
-        if (isset($rawMessage['reply_to'])) {
+        if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];
             $this->replyToScheduled = $replyTo['reply_to_scheduled'];
             if ($replyTo['forum_topic']) {
@@ -119,7 +119,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             API::isSupergroup($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
-                'id' => [$this->replyToMsgId]
+                'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
             ]
         )['messages'][0]);
     }

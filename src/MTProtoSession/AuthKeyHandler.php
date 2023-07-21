@@ -335,7 +335,10 @@ trait AuthKeyHandler
                      * ***********************************************************************
                      * Generate auth_key
                      */
-                    $this->logger->logger('Generating authorization key...', Logger::VERBOSE);
+                    $this->logger->logger(
+                        extension_loaded('gmp') ? 'Generating authorization key...' : 'Generating authorization key (install gmp to speed up this process)...', 
+                        Logger::VERBOSE
+                    );
                     $auth_key = $g_a->powMod($b, $dh_prime);
                     $auth_key_str = $auth_key->toBytes();
                     $auth_key_sha = \sha1($auth_key_str, true);

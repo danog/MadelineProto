@@ -151,9 +151,6 @@ trait CallHandler
                 )));
             }
             $args = $this->API->botAPIToMTProto($args);
-            if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
-                $args['ping_id'] = Tools::packSignedLong($args['ping_id']);
-            }
         }
         $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
         if (!$methodInfo) {

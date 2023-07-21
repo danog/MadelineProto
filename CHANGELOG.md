@@ -1,3 +1,17 @@
+MadelineProto was updated (8.0.0-beta114)!
+
+Features:
+- Added `DialogMessagePinned` service message with a `getPinnedMessage()` method.
+
+Fixes:
+- Fixed simple filters with service messages.
+- Fixed IDE typehinting for `getEventHandler`
+- Fixed startAndLoopMulti
+- Tweaked the default drop timeout on media DCs to avoid timeout errors on slow networks
+- Now the admin list only contains user report peers.
+
+---
+
 MadelineProto was updated (8.0.0-beta101)!
 
 After introducing [plugins »](https://docs.madelineproto.xyz/docs/PLUGINS.html), [bound methods »](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods), [filters »](https://docs.madelineproto.xyz/docs/FILTERS.html), [a built-in cron system »](https://docs.madelineproto.xyz/docs/UPDATES.html#cron), [IPC support for the event handler »](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc) and [automatic static analysis for event handler code »](https://docs.madelineproto.xyz/docs/UPDATES.html#automatic-static-analysis) in beta100, beta101 brings some bugfixes and the `getDownloadLink` function!

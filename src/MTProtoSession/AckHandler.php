@@ -104,6 +104,9 @@ trait AckHandler
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
+        if ($this->datacenter < 0) {
+            $dropTimeout *= 10;
+        }
         $result = [];
         /** @var MTProtoOutgoingMessage $message */
         foreach ($this->new_outgoing as $message_id => $message) {

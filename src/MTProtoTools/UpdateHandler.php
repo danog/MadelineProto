@@ -27,6 +27,7 @@ use Amp\Http\Client\Response;
 use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
@@ -34,6 +35,7 @@ use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Update;
@@ -338,7 +340,7 @@ trait UpdateHandler
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
-    public function wrapMessage(array $message): ?Message
+    public function wrapMessage(array $message): ?AbstractMessage
     {
         if ($message['_'] === 'messageEmpty') {
             return null;
@@ -385,6 +387,11 @@ trait UpdateHandler
                     $message,
                     $info,
                     $message['action']['user_id']
+                ),
+                'messageActionPinMessage' => new DialogMessagePinned(
+                    $this,
+                    $message,
+                    $info,
                 ),
                 default => null
             };

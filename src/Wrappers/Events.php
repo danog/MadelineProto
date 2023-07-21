@@ -141,7 +141,11 @@ trait Events
     /**
      * Get event handler (or plugin instance).
      *
-     * @param ?class-string<PluginEventHandler> $class
+     * @template T as EventHandler
+     *
+     * @param class-string<T>|null $class
+     *
+     * @return T|EventHandlerProxy|__PHP_Incomplete_Class|null
      */
     public function getEventHandler(?string $class = null): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
     {

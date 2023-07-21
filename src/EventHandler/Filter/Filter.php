@@ -91,7 +91,16 @@ abstract class Filter
                 HasSticker::class => new FilterSticker,
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
-                default => throw new AssertionError("Unknown type ".$type->getName())
+                default => is_subclass_of($type->getName(), Update::class)
+                    ? new class($type->getName()) extends Filter {
+                        public function __construct(private readonly string $class)
+                        {
+                        }
+                        public function apply(Update $update): bool {
+                            return $update instanceof $this->class;
+                        }
+                    }
+                    : throw new AssertionError("Unknown type ".$type->getName())
             }
         };
     }

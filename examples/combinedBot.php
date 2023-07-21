@@ -76,12 +76,7 @@ class MyEventHandler extends EventHandler
 }
 
 $MadelineProtos = [];
-foreach ([
-    'session1.madeline' => 'Bot Login',
-    'session2.madeline' => 'Userbot login',
-    'session3.madeline' => 'Userbot login (2)',
-] as $session => $message) {
-    Logger::log($message, Logger::WARNING);
+foreach (['session1.madeline', 'session2.madeline', 'session3.madeline'] as $session => $message) {
     $MadelineProtos []= new API($session);
 }
 

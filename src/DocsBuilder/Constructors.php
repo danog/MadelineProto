@@ -27,7 +27,7 @@ use danog\MadelineProto\Tools;
 use const PHP_EOL;
 
 /**
- * @internal
+ * @internal This garbage code needs to be thrown away completely and rewritten from scratch.
  */
 trait Constructors
 {
