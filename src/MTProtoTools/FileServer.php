@@ -154,7 +154,7 @@ trait FileServer
     private static array $checkedAutoload = [];
     private function getDefaultDownloadScript(): string
     {
-        if (Magic::$serverName) {
+        if (!Magic::$serverName) {
             throw new AssertionError(Lang::$current_lang["cli_need_dl.php_link"]);
         }
         $s = $this->getSessionName();
