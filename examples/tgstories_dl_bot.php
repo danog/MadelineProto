@@ -19,8 +19,11 @@
  */
 
 use danog\MadelineProto\API;
+use danog\MadelineProto\Broadcast\Progress;
+use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PluginEventHandler;
@@ -52,7 +55,7 @@ unset($u);
 
 final class StoriesEventHandler extends SimpleEventHandler
 {
-    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a @username!";
+    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a @username!\n\nSource code: https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php\nPowered by @MadelineProto";
     // Username of the admin of the bot
     private const ADMIN = "@danogentili";
 
@@ -67,6 +70,34 @@ final class StoriesEventHandler extends SimpleEventHandler
     public function getReportPeers()
     {
         return self::ADMIN;
+    }
+    
+    private int $lastLog = 0;
+    /**
+     * Handles updates to an in-progress broadcast.
+     */
+    public function onUpdateBroadcastProgress(Progress $progress): void
+    {
+        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
+            $this->lastLog = time();
+            $this->sendMessageToAdmins((string) $progress);
+        }
+    }
+
+    #[FilterCommand('broadcast')]
+    public function broadcastCommand(Message & FromAdmin $message): void
+    {
+        // We can broadcast messages to all users with /broadcast
+        if (!$message->replyToMsgId) {
+            $message->reply("You should reply to the message you want to broadcast.");
+            return;
+        }
+        $this->broadcastForwardMessages(
+            from_peer: $message->senderId,
+            message_ids: [$message->replyToMsgId],
+            drop_author: true,
+            pin: true,
+        );
     }
 
     #[FilterCommand('start')]
