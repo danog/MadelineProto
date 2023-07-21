@@ -201,8 +201,6 @@ final class Magic
      *
      */
     public static bool $hasOpenssl = false;
-    public static string $serverName;
-    public static string $requestUri;
     /**
      * Encoded emojis.
      *
@@ -296,13 +294,6 @@ final class Magic
                 }
             }
             self::$revision = 'Revision: '.self::$version;
-            if (self::$isIpcWorker && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
-                self::$serverName = $_ENV['SERVER_NAME'];
-                self::$requestUri = $_ENV['REQUEST_URI'];
-            } else {
-                self::$serverName = $_SERVER['SERVER_NAME'] ?? '';
-                self::$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-            }
             self::$initedLight = true;
             if ($light) {
                 return;

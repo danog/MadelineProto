@@ -154,7 +154,8 @@ trait FileServer
     private static array $checkedAutoload = [];
     private function getDefaultDownloadScript(): string
     {
-        if (!Magic::$serverName) {
+        $isCli = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
+        if ($isCli && (!Magic::$isIpcWorker || !($_ENV['absoluteRootDir'] ?? null))) {
             throw new AssertionError(Lang::$current_lang["cli_need_dl.php_link"]);
         }
         $s = $this->getSessionName();
@@ -201,15 +202,17 @@ trait FileServer
             }
 
             $f = \realpath($f);
-            $absoluteRootDir = WebRunner::getAbsoluteRootDir();
+            $absoluteRootDir = $isCli
+                ? $_ENV['absoluteRootDir']
+                : WebRunner::getAbsoluteRootDir();
 
             if (\substr($f, 0, \strlen($absoluteRootDir)) !== $absoluteRootDir) {
-                throw new AssertionError("Process runner is not within readable document root!");
+                throw new AssertionError("Process runner $f is not within readable document root $absoluteRootDir!");
             }
             $f = \substr($f, \strlen($absoluteRootDir)-1);
             $f = \str_replace(DIRECTORY_SEPARATOR, '/', $f);
             $f = \str_replace('//', '/', $f);
-            $f = 'https://'.Magic::$serverName.$f;
+            $f = 'https://'.($isCli ? $_ENV['serverName'] : $_SERVER['SERVER_NAME']).$f;
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
         } finally {
