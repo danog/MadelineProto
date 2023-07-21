@@ -24,6 +24,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PluginEventHandler;
+use danog\MadelineProto\SimpleEventHandler;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -49,9 +50,11 @@ if (!$u->isSelfUser()) {
 }
 unset($u);
 
-final class StoriesEventHandler extends PluginEventHandler
+final class StoriesEventHandler extends SimpleEventHandler
 {
-    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a username!";
+    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a @username!";
+    // Username of the admin of the bot
+    private const ADMIN = "@danogentili";
 
     private API $userInstance;
     public function onStart(): void
@@ -59,6 +62,11 @@ final class StoriesEventHandler extends PluginEventHandler
         // Login as a user
         $this->echo("Please login as a user!");
         $this->userInstance = new API('stories_user.madeline');
+    }
+
+    public function getReportPeers()
+    {
+        return self::ADMIN;
     }
 
     #[FilterCommand('start')]
