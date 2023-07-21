@@ -38,6 +38,17 @@ if (class_exists(API::class)) {
     require_once 'madeline.php';
 }
 
+// Login as a user
+$u = new API('stories_user.madeline');
+if (!$u->getSelf()) {
+    $this->echo("Please login as a user!");
+    $u->start();
+}
+if (!$u->isSelfUser()) {
+    throw new AssertionError("You must login as a user! Please delete the user.madeline folder to continue.");
+}
+unset($u);
+
 final class StoriesEventHandler extends PluginEventHandler
 {
     private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @username - Download all the stories of a username!";
@@ -48,10 +59,6 @@ final class StoriesEventHandler extends PluginEventHandler
         // Login as a user
         $this->echo("Please login as a user!");
         $this->userInstance = new API('stories_user.madeline');
-        $this->userInstance->start();
-        if (!$this->userInstance->isSelfUser()) {
-            throw new AssertionError("You must login as a user! Please delete the user.madeline folder to continue.");
-        }
     }
 
     #[FilterCommand('start')]
