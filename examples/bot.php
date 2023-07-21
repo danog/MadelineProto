@@ -180,7 +180,7 @@ class MyEventHandler extends SimpleEventHandler
     public function dlStoriesCommand(Message $message): void
     {
         if (!$message->commandArgs) {
-            $message->reply("You must specify the @nickname or the Telegram ID of a user to download their stories!");
+            $message->reply("You must specify the @username or the Telegram ID of a user to download their stories!");
             return;
         }
 
@@ -194,7 +194,7 @@ class MyEventHandler extends SimpleEventHandler
         foreach ($stories as $story) {
             $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
             if (isset($story['caption'])) {
-                $cur .= ', "'.self::markdownEscape($story['caption']).'": ';
+                $cur .= ', "'.self::markdownEscape($story['caption']).'"';
             }
             $result .= "$cur; [click here to download »]({$this->getDownloadLink($story)})\n";
         }
