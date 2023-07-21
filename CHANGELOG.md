@@ -1,9 +1,8 @@
 MadelineProto was updated (8.0.0-beta115)!
 
 Features:
-- You can now get direct download links for or **directly download** stories, here's an example:
-
-- Add support for `parse_mode` parsing for story methods.
+- You can now get direct download links for or **directly download** stories, check out the [open-source](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) [@tgstories_dl_bot](https://t.me/tgstories_dl_bot) to download any Telegram story!
+- Added support for `parse_mode` parsing for story methods.
 - `getReply` now simply returns null if the message doesn't reply to any other message.
 - `getReply` now has an optional parameter that can be used to filter the returned message type.
 - Added `isSelfUser()`, `isSelfBot()` messages to check whether the current user is a user or a bot.
@@ -14,10 +13,10 @@ Features:
 Fixes:
 - Fixed simple filters with service messages.
 - Fixed IDE typehinting for `getEventHandler`.
-- Fixed startAndLoopMulti
+- Fixed startAndLoopMulti.
 - Tweaked the default drop timeout on media DCs to avoid timeout errors on slow networks.
 - Now the admin list only contains user report peers.
-- Make `markdownEscape` method accessible
+- Make `markdownEscape` method accessible.
 - Fixed `getDownloadLink` for non-event-handler web IPC instances.
 
 ---
