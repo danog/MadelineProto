@@ -5,9 +5,9 @@ Features:
 
 Fixes:
 - Fixed simple filters with service messages.
-- Fixed IDE typehinting for `getEventHandler`
+- Fixed IDE typehinting for `getEventHandler`.
 - Fixed startAndLoopMulti
-- Tweaked the default drop timeout on media DCs to avoid timeout errors on slow networks
+- Tweaked the default drop timeout on media DCs to avoid timeout errors on slow networks.
 - Now the admin list only contains user report peers.
 
 ---

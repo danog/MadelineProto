@@ -652,7 +652,7 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::genVectorHash($ints);
     }
     /**
-     * Get admin IDs (equal to the report peers).
+     * Get admin IDs (equal to all user report peers).
      */
     public function getAdminIds(): array
     {
@@ -785,7 +785,11 @@ abstract class InternalDoc
     /**
      * Get event handler (or plugin instance).
      *
-     * @param ?class-string<PluginEventHandler> $class
+     * @template T as EventHandler
+     *
+     * @param class-string<T>|null $class
+     *
+     * @return T|EventHandlerProxy|__PHP_Incomplete_Class|null
      */
     public function getEventHandler(?string $class = null): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
     {
@@ -1088,6 +1092,13 @@ abstract class InternalDoc
     public function getWebMessage(string $message): string
     {
         return $this->wrapper->getAPI()->getWebMessage($message);
+    }
+    /**
+     * Check if has admins.
+     */
+    public function hasAdmins(): bool
+    {
+        return $this->wrapper->getAPI()->hasAdmins();
     }
     /**
      * Check if an event handler instance is present.
@@ -1985,7 +1996,7 @@ abstract class InternalDoc
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
-    public function wrapMessage(array $message): ?\danog\MadelineProto\EventHandler\Message
+    public function wrapMessage(array $message): ?\danog\MadelineProto\EventHandler\AbstractMessage
     {
         return $this->wrapper->getAPI()->wrapMessage($message);
     }

@@ -20,7 +20,6 @@
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\Logger;
 
 /*
  * Various ways to load MadelineProto

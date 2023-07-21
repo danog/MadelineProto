@@ -28,7 +28,6 @@ use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
@@ -182,7 +181,6 @@ class MyEventHandler extends SimpleEventHandler
         $message->reply('hello');
     }
 
-
     /**
      * Called when the dialog photo of a chat or channel changes.
      */
@@ -190,10 +188,9 @@ class MyEventHandler extends SimpleEventHandler
     public function logPhotoChanged(Incoming&DialogPhotoChanged $message): void
     {
         if ($message->photo) {
-            $message->reply("Nice :D");
-        } else {
-            $message->reply("Aww, why did you delete the group photo? :(");
+            $message->reply("Nice! Here's a download link for the photo: ".$message->photo->getDownloadLink());
         }
+        // The group photo was deleted
     }
 
     /**

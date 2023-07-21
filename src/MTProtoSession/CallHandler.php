@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
 
