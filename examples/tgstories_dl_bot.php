@@ -51,7 +51,7 @@ unset($u);
 
 final class StoriesEventHandler extends PluginEventHandler
 {
-    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @username - Download all the stories of a username!";
+    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a username!";
 
     private API $userInstance;
     public function onStart(): void
