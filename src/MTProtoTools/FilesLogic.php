@@ -249,7 +249,7 @@ trait FilesLogic
         } elseif (\is_array($file)) {
             return $this->uploadFromTgfile($file, $cb, $encrypted);
         }
-        if ($file instanceof ReadableStream) {
+        if ($file instanceof ReadableStream || \is_resource($file)) {
             return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
         if ($file instanceof LocalFile) {

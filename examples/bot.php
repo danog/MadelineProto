@@ -171,6 +171,10 @@ class MyEventHandler extends SimpleEventHandler
 
     /**
      * Downloads all telegram stories of a user (including protected ones).
+     *
+     * The bot must be started via web for this command to work.
+     *
+     * You can also start it via CLI but you'll have to specify a download script URL in the settings: https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link-cli-bots.
      */
     #[FilterCommand('dlStories')]
     public function dlStoriesCommand(Message $message): void
@@ -183,11 +187,16 @@ class MyEventHandler extends SimpleEventHandler
         $stories = $this->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
         // Skip deleted stories
         $stories = array_filter($stories, fn (array $s): bool => $s['_'] === 'storyItem');
+        // Sort by date
+        usort($stories, fn ($a, $b) => $a['date'] <=> $b['date']);
 
         $result = "Total stories: ".count($stories)."\n\n";
         foreach ($stories as $story) {
-            $message = self::markdownEscape($story['caption']);
-            $result .= "[$message]({$this->getDownloadLink($story)})\n";
+            $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
+            if (isset($story['caption'])) {
+                $cur .= ', "'.self::markdownEscape($story['caption']).'": ';
+            }
+            $result .= "$cur; [click here to download »]({$this->getDownloadLink($story)})\n";
         }
 
         $message->reply($result, parseMode: ParseMode::MARKDOWN);
@@ -247,6 +256,10 @@ class MyEventHandler extends SimpleEventHandler
 
     /**
      * Gets a download link for any file up to 4GB!
+     *
+     * The bot must be started via web for this command to work.
+     *
+     * You can also start it via CLI but you'll have to specify a download script URL in the settings: https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link-cli-bots.
      */
     #[FilterCommand('dl')]
     public function downloadLink(Incoming&Message $message): void

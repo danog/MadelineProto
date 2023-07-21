@@ -160,12 +160,14 @@ trait BotAPI
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = ($this->MTProtoToBotAPI($element));
+                $newd[$key] = $this->MTProtoToBotAPI($element);
             }
             return $newd;
         }
         $res = null;
         switch ($data['_']) {
+            case 'storyItem':
+                return $this->MTProtoToBotAPI($data['media']);
             case 'updates':
             case 'updatesCombined':
             case 'updateShort':
