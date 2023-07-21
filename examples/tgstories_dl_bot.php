@@ -55,7 +55,7 @@ unset($u);
 
 final class StoriesEventHandler extends SimpleEventHandler
 {
-    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n- /dlStories @danogentili - Download all the stories of a @username!\n\nSource code: https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php\nPowered by @MadelineProto";
+    private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n/dlStories @danogentili - Download all the stories of a @username!\n\n[Source code](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) powered by @MadelineProto";
     // Username of the admin of the bot
     private const ADMIN = "@danogentili";
 
