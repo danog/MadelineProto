@@ -42,6 +42,7 @@ use Throwable;
 use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
+use function Amp\File\deleteFile;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -355,16 +356,21 @@ trait FilesLogic
         } elseif (!$size) {
             $this->logger->logger('No content length for stream, caching first');
             $body = $stream;
-            $stream = new BlockingFile(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
-            while (($chunk = $body->read()) !== null) {
-                $stream->write($chunk);
+            $temp = tempnam(sys_get_temp_dir(), 'madeline_temp_file');
+            try {
+                $stream = openFile($temp, 'r+');
+                while (($chunk = $body->read()) !== null) {
+                    $stream->write($chunk);
+                }
+                $size = $stream->tell();
+                if (!$size) {
+                    throw new Exception('Wrong size!');
+                }
+                $stream->seek(0);
+                return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
+            } finally {
+                deleteFile($temp);
             }
-            $size = $stream->tell();
-            if (!$size) {
-                throw new Exception('Wrong size!');
-            }
-            $stream->seek(0);
-            return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
         }
         $res = ($this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted));
         if ($created) {
