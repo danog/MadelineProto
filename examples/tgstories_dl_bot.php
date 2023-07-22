@@ -124,6 +124,8 @@ final class StoriesEventHandler extends SimpleEventHandler
         $stories = $this->userInstance->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
         // Skip deleted stories
         $stories = array_filter($stories, fn (array $s): bool => $s['_'] === 'storyItem');
+        // Skip protected stories
+        $stories = array_filter($stories, fn (array $s): bool => !$s['noforwards']);
         // Sort by date
         usort($stories, fn ($a, $b) => $a['date'] <=> $b['date']);
 
