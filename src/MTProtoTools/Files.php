@@ -1089,6 +1089,7 @@ trait Files
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
                 $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
             }
+            $res['bytes'] = (string) $res['bytes'];
             if ($res['bytes'] === '') {
                 return 0;
             }
