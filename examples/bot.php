@@ -31,7 +31,6 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\Settings;
@@ -233,11 +232,14 @@ class MyEventHandler extends SimpleEventHandler
         $message->reply("Did you mean to write MadelineProto instead of ".$message->matches[1].'?');
     }
 
-    /**
-     * Incoming&Outgoing&Message is the same thing as just Message.
-     */
-    #[FilterText('hi')]
-    public function pingCommand(Incoming&Outgoing&Message $message): void
+    #[FilterText('test')]
+    public function pingCommand(Message $message): void
+    {
+        $message->reply('test reply');
+    }
+
+    #[FilterText('hi', caseInsensitive: true)]
+    public function pingCommandCaseInsensitive(Message $message): void
     {
         $message->reply('hello');
     }

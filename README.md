@@ -182,7 +182,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Uploading files](https://docs.madelineproto.xyz/docs/FILES.html#uploading-files)
   * [Reusing uploaded files](https://docs.madelineproto.xyz/docs/FILES.html#reusing-uploaded-files)
   * [Renaming files](https://docs.madelineproto.xyz/docs/FILES.html#renaming-files)
-  * [Forwarding protected content](https://docs.madelineproto.xyz/docs/FILES.html#forwarding-protected-content)
   * [Downloading files](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)
     * [Extracting download info](https://docs.madelineproto.xyz/docs/FILES.html#extracting-download-info)
     * [Getting a download link](https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link)

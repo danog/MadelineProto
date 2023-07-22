@@ -5,6 +5,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use Attribute;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
+use Webmozart\Assert\Assert;
 
 /**
  * Allow only messages with a specific content.
@@ -12,12 +13,20 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterText extends Filter
 {
+    private readonly string $content;
     public function __construct(
-        private readonly string $content
+        string $content,
+        private readonly bool $caseInsensitive = false
     ) {
+        Assert::notEmpty($content);
+        $this->content = $caseInsensitive ? \strtolower($content) : $content;
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->message === $this->content;
+        return $update instanceof Message && (
+            $this->caseInsensitive
+                ? \strtolower($update->message) === $this->content
+                : $update->message === $this->content
+        );
     }
 }
