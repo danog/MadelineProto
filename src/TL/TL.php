@@ -539,7 +539,7 @@ final class TL implements TLInterface
                 }
                 return (string) $object;
             case 'double':
-                return Tools::packDouble($object);
+                return Tools::packDouble(\is_int($object) ? (float) $object : $object);
             case 'string':
                 if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;

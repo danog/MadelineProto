@@ -853,7 +853,8 @@ trait Files
             $unlock();
             try {
                 deleteFile("$file.lock");
-            } catch (Throwable) {}
+            } catch (Throwable) {
+            }
             $stream->close();
         }
         return $file;
