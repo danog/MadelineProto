@@ -10,7 +10,6 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
-use Amp\File\Driver\BlockingFile;
 use Amp\File\File;
 use Amp\File\Whence;
 use Amp\Http\HttpStatus;
@@ -356,7 +355,7 @@ trait FilesLogic
         } elseif (!$size) {
             $this->logger->logger('No content length for stream, caching first');
             $body = $stream;
-            $temp = tempnam(sys_get_temp_dir(), 'madeline_temp_file');
+            $temp = \tempnam(\sys_get_temp_dir(), 'madeline_temp_file');
             try {
                 $stream = openFile($temp, 'r+');
                 while (($chunk = $body->read()) !== null) {

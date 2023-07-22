@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\DeferredFuture;
-use Amp\File\Driver\BlockingFile;
 use Amp\Future;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\EventHandler\Media;
@@ -88,7 +87,7 @@ trait Files
         if (!$size) {
             $this->logger->logger("No content length for {$url}, caching first");
             $body = $stream;
-            $temp = tempnam(sys_get_temp_dir(), 'madeline_temp_file');
+            $temp = \tempnam(\sys_get_temp_dir(), 'madeline_temp_file');
             try {
                 $stream = openFile($temp, 'r+');
                 while (($chunk = $body->read()) !== null) {

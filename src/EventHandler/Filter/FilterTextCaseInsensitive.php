@@ -8,10 +8,10 @@ use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
 /**
- * Allow only messages with a specific content.
+ * Allow only messages with a specific case-insensitive content.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterText extends Filter
+final class FilterTextCaseInsensitive extends Filter
 {
     public function __construct(
         private readonly string $content
@@ -20,6 +20,6 @@ final class FilterText extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->message === $this->content;
+        return $update instanceof Message && \strtolower($update->message) === $this->content;
     }
 }

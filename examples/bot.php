@@ -27,6 +27,7 @@ use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
+use danog\MadelineProto\EventHandler\Filter\FilterTextCaseInsensitive;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
@@ -238,7 +239,7 @@ class MyEventHandler extends SimpleEventHandler
         $message->reply('test reply');
     }
 
-    #[FilterText('hi', caseInsensitive: true)]
+    #[FilterTextCaseInsensitive('hi')]
     public function pingCommandCaseInsensitive(Message $message): void
     {
         $message->reply('hello');
