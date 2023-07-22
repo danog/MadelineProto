@@ -851,7 +851,9 @@ trait Files
             $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
         } finally {
             $unlock();
-            deleteFile("$file.lock");
+            try {
+                deleteFile("$file.lock");
+            } catch (Throwable) {}
             $stream->close();
         }
         return $file;

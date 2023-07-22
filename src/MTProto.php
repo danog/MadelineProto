@@ -71,6 +71,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
+use function Amp\File\deleteFile;
 use function Amp\File\getSize;
 use function Amp\Future\await;
 
@@ -1777,7 +1778,7 @@ final class MTProto implements TLCallback, LoggerGetter
                             ],
                         ],
                     );
-                    \unlink($path);
+                    deleteFile($path);
                 }
             }
             $sent = false;
