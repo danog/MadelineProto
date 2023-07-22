@@ -26,7 +26,6 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\PluginEventHandler;
 use danog\MadelineProto\SimpleEventHandler;
 
 // MadelineProto is already loaded
@@ -45,7 +44,9 @@ if (class_exists(API::class)) {
 // Login as a user
 $u = new API('stories_user.madeline');
 if (!$u->getSelf()) {
-    if (!$_GET) $u->echo("Please login as a user!");
+    if (!$_GET) {
+        $u->echo("Please login as a user!");
+    }
     $u->start();
 }
 if (!$u->isSelfUser()) {
@@ -71,7 +72,7 @@ final class StoriesEventHandler extends SimpleEventHandler
     {
         return self::ADMIN;
     }
-    
+
     private int $lastLog = 0;
     /**
      * Handles updates to an in-progress broadcast.

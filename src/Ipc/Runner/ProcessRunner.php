@@ -96,7 +96,7 @@ final class ProcessRunner extends RunnerAbstract
             \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
             [
                 'QUERY_STRING' => \http_build_query($params),
-                'absoluteRootDir' => PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' 
+                'absoluteRootDir' => PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg'
                     ? ''
                     : WebRunner::getAbsoluteRootDir(),
                 'serverName' => $_SERVER['SERVER_NAME'] ?? ''
