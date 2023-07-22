@@ -17,6 +17,7 @@ final class FilterTextCaseInsensitive extends Filter
         private readonly string $content
     ) {
         Assert::notEmpty($content);
+        Assert::lower($content);
     }
     public function apply(Update $update): bool
     {
