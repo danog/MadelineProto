@@ -98,8 +98,8 @@ final class Logger extends SettingsAbstract
     public function __sleep()
     {
         return $this->extra instanceof Closure
-            ? ['type', 'extra', 'level', 'maxSize']
-            : ['type', 'level', 'maxSize'];
+            ? ['type', 'level', 'maxSize']
+            : ['type', 'extra', 'level', 'maxSize'];
     }
     /**
      * Wakeup function.

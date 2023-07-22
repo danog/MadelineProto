@@ -119,7 +119,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function getReply(string $class = AbstractMessage::class): ?self
     {
-        if (!\is_subclass_of($class, AbstractMessage::class)) {
+        if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
             throw new AssertionError("A class that extends AbstractMessage was expected.");
         }
         if ($this->replyToMsgId === null) {

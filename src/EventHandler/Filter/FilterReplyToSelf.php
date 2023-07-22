@@ -14,6 +14,6 @@ final class FilterReplyToSelf extends Filter
 {
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->getReply()->out;
+        return $update instanceof Message && $update->getReply()?->out;
     }
 }
