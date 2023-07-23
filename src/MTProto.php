@@ -1655,6 +1655,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public static function getWebWarnings(): string
     {
+        Magic::start(light: false);
         $warning = '';
         if (Magic::$version !== Magic::$version_latest) {
             $warning .= "<h2 style='color:red;'>".\htmlentities(Lang::$current_lang['update_madelineproto']).'</h2>';
