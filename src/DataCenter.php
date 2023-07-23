@@ -413,15 +413,8 @@ final class DataCenter
                             $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                         } elseif ($combo[1][0] === WsStream::class) {
-                            $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
-                            if (!$subdomain) {
-                                continue;
-                            }
-                            if (DataCenter::isMedia($dc_number)) {
-                                $subdomain .= '-1';
-                            }
                             $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
-                            $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                            $uri = 'tcp://'.$address.':'.$port.'/'.$path;
                         }
                         $ctx = (new ConnectionContext())
                             ->setDc($dc_number)
