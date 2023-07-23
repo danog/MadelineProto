@@ -270,7 +270,7 @@ final class Connection
         $this->checker ??= new CheckLoop($this);
         $this->cleanup ??= new CleanupLoop($this);
         $this->waiter ??= new HttpWaitLoop($this);
-        if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN()) {
+        if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN() && !$this->shared->isHttp()) {
             $this->pinger = new PingLoop($this);
         }
         foreach ($this->new_outgoing as $message_id => $message) {
