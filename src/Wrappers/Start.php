@@ -27,6 +27,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
@@ -289,7 +290,7 @@ trait Start
             return;
         }
         $title = \htmlentities($title);
-        $message = \htmlentities($message);
+        $message = \htmlentities($message).MTProto::getWebWarnings();
         getOutputBufferStream()->write(\sprintf(
             $this->getSettings()->getTemplates()->getHtmlTemplate(),
             "$title<br><b>$message</b>",

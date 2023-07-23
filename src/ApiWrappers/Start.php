@@ -23,6 +23,7 @@ namespace danog\MadelineProto\ApiWrappers;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
@@ -84,7 +85,8 @@ trait Start
     private function webAPIEcho(Settings $settings, string $message = ''): void
     {
         $message = \htmlentities($message);
-        $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
+        $title = MTProto::getWebWarnings();
+        $title .= \htmlentities(Lang::$current_lang['apiManualWeb']);
         $title .= "<br>";
         $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
         $title .= "<br><b>$message</b>";

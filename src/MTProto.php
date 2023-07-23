@@ -1624,7 +1624,7 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         Logger::log($message);
 
-        $warning = '';
+        $warning = $this->getWebWarnings();
         if ($this->hasEventHandler()) {
             if (!$this->hasReportPeers()) {
                 Logger::log('!!! '.Lang::$current_lang['noReportPeers'].' !!!', Logger::FATAL_ERROR);
@@ -1647,13 +1647,25 @@ final class MTProto implements TLCallback, LoggerGetter
                 }
             }
         }
+
+        return "<html><body><h1>$message</h1>$warning</body></html>";
+    }
+    /**
+     * Get various warnings to show to the user in the web UI.
+     */
+    public static function getWebWarnings(): string
+    {
+        $warning = '';
+        if (Magic::$version !== Magic::$version_latest) {
+            $warning .= "<h2 style='color:red;'>".htmlentities(Lang::$current_lang['update_madelineproto']).'</h2>';
+        }
         if (!Magic::$hasOpenssl) {
             $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
         }
         if (!\extension_loaded('gmp')) {
             $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
         }
-        return "<html><body><h1>$message</h1>$warning</body></html>";
+        return $warning;
     }
 
     /**
