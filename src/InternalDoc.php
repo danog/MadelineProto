@@ -1094,6 +1094,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getWebMessage($message);
     }
     /**
+     * Get various warnings to show to the user in the web UI.
+     */
+    public static function getWebWarnings(): string
+    {
+        return \danog\MadelineProto\MTProto::getWebWarnings();
+    }
+    /**
      * Check if has admins.
      */
     public function hasAdmins(): bool
