@@ -176,6 +176,9 @@ abstract class EventHandler extends AbstractAPI
                 if (!$this instanceof SimpleEventHandler) {
                     continue;
                 }
+
+                array_map(fn (ReflectionAttribute $attribute) => $attribute->newInstance(), $methodRefl->getAttributes());
+
                 if ($periodic = $methodRefl->getAttributes(Cron::class)) {
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
