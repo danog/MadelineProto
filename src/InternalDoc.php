@@ -1840,9 +1840,9 @@ abstract class InternalDoc
      * @param string $fileId Bot API file ID
      * @return array Unpacked file ID
      */
-    public function unpackFileId(string $fileId): array
+    public static function unpackFileId(string $fileId): array
     {
-        return $this->wrapper->getAPI()->unpackFileId($fileId);
+        return \danog\MadelineProto\MTProto::unpackFileId($fileId);
     }
     /**
      * Unpack base256 signed int.

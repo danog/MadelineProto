@@ -86,11 +86,10 @@ trait BotAPIFiles
      * @param string $fileId Bot API file ID
      * @return array Unpacked file ID
      */
-    public function unpackFileId(string $fileId): array
+    public static function unpackFileId(string $fileId): array
     {
         $fileId = FileId::fromBotAPI($fileId);
 
-        $this->logger("Got file ID with version {$fileId->getVersion()}.{$fileId->getSubVersion()}");
         if (!\in_array($fileId->getVersion(), [2, 4], true)) {
             throw new Exception("Invalid bot API file ID version {$fileId->getVersion()}");
         }

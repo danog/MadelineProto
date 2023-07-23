@@ -610,6 +610,9 @@ abstract class Tools extends AsyncTools
         'fsockopen' => 'https://github.com/amphp/socket',
         'sleep' => '$this->sleep()',
         'usleep' => '$this->sleep()',
+        'proc_open' => 'https://github.com/amphp/process',
+        'shell_exec' => 'https://github.com/amphp/process',
+        'exec' => 'https://github.com/amphp/process',
     ];
     private const BLOCKING_CLASSES = [
         'pdo' => 'https://github.com/amphp/mysql',

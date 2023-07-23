@@ -240,9 +240,11 @@ trait FilesLogic
             $file = $file->url;
         }
         if ($file instanceof BotApiFileId) {
-            $file = $file->fileId;
+            $info = $this->getDownloadInfo($file->fileId);
+            $info['size'] = $file->size;
+            return $this->uploadFromTgfile($info, $cb, $encrypted);
         }
-        if (\is_string($file) || \is_object($file) && \method_exists($file, '__toString')) {
+        if (\is_string($file) || (\is_object($file) && \method_exists($file, '__toString'))) {
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
                 return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
             }

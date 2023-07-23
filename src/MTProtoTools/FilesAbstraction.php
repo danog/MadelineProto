@@ -179,6 +179,16 @@ trait FilesAbstraction
             $base['id'] = $file->botApiFileId;
             $file = null;
         }
+        if ($file instanceof BotApiFileId
+            && $file->getTypeClass() === Document::class
+            && ($fileName ?? $file->fileName) === $file->fileName
+            && !$file->protected
+        ) {
+            // Re-use
+            $base['_'] = 'inputMediaDocument';
+            $base['id'] = $file->fileId;
+            $file = null;
+        }
 
         return $this->sendMedia(
             [
@@ -265,6 +275,16 @@ trait FilesAbstraction
             $base['id'] = $file->botApiFileId;
             $file = null;
         }
+        if ($file instanceof BotApiFileId
+            && $file->getTypeClass() === Photo::class
+            && ($fileName ?? $file->fileName) === $file->fileName
+            && !$file->protected
+        ) {
+            // Re-use
+            $base['_'] = 'inputMediaPhoto';
+            $base['id'] = $file->fileId;
+            $file = null;
+        }
 
         return $this->sendMedia(
             [
@@ -309,7 +329,7 @@ trait FilesAbstraction
             $fileName ??= \basename($file->url);
         } elseif ($file instanceof BotApiFileId) {
             if ($fileName === null) {
-                throw new AssertionError("A file name must be provided when uploading a stream!");
+                throw new AssertionError("A file name must be provided when uploading a bot API file ID!");
             }
         } elseif ($file instanceof ReadableStream) {
             if ($fileName === null) {
