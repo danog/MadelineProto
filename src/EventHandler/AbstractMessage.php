@@ -131,13 +131,14 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             }
             return $this->replyCache;
         }
-        $this->replyCache = $this->API->wrapMessage($this->API->methodCallAsyncRead(
+        $messages = $this->API->methodCallAsyncRead(
             API::isSupergroup($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
             ]
-        )['messages'][0]);
+        )['messages'];
+        $this->replyCache = $messages ? $this->API->wrapMessage($messages[0]) : null;
         $this->replyCached = true;
         if (!$this->replyCache instanceof $class) {
             return null;

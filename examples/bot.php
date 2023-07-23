@@ -267,16 +267,12 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('dl')]
     public function downloadLink(Incoming&Message $message): void
     {
-        if (!$message->replyToMsgId) {
+        $reply = $message->getReply(Message::class);
+        if (!$reply?->media) {
             $message->reply("This command must reply to a media message!");
             return;
         }
-        $message = $message->getReply();
-        if (!$message instanceof Message || !$message->media) {
-            $message->reply("This command must reply to a media message!");
-            return;
-        }
-        $message->reply("Download link: ".$message->media->getDownloadLink());
+        $reply->reply("Download link: ".$reply->media->getDownloadLink());
     }
 
     public static function getPluginPaths(): string|array|null
