@@ -608,6 +608,7 @@ abstract class Tools extends AsyncTools
         'mysql_connect' => 'https://github.com/amphp/mysql',
         'fopen' => 'https://github.com/amphp/file',
         'fsockopen' => 'https://github.com/amphp/socket',
+        'pcntl_fork' => 'Tools::callFork',
         'sleep' => '$this->sleep()',
         'usleep' => '$this->sleep()',
         'proc_open' => 'https://github.com/amphp/process',

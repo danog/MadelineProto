@@ -126,10 +126,10 @@ class Exception extends \Exception
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
-            $print(\sprintf(Lang::$current_lang['mmapError1'], $maps));
-            $print(\sprintf(Lang::$current_lang['mmapError2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
-            $print(\sprintf(Lang::$current_lang['mmapError3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
-            $print(Lang::$current_lang['mmapError4']);
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
+            $print(Lang::$current_lang['mmapErrorPart4']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);

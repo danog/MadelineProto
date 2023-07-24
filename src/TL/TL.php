@@ -620,7 +620,7 @@ final class TL implements TLInterface
                     throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception(\sprintf(Lang::$current_lang['arrayIsRequired'], $type['subtype']));
+                    throw new Exception(\sprintf(Lang::$current_lang['array_invalid'], $type['subtype']));
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
