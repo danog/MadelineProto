@@ -15,7 +15,7 @@ final class FilterFromSenders extends Filter
 {
     /** @var array<string|int> */
     private readonly array $peers;
-    /** @var list<string|int> */
+    /** @var list<int> */
     private readonly array $peersResolved;
     public function __construct(string|int ...$idOrUsername)
     {
@@ -23,6 +23,9 @@ final class FilterFromSenders extends Filter
     }
     public function initialize(EventHandler $API): Filter
     {
+        if (\count($this->peers) === 1) {
+            return (new FilterFromSender(\array_values($this->peers)[0]))->initialize($API);
+        }
         $res = [];
         foreach ($this->peers as $peer) {
             $res []= $API->getId($peer);

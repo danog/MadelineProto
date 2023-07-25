@@ -35,6 +35,7 @@ use Revolt\EventLoop;
 use Throwable;
 
 use const LOCK_EX;
+
 use function Amp\File\exists;
 use function Amp\Ipc\connect;
 

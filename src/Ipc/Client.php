@@ -27,6 +27,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
@@ -55,9 +56,9 @@ final class Client extends ClientAbstract
     /**
      * Returns an instance of a client by session name.
      */
-    public static function giveInstanceBySession(string $session): Client
+    public static function giveInstanceBySession(string $session): Client|MTProto
     {
-        return self::$instances[$session];
+        return self::$instances[$session] ?? MTProto::giveInstanceBySession($session);
     }
 
     /**

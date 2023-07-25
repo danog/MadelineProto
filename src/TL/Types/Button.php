@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Types;
 
 use ArrayAccess;
-use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use JsonSerializable;
 
@@ -30,7 +30,7 @@ use JsonSerializable;
  *
  * @implements ArrayAccess<array-key, mixed>
  */
-final class Button implements JsonSerializable, ArrayAccess
+final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
 {
     /** Button label */
     public readonly string $label;
@@ -40,15 +40,6 @@ final class Button implements JsonSerializable, ArrayAccess
      * @var array<array-key, mixed>
      */
     private array $button = [];
-    /**
-     * Session name.
-     */
-    private string $session = '';
-    /**
-     * MTProto instance.
-     *
-     */
-    private MTProto|Client|null $API = null;
     /**
      * Message ID.
      */
@@ -69,6 +60,7 @@ final class Button implements JsonSerializable, ArrayAccess
      */
     public function __construct(MTProto $API, array $message, array $button)
     {
+        parent::__construct($API);
         if (!isset($message['from_id']) // No other option
             // It's a channel/chat, 100% what we need
             || $message['peer_id']['_'] !== 'peerUser'
@@ -82,15 +74,6 @@ final class Button implements JsonSerializable, ArrayAccess
         $this->label = $button['text'];
         $this->button = $button;
         $this->id = $message['id'];
-        $this->API = $API;
-        $this->session = $API->getWrapper()->getSession()->getSessionDirectoryPath();
-    }
-    /**
-     * Sleep function.
-     */
-    public function __sleep(): array
-    {
-        return ['button', 'peer', 'id', 'session'];
     }
     /**
      * Click on button.
@@ -99,18 +82,17 @@ final class Button implements JsonSerializable, ArrayAccess
      */
     public function click(bool $donotwait = true)
     {
-        $this->API ??= Client::giveInstanceBySession($this->session);
         switch ($this->button['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
                 return $this->button['url'];
             case 'keyboardButton':
-                return $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
+                return $this->getClient()->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
             case 'keyboardButtonCallback':
-                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
+                return $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
             case 'keyboardButtonGame':
-                return $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
+                return $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
         }
     }
     /**

@@ -15,7 +15,7 @@ final class EventHandlerProxy extends IpcCapable
     }
     public function __call(string $name, array $arguments): mixed
     {
-        return $this->API->callPluginMethod(
+        return $this->getClient()->callPluginMethod(
             $this->__plugin,
             $name,
             $arguments
@@ -23,18 +23,18 @@ final class EventHandlerProxy extends IpcCapable
     }
     public function __get(string $name): mixed
     {
-        return $this->API->getPluginProperty($this->__plugin, $name);
+        return $this->getClient()->getPluginProperty($this->__plugin, $name);
     }
     public function __set(string $name, mixed $value): void
     {
-        $this->API->setPluginProperty($this->__plugin, $name, $value);
+        $this->getClient()->setPluginProperty($this->__plugin, $name, $value);
     }
     public function __isset(string $name): bool
     {
-        return $this->API->issetPluginProperty($this->__plugin, $name);
+        return $this->getClient()->issetPluginProperty($this->__plugin, $name);
     }
     public function __unset(string $name): void
     {
-        $this->API->unsetPluginProperty($this->__plugin, $name);
+        $this->getClient()->unsetPluginProperty($this->__plugin, $name);
     }
 }

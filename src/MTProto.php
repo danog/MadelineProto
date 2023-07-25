@@ -420,6 +420,16 @@ final class MTProto implements TLCallback, LoggerGetter
     ];
 
     /**
+     * Returns an instance of a client by session name.
+     *
+     * @internal
+     */
+    public static function giveInstanceBySession(string $session): MTProto
+    {
+        return self::$references[$session];
+    }
+
+    /**
      * Serialize session, returning object to serialize to db.
      *
      * @internal
@@ -482,8 +492,8 @@ final class MTProto implements TLCallback, LoggerGetter
     public function __construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null)
     {
         if ($wrapper) {
-            self::$references[\spl_object_hash($this)] = $this;
             $this->wrapper = $wrapper;
+            self::$references[$this->getSessionName()] = $this;
         }
 
         $initDeferred = new DeferredFuture;
@@ -974,10 +984,10 @@ final class MTProto implements TLCallback, LoggerGetter
         // Setup one-time stuffs
         Magic::start(light: false);
 
-        // Set reference to itself
-        self::$references[\spl_object_hash($this)] = $this;
         // Set API wrapper
         $this->wrapper = $wrapper;
+        // Set reference to itself
+        self::$references[$this->getSessionName()] = $this;
 
         $deferred = new DeferredFuture;
         $this->initPromise = $deferred->getFuture();
@@ -1072,8 +1082,8 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
         $this->logger->logger('Will unreference instance');
-        if (isset(self::$references[\spl_object_hash($this)])) {
-            unset(self::$references[\spl_object_hash($this)]);
+        if (isset(self::$references[$this->getSessionName()])) {
+            unset(self::$references[$this->getSessionName()]);
         }
         $this->stopLoops();
         if (isset($this->seqUpdater)) {
