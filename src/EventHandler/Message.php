@@ -25,11 +25,10 @@ abstract class Message extends AbstractMessage
     /** Content of the message */
     public readonly string $message;
 
-    private bool $reactionsCached = false;
-
+    protected bool $reactionsCached = false;
 
     /** @var list<int|string> list of our message reactions */
-    private ?array $reactions;
+    private ?array $reactions = [];
 
     /** Info about a forwarded message */
     public readonly ?ForwardedInfo $fwdInfo;
@@ -144,13 +143,12 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Pin a message
+     * Pin a message.
      *
      * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
      * @param bool $silent Pin the message silently, without triggering a notification
-     * @return AbstractMessage|null
      */
-    public function pin(bool $pmOneside = false,bool $silent = false) : ?AbstractMessage
+    public function pin(bool $pmOneside = false, bool $silent = false): ?AbstractMessage
     {
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.updatePinnedMessage',
@@ -166,13 +164,12 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Unpin a message
+     * Unpin a message.
      *
      * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
      * @param bool $silent Pin the message silently, without triggering a notification
-     * @return Update|null
      */
-    public function unpin(bool $pmOneside = false,bool $silent = false) : ?Update
+    public function unpin(bool $pmOneside = false, bool $silent = false): ?Update
     {
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.updatePinnedMessage',
@@ -188,16 +185,16 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Get our reaction on message return null if message deleted
+     * Get our reaction on message return null if message deleted.
      *
      * @return list<string|int>|null
      */
     public function getReactions(): ?array
     {
-        if(!$this->reactionsCached){
+        if (!$this->reactionsCached) {
             $this->reactionsCached = true;
             $me = $this->getClient()->getSelf()['id'];
-            $myReactions = array_filter(
+            $myReactions = \array_filter(
                 $this->getClient()->methodCallAsyncRead(
                     'messages.getMessageReactionsList',
                     [
@@ -205,28 +202,28 @@ abstract class Message extends AbstractMessage
                         'id' => $this->id
                     ]
                 )['reactions'],
-                fn($reactions):bool => $reactions['peer_id']['user_id'] ?? $reactions['peer_id']['channel_id'] == $me
+                fn (array $r): bool => $r['peer_id']['user_id'] ?? $r['peer_id']['channel_id'] == $me
             );
-            $this->reactions = array_map(fn($reaction) => $reaction['reaction']['emoticon'] ?? $reaction['reaction']['document_id'] ,$myReactions);
+            $this->reactions = \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
         }
         return $this->reactions;
     }
 
     /**
-     * Add reaction to message
+     * Add reaction to message.
      *
      * @param list<string|int> $reaction Array of Reaction
      * @param bool $big Whether a bigger and longer reaction should be shown
      * @param bool $addToRecent Add this reaction to the recent reactions list.
-     * @return Update|null
      */
-    public function addReaction(array $reaction,bool $big = false,bool $addToRecent = true) :?Update{
+    public function addReaction(array $reaction, bool $big = false, bool $addToRecent = true): ?Update
+    {
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
             [
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
-                'reaction' => array_map(fn($reactions) => is_int($reactions) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reactions] : ['_' => 'reactionEmoji', 'emoticon' => $reactions],$reaction),
+                'reaction' => \array_map(fn ($reactions) => \is_int($reactions) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reactions] : ['_' => 'reactionEmoji', 'emoticon' => $reactions], $reaction),
                 'big' => $big,
                 'add_to_recent' => $addToRecent
             ]
@@ -236,10 +233,9 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Delete reaction from message
+     * Delete reaction from message.
      *
      * @param string|int $reaction string or int Reaction
-     * @return Update|null
      */
     public function delReaction(int|string $reaction): ?Update
     {
@@ -248,7 +244,7 @@ abstract class Message extends AbstractMessage
             [
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
-                'reaction' => [is_int($reaction) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reaction] : ['_' => 'reactionEmoji', 'emoticon' => $reaction]],
+                'reaction' => [\is_int($reaction) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reaction] : ['_' => 'reactionEmoji', 'emoticon' => $reaction]],
             ]
         );
         unset($this->reactions[$reaction]);
