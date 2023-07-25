@@ -254,14 +254,6 @@ abstract class Message extends AbstractMessage
         unset($this->reactions[$reaction]);
         return $this->getClient()->wrapUpdate($result);
     }
-    /**
-     * React to message
-     *
-     * @param string|array $reaction string or Array of Reaction
-     * @param bool $big Whether a bigger and longer reaction should be shown
-     * @param bool $addToRecent Add this reaction to the recent reactions list.
-     * @return Update|null
-     */
 
     private readonly string $html;
     private readonly string $htmlTelegram;
