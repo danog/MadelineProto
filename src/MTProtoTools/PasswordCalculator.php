@@ -192,7 +192,7 @@ final class PasswordCalculator
         $g_x = $g->powMod($x, $p);
         $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
-        $a = new BigInteger(Tools::random(2048 / 8), 256);
+        $a = new BigInteger(Tools::random(256), 256);
         $A = $g->powMod($a, $p);
         Crypt::checkG($A, $p);
         $AForHash = \str_pad($A->toBytes(), 256, \chr(0), STR_PAD_LEFT);

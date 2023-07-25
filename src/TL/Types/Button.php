@@ -39,16 +39,16 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      *
      * @var array<array-key, mixed>
      */
-    private array $button = [];
+    protected array $button = [];
     /**
      * Message ID.
      */
-    private int $id;
+    protected int $id;
     /**
      * Peer ID.
      *
      */
-    private array|int $peer;
+    protected array|int $peer;
     /**
      * Constructor function.
      *
@@ -94,15 +94,6 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
             case 'keyboardButtonGame':
                 return $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
         }
-    }
-    /**
-     * Get debug info.
-     */
-    public function __debugInfo(): array
-    {
-        $res = \get_object_vars($this);
-        unset($res['API']);
-        return $res;
     }
     /**
      * Serialize button.
