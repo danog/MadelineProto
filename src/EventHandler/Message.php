@@ -202,7 +202,7 @@ abstract class Message extends AbstractMessage
                         'id' => $this->id
                     ]
                 )['reactions'],
-                fn (array $r): bool => \boolval($r['peer_id']['user_id'] ?? $r['peer_id']['channel_id'] == $me)
+                fn (array $r): bool => \intval($r['peer_id']['user_id'] ?? $r['peer_id']['channel_id']) == $me
             );
             $this->reactions = \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
         }
