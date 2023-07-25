@@ -95,13 +95,13 @@ abstract class Message extends AbstractMessage
             $this->fwdInfo = new ForwardedInfo(
                 $fwdFrom['date'],
                 isset($fwdFrom['from_id'])
-                    ? $this->API->getIdInternal($fwdFrom['from_id'])
+                    ? $this->getClient()->getIdInternal($fwdFrom['from_id'])
                     : null,
                 $fwdFrom['from_name'] ?? null,
                 $fwdFrom['channel_post'] ?? null,
                 $fwdFrom['post_author'] ?? null,
                 isset($fwdFrom['saved_from_peer'])
-                    ? $this->API->getIdInternal($fwdFrom['saved_from_peer'])
+                    ? $this->getClient()->getIdInternal($fwdFrom['saved_from_peer'])
                     : null,
                 $fwdFrom['saved_from_msg_id'] ?? null
             );

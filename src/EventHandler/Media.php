@@ -82,7 +82,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
      */
     public function getDownloadLink(?string $scriptUrl = null): string
     {
-        return $this->API->getDownloadLink($this, $scriptUrl);
+        return $this->getClient()->getDownloadLink($this, $scriptUrl);
     }
 
     /** @internal */

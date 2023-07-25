@@ -30,7 +30,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\PlainTextRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
-use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 use JsonSerializable;
@@ -38,27 +38,17 @@ use JsonSerializable;
 /**
  * Represents a login QR code.
  */
-final class LoginQrCode implements JsonSerializable
+final class LoginQrCode extends IpcCapable implements JsonSerializable
 {
-    private string $session;
-
     /** @internal */
     public function __construct(
-        private MTProto|Client $API,
+        MTProto $API,
         /** @var non-empty-string The [QR code login link](https://core.telegram.org/api/links#qr-code-login-links) */
         public readonly string $link,
         /** @var positive-int The expiry date of the link */
         public readonly int $expiry
     ) {
-        $this->session = $API->getWrapper()->getSession()->getSessionDirectoryPath();
-    }
-
-    /**
-     * @internal
-     */
-    public function __sleep(): array
-    {
-        return ['link', 'expiry', 'session'];
+        parent::__construct($API);
     }
 
     /** @internal */
@@ -95,8 +85,7 @@ final class LoginQrCode implements JsonSerializable
 
     public function getLoginCancellation(): Cancellation
     {
-        $this->API ??= Client::giveInstanceBySession($this->session);
-        return $this->API->getQrLoginCancellation();
+        return $this->getClient()->getQrLoginCancellation();
     }
 
     /**
@@ -126,7 +115,7 @@ final class LoginQrCode implements JsonSerializable
             (new DeferredFuture)->getFuture()->await($cancellation);
         } catch (CancelledException) {
             $customCancellation?->throwIfRequested();
-            return $this->API->qrLogin();
+            return $this->getClient()->qrLogin();
         }
         throw new AssertionError("Unreachable!");
     }

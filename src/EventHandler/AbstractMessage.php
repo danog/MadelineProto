@@ -53,7 +53,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $this->id = $rawMessage['id'];
         $this->chatId = $info['bot_api_id'];
         $this->senderId = isset($rawMessage['from_id'])
-            ? $this->API->getIdInternal($rawMessage['from_id'])
+            ? $this->getClient()->getIdInternal($rawMessage['from_id'])
             : $this->chatId;
         $this->date = $rawMessage['date'];
         $this->mentioned = $rawMessage['mentioned'];
@@ -131,14 +131,14 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             }
             return $this->replyCache;
         }
-        $messages = $this->API->methodCallAsyncRead(
+        $messages = $this->getClient()->methodCallAsyncRead(
             API::isSupergroup($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
             ]
         )['messages'];
-        $this->replyCache = $messages ? $this->API->wrapMessage($messages[0]) : null;
+        $this->replyCache = $messages ? $this->getClient()->wrapMessage($messages[0]) : null;
         $this->replyCached = true;
         if (!$this->replyCache instanceof $class) {
             return null;
@@ -153,7 +153,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function delete(bool $revoke = true): void
     {
-        $this->API->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             API::isSupergroup($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
             [
                 'channel' => $this->chatId,
@@ -191,7 +191,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         bool $noWebpage = false,
         bool $updateStickersetsOrder = false,
     ): Message {
-        return $this->API->sendMessage(
+        return $this->getClient()->sendMessage(
             peer: $this->chatId,
             message: $message,
             parseMode: $parseMode,

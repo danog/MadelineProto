@@ -311,7 +311,7 @@ final class API extends AbstractAPI
                 $this->session,
                 $settings,
                 $forceFull
-            )->await(Tools::getTimeoutCancellation(30.0));
+            )->await(Tools::getTimeoutCancellation(3.0));
         } catch (CancelledException $e) {
             if (!$e->getPrevious() instanceof TimeoutException) {
                 throw $e;
@@ -322,16 +322,10 @@ final class API extends AbstractAPI
 
         if ($unserialized === 0) {
             // Timeout
-            Logger::log('!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!', Logger::FATAL_ERROR);
-            if (!$tryReconnect || (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'testing')) {
-                throw new Exception('Could not connect to MadelineProto, please check the MadelineProto.log file to debug!');
-            }
-            Logger::log('!!! Reconnecting using slower method. !!!', Logger::FATAL_ERROR);
-            // IPC server error, try fetching full session
-            return $this->connectToMadelineProto($settings, true, false);
+            throw new Exception(Lang::$current_lang['could_not_connect_to_MadelineProto']);
         } elseif ($unserialized instanceof Throwable) {
-            // IPC server error, try fetching full session
-            return $this->connectToMadelineProto($settings, true);
+            // IPC server error
+            throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
             $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));

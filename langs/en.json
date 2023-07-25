@@ -159,5 +159,7 @@
 
     "account_banned": "!!!!!!! WARNING !!!!!!!\nTelegram's flood prevention system suspended this account.\nTo continue, manual verification is required.\nSend an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.\nThen login again.\nIf you intentionally deleted this account, ignore this message.",
 
-    "plugin_path_does_not_exist": "Plugin path %s does not exist!"
+    "plugin_path_does_not_exist": "Plugin path %s does not exist!",
+
+    "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open or disable webserver path rewrites to fix!"
 }

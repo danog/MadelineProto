@@ -11,35 +11,30 @@ use danog\MadelineProto\MTProto;
  */
 abstract class IpcCapable
 {
-    private readonly string $session;
-    protected MTProto|Client|null $API;
+    protected readonly string $session;
+    private MTProto|Client|null $API;
 
     /** @internal */
-    protected function __construct(
-        MTProto|Client $API,
-    ) {
+    protected function __construct(MTProto $API)
+    {
         $this->API = $API;
-        if ($API instanceof MTProto) {
-            $this->session = $API->wrapper->getSession()->getSessionDirectoryPath();
-        } else {
-            $this->session = $API->getSession()->getSessionDirectoryPath();
-        }
+        $this->session = $API->getSessionName();
     }
 
     /** @internal */
-    public function __sleep()
+    final public function __sleep()
     {
         $vars = \get_object_vars($this);
         unset($vars['API']);
         return \array_keys($vars);
     }
-    /** @internal */
-    public function __wakeup(): void
+
+    final protected function getClient(): MTProto|Client
     {
-        $this->API = Client::giveInstanceBySession($this->session);
+        return $this->API ??= Client::giveInstanceBySession($this->session);
     }
 
-    public function __debugInfo()
+    final public function __debugInfo()
     {
         $vars = \get_object_vars($this);
         unset($vars['API']);
