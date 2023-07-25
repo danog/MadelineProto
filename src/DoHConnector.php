@@ -32,7 +32,6 @@ use Amp\Socket\ResourceSocket;
 use Amp\Socket\Socket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
-use Amp\TimeoutCancellation;
 use AssertionError;
 use danog\MadelineProto\Stream\ConnectionContext;
 use Revolt\EventLoop;
@@ -119,7 +118,7 @@ final class DoHConnector implements SocketConnector
                 $watcher = EventLoop::onWritable($socket, $deferred->complete(...));
                 $id = $token->subscribe($deferred->error(...));
                 try {
-                    $deferred->getFuture()->await(new TimeoutCancellation($timeout));
+                    $deferred->getFuture()->await(Tools::getTimeoutCancellation($timeout));
                 } catch (CancelledException $e) {
                     if (!$e->getPrevious() instanceof DnsTimeoutException) {
                         throw $e;

@@ -24,6 +24,7 @@ use Amp\ByteStream\ReadableStream;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\CustomEmoji;
 use danog\MadelineProto\EventHandler\Media\Document;
@@ -32,8 +33,9 @@ use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\MaskSticker;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
-use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\StaticSticker;
 use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\VideoSticker;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\FileCallback;
@@ -41,7 +43,6 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
-use Webmozart\Assert\Assert;
 
 /**
  * Manages upload and download of files.
@@ -70,20 +71,33 @@ trait FilesAbstraction
             return null;
         }
         $has_video = null;
+        $has_document_photo = null;
         $has_animated = false;
         foreach ($media['document']['attributes'] as $attr) {
             $t = $attr['_'];
             if ($t === 'documentAttributeImageSize') {
-                return new DocumentPhoto($this, $media, $attr, $protected);
+                $has_document_photo = $attr;
+                continue;
             }
             if ($t === 'documentAttributeAnimated') {
                 $has_animated = true;
                 continue;
             }
             if ($t === 'documentAttributeSticker') {
-                return $attr['mask']
-                    ? new MaskSticker($this, $media, $attr, $protected)
-                    : new Sticker($this, $media, $attr, $protected);
+                if ($has_video) {
+                    return new VideoSticker($this, $media, $attr, $has_video, $protected);
+                }
+
+                \assert($has_document_photo !== null);
+                if ($attr['mask']) {
+                    return new MaskSticker($this, $media, $attr, $has_document_photo, $protected);
+                }
+
+                if ($media['document']['mime_type'] === 'application/x-tgsticker') {
+                    return new AnimatedSticker($this, $media, $attr, $has_document_photo, $protected);
+                }
+
+                return new StaticSticker($this, $media, $attr, $has_document_photo, $protected);
             }
             if ($t === 'documentAttributeVideo') {
                 $has_video = $attr;
@@ -99,13 +113,16 @@ trait FilesAbstraction
             }
         }
         if ($has_animated) {
-            Assert::notNull($has_video);
+            \assert($has_video !== null);
             return new Gif($this, $media, $has_video, $protected);
         }
         if ($has_video) {
             return $has_video['round_message']
                 ? new RoundVideo($this, $media, $has_video, $protected)
                 : new Video($this, $media, $has_video, $protected);
+        }
+        if ($has_document_photo) {
+            return new DocumentPhoto($this, $media, $has_document_photo, $protected);
         }
         return new Document($this, $media, $protected);
     }

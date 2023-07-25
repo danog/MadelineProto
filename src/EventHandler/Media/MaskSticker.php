@@ -37,9 +37,10 @@ final class MaskSticker extends AbstractSticker
         MTProto $API,
         array $rawMedia,
         array $stickerAttribute,
+        array $photoAttribute,
         bool $protected,
     ) {
-        parent::__construct($API, $rawMedia, $stickerAttribute, $protected);
+        parent::__construct($API, $rawMedia, $stickerAttribute, $photoAttribute['w'], $photoAttribute['h'], $protected);
         $coords = $stickerAttribute['mask_coords'];
         $this->position = match ($coords['n']) {
             0 => MaskPosition::Forehead,

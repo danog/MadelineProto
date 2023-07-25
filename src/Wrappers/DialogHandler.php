@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Sync\LocalMutex;
-use Amp\TimeoutCancellation;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -105,7 +105,7 @@ trait DialogHandler
                     $result = $this->methodCallAsyncRead(
                         'updates.getDifference',
                         $state,
-                        ['cancellation' => new TimeoutCancellation(15.0), 'FloodWaitLimit' => 86400]
+                        ['cancellation' => Tools::getTimeoutCancellation(15.0), 'FloodWaitLimit' => 86400]
                     )['_'];
                 } catch (Throwable $e) {
                     $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");

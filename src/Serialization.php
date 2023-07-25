@@ -25,8 +25,8 @@ use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
+use AssertionError;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
@@ -191,11 +191,23 @@ abstract class Serialization
             } elseif (!\class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
-                Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
+                Logger::log("Session has event handler (class $class), but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
             } elseif (\is_subclass_of($class, EventHandler::class)) {
+                EventHandler::cachePlugins($class);
+            }
+        } else {
+            $class = $lightState->getEventHandler();
+            if ($class && !\class_exists($class)) {
+                // Have lock, can't use it
+                $unlock();
+                Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
+                Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
+                Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
+                throw new AssertionError("Please make sure the $class class is in scope.");
+            } elseif ($class && \is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
         }
@@ -268,7 +280,7 @@ abstract class Serialization
                 }
             }
             try {
-                if ($res = $cancelConnect->await(new TimeoutCancellation(1.0))) {
+                if ($res = $cancelConnect->await(Tools::getTimeoutCancellation(1.0))) {
                     if ($res instanceof Throwable) {
                         return [$res, null];
                     }

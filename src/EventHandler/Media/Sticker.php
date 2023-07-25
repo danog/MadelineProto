@@ -7,7 +7,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Represents a sticker.
  */
-final class Sticker extends AbstractSticker
+abstract class Sticker extends AbstractSticker
 {
     /** Whether this is a premium sticker and a premium sticker animation must be played. */
     public readonly bool $premiumSticker;
@@ -17,9 +17,11 @@ final class Sticker extends AbstractSticker
         MTProto $API,
         array $rawMedia,
         array $stickerAttribute,
+        int $width,
+        int $height,
         bool $protected,
     ) {
-        parent::__construct($API, $rawMedia, $stickerAttribute, $protected);
+        parent::__construct($API, $rawMedia, $stickerAttribute, $width, $height, $protected);
         $this->premiumSticker = !$rawMedia['nopremium'];
     }
 }

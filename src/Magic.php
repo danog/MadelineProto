@@ -290,7 +290,7 @@ final class Magic
             if (\file_exists(__DIR__.'/../.git/refs/heads/v8')) {
                 try {
                     self::$version = \trim(@\file_get_contents(__DIR__.'/../.git/refs/heads/v8'));
-                    if (self::$version && !str_ends_with(self::$version, '-81')) {
+                    if (self::$version && !\str_ends_with(self::$version, '-81')) {
                         // Running from within repo
                         self::$version_latest = self::$version;
                     }

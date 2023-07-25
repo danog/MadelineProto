@@ -37,7 +37,7 @@ final class LightState
     public function __construct(MTProto $API)
     {
         if ($API->hasEventHandler()) {
-            $this->eventHandler = \get_class($API->getEventHandler());
+            $this->eventHandler = $API->getEventHandler()::class;
         }
     }
 

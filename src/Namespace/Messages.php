@@ -102,6 +102,8 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param string $message The message
      * @param array $reply_markup Reply markup for sending bot buttons @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}> $entities Array of Message [entities](https://core.telegram.org/api/entities) for sending styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
@@ -110,7 +112,7 @@ interface Messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMessage(array|int|string $peer, bool $no_webpage = false, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], string $message = '', array $reply_markup = [], array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int $schedule_date = 0, array|int|string $send_as = []): array;
+    public function sendMessage(array|int|string $peer, bool $no_webpage = false, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, string $message = '', array $reply_markup = [], array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int $schedule_date = 0, array|int|string $send_as = []): array;
 
     /**
      * Send a media.
@@ -123,6 +125,8 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param string $message Caption
      * @param array $reply_markup Reply markup for bot keyboards @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}> $entities Array of Message [entities](https://core.telegram.org/api/entities) for styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
@@ -131,7 +135,7 @@ interface Messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMedia(array|int|string $peer, \danog\MadelineProto\EventHandler\Media|array|string $media, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], string $message = '', array $reply_markup = [], array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int $schedule_date = 0, array|int|string $send_as = []): array;
+    public function sendMedia(array|int|string $peer, \danog\MadelineProto\EventHandler\Media|array|string $media, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, string $message = '', array $reply_markup = [], array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int $schedule_date = 0, array|int|string $send_as = []): array;
 
     /**
      * Forwards messages by their IDs.
@@ -501,13 +505,15 @@ interface Messages
      * @param bool $clear_draft Whether to clear the [draft](https://core.telegram.org/api/drafts)
      * @param bool $hide_via Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](https://docs.madelineproto.xyz/API_docs/constructors/config.html))
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param int $query_id Query ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param string $id Result ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param int $schedule_date Scheduled message date for scheduled messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendInlineBotResult(array|int|string $peer, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $hide_via = false, array $reply_to = [], int $query_id = 0, string $id = '', int $schedule_date = 0, array|int|string $send_as = []): array;
+    public function sendInlineBotResult(array|int|string $peer, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $hide_via = false, array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, int $query_id = 0, string $id = '', int $schedule_date = 0, array|int|string $send_as = []): array;
 
     /**
      * Find out if a media message's caption can be edited.
@@ -786,9 +792,11 @@ interface Messages
      *
      * @param array|int|string $peer Other user @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendScreenshotNotification(array|int|string $peer, array $reply_to): array;
+    public function sendScreenshotNotification(array|int|string $peer, array $reply_to, int $reply_to_msg_id = 0, int $top_msg_id = 0): array;
 
     /**
      * Get faved stickers.
@@ -849,12 +857,14 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param list<array{_: 'inputSingleMedia', media: \danog\MadelineProto\EventHandler\Media|string|array, message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', user_id: array|int|string, offset?: int, length?: int}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}> $multi_media Array of The medias to send @see https://docs.madelineproto.xyz/API_docs/types/InputSingleMedia.html
      * @param int $schedule_date Scheduled message date for scheduled messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMultiMedia(array|int|string $peer, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], array $multi_media = [], int $schedule_date = 0, array|int|string $send_as = []): array;
+    public function sendMultiMedia(array|int|string $peer, bool $silent = false, bool $background = false, bool $clear_draft = false, bool $noforwards = false, bool $update_stickersets_order = false, array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, array $multi_media = [], int $schedule_date = 0, array|int|string $send_as = []): array;
 
     /**
      * Upload encrypted file and associate it to a secret chat.
@@ -1546,10 +1556,12 @@ interface Messages
      * @param mixed $theme_params Any JSON-encodable data
      * @param string $platform Short name of the application; 0-64 English letters, digits, and underscores
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param array|int|string $send_as Open the web app as the specified peer, sending the resulting the message as the specified peer. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'webViewResultUrl', query_id: int, url: string} @see https://docs.madelineproto.xyz/API_docs/types/WebViewResult.html
      */
-    public function requestWebView(array|int|string $peer, array|int|string $bot, bool $from_bot_menu = false, bool $silent = false, string $url = '', string $start_param = '', mixed $theme_params = null, string $platform = '', array $reply_to = [], array|int|string $send_as = []): array;
+    public function requestWebView(array|int|string $peer, array|int|string $bot, bool $from_bot_menu = false, bool $silent = false, string $url = '', string $start_param = '', mixed $theme_params = null, string $platform = '', array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string $send_as = []): array;
 
     /**
      * Indicate to the server (from the user side) that the user is still using a web app.
@@ -1561,9 +1573,11 @@ interface Messages
      * @param bool $silent Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is [terminated](https://docs.madelineproto.xyz/API_docs/methods/messages.sendWebViewResultMessage.html) should be sent silently (no notifications for the receivers).
      * @param int $query_id Web app interaction ID obtained from [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html)
      * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
+     * @param int $reply_to_msg_id ID Of message to reply to
+     * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
      * @param array|int|string $send_as Open the web app as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function prolongWebView(array|int|string $peer, array|int|string $bot, bool $silent = false, int $query_id = 0, array $reply_to = [], array|int|string $send_as = []): bool;
+    public function prolongWebView(array|int|string $peer, array|int|string $bot, bool $silent = false, int $query_id = 0, array $reply_to = [], int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string $send_as = []): bool;
 
     /**
      * Open a [bot web app](https://core.telegram.org/api/bots/webapps).
