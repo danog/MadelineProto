@@ -311,7 +311,7 @@ final class API extends AbstractAPI
                 $this->session,
                 $settings,
                 $forceFull
-            )->await(Tools::getTimeoutCancellation(3.0));
+            )->await(Tools::getTimeoutCancellation(30.0));
         } catch (CancelledException $e) {
             if (!$e->getPrevious() instanceof TimeoutException) {
                 throw $e;
