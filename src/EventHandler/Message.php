@@ -137,6 +137,73 @@ abstract class Message extends AbstractMessage
         }
     }
 
+    /**
+     * Pin a message
+     *
+     * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
+     * @param bool $silent Pin the message silently, without triggering a notification
+     * @return AbstractMessage|null
+     */
+    public function pin(bool $pmOneside = false,bool $silent = false) : ?AbstractMessage
+    {
+        $result = $this->API->methodCallAsyncRead(
+            'messages.updatePinnedMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->id,
+                'pm_oneside' => $pmOneside,
+                'silent' => $silent,
+                'unpin' => false
+            ]
+        );
+        return $this->API->wrapMessage($this->API->extractMessage($result));
+    }
+
+    /**
+     * Unpin a message
+     *
+     * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
+     * @param bool $silent Pin the message silently, without triggering a notification
+     * @return Update|null
+     */
+    public function unpin(bool $pmOneside = false,bool $silent = false) : ?Update
+    {
+        $result = $this->API->methodCallAsyncRead(
+            'messages.updatePinnedMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->id,
+                'pm_oneside' => $pmOneside,
+                'silent' => $silent,
+                'unpin' => true
+            ]
+        );
+        return $this->API->wrapUpdate($result);
+    }
+
+    /**
+     * React to message
+     *
+     * @param string|array $reaction string or Array of Reaction
+     * @param bool $big Whether a bigger and longer reaction should be shown
+     * @param bool $addToRecent Add this reaction to the recent reactions list.
+     * @return Update|null
+     */
+    public function react(string|array $reaction,bool $big = false,bool $addToRecent = true) : ?Update
+    {
+        $result = $this->API->methodCallAsyncRead(
+            'messages.sendReaction',
+            [
+                'peer' => $this->chatId,
+                'msg_id' => $this->id,
+                'reaction' => is_string($reaction) ? [['_' => 'reactionEmoji', 'emoticon' => $reaction]] : $reaction,
+                'big' => $big,
+                'add_to_recent' => $addToRecent
+            ]
+        );
+        return $this->API->wrapUpdate($result);
+    }
+
     private readonly string $html;
     private readonly string $htmlTelegram;
     private readonly ?array $entities;
