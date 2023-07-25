@@ -210,47 +210,4 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         );
     }
 
-    /**
-     * Reply inlineBotResult to message
-     *
-     * @param BigInteger $queryId Query ID from <a href='https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html'>messages.getInlineBotResults</a>
-     * @param int $id Result ID from <a href='https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html'>messages.getInlineBotResults</a>
-     * @param array|null $replyTo reply to specific message
-     * @param int|string|null $sendAs Send this message as the specified peer
-     * @param int|null $scheduleDate Schedule date.
-     * @param bool $hideVia Whether to hide the via @botname in the resulting message (only for bot usernames encountered in the <a href='https://docs.madelineproto.xyz/API_docs/constructors/config.html'>config</a>)
-     * @param bool $clearDraft Clears the draft field
-     * @param bool $silent Whether to send the message silently, without triggering notifications.
-     * @param bool $background Send this message as background message
-     * @return Update|null Return Update or null
-     *
-     */
-    public function replyInlineBotResult(
-        BigInteger $queryId,
-        int $id,
-        ?array $replyTo = null,
-        int|string|null $sendAs = null,
-        ?int $scheduleDate = null,
-        bool $hideVia = false,
-        bool $clearDraft = false,
-        bool $silent = false,
-        bool $background = false
-    ): ?Update
-    {
-        return $this->API->wrapUpdate($this->API->methodCallAsyncRead(
-            'messages.sendInlineBotResult',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => $replyTo ?? ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => $this->id, 'top_msg_id' => $this->topicId === 1 ? null : $this->topicId],
-                'query_id' => $queryId,
-                'id' => $id,
-                'send_as' => $sendAs,
-                'schedule_date' => $scheduleDate,
-                'hide_via' => $hideVia,
-                'clear_draft' => $clearDraft,
-                'silent' => $silent,
-                'background' => $background
-            ]
-        ));
-    }
 }
