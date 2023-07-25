@@ -127,7 +127,7 @@
     "extensionRequiredInstallWithApt": "Provate ad avviare sudo apt-get install %s.",
     "extensionRequiredInstallWithCustomInstructions": "Seguire le istruzioni su %s per installarla.",
     "extensionRecommended": "Attenzione: l'estensione %s non è installata, si prega di installarla per velocizzare MadelineProto!",
-    "mmapErrorPart1": "È stato raggiunto il limite massimo di regioni di memoria mappate (%s): è necessario incrementare il parametro di configurazione del kernel vm.max_map_count a 262144 per correggere l'errore.",
+    "mmapErrorPart1": "È stato raggiunto il limite massimo di regioni di memoria mappate (mmap, %s): è necessario incrementare il parametro di configurazione del kernel vm.max_map_count a 262144 per correggere l'errore.",
     "botAlreadyRunning": "Il bot è già in esecuzione!",
     "do_not_remove_MadelineProto.log_phar": "Per favore non rimuovere madeline.phar o madeline.php, o MadelineProto crasherà. Se hai problemi con MadelineProto, segnalali su https://github.com/danog/MadelineProto o https://t.me/pwrtelegramgroup",
     "do_not_use_blocking_function": "per motivi di performance, gli event handler non possono usare la funzione bloccante non asincrona %s, per favore usa %s",
@@ -146,5 +146,11 @@
     "dl.php_powered_by_madelineproto": "Server di scaricamento file Telegram (fino a 4GB), creato usando <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Clicca <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">qui</a> per configurare il tuo personale server di scaricamento file Telegram!",
     "invalid_dl.php_session": "%s non è uno script di scaricamento valido perché l'ID della sessione non è corretto (mi aspettavo %s, ho ricevuto %s)",
     "account_banned": "!!!!!!! ATTENZIONE !!!!!!!\nIl sistema antispam di telegram ha sospeso questo account.\nPer continuare, è richiesta una verifica manuale.\nMandare un'email in inglese a recover@telegram.org, chiedendo di sbannare il numero di telefono %s, spiegando brevemente cosa si ha intenzione di fare con l'account.\nPoi rieseguite nuovamente il login.\nIgnorare questo messaggio se la sessione è stata resettata intenzionalmente.",
-    "plugin_path_does_not_exist": "La cartella dei plugin %s non esiste!"
+    "plugin_path_does_not_exist": "La cartella dei plugin %s non esiste!",
+    "string_required": "È richiesta una stringa!",
+    "waveform_must_have_100_values": "Una forma d'onda deve essere un array contenente 100 valori!",
+    "waveform_value": "Un singolo valore di una forma d'onda deve essere compreso tra 0 e 31!",
+    "could_not_convert_object": "Non è stato possibile convertire l'oggetto di tipo %s",
+    "dl.php_check_logs_make_sure_session_running": "Sia l'event handler associato al bot che il server IPC della sessione sono offline, controllare i log e assicurarsi che almeno uno dei due sia online!",
+    "update_madelineproto": "Stai usando una vecchia versione di MadelineProto, è necessario un aggiornamento!"
 }

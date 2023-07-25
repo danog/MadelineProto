@@ -258,9 +258,9 @@ final class TL implements TLInterface
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', STR_PAD_LEFT);
-                        if ($id !== $nid) {
+                        /*if ($id !== $nid) {
                             $this->API?->logger?->logger(\sprintf('CRC32 mismatch (%s, %s) for %s', $id, $nid, $line), Logger::ERROR);
-                        }
+                        }*/
                         $id = $nid;
                     }
                     if (!\is_null($e)) {
