@@ -22,9 +22,9 @@ namespace danog\MadelineProto;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
-use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use Closure;
 use Generator;
@@ -120,7 +120,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function timeout(Generator|Future $promise, int $timeout): mixed
     {
-        return self::call($promise)->await(new TimeoutCancellation($timeout/1000));
+        return self::call($promise)->await(Tools::getTimeoutCancellation($timeout/1000));
     }
     /**
      * Creates an artificial timeout for any `Promise`.
@@ -305,6 +305,17 @@ abstract class AsyncTools extends StrTools
     {
         delay($time);
     }
+
+    /**
+     * @internal
+     */
+    public static function getTimeoutCancellation(float $timeout, string $message = "Operation timed out"): Cancellation
+    {
+        $deferred = new DeferredCancellation;
+        EventLoop::delay($timeout, fn () => $deferred->cancel(new TimeoutException($message)));
+        return $deferred->getCancellation();
+    }
+
     /**
      * Asynchronously read line.
      *

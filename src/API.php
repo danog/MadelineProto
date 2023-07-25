@@ -26,7 +26,6 @@ use Amp\Future;
 use Amp\Future\UnhandledFutureError;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
-use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\Ipc\Client;
@@ -312,7 +311,7 @@ final class API extends AbstractAPI
                 $this->session,
                 $settings,
                 $forceFull
-            )->await(new TimeoutCancellation(30.0));
+            )->await(Tools::getTimeoutCancellation(30.0));
         } catch (CancelledException $e) {
             if (!$e->getPrevious() instanceof TimeoutException) {
                 throw $e;

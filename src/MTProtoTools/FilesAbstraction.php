@@ -43,7 +43,6 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
-use Webmozart\Assert\Assert;
 
 /**
  * Manages upload and download of files.
@@ -89,7 +88,7 @@ trait FilesAbstraction
                     return new VideoSticker($this, $media, $attr, $has_video, $protected);
                 }
 
-                assert($has_document_photo !== null);
+                \assert($has_document_photo !== null);
                 if ($attr['mask']) {
                     return new MaskSticker($this, $media, $attr, $has_document_photo, $protected);
                 }
@@ -114,7 +113,7 @@ trait FilesAbstraction
             }
         }
         if ($has_animated) {
-            assert($has_video !== null);
+            \assert($has_video !== null);
             return new Gif($this, $media, $has_video, $protected);
         }
         if ($has_video) {

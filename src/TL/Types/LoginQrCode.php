@@ -24,7 +24,6 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
 use Amp\DeferredFuture;
-use Amp\TimeoutCancellation;
 use AssertionError;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
@@ -33,6 +32,7 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
 use JsonSerializable;
 
 /**
@@ -90,7 +90,7 @@ final class LoginQrCode implements JsonSerializable
 
     public function getExpirationCancellation(): Cancellation
     {
-        return new TimeoutCancellation((float) $this->expiresIn(), "The QR code expired!");
+        return Tools::getTimeoutCancellation((float) $this->expiresIn(), "The QR code expired!");
     }
 
     public function getLoginCancellation(): Cancellation

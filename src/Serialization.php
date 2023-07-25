@@ -25,7 +25,6 @@ use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
@@ -268,7 +267,7 @@ abstract class Serialization
                 }
             }
             try {
-                if ($res = $cancelConnect->await(new TimeoutCancellation(1.0))) {
+                if ($res = $cancelConnect->await(Tools::getTimeoutCancellation(1.0))) {
                     if ($res instanceof Throwable) {
                         return [$res, null];
                     }

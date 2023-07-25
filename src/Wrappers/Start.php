@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
-use Amp\TimeoutCancellation;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Client;
@@ -222,7 +221,7 @@ trait Start
                     /** @var ?LoginQrCode */
                     $qr = $this->qrLogin();
                     if (isset($_GET['waitQrCodeOrLogin'])) {
-                        $qr = $qr?->waitForLoginOrQrCodeExpiration(new TimeoutCancellation(5.0));
+                        $qr = $qr?->waitForLoginOrQrCodeExpiration(Tools::getTimeoutCancellation(5.0));
                     }
                 } catch (CancelledException) {
                     /** @var ?LoginQrCode */

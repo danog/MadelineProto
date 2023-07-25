@@ -24,7 +24,6 @@ use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
-use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
@@ -52,6 +51,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
 use Revolt\EventLoop;
@@ -227,7 +227,7 @@ trait UpdateHandler
             try {
                 $this->update_deferred = new DeferredFuture();
                 $this->update_deferred->getFuture()->await(
-                    $timeout === INF ? null : new TimeoutCancellation($timeout)
+                    $timeout === INF ? null : Tools::getTimeoutCancellation($timeout)
                 );
             } catch (CancelledException $e) {
                 if (!$e->getPrevious() instanceof TimeoutException) {
