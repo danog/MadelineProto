@@ -308,7 +308,16 @@ trait Login
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
         }
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
-        return $this->processAuthorization($this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]));
+        try {
+            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'PASSWORD_HASH_INVALID') {
+                $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]);
+            } else {
+                throw $e;
+            }
+        }
+        return $this->processAuthorization($res);
     }
     private function processAuthorization(array $authorization): array
     {

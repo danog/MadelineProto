@@ -137,9 +137,9 @@ abstract class Message extends AbstractMessage
         }
     }
 
-    private readonly string $html;
-    private readonly string $htmlTelegram;
-    private readonly ?array $entities;
+    protected readonly string $html;
+    protected readonly string $htmlTelegram;
+    protected readonly ?array $entities;
     /**
      * Get an HTML version of the message.
      *
