@@ -202,7 +202,7 @@ abstract class Message extends AbstractMessage
                         'id' => $this->id
                     ]
                 )['reactions'],
-                fn (array $r): bool => $r['peer_id']['user_id'] ?? $r['peer_id']['channel_id'] == $me
+                fn (array $r): bool => \boolval($r['peer_id']['user_id'] ?? $r['peer_id']['channel_id'] == $me)
             );
             $this->reactions = \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
         }
@@ -239,15 +239,18 @@ abstract class Message extends AbstractMessage
      */
     public function delReaction(int|string $reaction): ?Update
     {
+        $this->getReactions();
+        unset($this->reactions[\array_search($reaction, $this->reactions)]);
+        $r = \array_map(fn ($reactions) => \is_int($reactions) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reactions] : ['_' => 'reactionEmoji', 'emoticon' => $reactions], $this->reactions);
+        $r[]= ['_' => 'reactionEmpty'];
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
             [
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
-                'reaction' => [\is_int($reaction) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reaction] : ['_' => 'reactionEmoji', 'emoticon' => $reaction]],
+                'reaction' =>  $r,
             ]
         );
-        unset($this->reactions[$reaction]);
         return $this->getClient()->wrapUpdate($result);
     }
 
