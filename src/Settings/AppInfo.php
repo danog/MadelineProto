@@ -7,7 +7,6 @@ namespace danog\MadelineProto\Settings;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Magic;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SettingsAbstract;
 use Throwable;
 
