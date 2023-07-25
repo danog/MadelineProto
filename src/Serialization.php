@@ -206,7 +206,7 @@ abstract class Serialization
                 Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
-                throw new AssertionError("Please make sure the $class class is in scope.");
+                throw new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process).");
             } elseif ($class && \is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }

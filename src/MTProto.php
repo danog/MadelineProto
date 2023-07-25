@@ -1657,7 +1657,7 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         Magic::start(light: false);
         $warning = '';
-        if (Magic::$version !== Magic::$version_latest) {
+        if (API::RELEASE !== Magic::$latest_release) {
             $warning .= "<h2 style='color:red;'>".\htmlentities(Lang::$current_lang['update_madelineproto']).'</h2>';
         }
         if (!Magic::$hasOpenssl) {

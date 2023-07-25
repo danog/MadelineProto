@@ -72,10 +72,10 @@ final class GarbageCollector
         $cb = function () use ($client, $request, &$id): void {
             try {
                 $latest = $client->request($request);
-                Magic::$version_latest = \trim($latest->getBody()->buffer());
-                if (Magic::$version !== Magic::$version_latest) {
-                    $old = Magic::$version;
-                    $new = Magic::$version_latest;
+                Magic::$latest_release = \trim($latest->getBody()->buffer());
+                if (API::RELEASE !== Magic::$latest_release) {
+                    $old = API::RELEASE;
+                    $new = Magic::$latest_release;
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
 
                     $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
@@ -105,7 +105,7 @@ final class GarbageCollector
 
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
                     $base = \basename($path);
-                    if ($base === 'madeline-'.Magic::$version.'.phar') {
+                    if ($base === 'madeline-'.API::RELEASE.'.phar') {
                         continue;
                     }
                     $f = \fopen("$path.lock", 'c');

@@ -203,7 +203,7 @@ if [ "$PLATFORM" == "linux/arm64" ]; then :; else exit 0; fi
 cp "$input/madeline$php$branch.phar" "madeline81.phar"
 git remote add hub https://github.com/danog/MadelineProto
 
-echo -n "$COMMIT-81" > release
+echo -n "$TAG" > release
 cp tools/phar.php madeline.php
 
 gh release upload "$TAG" "madeline81.phar"
