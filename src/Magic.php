@@ -157,15 +157,10 @@ final class Magic
      */
     public static string $revision;
     /**
-     * MadelineProto version (clean).
-     *
-     */
-    public static ?string $version;
-    /**
      * Latest MadelineProto version.
      *
      */
-    public static ?string $version_latest;
+    public static ?string $latest_release;
     /**
      * Our CWD.
      *
@@ -286,18 +281,7 @@ final class Magic
             self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-            self::$version = null;
-            if (\file_exists(__DIR__.'/../.git/refs/heads/v8')) {
-                try {
-                    self::$version = \trim(@\file_get_contents(__DIR__.'/../.git/refs/heads/v8'));
-                    if (self::$version && !\str_ends_with(self::$version, '-81')) {
-                        // Running from within repo
-                        self::$version_latest = self::$version;
-                    }
-                } catch (Throwable $e) {
-                }
-            }
-            self::$revision = 'Revision: '.self::$version;
+            self::$revision = 'Revision: '.API::RELEASE;
             self::$initedLight = true;
             if ($light) {
                 return;
@@ -332,14 +316,14 @@ final class Magic
         self::$twoe1984 = new BigInteger('010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
         self::$twoe2047 = new BigInteger('80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
         self::$twoe2048 = new BigInteger('0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', 16);
-        if (self::$version && !isset(self::$version_latest)) {
-            self::$version_latest = null;
+        if (!isset(self::$latest_release)) {
+            self::$latest_release = null;
             try {
                 $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-                self::$version_latest = \trim(@\file_get_contents("https://phar.madelineproto.xyz/release$php"));
+                self::$latest_release = \trim(@\file_get_contents("https://phar.madelineproto.xyz/release$php"));
             } catch (Throwable $e) {
             }
-            if (self::$version_latest !== self::$version) {
+            if (self::$latest_release !== API::RELEASE) {
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
             }
         }
