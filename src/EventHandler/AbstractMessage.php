@@ -6,7 +6,6 @@ use AssertionError;
 use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use phpseclib3\Math\BigInteger;
 
 /**
  * Represents an incoming or outgoing message.
@@ -209,5 +208,4 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             updateStickersetsOrder: $updateStickersetsOrder
         );
     }
-
 }
