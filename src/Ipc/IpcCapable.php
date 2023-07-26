@@ -15,7 +15,7 @@ abstract class IpcCapable
     private MTProto|Client|null $API;
 
     /** @internal */
-    protected function __construct(MTProto $API)
+    protected function __construct(MTProto|Client $API)
     {
         $this->API = $API;
         $this->session = $API->getSessionName();

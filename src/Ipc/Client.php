@@ -84,6 +84,11 @@ final class Client extends ClientAbstract
     {
         return $this->session;
     }
+    /** @internal */
+    public function getSessionName(): string
+    {
+        return $this->session->getSessionDirectoryPath();
+    }
     /**
      * Run the provided async callable.
      *
