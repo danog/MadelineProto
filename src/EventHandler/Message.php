@@ -206,7 +206,7 @@ abstract class Message extends AbstractMessage
     /**
      * Add reaction to message.
      *
-     * @param string|int $reaction Array of Reaction
+     * @param string|int $reaction reaction
      * @param bool $big Whether a bigger and longer reaction should be shown
      * @param bool $addToRecent Add this reaction to the recent reactions list.
      */
