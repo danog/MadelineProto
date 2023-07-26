@@ -455,12 +455,12 @@ final class DataCenterConnection implements JsonSerializable
                 $this->API->logger->logger('Already connected!', Logger::WARNING);
                 return;
             }
+            $f = new DeferredFuture;
+            $this->connectionsPromise = $f->getFuture();
             $this->ctx = $ctx->getCtx();
             $this->connectMore(1);
             $this->restoreBackup();
-            $f = new DeferredFuture;
             $f->complete();
-            $this->connectionsPromise = $f->getFuture();
             if (isset($this->connectionsDeferred)) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
