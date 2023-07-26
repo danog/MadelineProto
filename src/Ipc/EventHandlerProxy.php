@@ -2,8 +2,6 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use danog\MadelineProto\MTProto;
-
 /**
  * Plugin event handler proxy object, for use through the IPC API.
  */
@@ -11,7 +9,7 @@ final class EventHandlerProxy extends IpcCapable
 {
     public function __construct(
         protected readonly ?string $__plugin,
-        MTProto $API
+        Client $API
     ) {
         parent::__construct($API);
     }
