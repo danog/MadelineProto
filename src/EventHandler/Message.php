@@ -199,7 +199,7 @@ abstract class Message extends AbstractMessage
             )['reactions'],
             fn (array $r): bool => $r['my']
         );
-        $this->reactions = \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
+        $this->reactions += \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
         return $this->reactions;
     }
 
@@ -218,8 +218,8 @@ abstract class Message extends AbstractMessage
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
                 'reaction' => match (\is_int($reaction)) {
-                    true => ['_' => 'reactionCustomEmoji', 'document_id' => $reaction],
-                    default => ['_' => 'reactionEmoji', 'emoticon' => $reaction]
+                    true => [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]],
+                    default => [['_' => 'reactionEmoji', 'emoticon' => $reaction]]
                 },
                 'big' => $big,
                 'add_to_recent' => $addToRecent
@@ -237,8 +237,8 @@ abstract class Message extends AbstractMessage
     public function delReaction(int|string $reaction): ?Update
     {
         $this->getReactions();
-        if ($index = \array_search($reaction, $this->reactions)) {
-            unset($this->reactions[$index]);
+        if (($key = \array_search($reaction, $this->reactions)) !== false) {
+            unset($this->reactions[$key]);
             $r = \array_map(fn ($reactions) => \is_int($reactions) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reactions] : ['_' => 'reactionEmoji', 'emoticon' => $reactions], $this->reactions);
             $r[]= ['_' => 'reactionEmpty'];
             $result = $this->getClient()->methodCallAsyncRead(
