@@ -281,13 +281,13 @@ final class Connection
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-        Assert::true($this->writer->start());
-        Assert::true($this->reader->start());
-        Assert::true($this->checker->start());
-        Assert::true($this->cleanup->start());
-        Assert::true($this->waiter->start());
+        Assert::true($this->writer->start(), "Could not start writer stream");
+        Assert::true($this->reader->start(), "Could not start reader stream");
+        Assert::true($this->checker->start(), "Could not start checker stream");
+        Assert::true($this->cleanup->start(), "Could not start cleanup stream");
+        Assert::true($this->waiter->start(), "Could not start waiter stream");
         if ($this->pinger) {
-            Assert::true($this->pinger->start());
+            Assert::true($this->pinger->start(), "Could not start pinger stream");
         }
     }
     /**

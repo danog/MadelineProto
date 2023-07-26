@@ -627,7 +627,7 @@ trait PeerHandler
         }
         if (\is_numeric($id)) {
             $id = (int) $id;
-            Assert::true($id !== 0);
+            Assert::true($id !== 0, "An invalid ID was specified!");
             if (!$this->chats[$id]) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");

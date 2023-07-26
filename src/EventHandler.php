@@ -410,7 +410,7 @@ abstract class EventHandler extends AbstractAPI
                         continue;
                     }
                     $class = $namespace.'\\'.$fileName;
-                    if (!\class_exists($class)) {
+                    if (!\class_exists($class) && !\interface_exists($class) && !\trait_exists($class) && !\enum_exists($class)) {
                         throw new AssertionError("$class was not defined when including $file!");
                     }
                     if ((new ReflectionClass($class))->getFileName() !== $file) {
@@ -441,7 +441,9 @@ abstract class EventHandler extends AbstractAPI
                     $file = $path.\str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
                     if (\file_exists($file)) {
                         require $file;
-                        Assert::classExists($class, "The $class class wasn't defined while including $file!");
+                        if (!\class_exists($class) && !\interface_exists($class) && !\trait_exists($class) && !\enum_exists($class)) {
+                            throw new AssertionError("$class was not defined when including $file!");
+                        }
                     }
                 });
 

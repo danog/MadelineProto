@@ -26,7 +26,7 @@ abstract class Message extends AbstractMessage
     public readonly string $message;
 
     /** @var list<int|string> list of our message reactions */
-    protected ?array $reactions = [];
+    protected array $reactions = [];
 
     /** Info about a forwarded message */
     public readonly ?ForwardedInfo $fwdInfo;
@@ -138,6 +138,13 @@ abstract class Message extends AbstractMessage
             $this->commandArgs = null;
             $this->commandType = null;
         }
+
+        foreach ($rawMessage['reactions']['results'] ?? [] as $r) {
+            if (isset($r['chosen_order'])) {
+                // Todo: live synchronization using a message database...
+                $this->reactions []= $r['reaction']['emoticon'] ?? $r['reaction']['document_id'];
+            }
+        }
     }
 
     /**
@@ -183,23 +190,12 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Get our reaction on message return null if message deleted.
+     * Get our reactions on the message.
      *
-     * @return list<string|int>|null
+     * @return list<string|int>
      */
-    public function getReactions(): ?array
+    public function getOurReactions(): array
     {
-        $myReactions = \array_filter(
-            $this->getClient()->methodCallAsyncRead(
-                'messages.getMessageReactionsList',
-                [
-                    'peer' => $this->chatId,
-                    'id' => $this->id
-                ]
-            )['reactions'],
-            fn (array $r): bool => $r['my']
-        );
-        $this->reactions += \array_map(fn (array $r) => $r['reaction']['emoticon'] ?? $r['reaction']['document_id'], $myReactions);
         return $this->reactions;
     }
 
@@ -209,49 +205,56 @@ abstract class Message extends AbstractMessage
      * @param string|int $reaction reaction
      * @param bool $big Whether a bigger and longer reaction should be shown
      * @param bool $addToRecent Add this reaction to the recent reactions list.
+     *
+     * @return list<string|int>
      */
-    public function addReaction(int|string $reaction, bool $big = false, bool $addToRecent = true): ?Update
+    public function addReaction(int|string $reaction, bool $big = false, bool $addToRecent = true): array
     {
-        $result = $this->getClient()->methodCallAsyncRead(
+        if (\in_array($reaction, $this->reactions, true)) {
+            return $this->reactions;
+        }
+        $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
             [
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
-                'reaction' => match (\is_int($reaction)) {
-                    true => [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]],
-                    default => [['_' => 'reactionEmoji', 'emoticon' => $reaction]]
-                },
+                'reaction' => \is_int($reaction)
+                    ? [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]]
+                    : [['_' => 'reactionEmoji', 'emoticon' => $reaction]],
                 'big' => $big,
                 'add_to_recent' => $addToRecent
             ]
         );
         $this->reactions[] = $reaction;
-        return $this->getClient()->wrapUpdate($result);
+        return $this->reactions;
     }
 
     /**
      * Delete reaction from message.
      *
      * @param string|int $reaction string or int Reaction
+     *
+     * @return list<string|int>
      */
-    public function delReaction(int|string $reaction): ?Update
+    public function delReaction(int|string $reaction): array
     {
-        $this->getReactions();
-        if (($key = \array_search($reaction, $this->reactions)) !== false) {
-            unset($this->reactions[$key]);
-            $r = \array_map(fn ($reactions) => \is_int($reactions) ? ['_' => 'reactionCustomEmoji', 'document_id' => $reactions] : ['_' => 'reactionEmoji', 'emoticon' => $reactions], $this->reactions);
-            $r[]= ['_' => 'reactionEmpty'];
-            $result = $this->getClient()->methodCallAsyncRead(
-                'messages.sendReaction',
-                [
-                    'peer' => $this->chatId,
-                    'msg_id' => $this->id,
-                    'reaction' =>  $r,
-                ]
-            );
-            return $this->getClient()->wrapUpdate($result);
+        $key = \array_search($reaction, $this->reactions, true);
+        if ($key === false) {
+            return $this->reactions;
         }
-        return null;
+        unset($this->reactions[$key]);
+        $this->reactions = \array_values($this->reactions);
+        $r = \array_map(fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
+        $r[]= ['_' => 'reactionEmpty'];
+        $this->getClient()->methodCallAsyncRead(
+            'messages.sendReaction',
+            [
+                'peer' => $this->chatId,
+                'msg_id' => $this->id,
+                'reaction' =>  $r,
+            ]
+        );
+        return $this->reactions;
     }
 
     protected readonly string $html;

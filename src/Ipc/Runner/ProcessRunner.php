@@ -96,7 +96,8 @@ final class ProcessRunner extends RunnerAbstract
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 $root = WebRunner::getAbsoluteRootDir();
-            } catch (Throwable) {}
+            } catch (Throwable) {
+            }
         }
         $envVars = \array_merge(
             \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),

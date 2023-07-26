@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\Settings;
@@ -237,6 +238,18 @@ class MyEventHandler extends SimpleEventHandler
     public function pingCommand(Message $message): void
     {
         $message->reply('test reply');
+    }
+
+    #[FilterCommand('react')]
+    public function reactCommand(Message&IsReply $message): void
+    {
+        $message->getReply(Message::class)->addReaction('👌');
+    }
+
+    #[FilterCommand('unreact')]
+    public function unreactCommand(Message&IsReply $message): void
+    {
+        $message->getReply(Message::class)->delReaction('👌');
     }
 
     #[FilterTextCaseInsensitive('hi')]

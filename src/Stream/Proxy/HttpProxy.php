@@ -62,8 +62,8 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
         }
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
         $this->stream = $ctx->getStream();
-        Assert::true($this->stream instanceof BufferedStreamInterface);
-        Assert::true($this->stream instanceof RawStreamInterface);
+        Assert::isInstanceOf($this->stream, BufferedStreamInterface::class);
+        Assert::isInstanceOf($this->stream, RawStreamInterface::class);
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {

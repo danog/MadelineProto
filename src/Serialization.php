@@ -199,7 +199,7 @@ abstract class Serialization
             } elseif (\is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
-        } else {
+        } elseif ($lightState) {
             $class = $lightState->getEventHandler();
             if ($class && !\class_exists($class)) {
                 // Have lock, can't use it
