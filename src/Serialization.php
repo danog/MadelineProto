@@ -195,11 +195,14 @@ abstract class Serialization
                 Logger::log("Session has event handler (class $class), but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
-                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
+                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), customE: new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process)."));
             } elseif (\is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
-        } elseif ($lightState) {
+        } else {
+            if (!$lightState) {
+                throw new AssertionError("Could not read the lightstate file, check logs!");
+            }
             $class = $lightState->getEventHandler();
             if ($class && !\class_exists($class)) {
                 // Have lock, can't use it
@@ -207,7 +210,7 @@ abstract class Serialization
                 Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
-                throw new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process).");
+                throw new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process).");
             } elseif ($class && \is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
@@ -259,9 +262,9 @@ abstract class Serialization
      * @param null|callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
      */
-    public static function tryConnect(string $ipcPath, Future $cancelConnect, ?callable $cancelFull = null): array
+    public static function tryConnect(string $ipcPath, Future $cancelConnect, ?callable $cancelFull = null, ?Throwable $customE = null): array
     {
-        for ($x = 0; $x < 60; $x++) {
+        for ($x = 0; $x < 25; $x++) {
             Logger::log('MadelineProto is starting, please wait...');
             if (\PHP_OS_FAMILY === 'Windows') {
                 Logger::log('For Windows users: please switch to Linux if this fails.');
@@ -293,6 +296,6 @@ abstract class Serialization
                 }
             }
         }
-        return [0, null];
+        return [$customE ?? 0, null];
     }
 }

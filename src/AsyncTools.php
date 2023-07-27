@@ -311,8 +311,9 @@ abstract class AsyncTools extends StrTools
      */
     public static function getTimeoutCancellation(float $timeout, string $message = "Operation timed out"): Cancellation
     {
+        $e = new TimeoutException($message);
         $deferred = new DeferredCancellation;
-        EventLoop::delay($timeout, fn () => $deferred->cancel(new TimeoutException($message)));
+        EventLoop::delay($timeout, fn () => $deferred->cancel($e));
         return $deferred->getCancellation();
     }
 

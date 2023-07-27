@@ -4,6 +4,8 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\Ipc\IpcCapable;
 use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Represents a generic update.
@@ -11,11 +13,13 @@ use JsonSerializable;
 abstract class Update extends IpcCapable implements JsonSerializable
 {
     /** @internal */
-    public function jsonSerialize(): mixed
+    final public function jsonSerialize(): mixed
     {
-        $v = \get_object_vars($this);
-        unset($v['API'], $v['session']);
-        $v['_'] = static::class;
-        return $v;
+        $res = ['_' => static::class];
+        $refl = new ReflectionClass($this);
+        foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+            $res[$prop->getName()] = $prop->getValue($this);
+        }
+        return $res;
     }
 }

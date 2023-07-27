@@ -501,7 +501,11 @@ final class MTProto implements TLCallback, LoggerGetter
         try {
             $this->initialize($settings);
         } catch (Throwable $e) {
-            $this->report((string) $e);
+            try {
+                $this->report((string) $e);
+            } catch (Throwable) {
+            }
+            throw $e;
         } finally {
             $initDeferred->complete();
         }
@@ -1066,7 +1070,11 @@ final class MTProto implements TLCallback, LoggerGetter
                 $broadcast->resume();
             }
         } catch (Throwable $e) {
-            $this->report((string) $e);
+            try {
+                $this->report((string) $e);
+            } catch (Throwable) {
+            }
+            throw $e;
         } finally {
             $deferred->complete();
         }

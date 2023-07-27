@@ -410,13 +410,14 @@ abstract class EventHandler extends AbstractAPI
                         continue;
                     }
                     $class = $namespace.'\\'.$fileName;
-                    if (!\class_exists($class) && !\interface_exists($class) && !\trait_exists($class) && !\enum_exists($class)) {
-                        throw new AssertionError("$class was not defined when including $file!");
-                    }
-                    if ((new ReflectionClass($class))->getFileName() !== $file) {
+                    $refl = new ReflectionClass($class);
+                    if ($refl->getFileName() !== $file) {
                         throw new AssertionError("$class was not defined when including $file, the same plugin is present in multiple plugin paths/composer!");
                     }
-                    if (\is_subclass_of($class, PluginEventHandler::class)) {
+                    if (\class_exists($class)
+                        && !$refl->isAbstract()
+                        && \is_subclass_of($class, PluginEventHandler::class)
+                    ) {
                         self::cachePlugins($class);
                         $pluginsTemp []= $class;
                     }

@@ -33,10 +33,13 @@ final class Serialization extends SettingsAbstract
     /**
      * Set serialization interval, in seconds.
      *
-     * @param int $interval Serialization interval, in seconds.
+     * @param int $interval Serialization interval, in seconds (minimum 10 seconds).
      */
     public function setInterval(int $interval): self
     {
+        if ($interval < 10) {
+            throw new \AssertionError("The serialization interval cannot be smaller than 10 seconds!");
+        }
         $this->interval = $interval;
 
         return $this;
