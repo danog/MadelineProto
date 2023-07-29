@@ -244,6 +244,15 @@ abstract class StrTools extends Extension
         );
     }
     /**
+     * Escape string for markdown codeblock.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownCodeblockEscape(string $what): string
+    {
+        return \str_replace('`', '\\`', $what);
+    }
+    /**
      * Escape type name.
      *
      * @internal

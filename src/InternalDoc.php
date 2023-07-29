@@ -1271,6 +1271,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->loop($callback);
     }
     /**
+     * Escape string for markdown codeblock.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownCodeblockEscape(string $what): string
+    {
+        return \danog\MadelineProto\StrTools::markdownCodeblockEscape($what);
+    }
+    /**
      * Escape string for markdown.
      *
      * @param string $what String to escape

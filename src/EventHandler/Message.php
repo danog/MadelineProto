@@ -109,9 +109,11 @@ abstract class Message extends AbstractMessage
                 $fwdFrom['saved_from_msg_id'] ?? null
             );
             $this->psaType = $fwdFrom['psa_type'] ?? null;
+            $this->imported = $fwdFrom['imported'];
         } else {
             $this->fwdInfo = null;
             $this->psaType = null;
+            $this->imported = false;
         }
 
         $this->protected = $rawMessage['noforwards'];
