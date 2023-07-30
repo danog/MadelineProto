@@ -15,7 +15,9 @@ use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
+use Webmozart\Assert\Assert;
 
 /**
  * Represents an incoming or outgoing message.
@@ -257,6 +259,78 @@ abstract class Message extends AbstractMessage
             ]
         );
         return $this->reactions;
+    }
+
+    /**
+     * Translate text message(for media translate it caption).
+     *
+     * @param string $toLang Two-letter ISO 639-1 language code of the language to which the message is translated
+     *
+     */
+    public function translate(
+        string $toLang = 'en'
+    ): string {
+        Assert::notEmpty($this->message);
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.translateText',
+            [
+                'peer' => $this->chatId,
+                'id' => [$this->id],
+                'text' => $this->message,
+                'to_lang' => $toLang
+            ]
+        );
+        return $result[0]['text'];
+    }
+
+    /**
+     * Edit message text.
+     *
+     * @param string $message New message
+     * @param array|null $replyMarkup Reply markup for inline keyboards
+     * @param array|null $entities Message entities for styled text
+     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
+     * @param int|null $scheduleDate Scheduled message date for scheduled messages
+     * @param bool $noWebpage Disable webpage preview
+     *
+     */
+    public function edit(
+        string    $message,
+        ?array    $replyMarkup = null,
+        ?array    $entities = null,
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?int      $scheduleDate = null,
+        bool      $noWebpage = false
+    ): Message {
+        Assert::notEmpty($this->message);
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->id,
+                'message' => $message,
+                'reply_markup' => $replyMarkup,
+                'entities' => $entities,
+                'parse_mode' => $parseMode,
+                'schedule_date' => $scheduleDate,
+                'no_webpage' => $noWebpage
+            ]
+        );
+        if (isset($result['_'])) {
+            return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+        }
+
+        $last = null;
+        foreach ($result as $updates) {
+            $new = $this->getClient()->wrapMessage($this->getClient()->extractMessage($updates));
+            if ($last) {
+                $last->nextSent = $new;
+            } else {
+                $first = $new;
+            }
+            $last = $new;
+        }
+        return $first;
     }
 
     protected readonly string $html;
