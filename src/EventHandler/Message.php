@@ -268,7 +268,7 @@ abstract class Message extends AbstractMessage
      *
      */
     public function translate(
-        string $toLang = 'en'
+        string $toLang
     ): string {
         if (empty($message = $this->message)) {
             return $message;
@@ -289,8 +289,6 @@ abstract class Message extends AbstractMessage
      * Edit message text.
      *
      * @param string $message New message
-     * @param array|null $replyMarkup Reply markup for inline keyboards
-     * @param array|null $entities Message entities for styled text
      * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
      * @param int|null $scheduleDate Scheduled message date for scheduled messages
      * @param bool $noWebpage Disable webpage preview
@@ -298,8 +296,6 @@ abstract class Message extends AbstractMessage
      */
     public function edit(
         string    $message,
-        ?array    $replyMarkup = null,
-        ?array    $entities = null,
         ParseMode $parseMode = ParseMode::TEXT,
         ?int      $scheduleDate = null,
         bool      $noWebpage = false
@@ -311,28 +307,12 @@ abstract class Message extends AbstractMessage
                 'peer' => $this->chatId,
                 'id' => $this->id,
                 'message' => $message,
-                'reply_markup' => $replyMarkup,
-                'entities' => $entities,
                 'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
                 'no_webpage' => $noWebpage
             ]
         );
-        if (isset($result['_'])) {
-            return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
-        }
-
-        $last = null;
-        foreach ($result as $updates) {
-            $new = $this->getClient()->wrapMessage($this->getClient()->extractMessage($updates));
-            if ($last) {
-                $last->nextSent = $new;
-            } else {
-                $first = $new;
-            }
-            $last = $new;
-        }
-        return $first;
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
     protected readonly string $html;
