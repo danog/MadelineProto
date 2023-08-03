@@ -2,6 +2,13 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\MTProto;
+
 final class ChatGameQuery extends AbstractGameQuery
 {
+    /** @internal */
+    public function __construct(MTProto $API, array $rawCallback)
+    {
+        parent::__construct($API, $rawCallback);
+    }
 }
