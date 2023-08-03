@@ -2,6 +2,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-class AbstractButtonQuery extends AbstractQuery
+abstract class AbstractButtonQuery extends AbstractQuery
 {
 }

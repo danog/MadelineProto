@@ -4,7 +4,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\MTProto;
 
-class AbstractGameQuery extends AbstractQuery
+abstract class AbstractGameQuery extends AbstractQuery
 {
     public readonly string $gameShortName;
 

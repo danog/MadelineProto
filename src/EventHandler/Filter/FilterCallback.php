@@ -3,7 +3,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\CallbackQuery;
+use danog\MadelineProto\EventHandler\AbstractButtonQuery;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
@@ -17,6 +17,6 @@ class FilterCallback extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof CallbackQuery && $update->data === $this->content;
+        return $update instanceof AbstractButtonQuery && $update->data === $this->content;
     }
 }
