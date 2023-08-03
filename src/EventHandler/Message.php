@@ -270,7 +270,9 @@ abstract class Message extends AbstractMessage
     public function translate(
         string $toLang = 'en'
     ): string {
-        Assert::notEmpty($this->message);
+        if (empty($message = $this->message)) {
+            return $message;
+        }
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.translateText',
             [

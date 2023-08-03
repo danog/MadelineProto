@@ -46,6 +46,12 @@ final class CallbackQuery extends Update
         $this->gameShortName = $rawCallback['game_short_name'] ?? '';
     }
 
+    /**
+     * @param string $message Popup to show
+     * @param bool $alert Whether to show the message as a popup instead of a toast notification
+     * @param string|null $url URL to open
+     * @param int $cacheTime Cache validity (default set to 5 min based on telegram official docs ...)
+     */
     public function answer(
         string  $message,
         bool    $alert = false,
@@ -63,6 +69,18 @@ final class CallbackQuery extends Update
             ]
         );
     }
+
+    /**
+     * Edit message text.
+     *
+     * @param string $message New message
+     * @param array|null $replyMarkup Reply markup for inline keyboards
+     * @param array|null $entities Message entities for styled text
+     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
+     * @param int|null $scheduleDate Scheduled message date for scheduled messages
+     * @param bool $noWebpage Disable webpage preview
+     *
+     */
 
     public function edit(
         ?string   $message,
