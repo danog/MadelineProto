@@ -35,6 +35,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\TL\Conversion\Extension;
 use Webmozart\Assert\Assert;
 
 /**
@@ -332,11 +333,27 @@ final class Connection
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
+        } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
+            if (is_array($arguments['media'])) {
+                if ($arguments['media']['_'] === 'inputMediaPhotoExternal') {
+                    $arguments['media']['_'] = 'inputMediaUploadedPhoto';
+                    $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
+                } elseif ($arguments['media']['_'] === 'inputMediaDocumentExternal') {
+                    $arguments['media']['_'] = 'inputMediaUploadedDocument';
+                    $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
+                    $arguments['media']['mime_type'] = Extension::getMimeFromExtension(
+                        pathinfo($arguments['media']['url'], PATHINFO_EXTENSION),
+                        'application/octet-stream'
+                    );
+                }
+            }
         } elseif ($method === 'messages.sendMultiMedia') {
             foreach ($arguments['multi_media'] as &$singleMedia) {
                 if (\is_string($singleMedia['media'])
                     || $singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
                     || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
+                    || $singleMedia['media']['_'] === 'inputMediaPhotoExternal'
+                    || $singleMedia['media']['_'] === 'inputMediaDocumentExternal'
                 ) {
                     $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
                 }

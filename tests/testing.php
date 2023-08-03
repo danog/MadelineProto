@@ -263,6 +263,9 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     // Image
     $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => __DIR__.'/faust.jpg'];
 
+    // Image by URL
+    $media['photo'] = ['_' => 'inputMediaPhotoExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg'];
+
     // Sticker
     $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
 
@@ -277,6 +280,9 @@ $MadelineProto->loop(function () use ($MadelineProto) {
 
     // Document
     $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
+
+    // Document by URL
+    $media['document'] = ['_' => 'inputMediaUploadedDocument', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
 
     $message = 'yay '.PHP_VERSION_ID;
     $mention = yield $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id

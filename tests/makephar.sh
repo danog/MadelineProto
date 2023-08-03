@@ -50,6 +50,8 @@ echo "Latest tag: $TAG"
 # Clean up
 madelinePath=$PWD
 
+dd if=/dev/random of=tests/60 bs=1M count=60
+
 k()
 {
     while :; do pkill -f "MadelineProto worker $(pwd)/tests/../testing.madeline" || break && sleep 1; done
