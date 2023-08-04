@@ -187,9 +187,9 @@ trait BotAPI
                 $newd['post'] = $data['post'];
                 $newd['silent'] = $data['silent'];
                 if (isset($data['from_id'])) {
-                    $newd['from'] = ($this->getPwrChat($data['from_id']));
+                    $newd['from'] = ($this->getPwrChat($data['from_id'], false));
                 }
-                $newd['chat'] = ($this->getPwrChat($data['peer_id']));
+                $newd['chat'] = ($this->getPwrChat($data['peer_id'], false));
                 if (isset($data['entities'])) {
                     $newd['entities'] = ($this->MTProtoToBotAPI($data['entities']));
                 }
@@ -200,14 +200,14 @@ trait BotAPI
                     $newd['edit_date'] = $data['edit_date'];
                 }
                 if (isset($data['via_bot_id'])) {
-                    $newd['via_bot'] = ($this->getPwrChat($data['via_bot_id']));
+                    $newd['via_bot'] = ($this->getPwrChat($data['via_bot_id'], false));
                 }
                 if (isset($data['fwd_from']['from_id'])) {
-                    $newd['forward_from'] = ($this->getPwrChat($data['fwd_from']['from_id']));
+                    $newd['forward_from'] = ($this->getPwrChat($data['fwd_from']['from_id'], false));
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
-                        $newd['forward_from_chat'] = $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']));
+                        $newd['forward_from_chat'] = $this->getPwrChat(MTProto::toSupergroup($data['fwd_from']['channel_id']), false);
                     } catch (Throwable $e) {
                     }
                 }
@@ -285,7 +285,7 @@ trait BotAPI
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
-                $data['user'] = ($this->getPwrChat($data['user_id']));
+                $data['user'] = ($this->getPwrChat($data['user_id'], false));
                 unset($data['user_id']);
                 return $data;
             case 'messageMediaPhoto':

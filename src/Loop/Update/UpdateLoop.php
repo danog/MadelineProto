@@ -29,6 +29,8 @@ use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
 
+use function Amp\delay;
+
 /**
  * Update loop.
  *
@@ -92,6 +94,10 @@ final class UpdateLoop extends Loop
                 try {
                     $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->currentDatacenter, 'postpone' => $this->first, 'FloodWaitLimit' => 86400]);
                 } catch (RPCErrorException $e) {
+                    if ($e->rpc === '-503') {
+                        delay(1.0);
+                        continue;
+                    }
                     if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'], true)) {
                         $this->feeder->stop();
                         unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
@@ -151,7 +157,16 @@ final class UpdateLoop extends Loop
                 }
             } else {
                 $this->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
-                $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->authorized_dc]);
+                do {
+                    try {
+                        $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->authorized_dc]);
+                        break;
+                    } catch (RPCErrorException $e) {
+                        if ($e->rpc !== '-503') {
+                            throw $e;
+                        }
+                    }
+                } while (true);
                 $this->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                 $timeout = self::DEFAULT_TIMEOUT;
                 switch ($difference['_']) {

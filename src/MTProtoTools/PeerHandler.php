@@ -36,6 +36,7 @@ use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use InvalidArgumentException;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
@@ -983,7 +984,11 @@ trait PeerHandler
      */
     public function getPwrChat(mixed $id, bool $fullfetch = true): array
     {
-        $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
+        try {
+            $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
+        } catch (Throwable) {
+            $full = $this->getInfo($id);
+        }
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
         switch ($full['type']) {
             case 'user':

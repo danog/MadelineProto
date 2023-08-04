@@ -61,7 +61,7 @@ The following open source projects were created using MadelineProto: you can dir
 * [`tgstories_dl_bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) - Source code of [@tgstories_dl_bot](https://t.me/tgstories_dl_bot) - Bot to download any Telegram Story!
 * [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/downloadRenameBot.php) - Download files by URL and rename Telegram files using this async parallelized bot!
 * [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/secret_bot.php) - Secret chat bot!
-* [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/pipesbot.php) - Creating inline bots and using other inline bots via a userbot!
+* [`pipesbot.php`](https://github.com/danog/pipesbot) - Creating inline bots and using other inline bots via a userbot!
 * [`bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/bot.php) - Examples for sending normal messages, downloading any media!
 
 Want to add your own open-source project to this list? [Click here!](https://docs.madelineproto.xyz/FOSS.html)
@@ -435,7 +435,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callfork-generator-amp-future-callable-callable-mixed-args-amp-future-t" name="callFork">Fork a new green thread and execute the passed function in the background: callFork</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastforwardmessages-mixed-from_peer-list-int-message_ids-bool-drop_author-false-danog-madelineproto-broadcast-filter-filter-null-bool-pin-false-int" name="broadcastForwardMessages">Forwards a list of messages to all peers (users, chats, channels) of the bot: broadcastForwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.forwardMessages.html" name="messages.forwardMessages">Forwards messages by their IDs: messages.forwardMessages</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genvectorhash-array-ints-string" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genvectorhash-array-longs-string" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportLoginToken.html" name="auth.exportLoginToken">Generate a login token, for login via QR code.  : auth.exportLoginToken</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.exportInvoice.html" name="payments.exportInvoice">Generate an invoice deep link: payments.exportInvoice</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.exportContactToken.html" name="contacts.exportContactToken">Generates a temporary profile link for the currently logged-in user: contacts.exportContactToken</a>
