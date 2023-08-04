@@ -17,7 +17,6 @@ use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
-use Webmozart\Assert\Assert;
 
 /**
  * Represents an incoming or outgoing message.
@@ -290,23 +289,25 @@ abstract class Message extends AbstractMessage
      *
      * @param string $message New message
      * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
+     * @param array|null $replyMarkup Reply markup for inline keyboards
      * @param int|null $scheduleDate Scheduled message date for scheduled messages
      * @param bool $noWebpage Disable webpage preview
      *
      */
     public function edit(
         string    $message,
+        ?array    $replyMarkup = null,
         ParseMode $parseMode = ParseMode::TEXT,
         ?int      $scheduleDate = null,
         bool      $noWebpage = false
     ): Message {
-        Assert::notEmpty($this->message);
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.editMessage',
             [
                 'peer' => $this->chatId,
                 'id' => $this->id,
                 'message' => $message,
+                'reply_markup' => $replyMarkup,
                 'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
                 'no_webpage' => $noWebpage

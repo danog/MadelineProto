@@ -350,13 +350,13 @@ trait UpdateHandler
     private function wrapQuery(array $callback): ?AbstractQuery
     {
         if ($callback['_'] == 'updateBotCallbackQuery') {
-            if (!isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
+            if (isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
                 return new ChatGameQuery($this, $callback);
             }
             return new ChatButtonQuery($this, $callback);
         }
         if ($callback['_'] == 'updateInlineBotCallbackQuery') {
-            if (!isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
+            if (isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
                 return new InlineGameQuery($this, $callback);
             }
             return new InlineButtonQuery($this, $callback);

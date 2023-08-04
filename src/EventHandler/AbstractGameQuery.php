@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace danog\MadelineProto\EventHandler;
 
@@ -10,7 +12,7 @@ abstract class AbstractGameQuery extends AbstractQuery
 
     public function __construct(MTProto $API, array $rawCallback)
     {
-        parent::__construct($API);
+        parent::__construct($API, $rawCallback);
         $this->gameShortName = $rawCallback['game_short_name'] ?? '';
     }
 }
