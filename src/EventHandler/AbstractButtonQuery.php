@@ -6,8 +6,13 @@ use danog\MadelineProto\MTProto;
 
 abstract class AbstractButtonQuery extends AbstractQuery
 {
+    /** @var string Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field. */
+    public readonly string $data;
+
+    /** @internal */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);
+        $this->data = (string) $rawCallback['data'];
     }
 }

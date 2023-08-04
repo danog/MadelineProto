@@ -14,15 +14,12 @@ final class ChatButtonQuery extends AbstractButtonQuery
     /** @var int Message ID */
     public readonly int $messageId;
 
-    public readonly string $data;
-
     /** @internal */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);
         $this->chatId = $API->getIdInternal($rawCallback['peer']);
         $this->messageId = $rawCallback['msg_id'];
-        $this->data = (string) $rawCallback['data'];
     }
 
     /**
