@@ -4,6 +4,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\AbstractButtonQuery;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Update;
 
@@ -21,6 +22,7 @@ final class FilterFromAdmin extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof AbstractMessage && \in_array($update->senderId, $this->adminIds, true);
+        return ($update instanceof AbstractMessage && \in_array($update->senderId, $this->adminIds, true)) ||
+            ($update instanceof AbstractButtonQuery && \in_array($update->userId, $this->adminIds, true));
     }
 }

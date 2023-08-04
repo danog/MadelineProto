@@ -15,6 +15,7 @@ use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
 
 /**
@@ -257,6 +258,62 @@ abstract class Message extends AbstractMessage
             ]
         );
         return $this->reactions;
+    }
+
+    /**
+     * Translate text message(for media translate it caption).
+     *
+     * @param string $toLang Two-letter ISO 639-1 language code of the language to which the message is translated
+     *
+     */
+    public function translate(
+        string $toLang
+    ): string {
+        if (empty($message = $this->message)) {
+            return $message;
+        }
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.translateText',
+            [
+                'peer' => $this->chatId,
+                'id' => [$this->id],
+                'text' => $this->message,
+                'to_lang' => $toLang
+            ]
+        );
+        return $result[0]['text'];
+    }
+
+    /**
+     * Edit message text.
+     *
+     * @param string $message New message
+     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
+     * @param array|null $replyMarkup Reply markup for inline keyboards
+     * @param int|null $scheduleDate Scheduled message date for scheduled messages
+     * @param bool $noWebpage Disable webpage preview
+     *
+     */
+    public function edit(
+        string    $message,
+        ?array    $replyMarkup = null,
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?int      $scheduleDate = null,
+        bool      $noWebpage = false
+    ): Message {
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->id,
+                'message' => $message,
+                'reply_markup' => $replyMarkup,
+                'parse_mode' => $parseMode,
+                'schedule_date' => $scheduleDate,
+                'no_webpage' => $noWebpage
+            ]
+        );
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
     protected readonly string $html;
