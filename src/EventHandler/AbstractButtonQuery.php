@@ -10,9 +10,16 @@ abstract class AbstractButtonQuery extends AbstractQuery
     public readonly string $data;
 
     /** @internal */
+
+    /**
+     * @readonly
+     * @var list<string> Regex matches, if a filter regex is present
+     *
+     */
+    public ?array $matches = null;
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);
-        $this->data = (string) $rawCallback['data'];
+        $this->data = $rawCallback['data'];
     }
 }

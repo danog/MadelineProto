@@ -14,12 +14,6 @@ abstract class AbstractQuery extends Update
      * @var int Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games.
      */
     public readonly int $chatInstance;
-    /**
-     * @readonly
-     * @var list<string> Regex matches, if a filter regex is present
-     *
-     */
-    public ?array $matches = null;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawCallback)

@@ -17,6 +17,6 @@ class FilterCallback extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof AbstractButtonQuery && $update->data === $this->content;
+        return $update instanceof AbstractButtonQuery && (string) $update->data === $this->content;
     }
 }
