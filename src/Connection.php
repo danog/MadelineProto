@@ -334,7 +334,7 @@ final class Connection
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
         } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
-            if (is_array($arguments['media'])) {
+            if (\is_array($arguments['media'])) {
                 if ($arguments['media']['_'] === 'inputMediaPhotoExternal') {
                     $arguments['media']['_'] = 'inputMediaUploadedPhoto';
                     $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
@@ -342,7 +342,7 @@ final class Connection
                     $arguments['media']['_'] = 'inputMediaUploadedDocument';
                     $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
                     $arguments['media']['mime_type'] = Extension::getMimeFromExtension(
-                        pathinfo($arguments['media']['url'], PATHINFO_EXTENSION),
+                        \pathinfo($arguments['media']['url'], PATHINFO_EXTENSION),
                         'application/octet-stream'
                     );
                 }

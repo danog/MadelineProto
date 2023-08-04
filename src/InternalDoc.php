@@ -645,11 +645,11 @@ abstract class InternalDoc
      *
      * Returns a vector hash.
      *
-     * @param array $ints IDs
+     * @param array $longs IDs
      */
-    public static function genVectorHash(array $ints): string
+    public static function genVectorHash(array $longs): string
     {
-        return \danog\MadelineProto\Tools::genVectorHash($ints);
+        return \danog\MadelineProto\Tools::genVectorHash($longs);
     }
     /**
      * Get admin IDs (equal to all user report peers).
@@ -1302,6 +1302,15 @@ abstract class InternalDoc
     public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
     {
         return \danog\MadelineProto\StrTools::markdownToMessageEntities($markdown);
+    }
+    /**
+     * Escape string for URL.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownUrlEscape(string $what): string
+    {
+        return \danog\MadelineProto\StrTools::markdownUrlEscape($what);
     }
     /**
      * Telegram UTF-8 multibyte split.

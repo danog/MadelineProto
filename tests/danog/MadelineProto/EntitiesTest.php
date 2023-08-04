@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\Tools;
 
 /** @internal */
 class EntitiesTest extends MadelineTestCase
@@ -45,7 +46,34 @@ class EntitiesTest extends MadelineTestCase
                     true
                 ),
             );
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: \htmlentities($html), parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
+            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $this->assertEquals($html, $result['text']);
+            $this->assertNoRelevantEntities($result['entities']);
+        } else {
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: Tools::markdownEscape($html), parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
+            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $this->assertEquals($html, $result['text']);
+            $this->assertNoRelevantEntities($result['entities']);
+
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
+            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $this->assertEquals($html, \rtrim($result['text']));
+            $this->assertEquals([['offset' => 0, 'length' => StrTools::mbStrlen($html), 'language' => '', 'type' => 'pre']], $result['entities']);
         }
+    }
+
+    private function assertNoRelevantEntities(array $entities): void
+    {
+        $entities = \array_filter($entities, fn (array $e) => !\in_array(
+            $e['type'],
+            ['url', 'email', 'phone_number', 'mention', 'bot_command'],
+            true
+        ));
+        $this->assertEmpty($entities);
     }
     public function provideEntities(): array
     {
@@ -312,6 +340,25 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
+                StrTools::markdownEscape('\\ test testovich _*~'),
+                '\\ test testovich _*~',
+                [],
+            ],
+            [
+                'markdown',
+                "```\n".StrTools::markdownCodeblockEscape('\\ ```').'```',
+                '\\ ```',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 5,
+                        'type' => 'pre',
+                        'language' => ''
+                    ]
+                ],
+            ],
+            [
+                'markdown',
                 '[link ](https://google.com/)test',
                 'link test',
                 [
@@ -320,6 +367,32 @@ class EntitiesTest extends MadelineTestCase
                         'length' => 4,
                         'type' => 'text_url',
                         'url' => 'https://google.com/'
+                    ],
+                ],
+            ],
+            [
+                'markdown',
+                '[link]('.StrTools::markdownUrlEscape('https://google.com/').')',
+                'link',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/'
+                    ],
+                ],
+            ],
+            [
+                'markdown',
+                '[link]('.StrTools::markdownUrlEscape('https://google.com/?v=\\test').')',
+                'link',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://google.com/?v=\\test'
                     ],
                 ],
             ],

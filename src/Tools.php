@@ -152,16 +152,16 @@ abstract class Tools extends AsyncTools
      *
      * Returns a vector hash.
      *
-     * @param array $ints IDs
+     * @param array $longs IDs
      */
-    public static function genVectorHash(array $ints): string
+    public static function genVectorHash(array $longs): string
     {
         $hash = 0;
-        foreach ($ints as $id) {
-            $hash = $hash ^ ($id >> 21);
-            $hash = $hash ^ ($id << 35);
-            $hash = $hash ^ ($id >> 4);
-            $hash = $hash + $id;
+        foreach ($longs as $long) {
+            $hash ^= $hash >> 21;
+            $hash ^= $hash << 35;
+            $hash ^= $hash >> 4;
+            $hash = $hash + $long;
         }
         return self::packSignedLong($hash);
     }
@@ -177,8 +177,6 @@ abstract class Tools extends AsyncTools
         }
         try {
             return \random_int(0, PHP_INT_MAX) % $modulus;
-        } catch (Exception $e) {
-            // random_compat will throw an Exception, which in PHP 5 does not implement Throwable
         } catch (Throwable $e) {
             // If a sufficient source of randomness is unavailable, random_bytes() will throw an
             // object that implements the Throwable interface (Exception, TypeError, Error).

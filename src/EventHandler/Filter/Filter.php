@@ -21,6 +21,7 @@ use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
+use danog\MadelineProto\EventHandler\SimpleFilter\FromAdminOrOutgoing;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocumentPhoto;
@@ -91,6 +92,7 @@ abstract class Filter
                 HasSticker::class => new FilterSticker,
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
+                FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
                 default => \is_subclass_of($type->getName(), Update::class)
                     ? new class($type->getName()) extends Filter {
                         public function __construct(private readonly string $class)

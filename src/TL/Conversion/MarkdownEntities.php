@@ -98,10 +98,13 @@ final class MarkdownEntities extends Entities
                         $offset++;
                     }
 
+                    $piece = '';
                     $posClose = $offset;
                     while (($posClose = \strpos($markdown, '```', $posClose)) !== false) {
                         if ($markdown[$posClose-1] === '\\') {
-                            $posClose++;
+                            $piece .= \substr($markdown, $offset, ($posClose-$offset)-1)."```";
+                            $posClose += 3;
+                            $offset = $posClose;
                             continue;
                         }
                         break;
@@ -109,10 +112,11 @@ final class MarkdownEntities extends Entities
                     if ($posClose === false) {
                         throw new AssertionError("Unclosed ``` opened @ pos $offset!");
                     }
+                    $piece .= \substr($markdown, $offset, $posClose-$offset);
 
                     $start = $messageLen;
 
-                    $message .= $piece = \substr($markdown, $offset, $posClose-$offset);
+                    $message .= $piece;
                     $pieceLen = StrTools::mbStrlen($piece);
                     $messageLen += $pieceLen;
 

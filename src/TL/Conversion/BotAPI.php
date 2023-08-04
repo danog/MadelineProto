@@ -217,7 +217,7 @@ trait BotAPI
                 if (isset($data['fwd_from']['channel_post'])) {
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
-                if (isset($data['media'])) {
+                if (isset($data['media']) && $data['media']['_'] !== 'messageMediaWebPage') {
                     $newd = \array_merge($newd, $this->MTProtoToBotAPI($data['media']));
                 }
                 return $newd;

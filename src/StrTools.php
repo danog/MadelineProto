@@ -201,6 +201,7 @@ abstract class StrTools extends Extension
     {
         return \str_replace(
             [
+                '\\',
                 '_',
                 '*',
                 '[',
@@ -221,6 +222,7 @@ abstract class StrTools extends Extension
                 '!',
             ],
             [
+                '\\\\',
                 '\\_',
                 '\\*',
                 '\\[',
@@ -250,7 +252,16 @@ abstract class StrTools extends Extension
      */
     public static function markdownCodeblockEscape(string $what): string
     {
-        return \str_replace('`', '\\`', $what);
+        return \str_replace('```', '\\```', $what);
+    }
+    /**
+     * Escape string for URL.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownUrlEscape(string $what): string
+    {
+        return \str_replace(')', '\\)', $what);
     }
     /**
      * Escape type name.
