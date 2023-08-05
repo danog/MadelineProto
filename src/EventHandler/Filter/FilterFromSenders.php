@@ -30,6 +30,7 @@ final class FilterFromSenders extends Filter
         foreach ($this->peers as $peer) {
             $res []= $API->getId($peer);
         }
+        /** @psalm-suppress InaccessibleProperty */
         $this->peersResolved = $res;
         return $this;
     }

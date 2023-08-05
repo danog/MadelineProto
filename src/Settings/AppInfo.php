@@ -273,8 +273,6 @@ final class AppInfo extends SettingsAbstract
      * Set whether to show a prompt, asking to enter an API ID/API hash if none is provided.
      *
      * @param bool $showPrompt Whether to show a prompt, asking to enter an API ID/API hash if none is provided.
-     *
-     * @return self
      */
     public function setShowPrompt(bool $showPrompt): static
     {

@@ -888,7 +888,7 @@ trait Files
             throw new Exception('Wrong callable provided');
         }
         if ($cb === null) {
-            $cb = function ($percent): void {
+            $cb = function (float $percent, float $speed, float $time): void {
                 $this->logger->logger('Download status: '.$percent.'%', Logger::NOTICE);
             };
         } else {

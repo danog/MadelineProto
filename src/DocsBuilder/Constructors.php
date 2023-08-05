@@ -77,7 +77,7 @@ trait Constructors
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
-                    $param[$type_or_subtype] = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
+                    $param[$type_or_subtype] = $this->TL->getConstructors()->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
                 if (\substr($param[$type_or_subtype], -1) === '>') {
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
@@ -131,7 +131,7 @@ trait Constructors
                 }
                 $ptype = $param[isset($param['subtype']) ? 'subtype' : 'type'];
                 if (\preg_match('/%/', $ptype)) {
-                    $ptype = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $ptype))['predicate'];
+                    $ptype = $this->TL->getConstructors()->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
                 $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true)) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
                 if (\substr($ptype, -1) === '>') {
@@ -161,7 +161,7 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
                 if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['description'])) {

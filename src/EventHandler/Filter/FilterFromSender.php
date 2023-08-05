@@ -19,6 +19,7 @@ final class FilterFromSender extends Filter
     }
     public function initialize(EventHandler $API): Filter
     {
+        /** @psalm-suppress InaccessibleProperty */
         $this->peerResolved = $API->getId($this->peer);
         return $this;
     }

@@ -54,7 +54,7 @@ trait Reliable
     /**
      * Called when receiving a msg_resend_req.
      */
-    public function onMsgResendReq(array $content, string $current_msg_id): void
+    public function onMsgResendReq(array $content, int $current_msg_id): void
     {
         $ok = true;
         foreach ($content['msg_ids'] as $msg_id) {
@@ -73,7 +73,7 @@ trait Reliable
     /**
      * Called when receiving a msg_resend_ans_req.
      */
-    public function onMsgResendAnsReq(array $content, string $current_msg_id): void
+    public function onMsgResendAnsReq(array $content, int $current_msg_id): void
     {
         $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);
     }

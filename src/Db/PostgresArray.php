@@ -15,7 +15,7 @@ use danog\MadelineProto\Settings\Database\SerializerType;
  * @internal
  * @template TKey as array-key
  * @template TValue
- * @extends SqlArray<TKey, TValue>
+ * @extends PostgresArrayBytea<TKey, TValue>
  */
 class PostgresArray extends PostgresArrayBytea
 {

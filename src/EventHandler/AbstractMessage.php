@@ -138,6 +138,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
             ]
         )['messages'];
+        /** @psalm-suppress InaccessibleProperty */
         $this->replyCache = $messages ? $this->getClient()->wrapMessage($messages[0]) : null;
         $this->replyCached = true;
         if (!$this->replyCache instanceof $class) {

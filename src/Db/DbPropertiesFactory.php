@@ -15,7 +15,6 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 use InvalidArgumentException;
 
 /**
- * @psalm-import-type TOrmConfig from DbPropertiesTrait
  * This factory class initializes the correct database backend for MadelineProto.
  *
  * @internal
@@ -23,7 +22,7 @@ use InvalidArgumentException;
 final class DbPropertiesFactory
 {
     /**
-     * @param TOrmConfig|'array' $config
+     * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool}|'array' $config
      * @return DbType
      * @internal
      * @uses \danog\MadelineProto\Db\MemoryArray

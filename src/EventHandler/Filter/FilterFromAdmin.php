@@ -17,6 +17,7 @@ final class FilterFromAdmin extends Filter
     private readonly array $adminIds;
     public function initialize(EventHandler $API): Filter
     {
+        /** @psalm-suppress InaccessibleProperty */
         $this->adminIds = $API->getAdminIds();
         return $this;
     }

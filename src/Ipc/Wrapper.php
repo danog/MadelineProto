@@ -27,6 +27,9 @@ use function Amp\Ipc\connect;
 /**
  * Callback payload wrapper.
  *
+ * @psalm-suppress InternalMethod
+ * @psalm-suppress InternalClass
+ *
  * @internal
  */
 final class Wrapper extends ClientAbstract

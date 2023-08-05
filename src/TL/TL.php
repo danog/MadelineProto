@@ -416,7 +416,7 @@ final class TL implements TLInterface
         ));
     }
     /**
-     * @var array<string, list<list{(callable(...): void), array}>>
+     * @var array<string, list<list{(callable(mixed): void), array}>>
      */
     private array $mutexSideEffects = [];
     /**

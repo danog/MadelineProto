@@ -227,6 +227,7 @@ abstract class EventHandler extends AbstractAPI
                 }
             }
             if ($has_any) {
+                /** @psalm-suppress UndefinedMethod */
                 $onAny = $this->onAny(...);
                 foreach ($constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {

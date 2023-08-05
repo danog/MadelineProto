@@ -22,10 +22,12 @@ final class FilterRegex extends Filter
     public function apply(Update $update): bool
     {
         if ($update instanceof Message && \preg_match($this->regex, $update->message, $matches)) {
+            /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
         if ($update instanceof ButtonQuery && \preg_match($this->regex, $update->data, $matches)) {
+            /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }

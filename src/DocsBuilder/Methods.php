@@ -72,7 +72,7 @@ trait Methods
         $this->docs_methods = [];
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', Logger::NOTICE);
-        foreach ($this->TL->getMethods($this->td)->by_id as $id => $data) {
+        foreach ($this->TL->getMethods()->by_id as $id => $data) {
             $method = $data['method'];
             $phpMethod = StrTools::methodEscape($method);
             $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
@@ -186,9 +186,9 @@ trait Methods
                 }
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
                 if (isset($this->tdDescriptions['methods'][$method])) {
-                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || $param['type'] === 'double' || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || $param['type'] === 'double' || ($id = $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes'], true) ? "'".$ptype."'" : '$'.$ptype;
@@ -267,6 +267,7 @@ trait Methods
         }
         $this->logger->logger('Generating methods index...', Logger::NOTICE);
         $reflection = new ReflectionClass(API::class);
+        /** @psalm-suppress UndefinedClass */
         $phpdoc = PhpDoc::fromNamespace(\danog\MadelineProto::class);
         $phpdoc->resolveAliases();
         $builder = DocBlockFactory::createInstance();

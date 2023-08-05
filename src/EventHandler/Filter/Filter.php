@@ -79,7 +79,7 @@ abstract class Filter
                 ServiceMessage::class => new FilterService,
                 IsForwarded::class => new FilterForwarded,
                 IsReply::class => new FilterReply,
-                IsReplyToSelf::class => new IsReplyToSelf,
+                IsReplyToSelf::class => new FilterReplyToSelf,
                 HasMedia::class => new FilterMedia,
                 HasNoMedia::class => new FilterNoMedia,
                 FromAdmin::class => new FilterFromAdmin,

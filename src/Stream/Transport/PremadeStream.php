@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Logger;
@@ -48,6 +49,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function setupTls(?Cancellation $cancellationToken = null): void
     {
+        \assert($this->stream instanceof Socket);
         $this->stream->setupTls($cancellationToken);
     }
     public function getStream()
@@ -77,6 +79,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
+        \assert($this->stream instanceof WritableStream);
         $this->stream->write($data);
     }
     /**

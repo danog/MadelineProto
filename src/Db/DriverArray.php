@@ -104,6 +104,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();
+        /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->old = false;
         $instance->setTable($table);
 

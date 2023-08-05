@@ -88,7 +88,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     public function read(?Cancellation $token = null): ?string
     {
         try {
-            if (!$this->message || ($data = $this->message->buffer($token)) === null) {
+            if (!$this->message) {
                 $this->message = $this->stream->receive($token);
                 if (!$this->message) {
                     return null;

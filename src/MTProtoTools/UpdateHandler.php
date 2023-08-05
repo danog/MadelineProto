@@ -474,6 +474,7 @@ trait UpdateHandler
 
         $last = null;
         foreach ($result as $updates) {
+            /** @var Message */
             $new = $this->wrapMessage($this->extractMessage($updates));
             if ($last) {
                 $last->nextSent = $new;
