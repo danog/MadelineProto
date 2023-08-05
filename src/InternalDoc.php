@@ -775,7 +775,7 @@ abstract class InternalDoc
      *      mime: string,
      *      size: int,
      *      InputFileLocation: array,
-     *      key_fingeprint?: string,
+     *      key_fingerprint?: string,
      *      key?: string,
      *      iv?: string,
      *      thumb_size?: string

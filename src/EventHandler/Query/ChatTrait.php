@@ -34,8 +34,8 @@ trait ChatTrait
         string    $message,
         ?array    $replyMarkup = null,
         ParseMode $parseMode = ParseMode::TEXT,
-        ?int      $scheduleDate = null,
-        bool      $noWebpage = false
+        bool      $noWebpage = false,
+        ?int      $scheduleDate = null
     ): Message {
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.editMessage',
