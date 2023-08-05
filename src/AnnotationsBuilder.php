@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use AssertionError;
+use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use ReflectionClass;
@@ -224,6 +225,27 @@ final class Blacklist {
             default => '[]'
         };
     }
+    private function preparePsalmDefault(string $type): string
+    {
+        [$isVector, $type] = self::isVector($type);
+        if ($isVector) {
+            return 'array<never, never>';
+        }
+        return match ($type) {
+            'string' => "''",
+            'bytes' => "''",
+            'int' => '0',
+            'long' => '0',
+            'strlong' => '0',
+            'double' => '0.0',
+            'float' => '0.0',
+            'Bool' => 'false',
+            'true' => 'false',
+            'DataJSON' => 'null',
+            'JSONValue' => 'null',
+            default => 'array<never, never>'
+        };
+    }
     private function prepareTLTypeDescription(string $type, string $description): string
     {
         [$isList, $type] = self::isVector($type);
@@ -312,6 +334,10 @@ final class Blacklist {
             $param_var = $type.' $'.$name;
             if (isset($param['pow'])) {
                 $param_var .= ' = '.$this->prepareTLDefault($param['type']);
+                $psalmDef = $this->preparePsalmDefault($param['type']);
+                if ($psalmDef === 'array<never, never>') {
+                    $psalmType .= '|'.$psalmDef;
+                }
             }
             $signature []= $param_var;
             $contents .= "     * @param {$psalmType} \${$name} {$description}\n";
@@ -505,9 +531,24 @@ final class Blacklist {
                 \fwrite($handle, "use Generator;\n");
                 \fwrite($handle, "use Amp\\Future;\n");
                 \fwrite($handle, "use Closure;\n");
+                \fwrite($handle, "use __PHP_Incomplete_Class;\n");
                 \fwrite($handle, "use Amp\\ByteStream\\WritableStream;\n");
+                \fwrite($handle, "use Amp\\ByteStream\\ReadableStream;\n");
                 \fwrite($handle, "use Amp\\Cancellation;\n");
                 \fwrite($handle, "use Amp\\Http\\Server\\Request as ServerRequest;\n");
+                \fwrite($handle, "use danog\\MadelineProto\\Broadcast\\Action;\n");
+                foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler::class, ClassFinder::RECURSIVE_MODE) as $class) {
+                    \fwrite($handle, "use $class;\n");
+                }
+                foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Ipc::class, ClassFinder::RECURSIVE_MODE) as $class) {
+                    if (\str_contains($class, 'Wrapper')) {
+                        continue;
+                    }
+                    \fwrite($handle, "use $class;\n");
+                }
+                foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Broadcast::class, ClassFinder::RECURSIVE_MODE) as $class) {
+                    \fwrite($handle, "use $class;\n");
+                }
 
                 \fwrite($handle, "\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {

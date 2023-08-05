@@ -13,7 +13,7 @@ use ReflectionProperty;
 abstract class Update extends IpcCapable implements JsonSerializable
 {
     /** @internal */
-    final public function jsonSerialize(): mixed
+    public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];
         $refl = new ReflectionClass($this);

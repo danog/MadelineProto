@@ -27,11 +27,6 @@ use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\AbstractQuery;
-use danog\MadelineProto\EventHandler\ChatButtonQuery;
-use danog\MadelineProto\EventHandler\ChatGameQuery;
-use danog\MadelineProto\EventHandler\InlineButtonQuery;
-use danog\MadelineProto\EventHandler\InlineGameQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
@@ -42,6 +37,10 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
+use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
+use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
+use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
+use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -339,30 +338,16 @@ trait UpdateHandler
     {
         return match ($update['_']) {
             'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
-            'updateBotCallbackQuery','updateInlineBotCallbackQuery' => $this->wrapQuery($update),
+            'updateBotCallbackQuery' => isset($update['game_short_name'])
+                ? new ChatGameQuery($this, $update)
+                : new ChatButtonQuery($this, $update),
+            'updateInlineBotCallbackQuery' => isset($update['game_short_name'])
+                ? new InlineGameQuery($this, $update)
+                : new InlineButtonQuery($this, $update),
             default => null
         };
     }
 
-    /**
-     * Wrap a Message constructor into an abstract Query object.
-     */
-    private function wrapQuery(array $callback): ?AbstractQuery
-    {
-        if ($callback['_'] == 'updateBotCallbackQuery') {
-            if (isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
-                return new ChatGameQuery($this, $callback);
-            }
-            return new ChatButtonQuery($this, $callback);
-        }
-        if ($callback['_'] == 'updateInlineBotCallbackQuery') {
-            if (isset($callback['game_short_name']) && !empty($callback['game_short_name'])) {
-                return new InlineGameQuery($this, $callback);
-            }
-            return new InlineButtonQuery($this, $callback);
-        }
-        return null;
-    }
     /**
      * Wrap a Message constructor into an abstract Message object.
      */

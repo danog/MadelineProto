@@ -35,6 +35,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages logging in and out.
@@ -261,6 +262,7 @@ trait Login
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }
+        Assert::allNotNull($callbacks);
         $this->TL->updateCallbacks($callbacks);
         $this->startUpdateSystem();
         $this->qrLoginDeferred?->cancel();

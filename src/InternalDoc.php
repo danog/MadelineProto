@@ -7,11 +7,26 @@
 
 namespace danog\MadelineProto;
 
+use __PHP_Incomplete_Class;
+use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Future;
 use Amp\Http\Server\Request as ServerRequest;
 use Closure;
+use danog\MadelineProto\Broadcast\Action;
+use danog\MadelineProto\Broadcast\Progress;
+use danog\MadelineProto\Broadcast\Status;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Keyboard;
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\EventHandlerProxy;
+use danog\MadelineProto\Ipc\Server;
 use Generator;
 
 abstract class InternalDoc

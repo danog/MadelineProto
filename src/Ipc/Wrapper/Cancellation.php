@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
+use Amp\CancelledException;
 
 /**
  * @internal

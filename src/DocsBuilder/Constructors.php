@@ -44,8 +44,8 @@ trait Constructors
         $this->docs_constructors = [];
         $this->logger->logger('Generating constructors documentation...', Logger::NOTICE);
         $got = [];
-        foreach ($this->TL->getConstructors($this->td)->by_predicate_and_layer as $predicate => $id) {
-            $data = $this->TL->getConstructors($this->td)->by_id[$id];
+        foreach ($this->TL->getConstructors()->by_predicate_and_layer as $predicate => $id) {
+            $data = $this->TL->getConstructors()->by_id[$id];
             if (isset($got[$id])) {
                 $data['layer'] = '';
             }

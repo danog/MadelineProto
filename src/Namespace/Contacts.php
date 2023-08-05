@@ -12,7 +12,7 @@ interface Contacts
     /**
      * Get contact by telegram IDs.
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return list<int>
      */
     public function getContactIDs(array $hash = []): array;
@@ -27,7 +27,7 @@ interface Contacts
     /**
      * Returns the current user's contact list.
      *
-     * @param list<int> $hash If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
+     * @param list<int>|array<never, never> $hash If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
      * @return array{_: 'contacts.contactsNotModified'}|array{_: 'contacts.contacts', contacts: list<array{_: 'contact', mutual: bool, user_id: int}>, saved_count: int, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Contacts.html
      */
     public function getContacts(array $hash = []): array;
@@ -37,7 +37,7 @@ interface Contacts
      *
      * Use [contacts.addContact](https://docs.madelineproto.xyz/API_docs/methods/contacts.addContact.html) to add Telegram contacts without actually using their phone number.
      *
-     * @param list<array{_: 'inputPhoneContact', client_id?: int, phone?: string, first_name?: string, last_name?: string}> $contacts Array of List of contacts to import @see https://docs.madelineproto.xyz/API_docs/types/InputContact.html
+     * @param list<array{_: 'inputPhoneContact', client_id?: int, phone?: string, first_name?: string, last_name?: string}>|array<never, never> $contacts Array of List of contacts to import @see https://docs.madelineproto.xyz/API_docs/types/InputContact.html
      * @return array{_: 'contacts.importedContacts', imported: list<array{_: 'importedContact', user_id: int, client_id: int}>, popular_invites: list<array{_: 'popularContact', client_id: int, importers: int}>, retry_contacts: list<int>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ImportedContacts.html
      */
     public function importContacts(array $contacts = []): array;
@@ -45,7 +45,7 @@ interface Contacts
     /**
      * Deletes several contacts from the list.
      *
-     * @param list<array|int|string> $id Array of User ID list @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param list<array|int|string>|array<never, never> $id Array of User ID list @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function deleteContacts(array $id = []): array;
@@ -53,7 +53,7 @@ interface Contacts
     /**
      * Delete contacts by phone number.
      *
-     * @param list<string> $phones Phone numbers
+     * @param list<string>|array<never, never> $phones Phone numbers
      */
     public function deleteByPhones(array $phones = []): bool;
 
@@ -102,7 +102,7 @@ interface Contacts
      * @param bool $channels Most frequently visited channels
      * @param int $offset Offset for [pagination](https://core.telegram.org/api/offsets)
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'contacts.topPeersNotModified'}|array{_: 'contacts.topPeers', categories: list<array{_: 'topPeerCategoryPeers', category: array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'}, count: int, peers: list<array{_: 'topPeer', peer: array|int|string, rating: float}>}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.topPeersDisabled'} @see https://docs.madelineproto.xyz/API_docs/types/contacts.TopPeers.html
      */
     public function getTopPeers(bool $correspondents = false, bool $bots_pm = false, bool $bots_inline = false, bool $phone_calls = false, bool $forward_users = false, bool $forward_chats = false, bool $groups = false, bool $channels = false, int $offset = 0, int $limit = 0, array $hash = []): array;
@@ -204,7 +204,7 @@ interface Contacts
     /**
      *
      *
-     * @param list<int> $id
+     * @param list<int>|array<never, never> $id
      */
     public function editCloseFriends(array $id = []): bool;
 

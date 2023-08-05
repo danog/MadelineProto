@@ -294,7 +294,7 @@ abstract class Message extends AbstractMessage
      * @param bool $noWebpage Disable webpage preview
      *
      */
-    public function edit(
+    public function editText(
         string    $message,
         ?array    $replyMarkup = null,
         ParseMode $parseMode = ParseMode::TEXT,

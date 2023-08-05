@@ -4,11 +4,12 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Query\ButtonQuery;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
 /**
- * Allow only messages matching the specified regex.
+ * Allow only messages or button queries matching the specified regex.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRegex extends Filter
@@ -21,6 +22,10 @@ final class FilterRegex extends Filter
     public function apply(Update $update): bool
     {
         if ($update instanceof Message && \preg_match($this->regex, $update->message, $matches)) {
+            $update->matches = $matches;
+            return true;
+        }
+        if ($update instanceof ButtonQuery && \preg_match($this->regex, $update->data, $matches)) {
             $update->matches = $matches;
             return true;
         }

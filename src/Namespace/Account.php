@@ -17,7 +17,7 @@ interface Account
      * @param int $token_type Device token type, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
      * @param string $token Device token, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
      * @param string $secret For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
-     * @param list<int> $other_uids List of user identifiers of other users currently using the client
+     * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
      */
     public function registerDevice(bool $app_sandbox, bool $no_muted = false, int $token_type = 0, string $token = '', string $secret = '', array $other_uids = []): bool;
 
@@ -26,7 +26,7 @@ interface Account
      *
      * @param int $token_type Device token type, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
      * @param string $token Device token, see [PUSH updates](https://core.telegram.org/api/push-updates#subscribing-to-notifications) for the possible values.
-     * @param list<int> $other_uids List of user identifiers of other users currently using the client
+     * @param list<int>|array<never, never> $other_uids List of user identifiers of other users currently using the client
      */
     public function unregisterDevice(int $token_type = 0, string $token = '', array $other_uids = []): bool;
 
@@ -72,7 +72,7 @@ interface Account
     /**
      * Returns a list of available [wallpapers](https://core.telegram.org/api/wallpapers).
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.wallPapersNotModified'}|array{_: 'account.wallPapers', hash: list<int>, wallpapers: list<array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}>} @see https://docs.madelineproto.xyz/API_docs/types/account.WallPapers.html
      */
     public function getWallPapers(array $hash = []): array;
@@ -113,7 +113,7 @@ interface Account
      * Change privacy settings of current account.
      *
      * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'} $key Peers to which the privacy rules apply @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
-     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueAllowCloseFriends'}> $rules Array of New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
+     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueAllowCloseFriends'}>|array<never, never> $rules Array of New privacy rules @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
      * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
     public function setPrivacy(array $key, array $rules = []): array;
@@ -124,7 +124,7 @@ interface Account
      * Can also be used to delete the account of a user that provided the login code, but forgot the 2FA password and no recovery method is configured, see [here »](https://core.telegram.org/api/srp#password-recovery) for more info on password recovery, and [here »](https://core.telegram.org/api/account-deletion) for more info on account deletion.
      *
      * @param string $reason Why is the account being deleted, can be empty
-     * @param string|array $password [2FA password](https://core.telegram.org/api/srp): this field can be omitted even for accounts with 2FA enabled: in this case account account deletion will be delayed by 7 days [as specified in the docs »](https://core.telegram.org/api/account-deletion) @see https://docs.madelineproto.xyz/API_docs/types/InputCheckPasswordSRP.html
+     * @param string|array|array<never, never> $password [2FA password](https://core.telegram.org/api/srp): this field can be omitted even for accounts with 2FA enabled: in this case account account deletion will be delayed by 7 days [as specified in the docs »](https://core.telegram.org/api/account-deletion) @see https://docs.madelineproto.xyz/API_docs/types/InputCheckPasswordSRP.html
      */
     public function deleteAccount(string $reason = '', string|array $password = []): bool;
 
@@ -178,7 +178,7 @@ interface Account
     /**
      * Log out an active [authorized session](https://core.telegram.org/api/auth) by its hash.
      *
-     * @param list<int> $hash Session hash
+     * @param list<int>|array<never, never> $hash Session hash
      */
     public function resetAuthorization(array $hash = []): bool;
 
@@ -225,7 +225,7 @@ interface Account
     /**
      * Log out an active web [telegram login](https://core.telegram.org/widgets/login) session.
      *
-     * @param list<int> $hash [Session](https://docs.madelineproto.xyz/API_docs/constructors/webAuthorization.html) hash
+     * @param list<int>|array<never, never> $hash [Session](https://docs.madelineproto.xyz/API_docs/constructors/webAuthorization.html) hash
      */
     public function resetWebAuthorization(array $hash = []): bool;
 
@@ -245,7 +245,7 @@ interface Account
     /**
      * Get saved [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}> $types Array of Requested value types @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
+     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}>|array<never, never> $types Array of Requested value types @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
      * @return list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
      */
     public function getSecureValue(array $types = []): array;
@@ -262,7 +262,7 @@ interface Account
     /**
      * Delete stored [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
-     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}> $types Array of Document types to delete @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
+     * @param list<array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}>|array<never, never> $types Array of Document types to delete @see https://docs.madelineproto.xyz/API_docs/types/SecureValueType.html
      */
     public function deleteSecureValue(array $types = []): bool;
 
@@ -283,7 +283,7 @@ interface Account
      * @param int $bot_id Bot ID
      * @param string $scope Telegram Passport element types requested by the service
      * @param string $public_key Service's public key
-     * @param list<array{_: 'secureValueHash', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, hash?: string}> $value_hashes Array of Types of values sent and their hashes @see https://docs.madelineproto.xyz/API_docs/types/SecureValueHash.html
+     * @param list<array{_: 'secureValueHash', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, hash?: string}>|array<never, never> $value_hashes Array of Types of values sent and their hashes @see https://docs.madelineproto.xyz/API_docs/types/SecureValueHash.html
      */
     public function acceptAuthorization(array $credentials, int $bot_id = 0, string $scope = '', string $public_key = '', array $value_hashes = []): bool;
 
@@ -380,7 +380,7 @@ interface Account
      * Returns list of chats with non-default notification settings.
      *
      * @param bool $compare_sound If true, chats with non-default sound will also be returned
-     * @param array|int|string $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
+     * @param array|int|string|array<never, never> $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function getNotifyExceptions(bool $compare_sound = false, bool $compare_stories = false, array|int|string $peer = []): array;
@@ -447,7 +447,7 @@ interface Account
      * Upload theme.
      *
      * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
-     * @param mixed $thumb A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
+     * @param mixed|array<never, never> $thumb A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      * @param string $file_name File name
      * @param string $mime_type MIME type, must be `application/x-tgtheme-{format}`, where `format` depends on the client
      * @return array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>} @see https://docs.madelineproto.xyz/API_docs/types/Document.html
@@ -459,8 +459,8 @@ interface Account
      *
      * @param string $slug Unique theme ID used to generate [theme deep links](https://core.telegram.org/api/links#theme-links), can be empty to autogenerate a random ID.
      * @param string $title Theme name
-     * @param array $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
-     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}> $settings Array of Theme settings, multiple values can be provided for the different base themes (day/night mode, etc). @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
+     * @param array|array<never, never> $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}>|array<never, never> $settings Array of Theme settings, multiple values can be provided for the different base themes (day/night mode, etc). @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
      * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
      */
     public function createTheme(string $slug = '', string $title = '', array $document = [], array $settings = []): array;
@@ -472,8 +472,8 @@ interface Account
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
      * @param string $slug Unique theme ID
      * @param string $title Theme name
-     * @param array $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
-     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}> $settings Array of Theme settings @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
+     * @param array|array<never, never> $document Theme file @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     * @param list<array{_: 'inputThemeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated?: bool, accent_color?: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}, wallpaper_settings?: array{_: 'wallPaperSettings', blur?: bool, motion?: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int}}>|array<never, never> $settings Array of Theme settings @see https://docs.madelineproto.xyz/API_docs/types/InputThemeSettings.html
      * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
      */
     public function updateTheme(array $theme, string $format = '', string $slug = '', string $title = '', array $document = [], array $settings = []): array;
@@ -490,9 +490,9 @@ interface Account
      * Install a theme.
      *
      * @param bool $dark Whether to install the dark version
-     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string} $theme Theme to install @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
+     * @param array{_: 'inputTheme', id?: int, access_hash?: int}|array{_: 'inputThemeSlug', slug?: string}|array<never, never> $theme Theme to install @see https://docs.madelineproto.xyz/API_docs/types/InputTheme.html
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'} $base_theme Indicates a basic theme provided by all clients @see https://docs.madelineproto.xyz/API_docs/types/BaseTheme.html
+     * @param array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}|array<never, never> $base_theme Indicates a basic theme provided by all clients @see https://docs.madelineproto.xyz/API_docs/types/BaseTheme.html
      */
     public function installTheme(bool $dark = false, array $theme = [], string $format = '', array $base_theme = []): bool;
 
@@ -509,7 +509,7 @@ interface Account
      * Get installed themes.
      *
      * @param string $format Theme format, a string that identifies the theming engines supported by the client
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
      */
     public function getThemes(string $format = '', array $hash = []): array;
@@ -531,7 +531,7 @@ interface Account
     /**
      * Get info about multiple [wallpapers](https://core.telegram.org/api/wallpapers).
      *
-     * @param list<array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}> $wallpapers Array of [Wallpapers](https://core.telegram.org/api/wallpapers) to fetch info about @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
+     * @param list<array{_: 'inputWallPaper', id?: int, access_hash?: int}|array{_: 'inputWallPaperSlug', slug?: string}|array{_: 'inputWallPaperNoFile', id?: int}>|array<never, never> $wallpapers Array of [Wallpapers](https://core.telegram.org/api/wallpapers) to fetch info about @see https://docs.madelineproto.xyz/API_docs/types/InputWallPaper.html
      * @return list<array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
      */
     public function getMultiWallPapers(array $wallpapers = []): array;
@@ -577,7 +577,7 @@ interface Account
     /**
      * Get all available chat themes.
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color: int, message_colors: list<int>, wallpaper?: array{_: 'wallPaper', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}, id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color: int, second_background_color: int, third_background_color: int, fourth_background_color: int, intensity: int, rotation: int}}}>, emoticon: string, installs_count: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
      */
     public function getChatThemes(array $hash = []): array;
@@ -592,7 +592,7 @@ interface Account
     /**
      * Change authorization settings.
      *
-     * @param list<int> $hash Session ID from the [authorization](https://docs.madelineproto.xyz/API_docs/constructors/authorization.html) constructor, fetchable using [account.getAuthorizations](https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizations.html)
+     * @param list<int>|array<never, never> $hash Session ID from the [authorization](https://docs.madelineproto.xyz/API_docs/constructors/authorization.html) constructor, fetchable using [account.getAuthorizations](https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizations.html)
      * @param bool $encrypted_requests_disabled Whether to enable or disable receiving encrypted chats: if the flag is not set, the previous setting is not changed
      * @param bool $call_requests_disabled Whether to enable or disable receiving calls: if the flag is not set, the previous setting is not changed
      */
@@ -601,7 +601,7 @@ interface Account
     /**
      * Fetch saved notification sounds.
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.savedRingtonesNotModified'}|array{_: 'account.savedRingtones', hash: list<int>, ringtones: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs: list<array>, video_thumbs: list<array>, dc_id: array, attributes: list<array>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedRingtones.html
      */
     public function getSavedRingtones(array $hash = []): array;
@@ -638,7 +638,7 @@ interface Account
     /**
      * Get a list of default suggested [emoji statuses](https://core.telegram.org/api/emoji-status).
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
     public function getDefaultEmojiStatuses(array $hash = []): array;
@@ -646,7 +646,7 @@ interface Account
     /**
      * Get recently used [emoji statuses](https://core.telegram.org/api/emoji-status).
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int}|array{_: 'emojiStatusUntil', document_id: int, until: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
      */
     public function getRecentEmojiStatuses(array $hash = []): array;
@@ -660,7 +660,7 @@ interface Account
     /**
      * Reorder usernames associated with the currently logged-in user.
      *
-     * @param list<string> $order The new order for active usernames. All active usernames must be specified.
+     * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
      */
     public function reorderUsernames(array $order = []): bool;
 
@@ -675,7 +675,7 @@ interface Account
     /**
      * Get a set of suggested [custom emoji stickers](https://core.telegram.org/api/custom-emoji) that can be [used as profile picture](https://core.telegram.org/api/files#sticker-profile-pictures).
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function getDefaultProfilePhotoEmojis(array $hash = []): array;
@@ -683,7 +683,7 @@ interface Account
     /**
      * Get a set of suggested [custom emoji stickers](https://core.telegram.org/api/custom-emoji) that can be [used as group picture](https://core.telegram.org/api/files#sticker-profile-pictures).
      *
-     * @param list<int> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function getDefaultGroupPhotoEmojis(array $hash = []): array;
@@ -702,7 +702,7 @@ interface Account
      * @param bool $users Whether the new settings should affect all private chats
      * @param bool $chats Whether the new settings should affect all groups
      * @param bool $broadcasts Whether the new settings should affect all [channels](https://core.telegram.org/api/channel)
-     * @param array|int|string $peer Whether the new settings should affect a specific peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string|array<never, never> $peer Whether the new settings should affect a specific peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
     public function saveAutoSaveSettings(array $settings, bool $users = false, bool $chats = false, bool $broadcasts = false, array|int|string $peer = []): bool;
 
@@ -715,7 +715,7 @@ interface Account
     /**
      *
      *
-     * @param list<string> $codes
+     * @param list<string>|array<never, never> $codes
      */
     public function invalidateSignInCodes(array $codes = []): bool;
 }

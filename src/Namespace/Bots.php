@@ -31,7 +31,7 @@ interface Bots
      *
      * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer: array|int|string}|array{_: 'botCommandScopePeerUser', peer: array|int|string, user_id: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
      * @param string $lang_code Language code
-     * @param list<array{_: 'botCommand', command?: string, description?: string}> $commands Array of Bot commands @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
+     * @param list<array{_: 'botCommand', command?: string, description?: string}>|array<never, never> $commands Array of Bot commands @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
      */
     public function setBotCommands(array $scope, string $lang_code = '', array $commands = []): bool;
 
@@ -85,7 +85,7 @@ interface Bots
     /**
      * Set localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string|array<never, never> $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $lang_code Language code, if left empty update the fallback about text and description
      * @param string $name New bot name
      * @param string $about New about text
@@ -96,7 +96,7 @@ interface Bots
     /**
      * Get localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string|array<never, never> $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $lang_code Language code, if left empty this method will return the fallback about text and description.
      * @return array{_: 'bots.botInfo', name: string, about: string, description: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.BotInfo.html
      */
@@ -106,7 +106,7 @@ interface Bots
      * Reorder usernames associated to a bot we own.
      *
      * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     * @param list<string> $order The new order for active usernames. All active usernames must be specified.
+     * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
      */
     public function reorderUsernames(array|int|string $bot, array $order = []): bool;
 

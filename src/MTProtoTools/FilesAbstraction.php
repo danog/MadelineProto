@@ -109,7 +109,8 @@ trait FilesAbstraction
                     : new Audio($this, $media, $attr, $protected);
             }
             if ($t === 'documentAttributeCustomEmoji') {
-                return new CustomEmoji($this, $media, $attr, $protected);
+                \assert($has_document_photo !== null);
+                return new CustomEmoji($this, $media, $attr, $has_document_photo, $protected);
             }
         }
         if ($has_animated) {

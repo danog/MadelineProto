@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Query;
 
+use danog\MadelineProto\EventHandler\CallbackQuery;
+use danog\MadelineProto\EventHandler\Query;
 use danog\MadelineProto\MTProto;
 
-abstract class AbstractGameQuery extends AbstractQuery
+/** Represents a query sent by the user by clicking on a "Play game" button. */
+abstract class GameQuery extends CallbackQuery
 {
     /** @var string Short name of a Game to be returned, serves as the unique identifier for the game */
     public readonly string $gameShortName;
