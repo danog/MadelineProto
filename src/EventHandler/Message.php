@@ -277,11 +277,11 @@ abstract class Message extends AbstractMessage
             [
                 'peer' => $this->chatId,
                 'id' => [$this->id],
-                'text' => $this->message,
+                'text' => [['_' => 'textWithEntities', 'text' => $this->message]],
                 'to_lang' => $toLang
             ]
         );
-        return $result[0]['text'];
+        return $result['result'][0]['text'];
     }
 
     /**
