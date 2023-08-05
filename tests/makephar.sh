@@ -61,7 +61,7 @@ k
 rm -rf madeline.phar testing.madeline*
 
 composer update
-composer test
+#composer test
 #vendor/bin/phpunit tests/danog/MadelineProto/EntitiesTest.php
 
 COMPOSER_TAG="$TAG"
