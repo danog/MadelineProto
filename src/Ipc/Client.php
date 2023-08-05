@@ -223,28 +223,26 @@ final class Client extends ClientAbstract
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = [])
     {
-        if (\is_array($args)) {
-            if (($method === 'messages.editInlineBotMessage' ||
-                $method === 'messages.uploadMedia' ||
-                $method === 'messages.sendMedia' ||
-                $method === 'messages.editMessage') &&
-                isset($args['media']['file']) &&
-                $args['media']['file'] instanceof FileCallbackInterface
-            ) {
-                $params = [$method, &$args, $aargs];
-                $wrapper = Wrapper::create($params, $this->session, $this->logger);
-                $wrapper->wrap($args['media']['file'], true);
-                return $this->__call('methodCallAsyncRead', $wrapper);
-            } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
-                $params = [$method, &$args, $aargs];
-                $wrapper = Wrapper::create($params, $this->session, $this->logger);
-                foreach ($args['multi_media'] as &$media) {
-                    if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
-                        $wrapper->wrap($media['media']['file'], true);
-                    }
+        if (($method === 'messages.editInlineBotMessage' ||
+            $method === 'messages.uploadMedia' ||
+            $method === 'messages.sendMedia' ||
+            $method === 'messages.editMessage') &&
+            isset($args['media']['file']) &&
+            $args['media']['file'] instanceof FileCallbackInterface
+        ) {
+            $params = [$method, &$args, $aargs];
+            $wrapper = Wrapper::create($params, $this->session, $this->logger);
+            $wrapper->wrap($args['media']['file'], true);
+            return $this->__call('methodCallAsyncRead', $wrapper);
+        } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
+            $params = [$method, &$args, $aargs];
+            $wrapper = Wrapper::create($params, $this->session, $this->logger);
+            foreach ($args['multi_media'] as &$media) {
+                if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
+                    $wrapper->wrap($media['media']['file'], true);
                 }
-                return $this->__call('methodCallAsyncRead', $wrapper);
             }
+            return $this->__call('methodCallAsyncRead', $wrapper);
         }
         return $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
     }
@@ -320,7 +318,7 @@ final class Client extends ClientAbstract
     {
         throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
-    public function getEventHandler(?string $class = null): EventHandlerProxy
+    public function getEventHandler(?string $class = null): ?EventHandlerProxy
     {
         if ($class !== null) {
             return $this->getPlugin($class);

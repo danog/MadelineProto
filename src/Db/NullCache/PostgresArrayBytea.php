@@ -12,7 +12,7 @@ use danog\MadelineProto\Db\PostgresArrayBytea as DbPostgresArrayBytea;
  * @template TKey as array-key
  * @template TValue
  *
- * @extends DbPostgresArray<TKey, TValue>
+ * @extends DbPostgresArrayBytea<TKey, TValue>
  * @internal
  */
 final class PostgresArrayBytea extends DbPostgresArrayBytea

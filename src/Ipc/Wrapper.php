@@ -47,7 +47,7 @@ final class Wrapper extends ClientAbstract
     /**
      * Callbacks IDs.
      *
-     * @var list<int|array{0: class-string<Obj>, array<string, int>}>
+     * @var list<int|list{class-string<Obj>, array<string, int>}>
      */
     private array $callbackIds = [];
     /**

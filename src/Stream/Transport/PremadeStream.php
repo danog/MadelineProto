@@ -80,6 +80,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
             throw new ClosedException('MadelineProto stream was disconnected');
         }
         \assert($this->stream instanceof WritableStream);
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $this->stream->write($data);
     }
     /**

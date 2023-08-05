@@ -52,7 +52,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      */
     public function disconnect(): void
     {
-        $this->stream->disconnect();
+        $this->stream->close();
     }
     /**
      * Get read buffer asynchronously.

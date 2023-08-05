@@ -117,6 +117,7 @@ abstract class StrTools extends Extension
     /**
      * Convert a message and a set of entities to HTML.
      *
+     * @param list<array{_: string, offset: int, length: int, ...}> $entities
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string

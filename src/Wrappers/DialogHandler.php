@@ -60,6 +60,7 @@ trait DialogHandler
                 $this->searchRightPts();
             }
             while (true) {
+                /** @psalm-suppress InvalidOperand */
                 $result = $this->methodCallAsyncRead(
                     'updates.getDifference',
                     [

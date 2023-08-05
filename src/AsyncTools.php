@@ -225,16 +225,6 @@ abstract class AsyncTools extends StrTools
         return $callable;
     }
     /**
-     * Call promise in background, deferring execution.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise Promise to resolve
-     */
-    public static function callForkDefer(Generator|Future $promise): void
-    {
-        self::callFork($promise);
-    }
-    /**
      * Call promise $b after promise $a.
      *
      * @deprecated Coroutines are deprecated since amp v3

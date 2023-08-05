@@ -81,7 +81,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         return $this->offsetGet($key) !== null;
     }
 
-    private function setSettings(DatabaseAbstract $settings): void
+    private function setSettings(DriverDatabaseAbstract $settings): void
     {
         $this->dbSettings = $settings;
         $this->setCacheTtl($settings->getCacheTtl());

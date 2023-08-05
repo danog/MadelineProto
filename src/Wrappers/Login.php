@@ -56,6 +56,7 @@ trait Login
             return null;
         }
         $callbacks = [$this, $this->referenceDatabase];
+        /** @psalm-suppress InvalidArgument */
         $this->TL->updateCallbacks($callbacks);
         $this->logger->logger(Lang::$current_lang['login_bot'], Logger::NOTICE);
         return $this->processAuthorization($this->methodCallAsyncRead(

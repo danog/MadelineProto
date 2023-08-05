@@ -230,6 +230,7 @@ trait FileServer
         self::$checkMutex ??= new LocalKeyedMutex;
         $lock = self::$checkMutex->acquire($scriptUrl);
         try {
+            /** @psalm-suppress ParadoxicalCondition */
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }

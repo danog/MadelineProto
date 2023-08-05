@@ -207,7 +207,7 @@ abstract class EventHandler extends AbstractAPI
                     $filter,
                     Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
                 );
-                $filter = $filter->initialize($this) ?? $filter;
+                $filter = $filter->initialize($this);
                 $handlers []= function (Update $update) use ($closure, $filter): void {
                     if ($filter->apply($update)) {
                         EventLoop::queue($closure, $update);
@@ -429,18 +429,18 @@ abstract class EventHandler extends AbstractAPI
         $plugins = [];
         try {
             self::$includingPlugins = true;
-            foreach ($paths as $path) {
-                if (isset(self::$checkedPaths[$path])) {
-                    $plugins = \array_merge($plugins, self::$checkedPaths[$path]);
+            foreach ($paths as $p) {
+                if (isset(self::$checkedPaths[$p])) {
+                    $plugins = \array_merge($plugins, self::$checkedPaths[$p]);
                     continue;
                 }
 
-                \spl_autoload_register(function (string $class) use ($path): void {
+                \spl_autoload_register(function (string $class) use ($p): void {
                     if (!\str_starts_with($class, 'MadelinePlugin\\')) {
                         return;
                     }
                     // Has leading /
-                    $file = $path.\str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
+                    $file = $p.\str_replace('\\', DIRECTORY_SEPARATOR, \substr($class, 14)).'.php';
                     if (\file_exists($file)) {
                         require $file;
                         if (!\class_exists($class) && !\interface_exists($class) && !\trait_exists($class) && !\enum_exists($class)) {
@@ -449,8 +449,8 @@ abstract class EventHandler extends AbstractAPI
                     }
                 });
 
-                $recurse($path);
-                self::$checkedPaths[$path] = $pluginsTemp;
+                $recurse($p);
+                self::$checkedPaths[$p] = $pluginsTemp;
                 $plugins = \array_merge($plugins, $pluginsTemp);
                 $pluginsTemp = [];
             }

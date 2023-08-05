@@ -22,7 +22,7 @@ use InvalidArgumentException;
 final class DbPropertiesFactory
 {
     /**
-     * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool}|'array' $config
+     * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool, innerMadelineProtoSerializer?: SerializerType}|'array' $config
      * @return DbType
      * @internal
      * @uses \danog\MadelineProto\Db\MemoryArray

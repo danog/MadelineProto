@@ -128,7 +128,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function setExtra($hash): void
     {
-        $rev = \str_contains($hash, '_rev');
+        $rev = \strpos($hash, '_rev');
         $this->rev = false;
         if ($rev !== false) {
             $hash = \substr($hash, 0, $rev);

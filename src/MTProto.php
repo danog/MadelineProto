@@ -981,6 +981,9 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      * @param Settings|SettingsEmpty $settings New settings
      * @param APIWrapper             $wrapper  API wrapper
+     *
+     * @psalm-suppress UnsupportedPropertyReferenceUsage
+     *
      * @internal
      */
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void

@@ -322,6 +322,8 @@ abstract class Message extends AbstractMessage
 
     /**
      * Get an HTML version of the message.
+     * 
+     * @psalm-suppress InaccessibleProperty
      *
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */

@@ -129,7 +129,7 @@ trait Files
             throw new Exception('Invalid callable provided');
         }
         if ($cb === null) {
-            $cb = function ($percent): void {
+            $cb = function (float $percent, float $speed, float $time): void {
                 $this->logger->logger('Upload status: '.$percent.'%', Logger::NOTICE);
             };
         } else {
@@ -545,6 +545,7 @@ trait Files
             $info = \array_values($info);
             $cur = $info[0];
             foreach ($info as $n) {
+                /** @psalm-suppress InvalidArrayAccess */
                 if ($n['width'] * $n['height'] > $cur['width'] * $cur['height']) {
                     $cur = $n;
                 }
@@ -570,7 +571,11 @@ trait Files
      *      name: string,
      *      mime: string,
      *      size: int,
-     *      InputFileLocation: array
+     *      InputFileLocation: array,
+     *      key_fingerprint?: string,
+     *      key?: string,
+     *      iv?: string,
+     *      thumb_size?: string
      * }
      */
     public function getDownloadInfo(mixed $messageMedia): array

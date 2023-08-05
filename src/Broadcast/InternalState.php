@@ -218,6 +218,7 @@ final class InternalState
             StatusInternal::IDLING_BEFORE_BROADCASTING => Status::BROADCASTING,
             StatusInternal::BROADCASTING => Status::BROADCASTING,
             StatusInternal::FINISHED => Status::FINISHED,
+            StatusInternal::CANCELLED => Status::CANCELLED,
         };
     }
     public function getProgress(): Progress

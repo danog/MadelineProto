@@ -237,7 +237,7 @@ final class Ogg
      *
      * @return iterable<string>
      */
-    private function read(): iterable
+    private function read(): \Generator
     {
         $state = self::STATE_READ_HEADER;
         $content = '';

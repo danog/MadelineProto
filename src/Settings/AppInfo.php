@@ -14,6 +14,8 @@ use const PHP_VERSION;
 
 /**
  * App information.
+ *
+ * @psalm-suppress UnsupportedPropertyReferenceUsage
  */
 final class AppInfo extends SettingsAbstract
 {

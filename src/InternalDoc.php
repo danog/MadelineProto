@@ -328,16 +328,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::callFork($callable, ...$args);
     }
     /**
-     * Call promise in background, deferring execution.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise Promise to resolve
-     */
-    public static function callForkDefer(\Generator|\Amp\Future $promise): void
-    {
-        \danog\MadelineProto\AsyncTools::callForkDefer($promise);
-    }
-    /**
      * Get call status.
      *
      * @param int $id Call ID
@@ -542,6 +532,7 @@ abstract class InternalDoc
     /**
      * Convert a message and a set of entities to HTML.
      *
+     * @param list<array{_: string, offset: int, length: int, ...}> $entities
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
@@ -783,7 +774,11 @@ abstract class InternalDoc
      *      name: string,
      *      mime: string,
      *      size: int,
-     *      InputFileLocation: array
+     *      InputFileLocation: array,
+     *      key_fingeprint?: string,
+     *      key?: string,
+     *      iv?: string,
+     *      thumb_size?: string
      * }
      */
     public function getDownloadInfo(mixed $messageMedia): array

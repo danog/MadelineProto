@@ -103,6 +103,7 @@ final class GarbageCollector
                     return;
                 }
 
+                /** @var string */
                 foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
                     $base = \basename($path);
                     if ($base === 'madeline-'.API::RELEASE.'.phar') {
