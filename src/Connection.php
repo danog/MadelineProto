@@ -339,7 +339,7 @@ final class Connection
                     $arguments['peer'] = 'me';
                 }
             }
-            if (\is_array($arguments['media'])) {
+            if (\is_array($arguments['media']) && isset($arguments['media']['_'])) {
                 if ($arguments['media']['_'] === 'inputMediaPhotoExternal') {
                     $arguments['media']['_'] = 'inputMediaUploadedPhoto';
                     $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);

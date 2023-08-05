@@ -78,7 +78,7 @@ class EntitiesTest extends MadelineTestCase
     public function provideEntities(): array
     {
         $this->setUpBeforeClass();
-        $mention = self::$MadelineProto->getPwrChat(\getenv('TEST_USERNAME'));
+        $mention = self::$MadelineProto->getPwrChat(\getenv('TEST_USERNAME'), false);
         return [
             [
                 'html',

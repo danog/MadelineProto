@@ -113,8 +113,9 @@
             "@psalm"
         ],
         "check": [
+            "@test",
             "@cs",
-            "@test"
+            "@psalm"
         ],
         "test-php7": "tests/test-conversion.sh 70",
         "test-php56": "tests/test-conversion.sh 5",
@@ -123,7 +124,7 @@
         "psalm": "psalm.phar --no-cache",
         "docs": "php tools/build_docs.php",
         "docs-fix": "tools/fix_docs.sh",
-        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],
         "post-update-cmd": ["@composer bin all update --ansi"]

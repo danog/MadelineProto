@@ -22,7 +22,7 @@ class FileIdTest extends MadelineTestCase
      */
     public static function stripFileReference(string $fileId): string
     {
-        return FileId::fromBotAPI($fileId)->setFileReference('');
+        return (string) FileId::fromBotAPI($fileId)->setFileReference('');
     }
     /**
      * Strip access hash (and possibly ID) from file ID.
@@ -31,7 +31,7 @@ class FileIdTest extends MadelineTestCase
      */
     public static function stripForChat(string $fileId): string
     {
-        return FileId::fromBotAPI($fileId)->setAccessHash(0);
+        return (string) FileId::fromBotAPI($fileId)->setAccessHash(0);
     }
 
     /**

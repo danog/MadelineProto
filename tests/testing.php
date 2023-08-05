@@ -282,7 +282,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
     // Document by URL
-    $media['document'] = ['_' => 'inputMediaUploadedDocument', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
+    $media['document'] = ['_' => 'inputMediaDocumentExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
 
     $message = 'yay '.PHP_VERSION_ID;
     $mention = yield $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
@@ -307,7 +307,9 @@ $MadelineProto->loop(function () use ($MadelineProto) {
                     ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
                 ]]);
             }
-            $fileOrig = read($inputMedia['file']);
+            $fileOrig = isset($inputMedia['file'])
+                ? read($inputMedia['file'])
+                : $MadelineProto->fileGetContents($inputMedia['url']);
             $MadelineProto->logger("Sending $type");
             $dl = $MadelineProto->extractMessage(yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
 
