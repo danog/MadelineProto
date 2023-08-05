@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use danog\Decoder\FileId;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AbstractSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;

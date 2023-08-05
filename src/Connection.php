@@ -334,6 +334,11 @@ final class Connection
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
         } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
+            if ($method === 'messages.uploadMedia') {
+                if (!isset($arguments['peer']) && !$this->API->isSelfBot()) {
+                    $arguments['peer'] = 'me';
+                }
+            }
             if (\is_array($arguments['media'])) {
                 if ($arguments['media']['_'] === 'inputMediaPhotoExternal') {
                     $arguments['media']['_'] = 'inputMediaUploadedPhoto';
@@ -399,10 +404,6 @@ final class Connection
                 }
             } elseif (isset($arguments['id'])) {
                 $method = 'photos.updateProfilePhoto';
-            }
-        } elseif ($method === 'messages.uploadMedia') {
-            if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
-                $arguments['peer'] = 'me';
             }
         } elseif ($method === 'channels.deleteUserHistory') {
             $method = 'channels.deleteParticipantHistory';

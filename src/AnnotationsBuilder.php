@@ -540,12 +540,14 @@ final class Blacklist {
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler::class, ClassFinder::RECURSIVE_MODE) as $class) {
                     \fwrite($handle, "use $class;\n");
                 }
+                /** @psalm-suppress UndefinedClass */
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Ipc::class, ClassFinder::RECURSIVE_MODE) as $class) {
                     if (\str_contains($class, 'Wrapper')) {
                         continue;
                     }
                     \fwrite($handle, "use $class;\n");
                 }
+                /** @psalm-suppress UndefinedClass */
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Broadcast::class, ClassFinder::RECURSIVE_MODE) as $class) {
                     \fwrite($handle, "use $class;\n");
                 }
