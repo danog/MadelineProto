@@ -24,19 +24,15 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
-use Amp\SignalException;
 use AssertionError;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\LogoutException;
-use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\Tools;
 
@@ -146,6 +142,9 @@ trait Login
         $c->cancel();
         return $c->getCancellation();
     }
+    /**
+     * Logout the session.
+     */
     public function logout(): void
     {
         if ($this->authorized === API::LOGGED_IN) {

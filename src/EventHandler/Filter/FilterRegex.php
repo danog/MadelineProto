@@ -14,6 +14,7 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRegex extends Filter
 {
+    /** @param non-empty-string $regex */
     public function __construct(private readonly string $regex)
     {
         \preg_match($regex, '');

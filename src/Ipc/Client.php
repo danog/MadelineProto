@@ -145,7 +145,7 @@ final class Client extends ClientAbstract
     {
         return $this->logger;
     }
-    
+
     /** @internal */
     public function getQrLoginCancellation(): Cancellation
     {

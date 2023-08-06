@@ -21,8 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\Ipc\IpcState;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 use const LOCK_EX;
 use const LOCK_SH;
@@ -31,12 +29,10 @@ use const PHP_MINOR_VERSION;
 use const PHP_VERSION;
 
 use function Amp\File\createDirectory;
-use function Amp\File\deleteDirectory;
 use function Amp\File\deleteFile;
 use function Amp\File\exists;
 use function Amp\File\isDirectory;
 use function Amp\File\isFile;
-use function Amp\File\listFiles;
 use function Amp\File\move;
 use function Amp\File\openFile;
 use function Amp\File\write;
@@ -118,14 +114,14 @@ final class SessionPaths
      */
     public function delete(): void
     {
-        if (file_exists($this->sessionDirectoryPath)) {
-            foreach (scandir($this->sessionDirectoryPath) as $f) {
+        if (\file_exists($this->sessionDirectoryPath)) {
+            foreach (\scandir($this->sessionDirectoryPath) as $f) {
                 if ($f === '.' || $f === '..') {
                     continue;
                 }
-                unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
+                \unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
             }
-            rmdir($this->sessionDirectoryPath);
+            \rmdir($this->sessionDirectoryPath);
         }
     }
     /**

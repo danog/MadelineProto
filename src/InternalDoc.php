@@ -29,6 +29,7 @@ use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\Ipc\Server;
 use Generator;
 
+/** @psalm-suppress PossiblyNullReference */
 abstract class InternalDoc
 {
     protected APIWrapper $wrapper;
@@ -674,7 +675,7 @@ abstract class InternalDoc
     /**
      * Get authorization info.
      *
-     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN
+     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN|API::LOGGED_OUT
      */
     public function getAuthorization(): int
     {
@@ -1259,6 +1260,15 @@ abstract class InternalDoc
         return \danog\MadelineProto\MTProto::isSupergroup($id);
     }
     /**
+     * Whether we're currently connected to the test DCs.
+     *
+     * @return boolean
+     */
+    public function isTestMode(): bool
+    {
+        return $this->wrapper->getAPI()->isTestMode();
+    }
+    /**
      * Logger.
      *
      * @param mixed  $param Parameter
@@ -1269,7 +1279,9 @@ abstract class InternalDoc
     {
         $this->wrapper->getAPI()->logger($param, $level, $file);
     }
-
+    /**
+     * Logout the session.
+     */
     public function logout(): void
     {
         $this->wrapper->getAPI()->logout();

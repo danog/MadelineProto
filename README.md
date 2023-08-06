@@ -467,7 +467,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getAppConfig.html" name="help.getAppConfig">Get app-specific configuration, see client configuration for more info on the result: help.getAppConfig</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getdnsclient-amp-dns-dnsresolver" name="getDNSClient">Get async DNS client: getDNSClient</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gethttpclient-amp-http-client-httpclient" name="getHTTPClient">Get async HTTP client: getHTTPClient</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getauthorization-danog-madelineproto-api-not_logged_in-danog-madelineproto-api-waiting_code-danog-madelineproto-api-waiting_signup-danog-madelineproto-api-waiting_password-danog-madelineproto-api-logged_in" name="getAuthorization">Get authorization info: getAuthorization</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getauthorization-danog-madelineproto-api-not_logged_in-danog-madelineproto-api-waiting_code-danog-madelineproto-api-waiting_signup-danog-madelineproto-api-waiting_password-danog-madelineproto-api-logged_in-api-logged_out" name="getAuthorization">Get authorization info: getAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAutoSaveSettings.html" name="account.getAutoSaveSettings">Get autosave settings: account.getAutoSaveSettings</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getconfig-array-config-array" name="getConfig">Get cached (or eventually re-fetch) server-side config: getConfig</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcachedconfig-array" name="getCachedConfig">Get cached server-side config: getCachedConfig</a>
@@ -649,6 +649,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#phonelogin-string-number-int-sms_type-5-mixed" name="phoneLogin">Login as user: phoneLogin</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importWebTokenAuthorization.html" name="auth.importWebTokenAuthorization">Login by importing an authorization token: auth.importWebTokenAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importLoginToken.html" name="auth.importLoginToken">Login using a redirected login token, generated in case of DC mismatch during QR code login: auth.importLoginToken</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#logout-void" name="logout">Logout the session: logout</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.searchCustomEmoji.html" name="messages.searchCustomEmoji">Look for custom emojis associated to a UTF8 emoji: messages.searchCustomEmoji</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getTermsOfServiceUpdate.html" name="help.getTermsOfServiceUpdate">Look for updates of telegram's terms of service: help.getTermsOfServiceUpdate</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mtprotototd-mixed-params-mixed" name="MTProtoToTd">MTProto to TD params: MTProtoToTd</a>
@@ -902,6 +903,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isaltervista-bool" name="isAltervista">Whether this is altervista: isAltervista</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipc-bool" name="isIpc">Whether we're an IPC client instance: isIpc</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipcworker-bool" name="isIpcWorker">Whether we're an IPC server process (as opposed to an event handler): isIpcWorker</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#istestmode-bool" name="isTestMode">Whether we're currently connected to the test DCs: isTestMode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmessage-array-message-danog-madelineproto-eventhandler-abstractmessage" name="wrapMessage">Wrap a Message constructor into an abstract Message object: wrapMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmedia-array-media-bool-protected-false-danog-madelineproto-eventhandler-media" name="wrapMedia">Wrap a media constructor into an abstract Media object: wrapMedia</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate-array-update-danog-madelineproto-eventhandler-update" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>

@@ -552,7 +552,7 @@ final class Blacklist {
                     \fwrite($handle, "use $class;\n");
                 }
 
-                \fwrite($handle, "\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
+                \fwrite($handle, "\n/** @psalm-suppress PossiblyNullReference */\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {
                     $namespaceInterface = '\\danog\\MadelineProto\\Namespace\\'.\ucfirst($namespace);
                     \fwrite($handle, '/** @var '.$namespaceInterface.' $'.$namespace." */\n");

@@ -189,7 +189,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Whether we're authorized.
      *
-     * @var API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN
+     * @var API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT
      */
     public int $authorized = API::NOT_LOGGED_IN;
     /**
@@ -1603,7 +1603,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Get authorization info.
      *
-     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN
+     * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN|API::LOGGED_OUT
      */
     public function getAuthorization(): int
     {

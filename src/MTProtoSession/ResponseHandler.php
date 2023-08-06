@@ -333,7 +333,7 @@ trait ResponseHandler
                             $this->logger->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         $this->API->logout();
-                        throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
+                        throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
