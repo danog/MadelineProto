@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\SignalException;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -332,7 +333,7 @@ trait ResponseHandler
                             $this->logger->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         $this->API->logout();
-                        return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                        throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
@@ -352,7 +353,7 @@ trait ResponseHandler
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
                             $this->logger->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                             $this->API->logout();
-                            return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                            throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
                         EventLoop::queue(function () use ($request): void {
                             $this->API->initAuthorization();
