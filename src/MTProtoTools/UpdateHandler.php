@@ -701,7 +701,7 @@ trait UpdateHandler
                     $authorization = $this->methodCallAsyncRead(
                         'auth.importLoginToken',
                         $authorization,
-                        ['datacenter' => $authorization['dc_id']]
+                        ['datacenter' => $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id']]
                     );
                 }
                 $this->processAuthorization($authorization['authorization']);

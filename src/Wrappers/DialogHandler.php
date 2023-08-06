@@ -214,11 +214,10 @@ trait DialogHandler
             $this->dialog_params['hash'] = 0;
         }
         $res = ['dialogs' => [0], 'count' => 1];
-        $datacenter = $this->datacenter->currentDatacenter;
         $dialogs = [];
         $this->logger->logger('Getting dialogs...');
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['FloodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;

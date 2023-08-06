@@ -1515,6 +1515,15 @@ final class MTProto implements TLCallback, LoggerGetter
         }
     }
     /**
+     * Whether we're currently connected to the test DCs.
+     *
+     * @return boolean
+     */
+    public function isTestMode(): bool
+    {
+        return $this->config['test_mode'];
+    }
+    /**
      * Parse DC options from config.
      *
      * @param array $dc_options DC options

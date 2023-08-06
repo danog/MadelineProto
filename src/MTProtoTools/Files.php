@@ -911,7 +911,11 @@ trait Files
         }
         $part_size ??= 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
-        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->authorized_dc;
+        if (isset($messageMedia['InputFileLocation']['dc_id'])) {
+            $datacenter = $this->isTestMode() ? 10_000 + $messageMedia['InputFileLocation']['dc_id'] : $messageMedia['InputFileLocation']['dc_id'];
+        } else {
+            $datacenter = $this->authorized_dc;
+        }
         if ($this->datacenter->has(-$datacenter)) {
             $datacenter = -$datacenter;
         }
@@ -1029,7 +1033,7 @@ trait Files
     {
         do {
             if (!$cdn) {
-                $basic_param = ['location' => $messageMedia['InputFileLocation']];
+                $basic_param = ['location' => $messageMedia['InputFileLocation'], 'cdn_supported' => true];
             } else {
                 $basic_param = ['file_token' => $messageMedia['file_token']];
             }
@@ -1062,7 +1066,7 @@ trait Files
                 $messageMedia['cdn_key'] = $res['encryption_key'];
                 $messageMedia['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
-                $datacenter = $res['dc_id'];
+                $datacenter = ($this->isTestMode() ? 10_000 : 0) + $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
                     $this->getConfig();

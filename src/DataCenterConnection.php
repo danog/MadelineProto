@@ -263,7 +263,7 @@ final class DataCenterConnection implements JsonSerializable
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
-                        $exported_authorization = $this->API->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => $this->datacenter], ['datacenter' => $authorized_dc_id]);
+                        $exported_authorization = $this->API->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => $this->datacenter % 10_000], ['datacenter' => $authorized_dc_id]);
                         $socket->methodCallAsyncRead('auth.importAuthorization', $exported_authorization);
                         $this->authorized(true);
                         break;

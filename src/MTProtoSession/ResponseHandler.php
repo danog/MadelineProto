@@ -306,12 +306,14 @@ trait ResponseHandler
                 }
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
-                $this->API->datacenter->currentDatacenter = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                if ($this->API->isTestMode()) {
+                    $datacenter += 10_000;
+                }
                 if ($request->isFileRelated() && $this->API->datacenter->has(-$datacenter)) {
                     $datacenter = -$datacenter;
-                }
-                if ($this->API->config['test_mode']) {
-                    $datacenter += 10_000;
+                } else {
+                    $this->API->datacenter->currentDatacenter = $datacenter;
                 }
                 if ($request->isUserRelated()) {
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
