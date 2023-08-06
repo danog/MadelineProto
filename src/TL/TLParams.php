@@ -44,7 +44,7 @@ trait TLParams
 
             if (\in_array($param['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'ping_id', 'exchange_id'], true) && $param['type'] === 'long') {
                 $param['type'] = 'strlong';
-            } elseif (\in_array($param['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'], true)) {
+            } elseif (\in_array($param['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv', 'encryption_key', 'encryption_iv'], true)) {
                 $param['type'] = 'string';
             } elseif ($param['name'] === 'server_public_key_fingerprints') {
                 $param['subtype'] = 'strlong';
