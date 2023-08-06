@@ -475,6 +475,9 @@ final class MTProto implements TLCallback, LoggerGetter
         if (self::$references) {
             Logger::log('Prompting final serialization (SHUTDOWN)...');
             foreach (self::$references as $instance) {
+                if ($instance->authorized === API::LOGGED_OUT) {
+                    continue;
+                }
                 $instance->wrapper->serialize();
             }
             Logger::log('Done final serialization (SHUTDOWN)!');
@@ -1122,6 +1125,9 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         $this->logger->logger('Unreferenced instance');
+        if ($this->authorized === API::LOGGED_OUT) {
+            $this->wrapper->getSession()->delete();
+        }
     }
     /**
      * Destructor.

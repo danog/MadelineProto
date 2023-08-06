@@ -1269,6 +1269,11 @@ abstract class InternalDoc
     {
         $this->wrapper->getAPI()->logger($param, $level, $file);
     }
+
+    public function logout(): void
+    {
+        $this->wrapper->getAPI()->logout();
+    }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *

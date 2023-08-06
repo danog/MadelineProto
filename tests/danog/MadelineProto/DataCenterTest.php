@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use Amp\PHPUnit\AsyncTestCase;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
@@ -36,8 +36,6 @@ final class DataCenterTest extends AsyncTestCase
      */
     public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
-        $this->markTestSkipped();
-        return;/*
         $settings = new Settings;
         $settings->getAppInfo()
             ->setApiHash(\getenv('API_HASH'))
@@ -54,11 +52,17 @@ final class DataCenterTest extends AsyncTestCase
             ->setTransport($transport)
             ->setRetry(false)
             ->setTimeout(10);
-        $API = new MTProto($settings);
-        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 '));
 
-        $ping = \random_bytes(8);
-        $this->assertEquals($ping, $API->methodCallAsyncRead('ping', ['ping_id' => $ping])['ping_id']);*/
+        // Init session
+        $API = new API(\sys_get_temp_dir()."/{$transport}_{$obfuscated}_{$protocol}_{$test_mode}_$ipv6", $settings);
+        unset($API);
+
+        // Fork
+        $API = new API(\sys_get_temp_dir()."/{$transport}_{$obfuscated}_{$protocol}_{$test_mode}_$ipv6", $settings);
+        $API->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 '));
+
+        $this->assertIsArray($API->help->getConfig());
+        $API->logout();
     }
 
     public function protocolProvider(): Generator

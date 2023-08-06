@@ -102,6 +102,12 @@ final class API extends AbstractAPI
      */
     public const LOGGED_IN = 3;
     /**
+     * We're logged out, the session will be deleted ASAP.
+     *
+     * @var int
+     */
+    public const LOGGED_OUT = 4;
+    /**
      * This peer is a user.
      *
      * @var string
