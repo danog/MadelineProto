@@ -356,7 +356,7 @@ final class MTProto implements TLCallback, LoggerGetter
             // Test datacenters
             'ipv4' => [
                 // ipv4 addresses
-                2 => [
+                10002 => [
                     // The rest will be fetched using help.getConfig
                     'ip_address' => '149.154.167.40',
                     'port' => 443,
@@ -366,7 +366,7 @@ final class MTProto implements TLCallback, LoggerGetter
             ],
             'ipv6' => [
                 // ipv6 addresses
-                2 => [
+                10002 => [
                     // The rest will be fetched using help.getConfig
                     'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
                     'port' => 443,
@@ -567,7 +567,7 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->TL->init($this->settings->getSchema(), $callbacks);
         $this->connectToAllDcs();
         $this->startLoops();
-        $this->datacenter->currentDatacenter= 2;
+        $this->datacenter->currentDatacenter = $this->config['test_mode'] ? 10002 : 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->hasTempAuthKey()) {
             try {
                 $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);

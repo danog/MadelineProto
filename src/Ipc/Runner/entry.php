@@ -138,7 +138,7 @@ use Webmozart\Assert\Assert;
             Logger::log('Got exception in IPC server, exiting...', Logger::FATAL_ERROR);
             $ipc = $session->getIpcState();
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())
-                && $API
+                && isset($API)
                 && $API->getAuthorization() !== API::LOGGED_OUT
             ) {
                 Logger::log('Reporting error!');

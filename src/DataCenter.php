@@ -258,7 +258,7 @@ final class DataCenter
                 if (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), Logger::ERROR);
+                $this->API->logger->logger("Connection failed ({$dc_number}): $e", Logger::ERROR);
             }
         }
         throw new Exception("Could not connect to DC {$dc_number}");

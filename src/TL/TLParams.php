@@ -50,6 +50,10 @@ trait TLParams
                 $param['subtype'] = 'strlong';
             }
 
+            if ($predicate === 'dcOption' && $param['name'] === 'secret') {
+                $param['type'] = 'string';
+            }
+
             if ($predicate === 'msg_container' && $param['name'] === 'messages') {
                 $param['splitSideEffects'] = true;
             }

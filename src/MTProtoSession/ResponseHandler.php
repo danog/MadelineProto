@@ -310,6 +310,9 @@ trait ResponseHandler
                 if ($request->isFileRelated() && $this->API->datacenter->has(-$datacenter)) {
                     $datacenter = -$datacenter;
                 }
+                if ($this->API->config['test_mode']) {
+                    $datacenter += 10_000;
+                }
                 if ($request->isUserRelated()) {
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }

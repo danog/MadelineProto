@@ -161,5 +161,5 @@
 
     "plugin_path_does_not_exist": "Plugin path %s does not exist!",
 
-    "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open or disable webserver path rewrites to fix!"
+    "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open or disable webserver path rewrites to fix! If you already did that, make sure the CLI version of PHP is exactly the same as the web version (same version, extensions, et cetera) and check out the MadelineProto.log file for more info about the error that prevented the IPC server from starting."
 }
