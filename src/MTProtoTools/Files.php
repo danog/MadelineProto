@@ -1103,8 +1103,8 @@ trait Files
                 return 0;
             }
             if (isset($messageMedia['cdn_key'])) {
-                $ivec = \substr($messageMedia['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
-                $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
+                $ivec = \substr((string)$messageMedia['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
+                $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], (string)$messageMedia['cdn_key'], $ivec);
                 $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc);
             }
             if (isset($messageMedia['key'])) {
