@@ -27,6 +27,7 @@ use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
@@ -344,6 +345,7 @@ trait UpdateHandler
             'updateInlineBotCallbackQuery' => isset($update['game_short_name'])
                 ? new InlineGameQuery($this, $update)
                 : new InlineButtonQuery($this, $update),
+            'updateBotInlineQuery' => new InlineQuery($this, $update),
             default => null
         };
     }
