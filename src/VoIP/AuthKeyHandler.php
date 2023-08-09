@@ -282,6 +282,9 @@ trait AuthKeyHandler
             $this->logger->logger(\sprintf('Saving debug data for call %s...', $call['id']), Logger::VERBOSE);
             $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
         }
+        if (!isset($this->calls[$call['id']])) {
+            return null;
+        }
         $c = $this->calls[$call['id']];
         unset($this->calls[$call['id']]);
         return $c;

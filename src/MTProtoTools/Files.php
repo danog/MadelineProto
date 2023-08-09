@@ -1113,8 +1113,8 @@ trait Files
             if ($offset['part_start_at'] || $offset['part_end_at'] !== $offset['limit']) {
                 $res['bytes'] = \substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
-            if (!$seekable) {
-                $offset['previous_promise'];
+            if (!$seekable && $offset['previous_promise'] instanceof Future) {
+                $offset['previous_promise']->await();
             }
             $len = \strlen($res['bytes']);
             $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);

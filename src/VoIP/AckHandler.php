@@ -22,11 +22,11 @@ use danog\MadelineProto\Logger;
  */
 trait AckHandler
 {
-    private function seqgt($s1, $s2)
+    private function seqgt(int $s1, int $s2): bool
     {
         return $s1 > $s2;
     }
-    public function received_packet($last_ack_id, $packet_seq_no, $ack_mask)
+    public function received_packet(int $last_ack_id, int $packet_seq_no, int $ack_mask): bool
     {
         if ($this->seqgt($packet_seq_no, $this->session_in_seq_no)) {
             $diff = $packet_seq_no - $this->session_in_seq_no;

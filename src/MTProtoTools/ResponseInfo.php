@@ -106,14 +106,14 @@ final class ResponseInfo
         }
         $seek_start = empty($seek_start) ? 0 : \abs(\intval($seek_start));
 
-        if ($range !== '') {
+        /*if ($range !== '') {
             //Safari video streaming fix
             $length = ($seek_end - $seek_start + 1);
             $maxChunkSize = 10 * 1024 ** 2;
             if ($length > $maxChunkSize) {
                 $seek_end = $seek_start + $maxChunkSize - 1;
             }
-        }
+        }*/
 
         $this->serve = $method !== 'HEAD';
         if ($seek_start > 0 || $seek_end < $size - 1) {

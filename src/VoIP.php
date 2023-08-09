@@ -18,7 +18,6 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\Ogg\Ogg;
 use danog\MadelineProto\VoIP\AckHandler;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
@@ -99,11 +98,11 @@ final class VoIP
     const PKT_SWITCH_TO_P2P = 13;
     const PKT_NOP = 14;
 
-    const TLID_DECRYPTED_AUDIO_BLOCK_HEX = 'dbf948c1';
-    const TLID_SIMPLE_AUDIO_BLOCK_HEX = 'cc0d0e76';
+    const TLID_DECRYPTED_AUDIO_BLOCK = "\xc1\xdb\xf9\x48";
+    const TLID_SIMPLE_AUDIO_BLOCK = "\x0d\x0e\x76\xcc";
 
-    const TLID_REFLECTOR_SELF_INFO_HEX = 'c01572c7';
-    const TLID_REFLECTOR_PEER_INFO_HEX = '27D9371C';
+    const TLID_REFLECTOR_SELF_INFO = "\xC7\x72\x15\xc0";
+    const TLID_REFLECTOR_PEER_INFO = "\x1C\x37\xD9\x27";
 
     const PROTO_ID = 'GrVP';
 
@@ -115,21 +114,15 @@ final class VoIP
 
     const CODEC_OPUS = 'SUPO';
 
-    private $TLID_DECRYPTED_AUDIO_BLOCK;
-    private $TLID_SIMPLE_AUDIO_BLOCK;
-    private $TLID_REFLECTOR_SELF_INFO;
-    private $TLID_REFLECTOR_PEER_INFO;
-
     private MTProto $MadelineProto;
-    public MTProto $madeline;
-    public $received_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    public $remote_ack_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    public $session_out_seq_no = 0;
-    public $session_in_seq_no = 0;
-    public $voip_state = 0;
-    public $configuration = ['endpoints' => [], 'shared_config' => []];
-    public $storage = [];
-    public $internalStorage = [];
+    public array $received_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    public array $remote_ack_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    public int $session_out_seq_no = 0;
+    public int $session_in_seq_no = 0;
+    public int $voip_state = 0;
+    public array $configuration = ['endpoints' => [], 'shared_config' => []];
+    public array $storage = [];
+    public array $internalStorage = [];
     private $signal = 0;
     private ?int $callState = null;
     private $callID;
@@ -152,10 +145,17 @@ final class VoIP
      */
     private array $sockets = [];
 
+    private ?Endpoint $bestEndpoint = null;
+
+    private bool $pendingPing = true;
     /**
      * Timeout watcher.
      */
     private ?string $timeoutWatcher = null;
+    /**
+     * Ping watcher.
+     */
+    private ?string $pingWatcher = null;
 
     /**
      * Last incoming timestamp.
@@ -182,7 +182,7 @@ final class VoIP
     public function __sleep(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['sockets'], $vars['timeoutWatcher']);
+        unset($vars['sockets'], $vars['bestEndpoint'], $vars['timeoutWatcher']);
 
         return \array_keys($vars);
     }
@@ -203,13 +203,9 @@ final class VoIP
     {
         $this->creator = $creator;
         $this->otherID = $otherID;
-        $this->madeline = $this->MadelineProto = $MadelineProto;
+        $this->MadelineProto = $MadelineProto;
         $this->callState = $callState;
         $this->packetQueue = new SplQueue;
-        $this->TLID_REFLECTOR_SELF_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_SELF_INFO_HEX));
-        $this->TLID_REFLECTOR_PEER_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_PEER_INFO_HEX));
-        $this->TLID_DECRYPTED_AUDIO_BLOCK = \strrev(\hex2bin(self::TLID_DECRYPTED_AUDIO_BLOCK_HEX));
-        $this->TLID_SIMPLE_AUDIO_BLOCK = \strrev(\hex2bin(self::TLID_SIMPLE_AUDIO_BLOCK_HEX));
     }
 
     /**
@@ -325,20 +321,25 @@ final class VoIP
             $this->authKey->setAuthKey($this->configuration['auth_key']);
 
             foreach ($this->configuration['endpoints'] as $endpoint) {
-                $this->sockets['v6 '.$endpoint['id']] = new Endpoint('['.$endpoint['ipv6'].']', $endpoint['port'], $endpoint['peer_tag'], true, $this);
-                $this->sockets['v4 '.$endpoint['id']] = new Endpoint($endpoint['ip'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
-            }
-            foreach ($this->sockets as $k => $socket) {
                 try {
-                    $socket->connect();
-                } catch (Throwable $e) {
-                    unset($this->sockets[$k]);
+                    $this->sockets['v6 '.$endpoint['id']] = new Endpoint('['.$endpoint['ipv6'].']', $endpoint['port'], $endpoint['peer_tag'], true, $this);
+                } catch (Throwable) {
+                }
+                try {
+                    $this->sockets['v4 '.$endpoint['id']] = new Endpoint($endpoint['ip'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
+                } catch (Throwable) {
                 }
             }
             foreach ($this->sockets as $socket) {
-                $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
+                $socket->write($this->encryptPacket([
+                    '_' => self::PKT_INIT,
+                    'protocol' => self::PROTOCOL_VERSION,
+                    'min_protocol' => self::MIN_PROTOCOL_VERSION,
+                    'audio_streams' => [self::CODEC_OPUS],
+                    'video_streams' => []
+                ], false));
                 EventLoop::queue(function () use ($socket): void {
-                    while ($payload = $this->recv_message($socket)) {
+                    while ($payload = $socket->read()) {
                         $this->lastIncomingTimestamp = \microtime(true);
                         EventLoop::queue($this->handlePacket(...), $socket, $payload);
                     }
@@ -356,12 +357,32 @@ final class VoIP
         switch ($packet['_']) {
             case self::PKT_INIT:
                 //$this->voip_state = self::STATE_WAIT_INIT_ACK;
-                $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $socket);
+                $this->peerVersion = $packet['protocol'];
+                $socket->write(
+                    $this->encryptPacket([
+                        '_' => self::PKT_INIT_ACK,
+                        'protocol' => self::PROTOCOL_VERSION,
+                        'min_protocol' => self::MIN_PROTOCOL_VERSION,
+                        'all_streams' => [
+                            ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]
+                        ]
+                    ])
+                );
 
-                $this->startWriteLoop($socket);
-                break;
+                // no break
             case self::PKT_INIT_ACK:
-                $this->startWriteLoop($socket);
+                if (!$this->bestEndpoint) {
+                    $this->bestEndpoint = $socket;
+                    $this->pingWatcher = EventLoop::delay(1.0, function (): void {
+                        $this->pendingPing = true;
+                        foreach ($this->sockets as $socket) {
+                            //$socket->udpPing();
+                            $packet = $this->encryptPacket(['_' => self::PKT_PING]);
+                            EventLoop::queue(fn () => $socket->write($packet));
+                        }
+                    });
+                    $this->startWriteLoop();
+                }
                 break;
             case self::PKT_STREAM_DATA:
                 $cnt = 1;
@@ -372,19 +393,26 @@ final class VoIP
             case self::PKT_STREAM_DATA_X3:
                 $cnt = 3;
                 break;
-        }
-        if (isset($cnt)) {
+            case self::PKT_PONG:
+                if ($this->pendingPing) {
+                    $this->pendingPing = false;
+                    if ($this->bestEndpoint !== $socket) {
+                        Logger::log("Changing best endpoint from {$this->bestEndpoint} to $socket");
+                        $this->bestEndpoint = $socket;
+                    }
+                }
+                break;
+            default:
+                \var_dump($packet);
         }
     }
     /**
      * Start write loop.
      */
-    private function startWriteLoop(Endpoint $socket): void
+    private function startWriteLoop(): void
     {
-        if ($this->voip_state === self::STATE_ESTABLISHED) {
-            return;
-        }
         $this->voip_state = self::STATE_ESTABLISHED;
+        Logger::log("Call established, sending OPUS data!");
 
         $this->tempHoldFiles = [];
         while (true) {
@@ -399,51 +427,34 @@ final class VoIP
                 $file = \array_shift($this->tempHoldFiles);
             }
             $it = $this->openFile($file);
-            if ($this->MadelineProto->getSettings()->getVoip()->getPreloadAudio()) {
-                while ($it->advance()) {
-                    $this->packetQueue->enqueue($it->getCurrent());
+            foreach ($it->opusPackets as $packet) {
+                $this->packetQueue->enqueue($packet);
+            }
+            $t = \microtime(true) + 0.060;
+            while (!$this->packetQueue->isEmpty()) {
+                $packet = $this->encryptPacket(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp]);
+
+                //Logger::log("Writing {$this->timestamp} in $this!");
+                $diff = $t - \microtime(true);
+                if ($diff > 0) {
+                    delay($diff);
                 }
-                $t = \microtime(true) + 0.060;
-                while (!$this->packetQueue->isEmpty()) {
-                    if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
-                        Logger::log("Exiting VoIP write loop in $this!");
-                        return;
-                    }
+                $this->bestEndpoint->write($packet);
+                $t += 0.060;
 
-                    //Logger::log("Writing {$this->timestamp} in $this!");
-                    delay($t - \microtime(true));
-                    $t = \microtime(true) + 0.060;
-
-                    $this->timestamp += 60;
-                }
-            } else {
-                $t = \microtime(true) + 0.060;
-                while ($it->advance()) {
-                    if (!$this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
-                        Logger::log("Exiting VoIP write loop in $this!");
-                        return;
-                    }
-
-                    //Logger::log("Writing {$this->timestamp} in $this!");
-                    delay($t - \microtime(true));
-                    $t = \microtime(true) + 0.060;
-
-                    $this->timestamp += 60;
-                }
+                $this->timestamp += 60;
             }
         }
     }
     /**
      * Open OGG file for reading.
      */
-    private function openFile(string $file)
+    private function openFile(string $file): Ogg
     {
         $ctx = new ConnectionContext;
         $ctx->addStream(FileBufferedStream::class, openFile($file, 'r'));
         $stream = $ctx->getStream();
-        $ogg = Ogg::init($stream, 60000);
-        $it = $ogg->getEmitter();
-        return $it;
+        return new Ogg($stream);
     }
     /**
      * Play file.
@@ -500,7 +511,7 @@ final class VoIP
      */
     public function setMadeline(MTProto $MadelineProto): void
     {
-        $this->MadelineProto = $this->madeline = $MadelineProto;
+        $this->MadelineProto = $MadelineProto;
     }
 
     /**

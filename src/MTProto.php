@@ -116,7 +116,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 170;
+    const V = 171;
     /**
      * Bad message error codes.
      *
@@ -529,22 +529,11 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->cleanupProperties();
         // Start IPC server
         if (!$this->ipcServer) {
-            try {
-                $this->ipcServer = new Server($this);
-                $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->getSession());
-            } catch (Throwable $e) {
-                $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
-            }
+            $this->ipcServer = new Server($this);
+            $this->ipcServer->setSettings($this->settings->getIpc());
+            $this->ipcServer->setIpcPath($this->wrapper->getSession());
         }
-        try {
-            $this->ipcServer->start();
-        } catch (Throwable $e) {
-            if (Magic::$isIpcWorker) {
-                throw $e;
-            }
-            $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
-        }
+        $this->ipcServer->start();
         // Load rsa keys
         $this->rsa_keys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
