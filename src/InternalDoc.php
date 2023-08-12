@@ -335,8 +335,7 @@ abstract class InternalDoc
     }
     /**
      * Play files on hold in call.
-     *
-     * @param list<string> $files
+     * @param array<string> $files
      */
     public function callPlayOnHold(int $id, array $files): void
     {
@@ -399,13 +398,13 @@ abstract class InternalDoc
     }
     /**
      * Discard call.
+     *
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discardCall(int $id, array $reason = [
-        '_' => 'phoneCallDiscardReasonDisconnect',
-    ], array $rating = [
-    ]): void
+    public function discardCall(int $id, \danog\MadelineProto\VoIP\DiscardReason $reason = \danog\MadelineProto\VoIP\DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
-        $this->wrapper->getAPI()->discardCall($id, $reason, $rating);
+        $this->wrapper->getAPI()->discardCall($id, $reason, $rating, $comment);
     }
     /**
      * Discard secret chat.
@@ -694,6 +693,13 @@ abstract class InternalDoc
     public function getCachedConfig(): array
     {
         return $this->wrapper->getAPI()->getCachedConfig();
+    }
+    /**
+     * Get the call with the specified user ID.
+     */
+    public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
+    {
+        return $this->wrapper->getAPI()->getCallByPeer($userId);
     }
     /**
      * Get call state.

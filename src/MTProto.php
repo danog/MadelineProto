@@ -670,6 +670,7 @@ final class MTProto implements TLCallback, LoggerGetter
             'reportDest',
 
             'calls',
+            'callsByPeer',
             'snitch',
         ];
     }

@@ -19,6 +19,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
@@ -96,23 +97,23 @@ final class VoIPController
 
     private array $call;
 
-    /** @var list<string> */
+    /** @var array<string> */
     private array $holdFiles = [];
     /** @var list<string> */
     private array $inputFiles = [];
+    private int $holdIndex = 0;
 
     /**
      * @var array<Endpoint>
      */
     private array $sockets = [];
-    private ?Endpoint $bestEndpoint = null;
+    private Endpoint $bestEndpoint;
     private bool $pendingPing = true;
     private ?string $timeoutWatcher = null;
     private float $lastIncomingTimestamp = 0.0;
     private float $lastOutgoingTimestamp = 0.0;
     private int $opusTimestamp = 0;
     private SplQueue $packetQueue;
-    private array $tempHoldFiles = [];
 
     /** Auth key */
     private readonly string $authKey;
@@ -134,10 +135,10 @@ final class VoIPController
         $call['_'] = 'inputPhoneCall';
         $this->packetQueue = new SplQueue;
         $this->call = $call;
-        if ($call['_'] === 'phoneCallWaiting') {
-            $this->callState = CallState::INCOMING;
-        } else {
+        if ($this->public->outgoing) {
             $this->callState = CallState::REQUESTED;
+        } else {
+            $this->callState = CallState::INCOMING;
         }
     }
 
@@ -165,7 +166,7 @@ final class VoIPController
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->API->logger->logger(Lang::$current_lang['call_already_declined']);
-                $this->discard(['_' => 'phoneCallDiscardReasonHangup']);
+                $this->discard(DiscardReason::HANGUP);
                 return false;
             }
             throw $e;
@@ -202,6 +203,8 @@ final class VoIPController
         $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
+
+        $this->callState = CallState::ACCEPTED;
         try {
             $this->API->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $this->call['id'], 'access_hash' => $this->call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 92]]);
         } catch (RPCErrorException $e) {
@@ -211,14 +214,12 @@ final class VoIPController
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->API->logger->logger(Lang::$current_lang['call_already_declined']);
-                $this->discard(['_' => 'phoneCallDiscardReasonHangup']);
+                $this->discard(DiscardReason::HANGUP);
                 return $this;
             }
             throw $e;
         }
         $this->call['b'] = $b;
-
-        $this->callState = CallState::ACCEPTED;
 
         return $this;
     }
@@ -236,7 +237,7 @@ final class VoIPController
         }
         $this->API->logger->logger(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
         $dh_config = $this->API->getDhConfig();
-        if (\hash('sha256', $params['g_a_or_b'], true) != $this->call['g_a_hash']) {
+        if (\hash('sha256', (string) $params['g_a_or_b'], true) !== (string) $this->call['g_a_hash']) {
             throw new SecurityException('Invalid g_a!');
         }
         $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
@@ -267,13 +268,11 @@ final class VoIPController
     public function __wakeup(): void
     {
         if ($this->callState === CallState::RUNNING) {
-            $this->lastIncomingTimestamp = microtime(true);
+            $this->lastIncomingTimestamp = \microtime(true);
             $this->startReadLoop();
             if ($this->voipState === VoIPState::ESTABLISHED) {
-                $diff = (int) ((microtime(true) - $this->lastOutgoingTimestamp) * 1000);
-                Logger::log("Missed $diff milliseconds of audio due to script shutdown...");
-                $this->opusTimestamp += $diff;
-                $this->opusTimestamp -= ($this->opusTimestamp) % 60;
+                $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
+                $this->opusTimestamp += $diff - ($diff % 60);
                 EventLoop::queue($this->startWriteLoop(...));
             }
         }
@@ -291,12 +290,17 @@ final class VoIPController
 
     /**
      * Discard call.
+     *
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = []): self
+    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
     {
         if ($this->callState === CallState::ENDED) {
             return $this;
         }
+        $this->API->cleanupCall($this->public->callID);
+
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
             EventLoop::cancel($this->timeoutWatcher);
@@ -306,21 +310,26 @@ final class VoIPController
         foreach ($this->sockets as $socket) {
             $socket->disconnect();
         }
+        $this->packetQueue = new SplQueue;
         Logger::log("Closed all sockets, discarding $this");
 
         $this->API->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
         try {
-            $this->API->methodCallAsyncRead('phone.discardCall', ['peer' => $this->call, 'duration' => \time() - $this->public->date, 'connection_id' => 0, 'reason' => $reason]);
+            $this->API->methodCallAsyncRead('phone.discardCall', ['peer' => $this->call, 'duration' => \time() - $this->public->date, 'connection_id' => 0, 'reason' => ['_' => match ($reason) {
+                DiscardReason::BUSY => 'phoneCallDiscardReasonBusy',
+                DiscardReason::HANGUP => 'phoneCallDiscardReasonHangup',
+                DiscardReason::DISCONNECTED => 'phoneCallDiscardReasonDisconnect',
+                DiscardReason::MISSED => 'phoneCallDiscardReasonMissed'
+            }]]);
         } catch (RPCErrorException $e) {
             if (!\in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'], true)) {
                 throw $e;
             }
         }
-        if (!empty($rating)) {
+        if ($rating !== null) {
             $this->API->logger->logger(\sprintf('Setting rating for call %s...', $this->call), Logger::VERBOSE);
-            $this->API->methodCallAsyncRead('phone.setCallRating', ['peer' => $this->call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
+            $this->API->methodCallAsyncRead('phone.setCallRating', ['peer' => $this->call, 'rating' => $rating, 'comment' => $comment]);
         }
-        $this->API->cleanupCall($this->public->callID);
         $this->callState = CallState::ENDED;
         return $this;
     }
@@ -395,7 +404,7 @@ final class VoIPController
                 break;
 
             case self::PKT_INIT_ACK:
-                if (!$this->bestEndpoint) {
+                if (!isset($this->bestEndpoint)) {
                     $this->bestEndpoint = $socket;
                     $this->startWriteLoop();
                 }
@@ -436,9 +445,29 @@ final class VoIPController
         }
         $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
             if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
-                $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+                $this->discard(DiscardReason::DISCONNECTED);
             }
         });
+    }
+    private bool $muted = false;
+    private bool $playingHold = false;
+    private function pullPacket(): bool
+    {
+        $file = \array_shift($this->inputFiles);
+        if ($file) {
+            $this->playingHold = false;
+        } else {
+            $this->playingHold = true;
+            if (!$this->holdFiles) {
+                return false;
+            }
+            $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
+        }
+        $it = $this->openFile($file);
+        foreach ($it->opusPackets as $packet) {
+            $this->packetQueue->enqueue($packet);
+        }
+        return false;
     }
     /**
      * Start write loop.
@@ -446,42 +475,60 @@ final class VoIPController
     private function startWriteLoop(): void
     {
         $this->voipState = VoIPState::ESTABLISHED;
-        Logger::log("Call established, sending OPUS data!");
+        Logger::log("Call established in $this, sending OPUS data!");
 
-        $this->tempHoldFiles = [];
+        $delay = $this->muted ? 0.2 : 0.06;
+        $t = \microtime(true) + $delay;
         while (true) {
-            if ($this->packetQueue->isEmpty()) {
-                $file = \array_shift($this->inputFiles);
-                if (!$file) {
-                    if (empty($this->tempHoldFiles)) {
-                        $this->tempHoldFiles = $this->holdFiles;
-                    }
-                    if (empty($this->tempHoldFiles)) {
-                        return;
-                    }
-                    $file = \array_shift($this->tempHoldFiles);
+            if ($this->packetQueue->isEmpty() && !$this->pullPacket()) {
+                if (!$this->muted) {
+                    $this->bestEndpoint->writeReliably([
+                        '_' => self::PKT_STREAM_STATE,
+                        'id' => 0,
+                        'enabled' => false
+                    ]);
+                    $this->muted = true;
+                    $delay = 0.2;
                 }
-                $it = $this->openFile($file);
-                foreach ($it->opusPackets as $packet) {
-                    $this->packetQueue->enqueue($packet);
+                $packet = $this->messageHandler->encryptPacket([
+                    '_' => self::PKT_NOP
+                ]);
+            } else {
+                if ($this->muted) {
+                    $this->bestEndpoint->writeReliably([
+                        '_' => self::PKT_STREAM_STATE,
+                        'id' => 0,
+                        'enabled' => true
+                    ]);
+                    $this->muted = false;
+                    $delay = 0.06;
+                    $this->opusTimestamp = 0;
                 }
-            }
-            $t = \microtime(true) + 0.060;
-            while (!$this->packetQueue->isEmpty()) {
-                $packet = $this->messageHandler->encryptPacket(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->opusTimestamp]);
-
-                //Logger::log("Writing {$this->timestamp} in $this!");
-                $cur = \microtime(true);
-                $diff = $t - $cur;
-                if ($diff > 0) {
-                    delay($diff);
-                }
-                $this->bestEndpoint->write($packet);
-                $this->lastOutgoingTimestamp = $cur;
-                $t += 0.060;
-
+                $packet = $this->messageHandler->encryptPacket([
+                    '_' => self::PKT_STREAM_DATA,
+                    'stream_id' => 0,
+                    'data' => $this->packetQueue->dequeue(),
+                    'timestamp' => $this->opusTimestamp
+                ]);
                 $this->opusTimestamp += 60;
             }
+            //Logger::log("Writing {$this->opusTimestamp} in $this!");
+            $cur = \microtime(true);
+            $diff = $t - $cur;
+            if ($diff > 0) {
+                delay($diff);
+            }
+
+            $this->bestEndpoint->write($packet);
+
+            if ($diff > 0) {
+                $cur += $diff;
+            } else {
+                Logger::log("We're late while sending audio data!");
+            }
+            $this->lastOutgoingTimestamp = $cur;
+
+            $t += $delay;
         }
     }
     /**
@@ -500,6 +547,9 @@ final class VoIPController
     public function play(string $file): self
     {
         $this->inputFiles[] = $file;
+        if ($this->playingHold) {
+            $this->packetQueue = new SplQueue;
+        }
 
         return $this;
     }
@@ -509,13 +559,13 @@ final class VoIPController
      */
     public function then(string $file): self
     {
-        $this->inputFiles[] = $file;
-
-        return $this;
+        return $this->play($file);
     }
 
     /**
      * Files to play on hold.
+     *
+     * @param array<string> $files
      */
     public function playOnHold(array $files): self
     {

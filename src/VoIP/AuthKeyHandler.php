@@ -44,6 +44,8 @@ trait AuthKeyHandler
 {
     /** @var array<int, VoIPController> */
     private array $calls = [];
+    /** @var array<int, VoIPController> */
+    private array $callsByPeer = [];
     private array $pendingCalls = [];
     /**
      * Request VoIP call.
@@ -75,6 +77,7 @@ trait AuthKeyHandler
             $res['a'] = $a;
             $res['g_a'] = \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
+            $this->callsByPeer[$controller->public->otherID] = $controller;
             unset($this->pendingCalls[$user]);
             $deferred->complete($controller->public);
         } catch (Throwable $e) {
@@ -124,10 +127,21 @@ trait AuthKeyHandler
 
     /**
      * Discard call.
+     *
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discardCall(int $id, array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = []): void
+    public function discardCall(int $id, DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
-        ($this->calls[$id] ?? null)?->discard($reason, $rating);
+        ($this->calls[$id] ?? null)?->discard($reason, $rating, $comment);
+    }
+
+    /**
+     * Get the call with the specified user ID.
+     */
+    public function getCallByPeer(int $userId): ?VoIP
+    {
+        return $this->callsByPeer[$userId] ?? null;
     }
 
     /**
@@ -140,8 +154,7 @@ trait AuthKeyHandler
 
     /**
      * Play files on hold in call.
-     *
-     * @param list<string> $files
+     * @param array<string> $files
      */
     public function callPlayOnHold(int $id, array $files): void
     {

@@ -257,7 +257,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.declinePasswordReset.html" name="account.declinePasswordReset">Abort a pending 2FA password reset, see here for more info »: account.declinePasswordReset</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.acceptLoginToken.html" name="auth.acceptLoginToken">Accept QR code login token, logging in the app that generated it: auth.acceptLoginToken</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#acceptcall-array-call-bool" name="acceptCall">Accept call: acceptCall</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#acceptcall-int-id-void" name="acceptCall">Accept call: acceptCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#acceptsecretchat-array-params-void" name="acceptSecretChat">Accept secret chat: acceptSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.acceptTermsOfService.html" name="help.acceptTermsOfService">Accept the new terms of service: help.acceptTermsOfService</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.toggleUsername.html" name="bots.toggleUsername">Activate or deactivate a purchased fragment.com username associated to a bot we own: bots.toggleUsername</a>
@@ -326,11 +326,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#closeconnection-string-message-void" name="closeConnection">Close connection with client, connected via web: closeConnection</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#completephonelogin-string-code-mixed" name="completePhoneLogin">Complet user login using login code: completePhoneLogin</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#complete2falogin-string-password-array" name="complete2faLogin">Complete 2FA login: complete2faLogin</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#completecall-array-params-mixed" name="completeCall">Complete call handshake: completeCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#completesignup-string-first_name-string-last_name-array" name="completeSignup">Complete signup to Telegram: completeSignup</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.startHistoryImport.html" name="messages.startHistoryImport">Complete the history import process, importing all messages into the chat.  : messages.startHistoryImport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.confirmPhone.html" name="account.confirmPhone">Confirm a phone number to cancel account deletion, for more info click here »: account.confirmPhone</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#confirmcall-array-params-mixed" name="confirmCall">Confirm call: confirmCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.receivedMessages.html" name="messages.receivedMessages">Confirms receipt of messages by a client, cancels PUSH-notification sending: messages.receivedMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tosupergroup-int-id-int" name="toSupergroup">Convert MTProto channel ID to bot API channel ID: toSupergroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mtprototobotapi-array-data-array" name="MTProtoToBotAPI">Convert MTProto parameters to bot API parameters: MTProtoToBotAPI</a>
@@ -383,7 +381,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.deleteContacts.html" name="contacts.deleteContacts">Deletes several contacts from the list: contacts.deleteContacts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.unblock.html" name="contacts.unblock">Deletes the user from the blacklist: contacts.unblock</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deactivateAllUsernames.html" name="channels.deactivateAllUsernames">Disable all purchased usernames of a supergroup or channel: channels.deactivateAllUsernames</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#discardcall-array-call-array-reason-array-rating-bool-need_debug-true-danog-madelineproto-voip" name="discardCall">Discard call: discardCall</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#discardcall-int-id-danog-madelineproto-voip-discardreason-reason-danog-madelineproto-voip-discardreason-hangup-int-1-5-rating-null-string-comment-null-void" name="discardCall">Discard call: discardCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#discardsecretchat-int-chat-void" name="discardSecretChat">Discard secret chat: discardSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.dismissSuggestion.html" name="help.dismissSuggestion">Dismiss a suggestion, see here for more info »: help.dismissSuggestion</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/chatlists.hideChatlistUpdates.html" name="chatlists.hideChatlistUpdates">Dismiss new pending peers recently added to a chat folder deep link »: chatlists.hideChatlistUpdates</a>
@@ -471,8 +469,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAutoSaveSettings.html" name="account.getAutoSaveSettings">Get autosave settings: account.getAutoSaveSettings</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getconfig-array-config-array" name="getConfig">Get cached (or eventually re-fetch) server-side config: getConfig</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcachedconfig-array" name="getCachedConfig">Get cached server-side config: getCachedConfig</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcall-int-call-array" name="getCall">Get call info: getCall</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callstatus-int-id-int" name="callStatus">Get call status: callStatus</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcallstate-int-id-danog-madelineproto-voip-callstate" name="getCallState">Get call state: getCallState</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callstatus-int-id-danog-madelineproto-voip-callstate" name="callStatus">Get call status: callStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiKeywordsDifference.html" name="messages.getEmojiKeywordsDifference">Get changed emoji keywords »: messages.getEmojiKeywordsDifference</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getAppChangelog.html" name="help.getAppChangelog">Get changelog of current app.  : help.getAppChangelog</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastStats.html" name="stats.getBroadcastStats">Get channel statistics: stats.getBroadcastStats</a>
@@ -699,6 +697,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updatePinnedMessage.html" name="messages.updatePinnedMessage">Pin a message: messages.updatePinnedMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updatePinnedForumTopic.html" name="channels.updatePinnedForumTopic">Pin or unpin forum topics: channels.updatePinnedForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleDialogPin.html" name="messages.toggleDialogPin">Pin/unpin a dialog: messages.toggleDialogPin</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplay-int-id-string-file-void" name="callPlay">Play file in call: callPlay</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplayonhold-int-id-string-files-void" name="callPlayOnHold">Play files on hold in call: callPlayOnHold</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getMessages.html" name="channels.getMessages">Please use the event handler: channels.getMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getHistory.html" name="messages.getHistory">Please use the event handler: messages.getHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessages.html" name="messages.getMessages">Please use the event handler: messages.getMessages</a>

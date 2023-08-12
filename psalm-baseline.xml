@@ -747,9 +747,7 @@
       <code>MTProtoToTdcli</code>
       <code>all</code>
       <code>any</code>
-      <code>completeCall</code>
       <code>completePhoneLogin</code>
-      <code>confirmCall</code>
       <code>downloadToCallable</code>
       <code>downloadToDir</code>
       <code>downloadToStream</code>
@@ -1276,7 +1274,6 @@
     <PossiblyNullReference>
       <code>logger</code>
       <code>start</code>
-      <code>start</code>
     </PossiblyNullReference>
     <PropertyNotSetInConstructor>
       <code>$channelParticipants</code>
@@ -1300,6 +1297,7 @@
     <RedundantCondition>
       <code><![CDATA[$this->minDatabase?->sync()]]></code>
       <code><![CDATA[isset($this->wrapper) && $this->isInited()]]></code>
+      <code><![CDATA[isset($this->wrapper) && isset(self::$references[$this->getSessionName()])]]></code>
     </RedundantCondition>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->authorized === API::LOGGED_IN && \is_int($dc_id)]]></code>
@@ -2009,39 +2007,6 @@
       <code>$stream</code>
     </MissingPropertyType>
   </file>
-  <file src="src/Stream/Ogg/Ogg.php">
-    <MismatchingDocblockReturnType>
-      <code><![CDATA[iterable<string>]]></code>
-    </MismatchingDocblockReturnType>
-    <PossiblyInvalidArgument>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$size</code>
-    </PossiblyInvalidArgument>
-    <PossiblyInvalidPropertyAssignmentValue>
-      <code><![CDATA[$this->currentDuration += $frameDuration]]></code>
-      <code><![CDATA[$this->currentDuration += $totalDuration]]></code>
-    </PossiblyInvalidPropertyAssignmentValue>
-    <PropertyNotSetInConstructor>
-      <code>$emitter</code>
-      <code>$packFormat</code>
-      <code>$stream</code>
-      <code>$streamCount</code>
-    </PropertyNotSetInConstructor>
-    <PropertyTypeCoercion>
-      <code><![CDATA[$stream->getReadBuffer($l)]]></code>
-    </PropertyTypeCoercion>
-    <ReferenceConstraintViolation>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-    </ReferenceConstraintViolation>
-  </file>
   <file src="src/Stream/Proxy/HttpProxy.php">
     <MissingConstructor>
       <code>$stream</code>
@@ -2341,97 +2306,60 @@
     </UnsupportedReferenceUsage>
   </file>
   <file src="src/VoIP.php">
-    <ArgumentTypeCoercion>
-      <code>$stream</code>
-    </ArgumentTypeCoercion>
-    <MissingPropertyType>
-      <code>$TLID_DECRYPTED_AUDIO_BLOCK</code>
-      <code>$TLID_REFLECTOR_PEER_INFO</code>
-      <code>$TLID_REFLECTOR_SELF_INFO</code>
-      <code>$TLID_SIMPLE_AUDIO_BLOCK</code>
-      <code>$callID</code>
-      <code>$configuration</code>
-      <code>$creatorID</code>
-      <code>$holdFiles</code>
-      <code>$inputFiles</code>
-      <code>$internalStorage</code>
-      <code>$isPlaying</code>
-      <code>$otherID</code>
-      <code>$outputFile</code>
-      <code>$protocol</code>
-      <code>$received_timestamp_map</code>
-      <code>$remote_ack_timestamp_map</code>
-      <code>$session_in_seq_no</code>
-      <code>$session_out_seq_no</code>
-      <code>$signal</code>
-      <code>$storage</code>
-      <code>$visualization</code>
-      <code>$voip_state</code>
-    </MissingPropertyType>
-    <MissingReturnType>
-      <code>openFile</code>
-    </MissingReturnType>
-    <PropertyNotSetInConstructor>
-      <code>$authKey</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/VoIP/AckHandler.php">
-    <MissingParamType>
-      <code>$ack_mask</code>
-      <code>$last_ack_id</code>
-      <code>$packet_seq_no</code>
-      <code>$s1</code>
-      <code>$s2</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>received_packet</code>
-      <code>seqgt</code>
-    </MissingReturnType>
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$API->getSelf()['id']]]></code>
+    </PossiblyInvalidArrayAccess>
   </file>
   <file src="src/VoIP/AuthKeyHandler.php">
-    <MissingClosureParamType>
-      <code>$controller</code>
-      <code>$id</code>
-    </MissingClosureParamType>
     <MissingReturnType>
-      <code>completeCall</code>
-      <code>confirmCall</code>
       <code>requestCall</code>
     </MissingReturnType>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$user['user_id']]]></code>
-    </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/VoIP/Endpoint.php">
-    <MissingReturnType>
-      <code>read</code>
-    </MissingReturnType>
+    <MissingParamType>
+      <code>$stream</code>
+    </MissingParamType>
+    <PossiblyInvalidArrayOffset>
+      <code><![CDATA[$result[$x]['data']]]></code>
+      <code><![CDATA[$result[$x]['data']]]></code>
+      <code><![CDATA[$result[$x]['has_more_flags']]]></code>
+      <code><![CDATA[$result[$x]['has_more_flags']]]></code>
+      <code><![CDATA[$result[$x]['stream_id']]]></code>
+      <code><![CDATA[$result[$x]['stream_id']]]></code>
+      <code><![CDATA[$result[$x]['timestamp']]]></code>
+      <code><![CDATA[$result[$x]['timestamp']]]></code>
+    </PossiblyInvalidArrayOffset>
     <PossiblyNullReference>
       <code>read</code>
     </PossiblyNullReference>
-  </file>
-  <file src="src/VoIP/MessageHandler.php">
-    <MissingParamType>
-      <code>$args</code>
-      <code>$datacenter</code>
-      <code>$object</code>
-      <code>$stream</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>pack_string</code>
-      <code>recv_message</code>
-      <code>send_message</code>
-      <code>unpack_string</code>
-    </MissingReturnType>
     <PossiblyUndefinedVariable>
       <code>$ack_mask</code>
-      <code>$in_seq_no</code>
       <code>$out_seq_no</code>
     </PossiblyUndefinedVariable>
+  </file>
+  <file src="src/VoIPController.php">
+    <ArgumentTypeCoercion>
+      <code>$stream</code>
+    </ArgumentTypeCoercion>
+    <InaccessibleProperty>
+      <code><![CDATA[$this->authKey]]></code>
+      <code><![CDATA[$this->authKey]]></code>
+    </InaccessibleProperty>
+    <InvalidArgument>
+      <code><![CDATA[$this->call]]></code>
+    </InvalidArgument>
+    <InvalidPropertyAssignmentValue>
+      <code>$visualization</code>
+      <code>$visualization</code>
+    </InvalidPropertyAssignmentValue>
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$this->call['g_a']]]></code>
+    </PossiblyUndefinedArrayOffset>
+    <PropertyNotSetInConstructor>
+      <code>$authKey</code>
+      <code>$bestEndpoint</code>
+      <code>$messageHandler</code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Wrappers/DialogHandler.php">
     <InvalidReturnType>

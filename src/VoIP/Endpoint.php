@@ -12,6 +12,7 @@ use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIPController;
 use Exception;
 
+use function Amp\delay;
 use function Amp\Socket\connect;
 
 final class Endpoint
@@ -42,7 +43,7 @@ final class Endpoint
     {
         $vars = \get_object_vars($this);
         unset($vars['socket']);
-        return array_keys($vars);
+        return \array_keys($vars);
     }
 
     public function __toString(): string
@@ -104,6 +105,7 @@ final class Endpoint
                 }
                 $pos = 16;
             }
+            $result = [];
             if (\fread($payload, 12) === "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF") {
                 switch ($crc = \fread($payload, 4)) {
                     case VoIPController::TLID_REFLECTOR_SELF_INFO:
@@ -222,7 +224,7 @@ final class Endpoint
                         continue 2;
                     }
             }
-            if (!$this->handler->shouldSkip($in_seq_no, $out_seq_no, $ack_mask)) {
+            if (isset($in_seq_no) && isset($out_seq_no) && !$this->handler->shouldSkip($in_seq_no, $out_seq_no, $ack_mask)) {
                 continue;
             }
             switch ($result['_']) {
@@ -329,6 +331,20 @@ final class Endpoint
                     continue 2;
             }
             return $result;
+        } while (true);
+    }
+    public function writeReliably(array $data): bool
+    {
+        do {
+            $payload = $this->handler->encryptPacket($data);
+            $seqno = $this->handler->getLastSentSeq();
+            if (!$this->write($payload)) {
+                return false;
+            }
+            delay(0.2);
+            if ($this->handler->acked($seqno)) {
+                return true;
+            }
         } while (true);
     }
     /**

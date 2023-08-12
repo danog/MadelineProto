@@ -15,10 +15,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\VoIP\DiscardReason;
 
-final class VoIP extends Update
+final class VoIP extends Update implements SimpleFilters
 {
     /** Phone call ID */
     public readonly int $callID;
@@ -26,8 +28,6 @@ final class VoIP extends Update
     public readonly bool $outgoing;
     /** ID of the other user in the call */
     public readonly int $otherID;
-    /** ID of the creator of the call */
-    public readonly int $creatorID;
     /** When was the call created */
     public readonly int $date;
 
@@ -44,14 +44,12 @@ final class VoIP extends Update
         $call['_'] = 'inputPhoneCall';
         $this->date = $call['date'];
         $this->callID = $call['id'];
-        if ($call['_'] === 'phoneCallWaiting') {
-            $this->outgoing = false;
-            $this->otherID = $call['participant_id'];
-            $this->creatorID = $call['admin_id'];
-        } else {
+        if ($call['admin_id'] === $API->getSelf()['id']) {
             $this->outgoing = true;
+            $this->otherID = $call['participant_id'];
+        } else {
+            $this->outgoing = false;
             $this->otherID = $call['admin_id'];
-            $this->creatorID = $call['participant_id'];
         }
     }
 
@@ -65,10 +63,13 @@ final class VoIP extends Update
     }
     /**
      * Discard call.
+     *
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = []): self
+    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
     {
-        $this->getClient()->discardCall($this->callID, $reason, $rating);
+        $this->getClient()->discardCall($this->callID, $reason, $rating, $comment);
         return $this;
     }
 
@@ -104,6 +105,7 @@ final class VoIP extends Update
 
     /**
      * Files to play on hold.
+     * @param array<string> $files
      */
     public function playOnHold(array $files): self
     {

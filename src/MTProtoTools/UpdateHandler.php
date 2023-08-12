@@ -57,7 +57,6 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
-use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
@@ -753,14 +752,16 @@ trait UpdateHandler
         if ($update['_'] === 'updatePhoneCall') {
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
-                    return;
-                    /*if (!isset($this->calls[$update['phone_call']['id']])) {
-                        $update['phone_call'] = $this->calls[$update['phone_call']['id']] = new VoIP(
-                            $this,
-                            $update['phone_call'],
-                        );
+                    if (isset($this->calls[$update['phone_call']['id']])) {
+                        return;
                     }
-                    break;*/
+                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
+                        $this,
+                        $update['phone_call'],
+                    );
+                    $this->callsByPeer[$controller->public->otherID] = $controller;
+                    $update['phone_call'] = $controller->public;
+                    break;
                 case 'phoneCallWaiting':
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
@@ -769,6 +770,7 @@ trait UpdateHandler
                         $this,
                         $update['phone_call']
                     );
+                    $this->callsByPeer[$controller->public->otherID] = $controller;
                     $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallAccepted':
