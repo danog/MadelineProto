@@ -59,6 +59,7 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
+use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -293,10 +294,6 @@ final class MTProto implements TLCallback, LoggerGetter
      * Config loop.
      */
     public ?PeriodicLoopInternal $configLoop = null;
-    /**
-     * Call checker loop.
-     */
-    private ?PeriodicLoopInternal $callCheckerLoop = null;
     /**
      * Autoserialization loop.
      */
@@ -820,7 +817,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function startLoops(): void
     {
-        $this->callCheckerLoop ??= new PeriodicLoopInternal($this, $this->checkCalls(...), 'call check', 10);
         $this->serializeLoop ??= new PeriodicLoopInternal($this, $this->serialize(...), 'serialize', $this->settings->getSerialization()->getInterval());
         $this->phoneConfigLoop ??= new PeriodicLoopInternal($this, $this->getPhoneConfig(...), 'phone config', 3600);
         $this->configLoop ??= new PeriodicLoopInternal($this, $this->getConfig(...), 'config', 3600);
@@ -834,7 +830,6 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
         }
-        $this->callCheckerLoop->start();
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
@@ -852,10 +847,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function stopLoops(): void
     {
-        if ($this->callCheckerLoop) {
-            $this->callCheckerLoop->stop();
-            $this->callCheckerLoop = null;
-        }
         if ($this->serializeLoop) {
             $this->serializeLoop->stop();
             $this->serializeLoop = null;
@@ -1005,18 +996,6 @@ final class MTProto implements TLCallback, LoggerGetter
             }
 
             $this->TL->updateCallbacks($callbacks);
-
-            // Clean up phone call array
-            foreach ($this->calls as $id => $controller) {
-                if (!\is_object($controller)) {
-                    unset($this->calls[$id]);
-                } elseif ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
-                    $controller->setMadeline($this);
-                    $controller->discard();
-                } else {
-                    $controller->setMadeline($this);
-                }
-            }
 
             $this->settings->getConnection()->init();
             // Setup logger

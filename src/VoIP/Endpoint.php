@@ -5,66 +5,47 @@ declare(strict_types=1);
 namespace danog\MadelineProto\VoIP;
 
 use Amp\Socket\Socket;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
+use Exception;
 
 use function Amp\Socket\connect;
 
 final class Endpoint
 {
     /**
-     * IP address.
-     */
-    private string $ip;
-    /**
-     * Port.
-     */
-    private int $port;
-    /**
-     * Peer tag.
-     */
-    private string $peerTag;
-
-    /**
-     * Whether we're a reflector.
-     */
-    private bool $reflector;
-
-    /**
-     * Call instance.
-     */
-    private VoIP $instance;
-    /**
      * The socket.
      */
     private ?Socket $socket = null;
-
-    /**
-     * Whether we're the creator.
-     */
-    private bool $creator;
-
-    /**
-     * The auth key.
-     */
-    private PermAuthKey $authKey;
-
     /**
      * Create endpoint.
      */
-    public function __construct(string $ip, int $port, string $peerTag, bool $reflector, VoIP $instance)
+    public function __construct(
+        private readonly string $ip,
+        private readonly int $port,
+        private readonly string $peerTag,
+        private readonly bool $reflector,
+        private readonly bool $creator,
+        private readonly string $authKey,
+        private readonly string $callID,
+        private readonly MessageHandler $handler
+    )
     {
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->peerTag = $peerTag;
-        $this->reflector = $reflector;
-        $this->instance = $instance;
-        $this->creator = $instance->isCreator();
-        $this->authKey = $instance->getAuthKey();
         $this->socket = connect("udp://{$this->ip}:{$this->port}");
+    }
+    public function __wakeup()
+    {
+        $this->socket = connect("udp://{$this->ip}:{$this->port}");
+    }
+    public function __sleep(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['socket']);
+        return $vars;
     }
 
     public function __toString(): string
@@ -109,21 +90,21 @@ final class Endpoint
      */
     public function read(): ?array
     {
-        $packet = $this->socket->read();
-        if ($packet === null) {
-            return null;
-        }
-
         do {
+            $packet = $this->socket->read();
+            if ($packet === null) {
+                return null;
+            }
+    
             $payload = \fopen('php://memory', 'rw+b');
             \fwrite($payload, $packet);
             \fseek($payload, 0);
             $pos = 0;
-            if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
-                /*if (\fread($payload, 16) !== $this->peerTag) {
+            if ($this->handler->peerVersion < 9 || $this->reflector) {
+                if (\fread($payload, 16) !== $this->peerTag) {
                     Logger::log('Received packet has wrong peer tag', Logger::ERROR);
                     continue;
-                }*/
+                }
                 $pos = 16;
             }
             if (\fread($payload, 12) === "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF") {
@@ -149,11 +130,11 @@ final class Endpoint
             } else {
                 fseek($payload, $pos);
                 $message_key = \fread($payload, 16);
-                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey->getAuthKey(), !$this->creator);
+                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
                 $encrypted_data = \stream_get_contents($payload);
                 $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
-                if ($message_key != \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
+                if ($message_key != \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
                     Logger::log('msg_key mismatch!', Logger::ERROR);
                     continue;
                 }
@@ -177,7 +158,7 @@ final class Endpoint
                     $flags = \unpack('V', \stream_get_contents($payload, 4))[1];
                     $result['_'] = $flags >> 24;
                     if ($flags & 4) {
-                        if (\stream_get_contents($payload, 16) !== $this->instance->configuration['call_id']) {
+                        if (\stream_get_contents($payload, 16) !== $this->callID) {
                             Logger::log('Call ID mismatch', Logger::ERROR);
                             continue 2;
                         }
@@ -220,8 +201,8 @@ final class Endpoint
 
                     break;
                 default:
-                    if ($this->instance->getPeerVersion() >= 8 || (!$this->instance->getPeerVersion())) {
-                        \fseek($payload, -4, SEEK_CUR);
+                    if ($this->handler->peerVersion >= 8 || (!$this->handler->peerVersion)) {
+                        \fseek($payload, 0);
                         $result['_'] = \ord(\stream_get_contents($payload, 1));
                         $in_seq_no = \unpack('V', \stream_get_contents($payload, 4))[1];
                         $out_seq_no = \unpack('V', \stream_get_contents($payload, 4))[1];
@@ -244,8 +225,8 @@ final class Endpoint
                         continue 2;
                     }
             }
-            if (!$this->instance->received_packet($in_seq_no, $out_seq_no, $ack_mask)) {
-                return $this->read();
+            if (!$this->handler->shouldSkip($in_seq_no, $out_seq_no, $ack_mask)) {
+                continue;
             }
             switch ($result['_']) {
                 // streamTypeSimple codec:int8 = StreamType;
@@ -261,6 +242,7 @@ final class Endpoint
                     for ($x = 0; $x < $length; $x++) {
                         $result['audio_streams'][$x] = \stream_get_contents($message, 4);
                     }
+                    $this->handler->peerVersion = $result['protocol'];
                     break;
                     // streamType id:int8 type:int8 codec:int8 frame_duration:int16 enabled:int8 = StreamType;
                     //
@@ -296,10 +278,11 @@ final class Endpoint
                     $result['timestamp'] = \unpack('V', \stream_get_contents($message, 4))[1];
                     $result['data'] = \stream_get_contents($message, $length);
                     break;
-                    /*case \danog\MadelineProto\VoIP::PKT_UPDATE_STREAMS:
-                        break;
-                    case \danog\MadelineProto\VoIP::PKT_PING:
-                        break;*/
+                case \danog\MadelineProto\VoIP::PKT_UPDATE_STREAMS:
+                    continue 2;
+                case \danog\MadelineProto\VoIP::PKT_PING:
+                    $result['out_seq_no'] = $out_seq_no;
+                    break;
                 case VoIP::PKT_PONG:
                     if (\fstat($payload)['size'] - \ftell($payload)) {
                         $result['out_seq_no'] = \unpack('V', \stream_get_contents($payload, 4))[1];
@@ -365,11 +348,11 @@ final class Endpoint
             $padding += 16;
         }
         $plaintext .= Tools::random($padding);
-        $message_key = \substr(\hash('sha256', \substr($this->authKey->getAuthKey(), 88 + ($this->creator ? 0 : 8), 32).$plaintext, true), 8, 16);
-        [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey->getAuthKey(), $this->creator);
+        $message_key = \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 0 : 8), 32).$plaintext, true), 8, 16);
+        [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, $this->creator);
         $payload = $message_key.Crypt::igeEncrypt($plaintext, $aes_key, $aes_iv);
 
-        if ($this->instance->getPeerVersion() < 9 || $this->reflector) {
+        if ($this->handler->peerVersion < 9 || $this->reflector) {
             $payload = $this->peerTag.$payload;
         }
 
@@ -383,12 +366,5 @@ final class Endpoint
         }
         $this->socket->write($this->peerTag.Tools::packSignedLong(-1).Tools::packSignedInt(-1).Tools::packSignedInt(-2).Tools::random(8));
         return true;
-    }
-    /**
-     * Get peer tag.
-     */
-    public function getPeerTag(): string
-    {
-        return $this->peerTag;
     }
 }

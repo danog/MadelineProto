@@ -58,6 +58,7 @@ use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
+use danog\MadelineProto\VoIP\CallState;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -344,6 +345,7 @@ trait UpdateHandler
             'updateInlineBotCallbackQuery' => isset($update['game_short_name'])
                 ? new InlineGameQuery($this, $update)
                 : new InlineButtonQuery($this, $update),
+            'updatePhoneCall' => $update['phone_call'],
             default => null
         };
     }
@@ -749,38 +751,47 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
-            if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-                $this->logger->logger('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', Logger::WARNING);
-                return;
-            }
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
+                    return;
+                    /*if (!isset($this->calls[$update['phone_call']['id']])) {
+                        $update['phone_call'] = $this->calls[$update['phone_call']['id']] = new VoIP(
+                            $this,
+                            $update['phone_call'],
+                        );
+                    }
+                    break;*/
+                case 'phoneCallWaiting':
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $controller = new VoIP(false, $update['phone_call']['admin_id'], $this, VoIP::CALL_STATE_INCOMING);
-                    $controller->setCall($update['phone_call']);
-                    $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
-                    $controller->storage['video'] = $update['phone_call']['video'] ?? false;
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
+                    $update['phone_call'] = $this->calls[$update['phone_call']['id']] = new VoIP(
+                        $this,
+                        $update['phone_call']
+                    );
                     break;
                 case 'phoneCallAccepted':
-                    if (!($this->confirmCall($update['phone_call']))) {
+                    if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']];
+                    $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->confirm($update['phone_call']);
+                    $update['phone_call'] = $controller;
                     break;
                 case 'phoneCall':
-                    if (!($this->completeCall($update['phone_call']))) {
+                    if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']];
+                    $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->complete($update['phone_call']);
+                    $update['phone_call'] = $controller;
                     break;
                 case 'phoneCallDiscarded':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    $update['phone_call'] = $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->discard();
                     break;
             }
         }

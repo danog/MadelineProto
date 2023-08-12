@@ -40,6 +40,7 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
+use danog\MadelineProto\VoIP;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -55,6 +56,9 @@ if (class_exists(API::class)) {
 }
 /**
  * Event handler class.
+ *
+ * NOTE: ALL of the following methods are OPTIONAL.
+ * You can even provide an empty event handler if you want.
  *
  * All properties returned by __sleep are automatically stored in the database.
  */
@@ -228,7 +232,7 @@ class MyEventHandler extends SimpleEventHandler
         $message->reply($args[0] ?? '');
     }
 
-    #[FilterRegex('/.*(mt?proto).*/i')]
+    #[FilterRegex('/.*(mt?proto)[^.]?.*/i')]
     public function testRegex(Incoming & Message $message): void
     {
         $message->reply("Did you mean to write MadelineProto instead of ".$message->matches[1].'?');
@@ -286,6 +290,18 @@ class MyEventHandler extends SimpleEventHandler
             return;
         }
         $reply->reply("Download link: ".$reply->media->getDownloadLink());
+    }
+
+    #[FilterCommand('call')]
+    public function callVoip(Incoming&Message $message): void
+    {
+        $this->requestCall($message->senderId)->play(__DIR__.'/../music.ogg');
+    }
+
+    #[Handler]
+    public function handleIncomingCall(VoIP $call): void
+    {
+        $call->accept()->play(__DIR__.'/../music.ogg');
     }
 
     public static function getPluginPaths(): string|array|null

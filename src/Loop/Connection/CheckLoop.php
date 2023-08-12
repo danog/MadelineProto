@@ -126,6 +126,7 @@ final class CheckLoop extends Loop
                 $list = '';
                 // Don't edit this here pls
                 foreach ($message_ids as $message_id) {
+                    if (!isset($this->connection->outgoing_messages[$message_id])) continue;
                     $list .= $this->connection->outgoing_messages[$message_id]->getConstructor().', ';
                 }
                 $this->logger->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);

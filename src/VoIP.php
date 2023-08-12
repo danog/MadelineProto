@@ -15,41 +15,28 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
+use AssertionError;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\VoIP\AckHandler;
+use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
+use danog\MadelineProto\VoIP\VoIPState;
+use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use function Amp\delay;
 use function Amp\File\openFile;
 
-if (\extension_loaded('php-libtgvoip')) {
-    return;
-}
-
-final class VoIP
+final class VoIP extends Update
 {
-    use MessageHandler;
-    use AckHandler;
-
-    const PHP_LIBTGVOIP_VERSION = '1.5.0';
-    const STATE_CREATED = 0;
-    const STATE_WAIT_INIT = 1;
-    const STATE_WAIT_INIT_ACK = 2;
-    const STATE_ESTABLISHED = 3;
-    const STATE_FAILED = 4;
-    const STATE_RECONNECTING = 5;
-
-    const TGVOIP_ERROR_UNKNOWN = 0;
-    const TGVOIP_ERROR_INCOMPATIBLE = 1;
-    const TGVOIP_ERROR_TIMEOUT = 2;
-    const TGVOIP_ERROR_AUDIO_IO = 3;
-
     const NET_TYPE_UNKNOWN = 0;
     const NET_TYPE_GPRS = 1;
     const NET_TYPE_EDGE = 2;
@@ -75,194 +62,276 @@ final class VoIP
     const AUDIO_STATE_CONFIGURED = 1;
     const AUDIO_STATE_RUNNING = 2;
 
-    const CALL_STATE_NONE = -1;
-    const CALL_STATE_REQUESTED = 0;
-    const CALL_STATE_INCOMING = 1;
-    const CALL_STATE_ACCEPTED = 2;
-    const CALL_STATE_CONFIRMED = 3;
-    const CALL_STATE_READY = 4;
-    const CALL_STATE_ENDED = 5;
-
+    /** @internal */
     const PKT_INIT = 1;
+    /** @internal */
     const PKT_INIT_ACK = 2;
+    /** @internal */
     const PKT_STREAM_STATE = 3;
+    /** @internal */
     const PKT_STREAM_DATA = 4;
+    /** @internal */
     const PKT_UPDATE_STREAMS = 5;
+    /** @internal */
     const PKT_PING = 6;
+    /** @internal */
     const PKT_PONG = 7;
+    /** @internal */
     const PKT_STREAM_DATA_X2 = 8;
+    /** @internal */
     const PKT_STREAM_DATA_X3 = 9;
+    /** @internal */
     const PKT_LAN_ENDPOINT = 10;
+    /** @internal */
     const PKT_NETWORK_CHANGED = 11;
+    /** @internal */
     const PKT_SWITCH_PREF_RELAY = 12;
+    /** @internal */
     const PKT_SWITCH_TO_P2P = 13;
+    /** @internal */
     const PKT_NOP = 14;
 
+    /** @internal */
     const TLID_DECRYPTED_AUDIO_BLOCK = "\xc1\xdb\xf9\x48";
+    /** @internal */
     const TLID_SIMPLE_AUDIO_BLOCK = "\x0d\x0e\x76\xcc";
 
+    /** @internal */
     const TLID_REFLECTOR_SELF_INFO = "\xC7\x72\x15\xc0";
+    /** @internal */
     const TLID_REFLECTOR_PEER_INFO = "\x1C\x37\xD9\x27";
 
+    /** @internal */
     const PROTO_ID = 'GrVP';
 
+    /** @internal */
     const PROTOCOL_VERSION = 9;
+    /** @internal */
     const MIN_PROTOCOL_VERSION = 9;
 
+    /** @internal */
     const STREAM_TYPE_AUDIO = 1;
+    /** @internal */
     const STREAM_TYPE_VIDEO = 2;
 
+    /** @internal */
     const CODEC_OPUS = 'SUPO';
 
-    private MTProto $MadelineProto;
-    public array $received_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    public array $remote_ack_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    public int $session_out_seq_no = 0;
-    public int $session_in_seq_no = 0;
-    public int $voip_state = 0;
-    public array $configuration = ['endpoints' => [], 'shared_config' => []];
-    public array $storage = [];
-    public array $internalStorage = [];
-    private $signal = 0;
-    private ?int $callState = null;
-    private $callID;
-    private $creatorID;
-    private $otherID;
-    private $protocol;
-    private $visualization;
-    private $holdFiles = [];
-    private $inputFiles = [];
-    private $outputFile;
-    private $isPlaying = false;
+    protected MessageHandler $messageHandler;
+    protected VoIPState $voipState = VoIPState::CREATED;
+    protected CallState $callState;
 
-    private bool $creator;
+    protected readonly array $call;
 
-    private PermAuthKey $authKey;
-    private int $peerVersion = 0;
+    /** @var list<string> */
+    protected array $holdFiles = [];
+    /** @var list<string> */
+    protected array $inputFiles = [];
 
     /**
      * @var array<Endpoint>
      */
-    private array $sockets = [];
+    protected array $sockets = [];
+    protected ?Endpoint $bestEndpoint = null;
+    protected bool $pendingPing = true;
+    protected ?string $timeoutWatcher = null;
+    protected ?string $pingWatcher = null;
+    protected float $lastIncomingTimestamp = 0.0;
+    protected int $opusTimestamp = 0;
+    protected SplQueue $packetQueue;
+    protected array $tempHoldFiles = [];
 
-    private ?Endpoint $bestEndpoint = null;
+    /** Auth key */
+    protected readonly string $authKey;
+    /** Protocol call ID */
+    protected readonly string $protocolCallID;
 
-    private bool $pendingPing = true;
-    /**
-     * Timeout watcher.
-     */
-    private ?string $timeoutWatcher = null;
-    /**
-     * Ping watcher.
-     */
-    private ?string $pingWatcher = null;
+    /** Phone call ID */
+    public readonly int $callID;
+    /** Whether the call is an outgoing call */
+    public readonly bool $outgoing;
+    /** ID of the other user in the call */
+    public readonly int $otherID;
+    /** ID of the creator of the call */
+    public readonly int $creatorID;
+    /** When was the call created */
+    public readonly int $date;
+    /** @var ?list{string, string, string, string} */
+    protected ?array $visualization = null;
 
     /**
-     * Last incoming timestamp.
-     *
+     * Constructor.
+     * 
+     * @internal
      */
-    private float $lastIncomingTimestamp = 0.0;
-    /**
-     * The outgoing timestamp.
-     *
-     */
-    private int $timestamp = 0;
-    /**
-     * Packet queue.
-     *
-     */
-    private SplQueue $packetQueue;
-    /**
-     * Temporary holdfile array.
-     */
-    private array $tempHoldFiles = [];
-    /**
-     * Sleep function.
-     */
-    public function __sleep(): array
+    public function __construct(
+        protected readonly MTProto $API,
+        array $call
+    )
     {
-        $vars = \get_object_vars($this);
-        unset($vars['sockets'], $vars['bestEndpoint'], $vars['timeoutWatcher']);
+        $call['_'] = 'inputPhoneCall';
+        $this->packetQueue = new SplQueue;
+        $this->call = $call;
+        $this->date = $call['date'];
+        $this->callID = $call['id'];
+        if ($call['_'] === 'phoneCallWaiting') {
+            $this->outgoing = false;
+            $this->otherID = $call['participant_id'];
+            $this->creatorID = $call['admin_id'];
+            $this->callState = CallState::INCOMING;
+        } else {
+            $this->outgoing = true;
+            $this->otherID = $call['admin_id'];
+            $this->creatorID = $call['participant_id'];
+            $this->callState = CallState::REQUESTED;
+        }
+    }
 
-        return \array_keys($vars);
+    /**
+     * Confirm requested call.
+     * @internal
+     */
+    public function confirm(array $params): bool
+    {
+        if ($this->callState !== CallState::REQUESTED) {
+            $this->API->logger->logger(\sprintf(Lang::$current_lang['call_error_2'], $this->callID));
+            return false;
+        }
+        $this->API->logger->logger(\sprintf(Lang::$current_lang['call_confirming'], $this->otherID), Logger::VERBOSE);
+        $dh_config = $this->API->getDhConfig();
+        $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
+        Crypt::checkG($params['g_b'], $dh_config['p']);
+        $key = \str_pad($params['g_b']->powMod($this->call['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+        try {
+            $res = ($this->API->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->call['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 92]]))['phone_call'];
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                $this->API->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
+                return true;
+            }
+            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                $this->API->logger->logger(Lang::$current_lang['call_already_declined']);
+                $this->discard(['_' => 'phoneCallDiscardReasonHangup']);
+                return false;
+            }
+            throw $e;
+        }
+        $visualization = [];
+        $length = new BigInteger(\count(Magic::$emojis));
+        foreach (\str_split(\hash('sha256', $key.\str_pad($this->call['g_a'], 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
+            $number[0] = \chr(\ord($number[0]) & 0x7f);
+            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
+        }
+        $this->visualization = $visualization;
+        $this->authKey = $key;
+        $this->callState = CallState::RUNNING;
+        $this->protocolCallID = \substr(\hash('sha256', $key, true), -16);
+        $this->initialize($res['connections']);
+        return true;
+    }
+    /**
+     * Accept incoming call.
+     */
+    public function accept(): self
+    {
+        if ($this->callState === CallState::RUNNING || $this->callState === CallState::ENDED) {
+            return $this;
+        }
+        Assert::eq($this->callState->name, CallState::INCOMING->name);
+
+        $this->API->logger->logger(\sprintf(Lang::$current_lang['accepting_call'], $this->otherID), Logger::VERBOSE);
+        $dh_config = $this->API->getDhConfig();
+        $this->API->logger->logger('Generating b...', Logger::VERBOSE);
+        $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
+        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
+        Crypt::checkG($g_b, $dh_config['p']);
+        try {
+            $this->API->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $this->call['id'], 'access_hash' => $this->call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 92]]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                $this->API->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $this->callID));
+                return $this;
+            }
+            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                $this->API->logger->logger(Lang::$current_lang['call_already_declined']);
+                $this->discard(['_' => 'phoneCallDiscardReasonHangup']);
+                return $this;
+            }
+            throw $e;
+        }
+        $this->call['b'] = $b;
+
+        $this->callState = CallState::ACCEPTED;
+
+        return $this;
+    }
+
+    /**
+     * Complete call handshake.
+     * 
+     * @internal
+     */
+    public function complete(array $params): bool
+    {
+        if ($this->callState !== CallState::ACCEPTED) {
+            $this->API->logger->logger(\sprintf(Lang::$current_lang['call_error_3'], $params['id']));
+            return false;
+        }
+        $this->API->logger->logger(\sprintf(Lang::$current_lang['call_completing'], $this->otherID), Logger::VERBOSE);
+        $dh_config = $this->API->getDhConfig();
+        if (\hash('sha256', $params['g_a_or_b'], true) != $this->call['g_a_hash']) {
+            throw new SecurityException('Invalid g_a!');
+        }
+        $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
+        Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
+        $key = \str_pad($params['g_a_or_b']->powMod($this->call['b'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+        if (\substr(\sha1($key, true), -8) != $params['key_fingerprint']) {
+            throw new SecurityException(Lang::$current_lang['fingerprint_invalid']);
+        }
+        $visualization = [];
+        $length = new BigInteger(\count(Magic::$emojis));
+        foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
+            $number[0] = \chr(\ord($number[0]) & 0x7f);
+            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
+        }
+        $this->visualization = $visualization;
+        $this->authKey = $key;
+        $this->callState = CallState::RUNNING;
+        $this->protocolCallID = \substr(\hash('sha256', $key, true), -16);
+        $this->initialize($params['connections']);
+        return true;
     }
     /**
      * Wakeup function.
      */
     public function __wakeup(): void
     {
-        if ($this->voip_state === self::STATE_ESTABLISHED) {
-            $this->voip_state = self::STATE_CREATED;
-            $this->startTheMagic();
+        if ($this->callState === CallState::RUNNING) {
+            $this->startReadLoop();
+            if ($this->voipState === VoIPState::ESTABLISHED) {
+                $this->startWriteLoop();
+            }    
         }
     }
-    /**
-     * Constructor.
-     */
-    public function __construct(bool $creator, int $otherID, MTProto $MadelineProto, int $callState)
-    {
-        $this->creator = $creator;
-        $this->otherID = $otherID;
-        $this->MadelineProto = $MadelineProto;
-        $this->callState = $callState;
-        $this->packetQueue = new SplQueue;
-    }
 
     /**
-     * Get max layer.
+     * Get call emojis (will return null if the call is not inited yet).
+     * 
+     * @return ?list{string, string, string, string}
      */
-    public static function getConnectionMaxLayer(): int
-    {
-        return 92;
-    }
-
-    /**
-     * Get debug string.
-     */
-    public function getDebugString(): string
-    {
-        return '';
-    }
-
-    /**
-     * Set call constructor.
-     */
-    public function setCall(array $callID): void
-    {
-        $this->protocol = $callID['protocol'];
-        $this->callID = [
-            '_' => 'inputPhoneCall',
-            'id' => $callID['id'],
-            'access_hash' => $callID['access_hash'],
-        ];
-    }
-
-    /**
-     * Set emojis.
-     */
-    public function setVisualization(array $visualization): void
-    {
-        $this->visualization = $visualization;
-    }
-
-    /**
-     * Get emojis.
-     */
-    public function getVisualization(): array
+    public function getVisualization(): ?array
     {
         return $this->visualization;
     }
 
     /**
      * Discard call.
-     *
      */
-    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = [], bool $debug = false): self
+    public function discard(array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = []): self
     {
-        if (($this->callState ?? self::CALL_STATE_ENDED) === self::CALL_STATE_ENDED || empty($this->configuration)) {
+        if ($this->callState === CallState::ENDED) {
             return $this;
         }
-        $this->callState = self::CALL_STATE_ENDED;
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
             EventLoop::cancel($this->timeoutWatcher);
@@ -274,80 +343,67 @@ final class VoIP
         }
         Logger::log("Closed all sockets, discarding $this");
 
-        $this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug);
-        return $this;
-    }
-
-    public function __destruct()
-    {
-        EventLoop::queue($this->discard(...), ['_' => 'phoneCallDiscardReasonDisconnect']);
-    }
-    /**
-     * Accept call.
-     *
-     */
-    public function accept(): self|false
-    {
-        if ($this->callState !== self::CALL_STATE_INCOMING) {
-            return false;
+        $this->API->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $this->callID), Logger::VERBOSE);
+        try {
+            $this->API->methodCallAsyncRead('phone.discardCall', ['peer' => $this->call, 'duration' => \time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason]);
+        } catch (RPCErrorException $e) {
+            if (!\in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'], true)) {
+                throw $e;
+            }
         }
-        $this->callState = self::CALL_STATE_ACCEPTED;
-
-        $res = $this->MadelineProto->acceptCall($this->callID);
-
-        if (!$res) {
-            $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+        if (!empty($rating)) {
+            $this->API->logger->logger(\sprintf('Setting rating for call %s...', $this->call), Logger::VERBOSE);
+            $this->API->methodCallAsyncRead('phone.setCallRating', ['peer' => $this->call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
         }
-
+        $this->API->cleanupCall($this->callID);
+        $this->callState = CallState::ENDED;
         return $this;
     }
 
     /**
-     * Start the actual call.
+     * Connect to the specified endpoints.
      */
-    public function startTheMagic(): self
+    private function initialize(array $endpoints): void
     {
-        if ($this->voip_state !== self::STATE_CREATED) {
-            return $this;
+        foreach ($endpoints as $endpoint) {
+            try {
+                $this->sockets['v6 '.$endpoint['id']] = new Endpoint(
+                    '['.$endpoint['ipv6'].']',
+                    $endpoint['port'],
+                    $endpoint['peer_tag'],
+                    true,
+                    $this->outgoing,
+                    $this->authKey,
+                    $this->protocolCallID,
+                    $this->messageHandler
+                );
+            } catch (Throwable) {
+            }
+            try {
+                $this->sockets['v4 '.$endpoint['id']] = new Endpoint(
+                    $endpoint['ip'],
+                    $endpoint['port'],
+                    $endpoint['peer_tag'],
+                    true,
+                    $this->outgoing,
+                    $this->authKey,
+                    $this->protocolCallID,
+                    $this->messageHandler
+                );
+            } catch (Throwable) {
+            }
         }
-        $this->voip_state = self::STATE_WAIT_INIT;
-        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
-            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
-                $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
-            }
-        });
-        EventLoop::queue(function (): void {
-            $this->authKey = new PermAuthKey();
-            $this->authKey->setAuthKey($this->configuration['auth_key']);
-
-            foreach ($this->configuration['endpoints'] as $endpoint) {
-                try {
-                    $this->sockets['v6 '.$endpoint['id']] = new Endpoint('['.$endpoint['ipv6'].']', $endpoint['port'], $endpoint['peer_tag'], true, $this);
-                } catch (Throwable) {
-                }
-                try {
-                    $this->sockets['v4 '.$endpoint['id']] = new Endpoint($endpoint['ip'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
-                } catch (Throwable) {
-                }
-            }
-            foreach ($this->sockets as $socket) {
-                $socket->write($this->encryptPacket([
-                    '_' => self::PKT_INIT,
-                    'protocol' => self::PROTOCOL_VERSION,
-                    'min_protocol' => self::MIN_PROTOCOL_VERSION,
-                    'audio_streams' => [self::CODEC_OPUS],
-                    'video_streams' => []
-                ], false));
-                EventLoop::queue(function () use ($socket): void {
-                    while ($payload = $socket->read()) {
-                        $this->lastIncomingTimestamp = \microtime(true);
-                        EventLoop::queue($this->handlePacket(...), $socket, $payload);
-                    }
-                    Logger::log("Exiting VoIP read loop in $this!");
-                });
-            }
-        });
-        return $this;
+        $this->voipState = VoIPState::WAIT_INIT;
+        $this->startReadLoop();
+        foreach ($this->sockets as $socket) {
+            $socket->write($this->messageHandler->encryptPacket([
+                '_' => self::PKT_INIT,
+                'protocol' => self::PROTOCOL_VERSION,
+                'min_protocol' => self::MIN_PROTOCOL_VERSION,
+                'audio_streams' => [self::CODEC_OPUS],
+                'video_streams' => []
+            ], true));
+        }
     }
     /**
      * Handle incoming packet.
@@ -356,28 +412,32 @@ final class VoIP
     {
         switch ($packet['_']) {
             case self::PKT_INIT:
-                //$this->voip_state = self::STATE_WAIT_INIT_ACK;
-                $this->peerVersion = $packet['protocol'];
-                $socket->write(
-                    $this->encryptPacket([
-                        '_' => self::PKT_INIT_ACK,
-                        'protocol' => self::PROTOCOL_VERSION,
-                        'min_protocol' => self::MIN_PROTOCOL_VERSION,
-                        'all_streams' => [
-                            ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]
-                        ]
-                    ])
-                );
+                //$this->voipState = VoIPState::WAIT_INIT_ACK;
+                $socket->write($this->messageHandler->encryptPacket([
+                    '_' => self::PKT_INIT_ACK,
+                    'protocol' => self::PROTOCOL_VERSION,
+                    'min_protocol' => self::MIN_PROTOCOL_VERSION,
+                    'all_streams' => [
+                        ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]
+                    ]
+                ]));
+                $socket->write($this->messageHandler->encryptPacket([
+                    '_' => self::PKT_INIT,
+                    'protocol' => self::PROTOCOL_VERSION,
+                    'min_protocol' => self::MIN_PROTOCOL_VERSION,
+                    'audio_streams' => [self::CODEC_OPUS],
+                    'video_streams' => []
+                ]));
+                break;
 
-                // no break
             case self::PKT_INIT_ACK:
                 if (!$this->bestEndpoint) {
                     $this->bestEndpoint = $socket;
                     $this->pingWatcher = EventLoop::delay(1.0, function (): void {
                         $this->pendingPing = true;
                         foreach ($this->sockets as $socket) {
-                            //$socket->udpPing();
-                            $packet = $this->encryptPacket(['_' => self::PKT_PING]);
+                            $socket->udpPing();
+                            $packet = $this->messageHandler->encryptPacket(['_' => self::PKT_PING]);
                             EventLoop::queue(fn () => $socket->write($packet));
                         }
                     });
@@ -393,6 +453,9 @@ final class VoIP
             case self::PKT_STREAM_DATA_X3:
                 $cnt = 3;
                 break;
+            case self::PKT_PING:
+                $socket->write($this->messageHandler->encryptPacket(['_' => self::PKT_PONG, 'out_seq_no' => $packet['out_seq_no']]));
+                break;
             case self::PKT_PONG:
                 if ($this->pendingPing) {
                     $this->pendingPing = false;
@@ -402,16 +465,31 @@ final class VoIP
                     }
                 }
                 break;
-            default:
-                \var_dump($packet);
         }
+    }
+    private function startReadLoop(): void
+    {
+        foreach ($this->sockets as $socket) {
+            EventLoop::queue(function () use ($socket): void {
+                while ($payload = $socket->read()) {
+                    $this->lastIncomingTimestamp = \microtime(true);
+                    EventLoop::queue($this->handlePacket(...), $socket, $payload);
+                }
+                Logger::log("Exiting VoIP read loop in $this!");
+            });
+        }
+        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
+            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
+                $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+            }
+        });
     }
     /**
      * Start write loop.
      */
     private function startWriteLoop(): void
     {
-        $this->voip_state = self::STATE_ESTABLISHED;
+        $this->voipState = VoIPState::ESTABLISHED;
         Logger::log("Call established, sending OPUS data!");
 
         $this->tempHoldFiles = [];
@@ -432,7 +510,7 @@ final class VoIP
             }
             $t = \microtime(true) + 0.060;
             while (!$this->packetQueue->isEmpty()) {
-                $packet = $this->encryptPacket(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp]);
+                $packet = $this->messageHandler->encryptPacket(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->opusTimestamp]);
 
                 //Logger::log("Writing {$this->timestamp} in $this!");
                 $diff = $t - \microtime(true);
@@ -442,7 +520,7 @@ final class VoIP
                 $this->bestEndpoint->write($packet);
                 $t += 0.060;
 
-                $this->timestamp += 60;
+                $this->opusTimestamp += 60;
             }
         }
     }
@@ -507,124 +585,18 @@ final class VoIP
     }
 
     /**
-     * Set MadelineProto instance.
-     */
-    public function setMadeline(MTProto $MadelineProto): void
-    {
-        $this->MadelineProto = $MadelineProto;
-    }
-
-    /**
-     * Get call protocol.
-     */
-    public function getProtocol(): array
-    {
-        return $this->protocol;
-    }
-
-    /**
-     * Get ID of other user.
-     */
-    public function getOtherID(): int
-    {
-        return $this->otherID;
-    }
-
-    /**
-     * Get call ID.
-     *
-     */
-    public function getCallID(): string|int
-    {
-        return $this->callID;
-    }
-
-    /**
-     * Get creation date.
-     *
-     */
-    public function whenCreated(): int|bool
-    {
-        return $this->internalStorage['created'] ?? false;
-    }
-
-    /**
-     * Parse config.
-     */
-    public function parseConfig(): void
-    {
-    }
-
-    /**
      * Get call state.
      */
-    public function getCallState(): int
+    public function getCallState(): CallState
     {
-        return $this->callState ?? self::CALL_STATE_ENDED;
+        return $this->callState;
     }
-
     /**
-     * Get library version.
+     * Get VoIP state.
      */
-    public function getVersion(): string
+    public function getVoIPState(): VoIPState
     {
-        return 'libponyvoip-1.0';
-    }
-
-    /**
-     * Get preferred relay ID.
-     */
-    public function getPreferredRelayID(): int
-    {
-        return 0;
-    }
-
-    /**
-     * Get last error.
-     */
-    public function getLastError(): string
-    {
-        return '';
-    }
-
-    /**
-     * Get debug log.
-     */
-    public function getDebugLog(): string
-    {
-        return '';
-    }
-
-    /**
-     * Get signal bar count.
-     */
-    public function getSignalBarsCount(): int
-    {
-        return $this->signal;
-    }
-
-    /**
-     * Get the value of creator.
-     */
-    public function isCreator(): bool
-    {
-        return $this->creator;
-    }
-
-    /**
-     * Get the value of authKey.
-     */
-    public function getAuthKey(): PermAuthKey
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * Get the value of peerVersion.
-     */
-    public function getPeerVersion(): int
-    {
-        return $this->peerVersion;
+        return $this->voipState;
     }
 
     /**
@@ -632,7 +604,6 @@ final class VoIP
      */
     public function __toString(): string
     {
-        $id = $this->callID['id'];
-        return "call {$id} with {$this->otherID}";
+        return "call {$this->callID} with {$this->otherID}";
     }
 }

@@ -600,7 +600,7 @@ final class Ogg
         $writeTag("MadelineProto ".API::RELEASE.", ".$opus->opus_get_version_string());
         $tags .= \pack('V', 2);
         $writeTag("ENCODER=MadelineProto ".API::RELEASE." with ".$opus->opus_get_version_string());
-        $writeTag('See https://docs.madelineproto.xyz/docs/VOIP.html for more info');
+        $writeTag('See https://docs.madelineproto.xyz/docs/CALLS.html for more info');
         $writePage(
             0,
             0,

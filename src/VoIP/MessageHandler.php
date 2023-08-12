@@ -15,6 +15,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\VoIP;
 
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 
@@ -23,8 +24,22 @@ use danog\MadelineProto\VoIP;
  *
  * @internal
  */
-trait MessageHandler
+final class MessageHandler
 {
+    private array $received_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    private array $remote_ack_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    private int $session_out_seq_no = 0;
+    private int $session_in_seq_no = 0;
+
+    public int $peerVersion = 0;
+
+    public function __construct(
+        private readonly VoIP $instance,
+        private readonly string $callID
+    )
+    {
+    }
     private static function pack_string(string $object): string
     {
         $l = \strlen($object);
@@ -42,7 +57,7 @@ trait MessageHandler
 
         return $concat;
     }
-    private function encryptPacket(array $args, bool $increase_seqno = true): string
+    public function encryptPacket(array $args, bool $init = false): string
     {
         $message = '';
         switch ($args['_']) {
@@ -167,11 +182,11 @@ trait MessageHandler
         if ($this->peerVersion >= 8 || (!$this->peerVersion)) {
             $payload = \chr($args['_']);
             $payload .= Tools::packUnsignedInt($this->session_in_seq_no);
-            $payload .= Tools::packUnsignedInt($this->session_out_seq_no);
+            $payload .= Tools::packUnsignedInt($init ? 0 : $this->session_out_seq_no);
             $payload .= Tools::packUnsignedInt($ack_mask);
             $payload .= \chr(0);
             $payload .= $message;
-        } elseif (\in_array($this->voip_state, [VoIP::STATE_WAIT_INIT, VoIP::STATE_WAIT_INIT_ACK], true)) {
+        } elseif (\in_array($this->instance->getVoIPState(), [VoIPState::WAIT_INIT, VoIPState::WAIT_INIT_ACK], true)) {
             $payload = VoIP::TLID_DECRYPTED_AUDIO_BLOCK;
             $payload .= Tools::random(8);
             $payload .= \chr(7);
@@ -185,9 +200,9 @@ trait MessageHandler
             $flags = \strlen($message) ? $flags | 1 : $flags & ~1; // raw_data
             $flags = $flags | ($args['_'] << 24);
             $payload .= Tools::packUnsignedInt($flags);
-            $payload .= $this->configuration['call_id'];
+            $payload .= $this->callID;
             $payload .= Tools::packUnsignedInt($this->session_in_seq_no);
-            $payload .= Tools::packUnsignedInt($this->session_out_seq_no);
+            $payload .= Tools::packUnsignedInt($init ? 0 : $this->session_out_seq_no);
             $payload .= Tools::packUnsignedInt($ack_mask);
             $payload .= VoIP::PROTO_ID;
             if ($flags & 2) {
@@ -201,14 +216,67 @@ trait MessageHandler
             $payload .= Tools::random(8);
             $payload .= \chr(7);
             $payload .= Tools::random(7);
-            $message = \chr($args['_']).Tools::packUnsignedInt($this->session_in_seq_no).Tools::packUnsignedInt($this->session_out_seq_no).Tools::packUnsignedInt($ack_mask).$message;
+            $message = \chr($args['_']).Tools::packUnsignedInt($this->session_in_seq_no).Tools::packUnsignedInt($init ? 0 : $this->session_out_seq_no).Tools::packUnsignedInt($ack_mask).$message;
 
             $payload .= $this->pack_string($message);
         }
-        if ($increase_seqno) {
+        if (!$init) {
             $this->session_out_seq_no++;
         }
 
         return $payload;
+    }
+
+
+    public function shouldSkip(int $last_ack_id, int $packet_seq_no, int $ack_mask): bool
+    {
+        if ($packet_seq_no > $this->session_in_seq_no) {
+            $diff = $packet_seq_no - $this->session_in_seq_no;
+            if ($diff > 31) {
+                $this->received_timestamp_map = \array_fill(0, 32, 0);
+            } else {
+                $remaining = 32-$diff;
+                for ($x = 0; $x < $remaining; $x++) {
+                    $this->received_timestamp_map[$diff+$x] = $this->received_timestamp_map[$x];
+                }
+                for ($x = 1; $x < $diff; $x++) {
+                    $this->received_timestamp_map[$x] = 0;
+                }
+                $this->received_timestamp_map[0] = \microtime(true);
+            }
+            $this->session_in_seq_no = $packet_seq_no;
+        } elseif (($diff = $this->session_in_seq_no - $packet_seq_no) < 32) {
+            if (!$this->received_timestamp_map[$diff]) {
+                Logger::log("Got duplicate $packet_seq_no");
+                return false;
+            }
+            $this->received_timestamp_map[$diff] = \microtime(true);
+        } else {
+            Logger::log("Packet $packet_seq_no is out of order and too late");
+            return false;
+        }
+        if ($last_ack_id > $this->session_out_seq_no) {
+            $diff = $last_ack_id - $this->session_out_seq_no;
+            if ($diff > 31) {
+                $this->remote_ack_timestamp_map = \array_fill(0, 32, 0);
+            } else {
+                $remaining = 32-$diff;
+                for ($x = 0; $x < $remaining; $x++) {
+                    $this->remote_ack_timestamp_map[$diff+$x] = $this->remote_ack_timestamp_map[$x];
+                }
+                for ($x = 1; $x < $diff; $x++) {
+                    $this->remote_ack_timestamp_map[$x] = 0;
+                }
+                $this->remote_ack_timestamp_map[0] = \microtime(true);
+            }
+            $this->session_out_seq_no = $last_ack_id;
+
+            for ($x = 1; $x < 32; $x++) {
+                if (!$this->remote_ack_timestamp_map[$x] && ($ack_mask >> 32-$x) & 1) {
+                    $this->remote_ack_timestamp_map[$x] = \microtime(true);
+                }
+            }
+        }
+        return true;
     }
 }
