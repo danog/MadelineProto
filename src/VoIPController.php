@@ -109,6 +109,7 @@ final class VoIPController
     private bool $pendingPing = true;
     private ?string $timeoutWatcher = null;
     private float $lastIncomingTimestamp = 0.0;
+    private float $lastOutgoingTimestamp = 0.0;
     private int $opusTimestamp = 0;
     private SplQueue $packetQueue;
     private array $tempHoldFiles = [];
@@ -266,9 +267,14 @@ final class VoIPController
     public function __wakeup(): void
     {
         if ($this->callState === CallState::RUNNING) {
+            $this->lastIncomingTimestamp = microtime(true);
             $this->startReadLoop();
             if ($this->voipState === VoIPState::ESTABLISHED) {
-                $this->startWriteLoop();
+                $diff = (int) ((microtime(true) - $this->lastOutgoingTimestamp) * 1000);
+                Logger::log("Missed $diff milliseconds of audio due to script shutdown...");
+                $this->opusTimestamp += $diff;
+                $this->opusTimestamp -= ($this->opusTimestamp) % 60;
+                EventLoop::queue($this->startWriteLoop(...));
             }
         }
     }
@@ -444,30 +450,34 @@ final class VoIPController
 
         $this->tempHoldFiles = [];
         while (true) {
-            $file = \array_shift($this->inputFiles);
-            if (!$file) {
-                if (empty($this->tempHoldFiles)) {
-                    $this->tempHoldFiles = $this->holdFiles;
+            if ($this->packetQueue->isEmpty()) {
+                $file = \array_shift($this->inputFiles);
+                if (!$file) {
+                    if (empty($this->tempHoldFiles)) {
+                        $this->tempHoldFiles = $this->holdFiles;
+                    }
+                    if (empty($this->tempHoldFiles)) {
+                        return;
+                    }
+                    $file = \array_shift($this->tempHoldFiles);
                 }
-                if (empty($this->tempHoldFiles)) {
-                    return;
+                $it = $this->openFile($file);
+                foreach ($it->opusPackets as $packet) {
+                    $this->packetQueue->enqueue($packet);
                 }
-                $file = \array_shift($this->tempHoldFiles);
-            }
-            $it = $this->openFile($file);
-            foreach ($it->opusPackets as $packet) {
-                $this->packetQueue->enqueue($packet);
             }
             $t = \microtime(true) + 0.060;
             while (!$this->packetQueue->isEmpty()) {
                 $packet = $this->messageHandler->encryptPacket(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->opusTimestamp]);
 
                 //Logger::log("Writing {$this->timestamp} in $this!");
-                $diff = $t - \microtime(true);
+                $cur = \microtime(true);
+                $diff = $t - $cur;
                 if ($diff > 0) {
                     delay($diff);
                 }
                 $this->bestEndpoint->write($packet);
+                $this->lastOutgoingTimestamp = $cur;
                 $t += 0.060;
 
                 $this->opusTimestamp += 60;

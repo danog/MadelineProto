@@ -42,7 +42,7 @@ final class Endpoint
     {
         $vars = \get_object_vars($this);
         unset($vars['socket']);
-        return $vars;
+        return array_keys($vars);
     }
 
     public function __toString(): string

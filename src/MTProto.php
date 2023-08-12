@@ -1063,7 +1063,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
         $this->logger->logger('Will unreference instance');
-        if (isset(self::$references[$this->getSessionName()])) {
+        if (isset($this->wrapper) && isset(self::$references[$this->getSessionName()])) {
             unset(self::$references[$this->getSessionName()]);
         }
         $this->stopLoops();
