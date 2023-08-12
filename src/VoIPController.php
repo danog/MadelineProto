@@ -108,7 +108,7 @@ final class VoIPController
      */
     private array $sockets = [];
     private Endpoint $bestEndpoint;
-    private bool $pendingPing = true;
+    private ?string $pendingPing = null;
     private ?string $timeoutWatcher = null;
     private float $lastIncomingTimestamp = 0.0;
     private float $lastOutgoingTimestamp = 0.0;
@@ -270,6 +270,9 @@ final class VoIPController
         if ($this->callState === CallState::RUNNING) {
             $this->lastIncomingTimestamp = \microtime(true);
             $this->startReadLoop();
+            if ($this->pendingPing) {
+                $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
+            }
             if ($this->voipState === VoIPState::ESTABLISHED) {
                 $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
                 $this->opusTimestamp += $diff - ($diff % 60);
@@ -304,6 +307,10 @@ final class VoIPController
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
             EventLoop::cancel($this->timeoutWatcher);
+        }
+
+        if (isset($this->pendingPing)) {
+            EventLoop::cancel($this->pendingPing);
         }
 
         Logger::log("Closing all sockets in $this");
@@ -406,7 +413,7 @@ final class VoIPController
             case self::PKT_INIT_ACK:
                 if (!isset($this->bestEndpoint)) {
                     $this->bestEndpoint = $socket;
-                    $this->startWriteLoop();
+                    $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
                 }
                 break;
             case self::PKT_STREAM_DATA:
@@ -423,13 +430,21 @@ final class VoIPController
                 break;
             case self::PKT_PONG:
                 if ($this->pendingPing) {
-                    $this->pendingPing = false;
+                    EventLoop::cancel($this->pendingPing);
+                    $this->pendingPing = null;
                     if ($this->bestEndpoint !== $socket) {
                         Logger::log("Changing best endpoint from {$this->bestEndpoint} to $socket");
                         $this->bestEndpoint = $socket;
                     }
+                    $this->startWriteLoop();
                 }
                 break;
+        }
+    }
+    private function ping(): void
+    {
+        foreach ($this->sockets as $socket) {
+            EventLoop::queue(fn () => $socket->write($this->messageHandler->encryptPacket(['_' => self::PKT_PING])));
         }
     }
     private function startReadLoop(): void
@@ -443,11 +458,6 @@ final class VoIPController
                 Logger::log("Exiting VoIP read loop in $this!");
             });
         }
-        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
-            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
-                $this->discard(DiscardReason::DISCONNECTED);
-            }
-        });
     }
     private bool $muted = false;
     private bool $playingHold = false;
@@ -476,6 +486,12 @@ final class VoIPController
     {
         $this->voipState = VoIPState::ESTABLISHED;
         Logger::log("Call established in $this, sending OPUS data!");
+
+        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
+            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
+                $this->discard(DiscardReason::DISCONNECTED);
+            }
+        });
 
         $delay = $this->muted ? 0.2 : 0.06;
         $t = \microtime(true) + $delay;
