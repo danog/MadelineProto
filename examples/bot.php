@@ -299,7 +299,7 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     #[Handler]
-    public function handleIncomingCall(VoIP $call): void
+    public function handleIncomingCall(VoIP&Incoming $call): void
     {
         $call->accept()->play(__DIR__.'/../music.ogg');
     }

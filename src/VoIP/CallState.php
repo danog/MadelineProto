@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
-
-enum CallState {
+enum CallState
+{
     /** The call was requested */
     case REQUESTED;
     /** An incoming call */

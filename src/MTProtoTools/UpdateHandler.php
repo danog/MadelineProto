@@ -58,7 +58,7 @@ use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP;
-use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -765,10 +765,11 @@ trait UpdateHandler
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']] = new VoIP(
+                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
                         $this,
                         $update['phone_call']
                     );
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallAccepted':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
@@ -776,7 +777,7 @@ trait UpdateHandler
                     }
                     $controller = $this->calls[$update['phone_call']['id']];
                     $controller->confirm($update['phone_call']);
-                    $update['phone_call'] = $controller;
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCall':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
@@ -784,14 +785,15 @@ trait UpdateHandler
                     }
                     $controller = $this->calls[$update['phone_call']['id']];
                     $controller->complete($update['phone_call']);
-                    $update['phone_call'] = $controller;
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallDiscarded':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $controller = $this->calls[$update['phone_call']['id']];
+                    $controller = $this->calls[$update['phone_call']['id']];
                     $controller->discard();
+                    $update['phone_call'] = $controller->public;
                     break;
             }
         }

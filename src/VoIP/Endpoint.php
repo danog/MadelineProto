@@ -7,10 +7,9 @@ namespace danog\MadelineProto\VoIP;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\VoIP;
+use danog\MadelineProto\VoIPController;
 use Exception;
 
 use function Amp\Socket\connect;
@@ -31,19 +30,17 @@ final class Endpoint
         private readonly bool $reflector,
         private readonly bool $creator,
         private readonly string $authKey,
-        private readonly string $callID,
         private readonly MessageHandler $handler
-    )
-    {
+    ) {
         $this->socket = connect("udp://{$this->ip}:{$this->port}");
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->socket = connect("udp://{$this->ip}:{$this->port}");
     }
     public function __sleep(): array
     {
-        $vars = get_object_vars($this);
+        $vars = \get_object_vars($this);
         unset($vars['socket']);
         return $vars;
     }
@@ -95,7 +92,7 @@ final class Endpoint
             if ($packet === null) {
                 return null;
             }
-    
+
             $payload = \fopen('php://memory', 'rw+b');
             \fwrite($payload, $packet);
             \fseek($payload, 0);
@@ -109,14 +106,14 @@ final class Endpoint
             }
             if (\fread($payload, 12) === "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF") {
                 switch ($crc = \fread($payload, 4)) {
-                    case VoIP::TLID_REFLECTOR_SELF_INFO:
+                    case VoIPController::TLID_REFLECTOR_SELF_INFO:
                         $result['_'] = 'reflectorSelfInfo';
                         $result['date'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
                         $result['query_id'] = Tools::unpackSignedLong(\stream_get_contents($payload, 8));
                         $result['my_ip'] = \stream_get_contents($payload, 16);
                         $result['my_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
                         return $result;
-                    case VoIP::TLID_REFLECTOR_PEER_INFO:
+                    case VoIPController::TLID_REFLECTOR_PEER_INFO:
                         $result['_'] = 'reflectorPeerInfo';
                         $result['my_address'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
                         $result['my_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
@@ -128,7 +125,7 @@ final class Endpoint
                         continue 2;
                 }
             } else {
-                fseek($payload, $pos);
+                \fseek($payload, $pos);
                 $message_key = \fread($payload, 16);
                 [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
                 $encrypted_data = \stream_get_contents($payload);
@@ -152,13 +149,13 @@ final class Endpoint
 
             $result = [];
             switch ($crc = \stream_get_contents($payload, 4)) {
-                case VoIP::TLID_DECRYPTED_AUDIO_BLOCK:
+                case VoIPController::TLID_DECRYPTED_AUDIO_BLOCK:
                     \stream_get_contents($payload, 8);
                     $this->unpack_string($payload);
                     $flags = \unpack('V', \stream_get_contents($payload, 4))[1];
                     $result['_'] = $flags >> 24;
                     if ($flags & 4) {
-                        if (\stream_get_contents($payload, 16) !== $this->callID) {
+                        if (\stream_get_contents($payload, 16) !== $this->handler->callID) {
                             Logger::log('Call ID mismatch', Logger::ERROR);
                             continue 2;
                         }
@@ -171,7 +168,7 @@ final class Endpoint
                         $ack_mask = \unpack('V', \stream_get_contents($payload, 4))[1];
                     }
                     if ($flags & 8) {
-                        if (\stream_get_contents($payload, 4) !== VoIP::PROTO_ID) {
+                        if (\stream_get_contents($payload, 4) !== VoIPController::PROTO_ID) {
                             Logger::log('Protocol mismatch', Logger::ERROR);
                             continue 2;
                         }
@@ -186,7 +183,7 @@ final class Endpoint
                         \fseek($message, 0);
                     }
                     break;
-                case VoIP::TLID_SIMPLE_AUDIO_BLOCK:
+                case VoIPController::TLID_SIMPLE_AUDIO_BLOCK:
                     \stream_get_contents($payload, 8);
                     $this->unpack_string($payload);
                     $flags = \unpack('V', \stream_get_contents($payload, 4))[1];
@@ -232,7 +229,7 @@ final class Endpoint
                 // streamTypeSimple codec:int8 = StreamType;
                 //
                 // packetInit#1 protocol:int min_protocol:int flags:# data_saving_enabled:flags.0?true audio_streams:byteVector<streamTypeSimple> video_streams:byteVector<streamTypeSimple> = Packet;
-                case VoIP::PKT_INIT:
+                case VoIPController::PKT_INIT:
                     $result['protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                     $result['min_protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                     $flags = \unpack('V', \stream_get_contents($message, 4))[1];
@@ -247,7 +244,7 @@ final class Endpoint
                     // streamType id:int8 type:int8 codec:int8 frame_duration:int16 enabled:int8 = StreamType;
                     //
                     // packetInitAck#2 protocol:int min_protocol:int all_streams:byteVector<streamType> = Packet;
-                case VoIP::PKT_INIT_ACK:
+                case VoIPController::PKT_INIT_ACK:
                     $result['protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                     $result['min_protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                     $result['all_streams'] = [];
@@ -263,13 +260,13 @@ final class Endpoint
                     break;
                     // streamTypeState id:int8 enabled:int8 = StreamType;
                     // packetStreamState#3 state:streamTypeState = Packet;
-                case VoIP::PKT_STREAM_STATE:
+                case VoIPController::PKT_STREAM_STATE:
                     $result['id'] = \ord(\stream_get_contents($message, 1));
                     $result['enabled'] = \ord(\stream_get_contents($message, 1));
                     break;
                     // streamData flags:int2 stream_id:int6 has_more_flags:flags.1?true length:(flags.0?int16:int8) timestamp:int data:byteArray = StreamData;
                     // packetStreamData#4 stream_data:streamData = Packet;
-                case VoIP::PKT_STREAM_DATA:
+                case VoIPController::PKT_STREAM_DATA:
                     $flags = \ord(\stream_get_contents($message, 1));
                     $result['stream_id'] = $flags & 0x3F;
                     $flags = ($flags & 0xC0) >> 6;
@@ -278,17 +275,17 @@ final class Endpoint
                     $result['timestamp'] = \unpack('V', \stream_get_contents($message, 4))[1];
                     $result['data'] = \stream_get_contents($message, $length);
                     break;
-                case \danog\MadelineProto\VoIP::PKT_UPDATE_STREAMS:
+                case \danog\MadelineProto\VoIPController::PKT_UPDATE_STREAMS:
                     continue 2;
-                case \danog\MadelineProto\VoIP::PKT_PING:
+                case \danog\MadelineProto\VoIPController::PKT_PING:
                     $result['out_seq_no'] = $out_seq_no;
                     break;
-                case VoIP::PKT_PONG:
+                case VoIPController::PKT_PONG:
                     if (\fstat($payload)['size'] - \ftell($payload)) {
                         $result['out_seq_no'] = \unpack('V', \stream_get_contents($payload, 4))[1];
                     }
                     break;
-                case VoIP::PKT_STREAM_DATA_X2:
+                case VoIPController::PKT_STREAM_DATA_X2:
                     for ($x = 0; $x < 2; $x++) {
                         $flags = \ord(\stream_get_contents($message, 1));
                         $result[$x]['stream_id'] = $flags & 0x3F;
@@ -299,7 +296,7 @@ final class Endpoint
                         $result[$x]['data'] = \stream_get_contents($message, $length);
                     }
                     break;
-                case VoIP::PKT_STREAM_DATA_X3:
+                case VoIPController::PKT_STREAM_DATA_X3:
                     for ($x = 0; $x < 3; $x++) {
                         $flags = \ord(\stream_get_contents($message, 1));
                         $result[$x]['stream_id'] = $flags & 0x3F;
@@ -311,21 +308,21 @@ final class Endpoint
                     }
                     break;
                     // packetLanEndpoint#A address:int port:int = Packet;
-                case VoIP::PKT_LAN_ENDPOINT:
+                case VoIPController::PKT_LAN_ENDPOINT:
                     $result['address'] = \unpack('V', \stream_get_contents($payload, 4))[1];
                     $result['port'] = \unpack('V', \stream_get_contents($payload, 4))[1];
                     break;
                     // packetNetworkChanged#B flags:# data_saving_enabled:flags.0?true = Packet;
-                case VoIP::PKT_NETWORK_CHANGED:
+                case VoIPController::PKT_NETWORK_CHANGED:
                     $result['data_saving_enabled'] = (bool) (\unpack('V', \stream_get_contents($payload, 4))[1] & 1);
                     break;
                     // packetSwitchPreferredRelay#C relay_id:long = Packet;
-                case VoIP::PKT_SWITCH_PREF_RELAY:
+                case VoIPController::PKT_SWITCH_PREF_RELAY:
                     $result['relay_id'] = Tools::unpackSignedLong(\stream_get_contents($payload, 8));
                     break;
-                    /*case \danog\MadelineProto\VoIP::PKT_SWITCH_TO_P2P:
+                    /*case \danog\MadelineProto\VoIPController::PKT_SWITCH_TO_P2P:
                         break;
-                    case \danog\MadelineProto\VoIP::PKT_NOP:
+                    case \danog\MadelineProto\VoIPController::PKT_NOP:
                         break;*/
                 default:
                     Logger::log('Unknown packet received: '.$result['_'], Logger::ERROR);

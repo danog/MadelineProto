@@ -21,16 +21,12 @@ declare(strict_types=1);
 namespace danog\MadelineProto\VoIP;
 
 use Amp\DeferredFuture;
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\PeerNotInDbException;
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\VoIP;
+use danog\MadelineProto\VoIPController;
 use phpseclib3\Math\BigInteger;
 use Throwable;
 
@@ -46,7 +42,7 @@ use const STR_PAD_LEFT;
  */
 trait AuthKeyHandler
 {
-    /** @var array<int, VoIP> */
+    /** @var array<int, VoIPController> */
     private array $calls = [];
     private array $pendingCalls = [];
     /**
@@ -66,7 +62,7 @@ trait AuthKeyHandler
         }
         $deferred = new DeferredFuture;
         $this->pendingCalls[$user] = $deferred->getFuture();
-        
+
         try {
             $this->logger->logger(\sprintf('Calling %s...', $user), Logger::VERBOSE);
             $dh_config = ($this->getDhConfig());
@@ -78,9 +74,9 @@ trait AuthKeyHandler
             $res = $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 92]])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-            $this->calls[$res['id']] = $controller = new VoIP($this, $res);
+            $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
             unset($this->pendingCalls[$user]);
-            $deferred->complete($controller);
+            $deferred->complete($controller->public);
         } catch (Throwable $e) {
             unset($this->pendingCalls[$user]);
             $deferred->error($e);
@@ -101,7 +97,62 @@ trait AuthKeyHandler
     }
 
     /** @internal */
-    public function cleanupCall(int $id): void {
+    public function cleanupCall(int $id): void
+    {
         unset($this->calls[$id]);
+    }
+
+    /**
+     * Get call emojis (will return null if the call is not inited yet).
+     *
+     * @internal
+     *
+     * @return ?list{string, string, string, string}
+     */
+    public function getCallVisualization(int $id): ?array
+    {
+        return ($this->calls[$id] ?? null)?->getVisualization();
+    }
+
+    /**
+     * Accept call.
+     */
+    public function acceptCall(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->accept();
+    }
+
+    /**
+     * Discard call.
+     */
+    public function discardCall(int $id, array $reason = ['_' => 'phoneCallDiscardReasonDisconnect'], array $rating = []): void
+    {
+        ($this->calls[$id] ?? null)?->discard($reason, $rating);
+    }
+
+    /**
+     * Play file in call.
+     */
+    public function callPlay(int $id, string $file): void
+    {
+        ($this->calls[$id] ?? null)?->play($file);
+    }
+
+    /**
+     * Play files on hold in call.
+     *
+     * @param list<string> $files
+     */
+    public function callPlayOnHold(int $id, array $files): void
+    {
+        ($this->calls[$id] ?? null)?->playOnHold($files);
+    }
+
+    /**
+     * Get call state.
+     */
+    public function getCallState(int $id): ?CallState
+    {
+        return ($this->calls[$id] ?? null)?->getCallState();
     }
 }

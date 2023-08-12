@@ -146,12 +146,10 @@ abstract class InternalDoc
     }
     /**
      * Accept call.
-     *
-     * @param array $call Call
      */
-    public function acceptCall(array $call): bool
+    public function acceptCall(int $id): void
     {
-        return $this->wrapper->getAPI()->acceptCall($call);
+        $this->wrapper->getAPI()->acceptCall($id);
     }
     /**
      * Accept secret chat.
@@ -329,11 +327,27 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::callFork($callable, ...$args);
     }
     /**
+     * Play file in call.
+     */
+    public function callPlay(int $id, string $file): void
+    {
+        $this->wrapper->getAPI()->callPlay($id, $file);
+    }
+    /**
+     * Play files on hold in call.
+     *
+     * @param list<string> $files
+     */
+    public function callPlayOnHold(int $id, array $files): void
+    {
+        $this->wrapper->getAPI()->callPlayOnHold($id, $files);
+    }
+    /**
      * Get call status.
      *
      * @param int $id Call ID
      */
-    public function callStatus(int $id): int
+    public function callStatus(int $id): ?\danog\MadelineProto\VoIP\CallState
     {
         return $this->wrapper->getAPI()->callStatus($id);
     }
@@ -365,15 +379,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->complete2faLogin($password);
     }
     /**
-     * Complete call handshake.
-     *
-     * @param array $params Params
-     */
-    public function completeCall(array $params)
-    {
-        return $this->wrapper->getAPI()->completeCall($params);
-    }
-    /**
      * Complet user login using login code.
      *
      * @param string $code Login code
@@ -393,25 +398,14 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
     /**
-     * Confirm call.
-     *
-     * @param array $params Params
-     */
-    public function confirmCall(array $params)
-    {
-        return $this->wrapper->getAPI()->confirmCall($params);
-    }
-    /**
      * Discard call.
-     *
-     * @param array   $call       Call
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
      */
-    public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true): ?\danog\MadelineProto\VoIP
+    public function discardCall(int $id, array $reason = [
+        '_' => 'phoneCallDiscardReasonDisconnect',
+    ], array $rating = [
+    ]): void
     {
-        return $this->wrapper->getAPI()->discardCall($call, $reason, $rating, $need_debug);
+        $this->wrapper->getAPI()->discardCall($id, $reason, $rating);
     }
     /**
      * Discard secret chat.
@@ -702,13 +696,11 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getCachedConfig();
     }
     /**
-     * Get call info.
-     *
-     * @param int $call Call ID
+     * Get call state.
      */
-    public function getCall(int $call): array
+    public function getCallState(int $id): ?\danog\MadelineProto\VoIP\CallState
     {
-        return $this->wrapper->getAPI()->getCall($call);
+        return $this->wrapper->getAPI()->getCallState($id);
     }
     /**
      * Store RSA keys for CDN datacenters.

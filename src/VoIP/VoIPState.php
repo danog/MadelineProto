@@ -23,7 +23,8 @@ namespace danog\MadelineProto\VoIP;
 /**
  * VoIP protcol state.
  */
-enum VoIPState {
+enum VoIPState
+{
     case CREATED;
     case WAIT_INIT;
     case WAIT_INIT_ACK;

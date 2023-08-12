@@ -59,7 +59,6 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
-use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
