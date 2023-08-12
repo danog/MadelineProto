@@ -102,7 +102,11 @@ trait AuthKeyHandler
     /** @internal */
     public function cleanupCall(int $id): void
     {
-        unset($this->calls[$id]);
+        if (isset($this->calls[$id])) {
+            $call = $this->calls[$id];
+            unset($this->callsByPeer[$call->public->otherID]);
+            unset($this->calls[$id]);
+        }
     }
 
     /**
