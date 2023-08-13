@@ -110,4 +110,4 @@ final class PostgresArray extends PostgresArrayBytea
     }
 }
 
-class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArray');
+\class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArray');

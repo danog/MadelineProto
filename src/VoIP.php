@@ -16,9 +16,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 

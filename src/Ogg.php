@@ -320,7 +320,6 @@ final class Ogg
             } else {
                 // Arbitrary number of frames
                 $ch = \ord($content[$offset++]);
-                $len--;
                 $count = $ch & 0x3F;
                 $vbr = $ch & 0x80;
                 $padding = $ch & 0x40;
@@ -372,7 +371,10 @@ final class Ogg
                 $this->currentDuration += $frameDuration;
                 if ($this->currentDuration >= 60_000) {
                     if ($this->currentDuration > 60_000) {
-                        throw new AssertionError("Emitting packet with duration {$this->currentDuration} but need {60000}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
+                        throw new AssertionError("Emitting packet with duration of {$this->currentDuration} microseconds but need 60000 microseconds, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
+                    }
+                    if (\strlen($this->opusPayload) !== \strlen($content)) {
+                        throw new AssertionError();
                     }
                     yield $this->opusPayload;
                     $this->opusPayload = '';
@@ -444,8 +446,7 @@ final class Ogg
                     }
                     $content .= $piece;
                     if ($state === self::STATE_STREAMING) {
-                        yield $content;
-                        //yield from $this->opusStateMachine($content);
+                        yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         Assert::true($firstPage);
                         $head = \substr($content, 0, 8);

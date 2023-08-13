@@ -283,13 +283,13 @@ abstract class InternalDoc
     /**
      * Play file in call.
      */
-    public function callPlay(int $id, string $file): void
+    public function callPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\Ipc\Wrapper\ReadableStream|string $file): void
     {
         $this->wrapper->getAPI()->callPlay($id, $file);
     }
     /**
      * Play files on hold in call.
-     * @param array<string> $files
+     * @param array<string|LocalFile|RemoteUrl|ReadableStream> $files
      */
     public function callPlayOnHold(int $id, array $files): void
     {

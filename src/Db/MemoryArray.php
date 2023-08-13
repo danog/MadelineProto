@@ -122,4 +122,4 @@ final class MemoryArray extends ArrayIterator implements DbArray
     }
 }
 
-class_alias(MemoryArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MemoryArray');
+\class_alias(MemoryArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MemoryArray');

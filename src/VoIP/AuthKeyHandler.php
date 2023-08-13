@@ -108,7 +108,6 @@ trait AuthKeyHandler
         if (isset($this->calls[$id])) {
             $call = $this->calls[$id];
             unset($this->callsByPeer[$call->public->otherID], $this->calls[$id]);
-
         }
     }
 

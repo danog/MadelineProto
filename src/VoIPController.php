@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ReadableStream;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use AssertionError;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -481,6 +482,9 @@ final class VoIPController
         }
         $it = $this->openFile($file);
         foreach ($it->opusPackets as $packet) {
+            if (($s = \strlen($packet)) > 1024) {
+                throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
+            }
             $this->packetQueue->enqueue($packet);
         }
         return false;
@@ -558,7 +562,7 @@ final class VoIPController
     {
         $ctx = new ConnectionContext;
         $ctx->addStream(FileBufferedStream::class, match (true) {
-            is_string($file) => openFile($file, 'r'),
+            \is_string($file) => openFile($file, 'r'),
             $file instanceof LocalFile => openFile($file->file, 'r'),
             $file instanceof RemoteUrl => HttpClientBuilder::buildDefault()->request(new Request($file->url))->getBody(),
             $file instanceof ReadableStream => $file,

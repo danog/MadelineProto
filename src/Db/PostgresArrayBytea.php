@@ -128,4 +128,4 @@ class PostgresArrayBytea extends SqlArray
     }
 }
 
-class_alias(PostgresArrayBytea::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArrayBytea');
+\class_alias(PostgresArrayBytea::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArrayBytea');
