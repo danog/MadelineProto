@@ -572,14 +572,6 @@ final class VoIPController
     }
 
     /**
-     * Play file.
-     */
-    public function then(string $file): self
-    {
-        return $this->play($file);
-    }
-
-    /**
      * Files to play on hold.
      *
      * @param array<string> $files

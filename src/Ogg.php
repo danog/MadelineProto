@@ -193,15 +193,7 @@ final class Ogg
     const STATE_STREAMING = 3;
     const STATE_END = 4;
 
-    /**
-     * Frame duration in microseconds.
-     */
-    private int $frameDuration;
-    /**
-     * Current total frame duration in microseconds.
-     */
     private int $currentDuration = 0;
-
     /**
      * Current OPUS payload.
      */
@@ -304,7 +296,6 @@ final class Ogg
             } else {
                 $frameDuration = 2**($conf % 4) * 2500;
             }
-            $this->frameDuration ??= $frameDuration;
 
             $paddingLen = 0;
             if ($c === 0) {
@@ -359,12 +350,12 @@ final class Ogg
             }
 
             $totalDuration = \count($sizes) * $frameDuration;
-            if (!$selfDelimited && $totalDuration + $this->currentDuration <= $this->frameDuration) {
+            if (!$selfDelimited && $totalDuration + $this->currentDuration <= 60_000) {
                 $this->currentDuration += $totalDuration;
                 $sum = \array_sum($sizes);
                 /** @psalm-suppress InvalidArgument */
                 $this->opusPayload .= \substr($content, $preOffset, (int) (($offset - $preOffset) + $sum + $paddingLen));
-                if ($this->currentDuration === $this->frameDuration) {
+                if ($this->currentDuration === 60_000) {
                     yield $this->opusPayload;
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
@@ -379,9 +370,9 @@ final class Ogg
                 $this->opusPayload .= \substr($content, $offset, $size);
                 $offset += $size;
                 $this->currentDuration += $frameDuration;
-                if ($this->currentDuration >= $this->frameDuration) {
-                    if ($this->currentDuration > $this->frameDuration) {
-                        Logger::log("Emitting packet with duration {$this->currentDuration} but need {$this->frameDuration}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
+                if ($this->currentDuration >= 60_000) {
+                    if ($this->currentDuration > 60_000) {
+                        throw new AssertionError("Emitting packet with duration {$this->currentDuration} but need {60000}, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
                     }
                     yield $this->opusPayload;
                     $this->opusPayload = '';
@@ -453,8 +444,7 @@ final class Ogg
                     }
                     $content .= $piece;
                     if ($state === self::STATE_STREAMING) {
-                        yield $content;
-                        //yield from $this->opusStateMachine($content);
+                        yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         Assert::true($firstPage);
                         $head = \substr($content, 0, 8);
@@ -560,7 +550,7 @@ final class Ogg
         $in = $ctx->getStream();
         Assert::eq($in->bufferRead(length: 4), 'RIFF', "A .wav file must be provided!");
         $totalLength = \unpack('V', $in->bufferRead(length: 4))[1];
-        Assert::eq($in->bufferRead(length: 4), 'WAVE');
+        Assert::eq($in->bufferRead(length: 4), 'WAVE', "A .wav file must be provided!");
         do {
             $type = $in->bufferRead(length: 4);
             $length = \unpack('V', $in->bufferRead(length: 4))[1];
@@ -568,8 +558,8 @@ final class Ogg
                 Assert::eq($length, 16);
                 $contents = $in->bufferRead(length: $length + ($length % 2));
                 $header = \unpack('vaudioFormat/vchannels/VsampleRate/VbyteRate/vblockAlign/vbitsPerSample', $contents);
-                Assert::eq($header['audioFormat'], 1);
-                Assert::eq($header['sampleRate'], 48000);
+                Assert::eq($header['audioFormat'], 1, "The wav file must contain PCM audio");
+                Assert::eq($header['sampleRate'], 48000, "The sample rate of the wav file must be 48khz!");
             } elseif ($type === 'data') {
                 break;
             } else {
