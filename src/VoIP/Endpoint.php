@@ -334,10 +334,10 @@ final class Endpoint
                 case VoIPController::PKT_SWITCH_PREF_RELAY:
                     $result['relay_id'] = Tools::unpackSignedLong(\stream_get_contents($payload, 8));
                     break;
-                    /*case \danog\MadelineProto\VoIPController::PKT_SWITCH_TO_P2P:
-                        break;
-                    case \danog\MadelineProto\VoIPController::PKT_NOP:
-                        break;*/
+                case \danog\MadelineProto\VoIPController::PKT_SWITCH_TO_P2P:
+                    break;
+                case \danog\MadelineProto\VoIPController::PKT_NOP:
+                    break;
                 default:
                     Logger::log('Unknown packet received: '.$result['_'], Logger::ERROR);
                     continue 2;
