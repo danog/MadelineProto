@@ -406,6 +406,7 @@ final class MTProto implements TLCallback, LoggerGetter
         'channelParticipants' => ['innerMadelineProto' => true],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
+    private bool $cleaned = false;
 
     /**
      * Returns an instance of a client by session name.
@@ -836,6 +837,10 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function cleanupProperties(): void
     {
+        if ($this->cleaned) {
+            return;
+        }
+        $this->cleaned = true;
         $this->channels_state ??= new CombinedUpdatesState;
         $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
         $this->snitch ??= new Snitch;
@@ -919,6 +924,9 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->initPromise = $deferred->getFuture();
 
         try {
+            // Update settings from constructor
+            $this->updateSettings($settings);
+
             // Cleanup old properties, init new stuffs
             $this->cleanupProperties();
 
@@ -943,8 +951,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
             // Reset MTProto session (not related to user session)
             $this->resetMTProtoSession();
-            // Update settings from constructor
-            $this->updateSettings($settings);
+
             // Update TL callbacks
             $callbacks = [$this, $this->peerDatabase];
             if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -1091,6 +1098,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->settings = new Settings;
             } else {
                 if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+                    $this->setupLogger();
                     $this->logger->logger("Generic settings have changed!", Logger::WARNING);
                     $this->upgradeMadelineProto();
                 }
