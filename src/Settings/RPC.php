@@ -47,22 +47,6 @@ final class RPC extends SettingsAbstract
      */
     protected int $gzipEncodeIfGt = 1024 * 1024;
 
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['connection_settings']['all']['drop_timeout'])) {
-            $this->setRpcDropTimeout($settings['connection_settings']['all']['drop_timeout']);
-        }
-        if (isset($settings['flood_timeout']['wait_if_lt'])) {
-            $this->setFloodTimeout($settings['flood_timeout']['wait_if_lt']);
-        }
-        if (isset($settings['msg_array_limit']['call_queue'])) {
-            $this->setLimitCallQueue($settings['msg_array_limit']['call_queue']);
-        }
-        if (isset($settings['requests']['gzip_encode_if_gt'])) {
-            $this->setLimitCallQueue($settings['requests']['gzip_encode_if_gt']);
-        }
-    }
-
     /**
      * Get RPC drop timeout.
      */

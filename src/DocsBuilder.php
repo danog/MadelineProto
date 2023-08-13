@@ -56,9 +56,6 @@ final class DocsBuilder
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(null);
         $this->TL->init($settings['TL']);
-        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
-            $this->td = true;
-        }
         $this->settings = $settings;
         if (!\file_exists($this->settings['output_dir'])) {
             \mkdir($this->settings['output_dir']);
