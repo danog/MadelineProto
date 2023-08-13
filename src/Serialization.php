@@ -234,7 +234,7 @@ abstract class Serialization
                 $unserialized = DbPropertiesFactory::get(
                     $settings,
                     $tableName,
-                    [],
+                    ['enableCache' => false],
                     $unserialized,
                 );
             } else {

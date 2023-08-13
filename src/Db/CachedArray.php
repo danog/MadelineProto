@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\DatabaseAbstract;
+use IteratorAggregate;
 use Traversable;
 
 /**
@@ -29,8 +30,9 @@ use Traversable;
  * @template TValue
  *
  * @implements DbArray<TKey, TValue>
+ * @implements IteratorAggregate<TKey, TValue>
  */
-final class CachedArray implements DbArray
+final class CachedArray implements DbArray, IteratorAggregate
 {
     /** @use DbArrayTrait<TKey, TValue> */
     use DbArrayTrait;

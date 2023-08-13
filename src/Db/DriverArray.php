@@ -16,11 +16,14 @@
 
 namespace danog\MadelineProto\Db;
 
+use Closure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
+use Exception;
+use IteratorAggregate;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -34,8 +37,9 @@ use function Amp\Future\await;
  * @template TValue
  *
  * @implements DbArray<TKey, TValue>
+ * @implements IteratorAggregate<TKey, TValue>
  */
-abstract class DriverArray implements DbArray
+abstract class DriverArray implements DbArray, IteratorAggregate
 {
     /** @use DbArrayTrait<TKey, TValue> */
     use DbArrayTrait;
@@ -93,14 +97,10 @@ abstract class DriverArray implements DbArray
         ));
     }
 
-    private bool $old = true;
     public function __wakeup(): void
     {
         Magic::start(light: true);
         $this->setSettings($this->dbSettings);
-        if ($this->old) {
-            $this->setSerializer(SerializerType::SERIALIZE);
-        }
     }
 
     public static function getInstance(string $table, DbArray|null $previous, DatabaseAbstract $settings): DbArray
