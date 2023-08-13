@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Postgres\PostgresConfig;
 use Amp\Postgres\PostgresConnectionPool;
+use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use Throwable;
@@ -32,17 +33,25 @@ final class Postgres
     /** @var array<PostgresConnectionPool> */
     private static array $connections = [];
 
+    private static ?LocalKeyedMutex $mutex = null;
     public static function getConnection(DatabasePostgres $settings): PostgresConnectionPool
     {
+        self::$mutex ??= new LocalKeyedMutex;
         $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
-                ->withUser($settings->getUsername())
-                ->withPassword($settings->getPassword())
-                ->withDatabase($settings->getDatabase());
+        $lock = self::$mutex->acquire($dbKey);
 
-            static::createDb($config);
-            static::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+        try {
+            if (empty(static::$connections[$dbKey])) {
+                $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
+                    ->withUser($settings->getUsername())
+                    ->withPassword($settings->getPassword())
+                    ->withDatabase($settings->getDatabase());
+
+                static::createDb($config);
+                static::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+            }
+        } finally {
+            $lock->release();
         }
 
         return static::$connections[$dbKey];

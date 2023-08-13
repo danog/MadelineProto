@@ -18,8 +18,11 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\MysqlConfig;
 use Amp\Mysql\MysqlConnectionPool;
+use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+use danog\MadelineProto\Exception;
+use PDO;
 use Throwable;
 
 /**
@@ -29,20 +32,43 @@ use Throwable;
  */
 final class Mysql
 {
-    /** @var array<MysqlConnectionPool> */
+    /** @var array<list{MysqlConnectionPool, \PDO}> */
     private static array $connections = [];
 
-    public static function getConnection(DatabaseMysql $settings): MysqlConnectionPool
+    private static ?LocalKeyedMutex $mutex = null;
+    /** @return list{MysqlConnectionPool, \PDO} */
+    public static function getConnection(DatabaseMysql $settings): array
     {
+        self::$mutex ??= new LocalKeyedMutex;
         $dbKey = $settings->getKey();
-        if (!isset(self::$connections[$dbKey])) {
-            $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
-                ->withUser($settings->getUsername())
-                ->withPassword($settings->getPassword())
-                ->withDatabase($settings->getDatabase());
+        $lock = self::$mutex->acquire($dbKey);
 
-            self::createDb($config);
-            self::$connections[$dbKey] = new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+        try {
+            if (!isset(self::$connections[$dbKey])) {
+                $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
+                    ->withUser($settings->getUsername())
+                    ->withPassword($settings->getPassword())
+                    ->withDatabase($settings->getDatabase());
+
+                self::createDb($config);
+
+                $host = $config->getHost();
+                $port = $config->getPort();
+                if (!\extension_loaded('pdo_mysql')) {
+                    throw Exception::extension('pdo_mysql');
+                }
+
+                self::$connections[$dbKey] = [
+                    new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
+                    new PDO(
+                        "mysql:host={$host};port={$port};charset=UTF8",
+                        $settings->getUsername(),
+                        $settings->getPassword(),
+                    )
+                ];
+            }
+        } finally {
+            $lock->release();
         }
 
         return self::$connections[$dbKey];

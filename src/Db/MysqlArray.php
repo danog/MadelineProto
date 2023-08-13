@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Mysql\MysqlConfig;
 use Amp\Sql\Result;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
@@ -103,18 +102,10 @@ final class MysqlArray extends SqlArray
      */
     public function initConnection(DatabaseMysql $settings): void
     {
-        $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()));
-        $host = $config->getHost();
-        $port = $config->getPort();
-        if (!\extension_loaded('pdo_mysql')) {
-            throw Exception::extension('pdo_mysql');
+        if (isset($this->db)) {
+            return;
         }
-        $this->pdo = new PDO(
-            "mysql:host={$host};port={$port};charset=UTF8",
-            $settings->getUsername(),
-            $settings->getPassword(),
-        );
-        $this->db ??= Mysql::getConnection($settings);
+        [$this->db, $this->pdo] = Mysql::getConnection($settings);
     }
 
     /**

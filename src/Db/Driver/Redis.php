@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RedisConfig;
 use Amp\Redis\RemoteExecutorFactory;
+use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
 /**
@@ -31,16 +32,24 @@ final class Redis
     /** @var array<RedisRedis> */
     private static array $connections = [];
 
+    private static ?LocalKeyedMutex $mutex = null;
     public static function getConnection(DatabaseRedis $settings): RedisRedis
     {
+        self::$mutex ??= new LocalKeyedMutex;
         $dbKey = $settings->getKey();
-        if (empty(static::$connections[$dbKey])) {
-            $config = RedisConfig::fromUri($settings->getUri())
-                ->withPassword($settings->getPassword())
-                ->withDatabase($settings->getDatabase());
+        $lock = self::$mutex->acquire($dbKey);
 
-            static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
-            static::$connections[$dbKey]->ping();
+        try {
+            if (empty(static::$connections[$dbKey])) {
+                $config = RedisConfig::fromUri($settings->getUri())
+                    ->withPassword($settings->getPassword())
+                    ->withDatabase($settings->getDatabase());
+
+                static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
+                static::$connections[$dbKey]->ping();
+            }
+        } finally {
+            $lock->release();
         }
 
         return static::$connections[$dbKey];
