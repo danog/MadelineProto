@@ -23,6 +23,7 @@ use AssertionError;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use FFI;
+use FFI\CData;
 use Webmozart\Assert\Assert;
 
 use function Amp\File\openFile;
@@ -519,15 +520,24 @@ final class Ogg
         const char *opus_strerror(int error);
         const char *opus_get_version_string(void);
 
-        ', 'libopus.so');
+        ', 'libopus.so.0');
+        $checkErr = function (int|CData $err) use ($opus) {
+            if ($err instanceof CData) {
+                $err = $err->cdata;
+            }
+            if ($err < 0) {
+                throw new AssertionError("opus returned: ".$opus->opus_strerror($len));
+            }
+        };
         $err = FFI::new('int');
         $encoder = $opus->opus_encoder_create(48000, 2, self::OPUS_APPLICATION_AUDIO, FFI::addr($err));
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_COMPLEXITY_REQUEST, 10);
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_PACKET_LOSS_PERC_REQUEST, 1);
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_INBAND_FEC_REQUEST, 1);
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_SIGNAL_REQUEST, self::OPUS_SIGNAL_MUSIC);
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND);
-        $opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000);
+        $checkErr($err);
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_COMPLEXITY_REQUEST, 10));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_PACKET_LOSS_PERC_REQUEST, 1));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_INBAND_FEC_REQUEST, 1));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_SIGNAL_REQUEST, self::OPUS_SIGNAL_MUSIC));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
         $in = openFile($wavIn, 'r');
         Assert::eq($in->read(length: 4), 'RIFF');
@@ -629,9 +639,7 @@ final class Ogg
             $chunk = str_pad($in->read(length: $chunkSize), $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
-            if ($len < 0) {
-                throw new AssertionError("opus_encode returned: ".$opus->opus_strerror($len));
-            }
+            $checkErr($len);
             $writePage(
                 $in->eof() ? self::EOS : 0,
                 $granule += $granuleDiff,
