@@ -801,7 +801,7 @@ abstract class Tools extends AsyncTools
                 while ($parent = $parent->getAttribute('parent')) {
                     if ($parent instanceof ClassMethod
                         && $parent->isPublic()
-                        && in_array($parent->name->toLowerString(), self::NO_YIELD_FUNCTIONS, true)
+                        && \in_array($parent->name->toLowerString(), self::NO_YIELD_FUNCTIONS, true)
                     ) {
                         $issues []= new EventHandlerIssue(
                             message: Lang::$current_lang['do_not_use_yield'],
