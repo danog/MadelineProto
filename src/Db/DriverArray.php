@@ -151,7 +151,7 @@ abstract class DriverArray implements DbType
             SerializerType::STRING => fn ($v) => $v,
         };
     }
-    private static function migrateDataToDb(self $new, DbArray|null $old): void
+    private static function migrateDataToDb(self $new, DbType|null $old): void
     {
         $oldName = self::getMigrationName($old);
         $newName = self::getMigrationName($new);
