@@ -444,7 +444,8 @@ final class Ogg
                     }
                     $content .= $piece;
                     if ($state === self::STATE_STREAMING) {
-                        yield from $this->opusStateMachine($content);
+                        yield $content;
+                        //yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         Assert::true($firstPage);
                         $head = \substr($content, 0, 8);
