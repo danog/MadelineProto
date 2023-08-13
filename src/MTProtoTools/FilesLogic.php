@@ -125,6 +125,27 @@ trait FilesLogic
         }
     }
     /**
+     * Download file to an amphp stream, returning it.
+     *
+     * @param mixed                       $messageMedia File to download
+     * @param callable                    $cb            Callback
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     */
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    {
+        $pipe = new Pipe(1024*1024);
+        $sink = $pipe->getSink();
+        EventLoop::queue(function () use ($messageMedia, $sink, $cb, $offset, $end): void {
+            try {
+                $this->downloadToStream($messageMedia, $sink, $cb, $offset, $end);
+            } finally {
+                $sink->close();
+            }
+        });
+        return $pipe->getSource();
+    }
+    /**
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download

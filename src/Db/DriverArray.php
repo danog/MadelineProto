@@ -16,13 +16,11 @@
 
 namespace danog\MadelineProto\Db;
 
-use Closure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
-use Exception;
 use IteratorAggregate;
 
 use function Amp\async;

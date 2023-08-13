@@ -204,6 +204,12 @@
       <code>$cacheTtl</code>
     </PropertyNotSetInConstructor>
   </file>
+  <file src="src/Db/CachedArray.php">
+    <LessSpecificImplementedReturnType>
+      <code>Traversable</code>
+      <code>Traversable</code>
+    </LessSpecificImplementedReturnType>
+  </file>
   <file src="src/Db/DbArrayTrait.php">
     <InvalidArgument>
       <code>$index</code>
@@ -244,6 +250,9 @@
       <code>$settings</code>
       <code>$settings</code>
     </ArgumentTypeCoercion>
+    <MethodSignatureMismatch>
+      <code>DriverArray</code>
+    </MethodSignatureMismatch>
     <MissingClosureParamType>
       <code>$v</code>
       <code>$value</code>

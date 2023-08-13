@@ -447,6 +447,18 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->downloadToResponse($messageMedia, $request, $cb, $size, $mime, $name);
     }
     /**
+     * Download file to an amphp stream, returning it.
+     *
+     * @param mixed                       $messageMedia File to download
+     * @param callable                    $cb            Callback
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     */
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): \Amp\ByteStream\ReadableStream
+    {
+        return $this->wrapper->getAPI()->downloadToReturnedStream($messageMedia, $cb, $offset, $end);
+    }
+    /**
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download
