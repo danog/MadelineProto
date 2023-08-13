@@ -155,3 +155,5 @@ final class RedisArray extends DriverArray
         }
     }
 }
+
+class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\RedisArray');

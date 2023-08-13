@@ -19,10 +19,15 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
-use Amp\File\Whence;
+use Amp\ByteStream\WritableStream;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use AssertionError;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
+use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\Transport\PremadeStream;
 use FFI;
 use FFI\CData;
 use Webmozart\Assert\Assert;
@@ -498,7 +503,7 @@ final class Ogg
 
     public static function convert(
         LocalFile|RemoteUrl|ReadableStream $wavIn,
-        string $oggOut
+        LocalFile|WritableStream $oggOut
     ): void {
         $opus = FFI::cdef('
         typedef struct OpusEncoder OpusEncoder;
@@ -542,23 +547,33 @@ final class Ogg
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
-        $in = openFile($wavIn, 'r');
-        Assert::eq($in->read(length: 4), 'RIFF', "A .wav file must be provided!");
-        $totalLength = \unpack('V', $in->read(length: 4))[1];
-        Assert::eq($in->read(length: 4), 'WAVE');
+        $in = $wavIn instanceof LocalFile
+            ? openFile($wavIn->file, 'r')
+            : (
+                $wavIn instanceof RemoteUrl
+                ? HttpClientBuilder::buildDefault()->request(new Request($wavIn->url))->getBody()
+                : $wavIn
+            );
+
+        $ctx = (new ConnectionContext())->addStream(PremadeStream::class, $in)->addStream(SimpleBufferedRawStream::class);
+        /** @var SimpleBufferedRawStream */
+        $in = $ctx->getStream();
+        Assert::eq($in->bufferRead(length: 4), 'RIFF', "A .wav file must be provided!");
+        $totalLength = \unpack('V', $in->bufferRead(length: 4))[1];
+        Assert::eq($in->bufferRead(length: 4), 'WAVE');
         do {
-            $type = $in->read(length: 4);
-            $length = \unpack('V', $in->read(length: 4))[1];
+            $type = $in->bufferRead(length: 4);
+            $length = \unpack('V', $in->bufferRead(length: 4))[1];
             if ($type === 'fmt ') {
                 Assert::eq($length, 16);
-                $contents = $in->read(length: $length + ($length % 2));
+                $contents = $in->bufferRead(length: $length + ($length % 2));
                 $header = \unpack('vaudioFormat/vchannels/VsampleRate/VbyteRate/vblockAlign/vbitsPerSample', $contents);
                 Assert::eq($header['audioFormat'], 1);
                 Assert::eq($header['sampleRate'], 48000);
             } elseif ($type === 'data') {
                 break;
             } else {
-                $in->seek($length, Whence::Current);
+                $in->bufferRead($length);
             }
         } while (true);
 
@@ -566,7 +581,9 @@ final class Ogg
         $chunkSize = (int) ($sampleCount * $header['channels'] * ($header['bitsPerSample'] >> 3));
         $shift = (int) \log($header['channels'] * ($header['bitsPerSample'] >> 3), 2);
 
-        $out = openFile($oggOut, 'w');
+        $out = $oggOut instanceof LocalFile
+            ? openFile($oggOut->file, 'w')
+            : $oggOut;
 
         $writePage = function (int $header_type_flag, int $granule, int $streamId, int &$streamSeqno, string $packet) use ($out): void {
             Assert::true(\strlen($packet) < 65025);
@@ -638,19 +655,20 @@ final class Ogg
 
         $granule = 0;
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
-        while (!$in->eof()) {
-            $chunk = \str_pad($in->read(length: $chunkSize), $chunkSize, "\0");
+        do {
+            $chunkOrig = $in->bufferRead(length: $chunkSize);
+            $chunk = \str_pad($chunkOrig, $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
             $checkErr($len);
             $writePage(
-                $in->eof() ? self::EOS : 0,
+                \strlen($chunk) !== \strlen($chunkOrig) ? self::EOS : 0,
                 $granule += $granuleDiff,
                 $streamId,
                 $seqno,
                 FFI::string($buf, $len)
             );
-        }
+        } while (\strlen($chunk) === \strlen($chunkOrig));
         $opus->opus_encoder_destroy($encoder);
         unset($buf, $encoder, $opus);
 
