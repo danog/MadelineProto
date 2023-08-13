@@ -956,8 +956,6 @@ final class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
-
-        $this->minDatabase?->sync();
     }
     /**
      * Post-deserialization initialization function.

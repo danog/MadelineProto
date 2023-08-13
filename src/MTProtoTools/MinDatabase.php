@@ -25,8 +25,10 @@ use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TL\TLCallback;
 use Revolt\EventLoop;
+use Throwable;
 
 /**
  * Manages min peers.
@@ -62,12 +64,6 @@ final class MinDatabase implements TLCallback
      */
     private bool $clean = false;
     /**
-     * Whether we synced ourselves with the peer database.
-     *
-     */
-    private bool $synced = false;
-
-    /**
      * List of properties stored in database (memory or external).
      *
      * @see DbPropertiesFactory
@@ -76,20 +72,31 @@ final class MinDatabase implements TLCallback
         'db' => ['innerMadelineProto' => true],
     ];
 
+    private ?string $syncTimer = null;
+
     public function __construct(MTProto $API)
     {
         $this->API = $API;
     }
+    public function __destruct()
+    {
+        if ($this->syncTimer) {
+            EventLoop::cancel($this->syncTimer);
+            $this->syncTimer = null;
+        }
+    }
     public function __sleep()
     {
-        return ['db', 'API', 'clean', 'synced'];
+        return ['db', 'API', 'clean'];
     }
     public function init(): void
     {
         $this->initDb($this->API);
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             $this->db->clear();
+            return;
         }
+
         if (!$this->clean) {
             EventLoop::queue(function (): void {
                 foreach ($this->db as $id => $origin) {
@@ -100,25 +107,27 @@ final class MinDatabase implements TLCallback
                 $this->clean = true;
             });
         }
+        EventLoop::queue($this->sync(...));
+        $this->syncTimer = EventLoop::repeat(60.0, $this->sync(...));
     }
-    public function sync(): void
+    private function sync(): void
     {
-        if (!$this->synced) {
-            EventLoop::queue(function (): void {
-                $counter = 0;
-                foreach ($this->API->chats as $id => $chat) {
-                    $id = (int) $id;
-                    $counter++;
-                    if ($counter % 1000 === 0) {
-                        $this->API->logger->logger("Upgrading chats: $counter", Logger::WARNING);
-                    }
+        $this->API->waitForInit();
+        foreach ($this->db as $id => $_) {
+            $id = (int) $id;
 
-                    if (!($chat['min'] ?? false)) {
+            if ($this->API->chats[$id]['min'] ?? true) {
+                try {
+                    $this->API->refreshPeerCache($id);
+                } catch (Throwable $e) {
+                    if ($e instanceof RPCErrorException && $e->rpc === 'MSG_ID_INVALID') {
                         $this->clearPeer($id);
                     }
+                    $this->API->logger->logger("An error occurred while refreshing the peer cache for $id: $e");
                 }
-                $this->synced = true;
-            });
+            } else {
+                $this->clearPeer($id);
+            }
         }
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
@@ -215,7 +224,9 @@ final class MinDatabase implements TLCallback
             if ($origin['peer'] === $id) {
                 continue;
             }
-            $this->db[$id] = $origin;
+            if ($this->API->chats[$id]['min'] ?? true) {
+                $this->db[$id] = $origin;
+            }
         }
         $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }

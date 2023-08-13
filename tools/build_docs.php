@@ -248,7 +248,7 @@ foreach ($orderedfiles as $key => $filename) {
 
     preg_match_all('|( *)\* \[(.*)\]\((.*)\)|', $file, $matches);
     $file = 'https://docs.madelineproto.xyz/docs/'.basename($filename, '.md').'.html';
-    $index .= "* [$title]($file)\n";
+    $index .= "* [$title]($file) - $description\n";
     if (basename($filename) !== 'FEATURES.md') {
         foreach ($matches[1] as $key => $match) {
             $spaces = "  $match";

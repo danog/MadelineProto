@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\File\Whence;
 use AssertionError;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -495,8 +496,10 @@ final class Ogg
         }
     }
 
-    public static function convert(string $wavIn, string $oggOut): void
-    {
+    public static function convert(
+        LocalFile|RemoteUrl|ReadableStream $wavIn,
+        string $oggOut
+    ): void {
         $opus = FFI::cdef('
         typedef struct OpusEncoder OpusEncoder;
 
@@ -521,7 +524,7 @@ final class Ogg
         const char *opus_get_version_string(void);
 
         ', 'libopus.so.0');
-        $checkErr = function (int|CData $err) use ($opus) {
+        $checkErr = function (int|CData $err) use ($opus): void {
             if ($err instanceof CData) {
                 $err = $err->cdata;
             }
@@ -540,7 +543,7 @@ final class Ogg
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
         $in = openFile($wavIn, 'r');
-        Assert::eq($in->read(length: 4), 'RIFF');
+        Assert::eq($in->read(length: 4), 'RIFF', "A .wav file must be provided!");
         $totalLength = \unpack('V', $in->read(length: 4))[1];
         Assert::eq($in->read(length: 4), 'WAVE');
         do {
@@ -636,7 +639,7 @@ final class Ogg
         $granule = 0;
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
         while (!$in->eof()) {
-            $chunk = str_pad($in->read(length: $chunkSize), $chunkSize, "\0");
+            $chunk = \str_pad($in->read(length: $chunkSize), $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
             $checkErr($len);

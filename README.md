@@ -68,28 +68,28 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 
 ## Documentation
 
-* [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html)
-* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
+* [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html) - To create the session and set the serialization destination file, do the following:
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html) - There are many ways you can login with MadelineProto.
   * [Getting permission to use the telegram API](https://docs.madelineproto.xyz/docs/LOGIN.html#getting-permission-to-use-the-telegram-api)
   * [Automatic](https://docs.madelineproto.xyz/docs/LOGIN.html#automatic)
   * [Manual (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-user)
     * [API ID](https://docs.madelineproto.xyz/docs/LOGIN.html#api-id)
   * [Manual (bot)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-bot)
   * [QR code login (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#qr-code-user)
-* [Features](https://docs.madelineproto.xyz/docs/FEATURES.html)
-* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html)
-* [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html)
+* [Features](https://docs.madelineproto.xyz/docs/FEATURES.html) - MadelineProto can do everything official clients can do, and more!
+* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, ffi, openssl extensions to function properly.
+* [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html) - MadelineProto offers an official MadelineProto docker image for the linux/amd64, linux/arm64 and linux/riscv64 platforms @ hub.madelineproto.xyz/danog/madelineproto.  
   * [Getting started](https://docs.madelineproto.xyz/docs/DOCKER.html#getting-started)
     * [CLI bot (recommended)](https://docs.madelineproto.xyz/docs/DOCKER.html#cli-bot-recommended)
     * [Databases on docker](https://docs.madelineproto.xyz/docs/DOCKER.html#databases-on-docker)
     * [Web docker](https://docs.madelineproto.xyz/docs/DOCKER.html#web-docker)
     * [Custom extensions](https://docs.madelineproto.xyz/docs/DOCKER.html#custom-extensions)
-* [Installation](https://docs.madelineproto.xyz/docs/INSTALLATION.html)
+* [Installation](https://docs.madelineproto.xyz/docs/INSTALLATION.html) - There are various ways to install MadelineProto:
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
-* [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html)
-* [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html)
+* [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html) - MadelineProto can be used to broadcast messages to all users, chats and channels of a bot or userbot.  
+* [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html) - Update handling can be done in different ways: 
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Full example](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Bound methods](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods)
@@ -114,12 +114,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Configuration](https://docs.madelineproto.xyz/docs/UPDATES.html#configuration)
   * [Creating and uploading text files](https://docs.madelineproto.xyz/docs/UPDATES.html#creating-and-uploading-text-files)
   * [Logging](https://docs.madelineproto.xyz/docs/UPDATES.html#logging)
-* [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html)
+* [Filters](https://docs.madelineproto.xyz/docs/FILTERS.html) - MadelineProto offers a very simple and intuitive message filtering system, based on PHP's type system and attributes.
   * [Simple filters](https://docs.madelineproto.xyz/docs/FILTERS.html#simple-filters)
   * [Attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#attribute-filters)
     * [Creating custom attribute filters](https://docs.madelineproto.xyz/docs/FILTERS.html#creating-custom-attribute-filters)
   * [MTProto filters](https://docs.madelineproto.xyz/docs/FILTERS.html#mtproto-filters)
-* [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html)
+* [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html) - MadelineProto offers a native plugin system, based on event handlers!
   * [Installing plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html#installing-plugins)
     * [Simple installation](https://docs.madelineproto.xyz/docs/PLUGINS.html#simple-installation)
     * [Composer installation](https://docs.madelineproto.xyz/docs/PLUGINS.html#composer-installation)
@@ -131,12 +131,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Configuration](https://docs.madelineproto.xyz/docs/UPDATES.html#configuration)
   * [Creating and uploading text files](https://docs.madelineproto.xyz/docs/UPDATES.html#creating-and-uploading-text-files)
   * [Logging](https://docs.madelineproto.xyz/docs/UPDATES.html#logging)
-* [Database](https://docs.madelineproto.xyz/docs/DATABASE.html)
+* [Database](https://docs.madelineproto.xyz/docs/DATABASE.html) - MadelineProto optionally can keep some of its internal data in a database, such as mysql, mariadb, postgres or redis (you can also add your own!), reducing RAM usage.   
   * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
   * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
   * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
-* [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html)
+* [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html) - MadelineProto has lots of settings that can be used to modify the behaviour of the library.  
   * [AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
   * [Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
   * [Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
@@ -154,21 +154,21 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
   * [Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
-* [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html)
-* [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html)
+* [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html) - Here's how you can fetch info about the currently logged in user
+* [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html) - MadelineProto can throw lots of different exceptions.  
   * [List of exception types](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#list-of-exception-types)
   * [Pretty TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#pretty-tl-trace)
   * [Getting the TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#getting-the-tl-trace)
-* [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html)
-* [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html)
-* [Telegram VoIP phone calls](https://docs.madelineproto.xyz/docs/CALLS.html)
+* [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html) - If you make too many requests to telegram, you might get FLOOD_WAITed for a while. To avoid these flood waits, you must calculate the flood wait rate.  
+* [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html) - MadelineProto provides a unified class for logging messages to the logging destination defined in settings.  
+* [Telegram VoIP phone calls](https://docs.madelineproto.xyz/docs/CALLS.html) - MadelineProto provides an easy wrapper to work with phone calls.
   * [Requesting a call](https://docs.madelineproto.xyz/docs/CALLS.html#requesting-a-call)
     * [Playing mp3 files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-mp3-files)
     * [Playing streams](https://docs.madelineproto.xyz/docs/CALLS.html#playing-streams)
     * [Changing audio quality](https://docs.madelineproto.xyz/docs/CALLS.html#changing-audio-quality)
   * [Putting it all together](https://docs.madelineproto.xyz/docs/CALLS.html#putting-it-all-together)
   * [Accepting calls](https://docs.madelineproto.xyz/docs/CALLS.html#accepting-calls)
-* [Uploading and downloading files](https://docs.madelineproto.xyz/docs/FILES.html)
+* [Uploading and downloading files](https://docs.madelineproto.xyz/docs/FILES.html) - MadelineProto provides fully parallelized wrapper methods to upload and download files that support bot API file ids, direct upload by URL and file renaming.
   * [Bot API file IDs](https://docs.madelineproto.xyz/docs/FILES.html#bot-api-file-ids)
   * [Uploading & sending files](https://docs.madelineproto.xyz/docs/FILES.html#sending-files)
     * [Security notice](https://docs.madelineproto.xyz/docs/FILES.html#security-notice)
@@ -193,29 +193,29 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * [Download to http-server](https://docs.madelineproto.xyz/docs/FILES.html#download-to-http-server)
     * [Download to browser](https://docs.madelineproto.xyz/docs/FILES.html#download-to-browser)
   * [Getting progress](https://docs.madelineproto.xyz/docs/FILES.html#getting-progress)
-* [Getting info about chats](https://docs.madelineproto.xyz/docs/CHAT_INFO.html)
+* [Getting info about chats](https://docs.madelineproto.xyz/docs/CHAT_INFO.html) - There are various methods that can be used to fetch info about chats, based on bot API id, tg-cli ID, Peer, User, Chat objects.
   * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getPwrChat)
   * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getFullInfo)
   * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getInfo)
   * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getId)
-* [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html)
+* [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html) - There are two ways to get a list of all chats, depending if you logged in as a user, or as a bot.
   * [Dialog ID list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogIds)
   * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs)
   * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs)
-* [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html)
-* [Secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
+* [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html) - You can easily click inline buttons using MadelineProto, just access the correct button:
+* [Secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html) - MadelineProto provides wrappers to work with secret chats.
   * [Requesting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#requesting-secret-chats)
   * [Accepting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#accepting-secret-chats)
   * [Checking secret chat status](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#checking-secret-chat-status)
   * [Sending secret messages](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#sending-secret-messages)
-* [Using a proxy](https://docs.madelineproto.xyz/docs/PROXY.html)
+* [Using a proxy](https://docs.madelineproto.xyz/docs/PROXY.html) - You can use a proxy with MadelineProto.
   * [How to set a proxy](https://docs.madelineproto.xyz/docs/PROXY.html#how-to-set-a-proxy)
   * [Multiple proxies with automatic switch](https://docs.madelineproto.xyz/docs/PROXY.html#multiple-proxies-with-automatic-switch)
   * [Use pre-built MTProxy](https://docs.madelineproto.xyz/docs/PROXY.html#mtproxy)
   * [Use pre-built Socks5 proxy](https://docs.madelineproto.xyz/docs/PROXY.html#socks5-proxy)
   * [Use pre-built HTTP proxy](https://docs.madelineproto.xyz/docs/PROXY.html#http-proxy)
   * [Build your own proxy](https://docs.madelineproto.xyz/docs/PROXY.html#build-your-proxy)
-* [Async](https://docs.madelineproto.xyz/docs/ASYNC.html)
+* [Async](https://docs.madelineproto.xyz/docs/ASYNC.html) - MadelineProto now features async, for incredible speed improvements, and parallel processing, all powered by amphp.
   * [Usage](https://docs.madelineproto.xyz/docs/ASYNC.html#usage)
     * [Async in event handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-event-handler)
     * [Multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async)
@@ -231,8 +231,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
         * [Async forking](https://docs.madelineproto.xyz/docs/ASYNC.html#async-forking-does-async-green-thread-forking)
         * [Async flock](https://docs.madelineproto.xyz/docs/ASYNC.html#async-flock)
       * [MadelineProto async loop APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis)
-* [FAQ](https://docs.madelineproto.xyz/docs/FAQ.html)
-* [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
+* [FAQ](https://docs.madelineproto.xyz/docs/FAQ.html) - Here's a list of common MadelineProto questions and answers.
+* [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html) - There are simplifications for many, if not all of, these methods.
   * [Named arguments (PHP 8+)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
   * [Files](https://docs.madelineproto.xyz/docs/FILES.html)
@@ -933,9 +933,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.toggleAllStoriesHidden.html" name="stories.toggleAllStoriesHidden">stories.toggleAllStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePinned.html" name="stories.togglePinned">stories.togglePinned</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getStoriesMaxIDs.html" name="users.getStoriesMaxIDs">users.getStoriesMaxIDs</a>
-* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html)
+* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.  
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIB.html#credits)
-* [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
+* [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html) - The web template used for the $MadelineProto->start() and API ID web UIs can be changed.
 
