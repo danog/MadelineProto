@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings;
 
-use danog\MadelineProto\Db\DbType;
+use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\SettingsAbstract;
 
 /**
@@ -145,6 +145,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
         return $this;
     }
 
-    /** @return class-string<DbType> */
+    /** @return class-string<DbArray> */
     abstract public function getDriverClass(): string;
 }

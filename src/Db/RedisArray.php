@@ -87,7 +87,7 @@ final class RedisArray extends DriverArray
     }
     public function set(string|int $key, mixed $value): void
     {
-        $this->db->set($this->rKey($key), ($this->serializer)($value));
+        $this->db->set($this->rKey((string) $key), ($this->serializer)($value));
     }
 
     public function offsetGet(mixed $offset): mixed
@@ -105,7 +105,7 @@ final class RedisArray extends DriverArray
 
     public function unset(string|int $key): void
     {
-        $this->db->delete($this->rkey($key));
+        $this->db->delete($this->rkey((string) $key));
     }
 
     /**

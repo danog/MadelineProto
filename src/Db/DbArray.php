@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Db;
 
 use ArrayAccess;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
  * DB array interface.
@@ -26,8 +27,6 @@ use ArrayAccess;
  *
  * @extends ArrayAccess<TKey, TValue>
  * @extends DbType<TKey, TValue>
- *
- * @internal
  */
 interface DbArray extends DbType, ArrayAccess
 {
@@ -55,4 +54,9 @@ interface DbArray extends DbType, ArrayAccess
      * @psalm-return array<TKey, TValue>
      */
     public function getArrayCopy(): array;
+
+    /**
+     * Get instance.
+     */
+    public static function getInstance(string $table, self|null $previous, DatabaseAbstract $settings): self;
 }

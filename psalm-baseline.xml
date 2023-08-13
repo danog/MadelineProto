@@ -204,6 +204,19 @@
       <code>$cacheTtl</code>
     </PropertyNotSetInConstructor>
   </file>
+  <file src="src/Db/DbArrayTrait.php">
+    <InvalidArgument>
+      <code>$index</code>
+      <code>$index</code>
+      <code>$index</code>
+      <code>$index</code>
+    </InvalidArgument>
+  </file>
+  <file src="src/Db/DbType.php">
+    <ImplementedParamTypeMismatch>
+      <code>$index</code>
+    </ImplementedParamTypeMismatch>
+  </file>
   <file src="src/Db/Driver/Mysql.php">
     <ArgumentTypeCoercion>
       <code>$config</code>
@@ -227,7 +240,6 @@
   </file>
   <file src="src/Db/DriverArray.php">
     <ArgumentTypeCoercion>
-      <code>$previous</code>
       <code>$settings</code>
       <code>$settings</code>
       <code>$settings</code>

@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\Db;
 
 use Countable;
-use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
  * DB type interface.
@@ -59,12 +58,7 @@ interface DbType extends Countable
     /**
      * Get iterator.
      *
-     * @return \Traversable<TKey, TValue>
+     * @psalm-return \Traversable<TKey, TValue>
      */
     public function getIterator(): \Traversable;
-
-    /**
-     * Get instance.
-     */
-    public static function getInstance(string $table, DbType|null $previous, DatabaseAbstract $settings): self;
 }

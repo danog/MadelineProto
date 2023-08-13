@@ -42,7 +42,7 @@ final class CacheContainer
     private LocalMutex $mutex;
 
     public function __construct(
-        public DbType $inner
+        public DbArray $inner
     ) {
         $this->mutex = new LocalMutex;
     }
@@ -50,6 +50,10 @@ final class CacheContainer
     {
         $this->flushCache();
         return ['cache', 'ttl', 'inner'];
+    }
+    public function __wakeup(): void
+    {
+        $this->mutex = new LocalMutex;
     }
 
     public function startCacheCleanupLoop(int $cacheTtl): void

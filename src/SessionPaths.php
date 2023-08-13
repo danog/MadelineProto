@@ -45,7 +45,7 @@ use function Amp\File\write;
 final class SessionPaths
 {
     /**
-     * Legacy session path.
+     * Session directory path.
      */
     private string $sessionDirectoryPath;
     /**
@@ -215,7 +215,7 @@ final class SessionPaths
     }
 
     /**
-     * Get legacy session path.
+     * Get session directory path.
      */
     public function getSessionDirectoryPath(): string
     {

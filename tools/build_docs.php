@@ -33,6 +33,8 @@ use function Amp\File\read;
 
 chdir($d=__DIR__.'/..');
 
+`git checkout src/InternalDoc.php`;
+
 require 'vendor/autoload.php';
 
 require 'tools/translator.php';

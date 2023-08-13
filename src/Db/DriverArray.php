@@ -33,10 +33,13 @@ use function Amp\Future\await;
  * @template TKey as array-key
  * @template TValue
  *
- * @implements DbType<TKey, TValue>
+ * @implements DbArray<TKey, TValue>
  */
-abstract class DriverArray implements DbType
+abstract class DriverArray implements DbArray
 {
+    /** @use DbArrayTrait<TKey, TValue> */
+    use DbArrayTrait;
+
     protected string $table;
     /** @var callable(mixed): mixed */
     protected $serializer;
@@ -100,7 +103,7 @@ abstract class DriverArray implements DbType
         }
     }
 
-    public static function getInstance(string $table, DbType|null $previous, DatabaseAbstract $settings): DbType
+    public static function getInstance(string $table, DbArray|null $previous, DatabaseAbstract $settings): DbArray
     {
         /** @var MysqlArray|PostgresArray|RedisArray */
         $instance = new static();

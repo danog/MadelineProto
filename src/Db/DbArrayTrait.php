@@ -19,14 +19,15 @@ namespace danog\MadelineProto\Db;
 /**
  * DB array trait.
  *
- * @internal
+ * @template TTKey as array-key
+ * @template TTValue
  */
 trait DbArrayTrait
 {
     /**
      * Check if key isset.
      *
-     * @param mixed $key
+     * @param TTKey $key
      * @return bool true if the offset exists, otherwise false
      */
     final public function isset(string|int $key): bool
@@ -34,17 +35,24 @@ trait DbArrayTrait
         return $this->offsetGet($key) !== null;
     }
 
-    /** @param string|int $index */
+    /** @param TTKey $index */
     final public function offsetExists(mixed $index): bool
     {
         return $this->isset($index);
     }
 
+    /**
+     * @param TTKey $index
+     * @param TTValue $value
+     */
     final public function offsetSet(mixed $index, mixed $value): void
     {
         $this->set($index, $value);
     }
 
+    /**
+     * @param TTKey $index
+     */
     final public function offsetUnset(mixed $index): void
     {
         $this->unset($index);
@@ -52,6 +60,8 @@ trait DbArrayTrait
 
     /**
      * Get array copy.
+     *
+     * @psalm-return array<TTKey, TTValue>
      */
     final public function getArrayCopy(): array
     {

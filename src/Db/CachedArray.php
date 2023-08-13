@@ -32,6 +32,7 @@ use Traversable;
  */
 final class CachedArray implements DbArray
 {
+    /** @use DbArrayTrait<TKey, TValue> */
     use DbArrayTrait;
 
     private CacheContainer $cache;
@@ -39,7 +40,7 @@ final class CachedArray implements DbArray
     /**
      * Get instance.
      */
-    public static function getInstance(string $table, DbType|null $previous, DatabaseAbstract $settings): DbType
+    public static function getInstance(string $table, DbArray|null $previous, DatabaseAbstract $settings): DbArray
     {
         $new = $settings->getDriverClass();
         if ($previous === null) {
@@ -58,7 +59,7 @@ final class CachedArray implements DbArray
         return $previous;
     }
 
-    public function __construct(DbType $inner)
+    public function __construct(DbArray $inner)
     {
         $this->cache = new CacheContainer($inner);
     }

@@ -40,17 +40,17 @@ final class MemoryArray extends ArrayIterator implements DbArray
     /**
      * @param Memory $settings
      */
-    public static function getInstance(string $table, DbType|null $previous, $settings): DbType
+    public static function getInstance(string $table, DbArray|null $previous, $settings): DbArray
     {
         if ($previous instanceof MemoryArray) {
             return $previous;
         }
-        if ($previous instanceof DbArray) {
+        if ($previous instanceof DbType) {
             Logger::log('Loading database to memory. Please wait.', Logger::WARNING);
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }
-            $temp = $previous->getArrayCopy();
+            $temp = \iterator_to_array($previous->getIterator());
             $previous->clear();
             $previous = $temp;
         }

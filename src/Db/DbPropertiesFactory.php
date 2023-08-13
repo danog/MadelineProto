@@ -30,13 +30,8 @@ final class DbPropertiesFactory
 {
     /**
      * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool, innerMadelineProtoSerializer?: SerializerType}|'array' $config
-     * @internal
-     * @uses \danog\MadelineProto\Db\MemoryArray
-     * @uses \danog\MadelineProto\Db\MysqlArray
-     * @uses \danog\MadelineProto\Db\PostgresArray
-     * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $table, string|array $config, ?DbType $value = null): DbArray
+    public static function get(DatabaseAbstract $dbSettings, string $table, string|array $config, ?DbArray $value = null): DbArray
     {
         // Legacy
         if ($config === 'array') {
@@ -69,8 +64,10 @@ final class DbPropertiesFactory
             $dbSettings->setCacheTtl($config['cacheTtl']);
         }
 
-        $result = CachedArray::getInstance($table, $value, $dbSettings);
-        \assert($result instanceof DbArray);
-        return $result;
+        if (!($config['enableCache'] ?? true)) {
+            return $dbSettings->getDriverClass()::getInstance($table, $value, $dbSettings);
+        }
+
+        return CachedArray::getInstance($table, $value, $dbSettings);
     }
 }
