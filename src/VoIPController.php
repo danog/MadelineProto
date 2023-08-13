@@ -18,6 +18,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableStream;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -100,9 +103,9 @@ final class VoIPController
 
     private array $call;
 
-    /** @var array<string> */
+    /** @var array<string|LocalFile|RemoteUrl|ReadableStream> */
     private array $holdFiles = [];
-    /** @var list<string> */
+    /** @var list<string|LocalFile|RemoteUrl|ReadableStream> */
     private array $inputFiles = [];
     private int $holdIndex = 0;
 
@@ -551,17 +554,22 @@ final class VoIPController
     /**
      * Open OGG file for reading.
      */
-    private function openFile(string $file): Ogg
+    private function openFile(string|LocalFile|RemoteUrl|ReadableStream $file): Ogg
     {
         $ctx = new ConnectionContext;
-        $ctx->addStream(FileBufferedStream::class, openFile($file, 'r'));
+        $ctx->addStream(FileBufferedStream::class, match (true) {
+            is_string($file) => openFile($file, 'r'),
+            $file instanceof LocalFile => openFile($file->file, 'r'),
+            $file instanceof RemoteUrl => HttpClientBuilder::buildDefault()->request(new Request($file->url))->getBody(),
+            $file instanceof ReadableStream => $file,
+        });
         $stream = $ctx->getStream();
         return new Ogg($stream);
     }
     /**
      * Play file.
      */
-    public function play(string $file): self
+    public function play(string|LocalFile|RemoteUrl|ReadableStream $file): self
     {
         $this->inputFiles[] = $file;
         if ($this->playingHold) {
@@ -574,7 +582,7 @@ final class VoIPController
     /**
      * Files to play on hold.
      *
-     * @param array<string> $files
+     * @param array<string|LocalFile|RemoteUrl|ReadableStream> $files
      */
     public function playOnHold(array $files): self
     {
