@@ -27,14 +27,6 @@ use Revolt\EventLoop;
 abstract class AbstractAPI extends InternalDoc
 {
     /**
-     * Enable or disable async.
-     *
-     * @deprecated Starting from MadelineProto v8, async is always enabled. This function does nothing.
-     */
-    public function async(bool $async): void
-    {
-    }
-    /**
      * Start MadelineProto and the event handler (enables async).
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.

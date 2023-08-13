@@ -129,19 +129,19 @@ abstract class EventHandler extends AbstractAPI
                 $this->internalInitDb($this->wrapper->getAPI());
             }
             if ($main) {
-                $this->setReportPeers(Tools::call($this->getReportPeers())->await());
+                $this->setReportPeers($this->getReportPeers());
             }
             if (\method_exists($this, 'onStart')) {
                 $r = $this->onStart();
                 if ($r instanceof Generator) {
-                    $r = Tools::consumeGenerator($r);
+                    throw new AssertionError("Yield cannot be used in onStart!");
                 }
                 if ($r instanceof Future) {
                     $r = $r->await();
                 }
             }
             if ($main) {
-                $this->setReportPeers(Tools::call($this->getReportPeers())->await());
+                $this->setReportPeers($this->getReportPeers());
             }
             if ($this instanceof PluginEventHandler && !$this->isPluginEnabled()) {
                 return [[], []];
@@ -152,10 +152,7 @@ abstract class EventHandler extends AbstractAPI
             $handlers = [];
             $has_any = false;
             $basic_handler = static function (array $update, Closure $closure): void {
-                $r = $closure($update);
-                if ($r instanceof Generator) {
-                    Tools::consumeGenerator($r);
-                }
+                $closure($update);
             };
             foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
                 $method = $methodRefl->getName();

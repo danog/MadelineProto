@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use Amp\SignalException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
@@ -30,13 +29,10 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
-use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_SAPI;
-
-use function Amp\async;
 
 /**
  * Manages logging in and out.
@@ -93,25 +89,12 @@ trait Loop
         }
     }
     /**
-     * Start MadelineProto's update handling loop, or run the provided async callable.
+     * Start MadelineProto's update handling loop.
      *
-     * @deprecated Not needed anymore with amp v3
-     *
-     * @param callable|null $callback Async callable to run
+     * @internal
      */
-    public function loop(?callable $callback = null)
+    public function loop()
     {
-        if (\is_callable($callback)) {
-            $this->logger->logger('Running async callable');
-            $r = $callback();
-            if ($r instanceof Generator) {
-                $r = Tools::consumeGenerator($r);
-            }
-            if ($r instanceof Future) {
-                $r = $r->await();
-            }
-            return $r;
-        }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
             return false;

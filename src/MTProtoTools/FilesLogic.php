@@ -129,7 +129,7 @@ trait FilesLogic
      *
      * @param mixed                       $messageMedia File to download
      * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
-     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                    $cb            Callback
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
@@ -227,7 +227,7 @@ trait FilesLogic
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                           $cb        Callback
      */
     public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null)
     {
@@ -239,7 +239,7 @@ trait FilesLogic
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
-     * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                                              $cb        Callback
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
     public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -302,7 +302,7 @@ trait FilesLogic
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)

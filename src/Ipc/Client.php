@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Cancellation;
 use Amp\DeferredCancellation;
-use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -30,9 +29,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\Wrappers\Start;
-use Generator;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -92,24 +89,6 @@ final class Client extends ClientAbstract
         return $this->session->getSessionDirectoryPath();
     }
     /**
-     * Run the provided async callable.
-     *
-     * @deprecated Not needed anymore since MadelineProto v8 and amp v3
-     *
-     * @param callable $callback Async callable to run
-     */
-    public function loop(callable $callback)
-    {
-        $r = $callback();
-        if ($r instanceof Generator) {
-            $r = Tools::consumeGenerator($r);
-        }
-        if ($r instanceof Future) {
-            $r = $r->await();
-        }
-        return $r;
-    }
-    /**
      * Unreference.
      */
     public function unreference(): void
@@ -159,7 +138,7 @@ final class Client extends ClientAbstract
      * @param string|FileCallbackInterface $url       URL of file
      * @param integer                      $size      Size of file
      * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -183,7 +162,7 @@ final class Client extends ClientAbstract
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
@@ -203,7 +182,7 @@ final class Client extends ClientAbstract
      * Reupload telegram file.
      *
      * @param mixed    $media     Telegram file
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
     public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
@@ -256,7 +235,7 @@ final class Client extends ClientAbstract
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
@@ -274,7 +253,7 @@ final class Client extends ClientAbstract
      *
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                     $cb            Callback
      */
     public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null)
     {
@@ -295,7 +274,7 @@ final class Client extends ClientAbstract
      *
      * @param mixed                          $messageMedia File to download
      * @param callable|FileCallbackInterface $callable     Chunk callback
-     * @param callable                       $cb           Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                       $cb           Status callback
      * @param bool                           $seekable     Whether the callable can be called out of order
      * @param int                            $offset       Offset where to start downloading
      * @param int                            $end          Offset where to stop downloading (inclusive)

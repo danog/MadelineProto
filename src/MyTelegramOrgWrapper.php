@@ -290,13 +290,4 @@ final class MyTelegramOrgWrapper
         }
         return $final_headers;
     }
-    /**
-     * Run specified callable synchronously.
-     *
-     * @param callable $callable Callable
-     */
-    public function loop(callable $callable)
-    {
-        return Tools::wait($callable());
-    }
 }

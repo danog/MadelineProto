@@ -580,6 +580,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMegagroupStats.html" name="stats.getMegagroupStats">Get supergroup statistics: stats.getMegagroupStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getTmpPassword.html" name="account.getTmpPassword">Get temporary payment password: account.getTmpPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getAdminLog.html" name="channels.getAdminLog">Get the admin log of a channel/supergroup: channels.getAdminLog</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcallbypeer-int-userid-danog-madelineproto-voip" name="getCallByPeer">Get the call with the specified user ID: getCallByPeer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSearchCounters.html" name="messages.getSearchCounters">Get the number of results that would be found by a messages.search call with the same parameters: messages.getSearchCounters</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipants.html" name="channels.getParticipants">Get the participants of a supergroup/channel: channels.getParticipants</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getbroadcastprogress-int-id-danog-madelineproto-broadcast-progress" name="getBroadcastProgress">Get the progress of a currently running broadcast: getBroadcastProgress</a>
