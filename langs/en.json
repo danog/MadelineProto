@@ -143,7 +143,7 @@
     "do_not_use_blocking_class": "for performance reasons, handlers may not use the non-async blocking class %s, please use %s, instead",
     "do_not_use_deprecated_function": "the %s function is deprecated, please use %s, instead",
     "do_not_use_non_root_require_in_event_handler": "for performance reasons, you must not use require or include inside of an event handler class, only root-level requires are allowed.",
-
+    "do_not_use_yield": "MadelineProto 8 does not require or support the use of yield in async functions, you can remove all yield keywords now",
     "recommend_not_use_filesystem_function": "usage of the %s function is not recommended, because accessing the filesystem during update handling will slow down your bot, please see https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions for a list of alternative ways to store data that will not slow down your bot!",
 
     "plugins_do_not_use_require": "for performance reasons, plugins can only automatically include or require other files present in the plugins folder by triggering the PSR-4 autoloader (not by manually require()'ing them).",

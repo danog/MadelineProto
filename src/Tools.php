@@ -31,12 +31,15 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\Yield_;
+use PhpParser\Node\Expr\YieldFrom;
 use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassLike;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
@@ -598,7 +601,7 @@ abstract class Tools extends AsyncTools
     }
 
     private const BLOCKING_FUNCTIONS = [
-        'file_get_contents' => 'https://github.com/amphp/file, https://github.com/amphp/http-client',
+        'file_get_contents' => 'https://github.com/amphp/file, https://github.com/amphp/http-client or $this->fileGetContents()',
         'file_put_contents' => 'https://github.com/amphp/file',
         'curl_exec' => 'https://github.com/amphp/http-client',
         'mysqli_query' => 'https://github.com/amphp/mysql',
@@ -627,6 +630,11 @@ abstract class Tools extends AsyncTools
         'amp\\file\\read',
         'amp\\file\\write',
         'amp\\file\\openFile',
+    ];
+    private const NO_YIELD_FUNCTIONS = [
+        'onstart',
+        'onupdatenewmessage',
+        'onupdatenewchannelmessage'
     ];
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
@@ -773,6 +781,30 @@ abstract class Tools extends AsyncTools
                     if ($parent instanceof FunctionLike) {
                         $issues []= new EventHandlerIssue(
                             message: Lang::$current_lang['do_not_use_non_root_require_in_event_handler'],
+                            file: $file,
+                            line: $include->getStartLine(),
+                            severe: true
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
+        /** @var Yield_|YieldFrom $include */
+        foreach ([
+            ...$finder->findInstanceOf($code, Yield_::class),
+            ...$finder->findInstanceOf($code, YieldFrom::class),
+        ] as $include) {
+            if ($include->getAttribute('parent')) {
+                $parent = $include;
+                while ($parent = $parent->getAttribute('parent')) {
+                    if ($parent instanceof ClassMethod
+                        && $parent->isPublic()
+                        && in_array($parent->name->toLowerString(), self::NO_YIELD_FUNCTIONS, true)
+                    ) {
+                        $issues []= new EventHandlerIssue(
+                            message: Lang::$current_lang['do_not_use_yield'],
                             file: $file,
                             line: $include->getStartLine(),
                             severe: true
