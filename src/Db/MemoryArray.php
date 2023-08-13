@@ -40,7 +40,7 @@ final class MemoryArray extends ArrayIterator implements DbArray
     /**
      * @param Memory $settings
      */
-    public static function getInstance(string $table, DbType|array|null $previous, $settings): static
+    public static function getInstance(string $table, DbType|null $previous, $settings): DbType
     {
         if ($previous instanceof MemoryArray) {
             return $previous;

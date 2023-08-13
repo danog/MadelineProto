@@ -82,9 +82,6 @@ abstract class SqlArray extends DriverArray
     public function offsetGet(mixed $key): mixed
     {
         $key = (string) $key;
-        if ($this->hasCache($key)) {
-            return $this->getCache($key);
-        }
 
         $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key])->fetchRow();
         if ($row === null) {
@@ -92,7 +89,6 @@ abstract class SqlArray extends DriverArray
         }
 
         $value = ($this->deserializer)($row['value']);
-        $this->setCache($key, $value);
 
         return $value;
     }
@@ -100,11 +96,6 @@ abstract class SqlArray extends DriverArray
     public function set(string|int $key, mixed $value): void
     {
         $key = (string) $key;
-        if ($this->hasCache($key) && $this->getCache($key) === $value) {
-            return;
-        }
-
-        $this->setCache($key, $value);
 
         $this->execute(
             $this->queries[self::SQL_SET],
@@ -113,7 +104,6 @@ abstract class SqlArray extends DriverArray
                 'value' => ($this->serializer)($value),
             ],
         );
-        $this->setCache($key, $value);
     }
 
     /**
@@ -124,7 +114,6 @@ abstract class SqlArray extends DriverArray
     public function unset(string|int $key): void
     {
         $key = (string) $key;
-        $this->unsetCache($key);
 
         $this->execute(
             $this->queries[self::SQL_UNSET],
@@ -151,7 +140,6 @@ abstract class SqlArray extends DriverArray
      */
     public function clear(): void
     {
-        $this->clearCache();
         $this->execute($this->queries[self::SQL_CLEAR]);
     }
 

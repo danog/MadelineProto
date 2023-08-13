@@ -45,10 +45,6 @@
     <ArgumentTypeCoercion>
       <code>$eventHandler</code>
     </ArgumentTypeCoercion>
-    <DeprecatedMethod>
-      <code>loop</code>
-      <code>loop</code>
-    </DeprecatedMethod>
     <PossiblyNullReference>
       <code>getMessage</code>
       <code>isInited</code>
@@ -64,33 +60,6 @@
     </RiskyCast>
   </file>
   <file src="src/AsyncTools.php">
-    <DeprecatedMethod>
-      <code>self::call($a)</code>
-      <code>self::call($b)</code>
-      <code>self::call($callable)</code>
-      <code>self::call($promise)</code>
-      <code>self::call($promise)</code>
-      <code>self::timeout($promise, $timeout)</code>
-    </DeprecatedMethod>
-    <DocblockTypeContradiction>
-      <code>$callable instanceof Generator</code>
-    </DocblockTypeContradiction>
-    <InvalidReturnStatement>
-      <code>$callable</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType>
-      <code><![CDATA[Future<T>]]></code>
-    </InvalidReturnType>
-    <MissingClosureReturnType>
-      <code><![CDATA[fn ($v) => $v instanceof Generator ? self::consumeGenerator($v) : $v]]></code>
-    </MissingClosureReturnType>
-    <MissingReturnType>
-      <code>all</code>
-      <code>any</code>
-      <code>first</code>
-      <code>some</code>
-      <code>wait</code>
-    </MissingReturnType>
     <RedundantConditionGivenDocblockType>
       <code>\is_callable($callable)</code>
     </RedundantConditionGivenDocblockType>
@@ -227,18 +196,13 @@
       <code><![CDATA[$this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey]]></code>
     </UnsupportedReferenceUsage>
   </file>
-  <file src="src/Db/ArrayCacheTrait.php">
-    <MissingParamType>
-      <code>$value</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>getCache</code>
-    </MissingReturnType>
-  </file>
-  <file src="src/Db/DbArray.php">
-    <ImplementedReturnTypeMismatch>
-      <code><![CDATA[\Traversable<TKey, TValue>]]></code>
-    </ImplementedReturnTypeMismatch>
+  <file src="src/Db/CacheContainer.php">
+    <ParadoxicalCondition>
+      <code><![CDATA[isset($this->ttl[$index])]]></code>
+    </ParadoxicalCondition>
+    <PropertyNotSetInConstructor>
+      <code>$cacheTtl</code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Db/Driver/Mysql.php">
     <ArgumentTypeCoercion>
@@ -268,9 +232,6 @@
       <code>$settings</code>
       <code>$settings</code>
     </ArgumentTypeCoercion>
-    <LessSpecificReturnStatement>
-      <code>$instance</code>
-    </LessSpecificReturnStatement>
     <MissingClosureParamType>
       <code>$v</code>
       <code>$value</code>
@@ -285,14 +246,6 @@
       <code>$dbSettings</code>
       <code>$dbSettings</code>
       <code>$dbSettings</code>
-      <code>$dbSettings</code>
-      <code>$dbSettings</code>
-      <code>$dbSettings</code>
-      <code>$dbSettings</code>
-      <code>$deserializer</code>
-      <code>$deserializer</code>
-      <code>$deserializer</code>
-      <code>$deserializer</code>
       <code>$deserializer</code>
       <code>$deserializer</code>
       <code>$deserializer</code>
@@ -301,25 +254,14 @@
       <code>$serializer</code>
       <code>$serializer</code>
       <code>$serializer</code>
-      <code>$serializer</code>
-      <code>$serializer</code>
-      <code>$serializer</code>
-      <code>$serializer</code>
-      <code>$table</code>
-      <code>$table</code>
-      <code>$table</code>
-      <code>$table</code>
       <code>$table</code>
       <code>$table</code>
       <code>$table</code>
       <code>$table</code>
     </MissingConstructor>
-    <MoreSpecificReturnType>
-      <code>static</code>
-    </MoreSpecificReturnType>
-    <PossibleRawObjectIteration>
+    <RawObjectIteration>
       <code>$old</code>
-    </PossibleRawObjectIteration>
+    </RawObjectIteration>
     <UndefinedMethod>
       <code>setSettings</code>
     </UndefinedMethod>
@@ -349,13 +291,7 @@
     </InvalidDocblockParamName>
     <MissingConstructor>
       <code>$pdo</code>
-      <code>$pdo</code>
     </MissingConstructor>
-  </file>
-  <file src="src/Db/NullCache/NullCacheTrait.php">
-    <MissingParamType>
-      <code>$value</code>
-    </MissingParamType>
   </file>
   <file src="src/Db/PostgresArray.php">
     <MissingClosureParamType>
@@ -411,9 +347,6 @@
       <code>$db</code>
       <code>$db</code>
       <code>$db</code>
-      <code>$db</code>
-      <code>$db</code>
-      <code>$db</code>
     </MissingConstructor>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$row->fetchRow()['count']]]></code>
@@ -434,10 +367,6 @@
     <ArgumentTypeCoercion>
       <code>$class</code>
     </ArgumentTypeCoercion>
-    <DeprecatedMethod>
-      <code><![CDATA[Tools::call($this->getReportPeers())]]></code>
-      <code><![CDATA[Tools::call($this->getReportPeers())]]></code>
-    </DeprecatedMethod>
     <PossiblyInvalidArgument>
       <code><![CDATA[$this->wrapper->getAPI()]]></code>
     </PossiblyInvalidArgument>
@@ -720,19 +649,6 @@
     </PropertyTypeCoercion>
   </file>
   <file src="src/InternalDoc.php">
-    <DeprecatedMethod>
-      <code>\danog\MadelineProto\AsyncTools::after($a, $b)</code>
-      <code>\danog\MadelineProto\AsyncTools::all($promises)</code>
-      <code>\danog\MadelineProto\AsyncTools::any($promises)</code>
-      <code>\danog\MadelineProto\AsyncTools::call($promise)</code>
-      <code>\danog\MadelineProto\AsyncTools::first($promises)</code>
-      <code>\danog\MadelineProto\AsyncTools::some($promises)</code>
-      <code>\danog\MadelineProto\AsyncTools::timeout($promise, $timeout)</code>
-      <code>\danog\MadelineProto\AsyncTools::timeoutWithDefault($promise, $timeout, $default)</code>
-      <code>\danog\MadelineProto\AsyncTools::wait($promise)</code>
-      <code>loop</code>
-      <code>loop</code>
-    </DeprecatedMethod>
     <InvalidReturnStatement>
       <code><![CDATA[$this->wrapper->getAPI()->getEventHandler($class)]]></code>
     </InvalidReturnStatement>
@@ -745,19 +661,14 @@
     <MissingReturnType>
       <code>MTProtoToTd</code>
       <code>MTProtoToTdcli</code>
-      <code>all</code>
-      <code>any</code>
       <code>completePhoneLogin</code>
       <code>downloadToCallable</code>
       <code>downloadToDir</code>
       <code>downloadToStream</code>
       <code>end</code>
-      <code>first</code>
-      <code>loop</code>
       <code>phoneLogin</code>
       <code>requestCall</code>
       <code>requestSecretChat</code>
-      <code>some</code>
       <code>start</code>
       <code>tdToTdcli</code>
       <code>upload</code>
@@ -766,7 +677,6 @@
       <code>uploadFromStream</code>
       <code>uploadFromTgfile</code>
       <code>uploadFromUrl</code>
-      <code>wait</code>
     </MissingReturnType>
     <PossiblyInvalidPropertyAssignmentValue>
       <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
@@ -789,9 +699,6 @@
       <code><![CDATA[$this->upload ??= new \danog\MadelineProto\Namespace\AbstractAPI('upload')]]></code>
       <code><![CDATA[$this->users ??= new \danog\MadelineProto\Namespace\AbstractAPI('users')]]></code>
     </PossiblyInvalidPropertyAssignmentValue>
-    <PossiblyNullArgument>
-      <code>$callback</code>
-    </PossiblyNullArgument>
     <PossiblyUndefinedMethod>
       <code>setWrapper</code>
       <code>setWrapper</code>
@@ -822,7 +729,6 @@
       <code>downloadToCallable</code>
       <code>downloadToDir</code>
       <code>downloadToFile</code>
-      <code>loop</code>
       <code>methodCallAsyncRead</code>
       <code>uploadFromCallable</code>
       <code>uploadFromTgfile</code>
@@ -1295,7 +1201,6 @@
       <code><![CDATA[$this->chats]]></code>
     </RawObjectIteration>
     <RedundantCondition>
-      <code><![CDATA[$this->minDatabase?->sync()]]></code>
       <code><![CDATA[isset($this->wrapper) && $this->isInited()]]></code>
       <code><![CDATA[isset($this->wrapper) && isset(self::$references[$this->getSessionName()])]]></code>
     </RedundantCondition>
@@ -1305,9 +1210,6 @@
       <code>\is_int($dc_id)</code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
-    <TypeDoesNotContainNull>
-      <code><![CDATA[$this->minDatabase]]></code>
-    </TypeDoesNotContainNull>
     <UnsupportedReferenceUsage>
       <code><![CDATA[Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()]]]></code>
     </UnsupportedReferenceUsage>
@@ -1561,7 +1463,7 @@
       <code>$db</code>
     </PropertyNotSetInConstructor>
     <RawObjectIteration>
-      <code><![CDATA[$this->API->chats]]></code>
+      <code><![CDATA[$this->db]]></code>
       <code><![CDATA[$this->db]]></code>
     </RawObjectIteration>
   </file>
@@ -1717,15 +1619,11 @@
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MyTelegramOrgWrapper.php">
-    <DeprecatedMethod>
-      <code>Tools::wait($callable())</code>
-    </DeprecatedMethod>
     <MissingReturnType>
       <code>completeLogin</code>
       <code>createApp</code>
       <code>getApp</code>
       <code>hasApp</code>
-      <code>loop</code>
     </MissingReturnType>
     <PossiblyNullArgument>
       <code><![CDATA[$this->settings]]></code>
@@ -1832,9 +1730,6 @@
       <code>$ipcSocket</code>
       <code>$ipcSocket</code>
     </NullableReturnStatement>
-    <PossiblyUndefinedMethod>
-      <code>$unserialized</code>
-    </PossiblyUndefinedMethod>
   </file>
   <file src="src/SessionPaths.php">
     <LessSpecificReturnStatement>
@@ -2453,14 +2348,5 @@
       <code>$result</code>
       <code>$result</code>
     </PossiblyUndefinedVariable>
-  </file>
-  <file src="src/loop.php">
-    <MissingClosureReturnType>
-      <code>function ($_) use ($callback) {</code>
-    </MissingClosureReturnType>
-    <PossiblyNullFunctionCall>
-      <code>$callback()</code>
-      <code>$callback()</code>
-    </PossiblyNullFunctionCall>
   </file>
 </files>

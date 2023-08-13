@@ -33,7 +33,7 @@ use PDO;
  * @template TValue
  * @extends SqlArray<TKey, TValue>
  */
-class MysqlArray extends SqlArray
+final class MysqlArray extends SqlArray
 {
     // We're forced to use quoting (just like PDO does internally when using prepares) because native MySQL prepares are extremely slow.
     protected PDO $pdo;

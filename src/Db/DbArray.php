@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\Db;
 
 use ArrayAccess;
-use Countable;
 
 /**
  * DB array interface.
@@ -26,40 +25,10 @@ use Countable;
  * @template TValue
  *
  * @extends ArrayAccess<TKey, TValue>
+ * @extends DbType<TKey, TValue>
  */
-interface DbArray extends DbType, ArrayAccess, Countable
+interface DbArray extends DbType, ArrayAccess
 {
-    /**
-     * Get Array copy.
-     *
-     * @psalm-return array<TKey, TValue>
-     */
-    public function getArrayCopy(): array;
-    /**
-     * Check if element is set.
-     *
-     * @param TKey $key
-     */
-    public function isset(string|int $key): bool;
-    /**
-     * Unset element.
-     *
-     * @param TKey $key
-     */
-    public function unset(string|int $key): void;
-    /**
-     * Set element.
-     *
-     * @param TKey $key
-     * @param TValue $value
-     */
-    public function set(string|int $key, mixed $value): void;
-    /**
-     * Get element.
-     *
-     * @param TKey $index
-     */
-    public function offsetGet(mixed $index): mixed;
     /**
      * Set element.
      *
@@ -79,13 +48,9 @@ interface DbArray extends DbType, ArrayAccess, Countable
      */
     public function offsetExists(mixed $index): bool;
     /**
-     * Clear all elements.
-     */
-    public function clear(): void;
-    /**
-     * Get iterator.
+     * Get Array copy.
      *
-     * @return \Traversable<TKey, TValue>
+     * @psalm-return array<TKey, TValue>
      */
-    public function getIterator(): \Traversable;
+    public function getArrayCopy(): array;
 }

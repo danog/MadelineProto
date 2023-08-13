@@ -15,12 +15,7 @@ foreach ($classes as $class) {
 }
 $methods = array_unique($methods);
 
-function ssort($a, $b)
-{
-    return strlen($b->getName())-strlen($a->getName());
-}
-
-usort($methods, 'ssort');
+usort($methods, fn ($a, $b) => strlen($b->getName())-strlen($a->getName()));
 
 $find = [];
 $replace = [];

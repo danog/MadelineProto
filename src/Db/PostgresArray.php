@@ -29,7 +29,7 @@ use danog\MadelineProto\Settings\Database\SerializerType;
  * @template TValue
  * @extends PostgresArrayBytea<TKey, TValue>
  */
-class PostgresArray extends PostgresArrayBytea
+final class PostgresArray extends PostgresArrayBytea
 {
     /**
      * Prepare statements.

@@ -16,11 +16,17 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use danog\MadelineProto\Db\PostgresArrayBytea;
+
 /**
  * Postgres backend settings.
  */
 final class Postgres extends SqlAbstract
 {
+    public function getDriverClass(): string
+    {
+        return PostgresArrayBytea::class;
+    }
     public function mergeArray(array $settings): void
     {
         $settings = $settings['db']['postgres'] ?? [];

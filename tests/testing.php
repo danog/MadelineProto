@@ -344,4 +344,3 @@ foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     $MadelineProto->logger($sentMessage, Logger::NOTICE);
 }
-});

@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use danog\MadelineProto\Db\MysqlArray;
+
 /**
  * MySQL backend settings.
  *
@@ -23,6 +25,10 @@ namespace danog\MadelineProto\Settings\Database;
  */
 final class Mysql extends SqlAbstract
 {
+    public function getDriverClass(): string
+    {
+        return MysqlArray::class;
+    }
     public function mergeArray(array $settings): void
     {
         $settings = $settings['db']['mysql'] ?? [];

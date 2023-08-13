@@ -2,7 +2,7 @@
 
 /**
  * Load schema file names.
- *
+ * @internal
  */
 function loadSchemas(): array
 {
@@ -19,6 +19,7 @@ function loadSchemas(): array
  * Return max available layer number.
  *
  * @param array $schemas Scheme array
+ * @internal
  *
  * @return integer
  */
@@ -32,6 +33,7 @@ function maxLayer(array $schemas): int
  * Init docs.
  *
  * @param array $layers Scheme array
+ * @internal
  *
  * @return array Documentation information for old docs
  */

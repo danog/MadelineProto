@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
@@ -23,4 +24,8 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
  */
 final class Memory extends DatabaseAbstract
 {
+    public function getDriverClass(): string
+    {
+        return MemoryArray::class;
+    }
 }

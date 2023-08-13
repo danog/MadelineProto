@@ -30,7 +30,7 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  * @template TValue
  * @extends DriverArray<TKey, TValue>
  */
-class RedisArray extends DriverArray
+final class RedisArray extends DriverArray
 {
     private RedisRedis $db;
 
@@ -87,27 +87,17 @@ class RedisArray extends DriverArray
     }
     public function set(string|int $key, mixed $value): void
     {
-        if ($this->hasCache($key) && $this->getCache($key) === $value) {
-            return;
-        }
-
-        $this->setCache($key, $value);
-
         $this->db->set($this->rKey($key), ($this->serializer)($value));
-        $this->setCache($key, $value);
     }
 
     public function offsetGet(mixed $offset): mixed
     {
         $offset = (string) $offset;
-        if ($this->hasCache($offset)) {
-            return $this->getCache($offset);
-        }
 
         $value = $this->db->get($this->rKey($offset));
 
-        if ($value !== null && $value = ($this->deserializer)($value)) {
-            $this->setCache($offset, $value);
+        if ($value !== null) {
+            $value = ($this->deserializer)($value);
         }
 
         return $value;
@@ -115,8 +105,6 @@ class RedisArray extends DriverArray
 
     public function unset(string|int $key): void
     {
-        $this->unsetCache($key);
-
         $this->db->delete($this->rkey($key));
     }
 
@@ -152,7 +140,6 @@ class RedisArray extends DriverArray
      */
     public function clear(): void
     {
-        $this->clearCache();
         $request = $this->db->scan($this->itKey());
 
         $keys = [];

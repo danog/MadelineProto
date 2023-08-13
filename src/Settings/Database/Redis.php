@@ -16,11 +16,17 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use danog\MadelineProto\Db\RedisArray;
+
 /**
  * Redis backend settings.
  */
 final class Redis extends DriverDatabaseAbstract
 {
+    public function getDriverClass(): string
+    {
+        return RedisArray::class;
+    }
     /**
      * Database number.
      */

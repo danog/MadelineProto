@@ -14,21 +14,45 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Db\NullCache;
-
-use danog\MadelineProto\Db\RedisArray as DbRedisArray;
+namespace danog\MadelineProto\Db;
 
 /**
- * Redis database backend, no caching.
- *
- * @internal
- *
- * @template TKey as array-key
- * @template TValue
- *
- * @extends DbRedisArray<TKey, TValue>
+ * DB array trait.
  */
-final class RedisArray extends DbRedisArray
+trait DbArrayTrait
 {
-    use NullCacheTrait;
+    /**
+     * Check if key isset.
+     *
+     * @param mixed $key
+     * @return bool true if the offset exists, otherwise false
+     */
+    final public function isset(string|int $key): bool
+    {
+        return $this->offsetGet($key) !== null;
+    }
+
+    /** @param string|int $index */
+    final public function offsetExists(mixed $index): bool
+    {
+        return $this->isset($index);
+    }
+
+    final public function offsetSet(mixed $index, mixed $value): void
+    {
+        $this->set($index, $value);
+    }
+
+    final public function offsetUnset(mixed $index): void
+    {
+        $this->unset($index);
+    }
+
+    /**
+     * Get array copy.
+     */
+    final public function getArrayCopy(): array
+    {
+        return \iterator_to_array($this->getIterator());
+    }
 }

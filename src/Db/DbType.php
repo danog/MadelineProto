@@ -16,9 +16,55 @@
 
 namespace danog\MadelineProto\Db;
 
+use Countable;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
-interface DbType
+/**
+ * DB type interface.
+ *
+ * @template TKey as array-key
+ * @template TValue
+ */
+interface DbType extends Countable
 {
-    public static function getInstance(string $table, DbType|array|null $previous, DatabaseAbstract $settings): static;
+    /**
+     * Check if element is set.
+     *
+     * @param TKey $key
+     */
+    public function isset(string|int $key): bool;
+    /**
+     * Unset element.
+     *
+     * @param TKey $key
+     */
+    public function unset(string|int $key): void;
+    /**
+     * Set element.
+     *
+     * @param TKey $key
+     * @param TValue $value
+     */
+    public function set(string|int $key, mixed $value): void;
+    /**
+     * Get element.
+     *
+     * @param TKey $index
+     */
+    public function offsetGet(mixed $index): mixed;
+    /**
+     * Clear all elements.
+     */
+    public function clear(): void;
+    /**
+     * Get iterator.
+     *
+     * @return \Traversable<TKey, TValue>
+     */
+    public function getIterator(): \Traversable;
+
+    /**
+     * Get instance.
+     */
+    public static function getInstance(string $table, DbType|null $previous, DatabaseAbstract $settings): self;
 }
