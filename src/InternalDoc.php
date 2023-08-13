@@ -958,13 +958,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPropicInfo($data);
     }
     /**
-     * Get PSR logger.
-     */
-    public function getPsrLogger(): \Psr\Log\LoggerInterface
-    {
-        return $this->wrapper->getAPI()->getPsrLogger();
-    }
-    /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
      *
      * @param mixed $id Peer

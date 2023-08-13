@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
-use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -103,10 +102,6 @@ final class Logger
      * Log rotation loop ID.
      */
     private ?string $rotateId = null;
-    /**
-     * PSR logger.
-     */
-    private readonly PsrLogger $psr;
     /**
      * Default logger instance.
      */
@@ -235,7 +230,6 @@ final class Logger
      */
     public function __construct(SettingsLogger $settings, string $prefix = '')
     {
-        $this->psr = new PsrLogger($this);
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
 
         $this->mode = $settings->getType();
@@ -405,13 +399,5 @@ final class Logger
                     break;
             }
         }
-    }
-
-    /**
-     * Get PSR logger.
-     */
-    public function getPsrLogger(): LoggerInterface
-    {
-        return $this->psr;
     }
 }

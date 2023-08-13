@@ -754,13 +754,6 @@ final class MTProto implements TLCallback, LoggerGetter
         return $this->logger;
     }
     /**
-     * Get PSR logger.
-     */
-    public function getPsrLogger(): LoggerInterface
-    {
-        return $this->logger->getPsrLogger();
-    }
-    /**
      * Get async HTTP client.
      */
     public function getHTTPClient(): HttpClient

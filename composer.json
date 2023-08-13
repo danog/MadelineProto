@@ -55,7 +55,6 @@
         "amphp/redis": "^2",
         "amphp/websocket-client": "^2",
         "psr/http-factory": "^1.0",
-        "psr/log": "^3",
         "webmozart/assert": "^1.11",
         "bacon/bacon-qr-code": "^2.0",
         "nikic/php-parser": "^4.16",
