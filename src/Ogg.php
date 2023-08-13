@@ -550,7 +550,7 @@ final class Ogg
         } while (true);
 
         $sampleCount = 0.06 * $header['sampleRate'];
-        $chunkSize = (int) $sampleCount * $header['channels'] * ($header['bitsPerSample'] >> 3);
+        $chunkSize = (int) ($sampleCount * $header['channels'] * ($header['bitsPerSample'] >> 3));
         $shift = (int) \log($header['channels'] * ($header['bitsPerSample'] >> 3), 2);
 
         $out = openFile($oggOut, 'w');
@@ -626,7 +626,7 @@ final class Ogg
         $granule = 0;
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
         while (!$in->eof()) {
-            $chunk = $in->read(length: $chunkSize);
+            $chunk = str_pad($in->read(length: $chunkSize), $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
             if ($len < 0) {
