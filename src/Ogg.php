@@ -519,7 +519,7 @@ final class Ogg
         const char *opus_strerror(int error);
         const char *opus_get_version_string(void);
 
-        ', 'libopus.so.0.9.0');
+        ', 'libopus.so');
         $err = FFI::new('int');
         $encoder = $opus->opus_encoder_create(48000, 2, self::OPUS_APPLICATION_AUDIO, FFI::addr($err));
         $opus->opus_encoder_ctl($encoder, self::OPUS_SET_COMPLEXITY_REQUEST, 10);
@@ -629,6 +629,9 @@ final class Ogg
             $chunk = $in->read(length: $chunkSize);
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
+            if ($len < 0) {
+                throw new AssertionError("opus_encode returned: ".$opus->opus_strerror($len));
+            }
             $writePage(
                 $in->eof() ? self::EOS : 0,
                 $granule += $granuleDiff,
