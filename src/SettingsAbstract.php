@@ -26,15 +26,6 @@ abstract class SettingsAbstract
      *
      */
     protected bool $changed = true;
-    /**
-     * Merge legacy settings array.
-     *
-     * @param array $settings Settings array
-     * @internal
-     */
-    public function mergeArray(array $settings): void
-    {
-    }
 
     public function __sleep()
     {

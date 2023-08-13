@@ -18,6 +18,8 @@ namespace danog\MadelineProto\Db;
 
 /**
  * DB array trait.
+ *
+ * @internal
  */
 trait DbArrayTrait
 {

@@ -70,8 +70,7 @@ if ($loader) {
 }
 
 echo 'Loading settings...'.PHP_EOL;
-$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
-$settings = Settings::parseFromLegacyFull($settings);
+$settings = new Settings;
 $settings->getAppInfo()
     ->setApiId((int) getenv('API_ID'))
     ->setApiHash(getenv('API_HASH'));

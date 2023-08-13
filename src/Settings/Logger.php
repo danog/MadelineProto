@@ -55,49 +55,6 @@ final class Logger extends SettingsAbstract
      */
     protected int $maxSize = 1 * 1024 * 1024;
 
-    public function mergeArray(array $settings): void
-    {
-        if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
-            $settings['logger']['logger_param'] = $settings['logger']['param'];
-        }
-        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
-            $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-        }
-        switch ($settings['logger']['logger_level'] ?? null) {
-            case 'ULTRA_VERBOSE':
-                $settings['logger']['logger_level'] = 5;
-                break;
-            case 'VERBOSE':
-                $settings['logger']['logger_level'] = 4;
-                break;
-            case 'NOTICE':
-                $settings['logger']['logger_level'] = 3;
-                break;
-            case 'WARNING':
-                $settings['logger']['logger_level'] = 2;
-                break;
-            case 'ERROR':
-                $settings['logger']['logger_level'] = 1;
-                break;
-            case 'FATAL ERROR':
-                $settings['logger']['logger_level'] = 0;
-                break;
-        }
-        if (isset($settings['logger']['logger'])) {
-            $this->setType($settings['logger']['logger']);
-        }
-        if (isset($settings['logger']['logger_param'])) {
-            $this->setExtra($settings['logger']['logger_param']);
-        }
-        if (isset($settings['logger']['logger_level'])) {
-            $this->setLevel($settings['logger']['logger_level']);
-        }
-        if (isset($settings['logger']['max_size'])) {
-            $this->setMaxSize($settings['logger']['max_size'] ?? 1 * 1024 * 1024);
-        }
-
-        $this->init();
-    }
     public function __construct()
     {
         $this->type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')

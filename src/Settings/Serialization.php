@@ -28,12 +28,6 @@ final class Serialization extends SettingsAbstract
      */
     protected int $interval = 30;
 
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['serialization']['serialization_interval'])) {
-            $this->setInterval($settings['serialization']['serialization_interval']);
-        }
-    }
     /**
      * Get serialization interval, in seconds.
      */

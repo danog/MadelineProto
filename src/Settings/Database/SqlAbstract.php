@@ -45,22 +45,6 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      */
     protected string $uri = 'tcp://127.0.0.1';
 
-    public function mergeArray(array $settings): void
-    {
-        foreach (self::toCamel([
-            'max_connections',
-            'idle_timeout',
-        ]) as $object => $array) {
-            if (isset($settings[$array])) {
-                $this->{$object}($settings[$array]);
-            }
-        }
-        if (isset($settings['user'])) {
-            $this->setUsername($settings['user']);
-        }
-        parent::mergeArray($settings);
-    }
-
     /**
      * Get maximum connection limit.
      */

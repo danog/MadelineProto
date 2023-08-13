@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use AssertionError;
 use danog\ClassFinder\ClassFinder;
-use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use ReflectionClass;
 use ReflectionMethod;
@@ -56,9 +55,7 @@ final class AnnotationsBuilder
         $this->namespace = $namespace;
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL();
-        $tlSchema = new TLSchema;
-        $tlSchema->mergeArray($settings);
-        $this->TL->init($tlSchema);
+        $this->TL->init($settings['TL']);
         $this->blacklist = \json_decode(\file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
         $this->blacklistHard = $this->blacklist;
         unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['messages.getMessages']);

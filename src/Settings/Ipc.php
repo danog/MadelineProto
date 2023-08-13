@@ -29,10 +29,6 @@ final class Ipc extends SettingsAbstract
         Magic::start(light: true);
     }
 
-    public function mergeArray(array $settings): void
-    {
-    }
-
     /**
      * Get WARNING: this will cause slow startup if enabled.
      */

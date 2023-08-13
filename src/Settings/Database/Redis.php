@@ -36,15 +36,6 @@ final class Redis extends DriverDatabaseAbstract
      */
     protected string $uri = 'redis://127.0.0.1';
 
-    public function mergeArray(array $settings): void
-    {
-        $settings = $settings['db']['redis'] ?? [];
-        if (isset($settings['host'])) {
-            $this->setUri($settings['host'].(isset($settings['port']) ? ':'.($settings['port']) : ''));
-        }
-        parent::mergeArray($settings);
-    }
-
     /**
      * Get database number.
      */

@@ -51,23 +51,6 @@ final class TLSchema extends SettingsAbstract
     {
         return \array_merge(['wasUpgraded'], parent::__sleep());
     }
-    public function mergeArray(array $settings): void
-    {
-        $settings = $settings['tl_schema'] ?? [];
-        if (isset($settings['layer'])) {
-            $this->setLayer($settings['layer']);
-        }
-        $src = $settings['src'] ?? $settings;
-        if (isset($src['mtproto'])) {
-            $this->setMTProtoSchema($src['mtproto']);
-        }
-        if (isset($src['telegram'])) {
-            $this->setAPISchema($src['telegram']);
-        }
-        if (isset($src['secret'])) {
-            $this->setSecretSchema($src['secret']);
-        }
-    }
 
     /**
      * Upgrade scheme autonomously.

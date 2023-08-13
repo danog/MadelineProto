@@ -39,20 +39,6 @@ final class Auth extends SettingsAbstract
      */
     protected int $maxAuthTries = 5;
 
-    public function mergeArray(array $settings): void
-    {
-        foreach (self::toCamel([
-            'default_temp_auth_key_expires_in',
-        ]) as $object => $array) {
-            if (isset($settings['authorization'][$array])) {
-                $this->{$object}($settings['authorization'][$array]);
-            }
-        }
-        if (isset($settings['connection_settings']['all']['pfs'])) {
-            $this->setPfs($settings['connection_settings']['all']['pfs']);
-        }
-    }
-
     /**
      * Get validity period of the binding of temporary and permanent keys.
      */

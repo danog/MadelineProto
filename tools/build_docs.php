@@ -57,7 +57,7 @@ layerUpgrade($layer);
 $logger->logger("Initing docs (layer $layer)...", Logger::NOTICE);
 $docs = [
     [
-        'tl_schema'   => ['mtproto' => '', 'telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
+        'TL'   => (new TLSchema)->setMTProtoSchema('')->setAPISchema("$d/schemas/TL_telegram_v$layer.tl")->setSecretSchema("$d/schemas/TL_secret.tl"),
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",

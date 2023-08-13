@@ -72,9 +72,8 @@ final class MyTelegramOrgWrapper
     /**
      * Constructor.
      */
-    public function __construct(array|SettingsAbstract $settings)
+    public function __construct(SettingsAbstract $settings)
     {
-        $settings = Settings::parseFromLegacy($settings);
         if (!$settings instanceof Settings) {
             $settings = new Settings;
             $settings->merge($this->settings);

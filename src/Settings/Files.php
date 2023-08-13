@@ -46,22 +46,6 @@ final class Files extends SettingsAbstract
      */
     protected ?string $downloadLink = null;
 
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['upload']['allow_automatic_upload'])) {
-            $this->setAllowAutomaticUpload($settings['upload']['allow_automatic_upload']);
-        }
-        if (isset($settings['download']['report_broken_media'])) {
-            $this->setReportBrokenMedia($settings['download']['report_broken_media']);
-        }
-        if (isset($settings['upload']['parallel_chunks'])) {
-            $this->setUploadParallelChunks($settings['upload']['parallel_chunks']);
-        }
-        if (isset($settings['download']['parallel_chunks'])) {
-            $this->setDownloadParallelChunks($settings['download']['parallel_chunks']);
-        }
-    }
-
     /**
      * Get allow automatic upload of files from file paths present in constructors?
      */

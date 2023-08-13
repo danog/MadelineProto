@@ -19,9 +19,9 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Mysql\MysqlConfig;
 use Amp\Mysql\MysqlConnectionPool;
 use Amp\Sync\LocalKeyedMutex;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
-use danog\MadelineProto\Exception;
 use PDO;
 use Throwable;
 

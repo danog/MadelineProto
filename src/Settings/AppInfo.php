@@ -102,23 +102,6 @@ final class AppInfo extends SettingsAbstract
         }
     }
 
-    public function mergeArray(array $settings): void
-    {
-        foreach (self::toCamel([
-            'api_id',
-            'api_hash',
-            'device_model',
-            'system_version',
-            'app_version',
-            'lang_code',
-            'lang_pack',
-        ]) as $object => $array) {
-            if (isset($settings['app_info'][$array])) {
-                $this->{$object}($settings['app_info'][$array]);
-            }
-        }
-    }
-
     /**
      * Check if the settings have API ID/hash information.
      */

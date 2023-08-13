@@ -26,6 +26,8 @@ use ArrayAccess;
  *
  * @extends ArrayAccess<TKey, TValue>
  * @extends DbType<TKey, TValue>
+ *
+ * @internal
  */
 interface DbArray extends DbType, ArrayAccess
 {

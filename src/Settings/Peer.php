@@ -36,18 +36,6 @@ final class Peer extends SettingsAbstract
      */
     protected bool $cacheAllPeersOnStartup = false;
 
-    public function mergeArray(array $settings): void
-    {
-        foreach (self::toCamel([
-            'full_info_cache_time',
-            'full_fetch',
-            'cache_all_peers_on_startup',
-        ]) as $object => $array) {
-            if (isset($settings['peer'][$array])) {
-                $this->{$object}($settings['peer'][$array]);
-            }
-        }
-    }
     /**
      * Get cache time for full peer information (seconds).
      */

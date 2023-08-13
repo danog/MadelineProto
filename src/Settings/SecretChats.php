@@ -32,12 +32,6 @@ final class SecretChats extends SettingsAbstract
      */
     protected bool|array $accept = true;
 
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['secret_chats']['accept_chats'])) {
-            $this->setAccept($settings['secret_chats']['accept_chats']);
-        }
-    }
     /**
      * Get boolean or array of IDs.
      *

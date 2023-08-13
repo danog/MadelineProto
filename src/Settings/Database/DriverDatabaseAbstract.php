@@ -39,19 +39,6 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      */
     protected ?SerializerType $serializer = null;
 
-    public function mergeArray(array $settings): void
-    {
-        foreach (self::toCamel([
-            'database',
-            'password',
-            'cache_ttl',
-        ]) as $object => $array) {
-            if (isset($settings[$array])) {
-                $this->{$object}($settings[$array]);
-            }
-        }
-    }
-
     /**
      * Get DB key.
      */
