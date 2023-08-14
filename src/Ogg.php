@@ -20,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Cancellation;
 use Amp\Process\Process;
 use AssertionError;
 use Closure;
@@ -224,9 +225,9 @@ final class Ogg
     /**
      * Constructor.
      */
-    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream)
+    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null)
     {
-        $this->stream = Tools::openBuffered($stream);
+        $this->stream = Tools::openBuffered($stream, $cancellation);
         $pack_format = [
             'stream_structure_version' => 'C',
             'header_type_flag'         => 'C',
@@ -392,9 +393,9 @@ final class Ogg
     /**
      * Validate that the specified file, URL or stream is a valid VoIP OGG OPUS file.
      */
-    public function validate(LocalFile|RemoteUrl|ReadableStream $file): void
+    public function validate(LocalFile|RemoteUrl|ReadableStream $file, ?Cancellation $cancellation = null): void
     {
-        foreach ((new self($file))->opusPackets as $_) {
+        foreach ((new self($file, $cancellation))->opusPackets as $_) {
         }
     }
     /**
@@ -514,19 +515,20 @@ final class Ogg
      */
     public static function convert(
         LocalFile|RemoteUrl|ReadableStream $in,
-        LocalFile|WritableStream $oggOut
+        LocalFile|WritableStream $oggOut,
+        ?Cancellation $cancellation = null
     ): void {
         $inFile = match (true) {
             $in instanceof LocalFile => $in->file,
             $in instanceof RemoteUrl => $in->url,
             $in instanceof ReadableStream => '/dev/stdin',
         };
-        $proc = Process::start(['ffmpeg', '-hide_banner', '-loglevel', 'warning', '-i', $inFile, '-map', '0:a','-ar', '48000', '-f', 'wav', '-y', '/dev/stdout']);
+        $proc = Process::start(['ffmpeg', '-hide_banner', '-loglevel', 'warning', '-i', $inFile, '-map', '0:a','-ar', '48000', '-f', 'wav', '-y', '/dev/stdout'], cancellation: $cancellation);
         if ($in instanceof ReadableStream) {
-            async(pipe(...), $in, $proc->getStdin())->ignore();
+            async(pipe(...), $in, $proc->getStdin(), $cancellation)->ignore();
         }
-        async(pipe(...), $proc->getStderr(), getStderr())->ignore();
-        self::convertWav($proc->getStdout(), $oggOut);
+        async(pipe(...), $proc->getStderr(), getStderr(), $cancellation)->ignore();
+        self::convertWav($proc->getStdout(), $oggOut, $cancellation);
     }
 
     /**
@@ -537,7 +539,8 @@ final class Ogg
      */
     public static function convertWav(
         LocalFile|RemoteUrl|ReadableStream $wavIn,
-        LocalFile|WritableStream $oggOut
+        LocalFile|WritableStream $oggOut,
+        ?Cancellation $cancellation = null
     ): void {
         $opus = FFI::cdef('
         typedef struct OpusEncoder OpusEncoder;
@@ -581,7 +584,7 @@ final class Ogg
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
-        $read = Tools::openBuffered($wavIn);
+        $read = Tools::openBuffered($wavIn, $cancellation);
 
         Assert::eq($read(4), 'RIFF', "A .wav file must be provided!");
         $totalLength = \unpack('V', $read(4))[1];

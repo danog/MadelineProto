@@ -607,19 +607,19 @@ abstract class Tools extends AsyncTools
     /**
      * Provide a buffered reader for a file, URL or amp stream.
      *
-     * @return Closure(int, ?Cancellation): ?string
+     * @return Closure(int): ?string
      */
-    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream): Closure
+    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null): Closure
     {
         if ($stream instanceof LocalFile) {
             $stream = openFile($stream->file, 'r');
-            return fn (int $len, ?Cancellation $cancellation = null): ?string => $stream->read(cancellation: $cancellation, length: $len);
+            return fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
         }
         if ($stream instanceof RemoteUrl) {
-            $stream = HttpClientBuilder::buildDefault()->request(new Request($stream->url))->getBody();
+            $stream = HttpClientBuilder::buildDefault()->request(new Request($stream->url), $cancellation)->getBody();
         }
         $buffer = '';
-        return function (int $len, ?Cancellation $cancellation = null) use (&$buffer, $stream): ?string {
+        return function (int $len) use (&$buffer, $stream, $cancellation): ?string {
             if ($buffer === null) {
                 return null;
             }
