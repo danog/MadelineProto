@@ -40,18 +40,18 @@ final class Redis
         $lock = self::$mutex->acquire($dbKey);
 
         try {
-            if (empty(static::$connections[$dbKey])) {
+            if (empty(self::$connections[$dbKey])) {
                 $config = RedisConfig::fromUri($settings->getUri())
                     ->withPassword($settings->getPassword())
                     ->withDatabase($settings->getDatabase());
 
-                static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
-                static::$connections[$dbKey]->ping();
+                self::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
+                self::$connections[$dbKey]->ping();
             }
         } finally {
             $lock->release();
         }
 
-        return static::$connections[$dbKey];
+        return self::$connections[$dbKey];
     }
 }

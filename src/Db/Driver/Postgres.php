@@ -41,20 +41,20 @@ final class Postgres
         $lock = self::$mutex->acquire($dbKey);
 
         try {
-            if (empty(static::$connections[$dbKey])) {
+            if (empty(self::$connections[$dbKey])) {
                 $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
                     ->withUser($settings->getUsername())
                     ->withPassword($settings->getPassword())
                     ->withDatabase($settings->getDatabase());
 
-                static::createDb($config);
-                static::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+                self::createDb($config);
+                self::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
             }
         } finally {
             $lock->release();
         }
 
-        return static::$connections[$dbKey];
+        return self::$connections[$dbKey];
     }
 
     private static function createDb(PostgresConfig $config): void

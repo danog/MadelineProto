@@ -131,7 +131,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
                 }
             }
 
-            static::migrateDataToDb($instance, $previous);
+            self::migrateDataToDb($instance, $previous);
         }
 
         return $instance;

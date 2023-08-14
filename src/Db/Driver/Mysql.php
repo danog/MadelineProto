@@ -65,7 +65,7 @@ final class Mysql
                         $settings->getUsername(),
                         $settings->getPassword(),
                     );
-                } catch (PDOException $e) {
+                } catch (PDOException) {
                     $config = $config->withPassword(null);
                     $pdo = new PDO(
                         "mysql:host={$host};port={$port};charset=UTF8",
