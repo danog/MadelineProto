@@ -23,8 +23,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
-use Amp\Pipeline\ConcurrentIterator;
-use Amp\Pipeline\Queue;
+use Amp\DeferredFuture;
 use danog\Loop\GenericLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\VoIP\CallState;
@@ -34,6 +33,7 @@ use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
+use SplQueue;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -120,8 +120,8 @@ final class VoIPController
     private float $lastIncomingTimestamp = 0.0;
     private float $lastOutgoingTimestamp = 0.0;
     private int $opusTimestamp = 0;
-    private Queue $packetQueue;
-    private ConcurrentIterator $packetIterator;
+    private SplQueue $packetQueue;
+    private ?DeferredFuture $packetDeferred = null;
     private Cancellation $cancellation;
     private DeferredCancellation $deferred;
 
@@ -145,16 +145,61 @@ final class VoIPController
     ) {
         $this->public = new VoIP($API, $call);
         $call['_'] = 'inputPhoneCall';
-        $this->packetQueue = new Queue(PHP_INT_MAX);
-        $this->packetIterator = $this->packetQueue->iterate();
+        $this->packetQueue = new SplQueue();
         $this->deferred = new DeferredCancellation;
         $this->cancellation = $this->deferred->getCancellation();
         $this->playLoop = new GenericLoop($this->playLoop(...), "Play loop");
+        Assert::true($this->playLoop->start());
         $this->call = $call;
         if ($this->public->outgoing) {
             $this->callState = CallState::REQUESTED;
         } else {
             $this->callState = CallState::INCOMING;
+        }
+    }
+
+    public function __serialize(): array
+    {
+        $data = \get_object_vars($this);
+        unset($data['cancellation'], $data['deferred'], $data['packetDeferred'], $data['playLoop']);
+
+        $data['holdFiles'] = \array_filter(
+            $data['holdFiles'],
+            fn ($v) => !$v instanceof ReadableStream
+        );
+        $data['inputFiles'] = \array_filter(
+            $data['inputFiles'],
+            fn ($v) => !$v instanceof ReadableStream
+        );
+        return $data;
+    }
+    public function __destruct()
+    {
+        Logger::log("Destroyed $this");
+    }
+    /**
+     * Wakeup function.
+     */
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        $this->deferred = new DeferredCancellation;
+        $this->cancellation = $this->deferred->getCancellation();
+        $this->playLoop = new GenericLoop($this->playLoop(...), "Play loop");
+        Assert::true($this->playLoop->start());
+        if ($this->callState === CallState::RUNNING) {
+            $this->lastIncomingTimestamp = \microtime(true);
+            $this->startReadLoop();
+            if ($this->pendingPing) {
+                $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
+            }
+            if ($this->voipState === VoIPState::ESTABLISHED) {
+                $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
+                $this->opusTimestamp += $diff - ($diff % 60);
+                EventLoop::queue($this->startWriteLoop(...));
+            }
         }
     }
 
@@ -278,47 +323,6 @@ final class VoIPController
         $this->initialize($params['connections']);
         return true;
     }
-    public function __serialize(): array
-    {
-        $data = \get_object_vars($this);
-        unset($data['cancellation'], $data['deferred']);
-
-        $data['holdFiles'] = \array_filter(
-            $data['holdFiles'],
-            fn ($v) => !$v instanceof ReadableStream
-        );
-        $data['inputFiles'] = \array_filter(
-            $data['inputFiles'],
-            fn ($v) => !$v instanceof ReadableStream
-        );
-        return $data;
-    }
-    /**
-     * Wakeup function.
-     */
-    public function __unserialize(array $data): void
-    {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-        $this->deferred = new DeferredCancellation;
-        $this->cancellation = $this->deferred->getCancellation();
-        $this->playLoop = new GenericLoop($this->playLoop(...), "Play loop");
-        if ($this->callState === CallState::RUNNING) {
-            $this->lastIncomingTimestamp = \microtime(true);
-            $this->startReadLoop();
-            if ($this->pendingPing) {
-                $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
-            }
-            if ($this->voipState === VoIPState::ESTABLISHED) {
-                $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
-                $this->opusTimestamp += $diff - ($diff % 60);
-                $this->playLoop->start();
-                EventLoop::queue($this->startWriteLoop(...));
-            }
-        }
-    }
-
     /**
      * Get call emojis (will return null if the call is not inited yet).
      *
@@ -341,6 +345,10 @@ final class VoIPController
             return $this;
         }
         $this->API->cleanupCall($this->public->callID);
+        $this->callState = CallState::ENDED;
+        $this->playLoop->stop();
+        $this->deferred->cancel();
+        $this->skip();
 
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
@@ -355,7 +363,8 @@ final class VoIPController
         foreach ($this->sockets as $socket) {
             $socket->disconnect();
         }
-        $this->packetQueue->complete();
+        $this->packetQueue = new SplQueue;
+        $this->packetDeferred?->complete(false);
         Logger::log("Closed all sockets, discarding $this");
 
         $this->API->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
@@ -375,7 +384,6 @@ final class VoIPController
             $this->API->logger->logger(\sprintf('Setting rating for call %s...', $this->call), Logger::VERBOSE);
             $this->API->methodCallAsyncRead('phone.setCallRating', ['peer' => $this->call, 'rating' => $rating, 'comment' => $comment]);
         }
-        $this->callState = CallState::ENDED;
         return $this;
     }
 
@@ -524,39 +532,60 @@ final class VoIPController
             $it = new Ogg($pipe->getSource());
         }
         foreach ($it->opusPackets as $packet) {
-            $this->packetQueue->pushAsync($packet)->await($this->cancellation);
+            $this->packetQueue->enqueue($packet);
+            if ($this->packetDeferred) {
+                $deferred = $this->packetDeferred;
+                $this->packetDeferred = null;
+                $deferred->complete(true);
+            }
         }
     }
     private bool $muted = false;
     private bool $playingHold = false;
-    private function playLoop(): void
+    private function playLoop(): ?float
     {
-        while ($this->callState !== CallState::ENDED) {
-            $file = \array_shift($this->inputFiles);
-            if ($file) {
-                $this->playingHold = false;
-            } else {
-                $this->playingHold = true;
-                if (!$this->holdFiles) {
-                    return;
-                }
-                $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
+        if ($this->callState === CallState::ENDED) {
+            Logger::log("Exiting play loop in $this because the call ended!");
+            return GenericLoop::STOP;
+        }
+        Logger::log("Starting play loop in $this!");
+        $file = \array_shift($this->inputFiles);
+        if ($file) {
+            $this->playingHold = false;
+        } else {
+            $this->playingHold = true;
+            if (!$this->holdFiles) {
+                Logger::log("Pausing play loop in $this because there are no hold files!");
+                return GenericLoop::PAUSE;
             }
-            try {
-                $this->startPlaying($file);
-            } catch (CancelledException) {
-                $this->packetQueue->complete();
-                $this->packetQueue = new Queue(PHP_INT_MAX);
-                $this->packetIterator = $this->packetQueue->iterate();
+            $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
+        }
+        try {
+            $this->startPlaying($file);
+        } catch (CancelledException) {
+            $this->packetQueue = new SplQueue;
+
+            if ($this->packetDeferred) {
+                $deferred = $this->packetDeferred;
+                $this->packetDeferred = null;
+                $deferred?->complete(false);
             }
         }
+
+        return GenericLoop::CONTINUE;
     }
     private function pullPacket(): ?string
     {
-        if (!$this->packetIterator->continue()) {
-            return null;
+        if ($this->packetQueue->isEmpty()) {
+            if ($this->callState === CallState::ENDED || $this->playLoop->isPaused()) {
+                return null;
+            }
+            $this->packetDeferred ??= new DeferredFuture;
+            if (!$this->packetDeferred->getFuture()->await()) {
+                return null;
+            }
         }
-        return $this->packetIterator->getValue();
+        return $this->packetQueue->dequeue();
     }
     /**
      * Start write loop.
@@ -582,6 +611,7 @@ final class VoIPController
                         'id' => 0,
                         'enabled' => true
                     ])) {
+                        Logger::log("Exiting write loop in $this because we could not write stream state!");
                         return;
                     }
                     $this->muted = false;
@@ -602,6 +632,7 @@ final class VoIPController
                         'id' => 0,
                         'enabled' => false
                     ])) {
+                        Logger::log("Exiting write loop in $this because we could not write stream state!");
                         return;
                     }
                     $this->muted = true;
@@ -616,11 +647,10 @@ final class VoIPController
             $diff = $t - $cur;
             if ($diff > 0) {
                 delay($diff);
-            } else {
-                EventLoop::queue(Logger::log(...), "We're late while sending audio data!");
             }
 
             if (!$this->bestEndpoint->write($packet)) {
+                Logger::log("Exiting write loop in $this!");
                 return;
             }
 
@@ -641,7 +671,7 @@ final class VoIPController
         if ($this->playingHold) {
             $this->skip();
         }
-        $this->playLoop->start();
+        Assert::true($this->playLoop->resume());
 
         return $this;
     }
@@ -651,6 +681,7 @@ final class VoIPController
      */
     public function skip(): void
     {
+        $this->packetQueue = new SplQueue;
         $deferred = $this->deferred;
         $this->deferred = new DeferredCancellation;
         $this->cancellation = $this->deferred->getCancellation();
@@ -673,7 +704,7 @@ final class VoIPController
     public function playOnHold(array $files): self
     {
         $this->holdFiles = $files;
-        $this->playLoop->start();
+        Assert::true($this->playLoop->resume());
 
         return $this;
     }

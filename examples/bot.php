@@ -43,6 +43,8 @@ use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
 use danog\MadelineProto\VoIP;
 
+use function Amp\delay;
+
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
     // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader
@@ -302,7 +304,9 @@ class MyEventHandler extends SimpleEventHandler
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $call->accept()->play(new LocalFile(__DIR__.'/../music.ogg'));
+        $c=$call->accept()->play(new LocalFile(__DIR__.'/../music.ogg'));
+        delay(2.0);
+        $c->skip()->play(new LocalFile(__DIR__.'/../music.ogg'));
     }
 
     public static function getPluginPaths(): string|array|null
