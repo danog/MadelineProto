@@ -167,7 +167,7 @@ trait PeerHandler
                 ];
             }
             $this->chats->set($user['id'], $user);
-            if (!($user['min'] ?? false)) {
+            if ($existingChat && ($existingChat['min'] ?? false) && !($user['min'] ?? false)) {
                 $this->minDatabase->clearPeer($user['id']);
             }
         }
@@ -253,7 +253,7 @@ trait PeerHandler
                 ];
             }
             $this->chats->set($bot_api_id, $chat);
-            if (!($chat['min'] ?? false)) {
+            if ($existingChat && ($existingChat['min'] ?? false) && !($chat['min'] ?? false)) {
                 $this->minDatabase->clearPeer($bot_api_id);
             }
         }

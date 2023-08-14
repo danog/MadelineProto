@@ -94,6 +94,9 @@ final class CacheContainer
 
     public function set(string|int $key, mixed $value): void
     {
+        if (isset($this->ttl[$key]) && $this->cache[$key] === $value) {
+            return;
+        }
         $this->cache[$key] = $value;
         $this->ttl[$key] = true;
     }

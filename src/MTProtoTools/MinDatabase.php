@@ -42,6 +42,7 @@ final class MinDatabase implements TLCallback
     const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
     const ORIGINS = ['message', 'messageService'];
+    private const V = 1;
     /**
      * References indexed by location.
      *
@@ -58,11 +59,8 @@ final class MinDatabase implements TLCallback
      */
     private MTProto $API;
 
-    /**
-     * Whether we cleaned up old database information.
-     *
-     */
-    private bool $clean = false;
+    private int $v = 0;
+
     /**
      * List of properties stored in database (memory or external).
      *
@@ -77,6 +75,7 @@ final class MinDatabase implements TLCallback
     public function __construct(MTProto $API)
     {
         $this->API = $API;
+        $this->v = self::V;
     }
     public function __destruct()
     {
@@ -87,7 +86,7 @@ final class MinDatabase implements TLCallback
     }
     public function __sleep()
     {
-        return ['db', 'API', 'clean'];
+        return ['db', 'API', 'v'];
     }
     public function init(): void
     {
@@ -97,37 +96,9 @@ final class MinDatabase implements TLCallback
             return;
         }
 
-        if (!$this->clean) {
-            EventLoop::queue(function (): void {
-                foreach ($this->db as $id => $origin) {
-                    if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                        unset($this->db[$id]);
-                    }
-                }
-                $this->clean = true;
-            });
-        }
-        EventLoop::queue($this->sync(...));
-        $this->syncTimer = EventLoop::repeat(60.0, $this->sync(...));
-    }
-    private function sync(): void
-    {
-        $this->API->waitForInit();
-        foreach ($this->db as $id => $_) {
-            $id = (int) $id;
-
-            if ($this->API->chats[$id]['min'] ?? true) {
-                try {
-                    $this->API->refreshPeerCache($id);
-                } catch (Throwable $e) {
-                    if ($e instanceof RPCErrorException && $e->rpc === 'MSG_ID_INVALID') {
-                        $this->clearPeer($id);
-                    }
-                    $this->API->logger->logger("An error occurred while refreshing the peer cache for $id: $e");
-                }
-            } else {
-                $this->clearPeer($id);
-            }
+        if ($this->v !== self::V) {
+            $this->db->clear();
+            $this->v = self::V;
         }
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
@@ -153,10 +124,6 @@ final class MinDatabase implements TLCallback
     public function getTypeMismatchCallbacks(): array
     {
         return [];
-    }
-    public function areDeserializationCallbacksMutuallyExclusive(): bool
-    {
-        return true;
     }
     public function reset(): void
     {
