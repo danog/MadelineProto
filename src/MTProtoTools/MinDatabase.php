@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -85,7 +84,7 @@ final class MinDatabase implements TLCallback
     {
         return ['db', 'pendingDb', 'API', 'v'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->localMutex = new LocalKeyedMutex;
     }

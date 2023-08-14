@@ -62,14 +62,14 @@ interface Contacts
      *
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function block(array|int|string $id): bool;
+    public function block(array|int|string $id, bool $my_stories_from = false): bool;
 
     /**
      * Deletes the user from the blacklist.
      *
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function unblock(array|int|string $id): bool;
+    public function unblock(array|int|string $id, bool $my_stories_from = false): bool;
 
     /**
      * Returns the list of blocked users.
@@ -78,7 +78,7 @@ interface Contacts
      * @param int $limit The number of list elements to be returned
      * @return array{_: 'contacts.blocked', blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.blockedSlice', count: int, blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Blocked.html
      */
-    public function getBlocked(int $offset = 0, int $limit = 0): array;
+    public function getBlocked(bool $my_stories_from = false, int $offset = 0, int $limit = 0): array;
 
     /**
      * Returns users found by username substring.
@@ -214,4 +214,11 @@ interface Contacts
      * @param array|int|string $id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      */
     public function toggleStoriesHidden(array|int|string $id, bool $hidden): bool;
+
+    /**
+     *
+     *
+     * @param list<array|int|string>|array<never, never> $id Array of  @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     */
+    public function setBlocked(bool $my_stories_from = false, array $id = [], int $limit = 0): bool;
 }

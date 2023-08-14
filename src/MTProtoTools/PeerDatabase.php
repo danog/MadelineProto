@@ -305,9 +305,9 @@ final class PeerDatabase implements TLCallback
         foreach ($this->pendingDb as $key => $_) {
             if ($key < 0) {
                 $this->processChat($key);
-             } else {
+            } else {
                 $this->processUser($key);
-             }
+            }
         }
         return $this->usernames[$username];
     }
@@ -345,9 +345,9 @@ final class PeerDatabase implements TLCallback
         foreach ($this->pendingDb as $key => $_) {
             if ($key < 0) {
                 $this->processChat($key);
-             } else {
+            } else {
                 $this->processUser($key);
-             }
+            }
         }
         return $result;
     }
