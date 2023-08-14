@@ -850,12 +850,22 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->chats,
                 $this->full_chats,
             );
-            DbPropertiesFactory::get(
+            // Todo for when the username db is global
+            /*DbPropertiesFactory::get(
                 $this->settings->getDb(),
                 $this->getDbPrefix().'_MTProto_usernames',
                 ['innerMadelineProto' => true],
                 $this->usernames
-            )->clear();
+            )->clear();*/
+        }
+
+        if (!isset($this->TL)) {
+            $this->TL = new TL($this);
+            $callbacks = [$this, $this->referenceDatabase];
+            if (!($this->authorization['user']['bot'] ?? false)) {
+                $callbacks[] = $this->minDatabase;
+            }
+            $this->TL->init($this->settings->getSchema(), $callbacks);
         }
     }
 
