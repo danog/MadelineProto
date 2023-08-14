@@ -19,12 +19,7 @@
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
-use Amp\Http\Client\HttpClientBuilder;
-use Amp\Http\Client\Request;
-use AssertionError;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\Stream\Common\FileBufferedStream;
-use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\Endpoint;
@@ -37,7 +32,6 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\delay;
-use function Amp\File\openFile;
 
 /** @internal */
 final class VoIPController
@@ -104,9 +98,9 @@ final class VoIPController
 
     private array $call;
 
-    /** @var array<string|LocalFile|RemoteUrl|ReadableStream> */
+    /** @var array<LocalFile|RemoteUrl|ReadableStream> */
     private array $holdFiles = [];
-    /** @var list<string|LocalFile|RemoteUrl|ReadableStream> */
+    /** @var list<LocalFile|RemoteUrl|ReadableStream> */
     private array $inputFiles = [];
     private int $holdIndex = 0;
 
@@ -468,26 +462,25 @@ final class VoIPController
     }
     private bool $muted = false;
     private bool $playingHold = false;
-    private function pullPacket(): bool
+    private function pullPacket(): ?string
     {
-        $file = \array_shift($this->inputFiles);
-        if ($file) {
-            $this->playingHold = false;
-        } else {
-            $this->playingHold = true;
-            if (!$this->holdFiles) {
-                return false;
+        if ($this->packetQueue->isEmpty()) {
+            $file = \array_shift($this->inputFiles);
+            if ($file) {
+                $this->playingHold = false;
+            } else {
+                $this->playingHold = true;
+                if (!$this->holdFiles) {
+                    return null;
+                }
+                $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
             }
-            $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
-        }
-        $it = $this->openFile($file);
-        foreach ($it->opusPackets as $packet) {
-            if (($s = \strlen($packet)) > 1024) {
-                throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
+            $it = new Ogg($file);
+            foreach ($it->opusPackets as $packet) {
+                $this->packetQueue->enqueue($packet);
             }
-            $this->packetQueue->enqueue($packet);
         }
-        return false;
+        return $this->packetQueue->dequeue();
     }
     /**
      * Start write loop.
@@ -506,26 +499,15 @@ final class VoIPController
         $delay = $this->muted ? 0.2 : 0.06;
         $t = \microtime(true) + $delay;
         while (true) {
-            if ($this->packetQueue->isEmpty() && !$this->pullPacket()) {
-                if (!$this->muted) {
-                    $this->bestEndpoint->writeReliably([
-                        '_' => self::PKT_STREAM_STATE,
-                        'id' => 0,
-                        'enabled' => false
-                    ]);
-                    $this->muted = true;
-                    $delay = 0.2;
-                }
-                $packet = $this->messageHandler->encryptPacket([
-                    '_' => self::PKT_NOP
-                ]);
-            } else {
+            if ($packet = $this->pullPacket()) {
                 if ($this->muted) {
-                    $this->bestEndpoint->writeReliably([
+                    if (!$this->bestEndpoint->writeReliably([
                         '_' => self::PKT_STREAM_STATE,
                         'id' => 0,
                         'enabled' => true
-                    ]);
+                    ])) {
+                        return;
+                    }
                     $this->muted = false;
                     $delay = 0.06;
                     $this->opusTimestamp = 0;
@@ -533,19 +515,38 @@ final class VoIPController
                 $packet = $this->messageHandler->encryptPacket([
                     '_' => self::PKT_STREAM_DATA,
                     'stream_id' => 0,
-                    'data' => $this->packetQueue->dequeue(),
+                    'data' => $packet,
                     'timestamp' => $this->opusTimestamp
                 ]);
                 $this->opusTimestamp += 60;
+            } else {
+                if (!$this->muted) {
+                    if (!$this->bestEndpoint->writeReliably([
+                        '_' => self::PKT_STREAM_STATE,
+                        'id' => 0,
+                        'enabled' => false
+                    ])) {
+                        return;
+                    }
+                    $this->muted = true;
+                    $delay = 0.2;
+                }
+                $packet = $this->messageHandler->encryptPacket([
+                    '_' => self::PKT_NOP
+                ]);
             }
             //Logger::log("Writing {$this->opusTimestamp} in $this!");
             $cur = \microtime(true);
             $diff = $t - $cur;
             if ($diff > 0) {
                 delay($diff);
+            } else {
+                EventLoop::queue(Logger::log(...), "We're late while sending audio data!");
             }
 
-            $this->bestEndpoint->write($packet);
+            if (!$this->bestEndpoint->write($packet)) {
+                return;
+            }
 
             if ($diff > 0) {
                 $cur += $diff;
@@ -554,21 +555,6 @@ final class VoIPController
 
             $t += $delay;
         }
-    }
-    /**
-     * Open OGG file for reading.
-     */
-    private function openFile(string|LocalFile|RemoteUrl|ReadableStream $file): Ogg
-    {
-        $ctx = new ConnectionContext;
-        $ctx->addStream(FileBufferedStream::class, match (true) {
-            \is_string($file) => openFile($file, 'r'),
-            $file instanceof LocalFile => openFile($file->file, 'r'),
-            $file instanceof RemoteUrl => HttpClientBuilder::buildDefault()->request(new Request($file->url))->getBody(),
-            $file instanceof ReadableStream => $file,
-        });
-        $stream = $ctx->getStream();
-        return new Ogg($stream);
     }
     /**
      * Play file.

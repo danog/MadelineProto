@@ -20,14 +20,8 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
-use Amp\Http\Client\HttpClientBuilder;
-use Amp\Http\Client\Request;
 use AssertionError;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
-use danog\MadelineProto\Stream\BufferInterface;
-use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
-use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\Transport\PremadeStream;
+use Closure;
 use FFI;
 use FFI\CData;
 use Webmozart\Assert\Assert;
@@ -205,11 +199,6 @@ final class Ogg
     private int $streamCount;
 
     /**
-     * Buffered stream interface.
-     */
-    private BufferInterface $stream;
-
-    /**
      * Pack format.
      */
     private string $packFormat;
@@ -222,13 +211,15 @@ final class Ogg
     public readonly iterable $opusPackets;
 
     /**
-     * Constructor.
-     *
-     * @param BufferedStreamInterface $stream The stream
+     * @var (Closure(int, ?Cancellation): ?string) $stream The stream
      */
-    public function __construct(BufferedStreamInterface $stream)
+    private readonly Closure $stream;
+    /**
+     * Constructor.
+     */
+    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream)
     {
-        $this->stream = $stream->getReadBuffer($l);
+        $this->stream = Tools::openBuffered($stream);
         $pack_format = [
             'stream_structure_version' => 'C',
             'header_type_flag'         => 'C',
@@ -355,6 +346,9 @@ final class Ogg
                 /** @psalm-suppress InvalidArgument */
                 $this->opusPayload .= \substr($content, $preOffset, (int) (($offset - $preOffset) + $sum + $paddingLen));
                 if ($this->currentDuration === 60_000) {
+                    if (($s = \strlen($this->opusPayload)) > 1024) {
+                        throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
+                    }
                     yield $this->opusPayload;
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
@@ -376,6 +370,9 @@ final class Ogg
                     if (\strlen($this->opusPayload) !== \strlen($content)) {
                         throw new AssertionError();
                     }
+                    if (($s = \strlen($this->opusPayload)) > 1024) {
+                        throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
+                    }
                     yield $this->opusPayload;
                     $this->opusPayload = '';
                     $this->currentDuration = 0;
@@ -385,6 +382,14 @@ final class Ogg
         }
     }
 
+    /**
+     * Validate that the specified file, URL or stream is a valid VoIP OGG OPUS file.
+     */
+    public function validate(LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        foreach ((new self($file))->opusPackets as $_) {
+        }
+    }
     /**
      * Read frames.
      *
@@ -398,7 +403,7 @@ final class Ogg
         $ignoredStreams = [];
 
         while (true) {
-            $capture = $this->stream->bufferRead(4);
+            $capture = ($this->stream)(4);
             if ($capture !== self::CAPTURE_PATTERN) {
                 if ($capture === null) {
                     return;
@@ -408,7 +413,7 @@ final class Ogg
 
             $headers = \unpack(
                 $this->packFormat,
-                $this->stream->bufferRead(23)
+                ($this->stream)(23)
             );
             $ignore = \in_array($headers['bitstream_serial_number'], $ignoredStreams, true);
 
@@ -424,7 +429,7 @@ final class Ogg
 
             $segments = \unpack(
                 'C*',
-                $this->stream->bufferRead($headers['number_page_segments']),
+                ($this->stream)($headers['number_page_segments']),
             );
 
             //$serial = $headers['bitstream_serial_number'];
@@ -439,7 +444,7 @@ final class Ogg
             foreach ($segments as $segment_size) {
                 $sizeAccumulated += $segment_size;
                 if ($segment_size < 255) {
-                    $piece = $this->stream->bufferRead($sizeAccumulated);
+                    $piece = ($this->stream)($sizeAccumulated);
                     $sizeAccumulated = 0;
                     if ($ignore) {
                         continue;
@@ -539,33 +544,24 @@ final class Ogg
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
         $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
-        $in = $wavIn instanceof LocalFile
-            ? openFile($wavIn->file, 'r')
-            : (
-                $wavIn instanceof RemoteUrl
-                ? HttpClientBuilder::buildDefault()->request(new Request($wavIn->url))->getBody()
-                : $wavIn
-            );
+        $read = Tools::openBuffered($wavIn);
 
-        $ctx = (new ConnectionContext())->addStream(PremadeStream::class, $in)->addStream(SimpleBufferedRawStream::class);
-        /** @var SimpleBufferedRawStream */
-        $in = $ctx->getStream();
-        Assert::eq($in->bufferRead(length: 4), 'RIFF', "A .wav file must be provided!");
-        $totalLength = \unpack('V', $in->bufferRead(length: 4))[1];
-        Assert::eq($in->bufferRead(length: 4), 'WAVE', "A .wav file must be provided!");
+        Assert::eq($read(4), 'RIFF', "A .wav file must be provided!");
+        $totalLength = \unpack('V', $read(4))[1];
+        Assert::eq($read(4), 'WAVE', "A .wav file must be provided!");
         do {
-            $type = $in->bufferRead(length: 4);
-            $length = \unpack('V', $in->bufferRead(length: 4))[1];
+            $type = $read(4);
+            $length = \unpack('V', $read(4))[1];
             if ($type === 'fmt ') {
                 Assert::eq($length, 16);
-                $contents = $in->bufferRead(length: $length + ($length % 2));
+                $contents = $read($length + ($length % 2));
                 $header = \unpack('vaudioFormat/vchannels/VsampleRate/VbyteRate/vblockAlign/vbitsPerSample', $contents);
                 Assert::eq($header['audioFormat'], 1, "The wav file must contain PCM audio");
                 Assert::eq($header['sampleRate'], 48000, "The sample rate of the wav file must be 48khz!");
             } elseif ($type === 'data') {
                 break;
             } else {
-                $in->bufferRead($length);
+                $read($length);
             }
         } while (true);
 
@@ -636,6 +632,7 @@ final class Ogg
         $writeTag("MadelineProto ".API::RELEASE.", ".$opus->opus_get_version_string());
         $tags .= \pack('V', 2);
         $writeTag("ENCODER=MadelineProto ".API::RELEASE." with ".$opus->opus_get_version_string());
+        $writeTag("MADELINE_ENCODER_V=1");
         $writeTag('See https://docs.madelineproto.xyz/docs/CALLS.html for more info');
         $writePage(
             0,
@@ -648,7 +645,7 @@ final class Ogg
         $granule = 0;
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
         do {
-            $chunkOrig = $in->bufferRead(length: $chunkSize);
+            $chunkOrig = $read($chunkSize);
             $chunk = \str_pad($chunkOrig, $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);

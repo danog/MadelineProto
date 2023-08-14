@@ -55,7 +55,7 @@ trait AuthKeyHandler
      *
      * @param mixed $user User
      */
-    public function requestCall(mixed $user)
+    public function requestCall(mixed $user): VoIP
     {
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {

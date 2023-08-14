@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\Settings;
@@ -295,13 +296,13 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('call')]
     public function callVoip(Incoming&Message $message): void
     {
-        $this->requestCall($message->senderId)->play(__DIR__.'/../music.ogg');
+        $this->requestCall($message->senderId)->play(new LocalFile(__DIR__.'/../music.ogg'));
     }
 
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $call->accept()->play(__DIR__.'/../music.ogg');
+        $call->accept()->play(new LocalFile(__DIR__.'/../music.ogg'));
     }
 
     public static function getPluginPaths(): string|array|null

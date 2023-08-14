@@ -21,7 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableBuffer;
+use Amp\ByteStream\ReadableStream;
+use Amp\Cancellation;
 use Amp\File\File;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use ArrayAccess;
 use Closure;
 use Countable;
@@ -598,6 +602,41 @@ abstract class Tools extends AsyncTools
     public static function openFileAppendOnly(string $path): File
     {
         return openFile($path, "a");
+    }
+
+    /**
+     * Provide a buffered reader for a file, URL or amp stream.
+     *
+     * @return Closure(int, ?Cancellation): ?string
+     */
+    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream): Closure
+    {
+        if ($stream instanceof LocalFile) {
+            $stream = openFile($stream->file, 'r');
+            return fn (int $len, ?Cancellation $cancellation = null): ?string => $stream->read(cancellation: $cancellation, length: $len);
+        }
+        if ($stream instanceof RemoteUrl) {
+            $stream = HttpClientBuilder::buildDefault()->request(new Request($stream->url))->getBody();
+        }
+        $buffer = '';
+        return function (int $len, ?Cancellation $cancellation = null) use (&$buffer, $stream): ?string {
+            if ($buffer === null) {
+                return null;
+            }
+            do {
+                if (\strlen($buffer) >= $len) {
+                    $piece = \substr($buffer, 0, $len);
+                    $buffer = \substr($buffer, $len);
+                    return $piece;
+                }
+                $chunk = $stream->read($cancellation);
+                if ($chunk === null) {
+                    $buffer = null;
+                    return null;
+                }
+                $buffer .= $chunk;
+            } while (true);
+        };
     }
 
     private const BLOCKING_FUNCTIONS = [

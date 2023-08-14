@@ -1121,6 +1121,7 @@
   <file src="src/MTProto.php">
     <DocblockTypeContradiction>
       <code><![CDATA[\is_object($this->datacenter)]]></code>
+      <code><![CDATA[isset($this->TL)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
       <code><![CDATA[new DataCenter($this, $this->dcList, $this->settings->getConnection())]]></code>
@@ -1186,7 +1187,6 @@
     </PossiblyInvalidArgument>
     <PossiblyInvalidArrayAccess>
       <code><![CDATA[$this->getSelf()['bot']]]></code>
-      <code><![CDATA[$this->getSelf()['id']]]></code>
       <code><![CDATA[$this->getSelf()['premium']]]></code>
     </PossiblyInvalidArrayAccess>
     <PossiblyNullArrayAccess>
@@ -1228,7 +1228,6 @@
     </RedundantConditionGivenDocblockType>
     <UndefinedThisPropertyFetch>
       <code><![CDATA[$this->full_chats]]></code>
-      <code><![CDATA[$this->usernames]]></code>
     </UndefinedThisPropertyFetch>
     <UnsupportedReferenceUsage>
       <code><![CDATA[Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()]]]></code>
@@ -1455,7 +1454,6 @@
       <code>$size</code>
     </PossiblyNullArgument>
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
       <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>

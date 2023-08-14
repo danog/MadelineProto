@@ -1314,6 +1314,15 @@ abstract class InternalDoc
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
     }
     /**
+     * Provide a buffered reader for a file, URL or amp stream.
+     *
+     * @return Closure(int, ?Cancellation): ?string
+     */
+    public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream): \Closure
+    {
+        return \danog\MadelineProto\Tools::openBuffered($stream);
+    }
+    /**
      * Opens a file in append-only mode.
      *
      * @param string $path File path.
@@ -1481,7 +1490,7 @@ abstract class InternalDoc
      *
      * @param mixed $user User
      */
-    public function requestCall(mixed $user)
+    public function requestCall(mixed $user): \danog\MadelineProto\VoIP
     {
         return $this->wrapper->getAPI()->requestCall($user);
     }
