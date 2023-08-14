@@ -861,7 +861,7 @@ final class MTProto implements TLCallback, LoggerGetter
 
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
-            $callbacks = [$this, $this->referenceDatabase];
+            $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];
             if (!($this->authorization['user']['bot'] ?? false)) {
                 $callbacks[] = $this->minDatabase;
             }

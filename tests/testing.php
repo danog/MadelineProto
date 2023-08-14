@@ -252,8 +252,6 @@ if (!getenv('GITHUB_SHA') && stripos(($MadelineProto->readline('Do you want to m
 if (!getenv('TEST_USERNAME')) {
     throw new Exception('No TEST_USERNAME environment variable was provided!');
 }
-/*$MadelineProto->refreshPeerCache(\getenv('TEST_USERNAME'));
-$MadelineProto->refreshFullPeerCache(\getenv('TEST_USERNAME'));*/
 $mention = $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];

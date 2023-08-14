@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\MadelineProto\Db\DbArray;
@@ -92,9 +93,11 @@ final class PeerDatabase implements TLCallback
     ];
 
     private LocalMutex $decacheMutex;
+    private LocalKeyedMutex $mutex;
     public function __construct(private MTProto $API)
     {
         $this->decacheMutex = new LocalMutex;
+        $this->mutex = new LocalKeyedMutex;
     }
     public function __sleep()
     {
@@ -103,6 +106,7 @@ final class PeerDatabase implements TLCallback
     public function __wakeup(): void
     {
         $this->decacheMutex = new LocalMutex;
+        $this->mutex = new LocalKeyedMutex;
     }
     public function init(): void
     {
@@ -182,7 +186,12 @@ final class PeerDatabase implements TLCallback
     }
     public function clear(int $id): void
     {
-        unset($this->pendingDb[$id], $this->db[$id]);
+        if ($id < 0) {
+            $this->processChat($id);
+        } else {
+            $this->processUser($id);
+        }
+        unset($this->db[$id]);
     }
 
     /**
@@ -369,56 +378,63 @@ final class PeerDatabase implements TLCallback
             return;
         }
         $user = $this->pendingDb[$id];
-        unset($this->pendingDb[$id]);
-
-        $existingChat = $this->db[$user['id']];
-        if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
-            if (isset($existingChat['access_hash'])) {
-                $this->API->logger->logger("No access hash with user {$user['id']}, using backup");
-                $user['access_hash'] = $existingChat['access_hash'];
-                $user['min'] = false;
-            } else {
-                Assert::null($existingChat);
-                try {
-                    $this->API->methodCallAsyncRead('users.getUsers', ['id' => [[
-                        '_' => 'inputUser',
-                        'user_id' => $user['id'],
-                        'access_hash' => 0,
-                    ]]]);
-                    return;
-                } catch (RPCErrorException $e) {
-                    $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
-                }
-                foreach (self::getUsernames($user) as $username) {
-                    if (($this->resolveUsername($username)) === $user['id']) {
-                        return;
-                    }
-                }
+        $lock = $this->mutex->acquire((string) $id);
+        try {
+            if (!isset($this->pendingDb[$id])) {
                 return;
             }
-        }
-        if ($existingChat !== $user) {
-            $this->API->logger->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
-            if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
-                $this->API->logger->logger("{$user['id']} is min, filling missing fields", Logger::ULTRA_VERBOSE);
+            $existingChat = $this->db[$user['id']];
+            if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {
-                    $user['min'] = false;
+                    $this->API->logger->logger("No access hash with user {$user['id']}, using backup");
                     $user['access_hash'] = $existingChat['access_hash'];
+                    $user['min'] = false;
+                } else {
+                    Assert::null($existingChat);
+                    try {
+                        $this->API->methodCallAsyncRead('users.getUsers', ['id' => [[
+                            '_' => 'inputUser',
+                            'user_id' => $user['id'],
+                            'access_hash' => 0,
+                        ]]]);
+                        return;
+                    } catch (RPCErrorException $e) {
+                        $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
+                    }
+                    foreach (self::getUsernames($user) as $username) {
+                        if (($this->resolveUsername($username)) === $user['id']) {
+                            return;
+                        }
+                    }
+                    return;
                 }
             }
-            $this->recacheChatUsername($user['id'], $existingChat, $user);
-            if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
-                $user = [
-                    '_' => $user['_'],
-                    'id' => $user['id'],
-                    'access_hash' => $user['access_hash'] ?? null,
-                    'min' => $user['min'] ?? false,
-                ];
+            if ($existingChat !== $user) {
+                $this->API->logger->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
+                if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
+                    $this->API->logger->logger("{$user['id']} is min, filling missing fields", Logger::ULTRA_VERBOSE);
+                    if (isset($existingChat['access_hash'])) {
+                        $user['min'] = false;
+                        $user['access_hash'] = $existingChat['access_hash'];
+                    }
+                }
+                $this->recacheChatUsername($user['id'], $existingChat, $user);
+                if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
+                    $user = [
+                        '_' => $user['_'],
+                        'id' => $user['id'],
+                        'access_hash' => $user['access_hash'] ?? null,
+                        'min' => $user['min'] ?? false,
+                    ];
+                }
+                $this->db[$user['id']] = $user;
+                if ($existingChat && ($existingChat['min'] ?? false) && !($user['min'] ?? false)) {
+                    $this->API->minDatabase->clearPeer($user['id']);
+                }
             }
-            $this->db[$user['id']] = $user;
-            if ($existingChat && ($existingChat['min'] ?? false) && !($user['min'] ?? false)) {
-                $this->API->minDatabase->clearPeer($user['id']);
-            }
+        } finally {
+            unset($this->pendingDb[$id]);
+            $lock->release();
         }
     }
     public function addChatBlocking(int $chat): void
@@ -462,15 +478,73 @@ final class PeerDatabase implements TLCallback
         if (!isset($this->pendingDb[$id])) {
             return;
         }
-        $chat = $this->pendingDb[$id];
-        unset($this->pendingDb[$id]);
-        if ($chat['_'] === 'chat'
-            || $chat['_'] === 'chatEmpty'
-            || $chat['_'] === 'chatForbidden'
-        ) {
-            $existingChat = $this->db[-$chat['id']];
-            if (!$existingChat || $existingChat !== $chat) {
-                $this->API->logger->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
+        $lock = $this->mutex->acquire((string) $id);
+        try {
+            $chat = $this->pendingDb[$id];
+            if ($chat['_'] === 'chat'
+                || $chat['_'] === 'chatEmpty'
+                || $chat['_'] === 'chatForbidden'
+            ) {
+                $existingChat = $this->db[-$chat['id']];
+                if (!$existingChat || $existingChat !== $chat) {
+                    $this->API->logger->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
+                    if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
+                        $chat = [
+                            '_' => $chat['_'],
+                            'id' => $chat['id'],
+                            'access_hash' => $chat['access_hash'] ?? null,
+                            'min' => $chat['min'] ?? false,
+                        ];
+                    }
+                    $this->db[-$chat['id']] = $chat;
+                }
+                return;
+            }
+            if ($chat['_'] === 'channelEmpty') {
+                return;
+            }
+            if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
+                throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
+            }
+            $bot_api_id = MTProto::toSupergroup($chat['id']);
+            $existingChat = $this->db[$bot_api_id];
+            if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
+                if (isset($existingChat['access_hash'])) {
+                    $this->API->logger->logger("No access hash with channel {$bot_api_id}, using backup");
+                    $chat['access_hash'] = $existingChat['access_hash'];
+                } else {
+                    Assert::null($existingChat);
+                    try {
+                        $this->API->methodCallAsyncRead('channels.getChannels', ['id' => [[
+                            '_' => 'inputChannel',
+                            'channel_id' => $chat['id'],
+                            'access_hash' => 0,
+                        ]]]);
+                        return;
+                    } catch (RPCErrorException $e) {
+                        $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
+                    }
+                    foreach (self::getUsernames($chat) as $username) {
+                        if (($this->resolveUsername($username)) === $bot_api_id) {
+                            return;
+                        }
+                    }
+                    return;
+                }
+            }
+            if ($existingChat !== $chat) {
+                $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
+                $this->API->logger->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
+                if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
+                    $this->API->logger->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
+                    $newchat = $existingChat;
+                    foreach (['title', 'username', 'usernames', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
+                        if (isset($chat[$field])) {
+                            $newchat[$field] = $chat[$field];
+                        }
+                    }
+                    $chat = $newchat;
+                }
                 if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                     $chat = [
                         '_' => $chat['_'],
@@ -479,67 +553,14 @@ final class PeerDatabase implements TLCallback
                         'min' => $chat['min'] ?? false,
                     ];
                 }
-                $this->db[-$chat['id']] = $chat;
-            }
-            return;
-        }
-        if ($chat['_'] === 'channelEmpty') {
-            return;
-        }
-        if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
-            throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
-        }
-        $bot_api_id = MTProto::toSupergroup($chat['id']);
-        $existingChat = $this->db[$bot_api_id];
-        if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
-            if (isset($existingChat['access_hash'])) {
-                $this->API->logger->logger("No access hash with channel {$bot_api_id}, using backup");
-                $chat['access_hash'] = $existingChat['access_hash'];
-            } else {
-                Assert::null($existingChat);
-                try {
-                    $this->API->methodCallAsyncRead('channels.getChannels', ['id' => [[
-                        '_' => 'inputChannel',
-                        'channel_id' => $chat['id'],
-                        'access_hash' => 0,
-                    ]]]);
-                    return;
-                } catch (RPCErrorException $e) {
-                    $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
+                $this->db[$bot_api_id] = $chat;
+                if ($existingChat && ($existingChat['min'] ?? false) && !($chat['min'] ?? false)) {
+                    $this->API->minDatabase->clearPeer($bot_api_id);
                 }
-                foreach (self::getUsernames($chat) as $username) {
-                    if (($this->resolveUsername($username)) === $bot_api_id) {
-                        return;
-                    }
-                }
-                return;
             }
-        }
-        if ($existingChat !== $chat) {
-            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
-            $this->API->logger->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
-            if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
-                $this->API->logger->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
-                $newchat = $existingChat;
-                foreach (['title', 'username', 'usernames', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
-                    if (isset($chat[$field])) {
-                        $newchat[$field] = $chat[$field];
-                    }
-                }
-                $chat = $newchat;
-            }
-            if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
-                $chat = [
-                    '_' => $chat['_'],
-                    'id' => $chat['id'],
-                    'access_hash' => $chat['access_hash'] ?? null,
-                    'min' => $chat['min'] ?? false,
-                ];
-            }
-            $this->db[$bot_api_id] = $chat;
-            if ($existingChat && ($existingChat['min'] ?? false) && !($chat['min'] ?? false)) {
-                $this->API->minDatabase->clearPeer($bot_api_id);
-            }
+        } finally {
+            unset($this->pendingDb[$id]);
+            $lock->release();
         }
     }
     /**

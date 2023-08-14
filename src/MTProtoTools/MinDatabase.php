@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Sync\LocalKeyedMutex;
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -69,10 +71,12 @@ final class MinDatabase implements TLCallback
         'db' => ['innerMadelineProto' => true],
     ];
 
+    private LocalKeyedMutex $localMutex;
     public function __construct(MTProto $API)
     {
         $this->API = $API;
         $this->v = self::V;
+        $this->localMutex = new LocalKeyedMutex;
     }
     public function __destruct()
     {
@@ -80,6 +84,10 @@ final class MinDatabase implements TLCallback
     public function __sleep()
     {
         return ['db', 'pendingDb', 'API', 'v'];
+    }
+    public function __wakeup()
+    {
+        $this->localMutex = new LocalKeyedMutex;
     }
     public function init(): void
     {
@@ -200,10 +208,17 @@ final class MinDatabase implements TLCallback
         if (!isset($this->pendingDb[$id])) {
             return;
         }
-        $pending = $this->pendingDb[$id];
-        unset($this->pendingDb[$id]);
-        if ($this->API->peerDatabase->get($id)['min'] ?? true) {
-            $this->db[$id] = $pending;
+        $lock = $this->localMutex->acquire((string) $id);
+        try {
+            if (!isset($this->pendingDb[$id])) {
+                return;
+            }
+            if ($this->API->peerDatabase->get($id)['min'] ?? true) {
+                $this->db[$id] = $this->pendingDb[$id];
+            }
+        } finally {
+            unset($this->pendingDb[$id]);
+            $lock->release();
         }
     }
     public function populateFrom(array $object)
