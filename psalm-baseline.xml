@@ -1121,10 +1121,10 @@
   <file src="src/MTProto.php">
     <DocblockTypeContradiction>
       <code><![CDATA[\is_object($this->datacenter)]]></code>
-      <code><![CDATA[isset($this->TL)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
       <code><![CDATA[new DataCenter($this, $this->dcList, $this->settings->getConnection())]]></code>
+      <code>new PeerDatabase($this)</code>
     </DocblockTypeContradiction>
     <InvalidArgument>
       <code>$callbacks</code>
@@ -1186,6 +1186,7 @@
     </PossiblyInvalidArgument>
     <PossiblyInvalidArrayAccess>
       <code><![CDATA[$this->getSelf()['bot']]]></code>
+      <code><![CDATA[$this->getSelf()['id']]]></code>
       <code><![CDATA[$this->getSelf()['premium']]]></code>
     </PossiblyInvalidArrayAccess>
     <PossiblyNullArrayAccess>
@@ -1204,23 +1205,16 @@
     </PossiblyNullReference>
     <PropertyNotSetInConstructor>
       <code>$channelParticipants</code>
-      <code>$chats</code>
-      <code>$full_chats</code>
       <code>$logger</code>
       <code>$minDatabase</code>
       <code>$session</code>
       <code>$snitch</code>
-      <code>$usernames</code>
       <code>$wrapper</code>
       <code>MTProto</code>
     </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
       <code><![CDATA[$this->sanitizeReportPeers($userOrId)]]></code>
     </PropertyTypeCoercion>
-    <RawObjectIteration>
-      <code><![CDATA[$this->chats]]></code>
-      <code><![CDATA[$this->chats]]></code>
-    </RawObjectIteration>
     <RedundantCondition>
       <code><![CDATA[isset($this->wrapper) && $this->isInited()]]></code>
       <code><![CDATA[isset($this->wrapper) && isset(self::$references[$this->getSessionName()])]]></code>
@@ -1228,9 +1222,14 @@
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->authorized === API::LOGGED_IN && \is_int($dc_id)]]></code>
       <code><![CDATA[$this->datacenter]]></code>
+      <code><![CDATA[$this->peerDatabase]]></code>
       <code>\is_int($dc_id)</code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->full_chats]]></code>
+      <code><![CDATA[$this->usernames]]></code>
+    </UndefinedThisPropertyFetch>
     <UnsupportedReferenceUsage>
       <code><![CDATA[Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()]]]></code>
     </UnsupportedReferenceUsage>
@@ -1294,7 +1293,6 @@
       <code><![CDATA[fn () => $e]]></code>
     </MissingClosureReturnType>
     <PossiblyInvalidArgument>
-      <code>$response</code>
       <code>\time() + $seconds</code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
@@ -1483,15 +1481,44 @@
     <PropertyNotSetInConstructor>
       <code>$db</code>
     </PropertyNotSetInConstructor>
-    <RawObjectIteration>
-      <code><![CDATA[$this->db]]></code>
-      <code><![CDATA[$this->db]]></code>
-    </RawObjectIteration>
   </file>
   <file src="src/MTProtoTools/PasswordCalculator.php">
     <PossiblyNullReference>
       <code>powMod</code>
     </PossiblyNullReference>
+  </file>
+  <file src="src/MTProtoTools/PeerDatabase.php">
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[$this->pendingDb]]></code>
+      <code><![CDATA[$this->pendingDb]]></code>
+      <code><![CDATA[$this->pendingDb]]></code>
+    </InvalidPropertyAssignmentValue>
+    <PossiblyNullArgument>
+      <code>$id</code>
+      <code>$id</code>
+      <code><![CDATA[$this->API->getIdInternal($full)]]></code>
+      <code><![CDATA[$this->API->getIdInternal($full)]]></code>
+      <code><![CDATA[$this->API->getIdInternal($id)]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullArrayAccess>
+      <code><![CDATA[$this->API->authorization['user']]]></code>
+      <code><![CDATA[$this->API->authorization['user']['id']]]></code>
+    </PossiblyNullArrayAccess>
+    <PossiblyNullArrayOffset>
+      <code><![CDATA[$this->fullDb]]></code>
+      <code><![CDATA[$this->fullDb]]></code>
+      <code><![CDATA[$this->pendingDb]]></code>
+      <code><![CDATA[$this->pendingDb]]></code>
+      <code><![CDATA[$this->pendingDb]]></code>
+    </PossiblyNullArrayOffset>
+    <PropertyNotSetInConstructor>
+      <code>$db</code>
+      <code>$fullDb</code>
+      <code>$usernames</code>
+    </PropertyNotSetInConstructor>
+    <RedundantCastGivenDocblockType>
+      <code>(int) $id</code>
+    </RedundantCastGivenDocblockType>
   </file>
   <file src="src/MTProtoTools/PeerHandler.php">
     <InvalidArrayOffset>
@@ -1545,18 +1572,16 @@
       <code>$promises</code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
-      <code><![CDATA[$this->getIdInternal($full)]]></code>
-      <code><![CDATA[$this->getIdInternal($full)]]></code>
+      <code>$full</code>
       <code><![CDATA[$this->getIdInternal($id)]]></code>
       <code><![CDATA[$this->getIdInternal($id)]]></code>
+      <code><![CDATA[$this->peerDatabase->getFull($partial['bot_api_id'])]]></code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
-      <code><![CDATA[$this->authorization['user']]]></code>
-      <code><![CDATA[$this->authorization['user']['id']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
@@ -1564,13 +1589,10 @@
     </PossiblyNullArrayAccess>
     <PossiblyNullArrayOffset>
       <code><![CDATA[$res['participants']]]></code>
-      <code><![CDATA[$this->full_chats]]></code>
-      <code><![CDATA[$this->full_chats]]></code>
     </PossiblyNullArrayOffset>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$partial['InputChannel']]]></code>
       <code><![CDATA[$partial['InputUser']]]></code>
-      <code><![CDATA[$user['id']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MTProtoTools/ReferenceDatabase.php">
@@ -1579,7 +1601,14 @@
       <code><![CDATA[$this->API->authorization['user']]]></code>
       <code><![CDATA[$this->API->authorization['user']['id']]]></code>
       <code><![CDATA[$this->API->authorization['user']['id']]]></code>
+      <code><![CDATA[$this->getDb($locationString)['origins']]]></code>
+      <code><![CDATA[$this->getDb($locationString)['reference']]]></code>
+      <code><![CDATA[$this->getDb($locationString)['reference']]]></code>
+      <code><![CDATA[$this->getDb($locationString)['reference']]]></code>
     </PossiblyNullArrayAccess>
+    <PossiblyNullIterator>
+      <code><![CDATA[$this->getDb($locationString)['origins']]]></code>
+    </PossiblyNullIterator>
     <PropertyNotSetInConstructor>
       <code>$db</code>
     </PropertyNotSetInConstructor>
@@ -1601,6 +1630,9 @@
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
     </InaccessibleProperty>
+    <InvalidArrayOffset>
+      <code><![CDATA[$info['User']]]></code>
+    </InvalidArrayOffset>
     <MissingReturnType>
       <code>getUpdatesState</code>
       <code>loadUpdateState</code>
@@ -2081,16 +2113,8 @@
     <InvalidArrayOffset>
       <code><![CDATA[($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat']]]></code>
     </InvalidArrayOffset>
-    <InvalidReturnStatement>
-      <code>$result</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType>
-      <code><![CDATA[array<string, list<T>>]]></code>
-    </InvalidReturnType>
     <MissingClosureParamType>
       <code>$arg</code>
-      <code>$v</code>
-      <code>$v</code>
     </MissingClosureParamType>
     <MissingReturnType>
       <code>deserialize</code>
@@ -2294,10 +2318,6 @@
     <PossiblyNullArrayOffset>
       <code>$dialogs</code>
     </PossiblyNullArrayOffset>
-    <RawObjectIteration>
-      <code><![CDATA[$this->chats]]></code>
-      <code><![CDATA[$this->chats]]></code>
-    </RawObjectIteration>
   </file>
   <file src="src/Wrappers/Events.php">
     <DocblockTypeContradiction>
