@@ -699,8 +699,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updatePinnedMessage.html" name="messages.updatePinnedMessage">Pin a message: messages.updatePinnedMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updatePinnedForumTopic.html" name="channels.updatePinnedForumTopic">Pin or unpin forum topics: channels.updatePinnedForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleDialogPin.html" name="messages.toggleDialogPin">Pin/unpin a dialog: messages.toggleDialogPin</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplay-int-id-danog-madelineproto-localfile-danog-madelineproto-remoteurl-danog-madelineproto-ipc-wrapper-readablestream-string-file-void" name="callPlay">Play file in call: callPlay</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplayonhold-int-id-string-localfile-remoteurl-amp-bytestream-readablestream-files-void" name="callPlayOnHold">Play files on hold in call: callPlayOnHold</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplay-int-id-danog-madelineproto-localfile-danog-madelineproto-remoteurl-amp-bytestream-readablestream-file-void" name="callPlay">Play file in call: callPlay</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplayonhold-int-id-localfile-remoteurl-amp-bytestream-readablestream-files-void" name="callPlayOnHold">Play files on hold in call: callPlayOnHold</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getMessages.html" name="channels.getMessages">Please use the event handler: channels.getMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getHistory.html" name="messages.getHistory">Please use the event handler: messages.getHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessages.html" name="messages.getMessages">Please use the event handler: messages.getMessages</a>

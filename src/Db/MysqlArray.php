@@ -142,5 +142,3 @@ final class MysqlArray extends SqlArray
         ");
     }
 }
-
-\class_alias(MysqlArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray');

@@ -242,7 +242,6 @@ final class MinDatabase implements TLCallback
     public function clearPeer(int $id): void
     {
         unset($this->db[$id], $this->pendingDb[$id]);
-
     }
     public function __debugInfo()
     {

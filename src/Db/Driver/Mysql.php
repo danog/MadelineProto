@@ -23,6 +23,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 use PDO;
+use PDOException;
 use Throwable;
 
 /**
@@ -58,13 +59,23 @@ final class Mysql
                     throw Exception::extension('pdo_mysql');
                 }
 
-                self::$connections[$dbKey] = [
-                    new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
-                    new PDO(
+                try {
+                    $pdo = new PDO(
                         "mysql:host={$host};port={$port};charset=UTF8",
                         $settings->getUsername(),
                         $settings->getPassword(),
-                    )
+                    );
+                } catch (PDOException $e) {
+                    $config = $config->withPassword(null);
+                    $pdo = new PDO(
+                        "mysql:host={$host};port={$port};charset=UTF8",
+                        $settings->getUsername(),
+                    );
+                }
+
+                self::$connections[$dbKey] = [
+                    new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
+                    $pdo
                 ];
             }
         } finally {

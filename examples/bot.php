@@ -313,7 +313,9 @@ class MyEventHandler extends SimpleEventHandler
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
-// You can also use Redis, MySQL or PostgreSQL
+// You can also use Redis, MySQL or PostgreSQL.
+// Data is migrated automatically.
+//
 // $settings->setDb((new Redis)->setDatabase(0)->setPassword('pony'));
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
