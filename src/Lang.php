@@ -184,6 +184,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'بەهای دابینکراو %s بچووکترە لە -9223372036854775808',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'en' =>
         [
@@ -348,6 +349,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'Provided value %s is smaller than -9223372036854775808',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'fa' =>
         [
@@ -512,6 +514,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'مقدار داده شده‌ی %s کمتر از -9223372036854775808 است',
             'waveform_must_have_100_values' => 'آرایه waveformباید 100 مقدار داشته باشد(سایز مورد انتظار 100 است ) !',
             'waveform_value' => 'مقدار عددیwaveform باید بین 0 تا 31 باشد!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'fr' =>
         [
@@ -676,6 +679,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'La valeur fournie %s est inférieure à -9223372036854775808',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'he' =>
         [
@@ -840,6 +844,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'הערך שהתקבל %s קטן מ -9223372036854775808',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'it' =>
         [
@@ -1004,6 +1009,7 @@ Ignorare questo messaggio se la sessione è stata resettata intenzionalmente.',
             'value_smaller_than_9223372036854775808' => 'Il valore fornito (%s) è minore di -9223372036854775808',
             'waveform_must_have_100_values' => 'Una forma d\'onda deve essere un array contenente 100 valori!',
             'waveform_value' => 'Un singolo valore di una forma d\'onda deve essere compreso tra 0 e 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'ru' =>
         [
@@ -1168,6 +1174,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'Provided value %s is smaller than -9223372036854775808',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
         'uz' =>
         [
@@ -1332,6 +1339,7 @@ If you intentionally deleted this account, ignore this message.',
             'value_smaller_than_9223372036854775808' => 'Taqdim etilgan %s qiymati -9223372036854775808dan kichik',
             'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
             'waveform_value' => 'A waveform value must be between 0 and 31!',
+            'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
         ],
     ];
 
@@ -1498,5 +1506,6 @@ If you intentionally deleted this account, ignore this message.',
         'value_smaller_than_9223372036854775808' => 'Provided value %s is smaller than -9223372036854775808',
         'waveform_must_have_100_values' => 'A waveform array must have 100 values!',
         'waveform_value' => 'A waveform value must be between 0 and 31!',
+        'windows_warning' => 'For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it\'s 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)',
     ];
 }

@@ -171,7 +171,9 @@ abstract class DriverArray implements DbArray, IteratorAggregate
                     Logger::log("Loading data to table {$newName}: $counter/$total", Logger::WARNING);
                 }
             }
-            if ($promises) await($promises);
+            if ($promises) {
+                await($promises);
+            }
             if (self::getMigrationName($new, false) !== self::getMigrationName($old, false)) {
                 Logger::log("Dropping data from table {$oldName}", Logger::WARNING);
                 $old->clear();
