@@ -1314,11 +1314,11 @@ abstract class InternalDoc
     /**
      * Provide a buffered reader for a file, URL or amp stream.
      *
-     * @return Closure(int, ?Cancellation): ?string
+     * @return Closure(int): ?string
      */
-    public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream): \Closure
+    public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null): \Closure
     {
-        return \danog\MadelineProto\Tools::openBuffered($stream);
+        return \danog\MadelineProto\Tools::openBuffered($stream, $cancellation);
     }
     /**
      * Opens a file in append-only mode.
