@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\VoIP\CallState;
@@ -263,11 +264,27 @@ final class VoIPController
         $this->initialize($params['connections']);
         return true;
     }
+    public function __serialize(): array
+    {
+        $data = \get_object_vars($this);
+        $data['holdFiles'] = \array_filter(
+            $data['holdFiles'],
+            fn ($v) => !$v instanceof ReadableStream
+        );
+        $data['inputFiles'] = \array_filter(
+            $data['inputFiles'],
+            fn ($v) => !$v instanceof ReadableStream
+        );
+        return $data;
+    }
     /**
      * Wakeup function.
      */
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
         if ($this->callState === CallState::RUNNING) {
             $this->lastIncomingTimestamp = \microtime(true);
             $this->startReadLoop();
@@ -460,11 +477,50 @@ final class VoIPController
             });
         }
     }
+
+    private bool $skip = false;
+    private function startPlaying(LocalFile|RemoteUrl|ReadableStream $f): void
+    {
+        if ($this->skip) {
+            $this->skip = false;
+            return;
+        }
+        $it = null;
+        if ($f instanceof LocalFile) {
+            try {
+                $it = new Ogg($f);
+                if (!\in_array('MADELINE_ENCODER_V=1', $it->comments, true)) {
+                    $it = null;
+                }
+            } catch (Throwable) {
+                $it = null;
+            }
+        }
+        if (!$it) {
+            EventLoop::queue(Logger::log(...), "Starting conversion fiber...");
+            $pipe = new Pipe(4096);
+            EventLoop::queue(Ogg::convert(...), $f, $pipe->getSink());
+            $it = new Ogg($pipe->getSource());
+        }
+        foreach ($it->opusPackets as $packet) {
+            $this->packetQueue->enqueue($packet);
+            break;
+        }
+        EventLoop::queue(function () use ($it): void {
+            foreach ($it->opusPackets as $packet) {
+                $this->packetQueue->enqueue($packet);
+                if ($this->skip) {
+                    $this->skip = false;
+                    return;
+                }
+            }
+        });
+    }
     private bool $muted = false;
     private bool $playingHold = false;
     private function pullPacket(): ?string
     {
-        if ($this->packetQueue->isEmpty()) {
+        while ($this->packetQueue->isEmpty()) {
             $file = \array_shift($this->inputFiles);
             if ($file) {
                 $this->playingHold = false;
@@ -475,10 +531,7 @@ final class VoIPController
                 }
                 $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
             }
-            $it = new Ogg($file);
-            foreach ($it->opusPackets as $packet) {
-                $this->packetQueue->enqueue($packet);
-            }
+            $this->startPlaying($file);
         }
         return $this->packetQueue->dequeue();
     }
@@ -563,12 +616,28 @@ final class VoIPController
     {
         $this->inputFiles[] = $file;
         if ($this->playingHold) {
-            $this->packetQueue = new SplQueue;
+            $this->skip();
         }
 
         return $this;
     }
 
+    /**
+     * When called, skips to the next file in the playlist.
+     */
+    public function skip(): void
+    {
+        $this->skip = true;
+    }
+    /**
+     * Stops playing all files, clears the main and the hold playlist.
+     */
+    public function stop(): void
+    {
+        $this->inputFiles = [];
+        $this->holdFiles = [];
+        $this->skip();
+    }
     /**
      * Files to play on hold.
      *

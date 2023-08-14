@@ -296,15 +296,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->callPlayOnHold($id, $files);
     }
     /**
-     * Get call status.
-     *
-     * @param int $id Call ID
-     */
-    public function callStatus(int $id): ?\danog\MadelineProto\VoIP\CallState
-    {
-        return $this->wrapper->getAPI()->callStatus($id);
-    }
-    /**
      * Cancel a running broadcast.
      *
      * @param integer $id Broadcast ID
@@ -651,7 +642,14 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getCachedConfig();
     }
     /**
-     * Get the call with the specified user ID.
+     * Get phone call information.
+     */
+    public function getCall(int $id): ?\danog\MadelineProto\VoIP
+    {
+        return $this->wrapper->getAPI()->getCall($id);
+    }
+    /**
+     * Get the phone call with the specified user ID.
      */
     public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
     {
@@ -1684,6 +1682,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->setupLogger();
     }
     /**
+     * When called, skips to the next file in the playlist.
+     */
+    public function skipPlay(int $id): void
+    {
+        $this->wrapper->getAPI()->skipPlay($id);
+    }
+    /**
      * Asynchronously sleep.
      *
      * @param float $time Number of seconds to sleep for
@@ -1705,6 +1710,13 @@ abstract class InternalDoc
     public function stop(): void
     {
         $this->wrapper->getAPI()->stop();
+    }
+    /**
+     * Stops playing all files in the call, clears the main and the hold playlist.
+     */
+    public function stopPlay(int $id): void
+    {
+        $this->wrapper->getAPI()->stopPlay($id);
     }
     /**
      * Converts a string into an async amphp stream.

@@ -89,18 +89,6 @@ trait AuthKeyHandler
         }
         return $deferred->getFuture()->await();
     }
-    /**
-     * Get call status.
-     *
-     * @param int $id Call ID
-     */
-    public function callStatus(int $id): ?CallState
-    {
-        if (isset($this->calls[$id])) {
-            return $this->calls[$id]->getCallState();
-        }
-        return null;
-    }
 
     /** @internal */
     public function cleanupCall(int $id): void
@@ -143,11 +131,19 @@ trait AuthKeyHandler
     }
 
     /**
-     * Get the call with the specified user ID.
+     * Get the phone call with the specified user ID.
      */
     public function getCallByPeer(int $userId): ?VoIP
     {
         return $this->callsByPeer[$userId] ?? null;
+    }
+
+    /**
+     * Get phone call information.
+     */
+    public function getCall(int $id): ?VoIP
+    {
+        return $this->calls[$id] ?? null;
     }
 
     /**
@@ -156,6 +152,22 @@ trait AuthKeyHandler
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
         ($this->calls[$id] ?? null)?->play($file);
+    }
+
+    /**
+     * When called, skips to the next file in the playlist.
+     */
+    public function skipPlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->skip();
+    }
+
+    /**
+     * Stops playing all files in the call, clears the main and the hold playlist.
+     */
+    public function stopPlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->stop();
     }
 
     /**

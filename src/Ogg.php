@@ -30,7 +30,6 @@ use Webmozart\Assert\Assert;
 use function Amp\async;
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\pipe;
-use function Amp\delay;
 use function Amp\File\openFile;
 use function count;
 
@@ -214,6 +213,9 @@ final class Ogg
      * @var iterable<string>
      */
     public readonly iterable $opusPackets;
+    public readonly string $vendorString;
+    /** @var list<string> */
+    public readonly array $comments;
 
     /**
      * @var (Closure(int, ?Cancellation): ?string) $stream The stream
@@ -486,15 +488,16 @@ final class Ogg
                         $state = self::STATE_READ_COMMENT;
                     } elseif ($state === self::STATE_READ_COMMENT) {
                         $vendor_string_length = \unpack('V', \substr($content, 8, 4))[1];
-                        $result = [];
-                        $result['vendor_string'] = \substr($content, 12, $vendor_string_length);
+                        $this->vendorString = \substr($content, 12, $vendor_string_length);
                         $comment_count = \unpack('V', \substr($content, 12+$vendor_string_length, 4))[1];
                         $offset = 16+$vendor_string_length;
+                        $comments = [];
                         for ($x = 0; $x < $comment_count; $x++) {
                             $length = \unpack('V', \substr($content, $offset, 4))[1];
-                            $result['comments'][$x] = \substr($content, $offset += 4, $length);
+                            $comments []= \substr($content, $offset += 4, $length);
                             $offset += $length;
                         }
+                        $this->comments = $comments;
                         $state = self::STATE_STREAMING;
                     }
                     $content = '';
@@ -508,7 +511,6 @@ final class Ogg
      *
      * @param LocalFile|RemoteUrl|ReadableStream $in The input file, URL or stream.
      * @param LocalFile|WritableStream $oggOut The output file or stream.
-     * @return void
      */
     public static function convert(
         LocalFile|RemoteUrl|ReadableStream $in,
@@ -526,13 +528,12 @@ final class Ogg
         async(pipe(...), $proc->getStderr(), getStderr())->ignore();
         self::convertWav($proc->getStdout(), $oggOut);
     }
-    
+
     /**
      * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
      *
-     * @param LocalFile|RemoteUrl|ReadableStream $in The input file, URL or stream.
+     * @param LocalFile|RemoteUrl|ReadableStream $wavIn The input file, URL or stream.
      * @param LocalFile|WritableStream $oggOut The output file or stream.
-     * @return void
      */
     public static function convertWav(
         LocalFile|RemoteUrl|ReadableStream $wavIn,

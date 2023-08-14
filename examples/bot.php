@@ -296,13 +296,13 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('call')]
     public function callVoip(Incoming&Message $message): void
     {
-        $this->requestCall($message->senderId)->play(new LocalFile(__DIR__.'/../music.ogg'));
+        $this->requestCall($message->senderId)->play(new LocalFile('/home/daniil/music/In The Zone 2.flac'));
     }
 
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $call->accept()->play(new LocalFile(__DIR__.'/../music.ogg'));
+        $call->accept()->play(new LocalFile('/home/daniil/music/In The Zone 2.flac'));
     }
 
     public static function getPluginPaths(): string|array|null

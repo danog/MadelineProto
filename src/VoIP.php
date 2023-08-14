@@ -104,6 +104,24 @@ final class VoIP extends Update implements SimpleFilters
 
         return $this;
     }
+    /**
+     * When called, skips to the next file in the playlist.
+     */
+    public function skip(): self
+    {
+        $this->getClient()->skipPlay($this->callID);
+
+        return $this;
+    }
+    /**
+     * Stops playing all files, clears the main and the hold playlist.
+     */
+    public function stop(): self
+    {
+        $this->getClient()->stopPlay($this->callID);
+
+        return $this;
+    }
 
     /**
      * Files to play on hold.
