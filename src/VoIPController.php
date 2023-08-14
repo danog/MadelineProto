@@ -355,8 +355,7 @@ final class VoIPController
         foreach ($this->sockets as $socket) {
             $socket->disconnect();
         }
-        $this->packetQueue = new Queue(PHP_INT_MAX);
-        $this->packetIterator = $this->packetQueue->iterate();
+        $this->packetQueue->complete();
         Logger::log("Closed all sockets, discarding $this");
 
         $this->API->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
@@ -546,6 +545,7 @@ final class VoIPController
             try {
                 $this->startPlaying($file);
             } catch (CancelledException) {
+                $this->packetQueue->complete();
                 $this->packetQueue = new Queue(PHP_INT_MAX);
                 $this->packetIterator = $this->packetQueue->iterate();
             }
@@ -553,7 +553,9 @@ final class VoIPController
     }
     private function pullPacket(): ?string
     {
-        Assert::true($this->packetIterator->continue());
+        if (!$this->packetIterator->continue()) {
+            return null;
+        }
         return $this->packetIterator->getValue();
     }
     /**
