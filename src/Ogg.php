@@ -20,12 +20,17 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Process\Process;
 use AssertionError;
 use Closure;
 use FFI;
 use FFI\CData;
 use Webmozart\Assert\Assert;
 
+use function Amp\async;
+use function Amp\ByteStream\getStderr;
+use function Amp\ByteStream\pipe;
+use function Amp\delay;
 use function Amp\File\openFile;
 use function count;
 
@@ -498,7 +503,38 @@ final class Ogg
         }
     }
 
+    /**
+     * Converts a file, URL, or stream of any format (including video) into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
+     *
+     * @param LocalFile|RemoteUrl|ReadableStream $in The input file, URL or stream.
+     * @param LocalFile|WritableStream $oggOut The output file or stream.
+     * @return void
+     */
     public static function convert(
+        LocalFile|RemoteUrl|ReadableStream $in,
+        LocalFile|WritableStream $oggOut
+    ): void {
+        $inFile = match (true) {
+            $in instanceof LocalFile => $in->file,
+            $in instanceof RemoteUrl => $in->url,
+            $in instanceof ReadableStream => '/dev/stdin',
+        };
+        $proc = Process::start(['ffmpeg', '-hide_banner', '-loglevel', 'warning', '-i', $inFile, '-map', '0:a','-ar', '48000', '-f', 'wav', '-y', '/dev/stdout']);
+        if ($in instanceof ReadableStream) {
+            async(pipe(...), $in, $proc->getStdin())->ignore();
+        }
+        async(pipe(...), $proc->getStderr(), getStderr())->ignore();
+        self::convertWav($proc->getStdout(), $oggOut);
+    }
+    
+    /**
+     * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
+     *
+     * @param LocalFile|RemoteUrl|ReadableStream $in The input file, URL or stream.
+     * @param LocalFile|WritableStream $oggOut The output file or stream.
+     * @return void
+     */
+    public static function convertWav(
         LocalFile|RemoteUrl|ReadableStream $wavIn,
         LocalFile|WritableStream $oggOut
     ): void {
@@ -645,7 +681,7 @@ final class Ogg
         $granule = 0;
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
         do {
-            $chunkOrig = $read($chunkSize);
+            $chunkOrig = $read($chunkSize) ?? '';
             $chunk = \str_pad($chunkOrig, $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
