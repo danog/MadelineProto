@@ -289,11 +289,10 @@ abstract class InternalDoc
     }
     /**
      * Play files on hold in call.
-     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
-    public function callPlayOnHold(int $id, array $files): void
+    public function callPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
     {
-        $this->wrapper->getAPI()->callPlayOnHold($id, $files);
+        $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
     }
     /**
      * Cancel a running broadcast.

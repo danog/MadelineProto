@@ -125,11 +125,10 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Files to play on hold.
-     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
-    public function playOnHold(array $files): self
+    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
-        $this->getClient()->callPlayOnHold($this->callID, $files);
+        $this->getClient()->callPlayOnHold($this->callID, ...$files);
 
         return $this;
     }

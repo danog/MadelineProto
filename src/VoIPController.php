@@ -550,15 +550,9 @@ final class VoIPController
         }
         Logger::log("Starting play loop in $this!");
         $file = \array_shift($this->inputFiles);
-        if ($file) {
-            $this->playingHold = false;
-        } else {
-            $this->playingHold = true;
-            if (!$this->holdFiles) {
-                Logger::log("Pausing play loop in $this because there are no hold files!");
-                return GenericLoop::PAUSE;
-            }
-            $file = $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
+        if (!$file) {
+            Logger::log("Pausing play loop in $this!");
+            return GenericLoop::PAUSE;
         }
         try {
             $this->startPlaying($file);
@@ -577,7 +571,16 @@ final class VoIPController
     private function pullPacket(): ?string
     {
         if ($this->packetQueue->isEmpty()) {
-            if ($this->callState === CallState::ENDED || $this->playLoop->isPaused()) {
+            if ($this->callState === CallState::ENDED) {
+                return null;
+            }
+            if ($this->playLoop->isPaused()) {
+                if (!$this->holdFiles || $this->inputFiles) {
+                    return null;
+                }
+                $this->playingHold = true;
+                $this->inputFiles []= $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
+                Assert::true($this->playLoop->resume());
                 return null;
             }
             $this->packetDeferred ??= new DeferredFuture;
@@ -669,6 +672,7 @@ final class VoIPController
     {
         $this->inputFiles[] = $file;
         if ($this->playingHold) {
+            $this->playingHold = false;
             $this->skip();
         }
         Assert::true($this->playLoop->resume());
@@ -698,13 +702,10 @@ final class VoIPController
     }
     /**
      * Files to play on hold.
-     *
-     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
-    public function playOnHold(array $files): self
+    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
         $this->holdFiles = $files;
-        Assert::true($this->playLoop->resume());
 
         return $this;
     }

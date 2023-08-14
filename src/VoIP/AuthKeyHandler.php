@@ -172,11 +172,10 @@ trait AuthKeyHandler
 
     /**
      * Play files on hold in call.
-     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
-    public function callPlayOnHold(int $id, array $files): void
+    public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        ($this->calls[$id] ?? null)?->playOnHold($files);
+        ($this->calls[$id] ?? null)?->playOnHold(...$files);
     }
 
     /**

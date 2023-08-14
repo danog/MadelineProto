@@ -33,17 +33,15 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
-use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
 use danog\MadelineProto\VoIP;
-
-use function Amp\delay;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -298,15 +296,13 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('call')]
     public function callVoip(Incoming&Message $message): void
     {
-        $this->requestCall($message->senderId)->play(new LocalFile('/../music.ogg'));
+        $this->requestCall($message->senderId)->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
     }
 
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $c=$call->accept()->play(new LocalFile(__DIR__.'/../music.ogg'));
-        delay(2.0);
-        $c->skip()->play(new LocalFile(__DIR__.'/../music.ogg'));
+        $c=$call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
     }
 
     public static function getPluginPaths(): string|array|null

@@ -163,10 +163,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 * [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html) - MadelineProto provides a unified class for logging messages to the logging destination defined in settings.  
 * [Telegram VoIP phone calls](https://docs.madelineproto.xyz/docs/CALLS.html) - MadelineProto provides an easy wrapper to work with phone calls.
   * [Requesting a call](https://docs.madelineproto.xyz/docs/CALLS.html#requesting-a-call)
-    * [Playing mp3 files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-mp3-files)
-    * [Playing streams](https://docs.madelineproto.xyz/docs/CALLS.html#playing-streams)
-    * [Changing audio quality](https://docs.madelineproto.xyz/docs/CALLS.html#changing-audio-quality)
-  * [Putting it all together](https://docs.madelineproto.xyz/docs/CALLS.html#putting-it-all-together)
+  * [Playing audio files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-audio-files)
+    * [Webhost support!](https://docs.madelineproto.xyz/docs/CALLS.html#webhost-support)
   * [Accepting calls](https://docs.madelineproto.xyz/docs/CALLS.html#accepting-calls)
 * [Uploading and downloading files](https://docs.madelineproto.xyz/docs/FILES.html) - MadelineProto provides fully parallelized wrapper methods to upload and download files that support bot API file ids, direct upload by URL and file renaming.
   * [Bot API file IDs](https://docs.madelineproto.xyz/docs/FILES.html#bot-api-file-ids)
