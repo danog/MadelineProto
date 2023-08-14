@@ -143,9 +143,14 @@ final class PeerDatabase implements TLCallback
     {
         foreach ($chats as $id => $chat) {
             $this->db[$id] = $chat;
-            foreach ($this->getUsernames($chat) as $username) {
-                $this->usernames[$username] = $id;
+            if ($this->API->settings->getDb()->getEnableUsernameDb()) {
+                foreach (self::getUsernames($chat) as $username) {
+                    $this->usernames[$username] = $id;
+                }
             }
+        }
+        if (!$this->API->settings->getDb()->getEnableFullPeerDb()) {
+            return;
         }
         foreach ($fullChats as $id => $chat) {
             $this->fullDb[$id] = $chat;
@@ -247,8 +252,8 @@ final class PeerDatabase implements TLCallback
         if (!$this->API->settings->getDb()->getEnableUsernameDb()) {
             return;
         }
-        $new = $this->getUsernames($new);
-        $old = $old ? $this->getUsernames($old) : [];
+        $new = self::getUsernames($new);
+        $old = $old ? self::getUsernames($old) : [];
         $diffToRemove = \array_diff($old, $new);
         $diffToAdd = \array_diff($new, $old);
         if (!$diffToAdd && !$diffToRemove) {
@@ -370,7 +375,7 @@ final class PeerDatabase implements TLCallback
                 } catch (RPCErrorException $e) {
                     $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
                 }
-                foreach ($this->getUsernames($user) as $username) {
+                foreach (self::getUsernames($user) as $username) {
                     if (($this->resolveUsername($username)) === $user['id']) {
                         return;
                     }
@@ -476,7 +481,7 @@ final class PeerDatabase implements TLCallback
                 } catch (RPCErrorException $e) {
                     $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
                 }
-                foreach ($this->getUsernames($chat) as $username) {
+                foreach (self::getUsernames($chat) as $username) {
                     if (($this->resolveUsername($username)) === $bot_api_id) {
                         return;
                     }

@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\DeferredFuture;
-use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -153,14 +153,14 @@ trait AuthKeyHandler
     /**
      * Play file in call.
      */
-    public function callPlay(int $id, string|LocalFile|RemoteUrl|ReadableStream $file): void
+    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
         ($this->calls[$id] ?? null)?->play($file);
     }
 
     /**
      * Play files on hold in call.
-     * @param array<string|LocalFile|RemoteUrl|ReadableStream> $files
+     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
     public function callPlayOnHold(int $id, array $files): void
     {

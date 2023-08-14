@@ -32,8 +32,6 @@ use function Amp\Future\await;
  */
 trait DbPropertiesTrait
 {
-    public ?string $tmpDbPrefix = null;
-
     /**
      * Initialize database instance.
      *
@@ -45,12 +43,8 @@ trait DbPropertiesTrait
             throw new LogicException(static::class.' must have $dbProperties');
         }
         $dbSettings = $API->settings->getDb();
-        
-        $prefix = $API->getSelf()['id'] ?? null;
-        if (!$prefix) {
-            $API->tmpDbPrefix ??= 'tmp_'.\str_replace('0', '', \spl_object_hash($API));
-            $prefix = $API->tmpDbPrefix;
-        }
+
+        $prefix = $API->getDbPrefix();
 
         $className = \explode('\\', static::class);
         $className = \end($className);
@@ -60,7 +54,7 @@ trait DbPropertiesTrait
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $table = ($type['global'] ?? false) ? '' : $prefix.'_';
+                $table = ($type['global'] ?? false) ? ($API->isTestMode() ? 'test_' : 'prod_') : $prefix.'_';
                 $table .= $type['table'] ?? "{$className}_{$property}";
                 $promises[$property] = async(DbPropertiesFactory::get(...), $dbSettings, $table, $type, $this->{$property} ?? null);
             }

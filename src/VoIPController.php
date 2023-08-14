@@ -573,7 +573,7 @@ final class VoIPController
     /**
      * Play file.
      */
-    public function play(string|LocalFile|RemoteUrl|ReadableStream $file): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file): self
     {
         $this->inputFiles[] = $file;
         if ($this->playingHold) {
@@ -586,7 +586,7 @@ final class VoIPController
     /**
      * Files to play on hold.
      *
-     * @param array<string|LocalFile|RemoteUrl|ReadableStream> $files
+     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
     public function playOnHold(array $files): self
     {

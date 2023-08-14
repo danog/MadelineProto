@@ -195,9 +195,11 @@ final class MinDatabase implements TLCallback
         }
         $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }
-    private function flush(int $id): void 
+    private function flush(int $id): void
     {
-        if (!isset($this->pendingDb[$id])) return;
+        if (!isset($this->pendingDb[$id])) {
+            return;
+        }
         $pending = $this->pendingDb[$id];
         unset($this->pendingDb[$id]);
         if ($this->API->peerDatabase->get($id)['min'] ?? true) {
@@ -239,8 +241,8 @@ final class MinDatabase implements TLCallback
      */
     public function clearPeer(int $id): void
     {
-        unset($this->db[$id]);
-        unset($this->pendingDb[$id]);
+        unset($this->db[$id], $this->pendingDb[$id]);
+
     }
     public function __debugInfo()
     {

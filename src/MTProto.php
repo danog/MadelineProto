@@ -574,6 +574,20 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         return $this->wrapper->getSession()->getSessionDirectoryPath();
     }
+
+    private ?string $tmpDbPrefix = null;
+
+    /** @internal */
+    public function getDbPrefix(): string
+    {
+        $prefix = $this->getSelf()['id'] ?? null;
+        if (!$prefix) {
+            $this->tmpDbPrefix ??= 'tmp_'.\spl_object_id($this);
+            $prefix = $this->tmpDbPrefix;
+        }
+        return (string) $prefix;
+    }
+
     /**
      * Sleep function.
      *
@@ -836,6 +850,12 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->chats,
                 $this->full_chats,
             );
+            DbPropertiesFactory::get(
+                $this->settings->getDb(),
+                $this->getDbPrefix().'_MTProto_usernames',
+                ['innerMadelineProto' => true],
+                $this->usernames
+            )->clear();
         }
     }
 

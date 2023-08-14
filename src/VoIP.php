@@ -88,7 +88,7 @@ final class VoIP extends Update implements SimpleFilters
     /**
      * Play file.
      */
-    public function play(string|LocalFile|RemoteUrl|ReadableStream $file): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file): self
     {
         $this->getClient()->callPlay($this->callID, $file);
 
@@ -98,7 +98,7 @@ final class VoIP extends Update implements SimpleFilters
     /**
      * Play file.
      */
-    public function then(string|LocalFile|RemoteUrl|ReadableStream $file): self
+    public function then(LocalFile|RemoteUrl|ReadableStream $file): self
     {
         $this->getClient()->callPlay($this->callID, $file);
 
@@ -107,7 +107,7 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Files to play on hold.
-     * @param array<string|LocalFile|RemoteUrl|ReadableStream> $files
+     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
      */
     public function playOnHold(array $files): self
     {
