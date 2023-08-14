@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
-use Amp\Future;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -31,12 +30,8 @@ use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
-use Webmozart\Assert\Assert;
 
 use const STR_PAD_LEFT;
-
-use function Amp\async;
-use function Amp\Future\awaitAll;
 
 /**
  * @psalm-import-type TBeforeMethodResponseDeserialization from TLCallback
@@ -372,20 +367,12 @@ final class TL implements TLInterface
      */
     public function updateCallbacks(array $callbacks): void
     {
-        $this->beforeMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
-            fn (TLCallback $t) => [
-                $t->getMethodBeforeResponseDeserializationCallbacks(),
-                $t->areDeserializationCallbacksMutuallyExclusive(),
-                $t::class
-            ],
+        $this->beforeMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterMethodResponseDeserialization = $this->mergeCallbacks(\array_map(
-            fn (TLCallback $t) => [
-                $t->getMethodAfterResponseDeserializationCallbacks(),
-                $t->areDeserializationCallbacksMutuallyExclusive(),
-                $t::class
-            ],
+        $this->afterMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
             $callbacks
         ));
 
@@ -393,20 +380,12 @@ final class TL implements TLInterface
             fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
         ));
-        $this->beforeConstructorDeserialization = $this->mergeCallbacks(\array_map(
-            fn (TLCallback $t) => [
-                $t->getConstructorBeforeDeserializationCallbacks(),
-                $t->areDeserializationCallbacksMutuallyExclusive(),
-                $t::class
-            ],
+        $this->beforeConstructorDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterConstructorDeserialization = $this->mergeCallbacks(\array_map(
-            fn (TLCallback $t) => [
-                $t->getConstructorAfterDeserializationCallbacks(),
-                $t->areDeserializationCallbacksMutuallyExclusive(),
-                $t::class
-            ],
+        $this->afterConstructorDeserialization = \array_merge_recursive(...\array_map(
+            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
             $callbacks
         ));
 
@@ -414,49 +393,6 @@ final class TL implements TLInterface
             fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
             $callbacks
         ));
-    }
-    /**
-     * @var array<string, list<list{(callable(mixed): void), array}>>
-     */
-    private array $mutexSideEffects = [];
-    /**
-     * @var list<Future>
-     */
-    private array $futureSideEffects = [];
-    /**
-     * @template T
-     *
-     * @param list<list{array<string, list<T>>, bool, string}> $callbacks
-     * @return array<string, list<T>>
-     */
-    private function mergeCallbacks(array $callbacks): array
-    {
-        $result = [];
-        foreach ($callbacks as [$map, $mutex, $queueId]) {
-            foreach ($map as $constructor => $list) {
-                $this->mutexSideEffects[$queueId] ??= [];
-                if ($mutex) {
-                    $result[$constructor] = [
-                        ...$result[$constructor] ?? [],
-                        function (...$v) use ($list, $queueId): void {
-                            foreach ($list as $cb) {
-                                $this->mutexSideEffects[$queueId][] = [$cb, $v];
-                            }
-                        }
-                    ];
-                } else {
-                    $result[$constructor] = [
-                        ...$result[$constructor] ?? [],
-                        function (...$v) use ($list): void {
-                            foreach ($list as $cb) {
-                                $this->futureSideEffects[] = async($cb, ...$v);
-                            }
-                        }
-                    ];
-                }
-            }
-        }
-        return $result;
     }
     /**
      * Deserialize bool.
@@ -837,37 +773,9 @@ final class TL implements TLInterface
             throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
         $this->deserialize($stream, $type);
-        Assert::null($this->getSideEffects());
         return \ftell($stream);
     }
 
-    /**
-     * @var array<string, Future>
-     */
-    private array $lastMutexSideEffect = [];
-    public function getSideEffects(): ?Future
-    {
-        foreach ($this->mutexSideEffects as $key => $sideEffects) {
-            if (!$sideEffects) {
-                continue;
-            }
-            $this->mutexSideEffects[$key] = [];
-            $lastMutexSideEffect = $this->lastMutexSideEffect[$key] ?? null;
-            $this->lastMutexSideEffect[$key] = async(function () use ($lastMutexSideEffect, $sideEffects): void {
-                $lastMutexSideEffect?->await();
-                foreach ($sideEffects as [$cb, $v]) {
-                    $cb(...$v);
-                }
-            });
-            $this->futureSideEffects []= $this->lastMutexSideEffect[$key];
-        }
-        if (!$this->futureSideEffects) {
-            return null;
-        }
-        $sideEffects = $this->futureSideEffects;
-        $this->futureSideEffects = [];
-        return async(awaitAll(...), $sideEffects);
-    }
     /**
      * Extracts a waveform.
      *
@@ -1016,16 +924,8 @@ final class TL implements TLInterface
                 $count = \unpack('V', \stream_get_contents($stream, 4))[1];
                 $result = [];
                 $type['type'] = $type['subtype'];
-                $splitSideEffects = isset($type['splitSideEffects']);
-                if ($splitSideEffects) {
-                    unset($type['splitSideEffects']);
-                }
                 for ($i = 0; $i < $count; $i++) {
-                    $v = $this->deserialize($stream, $type);
-                    if ($splitSideEffects) {
-                        $v['sideEffects'] = $this->getSideEffects();
-                    }
-                    $result[] = $v;
+                    $result []= $this->deserialize($stream, $type);
                 }
                 return $result;
         }

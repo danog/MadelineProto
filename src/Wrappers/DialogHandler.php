@@ -135,11 +135,7 @@ trait DialogHandler
     {
         if ($this->authorization['user']['bot']) {
             $this->cacheAllBotUsers();
-            $res = [];
-            foreach ($this->chats as $id => $_) {
-                $res []= (int) $id;
-            }
-            return $res;
+            return $this->peerDatabase->getDialogIds();
         }
         return \array_keys($this->getFullDialogs());
     }
@@ -153,7 +149,7 @@ trait DialogHandler
         if ($this->authorization['user']['bot']) {
             $this->cacheAllBotUsers();
             $res = [];
-            foreach ($this->chats as $chat) {
+            foreach ($this->peerDatabase->getDialogs() as $chat) {
                 try {
                     $res[] = $this->genAll($chat, null, \danog\MadelineProto\API::INFO_TYPE_ALL)['Peer'];
                 } catch (Throwable $e) {

@@ -36,10 +36,6 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 interface TLCallback
 {
     /**
-     * Whether to allow parallel execution of the deserialization handlers or not.
-     */
-    public function areDeserializationCallbacksMutuallyExclusive(): bool;
-    /**
      * Called right before deserialization of the result of a method starts.
      *
      * Pass only the method name, will return void

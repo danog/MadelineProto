@@ -54,10 +54,6 @@ trait TLParams
                 $param['type'] = 'string';
             }
 
-            if ($predicate === 'msg_container' && $param['name'] === 'messages') {
-                $param['splitSideEffects'] = true;
-            }
-
             if ($predicate === 'documentAttributeAudio' && $param['name'] === 'waveform') {
                 $param['type'] = 'waveform';
             }

@@ -581,7 +581,7 @@ abstract class InternalDoc
         return \danog\MadelineProto\MTProto::fromSupergroup($id);
     }
     /**
-     * When were full info for this chat last cached.
+     * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID
      */
@@ -854,7 +854,7 @@ abstract class InternalDoc
      *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
      *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
      *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
-     *      bot_api_id: int|string,
+     *      bot_api_id: int,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,

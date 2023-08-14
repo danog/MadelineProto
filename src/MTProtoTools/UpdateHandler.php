@@ -408,7 +408,7 @@ trait UpdateHandler
                 default => null
             };
         }
-        if (($this->chats[$info['bot_api_id']]['username'] ?? '') === 'replies') {
+        if (($info['User']['username'] ?? '') === 'replies') {
             return null;
         }
         return match ($info['type']) {

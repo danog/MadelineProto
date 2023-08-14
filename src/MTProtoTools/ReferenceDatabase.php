@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -107,7 +106,7 @@ final class ReferenceDatabase implements TLCallback
     {
         return ['db', 'pendingDb', 'API', 'v'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->flushMutex = new LocalKeyedMutex;
     }
@@ -116,12 +115,11 @@ final class ReferenceDatabase implements TLCallback
         $this->initDb($this->API);
         if ($this->v === 0) {
             $this->db->clear();
+            $this->pendingDb = [];
             $this->v = self::V;
         }
-        if ($this->pendingDb) {
-            foreach ($this->pendingDb as $key => $_) {
-                EventLoop::queue($this->flush(...), $key);
-            }
+        foreach ($this->pendingDb as $key => $_) {
+            EventLoop::queue($this->flush(...), $key);
         }
     }
     private function flush(string $location): void
@@ -136,7 +134,7 @@ final class ReferenceDatabase implements TLCallback
                 return;
             }
             [
-                $reference, 
+                $reference,
                 $originType,
                 $origin
             ] = $this->pendingDb[$location];
@@ -146,9 +144,10 @@ final class ReferenceDatabase implements TLCallback
             }
             $locationValue['reference'] = $reference;
             $locationValue['origins'][$originType] = $origin;
-            ksort($locationValue['origins']);
+            \ksort($locationValue['origins']);
             $this->db[$location] = $locationValue;
         } finally {
+            unset($this->pendingDb[$location]);
             $lock->release();
         }
     }
@@ -423,7 +422,7 @@ final class ReferenceDatabase implements TLCallback
     private function storeReference(string $location, string $reference, int $originType, array $origin): void
     {
         $this->pendingDb[$location] = [
-            $reference, 
+            $reference,
             $originType,
             $origin
         ];
@@ -460,7 +459,8 @@ final class ReferenceDatabase implements TLCallback
         $object['file_reference'] = $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
         return $object;
     }
-    private function getDb(string $location): ?array {
+    private function getDb(string $location): ?array
+    {
         while (isset($this->pendingDb[$location])) {
             $this->flush($location);
         }
@@ -509,11 +509,7 @@ final class ReferenceDatabase implements TLCallback
                         break;
                         // Peer + photo ID
                     case self::PEER_PHOTO_ORIGIN:
-                        $fullChat = $this->API->full_chats[$origin['peer']];
-                        if (isset($fullChat['last_update'])) {
-                            $fullChat['last_update'] = 0;
-                            $this->API->full_chats[$origin['peer']] = $fullChat;
-                        }
+                        $this->API->peerDatabase->expireFull($origin['peer']);
                         $this->API->getFullInfo($origin['peer']);
                         break;
                         // Peer (default photo ID)

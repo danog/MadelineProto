@@ -205,9 +205,7 @@ final class ReadLoop extends Loop
                 throw $e;
             }
 
-            $sideEffects = $this->API->getTL()->getSideEffects();
             $message = new MTProtoIncomingMessage($deserialized, $message_id);
-            $message->setSideEffects($sideEffects);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }

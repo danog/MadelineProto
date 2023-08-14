@@ -515,7 +515,7 @@ trait Files
      */
     public function getPropicInfo($data): array
     {
-        return $this->getDownloadInfo($this->chats[$this->getInfo($data, \danog\MadelineProto\API::INFO_TYPE_ID)]);
+        return $this->getDownloadInfo($this->peerDatabase->get($this->getId($data)));
     }
     /**
      * Extract file info from bot API message.

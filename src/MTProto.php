@@ -43,6 +43,7 @@ use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
+use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
@@ -50,7 +51,6 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\SecretChats\MessageHandler;
 use danog\MadelineProto\SecretChats\ResponseHandler;
 use danog\MadelineProto\SecretChats\SeqNoHandler;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -220,17 +220,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $dh_config = ['version' => 0];
     /**
-     * Internal peer database.
-     *
-     */
-    public DbArray $chats;
-
-    /**
-     * Cache of usernames for chats.
-     *
-     */
-    public DbArray $usernames;
-    /**
      * Cached parameters for fetching channel participants.
      *
      */
@@ -245,11 +234,6 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      */
     public array $qres = [];
-    /**
-     * Full chat info database.
-     *
-     */
-    public DbArray $full_chats;
     /**
      * Sponsored message database.
      *
@@ -281,10 +265,15 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public ?ReferenceDatabase $referenceDatabase = null;
     /**
-     * min database.
+     * Min database.
      *
      */
     public MinDatabase $minDatabase;
+    /**
+     * Peer database.
+     *
+     */
+    public PeerDatabase $peerDatabase;
     /**
      * Phone config loop.
      */
@@ -407,11 +396,8 @@ final class MTProto implements TLCallback, LoggerGetter
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'chats' => ['innerMadelineProto' => true],
-        'full_chats' => ['innerMadelineProto' => true],
         'sponsoredMessages' => ['innerMadelineProto' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
-        'usernames' => ['innerMadelineProto' => true, 'innerMadelineProtoSerializer' => SerializerType::STRING],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
 
@@ -542,7 +528,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->test_rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
-        $callbacks = [$this];
+        $callbacks = [$this, $this->peerDatabase];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
             $callbacks []= $this->referenceDatabase;
         }
@@ -597,12 +583,10 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         return [
             // Databases
-            'chats',
-            'full_chats',
             'referenceDatabase',
             'minDatabase',
+            'peerDatabase',
             'channelParticipants',
-            'usernames',
             'sponsoredMessages',
 
             'tmpDbPrefix',
@@ -673,45 +657,6 @@ final class MTProto implements TLCallback, LoggerGetter
             'callsByPeer',
             'snitch',
         ];
-    }
-
-    private bool $runningUsernameMigration = false;
-    private function fillUsernamesCache(): void
-    {
-        if (!$this->settings->getDb()->getEnableUsernameDb()) {
-            $this->usernames->clear();
-            return;
-        }
-        if (!isset($this->usernames[' '])) {
-            if ($this->runningUsernameMigration) {
-                return;
-            }
-            $this->runningUsernameMigration = true;
-            $this->logger('Filling database cache. This can take a few minutes.', Logger::WARNING);
-
-            async(function (): void {
-                try {
-                    $counter = 0;
-                    foreach ($this->chats as $id => $chat) {
-                        $counter++;
-                        $id = (int) $id;
-                        if (isset($chat['username'])) {
-                            $this->usernames[\strtolower($chat['username'])] = $id;
-                        }
-                        foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
-                            $this->usernames[\strtolower($username)] = $id;
-                        }
-                        if ($counter % 1000 === 0) {
-                            $this->logger("Filling database cache. $counter", Logger::WARNING);
-                        }
-                    }
-                    $this->usernames[' '] = 0;
-                    $this->logger('Cache filled.', Logger::WARNING);
-                } finally {
-                    $this->runningUsernameMigration = false;
-                }
-            });
-        }
     }
 
     /**
@@ -877,53 +822,20 @@ final class MTProto implements TLCallback, LoggerGetter
 
         $this->referenceDatabase ??= new ReferenceDatabase($this);
         $this->minDatabase ??= new MinDatabase($this);
+        $this->peerDatabase ??= new PeerDatabase($this);
 
         $db = [];
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
+        $db []= async($this->peerDatabase->init(...));
         $db []= async($this->initDb(...), $this);
         await($db);
 
-        if (!isset($this->TL)) {
-            $this->TL = new TL($this);
-            $callbacks = [$this, $this->referenceDatabase];
-            if (!($this->authorization['user']['bot'] ?? false)) {
-                $callbacks[] = $this->minDatabase;
-            }
-            $this->TL->init($this->settings->getSchema(), $callbacks);
-        }
-
-        $this->fillUsernamesCache();
-
-        if (!$this->settings->getDb()->getEnableFullPeerDb()) {
-            $this->full_chats->clear();
-        }
-        if (!$this->settings->getDb()->getEnablePeerInfoDb()) {
-            if (isset($this->chats[0])) {
-                return;
-            }
-            $this->logger('Cleaning up peer database...');
-            $k = 0;
-            $total = \count($this->chats);
-            foreach ($this->chats as $key => $value) {
-                $value = [
-                    '_' => $value['_'],
-                    'id' => $value['id'],
-                    'access_hash' => $value['access_hash'] ?? null,
-                    'min' => $value['min'] ?? false,
-                ];
-                $k++;
-                if ($k % 500 === 0 || $k === $total) {
-                    $this->logger("Cleaning up peer database ($k/$total)...");
-                    $this->chats->set($key, $value);
-                } else {
-                    $this->chats->set($key, $value);
-                }
-            }
-            $this->chats->set(0, []);
-            $this->logger('Cleaned up peer database!');
-        } elseif (isset($this->chats[0])) {
-            unset($this->chats[0]);
+        if (isset($this->chats) && $this->chats instanceof MemoryArray) {
+            $this->peerDatabase->importLegacy(
+                $this->chats,
+                $this->full_chats,
+            );
         }
     }
 
@@ -940,9 +852,6 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         $this->settings->setSchema(new TLSchema);
-        if (!isset($this->usernames[' '])) {
-            $this->usernames->clear();
-        }
 
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
@@ -985,7 +894,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->cleanupProperties();
 
             // Re-set TL closures
-            $callbacks = [$this];
+            $callbacks = [$this, $this->peerDatabase];
             if ($this->settings->getDb()->getEnableFileReferenceDb()) {
                 $callbacks []= $this->referenceDatabase;
             }
@@ -1008,7 +917,7 @@ final class MTProto implements TLCallback, LoggerGetter
             // Update settings from constructor
             $this->updateSettings($settings);
             // Update TL callbacks
-            $callbacks = [$this];
+            $callbacks = [$this, $this->peerDatabase];
             if ($this->settings->getDb()->getEnableFileReferenceDb()) {
                 $callbacks[] = $this->referenceDatabase;
             }
@@ -1463,13 +1372,6 @@ final class MTProto implements TLCallback, LoggerGetter
         return $this->config;
     }
     /**
-     * @internal
-     */
-    public function addConfig(array $config): void
-    {
-        $this->config = $config;
-    }
-    /**
      * Parse cached config.
      */
     private function parseConfig(): void
@@ -1880,13 +1782,14 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(
-            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
-            \array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
-            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
-            ['help.support' => [$this->addSupport(...)]],
-            ['config' => [$this->addConfig(...)]],
-        );
+        return [
+            'help.support' => [function (array $support): void {
+                $this->supportUser = $support['user']['id'];
+            }],
+            'config' => [function (array $config): void {
+                $this->config = $config;
+            }]
+        ];
     }
     /**
      * @internal
@@ -1948,7 +1851,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function __debugInfo(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['full_chats'], $vars['chats'], $vars['referenceDatabase'], $vars['minDatabase'], $vars['TL']);
+        unset($vars['peerDatabase'], $vars['referenceDatabase'], $vars['minDatabase'], $vars['TL']);
         return $vars;
     }
 }

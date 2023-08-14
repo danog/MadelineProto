@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Db;
 
 use ArrayAccess;
 use danog\MadelineProto\Settings\DatabaseAbstract;
+use Traversable;
 
 /**
  * DB array interface.
@@ -26,9 +27,10 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
  * @template TValue
  *
  * @extends ArrayAccess<TKey, TValue>
+ * @extends Traversable<TKey, TValue>
  * @extends DbType<TKey, TValue>
  */
-interface DbArray extends DbType, ArrayAccess
+interface DbArray extends DbType, ArrayAccess, Traversable
 {
     /**
      * Set element.
