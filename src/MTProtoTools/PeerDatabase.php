@@ -293,6 +293,13 @@ final class PeerDatabase implements TLCallback
 
     public function getIdFromUsername(string $username): ?int
     {
+        foreach ($this->pendingDb as $key => $_) {
+            if ($key < 0) {
+                $this->processChat($key);
+             } else {
+                $this->processUser($key);
+             }
+        }
         return $this->usernames[$username];
     }
 
@@ -325,6 +332,13 @@ final class PeerDatabase implements TLCallback
             }
         } finally {
             unset($this->caching_simple_username[$username]);
+        }
+        foreach ($this->pendingDb as $key => $_) {
+            if ($key < 0) {
+                $this->processChat($key);
+             } else {
+                $this->processUser($key);
+             }
         }
         return $result;
     }
@@ -407,17 +421,29 @@ final class PeerDatabase implements TLCallback
             }
         }
     }
-    public function addChatBlocking(array $chat): void
+    public function addChatBlocking(int $chat): void
     {
-        $id = $this->API->getIdInternal($chat);
-        $this->pendingDb[$id] = $chat;
-        $this->processChat($id);
+        if (isset($this->pendingDb[$chat])) {
+            $this->processChat($chat);
+        } else {
+            $this->pendingDb[$chat] = [
+                '_' => 'channel',
+                'id' => MTProto::fromSupergroup($chat),
+            ];
+            $this->processChat($chat);
+        }
     }
-    public function addUserBlocking(array $user): void
+    public function addUserBlocking(int $user): void
     {
-        $id = $this->API->getIdInternal($user);
-        $this->pendingDb[$id] = $user;
-        $this->processUser($id);
+        if (isset($this->pendingDb[$user])) {
+            $this->processChat($user);
+        } else {
+            $this->pendingDb[$user] = [
+                '_' => 'user',
+                'id' => $user,
+            ];
+            $this->processUser($user);
+        }
     }
     /**
      * Add chat to database.

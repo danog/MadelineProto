@@ -430,17 +430,11 @@ trait PeerHandler
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
                     if ($this->isSupergroup($id)) {
-                        $this->peerDatabase->addChatBlocking([
-                            '_' => 'channel',
-                            'id' => $this->fromSupergroup($id),
-                        ]);
+                        $this->peerDatabase->addChatBlocking($id);
                     } elseif ($id < 0) {
                         $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id]]);
                     } else {
-                        $this->peerDatabase->addUserBlocking([
-                            '_' => 'user',
-                            'id' => $id,
-                        ]);
+                        $this->peerDatabase->addUserBlocking($id);
                     }
                 } catch (Exception $e) {
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
