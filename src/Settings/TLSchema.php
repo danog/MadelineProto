@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
+use Throwable;
 
 /**
  * TL schema settings.
@@ -57,8 +58,13 @@ final class TLSchema extends SettingsAbstract
      */
     public function __wakeup(): void
     {
+        $exists = false;
+        try {
+            $exists = \file_exists($this->APISchema);
+        } catch (Throwable) {
+        }
         // Scheme was upgraded or path has changed
-        if (!\file_exists($this->APISchema)) {
+        if (!$exists) {
             $new = new self;
             $this->setAPISchema($new->getAPISchema());
             $this->setMTProtoSchema($new->getMTProtoSchema());

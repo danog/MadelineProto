@@ -1601,7 +1601,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
         }
         if (!\extension_loaded('uv')) {
-            $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</h2>";
+            $warning .= "<p>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
         }
         return $warning;
     }
