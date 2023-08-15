@@ -174,7 +174,7 @@ abstract class EventHandler extends AbstractAPI
                 \array_map(fn (ReflectionAttribute $attribute) => $attribute->newInstance(), $methodRefl->getAttributes());
 
                 if ($periodic = $methodRefl->getAttributes(Cron::class)) {
-                    if ($this instanceof SimpleEventHandler) {
+                    if (!$this instanceof SimpleEventHandler) {
                         throw new AssertionError("Please extend SimpleEventHandler to use crons!");
                     }
                     $periodic = $periodic[0]->newInstance();
@@ -205,7 +205,7 @@ abstract class EventHandler extends AbstractAPI
                     Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
                 );
                 $filter = $filter->initialize($this);
-                if ($this instanceof SimpleEventHandler) {
+                if (!$this instanceof SimpleEventHandler) {
                     throw new AssertionError("Please extend SimpleEventHandler to use filters!");
                 }
                 $handlers []= function (Update $update) use ($closure, $filter): void {
