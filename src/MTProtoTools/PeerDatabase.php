@@ -139,9 +139,12 @@ final class PeerDatabase implements TLCallback
             $this->usernames->clear();
         }
 
-        foreach ($this->pendingDb as $key => $_) {
-            EventLoop::queue($key < 0 ? $this->processChat(...) : $this->processUser(...), $key);
-        }
+        EventLoop::queue(function () {
+            $this->API->waitForInit();
+            foreach ($this->pendingDb as $key => $_) {
+                EventLoop::queue($key < 0 ? $this->processChat(...) : $this->processUser(...), $key);
+            }
+        });
     }
     public function importLegacy(MemoryArray $chats, MemoryArray $fullChats): void
     {
