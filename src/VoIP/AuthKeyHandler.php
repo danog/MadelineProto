@@ -135,7 +135,7 @@ trait AuthKeyHandler
      */
     public function getCallByPeer(int $userId): ?VoIP
     {
-        return $this->callsByPeer[$userId] ?? null;
+        return ($this->callsByPeer[$userId] ?? null)?->public;
     }
 
     /**
@@ -143,7 +143,7 @@ trait AuthKeyHandler
      */
     public function getCall(int $id): ?VoIP
     {
-        return $this->calls[$id] ?? null;
+        return ($this->calls[$id] ?? null)?->public;
     }
 
     /**

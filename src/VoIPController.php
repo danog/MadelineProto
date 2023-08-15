@@ -680,7 +680,7 @@ final class VoIPController
             $this->playingHold = false;
             $this->skip();
         }
-        Assert::true($this->playLoop->resume());
+        $this->playLoop->resume();
 
         return $this;
     }
