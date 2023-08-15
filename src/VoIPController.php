@@ -173,10 +173,6 @@ final class VoIPController
         );
         return $data;
     }
-    public function __destruct()
-    {
-        Logger::log("Destroyed $this");
-    }
     /**
      * Wakeup function.
      */
@@ -503,7 +499,16 @@ final class VoIPController
     {
         foreach ($this->sockets as $socket) {
             EventLoop::queue(function () use ($socket): void {
-                while ($payload = $socket->read()) {
+                while (true) {
+                    try {
+                        $payload = $socket->read();
+                    } catch (Throwable $e) {
+                        Logger::log("Got $e in this!");
+                        continue;
+                    }
+                    if (!$payload) {
+                        break;
+                    }
                     $this->lastIncomingTimestamp = \microtime(true);
                     EventLoop::queue($this->handlePacket(...), $socket, $payload);
                 }

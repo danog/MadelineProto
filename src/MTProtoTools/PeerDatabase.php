@@ -377,12 +377,12 @@ final class PeerDatabase implements TLCallback
         if (!isset($this->pendingDb[$id])) {
             return;
         }
-        $user = $this->pendingDb[$id];
         $lock = $this->mutex->acquire((string) $id);
         try {
             if (!isset($this->pendingDb[$id])) {
                 return;
             }
+            $o = $user = $this->pendingDb[$id];
             $existingChat = $this->db[$user['id']];
             if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {
@@ -433,7 +433,9 @@ final class PeerDatabase implements TLCallback
                 }
             }
         } finally {
-            unset($this->pendingDb[$id]);
+            if ($this->pendingDb[$id] === $o) {
+                unset($this->pendingDb[$id]);
+            }
             $lock->release();
         }
     }
@@ -480,7 +482,10 @@ final class PeerDatabase implements TLCallback
         }
         $lock = $this->mutex->acquire((string) $id);
         try {
-            $chat = $this->pendingDb[$id];
+            if (!isset($this->pendingDb[$id])) {
+                return;
+            }
+            $o = $chat = $this->pendingDb[$id];
             if ($chat['_'] === 'chat'
                 || $chat['_'] === 'chatEmpty'
                 || $chat['_'] === 'chatForbidden'
@@ -559,7 +564,9 @@ final class PeerDatabase implements TLCallback
                 }
             }
         } finally {
-            unset($this->pendingDb[$id]);
+            if ($this->pendingDb[$id] === $o) {
+                unset($this->pendingDb[$id]);
+            }
             $lock->release();
         }
     }
