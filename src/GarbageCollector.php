@@ -27,6 +27,7 @@ use WeakMap;
 
 use const LOCK_EX;
 use const LOCK_NB;
+
 use function Amp\File\move;
 
 use function Amp\File\read;
@@ -105,7 +106,10 @@ final class GarbageCollector
                         $unlock();
                     }
 
-                    write(MADELINE_PHAR_VERSION, '');
+                    try {
+                        \unlink(MADELINE_PHAR_VERSION);
+                    } catch (Throwable) {
+                    }
                     if (Magic::$isIpcWorker) {
                         throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
                     }
