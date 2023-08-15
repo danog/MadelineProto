@@ -433,7 +433,7 @@ final class PeerDatabase implements TLCallback
                 }
             }
         } finally {
-            if ($this->pendingDb[$id] === $o) {
+            if (isset($o) && $this->pendingDb[$id] === $o) {
                 unset($this->pendingDb[$id]);
             }
             $lock->release();
@@ -564,7 +564,7 @@ final class PeerDatabase implements TLCallback
                 }
             }
         } finally {
-            if ($this->pendingDb[$id] === $o) {
+            if (isset($o) && $this->pendingDb[$id] === $o) {
                 unset($this->pendingDb[$id]);
             }
             $lock->release();
