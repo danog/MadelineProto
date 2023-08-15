@@ -103,9 +103,12 @@ final class MinDatabase implements TLCallback
             $this->v = self::V;
         }
 
-        foreach ($this->pendingDb as $key => $_) {
-            EventLoop::queue($this->flush(...), $key);
-        }
+        EventLoop::queue(function () {
+            $this->API->waitForInit();
+            foreach ($this->pendingDb as $key => $_) {
+                EventLoop::queue($this->flush(...), $key);
+            }
+        });
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
