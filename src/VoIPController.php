@@ -526,6 +526,8 @@ final class VoIPController
                 if (!\in_array('MADELINE_ENCODER_V=1', $it->comments, true)) {
                     $it = null;
                 }
+            } catch (CancelledException $e) {
+                throw $e;
             } catch (Throwable) {
                 $it = null;
             }

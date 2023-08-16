@@ -139,7 +139,7 @@ final class PeerDatabase implements TLCallback
             $this->usernames->clear();
         }
 
-        EventLoop::queue(function () {
+        EventLoop::queue(function (): void {
             $this->API->waitForInit();
             foreach ($this->pendingDb as $key => $_) {
                 EventLoop::queue($key < 0 ? $this->processChat(...) : $this->processUser(...), $key);

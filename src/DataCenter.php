@@ -321,54 +321,58 @@ final class DataCenter
             }
         }
         $combos[] = $default;
-        if ($this->settings->getRetry()) {
-            $only = $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'];
-            if ($only || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
-                $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
-                $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
-                if ($only) {
-                    \array_unshift($combos, $combo);
-                } else {
-                    $combos []= $combo;
-                }
+
+        $only = $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'];
+        if ($only || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
+            $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
+            $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
+            if ($only) {
+                \array_unshift($combos, $combo);
+            } else {
+                $combos []= $combo;
             }
-            $proxyCombos = [];
-            foreach ($this->settings->getProxies() as $proxy => $extras) {
-                foreach ($extras as $extra) {
-                    if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
-                        $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
-                    }
-                    foreach ($combos as $orig) {
-                        $combo = [];
-                        if ($proxy === ObfuscatedStream::class) {
-                            $combo = $orig;
-                            if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
-                                $combo[\count($combo) - 2][1] = $extra;
-                            } else {
-                                $mtproto = \end($combo);
-                                $combo[\count($combo) - 1] = [$proxy, $extra];
-                                $combo[] = $mtproto;
-                            }
+        }
+        $proxyCombos = [];
+        foreach ($this->settings->getProxies() as $proxy => $extras) {
+            foreach ($extras as $extra) {
+                if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
+                    $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                }
+                foreach ($combos as $orig) {
+                    $combo = [];
+                    if ($proxy === ObfuscatedStream::class) {
+                        $combo = $orig;
+                        if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
+                            $combo[\count($combo) - 2][1] = $extra;
                         } else {
-                            if ($orig[1][0] === BufferedRawStream::class) {
-                                [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
-                                $first[] = [$proxy, $extra];
-                                $combo = \array_merge($first, $second);
-                            } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
-                                [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
-                                $first[] = [BufferedRawStream::class, []];
-                                $first[] = [$proxy, $extra];
-                                $combo = \array_merge($first, $second);
-                            }
+                            $mtproto = \end($combo);
+                            $combo[\count($combo) - 1] = [$proxy, $extra];
+                            $combo[] = $mtproto;
                         }
-                        $proxyCombos []= $combo;
+                    } else {
+                        if ($orig[1][0] === BufferedRawStream::class) {
+                            [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
+                            $first[] = [$proxy, $extra];
+                            $combo = \array_merge($first, $second);
+                        } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
+                            [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
+                            $first[] = [BufferedRawStream::class, []];
+                            $first[] = [$proxy, $extra];
+                            $combo = \array_merge($first, $second);
+                        }
                     }
+                    $proxyCombos []= $combo;
                 }
             }
+        }
+        if ($this->settings->getRetry()) {
             $combos = \array_merge($proxyCombos, $combos);
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
-            $combos = \array_unique($combos, SORT_REGULAR);
+        } elseif ($proxyCombos) {
+            $combos = $proxyCombos;
         }
+        $combos = \array_unique($combos, SORT_REGULAR);
+
         $context ??= (new ConnectContext())->withConnectTimeout($this->settings->getTimeout())->withBindTo($this->settings->getBindTo());
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {

@@ -330,9 +330,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private TL $TL;
 
-    /**
-     * @var Cache
-     */
     private Cache $reportCache;
 
     /**

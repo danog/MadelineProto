@@ -339,10 +339,23 @@ final class Connection extends SettingsAbstract
     /**
      * Set proxies.
      *
-     * @param array $proxies Proxies
+     * The key must be one of:
+     *
+     * * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
+     * * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
+     * * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
+     *
+     * The value must be a list of extra (URI, username, password) for that proxy.
+     *
+     * @param array<class-string<StreamInterface>, list<array>> $proxies Proxies
      */
     public function setProxy(array $proxies): self
     {
+        foreach ($proxies as $proxy => $_) {
+            if (!isset(\class_implements($proxy)[StreamInterface::class])) {
+                throw new Exception('An invalid proxy class was specified!');
+            }
+        }
         $this->proxy = $proxies;
         return $this;
     }

@@ -142,11 +142,12 @@ class MyEventHandler extends SimpleEventHandler
         }
     }
 
+    /**
+     * If the message is a /restart command from an admin, restart to reload changes to the event handler code.
+     */
     #[FilterCommand('restart')]
     public function restartCommand(Incoming & Message & FromAdmin $message): void
     {
-        // If the message is a /restart command from an admin, restart to reload changes to the event handler code.
-
         // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
         $this->restart();
     }
@@ -302,7 +303,7 @@ class MyEventHandler extends SimpleEventHandler
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $c=$call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+        $call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
     }
 
     public static function getPluginPaths(): string|array|null
