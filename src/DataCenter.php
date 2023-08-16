@@ -406,20 +406,6 @@ final class DataCenter
                         } else {
                             $uri = 'tcp://'.$address.':'.$port;
                         }
-                        if ($combo[1][0] === WssStream::class) {
-                            $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
-                            if (!$subdomain) {
-                                continue;
-                            }
-                            if (DataCenter::isMedia($dc_number)) {
-                                $subdomain .= '-1';
-                            }
-                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
-                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
-                        } elseif ($combo[1][0] === WsStream::class) {
-                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
-                            $uri = 'tcp://'.$address.':'.$port.'/'.$path;
-                        }
                         $ctx = (new ConnectionContext())
                             ->setDc($dc_number)
                             ->setCdn($this->isCdn($dc_number))
@@ -432,6 +418,21 @@ final class DataCenter
                             }
                             if (\in_array($stream[0], [WsStream::class, WssStream::class], true) && $stream[1] === []) {
                                 $stream[1] = $this->dohWrapper->webSocketConnector;
+                                if ($stream[0] === WssStream::class) {
+                                    $subdomain = $this->settings->getSslSubdomains()[\abs($dc_number)] ?? null;
+                                    if (!$subdomain) {
+                                        continue;
+                                    }
+                                    if (DataCenter::isMedia($dc_number)) {
+                                        $subdomain .= '-1';
+                                    }
+                                    $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
+                                    $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                                } else {
+                                    $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
+                                    $uri = 'tcp://'.$address.':'.$port.'/'.$path;
+                                }
+                                $ctx->setUri($uri);
                             }
                             /** @var array{0: class-string, 1: mixed} $stream */
                             /** @psalm-suppress TooFewArguments Psalm bug */

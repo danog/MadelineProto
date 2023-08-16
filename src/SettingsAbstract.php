@@ -63,6 +63,9 @@ abstract class SettingsAbstract
                     || $other->{$name} !== $this->{$name}
                 )
             ) {
+                if ($uc === 'Proxy') {
+                    $uc = 'Proxies';
+                }
                 $this->{"set$uc"}($other->{$name});
                 $this->changed = true;
             }

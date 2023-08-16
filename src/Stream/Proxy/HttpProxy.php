@@ -61,9 +61,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
-        $ctxCloned = clone $ctx;
         $this->stream = $ctx->getStream();
-        $ctx = $ctxCloned;
         Assert::isInstanceOf($this->stream, BufferedStreamInterface::class);
         Assert::isInstanceOf($this->stream, RawStreamInterface::class);
         $address = $uri->getHost();
@@ -107,25 +105,13 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
             $current_header = \explode(':', $current_header, 2);
             $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
         }
-        $close = $protocol_version === '1.0';
-        if (isset($headers['connection'])) {
-            $close = \strtolower($headers['connection']) === 'close';
-        }
         if ($code !== 200) {
             $read = '';
             if (isset($headers['content-length'])) {
                 $read = $buffer->bufferRead((int) $headers['content-length']);
             }
-            if ($close) {
-                $this->disconnect();
-                $this->connect($ctx);
-            }
             Logger::log(\trim($read));
             throw new Exception($description, $code);
-        }
-        if ($close) {
-            $this->stream->disconnect();
-            $this->stream->connect($ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];

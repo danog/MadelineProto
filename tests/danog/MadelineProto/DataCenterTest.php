@@ -100,7 +100,7 @@ final class DataCenterTest extends TestCase
             ->setObfuscated($obfuscated)
             ->setTransport($transport)
             ->setRetry(false)
-            ->setProxy($proxies)
+            ->setProxies($proxies)
             ->setTimeout(10);
 
         $API = $test_mode ? self::$test : self::$main;
@@ -126,7 +126,8 @@ final class DataCenterTest extends TestCase
             if (\file_get_contents('https://ipv6.google.com')) {
                 $ipv6Pair []= true;
             }
-        } catch (Throwable) {}
+        } catch (Throwable) {
+        }
 
         foreach ([false] as $test_mode) {
             foreach ($ipv6Pair as $ipv6) {

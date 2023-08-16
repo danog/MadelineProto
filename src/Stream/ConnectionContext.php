@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Stream;
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\DataCenter;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use League\Uri\Http;

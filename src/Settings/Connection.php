@@ -349,7 +349,7 @@ final class Connection extends SettingsAbstract
      *
      * @param array<class-string<StreamInterface>, list<array>> $proxies Proxies
      */
-    public function setProxy(array $proxies): self
+    public function setProxies(array $proxies): self
     {
         foreach ($proxies as $proxy => $_) {
             if (!isset(\class_implements($proxy)[StreamInterface::class])) {
