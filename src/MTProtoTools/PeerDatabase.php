@@ -202,6 +202,13 @@ final class PeerDatabase implements TLCallback
      */
     public function getDialogIds(): array
     {
+        foreach ($this->pendingDb as $key => $_) {
+            if ($key < 0) {
+                $this->processChat($key);
+            } else {
+                $this->processUser($key);
+            }
+        }
         $res = [];
         foreach ($this->db as $id => $_) {
             $res []= (int) $id;
@@ -214,6 +221,13 @@ final class PeerDatabase implements TLCallback
      */
     public function getDialogs(): iterable
     {
+        foreach ($this->pendingDb as $key => $_) {
+            if ($key < 0) {
+                $this->processChat($key);
+            } else {
+                $this->processUser($key);
+            }
+        }
         return $this->db->getIterator();
     }
 
@@ -372,6 +386,9 @@ final class PeerDatabase implements TLCallback
         if ($user['id'] === ($this->API->authorization['user']['id'] ?? null)) {
             $this->API->authorization['user'] = $user;
         }
+        if (($this->pendingDb[$user['id']] ?? null) === $user['id']) {
+            return;
+        }
         $this->pendingDb[$user['id']] = $user;
         EventLoop::queue($this->processUser(...), $user['id']);
     }
@@ -475,6 +492,9 @@ final class PeerDatabase implements TLCallback
     private function addChat(array $chat): void
     {
         $id = $this->API->getIdInternal($chat);
+        if (($this->pendingDb[$id] ?? null) === $chat) {
+            return;
+        }
         $this->pendingDb[$id] = $chat;
         EventLoop::queue($this->processChat(...), $id);
     }
