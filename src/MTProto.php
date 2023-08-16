@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cache\Cache;
+use Amp\Cache\LocalCache;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
@@ -327,6 +329,11 @@ final class MTProto implements TLCallback, LoggerGetter
      * TL serializer.
      */
     private TL $TL;
+
+    /**
+     * @var Cache
+     */
+    private Cache $reportCache;
 
     /**
      * Snitch.
@@ -850,13 +857,6 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->chats,
                 $this->full_chats,
             );
-            // Todo for when the username db is global
-            /*DbPropertiesFactory::get(
-                $this->settings->getDb(),
-                $this->getDbPrefix().'_MTProto_usernames',
-                ['innerMadelineProto' => true],
-                $this->usernames
-            )->clear();*/
         }
 
         if (!isset($this->TL)) {
@@ -1703,6 +1703,13 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!$this->reportDest) {
             return;
         }
+
+        $this->reportCache ??= new LocalCache();
+        if ($this->reportCache->get($message)) {
+            return;
+        }
+        $this->reportCache->set($message, true, 60);
+
         $this->reportMutex ??= new LocalMutex;
         $lock = $this->reportMutex->acquire();
         try {
