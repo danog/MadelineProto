@@ -202,15 +202,8 @@ final class PeerDatabase implements TLCallback
      */
     public function getDialogIds(): array
     {
-        foreach ($this->pendingDb as $key => $_) {
-            if ($key < 0) {
-                $this->processChat($key);
-            } else {
-                $this->processUser($key);
-            }
-        }
         $res = [];
-        foreach ($this->db as $id => $_) {
+        foreach ($this->getDialogs() as $id => $_) {
             $res []= (int) $id;
         }
         return $res;

@@ -535,7 +535,11 @@ final class VoIPController
         if (!$it) {
             EventLoop::queue(Logger::log(...), "Starting conversion fiber...");
             $pipe = new Pipe(4096);
-            EventLoop::queue(Ogg::convert(...), $f, $pipe->getSink(), $this->cancellation);
+            EventLoop::queue(function () use ($f, $pipe) {
+                try {
+                    Ogg::convert($f, $pipe->getSink(), $this->cancellation);
+                } catch (CancelledException) {}
+            });
             $it = new Ogg($pipe->getSource());
         }
         foreach ($it->opusPackets as $packet) {

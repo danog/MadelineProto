@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Db;
 use Amp\Sync\LocalMutex;
 use Revolt\EventLoop;
 use Traversable;
+use Webmozart\Assert\Assert;
 
 /** @internal */
 final class CacheContainer
@@ -130,20 +131,28 @@ final class CacheContainer
     {
         $lock = $this->mutex->acquire();
         try {
+            $updatedValues = [];
             $newValues = [];
             $newTtl = [];
             $now = \time();
-            foreach ($this->ttl as $key => &$ttl) {
+            foreach ($this->ttl as $key => $ttl) {
                 if ($ttl === true) {
+                    $updatedValues[$key] = $this->cache[$key];
                     if ($this->cache[$key] === null) {
                         $this->inner->unset($key);
                     } else {
                         $this->inner->set($key, $this->cache[$key]);
                     }
-                    $ttl = \time() + $this->cacheTtl;
                 } elseif ($ttl > $now) {
-                    $newTtl[$key] = $this->ttl[$key];
+                    $newTtl[$key] = $ttl;
                     $newValues[$key] = $this->cache[$key];
+                }
+            }
+            foreach ($updatedValues as $key => $value) {
+                if (($newValues[$key] = $this->cache[$key]) === $value) {
+                    $newTtl[$key] = \time() + $this->cacheTtl;
+                } else {
+                    $newTtl[$key] = $this->ttl[$key];
                 }
             }
             $this->ttl = $newTtl;
