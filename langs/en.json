@@ -136,7 +136,7 @@
     "static_analysis_minor": "A minor issue was encountered during static analysis of %s: %s",
     "static_analysis_severe": "A severe issue was encountered during static analysis of %s: %s",
     "secret_chat_skipping": "I do not have the secret chat %s in the database, skipping message...",
-    "must_have_declare_types": "for performance reasons, the first statement of an event handler file must be declare(strict_types=1);",
+    "must_have_declare_types": "for performance reasons, the first statement of an event handler file must be \"declare(strict_types=1);\"",
     "do_not_delete_MadelineProto.log": "the MadelineProto.log file must never be deleted, please set a custom max size in the settings, instead!",
     "do_not_remove_MadelineProto.log_phar": "Please do not remove madeline.phar or madeline.php, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup",
     "do_not_use_blocking_function": "for performance reasons, event handlers may not use the non-async blocking function %s, please use %s, instead",
