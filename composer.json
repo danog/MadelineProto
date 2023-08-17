@@ -22,6 +22,7 @@
         "krakjoe/pthreads-polyfill": "*",
         "ext-pthreads": "*"
     },
+    "minimum-stability": "dev",
     "require": {
         "php-64bit": ">=8.1",
         "danog/primemodule": "^1",
