@@ -19,7 +19,6 @@ namespace danog\MadelineProto\Db;
 use Amp\Sync\LocalMutex;
 use Revolt\EventLoop;
 use Traversable;
-use Webmozart\Assert\Assert;
 
 /** @internal */
 final class CacheContainer

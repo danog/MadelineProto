@@ -535,10 +535,11 @@ final class VoIPController
         if (!$it) {
             EventLoop::queue(Logger::log(...), "Starting conversion fiber...");
             $pipe = new Pipe(4096);
-            EventLoop::queue(function () use ($f, $pipe) {
+            EventLoop::queue(function () use ($f, $pipe): void {
                 try {
                     Ogg::convert($f, $pipe->getSink(), $this->cancellation);
-                } catch (CancelledException) {}
+                } catch (CancelledException) {
+                }
             });
             $it = new Ogg($pipe->getSource());
         }
