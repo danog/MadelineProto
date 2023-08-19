@@ -132,12 +132,16 @@ final class DjLoop extends VoIPLoop
             $this->instance->log("Pausing DJ loop in $this because both queues are full!");
             return self::PAUSE;
         }
-        $this->instance->log("Resuming DJ loop in $this!");
-        $file = \array_shift($this->inputFiles);
-        if (!$file) {
+        if (!$this->inputFiles) {
             $this->instance->log("Pausing DJ loop in $this because we have nothing to play!");
             return self::PAUSE;
         }
+        if ($this->inputFiles[0] instanceof ReadableStream && !($this->readingPrimary ? $this->packetQueueSecondary : $this->packetQueuePrimary)->isEmpty()) {
+            $this->instance->log("Pausing DJ loop in $this because the next audio is a stream, and we're still playing the old file!");
+            return self::PAUSE;
+        }
+        $this->instance->log("Resuming DJ loop in $this!");
+        $file = \array_shift($this->inputFiles);
         try {
             $fileStr = match (true) {
                 $file instanceof LocalFile => $file->file,
@@ -167,6 +171,8 @@ final class DjLoop extends VoIPLoop
                 $this->packetDeferred = null;
                 $deferred?->complete(false);
             }
+        } catch (Throwable $e) {
+            $this->instance->log("Got $e in $this!");
         } finally {
             $this->readingPrimary = !$this->readingPrimary;
         }

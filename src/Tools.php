@@ -644,6 +644,7 @@ abstract class Tools extends AsyncTools
                 $chunk = $stream->read($cancellation);
                 if ($chunk === null) {
                     $buffer = null;
+                    $stream->close();
                     return null;
                 }
                 $buffer .= $chunk;

@@ -20,20 +20,25 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\DeferredCancellation;
+use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Wrappers\Start;
 use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\async;
+use function Amp\Future\await;
 
 /**
  * IPC client.
@@ -152,6 +157,58 @@ final class Client extends ClientAbstract
         $wrapper->wrap($cb, false);
         return $this->__call('uploadFromUrl', $wrapper);
     }
+
+    /**
+     * Play file in call.
+     */
+    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        $future = null;
+        $params = [$id, &$file];
+        if ($file instanceof ReadableStream) {
+            $deferred = new DeferredFuture;
+            $file->onClose(function () use ($deferred) {
+                $deferred->complete();
+            });
+            $future = $deferred->getFuture();
+        }
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call('callPlay', $wrapper);
+        if ($future) {
+            $future->await();
+        }
+    }
+
+    /**
+     * Play files on hold in call.
+     */
+    public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        $params = [$id, $files];
+        $futures = [];
+        foreach ($files as $file) {
+            if ($file instanceof ReadableStream) {
+                $deferred = new DeferredFuture;
+                $file->onClose(function () use ($deferred) {
+                    $deferred->complete();
+                });
+                $futures []= $deferred->getFuture();
+            }
+        }
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        foreach ($params as &$param) {
+            if ($param instanceof ReadableStream) {
+                $wrapper->wrap($param, true);
+            }
+        }
+        $this->__call('callPlayOnHold', $wrapper);
+        if ($futures) {
+            await($futures);
+        }
+    }
+
+
     /**
      * Upload file from callable.
      *

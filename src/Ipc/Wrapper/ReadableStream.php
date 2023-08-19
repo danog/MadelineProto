@@ -22,6 +22,8 @@ use Amp\Cancellation;
 use IteratorAggregate;
 use Webmozart\Assert\Assert;
 
+use function Amp\async;
+
 /**
  * @internal
  */
@@ -32,7 +34,9 @@ class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
 
     public function read(?Cancellation $cancellation = null): ?string
     {
-        Assert::null($cancellation);
+        if ($cancellation) {
+            return async($this->__call(...), 'read')->await($cancellation);
+        }
         return $this->__call('read');
     }
 
