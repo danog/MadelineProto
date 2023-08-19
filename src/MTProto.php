@@ -1157,6 +1157,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Setup logger.
+     * 
+     * @internal
      */
     public function setupLogger(): void
     {
