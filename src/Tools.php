@@ -25,6 +25,7 @@ use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\File\File;
+use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use ArrayAccess;
@@ -613,6 +614,7 @@ abstract class Tools extends AsyncTools
     {
         return new Pipe(512*1024);
     }
+    private static ?HttpClient $client = null;
     /**
      * Provide a buffered reader for a file, URL or amp stream.
      *
@@ -625,7 +627,8 @@ abstract class Tools extends AsyncTools
             return fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
         }
         if ($stream instanceof RemoteUrl) {
-            $stream = HttpClientBuilder::buildDefault()->request(new Request($stream->url), $cancellation)->getBody();
+            self::$client ??= HttpClientBuilder::buildDefault();
+            $stream = self::$client->request(new Request($stream->url), $cancellation)->getBody();
         }
         $buffer = '';
         return function (int $len) use (&$buffer, $stream, $cancellation): ?string {
