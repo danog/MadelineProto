@@ -53,7 +53,6 @@ use Throwable;
 use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
-use function Amp\File\deleteFile;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -326,7 +325,7 @@ trait FilesLogic
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -387,26 +386,8 @@ trait FilesLogic
             $stream->seek(0, Whence::End);
             $size = $stream->tell();
             $stream->seek(0);
-        } elseif (!$size) {
-            $this->logger->logger('No content length for stream, caching first');
-            $body = $stream;
-            $temp = \tempnam(\sys_get_temp_dir(), 'madeline_temp_file');
-            try {
-                $stream = openFile($temp, 'r+');
-                while (($chunk = $body->read()) !== null) {
-                    $stream->write($chunk);
-                }
-                $size = $stream->tell();
-                if (!$size) {
-                    throw new Exception('Wrong size!');
-                }
-                $stream->seek(0);
-                return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
-            } finally {
-                deleteFile($temp);
-            }
         }
-        $res = ($this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted));
+        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
         if ($created) {
             /** @var StreamInterface $stream */
             $stream->disconnect();

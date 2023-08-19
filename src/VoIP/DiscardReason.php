@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\VoIP;
 
 /**
- * Why was the call discareded?
+ * Why was the call discarded?
  */
 enum DiscardReason
 {
-    /* We missed the call */
+    /** We missed the call */
     case MISSED;
     /** The phone call was disconnected */
     case DISCONNECTED;

@@ -33,6 +33,7 @@ use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\StreamEof;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 use Throwable;
@@ -83,25 +84,6 @@ trait Files
         $mime = \trim(\explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
-        if (!$size) {
-            $this->logger->logger("No content length for {$url}, caching first");
-            $body = $stream;
-            $temp = \tempnam(\sys_get_temp_dir(), 'madeline_temp_file');
-            try {
-                $stream = openFile($temp, 'r+');
-                while (($chunk = $body->read()) !== null) {
-                    $stream->write($chunk);
-                }
-                $size = $stream->tell();
-                if (!$size) {
-                    throw new Exception('Wrong size!');
-                }
-                $stream->seek(0);
-                return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
-            } finally {
-                deleteFile($temp);
-            }
-        }
         return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
     /**
@@ -118,7 +100,7 @@ trait Files
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -138,17 +120,20 @@ trait Files
                 });
             };
         }
+        $part_size = 512 * 1024;
+        if (!$size) {
+            $seekable = false;
+        }
         $datacenter = $this->authorized_dc;
         if ($this->datacenter->has(-$datacenter)) {
             $datacenter = -$datacenter;
         }
-        $part_size = 512 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
-        $part_total_num = (int) \ceil($size / $part_size);
+        $part_total_num = $size ? ((int) \ceil($size / $part_size)) : -1;
         Assert::notEq($part_total_num, 0);
         $part_num = 0;
-        $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
-        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
+        $method = $size > 10 * 1024 * 1024 || !$size ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
+        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 || !$size ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
         $file_id = Tools::random(8);
         $ige = null;
         $fingerprint = null;
@@ -166,21 +151,32 @@ trait Files
         $promises = [];
         $speed = 0;
         $time = 0;
-        $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
-            static $cur = 0;
-            $cur++;
-            $cb($cur * 100 / $part_total_num, $speed, $time);
-        };
-        $callable = static function (int $part_num) use ($size, $file_id, $part_total_num, $part_size, $callable, $ige) {
+        if ($size) {
+            $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
+                static $cur = 0;
+                $cur++;
+                $cb($cur * 100 / $part_total_num, $speed, $time);
+            };
+        }
+        $totalSize = 0;
+        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige) {
             static $offset = 0;
             $oldOffset = $offset;
-            $size = $offset + $part_size > $size ? ($size % $part_size) : $part_size;
             $offset += $part_size;
 
             $bytes = $callable(
                 $oldOffset,
                 $part_size
             );
+            $totalSize += $bytesLen = \strlen($bytes);
+            if ($size === 0) {
+                if ($bytesLen === 0) {
+                    throw new StreamEof();
+                }
+                if ($bytesLen < $part_size) {
+                    $part_total_num = (int) \ceil($totalSize / $part_size);
+                }
+            }
 
             if ($bytes instanceof Future) {
                 $bytes = $bytes->await();
@@ -188,12 +184,12 @@ trait Files
             if ($ige) {
                 $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
             }
-            //\hash_update($ctx, $bytes);
+
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
         $resPromises = [];
         $start = \microtime(true);
-        while ($part_num < $part_total_num) {
+        while ($part_num < $part_total_num || !$size) {
             $writePromise = async(
                 $this->methodCallAsyncWrite(...),
                 $method,
@@ -201,9 +197,13 @@ trait Files
                 ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
             );
             if (!$seekable) {
-                $writePromise->await();
+                try {
+                    $writePromise->await();
+                } catch (StreamEof) {
+                    break;
+                }
             }
-            EventLoop::queue(function () use ($writePromise, $cb, $part_num, &$resPromises): void {
+            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises): void {
                 $readFuture = $writePromise->await();
                 $d = new DeferredFuture;
                 $resPromises[] = $d->getFuture();
@@ -213,10 +213,12 @@ trait Files
                         throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
-                    $cb();
+                    if ($size) {
+                        $cb();
+                    }
                     $d->complete();
                 } catch (Throwable $e) {
-                    $this->logger("Got exception while uploading: {$e}");
+                    $this->logger("Got exception while uploading $part_num: {$e}");
                     $d->error($e);
                     throw $e;
                 }
@@ -233,17 +235,14 @@ trait Files
                     }
                 }
             }
-            if (!($part_num % $parallel_chunks)) {
-                $time = \microtime(true) - $start;
-                $speed = (int) ($size * 8 / $time) / 1000000;
-                $this->logger->logger("Partial upload time: {$time}");
-                $this->logger->logger("Partial upload speed: {$speed} mbps");
-            }
         }
         await($promises);
         await($resPromises);
         $time = \microtime(true) - $start;
-        $speed = (int) ($size * 8 / $time) / 1000000;
+        $speed = (int) ($totalSize * 8 / $time) / 1000000;
+        if (!$size) {
+            $cb(100, $speed, $time);
+        }
         $this->logger->logger("Total upload time: {$time}");
         $this->logger->logger("Total upload speed: {$speed} mbps");
         $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $fileName, 'mime_type' => $mime];
@@ -251,7 +250,7 @@ trait Files
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
-            $constructor['size'] = $size;
+            $constructor['size'] = $totalSize;
         }
         $constructor['md5_checksum'] = '';
         //\hash_final($ctx);

@@ -26,6 +26,7 @@ use AssertionError;
 use Closure;
 use FFI;
 use FFI\CData;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
@@ -531,18 +532,7 @@ final class Ogg
         self::convertWav($proc->getStdout(), $oggOut, $cancellation);
     }
 
-    /**
-     * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
-     *
-     * @param LocalFile|RemoteUrl|ReadableStream $wavIn The input file, URL or stream.
-     * @param LocalFile|WritableStream $oggOut The output file or stream.
-     */
-    public static function convertWav(
-        LocalFile|RemoteUrl|ReadableStream $wavIn,
-        LocalFile|WritableStream $oggOut,
-        ?Cancellation $cancellation = null
-    ): void {
-        $opus = FFI::cdef('
+    private const CDEF = '
         typedef struct OpusEncoder OpusEncoder;
 
         OpusEncoder *opus_encoder_create(
@@ -564,8 +554,28 @@ final class Ogg
         void opus_encoder_destroy(OpusEncoder *st);
         const char *opus_strerror(int error);
         const char *opus_get_version_string(void);
-
-        ', 'libopus.so.0');
+    ';
+    /**
+     * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
+     *
+     * @param LocalFile|RemoteUrl|ReadableStream $wavIn The input file, URL or stream.
+     * @param LocalFile|WritableStream $oggOut The output file or stream.
+     */
+    public static function convertWav(
+        LocalFile|RemoteUrl|ReadableStream $wavIn,
+        LocalFile|WritableStream $oggOut,
+        ?Cancellation $cancellation = null
+    ): void {
+        foreach (['libopus.so', 'libopus.so.0'] as $k => $lib) {
+            try {
+                $opus = FFI::cdef(self::CDEF, $lib);
+                break;
+            } catch (Throwable $e) {
+                if ($k) {
+                    throw $e;
+                }
+            }
+        }
         $checkErr = function (int|CData $err) use ($opus): void {
             if ($err instanceof CData) {
                 $err = $err->cdata;
@@ -586,7 +596,11 @@ final class Ogg
 
         $read = Tools::openBuffered($wavIn, $cancellation);
 
-        Assert::eq($read(4), 'RIFF', "A .wav file must be provided!");
+        $header = $read(4);
+        if ($header === null) {
+            throw new AssertionError("Could not convert the file, make sure ffmpeg and libopus are installed!");
+        }
+        Assert::eq($header, 'RIFF', "A .wav file must be provided!");
         $totalLength = \unpack('V', $read(4))[1];
         Assert::eq($read(4), 'WAVE', "A .wav file must be provided!");
         do {

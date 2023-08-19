@@ -1910,7 +1910,7 @@ abstract class InternalDoc
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
     }
@@ -1924,7 +1924,7 @@ abstract class InternalDoc
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
