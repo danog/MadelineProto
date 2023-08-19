@@ -28,6 +28,8 @@ use danog\MadelineProto\SecurityException;
 /**
  * Secret feed loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class SecretFeedLoop extends Loop

@@ -39,6 +39,8 @@ use function substr;
 /**
  * Socket read loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class ReadLoop extends Loop

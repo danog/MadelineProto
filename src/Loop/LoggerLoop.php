@@ -22,6 +22,9 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
 
+/**
+ * @internal
+ */
 trait LoggerLoop
 {
     private bool $logPauses = true;

@@ -26,6 +26,8 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 /**
  * HttpWait loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class HttpWaitLoop extends Loop

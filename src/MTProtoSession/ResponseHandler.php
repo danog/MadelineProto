@@ -235,7 +235,10 @@ trait ResponseHandler
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $body = $request->getBodyOrEmpty();
             $trimmed = $body;
-            if (isset($trimmed['peer'])) {
+            if (isset($trimmed['peer']) && (
+                !\is_array($trimmed['peer'])
+                || (($trimmed['peer']['_'] ?? null) !== 'inputPhoneCall')
+            )) {
                 try {
                     $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getIdInternal($body['peer']);
                 } catch (Throwable $e) {

@@ -27,6 +27,9 @@ use Exception;
 use function Amp\delay;
 use function Amp\Socket\connect;
 
+/**
+ * @internal
+ */
 final class Endpoint
 {
     /**

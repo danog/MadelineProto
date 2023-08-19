@@ -22,6 +22,9 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\MTProto;
 
+/**
+ * @internal
+ */
 trait InternalLoop
 {
     use LoggerLoop {

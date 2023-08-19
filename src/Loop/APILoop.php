@@ -24,6 +24,7 @@ use danog\MadelineProto\InternalDoc;
 
 /**
  * API loop trait.
+ * @internal
  */
 trait APILoop
 {
