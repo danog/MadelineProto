@@ -8,6 +8,7 @@
 namespace danog\MadelineProto;
 
 use __PHP_Incomplete_Class;
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
@@ -1014,6 +1015,14 @@ abstract class InternalDoc
     public function getSponsoredMessages(array|string|int $peer): ?array
     {
         return $this->wrapper->getAPI()->getSponsoredMessages($peer);
+    }
+    /**
+     * Obtains a pipe that can be used to upload a file from a stream.
+     *
+     */
+    public static function getStreamPipe(): \Amp\ByteStream\Pipe
+    {
+        return \danog\MadelineProto\Tools::getStreamPipe();
     }
     /**
      * Get TL serializer.

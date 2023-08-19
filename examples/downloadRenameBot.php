@@ -21,6 +21,7 @@
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use League\Uri\Contracts\UriException;
@@ -64,29 +65,11 @@ class MyEventHandler extends EventHandler
     }
 
     /**
-     * Whether to allow uploads.
-     */
-    private $UPLOAD;
-
-    /**
      * Array of media objects.
      *
      * @var array
      */
     private $states = [];
-    public function onStart(): void
-    {
-        $this->adminId = $this->getInfo(self::ADMIN)['bot_api_id'];
-    }
-    /**
-     * Handle updates from channels and supergroups.
-     *
-     * @param array $update Update
-     */
-    public function onUpdateNewChannelMessage(array $update): void
-    {
-        //$this->onUpdateNewMessage($update);
-    }
     /**
      * Handle updates from users.
      *
@@ -108,10 +91,6 @@ class MyEventHandler extends EventHandler
 
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
-            }
-            if ($update['message']['message'] === '/report' && $peerId === $this->adminId) {
-                $this->reportMemoryProfile();
-                return;
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
                 $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
@@ -175,7 +154,7 @@ class MyEventHandler extends EventHandler
                     ],
                 ],
                 message: 'Powered by @MadelineProto!',
-                parse_mode: 'Markdown',
+                parse_mode: ParseMode::MARKDOWN,
             );
 
             if (in_array($peer['type'], ['channel', 'supergroup'])) {

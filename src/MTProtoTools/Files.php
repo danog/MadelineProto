@@ -159,7 +159,7 @@ trait Files
             };
         }
         $totalSize = 0;
-        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige) {
+        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige): array {
             static $offset = 0;
             $oldOffset = $offset;
             $offset += $part_size;

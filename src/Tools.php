@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
@@ -604,6 +605,14 @@ abstract class Tools extends AsyncTools
         return openFile($path, "a");
     }
 
+    /**
+     * Obtains a pipe that can be used to upload a file from a stream.
+     *
+     */
+    public static function getStreamPipe(): Pipe
+    {
+        return new Pipe(512*1024);
+    }
     /**
      * Provide a buffered reader for a file, URL or amp stream.
      *

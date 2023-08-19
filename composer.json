@@ -73,8 +73,7 @@
         "amphp/http-server": "^3",
         "leproxy/leproxy": "^0.2.2",
         "revolt/event-loop-adapter-react": "^1",
-        "dg/bypass-finals": "dev-master",
-        "roave/backward-compatibility-check": "^8.3"
+        "dg/bypass-finals": "dev-master"
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",

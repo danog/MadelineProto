@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use JsonSerializable;
@@ -106,5 +107,14 @@ abstract class Media extends IpcCapable implements JsonSerializable
         unset($v['API'], $v['session'], $v['location']);
         $v['_'] = static::class;
         return $v;
+    }
+
+    /**
+     * Get a readable amp stream with the file contents.
+     *
+     */
+    public function getStream(): ReadableStream
+    {
+        return $this->getClient()->downloadToReturnedStream($this);
     }
 }

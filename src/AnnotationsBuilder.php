@@ -531,6 +531,7 @@ final class Blacklist {
                 \fwrite($handle, "use __PHP_Incomplete_Class;\n");
                 \fwrite($handle, "use Amp\\ByteStream\\WritableStream;\n");
                 \fwrite($handle, "use Amp\\ByteStream\\ReadableStream;\n");
+                \fwrite($handle, "use Amp\\ByteStream\\Pipe;\n");
                 \fwrite($handle, "use Amp\\Cancellation;\n");
                 \fwrite($handle, "use Amp\\Http\\Server\\Request as ServerRequest;\n");
                 \fwrite($handle, "use danog\\MadelineProto\\Broadcast\\Action;\n");

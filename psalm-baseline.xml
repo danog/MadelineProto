@@ -688,7 +688,6 @@
       <code>downloadToStream</code>
       <code>end</code>
       <code>phoneLogin</code>
-      <code>requestCall</code>
       <code>requestSecretChat</code>
       <code>start</code>
       <code>tdToTdcli</code>
@@ -1203,15 +1202,6 @@
       <code>logger</code>
       <code>start</code>
     </PossiblyNullReference>
-    <PropertyNotSetInConstructor>
-      <code>$channelParticipants</code>
-      <code>$logger</code>
-      <code>$minDatabase</code>
-      <code>$session</code>
-      <code>$snitch</code>
-      <code>$wrapper</code>
-      <code>MTProto</code>
-    </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
       <code><![CDATA[$this->sanitizeReportPeers($userOrId)]]></code>
     </PropertyTypeCoercion>
@@ -1363,9 +1353,6 @@
     <DocblockTypeContradiction>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </DocblockTypeContradiction>
-    <MissingClosureReturnType>
-      <code>static function (int $part_num) use ($size, $file_id, $part_total_num, $part_size, $callable, $ige) {</code>
-    </MissingClosureReturnType>
     <MissingParamType>
       <code>$data</code>
       <code>$media</code>
@@ -1423,6 +1410,9 @@
     <RedundantCondition>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </RedundantCondition>
+    <TooManyArguments>
+      <code>$cb(100, $speed, $time)</code>
+    </TooManyArguments>
     <TypeDoesNotContainType>
       <code><![CDATA[$res['ext'] === '']]></code>
       <code><![CDATA[$res['ext'] === '']]></code>
@@ -1457,7 +1447,6 @@
       <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
-      <code>read</code>
       <code>seek</code>
       <code>seek</code>
     </PossiblyUndefinedMethod>
@@ -1488,12 +1477,8 @@
   <file src="src/MTProtoTools/PeerDatabase.php">
     <InvalidPropertyAssignmentValue>
       <code><![CDATA[$this->pendingDb]]></code>
-      <code><![CDATA[$this->pendingDb]]></code>
-      <code><![CDATA[$this->pendingDb]]></code>
     </InvalidPropertyAssignmentValue>
     <PossiblyNullArgument>
-      <code>$id</code>
-      <code>$id</code>
       <code><![CDATA[$this->API->getIdInternal($full)]]></code>
       <code><![CDATA[$this->API->getIdInternal($full)]]></code>
       <code><![CDATA[$this->API->getIdInternal($id)]]></code>
@@ -1505,8 +1490,6 @@
     <PossiblyNullArrayOffset>
       <code><![CDATA[$this->fullDb]]></code>
       <code><![CDATA[$this->fullDb]]></code>
-      <code><![CDATA[$this->pendingDb]]></code>
-      <code><![CDATA[$this->pendingDb]]></code>
       <code><![CDATA[$this->pendingDb]]></code>
     </PossiblyNullArrayOffset>
     <PropertyNotSetInConstructor>
@@ -2248,11 +2231,6 @@
       <code><![CDATA[$API->getSelf()['id']]]></code>
     </PossiblyInvalidArrayAccess>
   </file>
-  <file src="src/VoIP/AuthKeyHandler.php">
-    <MissingReturnType>
-      <code>requestCall</code>
-    </MissingReturnType>
-  </file>
   <file src="src/VoIP/Endpoint.php">
     <MissingParamType>
       <code>$stream</code>
@@ -2276,9 +2254,6 @@
     </PossiblyUndefinedVariable>
   </file>
   <file src="src/VoIPController.php">
-    <ArgumentTypeCoercion>
-      <code>$stream</code>
-    </ArgumentTypeCoercion>
     <InaccessibleProperty>
       <code><![CDATA[$this->authKey]]></code>
       <code><![CDATA[$this->authKey]]></code>

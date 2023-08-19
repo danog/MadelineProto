@@ -526,7 +526,9 @@ final class Ogg
         };
         $proc = Process::start(['ffmpeg', '-hide_banner', '-loglevel', 'warning', '-i', $inFile, '-map', '0:a','-ar', '48000', '-f', 'wav', '-y', '/dev/stdout'], cancellation: $cancellation);
         if ($in instanceof ReadableStream) {
-            async(pipe(...), $in, $proc->getStdin(), $cancellation)->ignore();
+            async(pipe(...), $in, $proc->getStdin(), $cancellation)
+                ->ignore()
+                ->finally($proc->getStdin()->close(...));
         }
         async(pipe(...), $proc->getStderr(), getStderr(), $cancellation)->ignore();
         self::convertWav($proc->getStdout(), $oggOut, $cancellation);

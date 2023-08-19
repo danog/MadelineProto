@@ -82,6 +82,8 @@ use function time;
 /**
  * Manages all of the mtproto stuff.
  *
+ * @psalm-suppress PropertyNotSetInConstructor
+ *
  * @internal
  */
 final class MTProto implements TLCallback, LoggerGetter
