@@ -7,6 +7,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\Ogg;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\SimpleEventHandler;
 
 use function Amp\async;
@@ -28,7 +29,13 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('start')]
     public function startCmd(Incoming&Message $message): void
     {
-        $message->reply("This bot can be used to convert files to be played by a @MadelineProto Telegram webradio!\n\nSee https://docs.madelineproto.xyz/docs/CALLS.html for more info, and call @magicalcrazypony to hear some nice tunes!\n\nSend me an audio file to start.\n\nPowered by @MadelineProto.");
+        $message->reply(
+            message: "This bot can be used to convert files to be played by a @MadelineProto Telegram webradio!".
+            "\n\nSee https://docs.madelineproto.xyz/docs/CALLS.html for more info, and call @magicalcrazypony to hear some nice tunes!".
+            "\n\nSend me an audio file to start.".
+            "\n\nPowered by @MadelineProto, [source code](https://github.com/danog/MadelineProto/blob/v8/examples/libtgvoipbot.php).",
+            parseMode: ParseMode::MARKDOWN
+        );
     }
     #[Handler]
     public function convertCmd((Incoming&Message&HasAudio)|(Incoming&Message&HasDocument) $message): void
