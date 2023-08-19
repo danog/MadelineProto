@@ -42,7 +42,7 @@ class MyEventHandler extends SimpleEventHandler
         )->finally($sink->close(...));
 
         $this->sendDocument(
-            $message->chatId,
+            peer: $message->chatId,
             file: $pipe->getSource(),
             fileName: $message->media->fileName.".ogg"
         );
