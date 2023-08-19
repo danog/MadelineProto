@@ -18,15 +18,9 @@
 
 namespace danog\MadelineProto;
 
-use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableStream;
-use Amp\Cancellation;
-use Amp\CancelledException;
-use Amp\DeferredCancellation;
-use Amp\DeferredFuture;
-use danog\Loop\GenericLoop;
 use danog\Loop\Loop;
-use danog\MadelineProto\Loop\VoIPLoop;
+use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
@@ -35,7 +29,6 @@ use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
-use SplQueue;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -106,12 +99,6 @@ final class VoIPController
 
     private array $call;
 
-    /** @var array<LocalFile|RemoteUrl|ReadableStream> */
-    private array $holdFiles = [];
-    /** @var list<LocalFile|RemoteUrl|ReadableStream> */
-    private array $inputFiles = [];
-    private int $holdIndex = 0;
-
     /**
      * @var array<Endpoint>
      */
@@ -122,12 +109,8 @@ final class VoIPController
     private float $lastIncomingTimestamp = 0.0;
     private float $lastOutgoingTimestamp = 0.0;
     private int $opusTimestamp = 0;
-    private SplQueue $packetQueue;
-    private ?DeferredFuture $packetDeferred = null;
-    private Cancellation $cancellation;
-    private DeferredCancellation $deferred;
 
-    private VoIPLoop $djLoop;
+    private DjLoop $diskJockey;
 
     /** Auth key */
     private readonly string $authKey;
@@ -147,11 +130,8 @@ final class VoIPController
     ) {
         $this->public = new VoIP($API, $call);
         $call['_'] = 'inputPhoneCall';
-        $this->packetQueue = new SplQueue();
-        $this->deferred = new DeferredCancellation;
-        $this->cancellation = $this->deferred->getCancellation();
-        $this->djLoop = new VoIPLoop($this, $this->djLoop(...), "Play loop");
-        Assert::true($this->djLoop->start());
+        $this->diskJockey = new DjLoop($this);
+        Assert::true($this->diskJockey->start());
         $this->call = $call;
         if ($this->public->outgoing) {
             $this->callState = CallState::REQUESTED;
@@ -162,18 +142,7 @@ final class VoIPController
 
     public function __serialize(): array
     {
-        $data = \get_object_vars($this);
-        unset($data['cancellation'], $data['deferred'], $data['packetDeferred'], $data['djLoop']);
-
-        $data['holdFiles'] = \array_filter(
-            $data['holdFiles'],
-            fn ($v) => !$v instanceof ReadableStream
-        );
-        $data['inputFiles'] = \array_filter(
-            $data['inputFiles'],
-            fn ($v) => !$v instanceof ReadableStream
-        );
-        return $data;
+        return \get_object_vars($this);
     }
     /**
      * Wakeup function.
@@ -183,10 +152,11 @@ final class VoIPController
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        $this->deferred = new DeferredCancellation;
-        $this->cancellation = $this->deferred->getCancellation();
-        $this->djLoop = new VoIPLoop($this, $this->djLoop(...), "Play loop");
-        Assert::true($this->djLoop->start());
+        if (!isset($this->API->logger)) {
+            $this->API->setupLogger();
+        }
+        $this->diskJockey ??= new DjLoop($this);
+        Assert::true($this->diskJockey->start());
         if ($this->callState === CallState::RUNNING) {
             if ($this->voipState === VoIPState::CREATED) {
                 // No endpoints yet
@@ -353,8 +323,7 @@ final class VoIPController
         }
         $this->API->cleanupCall($this->public->callID);
         $this->callState = CallState::ENDED;
-        $this->djLoop->stop();
-        $this->deferred->cancel();
+        $this->diskJockey->discard();
         $this->skip();
 
         $this->log("Now closing $this");
@@ -370,8 +339,6 @@ final class VoIPController
         foreach ($this->sockets as $socket) {
             $socket->disconnect();
         }
-        $this->packetQueue = new SplQueue;
-        $this->packetDeferred?->complete(false);
         $this->log("Closed all sockets, discarding $this");
 
         $this->log(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
@@ -542,103 +509,11 @@ final class VoIPController
         }
     }
 
-    private function startPlaying(LocalFile|RemoteUrl|ReadableStream $f): void
-    {
-        $it = null;
-        if ($f instanceof LocalFile) {
-            try {
-                $it = new Ogg($f, $this->cancellation);
-                if (!\in_array('MADELINE_ENCODER_V=1', $it->comments, true)) {
-                    $it = null;
-                }
-            } catch (CancelledException $e) {
-                throw $e;
-            } catch (Throwable) {
-                $it = null;
-            }
-        }
-        if (!$it) {
-            $this->log("Starting conversion fiber...");
-            $pipe = new Pipe(4096);
-            EventLoop::queue(function () use ($f, $pipe): void {
-                try {
-                    Ogg::convert($f, $pipe->getSink(), $this->cancellation);
-                } catch (CancelledException) {
-                } finally {
-                    $pipe->getSink()->close();
-                }
-            });
-            $it = new Ogg($pipe->getSource());
-        }
-        foreach ($it->opusPackets as $packet) {
-            $this->packetQueue->enqueue($packet);
-            if ($this->packetDeferred) {
-                $deferred = $this->packetDeferred;
-                $this->packetDeferred = null;
-                $deferred->complete(true);
-            }
-        }
-    }
-    private function log(string $message): void 
+    public function log(string $message): void
     {
         EventLoop::queue($this->API->logger->logger(...), $message);
     }
     private bool $muted = true;
-    private bool $playingHold = false;
-    private function djLoop(): ?float
-    {
-        if ($this->callState === CallState::ENDED) {
-            $this->log("Exiting DJ loop in $this because the call ended!");
-            return GenericLoop::STOP;
-        }
-        $this->log("Resuming DJ loop in $this!");
-        $file = \array_shift($this->inputFiles);
-        if (!$file) {
-            $this->log("Pausing DJ loop in $this because we have nothing to play!");
-            return GenericLoop::PAUSE;
-        }
-        try {
-            $fileStr = match (true) {
-                $file instanceof LocalFile => $file->file,
-                $file instanceof RemoteUrl => $file->url,
-                $file instanceof ReadableStream => 'stream '.spl_object_id($file)
-            };
-            $this->log("DJ loop: playing $fileStr in $this!");
-            $this->startPlaying($file);
-        } catch (CancelledException) {
-            $this->packetQueue = new SplQueue;
-
-            if ($this->packetDeferred) {
-                $deferred = $this->packetDeferred;
-                $this->packetDeferred = null;
-                $deferred?->complete(false);
-            }
-        }
-
-        return GenericLoop::CONTINUE;
-    }
-    private function pullPacket(): ?string
-    {
-        if ($this->packetQueue->isEmpty()) {
-            if ($this->callState === CallState::ENDED) {
-                return null;
-            }
-            if ($this->djLoop->isPaused()) {
-                if (!$this->holdFiles || $this->inputFiles) {
-                    return null;
-                }
-                $this->playingHold = true;
-                $this->inputFiles []= $this->holdFiles[($this->holdIndex++) % \count($this->holdFiles)];
-                Assert::true($this->djLoop->resume());
-                return null;
-            }
-            $this->packetDeferred ??= new DeferredFuture;
-            if (!$this->packetDeferred->getFuture()->await()) {
-                return null;
-            }
-        }
-        return $this->packetQueue->dequeue();
-    }
     /**
      * Start write loop.
      */
@@ -655,8 +530,9 @@ final class VoIPController
         $delay = $this->muted ? 0.2 : 0.06;
         $t = \microtime(true) + $delay;
         while (true) {
-            if ($packet = $this->pullPacket()) {
+            if ($packet = $this->diskJockey->pullPacket()) {
                 if ($this->muted) {
+                    $this->log("Unmuting outgoing audio in $this!");
                     if (!$this->bestEndpoint->writeReliably([
                         '_' => self::PKT_STREAM_STATE,
                         'id' => 0,
@@ -678,6 +554,7 @@ final class VoIPController
                 $this->opusTimestamp += 60;
             } else {
                 if (!$this->muted) {
+                    $this->log("Muting outgoing audio in $this!");
                     if (!$this->bestEndpoint->writeReliably([
                         '_' => self::PKT_STREAM_STATE,
                         'id' => 0,
@@ -716,16 +593,9 @@ final class VoIPController
     /**
      * Play file.
      */
-    public function play(LocalFile|RemoteUrl|ReadableStream $file): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        $this->inputFiles[] = $file;
-        if ($this->playingHold) {
-            $this->playingHold = false;
-            $this->skip();
-        }
-        $this->djLoop->resume();
-
-        return $this;
+        $this->diskJockey->play($file);
     }
 
     /**
@@ -733,29 +603,29 @@ final class VoIPController
      */
     public function skip(): void
     {
-        $this->packetQueue = new SplQueue;
-        $deferred = $this->deferred;
-        $this->deferred = new DeferredCancellation;
-        $this->cancellation = $this->deferred->getCancellation();
-        $deferred->cancel();
+        $this->diskJockey->skip();
     }
     /**
      * Stops playing all files, clears the main and the hold playlist.
      */
     public function stop(): void
     {
-        $this->inputFiles = [];
-        $this->holdFiles = [];
-        $this->skip();
+        $this->diskJockey->stopPlaying();
     }
     /**
      * Files to play on hold.
      */
-    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): self
+    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $this->holdFiles = $files;
-
-        return $this;
+        $this->diskJockey->playOnHold(...$files);
+    }
+    /**
+     * Get info about the audio currently being played.
+     *
+     */
+    public function getCurrent(): LocalFile|RemoteUrl|string|null
+    {
+        return $this->diskJockey->getCurrent();
     }
 
     /**

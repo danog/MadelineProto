@@ -179,6 +179,16 @@ trait AuthKeyHandler
     }
 
     /**
+     * Get the file that is currently being played.
+     * 
+     * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     */
+    public function callGetCurrent(int $id): RemoteUrl|LocalFile|string|null
+    {
+        return ($this->calls[$id] ?? null)?->getCurrent();
+    }
+
+    /**
      * Get call state.
      */
     public function getCallState(int $id): ?CallState

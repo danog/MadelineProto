@@ -282,6 +282,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::callFork($callable, ...$args);
     }
     /**
+     * Get the file that is currently being played.
+     */
+    public function callGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
+    {
+        return $this->wrapper->getAPI()->callGetCurrent($id);
+    }
+    /**
      * Play file in call.
      */
     public function callPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
@@ -1681,13 +1688,6 @@ abstract class InternalDoc
     public function setWebhook(string $webhookUrl): void
     {
         $this->wrapper->getAPI()->setWebhook($webhookUrl);
-    }
-    /**
-     * Setup logger.
-     */
-    public function setupLogger(): void
-    {
-        $this->wrapper->getAPI()->setupLogger();
     }
     /**
      * When called, skips to the next file in the playlist.

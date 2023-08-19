@@ -20,22 +20,55 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop;
 
+use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\VoIPController;
 
 /**
  * @internal
  */
-trait LoggerLoop
+abstract class VoIPLoop extends Loop
 {
-    private bool $logPauses = true;
+    public function __construct(
+        protected VoIPController $instance,
+    ) {
+    }
+    /**
+     * Signal that loop has started.
+     */
+    protected function startedLoop(): void
+    {
+        $this->instance->log("Entered $this");
+        parent::startedLoop();
+    }
 
     /**
-     * Constructor.
-     *
-     * @param Logger $logger Logger instance
+     * Signal that loop has exited.
      */
-    public function __construct(private Logger $logger)
+    protected function exitedLoop(): void
     {
+        $this->instance->log("Exited $this");
+        parent::exitedLoop();
+    }
+
+    /**
+     * Report pause, can be overriden for logging.
+     *
+     * @param float $timeout Pause duration, 0 = forever
+     */
+    protected function reportPause(float $timeout): void
+    {
+        if ($timeout) {
+            $this->instance->log(
+                "Pausing $this for $timeout",
+                Logger::ULTRA_VERBOSE,
+            );
+        } else {
+            $this->instance->log(
+                "Pausing $this until resume is called",
+                Logger::ULTRA_VERBOSE,
+            );
+        }
     }
 
     /**
