@@ -26,6 +26,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Ogg;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP;
@@ -161,6 +162,11 @@ trait AuthKeyHandler
      */
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
+        if (!Magic::canConvertOgg()) {
+            if ($file instanceof LocalFile) {
+                Ogg::validateOgg($file);
+            }
+        }
         ($this->calls[$id] ?? null)?->play($file);
     }
 
@@ -174,7 +180,7 @@ trait AuthKeyHandler
         if (!isset($this->calls[$id])) {
             return;
         }
-        $this->calls[$id]->play($file);
+        $this->callPlay($id, $file);
         if ($file instanceof ReadableStream) {
             $deferred = new DeferredFuture;
             $file->onClose($deferred->complete(...));
@@ -227,6 +233,13 @@ trait AuthKeyHandler
      */
     public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
+        if (!Magic::canConvertOgg()) {
+            foreach ($files as $file) {
+                if ($file instanceof LocalFile) {
+                    Ogg::validateOgg($file);
+                }
+            }
+        }
         ($this->calls[$id] ?? null)?->playOnHold(...$files);
     }
 
@@ -240,7 +253,7 @@ trait AuthKeyHandler
         if (!isset($this->calls[$id])) {
             return;
         }
-        $this->calls[$id]->playOnHold(...$files);
+        $this->callPlayOnHold($id, ...$files);
         foreach ($files as $file) {
             if ($file instanceof ReadableStream) {
                 $deferred = new DeferredFuture;

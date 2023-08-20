@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableBuffer;
+use Amp\ByteStream\WritableBuffer;
 use Amp\DeferredFuture;
 use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
@@ -388,5 +390,19 @@ final class Magic
             self::$ipv6 = $ipv6;
             self::$initedIpv6 = true;
         }
+    }
+
+    private static ?bool $canConvert = null;
+    public static function canConvertOgg(): bool {
+        if (self::$canConvert !== null) {
+            return self::$canConvert;
+        }
+        try {
+            Ogg::convert(new ReadableBuffer("\0"), new WritableBuffer);
+            self::$canConvert = true;
+        } catch (\Throwable) {
+            self::$canConvert = false;
+        }
+        return self::$canConvert;
     }
 }
