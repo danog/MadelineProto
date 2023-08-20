@@ -14,23 +14,9 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Filter;
+namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
-use Attribute;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\VoIP;
-use danog\MadelineProto\VoIP\CallState;
-
-/**
- * Allow only outgoing messages.
- */
-#[Attribute(Attribute::TARGET_METHOD)]
-final class FilterOutgoing extends Filter
+/** Represents an ended call */
+interface Ended
 {
-    public function apply(Update $update): bool
-    {
-        return ($update instanceof AbstractMessage && $update->out)
-            || ($update instanceof VoIP && $update->getCallState() === CallState::REQUESTED);
-    }
 }

@@ -615,6 +615,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getAdminIds();
     }
     /**
+     * Get all pending and running calls, indexed by user ID.
+     *
+     * @return array<int, VoIP>
+     */
+    public function getAllCalls(): array
+    {
+        return $this->wrapper->getAPI()->getAllCalls();
+    }
+    /**
      * Get full list of MTProto and API methods.
      */
     public function getAllMethods(): array

@@ -17,20 +17,18 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIP\CallState;
 
 /**
- * Allow only outgoing messages.
+ * Allow only ended calls.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterOutgoing extends Filter
+final class FilterEnded extends Filter
 {
     public function apply(Update $update): bool
     {
-        return ($update instanceof AbstractMessage && $update->out)
-            || ($update instanceof VoIP && $update->getCallState() === CallState::REQUESTED);
+        return $update instanceof VoIP && $update->getCallState() === CallState::ENDED;
     }
 }

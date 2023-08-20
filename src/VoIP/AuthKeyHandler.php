@@ -139,6 +139,16 @@ trait AuthKeyHandler
     }
 
     /**
+     * Get all pending and running calls, indexed by user ID.
+     *
+     * @return array<int, VoIP>
+     */
+    public function getAllCalls(): array
+    {
+        return \array_map(fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+    }
+
+    /**
      * Get phone call information.
      */
     public function getCall(int $id): ?VoIP

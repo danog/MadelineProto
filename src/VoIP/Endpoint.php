@@ -165,25 +165,25 @@ final class Endpoint
                         return $result;
                 }
                 Logger::log('Unknown unencrypted packet received: '.\bin2hex($crc), Logger::ERROR);
-                continue 2;
-            } else {
-                $message_key = $head.$payload->bufferRead(4);
-                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
-                $encrypted_data = $payload->bufferRead($l-($pos+16));
-                $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
-
-                if ($message_key != \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
-                    Logger::log('msg_key mismatch!', Logger::ERROR);
-                    continue;
-                }
-
-                $innerLen = \unpack('v', \substr($packet, 0, 2))[1];
-                if ($innerLen > \strlen($packet)) {
-                    Logger::log('Received packet has wrong inner length!', Logger::ERROR);
-                    continue;
-                }
-                $packet = \substr($packet, 2);
+                continue;
             }
+            $message_key = $head.$payload->bufferRead(4);
+            [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
+            $encrypted_data = $payload->bufferRead($l-($pos+16));
+            $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
+
+            if ($message_key != \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
+                Logger::log('msg_key mismatch!', Logger::ERROR);
+                continue;
+            }
+
+            $innerLen = \unpack('v', \substr($packet, 0, 2))[1];
+            if ($innerLen > \strlen($packet)) {
+                Logger::log('Received packet has wrong inner length!', Logger::ERROR);
+                continue;
+            }
+            $packet = \substr($packet, 2);
+
             $payload = \fopen('php://memory', 'rw+b');
             \fwrite($payload, $packet);
             \fseek($payload, 0);
