@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Redis\Redis as RedisRedis;
+use Amp\Redis\RedisClient;
 use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
@@ -32,7 +32,7 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  */
 final class RedisArray extends DriverArray
 {
-    private RedisRedis $db;
+    private RedisClient $db;
 
     /**
      * Initialize on startup.

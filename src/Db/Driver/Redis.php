@@ -16,11 +16,14 @@
 
 namespace danog\MadelineProto\Db\Driver;
 
-use Amp\Redis\Redis as RedisRedis;
+use Amp\Redis\Connection\ReconnectingRedisLink;
+use Amp\Redis\RedisClient;
 use Amp\Redis\RedisConfig;
 use Amp\Redis\RemoteExecutorFactory;
 use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
+
+use function Amp\Redis\createRedisConnector;
 
 /**
  * Redis driver wrapper.
@@ -29,11 +32,11 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
  */
 final class Redis
 {
-    /** @var array<RedisRedis> */
+    /** @var array<RedisClient> */
     private static array $connections = [];
 
     private static ?LocalKeyedMutex $mutex = null;
-    public static function getConnection(DatabaseRedis $settings): RedisRedis
+    public static function getConnection(DatabaseRedis $settings): RedisClient
     {
         self::$mutex ??= new LocalKeyedMutex;
         $dbKey = $settings->getKey();
@@ -45,7 +48,7 @@ final class Redis
                     ->withPassword($settings->getPassword())
                     ->withDatabase($settings->getDatabase());
 
-                self::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
+                self::$connections[$dbKey] = new RedisClient(new ReconnectingRedisLink(createRedisConnector($config)));
                 self::$connections[$dbKey]->ping();
             }
         } finally {
