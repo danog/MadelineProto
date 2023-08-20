@@ -21,6 +21,7 @@ use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Keyboard;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Message;
@@ -1208,6 +1209,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isIpcWorker();
     }
     /**
+     * Whether the currently playing audio file is paused.
+     */
+    public function isPlayPaused(int $id): bool
+    {
+        return $this->wrapper->getAPI()->isPlayPaused($id);
+    }
+    /**
      * Returns whether the current user is a premium user, cached.
      */
     public function isPremium(): bool
@@ -1392,6 +1400,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::packUnsignedInt($value);
     }
     /**
+     * Pauses playback of the current audio file in the call.
+     */
+    public function pausePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->pausePlay($id);
+    }
+    /**
      * Check if peer is present in internal peer database.
      *
      * @param mixed $id Peer
@@ -1540,6 +1555,13 @@ abstract class InternalDoc
     public function restart(): void
     {
         $this->wrapper->getAPI()->restart();
+    }
+    /**
+     * Resumes playback of the current audio file in the call.
+     */
+    public function resumePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->resumePlay($id);
     }
     /**
      * Rethrow exception into event loop.

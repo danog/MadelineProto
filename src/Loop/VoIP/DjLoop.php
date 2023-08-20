@@ -312,6 +312,10 @@ final class DjLoop extends VoIPLoop
     {
         $this->pause = false;
     }
+    public function isAudioPaused(): bool
+    {
+        return $this->pause;
+    }
     /**
      * Get info about the audio currently being played.
      *

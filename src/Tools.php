@@ -628,7 +628,12 @@ abstract class Tools extends AsyncTools
         }
         if ($stream instanceof RemoteUrl) {
             self::$client ??= HttpClientBuilder::buildDefault();
-            $stream = self::$client->request(new Request($stream->url), $cancellation)->getBody();
+            $request = new Request($stream->url);
+            $request->setTransferTimeout(INF);
+            $stream = self::$client->request(
+                $request,
+                $cancellation
+            )->getBody();
         }
         $buffer = '';
         return function (int $len) use (&$buffer, $stream, $cancellation): ?string {

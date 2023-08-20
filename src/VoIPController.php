@@ -159,7 +159,7 @@ final class VoIPController
         }
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
-        EventLoop::queue(function () {
+        EventLoop::queue(function (): void {
             if ($this->callState === CallState::RUNNING) {
                 if ($this->voipState === VoIPState::CREATED) {
                     // No endpoints yet
@@ -420,7 +420,7 @@ final class VoIPController
                     $this->log("Got error while connecting to $socket: $e");
                 }
             });
-            if (!isset($this->bestEndpoint) || $socket === $this->bestEndpoint) {
+            if ((!isset($this->bestEndpoint) && $socket->udp) || (isset($this->bestEndpoint) && $socket === $this->bestEndpoint)) {
                 $promises []= $promise;
             }
         }
@@ -632,6 +632,13 @@ final class VoIPController
     public function resume(): void
     {
         $this->diskJockey->resumePlaying();
+    }
+    /**
+     * Whether the file we're currently playing is paused.
+     */
+    public function isPaused(): void
+    {
+        $this->diskJockey->isAudioPaused();
     }
     /**
      * Files to play on hold.

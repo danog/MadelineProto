@@ -85,8 +85,10 @@ final class ExitFailure
 
         $refl = new ReflectionObject($exception);
         foreach (['trace', 'line', 'file'] as $prop) {
-            $trace = $refl->getProperty($prop);
-            $trace->setValue($exception, $this->{$prop});
+            try {
+                $trace = $refl->getProperty($prop);
+                $trace->setValue($exception, $this->{$prop});
+            } catch (Throwable) {}
         }
 
         if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {

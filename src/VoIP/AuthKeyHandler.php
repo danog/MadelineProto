@@ -215,6 +215,14 @@ trait AuthKeyHandler
     }
 
     /**
+     * Whether the currently playing audio file is paused.
+     */
+    public function isPlayPaused(int $id): bool
+    {
+        return ($this->calls[$id] ?? null)?->isPaused() ?? false;
+    }
+
+    /**
      * Play files on hold in call.
      */
     public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void

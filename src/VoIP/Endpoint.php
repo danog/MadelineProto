@@ -57,7 +57,7 @@ final class Endpoint
         private readonly MessageHandler $handler
     ) {
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->udp ??= true;
     }

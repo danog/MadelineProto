@@ -137,6 +137,16 @@ final class VoIP extends Update implements SimpleFilters
     }
 
     /**
+     * Whether the currently playing file is paused.
+     *
+     * @return boolean
+     */
+    public function isPaused(): bool
+    {
+        return $this->getClient()->isPlayPaused($this->callID);
+    }
+
+    /**
      * Resumes the currently playing file.
      */
     public function resume(): self
