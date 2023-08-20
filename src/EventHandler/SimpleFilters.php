@@ -34,10 +34,11 @@ use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReplyToSelf;
 use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
+use danog\MadelineProto\EventHandler\SimpleFilter\Running;
 
 /**
  * @internal An internal interface used to avoid type errors when using simple filters.
  */
-interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, IsForwarded, IsReply, IsReplyToSelf, Ended
+interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, IsForwarded, IsReply, IsReplyToSelf, Ended, Running
 {
 }

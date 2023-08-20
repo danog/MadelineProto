@@ -53,6 +53,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReplyToSelf;
 use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
+use danog\MadelineProto\EventHandler\SimpleFilter\Running;
 use danog\MadelineProto\EventHandler\Update;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
@@ -108,6 +109,7 @@ abstract class Filter
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
                 Ended::class => new FilterEnded,
+                Running::class => new FilterRunning,
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
                 default => \is_subclass_of($type->getName(), Update::class)
                     ? new class($type->getName()) extends Filter {
