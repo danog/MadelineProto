@@ -408,6 +408,12 @@ final class VoIPController
     }
     private function connectToAll(): void
     {
+        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
+            if (\microtime(true) - $this-lastIncomingTimestamp > 10) {
+                $this->discard(DiscardReason::DISCONNECTED);
+            }
+        });
+
         $promises = [];
         foreach ($this->sockets as $socket) {
             $promise = async(function () use ($socket): void {
@@ -527,12 +533,6 @@ final class VoIPController
     private function startWriteLoop(): void
     {
         $this->setVoipState(VoIPState::ESTABLISHED);
-
-        $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
-            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
-                $this->discard(DiscardReason::DISCONNECTED);
-            }
-        });
 
         $delay = $this->muted ? 0.2 : 0.06;
         $t = \microtime(true) + $delay;
