@@ -19,7 +19,7 @@ if (!isset($argv[3])) {
 @unlink($argv[2]);
 
 $p = new Phar(__DIR__.'/../'.$argv[2], 0, $argv[2]);
-$p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.tl|\.json|\.dat|\.h)$/i');
+$p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.tl|\.json|\.dat|\.h|\.wav)$/i');
 
 $p->setStub('<?php
 
