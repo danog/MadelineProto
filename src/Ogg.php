@@ -537,10 +537,9 @@ final class Ogg
     /**
      * Validate that the specified OGG OPUS file can be played directly by MadelineProto, without doing any conversion.
      *
-     * @param LocalFile $f File to open.
      * @throws \Throwable If validation fails.
      */
-    public static function validateOgg(LocalFile $f): void
+    public static function validateOgg(LocalFile|RemoteUrl|ReadableStream $f): void
     {
         foreach ((new self($f))->opusPackets as $p) {
         }

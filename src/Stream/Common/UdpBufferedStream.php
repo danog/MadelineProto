@@ -155,10 +155,10 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
                 } else {
-                    if (strlen($this->data) > $this->length) {
+                    if (\strlen($this->data) > $this->length) {
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
-                    if (strlen($this->data) === $this->length) {
+                    if (\strlen($this->data) === $this->length) {
                         $this->stream->write($this->data);
                     }
                 }

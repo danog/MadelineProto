@@ -64,7 +64,8 @@ final class Endpoint
         $this->udp ??= true;
         $context = new ConnectionContext;
         $context->setUri($this->__toString())
-                ->setSocketContext((new ConnectContext())
+                ->setSocketContext(
+                    (new ConnectContext())
                     ->withConnectTimeout($settings->getTimeout())->withBindTo($settings->getBindTo())
                 )
                 ->addStream(DefaultStream::class);

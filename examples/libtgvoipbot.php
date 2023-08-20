@@ -53,7 +53,8 @@ class MyEventHandler extends SimpleEventHandler
             $this->sendDocument(
                 peer: $message->chatId,
                 file: $pipe->getSource(),
-                fileName: $message->media->fileName.".ogg"
+                fileName: $message->media->fileName.".ogg",
+                replyToMsgId: $message->id
             );
         } finally {
             $reply->delete();

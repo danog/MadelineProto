@@ -402,7 +402,8 @@ final class VoIPController
         $this->setVoipState(VoIPState::WAIT_INIT);
         $this->connectToAll();
     }
-    private function connectToAll(): void {
+    private function connectToAll(): void
+    {
         foreach ($this->sockets as $socket) {
             EventLoop::queue(function () use ($socket): void {
                 try {
@@ -481,7 +482,7 @@ final class VoIPController
     private function startReadLoop(Endpoint $endpoint): void
     {
         EventLoop::queue(function () use ($endpoint): void {
-            EventLoop::queue(function () use ($endpoint) {
+            EventLoop::queue(function () use ($endpoint): void {
                 while ($this->voipState->value <= VoIPState::WAIT_INIT_ACK->value) {
                     $this->log("Sending PKT_INIT to $endpoint...");
                     $endpoint->sendInit();
