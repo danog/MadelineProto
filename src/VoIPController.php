@@ -481,10 +481,13 @@ final class VoIPController
     private function startReadLoop(Endpoint $endpoint): void
     {
         EventLoop::queue(function () use ($endpoint): void {
-            if ($this->voipState->value <= VoIPState::WAIT_INIT_ACK->value) {
-                $this->log("Sending PKT_INIT to $endpoint...");
-                EventLoop::queue($endpoint->sendInit(...));
-            }
+            EventLoop::queue(function () use ($endpoint) {
+                while ($this->voipState->value <= VoIPState::WAIT_INIT_ACK->value) {
+                    $this->log("Sending PKT_INIT to $endpoint...");
+                    $endpoint->sendInit();
+                    delay(0.02);
+                }
+            });
             $this->log("Started read loop in $endpoint!");
             while (true) {
                 try {
