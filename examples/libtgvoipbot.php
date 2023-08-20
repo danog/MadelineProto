@@ -66,4 +66,4 @@ if (!getenv('TOKEN')) {
     throw new AssertionError("You must define a TOKEN environment variable with the token of the bot!");
 }
 
-MyEventHandler::startAndLoopBot('libtgvoipbot.madeline', getenv('TOKEN'));
+MyEventHandler::startAndLoopBot($argv[1] ?? 'libtgvoipbot.madeline', getenv('TOKEN'));
