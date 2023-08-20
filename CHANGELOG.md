@@ -1,3 +1,7 @@
+More recent entries can be seen on the Telegram channel [@MadelineProto](https://t.me/MadelineProto)!
+
+---
+
 MadelineProto was updated (8.0.0-beta115)!
 
 Features:
