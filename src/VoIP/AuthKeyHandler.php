@@ -199,6 +199,22 @@ trait AuthKeyHandler
     }
 
     /**
+     * Pauses playback of the current audio file in the call.
+     */
+    public function pausePlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->pause();
+    }
+
+    /**
+     * Resumes playback of the current audio file in the call.
+     */
+    public function resumePlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->resume();
+    }
+
+    /**
      * Play files on hold in call.
      */
     public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void

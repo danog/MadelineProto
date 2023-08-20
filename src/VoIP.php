@@ -127,6 +127,26 @@ final class VoIP extends Update implements SimpleFilters
     }
 
     /**
+     * Pauses the currently playing file.
+     */
+    public function pause(): self
+    {
+        $this->getClient()->pausePlay($this->callID);
+
+        return $this;
+    }
+
+    /**
+     * Resumes the currently playing file.
+     */
+    public function resume(): self
+    {
+        $this->getClient()->resumePlay($this->callID);
+
+        return $this;
+    }
+
+    /**
      * Files to play on hold.
      */
     public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): self

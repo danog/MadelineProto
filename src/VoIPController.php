@@ -157,23 +157,25 @@ final class VoIPController
         }
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
-        if ($this->callState === CallState::RUNNING) {
-            if ($this->voipState === VoIPState::CREATED) {
-                // No endpoints yet
-                return;
+        EventLoop::queue(function () {
+            if ($this->callState === CallState::RUNNING) {
+                if ($this->voipState === VoIPState::CREATED) {
+                    // No endpoints yet
+                    return;
+                }
+                $this->lastIncomingTimestamp = \microtime(true);
+                $this->connectToAll();
+                if ($this->voipState === VoIPState::WAIT_PONG) {
+                    $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
+                } elseif ($this->voipState === VoIPState::WAIT_STREAM_INIT) {
+                    $this->initStream();
+                } elseif ($this->voipState === VoIPState::ESTABLISHED) {
+                    $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
+                    $this->opusTimestamp += $diff - ($diff % 60);
+                    $this->startWriteLoop();
+                }
             }
-            $this->lastIncomingTimestamp = \microtime(true);
-            $this->connectToAll();
-            if ($this->voipState === VoIPState::WAIT_PONG) {
-                $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
-            } elseif ($this->voipState === VoIPState::WAIT_STREAM_INIT) {
-                EventLoop::queue($this->initStream(...));
-            } elseif ($this->voipState === VoIPState::ESTABLISHED) {
-                $diff = (int) ((\microtime(true) - $this->lastOutgoingTimestamp) * 1000);
-                $this->opusTimestamp += $diff - ($diff % 60);
-                EventLoop::queue($this->startWriteLoop(...));
-            }
-        }
+        });
     }
 
     /**
@@ -609,6 +611,20 @@ final class VoIPController
     public function stop(): void
     {
         $this->diskJockey->stopPlaying();
+    }
+    /**
+     * Pauses the currently playing file.
+     */
+    public function pause(): void
+    {
+        $this->diskJockey->pausePlaying();
+    }
+    /**
+     * Resumes the currently playing file.
+     */
+    public function resume(): void
+    {
+        $this->diskJockey->resumePlaying();
     }
     /**
      * Files to play on hold.

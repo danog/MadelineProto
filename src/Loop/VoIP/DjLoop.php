@@ -68,6 +68,8 @@ final class DjLoop extends VoIPLoop
     private DeferredCancellation $deferredSecondary;
     private int $holdIndex = 0;
 
+    private bool $pause = false;
+
     public function __construct(VoIPController $instance)
     {
         parent::__construct($instance);
@@ -82,6 +84,7 @@ final class DjLoop extends VoIPLoop
     public function __serialize(): array
     {
         return [
+            'pause' => $this->pause,
             'instance' => $this->instance,
             'holdFiles' => \array_filter(
                 $this->holdFiles,
@@ -219,6 +222,9 @@ final class DjLoop extends VoIPLoop
     }
     public function pullPacket(): ?string
     {
+        if ($this->pause) {
+            return null;
+        }
         $queue = $this->playingPrimary ? $this->packetQueuePrimary : $this->packetQueueSecondary;
         if ($queue->isEmpty()) {
             if ($this->instance->getCallState() === CallState::ENDED) {
@@ -297,6 +303,14 @@ final class DjLoop extends VoIPLoop
         $this->holdFiles = [];
         $this->skip();
         $this->skip();
+    }
+    public function pausePlaying(): void
+    {
+        $this->pause = true;
+    }
+    public function resumePlaying(): void
+    {
+        $this->pause = false;
     }
     /**
      * Get info about the audio currently being played.
