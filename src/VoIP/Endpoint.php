@@ -163,10 +163,9 @@ final class Endpoint
                         $result['peer_address'] = Tools::unpackSignedInt($payload->bufferRead(4));
                         $result['peer_port'] = Tools::unpackSignedInt($payload->bufferRead(4));
                         return $result;
-                    default:
-                        Logger::log('Unknown unencrypted packet received: '.\bin2hex($crc), Logger::ERROR);
-                        continue 2;
                 }
+                Logger::log('Unknown unencrypted packet received: '.\bin2hex($crc), Logger::ERROR);
+                continue 2;
             } else {
                 $message_key = $head.$payload->bufferRead(4);
                 [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);

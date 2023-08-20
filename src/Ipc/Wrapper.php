@@ -103,7 +103,6 @@ final class Wrapper extends ClientAbstract
      *
      * @param mixed           $callback    Callback to wrap
      * @param bool            $wrapObjects Whether to wrap object methods, too
-     * @param-out int $callback Callback ID
      */
     public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
