@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\SimpleFilter\Ended;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
@@ -37,6 +38,6 @@ use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
 /**
  * @internal An internal interface used to avoid type errors when using simple filters.
  */
-interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, IsForwarded, IsReply, IsReplyToSelf
+interface SimpleFilters extends Incoming, Outgoing, FromAdmin, HasAudio, HasDocument, HasDocumentPhoto, HasGif, HasMedia, HasNoMedia, HasPhoto, HasRoundVideo, HasSticker, HasVideo, HasVoice, IsForwarded, IsReply, IsReplyToSelf, Ended
 {
 }
