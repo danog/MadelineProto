@@ -188,7 +188,7 @@ final class DjLoop extends VoIPLoop
     private function startPlaying(LocalFile|RemoteUrl|ReadableStream $f, SplQueue $queue, Cancellation $cancellation): void
     {
         $it = null;
-        if ($f instanceof LocalFile) {
+        if ($f instanceof LocalFile || $f instanceof RemoteUrl) {
             try {
                 $it = new Ogg($f, $cancellation);
                 if (!\in_array('MADELINE_ENCODER_V=1', $it->comments, true)) {
