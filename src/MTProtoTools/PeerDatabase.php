@@ -152,7 +152,7 @@ final class PeerDatabase implements TLCallback
             $this->db[$id] = $chat;
             if ($this->API->settings->getDb()->getEnableUsernameDb()) {
                 foreach (self::getUsernames($chat) as $username) {
-                    $this->usernames[$username] = $id;
+                    $this->usernames[$username] = (int) $id;
                 }
             }
         }
@@ -319,7 +319,8 @@ final class PeerDatabase implements TLCallback
                 $this->processUser($key);
             }
         }
-        return $this->usernames[$username];
+        $result = $this->usernames[$username];
+        return $result === null ? $result : (int) $result;
     }
 
     private array $caching_simple_username = [];
