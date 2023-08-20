@@ -124,15 +124,12 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
         return new class($length, $append, $this) implements WriteBufferInterface {
             private string $append = '';
             private int $append_after = 0;
-            private RawStreamInterface $stream;
             private string $data = '';
             /**
              * Constructor function.
              */
-            public function __construct(int $length, string $append, RawStreamInterface $rawStreamInterface)
+            public function __construct(private readonly int $length, string $append, private readonly RawStreamInterface $stream)
             {
-                $this->stream = $rawStreamInterface;
-                $this->length = $length;
                 if (\strlen($append)) {
                     $this->append = $append;
                     $this->append_after = $length - \strlen($append);
@@ -156,6 +153,13 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
                         $this->append_after = 0;
                         $this->append = '';
                         throw new Exception('Tried to send too much out of frame data, cannot append');
+                    }
+                } else {
+                    if (strlen($this->data) > $this->length) {
+                        throw new Exception('Tried to send too much out of frame data, cannot append');
+                    }
+                    if (strlen($this->data) === $this->length) {
+                        $this->stream->write($this->data);
                     }
                 }
             }

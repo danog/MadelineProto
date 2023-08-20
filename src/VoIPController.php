@@ -163,12 +163,8 @@ final class VoIPController
                 return;
             }
             $this->lastIncomingTimestamp = \microtime(true);
-            $this->startReadLoop();
-            if ($this->voipState === VoIPState::WAIT_INIT) {
-                EventLoop::queue($this->sendInits(...));
-            } elseif ($this->voipState === VoIPState::WAIT_INIT_ACK) {
-                EventLoop::queue($this->sendInits(...));
-            } elseif ($this->voipState === VoIPState::WAIT_PONG) {
+            $this->connectToAll();
+            if ($this->voipState === VoIPState::WAIT_PONG) {
                 $this->pendingPing = EventLoop::repeat(0.2, $this->ping(...));
             } elseif ($this->voipState === VoIPState::WAIT_STREAM_INIT) {
                 EventLoop::queue($this->initStream(...));
@@ -376,9 +372,10 @@ final class VoIPController
      */
     private function initialize(array $endpoints): void
     {
-        foreach ($endpoints as $endpoint) {
-            try {
-                $this->sockets['v6 '.$endpoint['id']] = new Endpoint(
+        foreach ([true, false] as $udp) {
+            foreach ($endpoints as $endpoint) {
+                $this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']] = new Endpoint(
+                    $udp,
                     '['.$endpoint['ipv6'].']',
                     $endpoint['port'],
                     $endpoint['peer_tag'],
@@ -387,10 +384,8 @@ final class VoIPController
                     $this->authKey,
                     $this->messageHandler
                 );
-            } catch (Throwable) {
-            }
-            try {
-                $this->sockets['v4 '.$endpoint['id']] = new Endpoint(
+                $this->sockets[($udp ? 'udp' : 'tcp').' v4 '.$endpoint['id']] = new Endpoint(
+                    $udp,
                     $endpoint['ip'],
                     $endpoint['port'],
                     $endpoint['peer_tag'],
@@ -399,24 +394,23 @@ final class VoIPController
                     $this->authKey,
                     $this->messageHandler
                 );
-            } catch (Throwable) {
             }
         }
         $this->setVoipState(VoIPState::WAIT_INIT);
-        $this->startReadLoop();
-        $this->sendInits();
+        $this->connectToAll();
     }
-    private function sendInits(): void
-    {
+    private function connectToAll(): void {
         foreach ($this->sockets as $socket) {
-            $socket->udpPing();
-            $socket->write($this->messageHandler->encryptPacket([
-                '_' => self::PKT_INIT,
-                'protocol' => self::PROTOCOL_VERSION,
-                'min_protocol' => self::MIN_PROTOCOL_VERSION,
-                'audio_streams' => [self::CODEC_OPUS],
-                'video_streams' => []
-            ], true));
+            EventLoop::queue(function () use ($socket): void {
+                try {
+                    $this->log("Connecting to $socket...");
+                    $socket->connect();
+                    $this->log("Successfully connected to $socket!");
+                    $this->startReadLoop($socket);
+                } catch (Throwable $e) {
+                    $this->log("Got error while connecting to $socket: $e");
+                }
+            });
         }
     }
     /**
@@ -435,13 +429,7 @@ final class VoIPController
                         ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]
                     ]
                 ]));
-                $socket->write($this->messageHandler->encryptPacket([
-                    '_' => self::PKT_INIT,
-                    'protocol' => self::PROTOCOL_VERSION,
-                    'min_protocol' => self::MIN_PROTOCOL_VERSION,
-                    'audio_streams' => [self::CODEC_OPUS],
-                    'video_streams' => []
-                ]));
+                $socket->sendInit();
                 break;
 
             case self::PKT_INIT_ACK:
@@ -487,26 +475,29 @@ final class VoIPController
             EventLoop::queue(fn () => $socket->write($this->messageHandler->encryptPacket(['_' => self::PKT_PING])));
         }
     }
-    private function startReadLoop(): void
+    private function startReadLoop(Endpoint $endpoint): void
     {
-        foreach ($this->sockets as $socket) {
-            EventLoop::queue(function () use ($socket): void {
-                while (true) {
-                    try {
-                        $payload = $socket->read();
-                    } catch (Throwable $e) {
-                        $this->log("Got $e in this!");
-                        continue;
-                    }
-                    if (!$payload) {
-                        break;
-                    }
-                    $this->lastIncomingTimestamp = \microtime(true);
-                    EventLoop::queue($this->handlePacket(...), $socket, $payload);
+        EventLoop::queue(function () use ($endpoint): void {
+            if ($this->voipState->value <= VoIPState::WAIT_INIT_ACK->value) {
+                $this->log("Sending PKT_INIT to $endpoint...");
+                EventLoop::queue($endpoint->sendInit(...));
+            }
+            $this->log("Started read loop in $endpoint!");
+            while (true) {
+                try {
+                    $payload = $endpoint->read();
+                } catch (Throwable $e) {
+                    $this->log("Got $e in $endpoint, $this!");
+                    continue;
                 }
-                $this->log("Exiting VoIP read loop in $this!");
-            });
-        }
+                if (!$payload) {
+                    break;
+                }
+                $this->lastIncomingTimestamp = \microtime(true);
+                EventLoop::queue($this->handlePacket(...), $endpoint, $payload);
+            }
+            $this->log("Exiting VoIP read loop in $endpoint, $this!");
+        });
     }
 
     public function log(string $message, int $level = Logger::NOTICE): void

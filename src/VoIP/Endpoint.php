@@ -16,16 +16,23 @@
 
 namespace danog\MadelineProto\VoIP;
 
+use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\Common\UdpBufferedStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIPController;
 use Exception;
 
 use function Amp\delay;
-use function Amp\Socket\connect;
 
 /**
  * @internal
@@ -35,11 +42,12 @@ final class Endpoint
     /**
      * The socket.
      */
-    private ?Socket $socket = null;
+    private ?BufferedStreamInterface $socket = null;
     /**
      * Create endpoint.
      */
     public function __construct(
+        private readonly bool $udp,
         private readonly string $ip,
         private readonly int $port,
         private readonly string $peerTag,
@@ -48,11 +56,28 @@ final class Endpoint
         private readonly string $authKey,
         private readonly MessageHandler $handler
     ) {
-        $this->socket = connect("udp://{$this->ip}:{$this->port}");
     }
-    public function __wakeup(): void
+    public function connect(): void
     {
-        $this->socket = connect("udp://{$this->ip}:{$this->port}");
+        $settings = $this->handler->instance->API->settings->getConnection();
+
+        $this->udp ??= true;
+        $context = new ConnectionContext;
+        $context->setUri($this->__toString())
+                ->setSocketContext((new ConnectContext())
+                    ->withConnectTimeout($settings->getTimeout())->withBindTo($settings->getBindTo())
+                )
+                ->addStream(DefaultStream::class);
+        if ($this->udp) {
+            $context->addStream(UdpBufferedStream::class);
+        } else {
+            $context->addStream(BufferedRawStream::class)
+                    ->addStream(ObfuscatedStream::class);
+        }
+        $this->socket = $context->getStream();
+        if ($this->udp) {
+            $this->udpPing();
+        }
     }
     public function __sleep(): array
     {
@@ -63,7 +88,9 @@ final class Endpoint
 
     public function __toString(): string
     {
-        return "{$this->ip}:{$this->port}";
+        return $this->udp
+            ? "udp://{$this->ip}:{$this->port}"
+            : "tcp://{$this->ip}:{$this->port}";
     }
     /**
      * Disconnect from endpoint.
@@ -71,7 +98,7 @@ final class Endpoint
     public function disconnect(): void
     {
         if ($this->socket !== null) {
-            $this->socket->close();
+            $this->socket->disconnect();
             $this->socket = null;
         }
     }
@@ -104,48 +131,45 @@ final class Endpoint
     public function read(): ?array
     {
         do {
-            $packet = $this->socket->read();
-            if ($packet === null) {
+            try {
+                $payload = $this->socket->getReadBuffer($l);
+            } catch (NothingInTheSocketException) {
                 return null;
             }
 
-            $payload = \fopen('php://memory', 'rw+b');
-            \fwrite($payload, $packet);
-            \fseek($payload, 0);
             $pos = 0;
             if ($this->handler->peerVersion < 9 || $this->reflector) {
-                if (\fread($payload, 16) !== $this->peerTag) {
+                if ($payload->bufferRead(16) !== $this->peerTag) {
                     Logger::log('Received packet has wrong peer tag', Logger::ERROR);
                     continue;
                 }
                 $pos = 16;
             }
             $result = [];
-            if (\fread($payload, 12) === "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF") {
-                switch ($crc = \fread($payload, 4)) {
+            if (($head = $payload->bufferRead(12)) === "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF") {
+                switch ($crc = $payload->bufferRead(4)) {
                     case VoIPController::TLID_REFLECTOR_SELF_INFO:
                         $result['_'] = 'reflectorSelfInfo';
-                        $result['date'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
-                        $result['query_id'] = Tools::unpackSignedLong(\stream_get_contents($payload, 8));
-                        $result['my_ip'] = \stream_get_contents($payload, 16);
-                        $result['my_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
+                        $result['date'] = Tools::unpackSignedInt($payload->bufferRead(4));
+                        $result['query_id'] = Tools::unpackSignedLong($payload->bufferRead(8));
+                        $result['my_ip'] = $payload->bufferRead(16);
+                        $result['my_port'] = Tools::unpackSignedInt($payload->bufferRead(4));
                         return $result;
                     case VoIPController::TLID_REFLECTOR_PEER_INFO:
                         $result['_'] = 'reflectorPeerInfo';
-                        $result['my_address'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
-                        $result['my_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
-                        $result['peer_address'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
-                        $result['peer_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
+                        $result['my_address'] = Tools::unpackSignedInt($payload->bufferRead(4));
+                        $result['my_port'] = Tools::unpackSignedInt($payload->bufferRead(4));
+                        $result['peer_address'] = Tools::unpackSignedInt($payload->bufferRead(4));
+                        $result['peer_port'] = Tools::unpackSignedInt($payload->bufferRead(4));
                         return $result;
                     default:
                         Logger::log('Unknown unencrypted packet received: '.\bin2hex($crc), Logger::ERROR);
                         continue 2;
                 }
             } else {
-                \fseek($payload, $pos);
-                $message_key = \fread($payload, 16);
+                $message_key = $head.$payload->bufferRead(4);
                 [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
-                $encrypted_data = \stream_get_contents($payload);
+                $encrypted_data = $payload->bufferRead($l-($pos+16));
                 $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
                 if ($message_key != \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
@@ -384,7 +408,7 @@ final class Endpoint
             $payload = $this->peerTag.$payload;
         }
 
-        $this->socket->write($payload);
+        $this->socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
         return true;
     }
     public function udpPing(): bool
@@ -392,7 +416,18 @@ final class Endpoint
         if ($this->socket === null) {
             return false;
         }
-        $this->socket->write($this->peerTag.Tools::packSignedLong(-1).Tools::packSignedInt(-1).Tools::packSignedInt(-2).Tools::random(8));
+        $data = $this->peerTag.Tools::packSignedLong(-1).Tools::packSignedInt(-1).Tools::packSignedInt(-2).Tools::random(8);
+        $this->socket->getWriteBuffer(\strlen($data))->bufferWrite($data);
         return true;
+    }
+    public function sendInit(): bool
+    {
+        return $this->write($this->handler->encryptPacket([
+            '_' => VoIPController::PKT_INIT,
+            'protocol' => VoIPController::PROTOCOL_VERSION,
+            'min_protocol' => VoIPController::MIN_PROTOCOL_VERSION,
+            'audio_streams' => [VoIPController::CODEC_OPUS],
+            'video_streams' => []
+        ], true));
     }
 }

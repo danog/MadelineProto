@@ -37,7 +37,7 @@ final class MessageHandler
     public int $peerVersion = 0;
 
     public function __construct(
-        private readonly VoIPController $instance,
+        public readonly VoIPController $instance,
         public readonly string $callID
     ) {
     }

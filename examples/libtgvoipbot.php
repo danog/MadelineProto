@@ -40,19 +40,24 @@ class MyEventHandler extends SimpleEventHandler
     #[Handler]
     public function convertCmd((Incoming&Message&HasAudio)|(Incoming&Message&HasDocument) $message): void
     {
-        $pipe = self::getStreamPipe();
-        $sink = $pipe->getSink();
-        async(
-            Ogg::convert(...),
-            $message->media->getStream(),
-            $sink
-        )->finally($sink->close(...));
+        $reply = $message->reply("Conversion in progress...");
+        try {
+            $pipe = self::getStreamPipe();
+            $sink = $pipe->getSink();
+            async(
+                Ogg::convert(...),
+                $message->media->getStream(),
+                $sink
+            )->finally($sink->close(...));
 
-        $this->sendDocument(
-            peer: $message->chatId,
-            file: $pipe->getSource(),
-            fileName: $message->media->fileName.".ogg"
-        );
+            $this->sendDocument(
+                peer: $message->chatId,
+                file: $pipe->getSource(),
+                fileName: $message->media->fileName.".ogg"
+            );
+        } finally {
+            $reply->delete();
+        }
     }
 }
 
