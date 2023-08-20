@@ -398,9 +398,9 @@ final class Magic
             return self::$canConvert;
         }
         try {
-            Ogg::convert(new ReadableBuffer("\0"), new WritableBuffer);
+            Ogg::convert(new LocalFile(__DIR__.'/empty.wav'), new WritableBuffer);
             self::$canConvert = true;
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             self::$canConvert = false;
         }
         return self::$canConvert;
