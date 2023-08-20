@@ -1,2 +1,5 @@
 tests/ export-ignore
 extracted.json export-ignore
+README.md export-ignore
+langs/ export-ignore
+
