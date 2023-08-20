@@ -6,6 +6,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings;
 use PHPUnit\Framework\TestCase;
 
 /** @internal */
@@ -24,19 +25,12 @@ abstract class MadelineTestCase extends TestCase
         if (self::$MadelineProto !== null) {
             return;
         }
+        $settings = new Settings;
+        $settings->getAppInfo()->setApiId((int) \getenv('API_ID'))->setApiHash(\getenv('API_HASH'));
+        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra(__DIR__.'/../../MadelineProto.log')->setLevel(Logger::ULTRA_VERBOSE);
         self::$MadelineProto = new API(
             'testing.madeline',
-            [
-                'app_info' => [
-                    'api_id' => (int) \getenv('API_ID'),
-                    'api_hash' => \getenv('API_HASH'),
-                ],
-                'logger' => [
-                    'logger' => Logger::FILE_LOGGER,
-                    'logger_param' => __DIR__.'/../../MadelineProto.log',
-                    'logger_level' => Logger::ULTRA_VERBOSE,
-                ],
-            ],
+            $settings
         );
         self::$MadelineProto->botLogin(\getenv('BOT_TOKEN'));
     }

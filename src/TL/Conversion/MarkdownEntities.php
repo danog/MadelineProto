@@ -159,17 +159,20 @@ final class MarkdownEntities extends Entities
                     [, $start] = \array_pop($stack);
                     if ($char === '](') {
                         $posClose = $offset;
+                        $link = '';
                         while (($posClose = \strpos($markdown, ')', $posClose)) !== false) {
                             if ($markdown[$posClose-1] === '\\') {
-                                $posClose++;
+                                $link .= \substr($markdown, $offset, ($posClose-$offset)-1);
+                                $offset = $posClose++;
                                 continue;
                             }
+                            $link .= \substr($markdown, $offset, ($posClose-$offset));
                             break;
                         }
                         if ($posClose === false) {
                             throw new AssertionError("Unclosed ) opened @ pos $offset!");
                         }
-                        $entity = self::handleLink(\substr($markdown, $offset, $posClose-$offset));
+                        $entity = self::handleLink($link);
                         $offset = $posClose+1;
                     } else {
                         $entity = match ($char) {
