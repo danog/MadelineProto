@@ -759,6 +759,9 @@
     <ArgumentTypeCoercion>
       <code><![CDATA[$payload->getException()]]></code>
     </ArgumentTypeCoercion>
+    <InvalidThrow>
+      <code><![CDATA[throw $result->getException();]]></code>
+    </InvalidThrow>
     <PossiblyNullReference>
       <code>logger</code>
     </PossiblyNullReference>
@@ -1646,6 +1649,10 @@
     <PossiblyUndefinedVariable>
       <code>$first</code>
     </PossiblyUndefinedVariable>
+    <RedundantCondition>
+      <code><![CDATA[\count($this->eventHandlerHandlers) !== 0 && \is_array($update)]]></code>
+      <code>\is_array($update)</code>
+    </RedundantCondition>
   </file>
   <file src="src/Magic.php">
     <PossiblyUndefinedArrayOffset>
@@ -1850,16 +1857,12 @@
     </MissingPropertyType>
   </file>
   <file src="src/Stream/Common/UdpBufferedStream.php">
-    <InvalidPropertyAssignmentValue>
-      <code><![CDATA[$ctx->getStream($header)]]></code>
-    </InvalidPropertyAssignmentValue>
+    <DocblockTypeContradiction>
+      <code><![CDATA[\strlen($header) === '']]></code>
+    </DocblockTypeContradiction>
     <PossiblyNullReference>
       <code>close</code>
     </PossiblyNullReference>
-    <PropertyNotSetInConstructor>
-      <code>$append</code>
-      <code>$append_after</code>
-    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Stream/ConnectionContext.php">
     <LessSpecificReturnStatement>
@@ -2232,6 +2235,12 @@
     </PossiblyInvalidArrayAccess>
   </file>
   <file src="src/VoIP/Endpoint.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$this->udp]]></code>
+    </InaccessibleProperty>
+    <InvalidReturnType>
+      <code>?array</code>
+    </InvalidReturnType>
     <MissingParamType>
       <code>$stream</code>
     </MissingParamType>
@@ -2245,13 +2254,33 @@
       <code><![CDATA[$result[$x]['timestamp']]]></code>
       <code><![CDATA[$result[$x]['timestamp']]]></code>
     </PossiblyInvalidArrayOffset>
+    <PossiblyNullArgument>
+      <code>$crc</code>
+      <code>$encrypted_data</code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(4)]]></code>
+      <code><![CDATA[$payload->bufferRead(8)]]></code>
+    </PossiblyNullArgument>
     <PossiblyNullReference>
-      <code>read</code>
+      <code>getReadBuffer</code>
     </PossiblyNullReference>
     <PossiblyUndefinedVariable>
       <code>$ack_mask</code>
       <code>$out_seq_no</code>
     </PossiblyUndefinedVariable>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$context->getStream()]]></code>
+    </PropertyTypeCoercion>
+    <RedundantCondition>
+      <code><![CDATA[$this->udp]]></code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code>true</code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/VoIPController.php">
     <InaccessibleProperty>
@@ -2265,6 +2294,9 @@
       <code>$visualization</code>
       <code>$visualization</code>
     </InvalidPropertyAssignmentValue>
+    <PossiblyNullArgument>
+      <code><![CDATA[$this->pendingPing]]></code>
+    </PossiblyNullArgument>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$this->call['g_a']]]></code>
     </PossiblyUndefinedArrayOffset>
@@ -2273,6 +2305,9 @@
       <code>$bestEndpoint</code>
       <code>$messageHandler</code>
     </PropertyNotSetInConstructor>
+    <TypeDoesNotContainType>
+      <code><![CDATA[isset($this->API->logger)]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/Wrappers/DialogHandler.php">
     <InvalidReturnType>
