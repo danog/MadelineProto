@@ -266,7 +266,6 @@ final class VoIPController
     public function complete(array $params): bool
     {
         if ($this->callState !== CallState::ACCEPTED) {
-            $this->log(\sprintf(Lang::$current_lang['call_error_3'], $params['id']));
             return false;
         }
         $this->log(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
@@ -374,26 +373,30 @@ final class VoIPController
     {
         foreach ([true, false] as $udp) {
             foreach ($endpoints as $endpoint) {
-                $this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']] = new Endpoint(
-                    $udp,
-                    '['.$endpoint['ipv6'].']',
-                    $endpoint['port'],
-                    $endpoint['peer_tag'],
-                    true,
-                    $this->public->outgoing,
-                    $this->authKey,
-                    $this->messageHandler
-                );
-                $this->sockets[($udp ? 'udp' : 'tcp').' v4 '.$endpoint['id']] = new Endpoint(
-                    $udp,
-                    $endpoint['ip'],
-                    $endpoint['port'],
-                    $endpoint['peer_tag'],
-                    true,
-                    $this->public->outgoing,
-                    $this->authKey,
-                    $this->messageHandler
-                );
+                if (!isset($this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']])) {
+                    $this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']] = new Endpoint(
+                        $udp,
+                        '['.$endpoint['ipv6'].']',
+                        $endpoint['port'],
+                        $endpoint['peer_tag'],
+                        true,
+                        $this->public->outgoing,
+                        $this->authKey,
+                        $this->messageHandler
+                    );
+                }
+                if (!isset($this->sockets[($udp ? 'udp' : 'tcp').' v4 '.$endpoint['id']])) {
+                    $this->sockets[($udp ? 'udp' : 'tcp').' v4 '.$endpoint['id']] = new Endpoint(
+                        $udp,
+                        $endpoint['ip'],
+                        $endpoint['port'],
+                        $endpoint['peer_tag'],
+                        true,
+                        $this->public->outgoing,
+                        $this->authKey,
+                        $this->messageHandler
+                    );
+                }
             }
         }
         $this->setVoipState(VoIPState::WAIT_INIT);
