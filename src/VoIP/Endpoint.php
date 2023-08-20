@@ -16,8 +16,11 @@
 
 namespace danog\MadelineProto\VoIP;
 
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket;
+use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -43,6 +46,7 @@ final class Endpoint
      * The socket.
      */
     private ?BufferedStreamInterface $socket = null;
+    private ?DeferredFuture $connectFuture = null;
     /**
      * Create endpoint.
      */
@@ -56,37 +60,49 @@ final class Endpoint
         private readonly string $authKey,
         private readonly MessageHandler $handler
     ) {
+        $this->connectFuture = new DeferredFuture;
     }
     public function __wakeup(): void
     {
         $this->udp ??= true;
+        $this->connectFuture = new DeferredFuture;
     }
     public function connect(): void
     {
-        $settings = $this->handler->instance->API->settings->getConnection();
+        try {
+            $settings = $this->handler->instance->API->settings->getConnection();
 
-        $context = new ConnectionContext;
-        $context->setUri($this->__toString())
-                ->setSocketContext(
-                    (new ConnectContext())
-                    ->withConnectTimeout($settings->getTimeout())->withBindTo($settings->getBindTo())
-                )
-                ->addStream(DefaultStream::class);
-        if ($this->udp) {
-            $context->addStream(UdpBufferedStream::class);
-        } else {
-            $context->addStream(BufferedRawStream::class)
-                    ->addStream(ObfuscatedStream::class);
-        }
-        $this->socket = $context->getStream();
-        if ($this->udp) {
-            $this->udpPing();
+            $context = new ConnectionContext;
+            $context->setUri($this->__toString())
+                    ->setSocketContext(
+                        (new ConnectContext())
+                        ->withConnectTimeout($settings->getTimeout())->withBindTo($settings->getBindTo())
+                    )
+                    ->addStream(DefaultStream::class);
+            if ($this->udp) {
+                $context->addStream(UdpBufferedStream::class);
+            } else {
+                $context->addStream(BufferedRawStream::class)
+                        ->addStream(ObfuscatedStream::class);
+            }
+            $this->socket = $context->getStream();
+            $f = $this->connectFuture;
+            $this->connectFuture = null;
+            $f->complete();
+            if ($this->udp) {
+                $this->udpPing();
+            }
+        } catch (\Throwable $e) {
+            $this->socket = null;
+            $this->connectFuture?->complete();
+            throw $e;
         }
     }
     public function __sleep(): array
     {
         $vars = \get_object_vars($this);
         unset($vars['socket']);
+        unset($vars['connectFuture']);
         return \array_keys($vars);
     }
 
@@ -394,6 +410,7 @@ final class Endpoint
      */
     public function write(string $payload): bool
     {
+        $this->connectFuture?->getFuture()?->await();
         if ($this->socket === null) {
             return false;
         }
@@ -411,16 +428,26 @@ final class Endpoint
             $payload = $this->peerTag.$payload;
         }
 
-        $this->socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
+        try {
+            $this->socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
+        } catch (ClosedException) {
+            $this->socket = null;
+            return $this->socket;
+        }
         return true;
     }
-    public function udpPing(): bool
+    private function udpPing(): bool
     {
         if ($this->socket === null) {
             return false;
         }
         $data = $this->peerTag.Tools::packSignedLong(-1).Tools::packSignedInt(-1).Tools::packSignedInt(-2).Tools::random(8);
-        $this->socket->getWriteBuffer(\strlen($data))->bufferWrite($data);
+        try {
+            $this->socket->getWriteBuffer(\strlen($data))->bufferWrite($data);
+        } catch (ClosedException) {
+            $this->socket = null;
+            return $this->socket;
+        }
         return true;
     }
     public function sendInit(): bool
