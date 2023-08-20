@@ -32,7 +32,9 @@ use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
+use function Amp\async;
 use function Amp\delay;
+use function Amp\Future\await;
 
 /** @internal */
 final class VoIPController
@@ -406,8 +408,9 @@ final class VoIPController
     }
     private function connectToAll(): void
     {
+        $promises = [];
         foreach ($this->sockets as $socket) {
-            EventLoop::queue(function () use ($socket): void {
+            $promise = async(function () use ($socket): void {
                 try {
                     $this->log("Connecting to $socket...");
                     $socket->connect();
@@ -417,7 +420,11 @@ final class VoIPController
                     $this->log("Got error while connecting to $socket: $e");
                 }
             });
+            if (!isset($this->bestEndpoint) || $socket === $this->bestEndpoint) {
+                $promises []= $promise;
+            }
         }
+        await($promises);
     }
     /**
      * Handle incoming packet.

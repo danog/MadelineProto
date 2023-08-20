@@ -47,7 +47,7 @@ final class Endpoint
      * Create endpoint.
      */
     public function __construct(
-        private readonly bool $udp,
+        public readonly bool $udp,
         private readonly string $ip,
         private readonly int $port,
         private readonly string $peerTag,
@@ -57,11 +57,14 @@ final class Endpoint
         private readonly MessageHandler $handler
     ) {
     }
+    public function __wakeup()
+    {
+        $this->udp ??= true;
+    }
     public function connect(): void
     {
         $settings = $this->handler->instance->API->settings->getConnection();
 
-        $this->udp ??= true;
         $context = new ConnectionContext;
         $context->setUri($this->__toString())
                 ->setSocketContext(
