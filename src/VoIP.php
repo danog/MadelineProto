@@ -22,6 +22,9 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 
+/**
+ * This update represents a VoIP Telegram call.
+ */
 final class VoIP extends Update implements SimpleFilters
 {
     /** Phone call ID */

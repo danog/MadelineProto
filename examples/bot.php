@@ -112,18 +112,6 @@ class MyEventHandler extends SimpleEventHandler
         $this->sendMessageToAdmins("The bot is online, current time ".date(DATE_RFC850)."!");
     }
 
-    private int $lastLog = 0;
-    /**
-     * Handles updates to an in-progress broadcast.
-     */
-    public function onUpdateBroadcastProgress(Progress $progress): void
-    {
-        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
-            $this->lastLog = time();
-            $this->sendMessageToAdmins((string) $progress);
-        }
-    }
-
     /**
      * Handle incoming updates from users, chats and channels.
      */
@@ -223,6 +211,19 @@ class MyEventHandler extends SimpleEventHandler
             drop_author: true,
             pin: true,
         );
+    }
+
+    private int $lastLog = 0;
+    /**
+     * Handles updates to an in-progress broadcast.
+     */
+    #[Handler]
+    public function handleBroadcastProgress(Progress $progress): void
+    {
+        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
+            $this->lastLog = time();
+            $this->sendMessageToAdmins((string) $progress);
+        }
     }
 
     #[FilterCommand('echo')]

@@ -128,9 +128,6 @@ trait UpdateHandler
     private function eventUpdateHandler(array $update): void
     {
         $updateType = $update['_'];
-        if ($update['_'] === 'updateBroadcastProgress') {
-            $update = $update['progress'];
-        }
         if ($f = $this->event_handler_instance->waitForInternalStart()) {
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
@@ -148,6 +145,9 @@ trait UpdateHandler
                     $closure($obj);
                 }
             }
+        }
+        if ($updateType === 'updateBroadcastProgress') {
+            $update = $update['progress'];
         }
         if (isset($this->eventHandlerMethods[$updateType])) {
             foreach ($this->eventHandlerMethods[$updateType] as $closure) {
@@ -345,6 +345,7 @@ trait UpdateHandler
                 ? new InlineGameQuery($this, $update)
                 : new InlineButtonQuery($this, $update),
             'updatePhoneCall' => $update['phone_call'],
+            'updateBroadcastProgress' => $update['progress'],
             default => null
         };
     }

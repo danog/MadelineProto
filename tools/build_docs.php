@@ -13,8 +13,6 @@
 
 use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Lang;
@@ -171,11 +169,16 @@ foreach ($orderedfiles as $key => $filename) {
     $lines = preg_replace_callback('/\<\!--\s+cut_here\s+(\S+)\s+-->.*\<\!--\s+cut_here_end\s+\1\s+--\>/sim', function ($matches) {
         [, $match] = $matches;
         if ($match === "concretefilters") {
-            $result = [Update::class, AbstractMessage::class, Message::class, ServiceMessage::class];
-            $result = array_merge($result, ClassFinder::getClassesInNamespace(
-                \danog\MadelineProto\EventHandler\Message::class,
+            $result = ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto::class,
                 ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
-            ));
+            );
+            $result []= ServiceMessage::class;
+            $result = array_filter(
+                $result,
+                fn ($class) => is_subclass_of($class, Update::class)
+            );
+            sort($result);
             $data = printTypes($result, $match);
         } elseif ($match === "simplefilters") {
             $result = ClassFinder::getClassesInNamespace(
