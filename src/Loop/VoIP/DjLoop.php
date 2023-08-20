@@ -300,7 +300,7 @@ final class DjLoop extends VoIPLoop
     }
     /**
      * Get info about the audio currently being played.
-     * 
+     *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
      */
     public function getCurrent(): LocalFile|RemoteUrl|string|null

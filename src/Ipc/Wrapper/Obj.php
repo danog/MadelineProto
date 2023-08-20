@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
+use danog\MadelineProto\Ipc\ClientAbstract;
 use danog\MadelineProto\Ipc\Wrapper;
 
 /**
@@ -30,7 +31,7 @@ abstract class Obj
      *
      * @param array<string, int> $methods
      */
-    public function __construct(private Wrapper $wrapper, private array $methods)
+    public function __construct(private ClientAbstract $wrapper, private array $methods)
     {
     }
     /**

@@ -155,6 +155,24 @@ trait AuthKeyHandler
     }
 
     /**
+     * Play file in call, blocking until the file has finished playing if a stream is provided.
+     *
+     * @internal
+     */
+    public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        if (!isset($this->calls[$id])) {
+            return;
+        }
+        $this->calls[$id]->play($file);
+        if ($file instanceof ReadableStream) {
+            $deferred = new DeferredFuture;
+            $file->onClose($deferred->complete(...));
+            $deferred->getFuture()->await();
+        }
+    }
+
+    /**
      * When called, skips to the next file in the playlist.
      */
     public function skipPlay(int $id): void
@@ -179,8 +197,28 @@ trait AuthKeyHandler
     }
 
     /**
+     * Play files on hold in call.
+     *
+     * @internal
+     */
+    public function callPlayOnHoldBlocking(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        if (!isset($this->calls[$id])) {
+            return;
+        }
+        $this->calls[$id]->playOnHold(...$files);
+        foreach ($files as $file) {
+            if ($file instanceof ReadableStream) {
+                $deferred = new DeferredFuture;
+                $file->onClose($deferred->complete(...));
+                $deferred->getFuture()->await();
+            }
+        }
+    }
+
+    /**
      * Get the file that is currently being played.
-     * 
+     *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
      */
     public function callGetCurrent(int $id): RemoteUrl|LocalFile|string|null

@@ -16,11 +16,12 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
+use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableStream as AmpReadableStream;
 use Amp\ByteStream\ReadableStreamIteratorAggregate;
 use Amp\Cancellation;
 use IteratorAggregate;
-use Webmozart\Assert\Assert;
+use Revolt\EventLoop;
 
 use function Amp\async;
 
@@ -34,10 +35,25 @@ class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
 
     public function read(?Cancellation $cancellation = null): ?string
     {
-        if ($cancellation) {
-            return async($this->__call(...), 'read')->await($cancellation);
-        }
-        return $this->__call('read');
+        return async(function (): ?string {
+            $result = null;
+            try {
+                $result = $this->__call('read');
+            } catch (ClosedException $e) {
+                if ($this->closeCallbacks) {
+                    \array_map(EventLoop::queue(...), $this->closeCallbacks);
+                    $this->closeCallbacks = [];
+                }
+                throw $e;
+            }
+            if ($result === null) {
+                if ($this->closeCallbacks) {
+                    \array_map(EventLoop::queue(...), $this->closeCallbacks);
+                    $this->closeCallbacks = [];
+                }
+            }
+            return $result;
+        })->await($cancellation);
     }
 
     /**

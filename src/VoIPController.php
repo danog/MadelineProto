@@ -509,9 +509,9 @@ final class VoIPController
         }
     }
 
-    public function log(string $message): void
+    public function log(string $message, int $level = Logger::NOTICE): void
     {
-        EventLoop::queue($this->API->logger->logger(...), $message);
+        EventLoop::queue($this->API->logger->logger(...), $message, $level);
     }
     private bool $muted = true;
     /**

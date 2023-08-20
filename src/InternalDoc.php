@@ -283,6 +283,8 @@ abstract class InternalDoc
     }
     /**
      * Get the file that is currently being played.
+     *
+     * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
      */
     public function callGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
     {

@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Ipc;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\DeferredCancellation;
-use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -38,7 +37,6 @@ use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\async;
-use function Amp\Future\await;
 
 /**
  * IPC client.
@@ -163,21 +161,10 @@ final class Client extends ClientAbstract
      */
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        $future = null;
         $params = [$id, &$file];
-        if ($file instanceof ReadableStream) {
-            $deferred = new DeferredFuture;
-            $file->onClose(function () use ($deferred) {
-                $deferred->complete();
-            });
-            $future = $deferred->getFuture();
-        }
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($file, true);
-        $this->__call('callPlay', $wrapper);
-        if ($future) {
-            $future->await();
-        }
+        $this->__call('callPlayBlocking', $wrapper);
     }
 
     /**
@@ -186,28 +173,14 @@ final class Client extends ClientAbstract
     public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
         $params = [$id, $files];
-        $futures = [];
-        foreach ($files as $file) {
-            if ($file instanceof ReadableStream) {
-                $deferred = new DeferredFuture;
-                $file->onClose(function () use ($deferred) {
-                    $deferred->complete();
-                });
-                $futures []= $deferred->getFuture();
-            }
-        }
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         foreach ($params as &$param) {
             if ($param instanceof ReadableStream) {
                 $wrapper->wrap($param, true);
             }
         }
-        $this->__call('callPlayOnHold', $wrapper);
-        if ($futures) {
-            await($futures);
-        }
+        $this->__call('callPlayOnHoldBlocking', $wrapper);
     }
-
 
     /**
      * Upload file from callable.

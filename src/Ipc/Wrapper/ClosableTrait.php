@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
-use AssertionError;
+use Revolt\EventLoop;
 
 /**
  * @internal
@@ -24,11 +24,19 @@ use AssertionError;
 trait ClosableTrait
 {
     /**
+     * @var list<Closure(): void>
+     */
+    private array $closeCallbacks = [];
+    /**
      * Closes the resource, marking it as unusable.
      * Whether pending operations are aborted or not is implementation dependent.
      */
     public function close(): void
     {
+        if ($this->closeCallbacks) {
+            \array_map(EventLoop::queue(...), $this->closeCallbacks);
+            $this->closeCallbacks = [];
+        }
         $this->__call('close');
     }
 
@@ -49,6 +57,11 @@ trait ClosableTrait
      */
     public function onClose(\Closure $onClose): void
     {
-        throw new AssertionError("Not implemented");
+        $this->closeCallbacks []= $onClose;
+    }
+
+    final public function __destruct()
+    {
+        $this->close();
     }
 }

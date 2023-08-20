@@ -135,7 +135,7 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Get the file that is currently being played.
-     * 
+     *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
      */
     public function getCurrent(): RemoteUrl|LocalFile|string|null
