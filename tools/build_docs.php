@@ -115,6 +115,7 @@ $order = [
     'PROXY',
     'ASYNC',
     'FAQ',
+    'UPGRADING',
     'USING_METHODS',
     'CONTRIB',
     'TEMPLATES',

@@ -88,7 +88,8 @@ final class ExitFailure
             try {
                 $trace = $refl->getProperty($prop);
                 $trace->setValue($exception, $this->{$prop});
-            } catch (Throwable) {}
+            } catch (Throwable) {
+            }
         }
 
         if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {

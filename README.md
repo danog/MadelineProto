@@ -236,6 +236,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
         * [Async flock](https://docs.madelineproto.xyz/docs/ASYNC.html#async-flock)
       * [MadelineProto async loop APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis)
 * [FAQ](https://docs.madelineproto.xyz/docs/FAQ.html) - Here's a list of common MadelineProto questions and answers.
+* [Upgrading from MadelineProto v7 to v8](https://docs.madelineproto.xyz/docs/UPGRADING.html) - MadelineProto v8 is a major MadelineProto update, that removes a large number of long-deprecated APIs: I've created this upgrade checklist, to simplify the upgrade process.  
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html) - There are simplifications for many, if not all of, these methods.
   * [Named arguments (PHP 8+)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
@@ -702,6 +703,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#openfileappendonly-string-path-amp-file-file" name="openFileAppendOnly">Opens a file in append-only mode: openFileAppendOnly</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.receivedCall.html" name="phone.receivedCall">Optional: notify the server that the user is currently busy in a call: this will automatically refuse all incoming phone calls until the current phone call is ended: phone.receivedCall</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#updatesettings-settingsabstract-settings-void" name="updateSettings">Parse, update and store settings: updateSettings</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#pauseplay-int-id-void" name="pausePlay">Pauses playback of the current audio file in the call: pausePlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#validateeventhandlerclass-class-string-eventhandler-class-list-eventhandlerissue" name="validateEventHandlerClass">Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements: validateEventHandlerClass</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updatePinnedMessage.html" name="messages.updatePinnedMessage">Pin a message: messages.updatePinnedMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updatePinnedForumTopic.html" name="channels.updatePinnedForumTopic">Pin or unpin forum topics: channels.updatePinnedForumTopic</a>
@@ -758,6 +760,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resetNotifySettings.html" name="account.resetNotifySettings">Resets all notification settings from users and groups: account.resetNotifySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resolvePhone.html" name="contacts.resolvePhone">Resolve a phone number to get user info, if their privacy settings allow it: contacts.resolvePhone</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#restart-void" name="restart">Restart update loop: restart</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#resumeplay-int-id-void" name="resumePlay">Resumes playback of the current audio file in the call: resumePlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rethrow-throwable-e-void" name="rethrow">Rethrow exception into event loop: rethrow</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAllDrafts.html" name="messages.getAllDrafts">Return all message drafts.  : messages.getAllDrafts</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsettings-danog-madelineproto-settings" name="getSettings">Return current settings: getSettings</a>
@@ -910,6 +913,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#skipplay-int-id-void" name="skipPlay">When called, skips to the next file in the playlist: skipPlay</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateDeviceLocked.html" name="account.updateDeviceLocked">When client-side passcode lock feature is enabled, will not show message texts in incoming PUSH notifications: account.updateDeviceLocked</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#fullchatlastupdated-mixed-id-int" name="fullChatLastUpdated">When was full info for this chat last cached: fullChatLastUpdated</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isplaypaused-int-id-bool" name="isPlayPaused">Whether the currently playing audio file is paused: isPlayPaused</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContactSignUpNotification.html" name="account.getContactSignUpNotification">Whether the user will receive notifications when contacts sign up: account.getContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isaltervista-bool" name="isAltervista">Whether this is altervista: isAltervista</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipc-bool" name="isIpc">Whether we're an IPC client instance: isIpc</a>
