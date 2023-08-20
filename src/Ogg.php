@@ -534,6 +534,18 @@ final class Ogg
         self::convertWav($proc->getStdout(), $oggOut, $cancellation);
     }
 
+    /**
+     * Validate that the specified OGG OPUS file can be played directly by MadelineProto, without doing any conversion.
+     *
+     * @param LocalFile $f File to open.
+     * @throws \Throwable If validation fails.
+     */
+    public static function validateOgg(LocalFile $f): void
+    {
+        foreach ((new self($f))->opusPackets as $p) {
+        }
+    }
+
     private const CDEF = '
         typedef struct OpusEncoder OpusEncoder;
 
