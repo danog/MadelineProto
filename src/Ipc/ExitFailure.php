@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TL\Exception;
+use ReflectionObject;
 use RuntimeException;
 use Throwable;
 
@@ -31,6 +32,10 @@ final class ExitFailure
     private string $type;
 
     private string $message;
+
+    private string $file;
+
+    private int $line;
 
     private int|string $code;
 
@@ -48,6 +53,8 @@ final class ExitFailure
         $this->type = $exception::class;
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
+        $this->file = $exception->getFile();
+        $this->line = $exception->getLine();
         $this->trace = ContextFlattenThrowableBacktrace($exception);
         if (\method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
@@ -74,6 +81,12 @@ final class ExitFailure
             }
         } catch (Throwable $e) {
             $exception = new RuntimeException($this->message, $this->code, $previous);
+        }
+
+        $refl = new ReflectionObject($exception);
+        foreach (['trace', 'line', 'file'] as $prop) {
+            $trace = $refl->getProperty($prop);
+            $trace->setValue($exception, $this->{$prop});
         }
 
         if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {

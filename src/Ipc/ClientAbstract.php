@@ -158,6 +158,10 @@ abstract class ClientAbstract
         $id = $this->id++;
         $this->requests[$id] = [$function, $arguments, $deferred];
         $this->server->send([$function, $arguments]);
-        return $deferred->getFuture()->await();
+        $result = $deferred->getFuture()->await();
+        if ($result instanceof ExitFailure) {
+            throw $result->getException();
+        }
+        return $result;
     }
 }

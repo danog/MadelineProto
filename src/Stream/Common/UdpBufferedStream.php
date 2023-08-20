@@ -31,6 +31,8 @@ use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\WriteBufferInterface;
 
+use function Amp\Socket\socketConnector;
+
 /**
  * UDP stream wrapper.
  *
@@ -45,7 +47,13 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = $ctx->getStream($header);
+        $ctx = $ctx->getCtx();
+        $uri = $ctx->getUri();
+        $this->stream = (($this->connector ?? socketConnector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
+        if (\strlen($header) === '') {
+            return;
+        }
+        $this->stream->write($header);
     }
     /**
      * Async close.
@@ -114,9 +122,8 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
     public function getWriteBuffer(int $length, string $append = ''): WriteBufferInterface
     {
         return new class($length, $append, $this) implements WriteBufferInterface {
-            private int $length;
-            private string $append;
-            private int $append_after;
+            private string $append = '';
+            private int $append_after = 0;
             private RawStreamInterface $stream;
             private string $data = '';
             /**

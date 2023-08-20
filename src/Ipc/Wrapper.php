@@ -20,7 +20,6 @@ use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Parallel\Context\Internal\ExitFailure;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
@@ -115,7 +114,7 @@ final class Wrapper extends ClientAbstract
                 $this->callbacks[$id] = [$callback, $method];
                 $ids[$method] = $id;
             }
-            $class = Obj::class;
+            $class = null;
             if ($callback instanceof ByteStreamReadableStream) {
                 $class = \method_exists($callback, 'seek') ? ReadableStream::class : SeekableReadableStream::class;
             } elseif ($callback instanceof ByteStreamWritableStream) {
@@ -124,6 +123,9 @@ final class Wrapper extends ClientAbstract
                 $class = FileCallback::class;
             } elseif ($callback instanceof Cancellation) {
                 $class = WrapperCancellation::class;
+            }
+            if (!$class) {
+                return;
             }
             $callback = [$class, $ids]; // Will be re-filled later
             $this->callbackIds[] = &$callback;
