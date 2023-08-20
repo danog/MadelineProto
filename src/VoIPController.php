@@ -409,7 +409,7 @@ final class VoIPController
     private function connectToAll(): void
     {
         $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
-            if (\microtime(true) - $this-lastIncomingTimestamp > 10) {
+            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
                 $this->discard(DiscardReason::DISCONNECTED);
             }
         });
