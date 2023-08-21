@@ -500,7 +500,9 @@ final class VoIPController
             EventLoop::queue(function () use ($endpoint): void {
                 while ($this->voipState->value <= VoIPState::WAIT_INIT_ACK->value) {
                     $this->log("Sending PKT_INIT to $endpoint...");
-                    $endpoint->sendInit();
+                    if (!$endpoint->sendInit()) {
+                        return;
+                    }
                     delay(0.02);
                 }
             });
