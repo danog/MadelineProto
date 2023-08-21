@@ -503,7 +503,7 @@ final class VoIPController
                     if (!$endpoint->sendInit()) {
                         return;
                     }
-                    delay(0.02);
+                    delay(0.5);
                 }
             });
             $this->log("Started read loop in $endpoint!");
