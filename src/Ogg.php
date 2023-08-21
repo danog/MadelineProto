@@ -613,18 +613,10 @@ final class Ogg
                 $err = $err->cdata;
             }
             if ($err < 0) {
-                throw new AssertionError("opus returned: ".$opus->opus_strerror($len));
+                throw new AssertionError("opus returned: ".$opus->opus_strerror($err));
             }
         };
         $err = FFI::new('int');
-        $encoder = $opus->opus_encoder_create(48000, 2, self::OPUS_APPLICATION_AUDIO, FFI::addr($err));
-        $checkErr($err);
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_COMPLEXITY_REQUEST, 10));
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_PACKET_LOSS_PERC_REQUEST, 1));
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_INBAND_FEC_REQUEST, 1));
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_SIGNAL_REQUEST, self::OPUS_SIGNAL_MUSIC));
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
-        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
         $read = Tools::openBuffered($wavIn, $cancellation);
 
@@ -654,6 +646,15 @@ final class Ogg
         $sampleCount = 0.06 * $header['sampleRate'];
         $chunkSize = (int) ($sampleCount * $header['channels'] * ($header['bitsPerSample'] >> 3));
         $shift = (int) \log($header['channels'] * ($header['bitsPerSample'] >> 3), 2);
+
+        $encoder = $opus->opus_encoder_create(48000, $header['channels'], self::OPUS_APPLICATION_AUDIO, FFI::addr($err));
+        $checkErr($err);
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_COMPLEXITY_REQUEST, 10));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_PACKET_LOSS_PERC_REQUEST, 1));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_INBAND_FEC_REQUEST, 1));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_SIGNAL_REQUEST, self::OPUS_SIGNAL_MUSIC));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BANDWIDTH_REQUEST, self::OPUS_BANDWIDTH_FULLBAND));
+        $checkErr($opus->opus_encoder_ctl($encoder, self::OPUS_SET_BITRATE_REQUEST, 130*1000));
 
         $out = $oggOut instanceof LocalFile
             ? openFile($oggOut->file, 'w')
