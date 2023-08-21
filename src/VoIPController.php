@@ -638,9 +638,9 @@ final class VoIPController
     /**
      * Whether the file we're currently playing is paused.
      */
-    public function isPaused(): void
+    public function isPaused(): bool
     {
-        $this->diskJockey->isAudioPaused();
+        return $this->diskJockey->isAudioPaused();
     }
     /**
      * Files to play on hold.

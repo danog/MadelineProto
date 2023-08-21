@@ -24,6 +24,7 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Ipc\Client;
@@ -304,6 +305,13 @@ abstract class InternalDoc
     public function callPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
     {
         $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
+    }
+    /**
+     * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
+     */
+    public static function canConvertOgg(): bool
+    {
+        return \danog\MadelineProto\Tools::canConvertOgg();
     }
     /**
      * Cancel a running broadcast.

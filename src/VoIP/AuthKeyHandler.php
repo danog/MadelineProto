@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIPController;
 use phpseclib3\Math\BigInteger;
@@ -163,7 +164,7 @@ trait AuthKeyHandler
      */
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        if (!Magic::canConvertOgg()) {
+        if (!Tools::canConvertOgg()) {
             if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
                 Ogg::validateOgg($file);
             } else {
@@ -236,7 +237,7 @@ trait AuthKeyHandler
      */
     public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        if (!Magic::canConvertOgg()) {
+        if (!Tools::canConvertOgg()) {
             foreach ($files as $file) {
                 if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
                     Ogg::validateOgg($file);

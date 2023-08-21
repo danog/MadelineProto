@@ -19,7 +19,6 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Connection\ReconnectingRedisLink;
 use Amp\Redis\RedisClient;
 use Amp\Redis\RedisConfig;
-use Amp\Redis\RemoteExecutorFactory;
 use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 

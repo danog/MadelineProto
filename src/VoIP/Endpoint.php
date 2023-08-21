@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\VoIP;
 
 use Amp\DeferredFuture;
-use Amp\Future;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket;
 use Amp\Websocket\ClosedException;
@@ -88,6 +87,7 @@ final class Endpoint
             $this->socket = $context->getStream();
             $f = $this->connectFuture;
             $this->connectFuture = null;
+            assert($f !== null);
             $f->complete();
             if ($this->udp) {
                 $this->udpPing();
@@ -101,8 +101,8 @@ final class Endpoint
     public function __sleep(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['socket']);
-        unset($vars['connectFuture']);
+        unset($vars['socket'], $vars['connectFuture']);
+
         return \array_keys($vars);
     }
 
@@ -432,7 +432,7 @@ final class Endpoint
             $this->socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
         } catch (ClosedException) {
             $this->socket = null;
-            return $this->socket;
+            return false;
         }
         return true;
     }
@@ -446,7 +446,7 @@ final class Endpoint
             $this->socket->getWriteBuffer(\strlen($data))->bufferWrite($data);
         } catch (ClosedException) {
             $this->socket = null;
-            return $this->socket;
+            return false;
         }
         return true;
     }

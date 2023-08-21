@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableBuffer;
 use Amp\Cancellation;
 use Amp\File\File;
 use Amp\Http\Client\HttpClient;
@@ -873,5 +874,23 @@ abstract class Tools extends AsyncTools
         }
 
         return $issues;
+    }
+
+    private static ?bool $canConvert = null;
+    /**
+     * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
+     */
+    public static function canConvertOgg(): bool
+    {
+        if (self::$canConvert !== null) {
+            return self::$canConvert;
+        }
+        try {
+            Ogg::convert(new LocalFile(__DIR__.'/empty.wav'), new WritableBuffer);
+            self::$canConvert = true;
+        } catch (\Throwable $e) {
+            self::$canConvert = false;
+        }
+        return self::$canConvert;
     }
 }
