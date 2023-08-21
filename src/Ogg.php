@@ -580,6 +580,7 @@ final class Ogg
         const char *opus_strerror(int error);
         const char *opus_get_version_string(void);
     ';
+    private static ?FFI $FFI = null;
     /**
      * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
      *
@@ -591,13 +592,18 @@ final class Ogg
         LocalFile|WritableStream $oggOut,
         ?Cancellation $cancellation = null
     ): void {
-        foreach (['libopus.so', 'libopus.so.0'] as $k => $lib) {
-            try {
-                $opus = FFI::cdef(self::CDEF, $lib);
-                break;
-            } catch (Throwable $e) {
-                if ($k) {
-                    throw $e;
+        if (isset(self::$FFI)) {
+            $opus = self::$FFI;
+        } else {
+            foreach (['libopus.so', 'libopus.so.0'] as $k => $lib) {
+                try {
+                    $opus = FFI::cdef(self::CDEF, $lib);
+                    self::$FFI = $opus;
+                    break;
+                } catch (Throwable $e) {
+                    if ($k) {
+                        throw $e;
+                    }
                 }
             }
         }
