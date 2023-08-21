@@ -113,18 +113,8 @@ class MyEventHandler extends EventHandler
                     $url = "http://$url";
                 }
             }
-            $id = $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId]);
-            if (!isset($id['id'])) {
-                $this->report(json_encode($id));
-                foreach ($id['updates'] as $updat) {
-                    if (isset($updat['id'])) {
-                        $id = $updat['id'];
-                        break;
-                    }
-                }
-            } else {
-                $id = $id['id'];
-            }
+            $msg = $this->sendMessage(peer: $peerId, message: 'Preparing...', replyToMsgId: $messageId);
+            $id = $msg->id;
 
             $url = new FileCallback(
                 $url,
@@ -157,11 +147,7 @@ class MyEventHandler extends EventHandler
                 parse_mode: ParseMode::MARKDOWN,
             );
 
-            if (in_array($peer['type'], ['channel', 'supergroup'])) {
-                $this->channels->deleteMessages(['channel' => $peerId, 'id' => [$id]]);
-            } else {
-                $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
-            }
+            $msg->delete();
         } catch (Throwable $e) {
             if (strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && strpos($e->getMessage(), 'URI') === false) {
                 $this->report((string) $e);
