@@ -112,9 +112,10 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /**
      * Get a readable amp stream with the file contents.
      *
+     * @param ?(callable(float, float, float): void) $cb Progress callback
      */
-    public function getStream(): ReadableStream
+    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
     {
-        return $this->getClient()->downloadToReturnedStream($this);
+        return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end);
     }
 }
