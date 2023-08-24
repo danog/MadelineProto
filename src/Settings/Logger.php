@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Settings;
 
@@ -43,49 +55,6 @@ final class Logger extends SettingsAbstract
      */
     protected int $maxSize = 1 * 1024 * 1024;
 
-    public function mergeArray(array $settings): void
-    {
-        if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
-            $settings['logger']['logger_param'] = $settings['logger']['param'];
-        }
-        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
-            $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-        }
-        switch ($settings['logger']['logger_level'] ?? null) {
-            case 'ULTRA_VERBOSE':
-                $settings['logger']['logger_level'] = 5;
-                break;
-            case 'VERBOSE':
-                $settings['logger']['logger_level'] = 4;
-                break;
-            case 'NOTICE':
-                $settings['logger']['logger_level'] = 3;
-                break;
-            case 'WARNING':
-                $settings['logger']['logger_level'] = 2;
-                break;
-            case 'ERROR':
-                $settings['logger']['logger_level'] = 1;
-                break;
-            case 'FATAL ERROR':
-                $settings['logger']['logger_level'] = 0;
-                break;
-        }
-        if (isset($settings['logger']['logger'])) {
-            $this->setType($settings['logger']['logger']);
-        }
-        if (isset($settings['logger']['logger_param'])) {
-            $this->setExtra($settings['logger']['logger_param']);
-        }
-        if (isset($settings['logger']['logger_level'])) {
-            $this->setLevel($settings['logger']['logger_level']);
-        }
-        if (isset($settings['logger']['max_size'])) {
-            $this->setMaxSize($settings['logger']['max_size'] ?? 1 * 1024 * 1024);
-        }
-
-        $this->init();
-    }
     public function __construct()
     {
         $this->type = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')

@@ -1,11 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TL\Exception;
+use ReflectionObject;
 use RuntimeException;
 use Throwable;
 
@@ -19,6 +32,10 @@ final class ExitFailure
     private string $type;
 
     private string $message;
+
+    private string $file;
+
+    private int $line;
 
     private int|string $code;
 
@@ -36,6 +53,8 @@ final class ExitFailure
         $this->type = $exception::class;
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
+        $this->file = $exception->getFile();
+        $this->line = $exception->getLine();
         $this->trace = ContextFlattenThrowableBacktrace($exception);
         if (\method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
@@ -62,6 +81,15 @@ final class ExitFailure
             }
         } catch (Throwable $e) {
             $exception = new RuntimeException($this->message, $this->code, $previous);
+        }
+
+        $refl = new ReflectionObject($exception);
+        foreach (['trace', 'line', 'file'] as $prop) {
+            try {
+                $trace = $refl->getProperty($prop);
+                $trace->setValue($exception, $this->{$prop});
+            } catch (Throwable) {
+            }
         }
 
         if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {

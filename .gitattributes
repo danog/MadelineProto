@@ -1,1 +1,7 @@
 tests/ export-ignore
+extracted.json export-ignore
+README.md export-ignore
+CHANGELOG.md export-ignore
+psalm-baseline.xml export-ignore
+langs/ export-ignore
+

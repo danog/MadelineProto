@@ -280,7 +280,7 @@ final class Logger
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
                             \ftruncate($stdout->getResource(), 0);
-                            self::log("Automatically truncated logfile to $maxSize");
+                            self::log("Automatically truncated logfile to $maxSize, MadelineProto ".\danog\MadelineProto\API::RELEASE);
                         }
                     },
                 );

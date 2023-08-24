@@ -20,18 +20,22 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Broadcast;
 
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 use JsonSerializable;
 
 /**
  * Broadcast progress.
  */
-final class Progress implements JsonSerializable
+final class Progress extends Update implements JsonSerializable
 {
     /**
      * Completion percentage.
      */
     public readonly int $percent;
+    /** @internal */
     public function __construct(
+        MTProto $API,
         /** Broadcast ID */
         public readonly int $broadcastId,
         /** Broadcast status */
@@ -43,12 +47,8 @@ final class Progress implements JsonSerializable
         /** Failed number of peers */
         public readonly int $failCount,
     ) {
+        parent::__construct($API);
         $this->percent = $pendingCount ? (int) (($successCount+$failCount)*100/$pendingCount) : 0;
-    }
-    /** @internal */
-    public function jsonSerialize(): mixed
-    {
-        return \get_object_vars($this);
     }
     public function __toString(): string
     {

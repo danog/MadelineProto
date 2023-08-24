@@ -303,11 +303,6 @@ final class Magic
             }
         }
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
-        if (\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(VoIP::PHP_LIBTGVOIP_VERSION, ['1.5.0'], true)) {
-                throw new Exception(\hex2bin(Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
-            }
-        }
         self::$hasOpenssl = \extension_loaded('openssl');
         self::$emojis = \json_decode(self::JSON_EMOJIS);
         self::$zero = new BigInteger(0);

@@ -29,6 +29,8 @@ use Throwable;
 /**
  * Ping loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class PingLoop extends Loop

@@ -4,7 +4,7 @@ use danog\MadelineProto\Lang;
 
 /**
  * Merge extracted docs.
- *
+ * @internal
  */
 function mergeExtracted(): void
 {

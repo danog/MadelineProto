@@ -39,6 +39,8 @@ use function substr;
 /**
  * Socket read loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class ReadLoop extends Loop
@@ -205,9 +207,7 @@ final class ReadLoop extends Loop
                 throw $e;
             }
 
-            $sideEffects = $this->API->getTL()->getSideEffects();
             $message = new MTProtoIncomingMessage($deserialized, $message_id);
-            $message->setSideEffects($sideEffects);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }

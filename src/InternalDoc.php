@@ -8,6 +8,7 @@
 namespace danog\MadelineProto;
 
 use __PHP_Incomplete_Class;
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
@@ -20,14 +21,15 @@ use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Keyboard;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\Ipc\Server;
-use Generator;
 
 /** @psalm-suppress PossiblyNullReference */
 abstract class InternalDoc
@@ -146,12 +148,10 @@ abstract class InternalDoc
     }
     /**
      * Accept call.
-     *
-     * @param array $call Call
      */
-    public function acceptCall(array $call): bool
+    public function acceptCall(int $id): void
     {
-        return $this->wrapper->getAPI()->acceptCall($call);
+        $this->wrapper->getAPI()->acceptCall($id);
     }
     /**
      * Accept secret chat.
@@ -161,39 +161,6 @@ abstract class InternalDoc
     public function acceptSecretChat(array $params): void
     {
         $this->wrapper->getAPI()->acceptSecretChat($params);
-    }
-    /**
-     * Call promise $b after promise $a.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $a Promise A
-     * @param Generator|Future $b Promise B
-     * @psalm-suppress InvalidScope
-     */
-    public static function after(\Generator|\Amp\Future $a, \Generator|\Amp\Future $b): \Amp\Future
-    {
-        return \danog\MadelineProto\AsyncTools::after($a, $b);
-    }
-    /**
-     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
-     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param array<(Generator|Future)> $promises Promises
-     */
-    public static function all(array $promises)
-    {
-        return \danog\MadelineProto\AsyncTools::all($promises);
-    }
-    /**
-     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param array<(Future|Generator)> $promises Promises
-     */
-    public static function any(array $promises)
-    {
-        return \danog\MadelineProto\AsyncTools::any($promises);
     }
     /**
      * Create array.
@@ -301,18 +268,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin);
     }
     /**
-     * Convert generator, promise or any other value to a promise.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @template TReturn
-     * @param Generator<mixed, mixed, mixed, TReturn>|Future<TReturn>|TReturn $promise
-     * @return Future<TReturn>
-     */
-    public static function call(mixed $promise): \Amp\Future
-    {
-        return \danog\MadelineProto\AsyncTools::call($promise);
-    }
-    /**
      * Fork a new green thread and execute the passed function in the background.
      *
      * @template T
@@ -329,13 +284,34 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::callFork($callable, ...$args);
     }
     /**
-     * Get call status.
+     * Get the file that is currently being played.
      *
-     * @param int $id Call ID
+     * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
      */
-    public function callStatus(int $id): int
+    public function callGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
     {
-        return $this->wrapper->getAPI()->callStatus($id);
+        return $this->wrapper->getAPI()->callGetCurrent($id);
+    }
+    /**
+     * Play file in call.
+     */
+    public function callPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    {
+        $this->wrapper->getAPI()->callPlay($id, $file);
+    }
+    /**
+     * Play files on hold in call.
+     */
+    public function callPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
+    {
+        $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
+    }
+    /**
+     * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
+     */
+    public static function canConvertOgg(): bool
+    {
+        return \danog\MadelineProto\Tools::canConvertOgg();
     }
     /**
      * Cancel a running broadcast.
@@ -365,15 +341,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->complete2faLogin($password);
     }
     /**
-     * Complete call handshake.
-     *
-     * @param array $params Params
-     */
-    public function completeCall(array $params)
-    {
-        return $this->wrapper->getAPI()->completeCall($params);
-    }
-    /**
      * Complet user login using login code.
      *
      * @param string $code Login code
@@ -393,25 +360,14 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
     /**
-     * Confirm call.
-     *
-     * @param array $params Params
-     */
-    public function confirmCall(array $params)
-    {
-        return $this->wrapper->getAPI()->confirmCall($params);
-    }
-    /**
      * Discard call.
      *
-     * @param array   $call       Call
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true): ?\danog\MadelineProto\VoIP
+    public function discardCall(int $id, \danog\MadelineProto\VoIP\DiscardReason $reason = \danog\MadelineProto\VoIP\DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
-        return $this->wrapper->getAPI()->discardCall($call, $reason, $rating, $need_debug);
+        $this->wrapper->getAPI()->discardCall($id, $reason, $rating, $comment);
     }
     /**
      * Discard secret chat.
@@ -500,11 +456,23 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->downloadToResponse($messageMedia, $request, $cb, $size, $mime, $name);
     }
     /**
+     * Download file to an amphp stream, returning it.
+     *
+     * @param mixed                       $messageMedia File to download
+     * @param callable                    $cb            Callback
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     */
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): \Amp\ByteStream\ReadableStream
+    {
+        return $this->wrapper->getAPI()->downloadToReturnedStream($messageMedia, $cb, $offset, $end);
+    }
+    /**
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download
      * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
-     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                    $cb            Callback
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
@@ -598,16 +566,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->fileGetContents($url);
     }
     /**
-     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param array<(Future|Generator)> $promises Promises
-     */
-    public static function first(array $promises)
-    {
-        return \danog\MadelineProto\AsyncTools::first($promises);
-    }
-    /**
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
@@ -632,7 +590,7 @@ abstract class InternalDoc
         return \danog\MadelineProto\MTProto::fromSupergroup($id);
     }
     /**
-     * When were full info for this chat last cached.
+     * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID
      */
@@ -664,6 +622,15 @@ abstract class InternalDoc
     public function getAdminIds(): array
     {
         return $this->wrapper->getAPI()->getAdminIds();
+    }
+    /**
+     * Get all pending and running calls, indexed by user ID.
+     *
+     * @return array<int, VoIP>
+     */
+    public function getAllCalls(): array
+    {
+        return $this->wrapper->getAPI()->getAllCalls();
     }
     /**
      * Get full list of MTProto and API methods.
@@ -702,13 +669,25 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getCachedConfig();
     }
     /**
-     * Get call info.
-     *
-     * @param int $call Call ID
+     * Get phone call information.
      */
-    public function getCall(int $call): array
+    public function getCall(int $id): ?\danog\MadelineProto\VoIP
     {
-        return $this->wrapper->getAPI()->getCall($call);
+        return $this->wrapper->getAPI()->getCall($id);
+    }
+    /**
+     * Get the phone call with the specified user ID.
+     */
+    public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
+    {
+        return $this->wrapper->getAPI()->getCallByPeer($userId);
+    }
+    /**
+     * Get call state.
+     */
+    public function getCallState(int $id): ?\danog\MadelineProto\VoIP\CallState
+    {
+        return $this->wrapper->getAPI()->getCallState($id);
     }
     /**
      * Store RSA keys for CDN datacenters.
@@ -900,7 +879,7 @@ abstract class InternalDoc
      *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
      *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
      *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
-     *      bot_api_id: int|string,
+     *      bot_api_id: int,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
@@ -1063,6 +1042,14 @@ abstract class InternalDoc
     public function getSponsoredMessages(array|string|int $peer): ?array
     {
         return $this->wrapper->getAPI()->getSponsoredMessages($peer);
+    }
+    /**
+     * Obtains a pipe that can be used to upload a file from a stream.
+     *
+     */
+    public static function getStreamPipe(): \Amp\ByteStream\Pipe
+    {
+        return \danog\MadelineProto\Tools::getStreamPipe();
     }
     /**
      * Get TL serializer.
@@ -1230,6 +1217,13 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isIpcWorker();
     }
     /**
+     * Whether the currently playing audio file is paused.
+     */
+    public function isPlayPaused(int $id): bool
+    {
+        return $this->wrapper->getAPI()->isPlayPaused($id);
+    }
+    /**
      * Returns whether the current user is a premium user, cached.
      */
     public function isPremium(): bool
@@ -1285,17 +1279,6 @@ abstract class InternalDoc
     public function logout(): void
     {
         $this->wrapper->getAPI()->logout();
-    }
-    /**
-     * Start MadelineProto's update handling loop, or run the provided async callable.
-     *
-     * @deprecated Not needed anymore with amp v3
-     *
-     * @param callable|null $callback Async callable to run
-     */
-    public function loop(?callable $callback = null)
-    {
-        return $this->wrapper->getAPI()->loop($callback);
     }
     /**
      * Escape string for markdown codeblock.
@@ -1371,6 +1354,15 @@ abstract class InternalDoc
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
     }
     /**
+     * Provide a buffered reader for a file, URL or amp stream.
+     *
+     * @return Closure(int): ?string
+     */
+    public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null): \Closure
+    {
+        return \danog\MadelineProto\Tools::openBuffered($stream, $cancellation);
+    }
+    /**
      * Opens a file in append-only mode.
      *
      * @param string $path File path.
@@ -1414,6 +1406,13 @@ abstract class InternalDoc
     public static function packUnsignedInt(int $value): string
     {
         return \danog\MadelineProto\Tools::packUnsignedInt($value);
+    }
+    /**
+     * Pauses playback of the current audio file in the call.
+     */
+    public function pausePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->pausePlay($id);
     }
     /**
      * Check if peer is present in internal peer database.
@@ -1538,7 +1537,7 @@ abstract class InternalDoc
      *
      * @param mixed $user User
      */
-    public function requestCall(mixed $user)
+    public function requestCall(mixed $user): \danog\MadelineProto\VoIP
     {
         return $this->wrapper->getAPI()->requestCall($user);
     }
@@ -1564,6 +1563,13 @@ abstract class InternalDoc
     public function restart(): void
     {
         $this->wrapper->getAPI()->restart();
+    }
+    /**
+     * Resumes playback of the current audio file in the call.
+     */
+    public function resumePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->resumePlay($id);
     }
     /**
      * Rethrow exception into event loop.
@@ -1725,11 +1731,11 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->setWebhook($webhookUrl);
     }
     /**
-     * Setup logger.
+     * When called, skips to the next file in the playlist.
      */
-    public function setupLogger(): void
+    public function skipPlay(int $id): void
     {
-        $this->wrapper->getAPI()->setupLogger();
+        $this->wrapper->getAPI()->skipPlay($id);
     }
     /**
      * Asynchronously sleep.
@@ -1739,17 +1745,6 @@ abstract class InternalDoc
     public static function sleep(float $time): void
     {
         \danog\MadelineProto\AsyncTools::sleep($time);
-    }
-    /**
-     * Resolves with a two-item array delineating successful and failed Promise results.
-     * The returned promise will only fail if the given number of required promises fail.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param array<(Future|Generator)> $promises Promises
-     */
-    public static function some(array $promises)
-    {
-        return \danog\MadelineProto\AsyncTools::some($promises);
     }
     /**
      * Log in to telegram (via CLI or web).
@@ -1764,6 +1759,13 @@ abstract class InternalDoc
     public function stop(): void
     {
         $this->wrapper->getAPI()->stop();
+    }
+    /**
+     * Stops playing all files in the call, clears the main and the hold playlist.
+     */
+    public function stopPlay(int $id): void
+    {
+        $this->wrapper->getAPI()->stopPlay($id);
     }
     /**
      * Converts a string into an async amphp stream.
@@ -1819,36 +1821,6 @@ abstract class InternalDoc
     public static function testFibers(int $fiberCount = 100000): array
     {
         return \danog\MadelineProto\Tools::testFibers($fiberCount);
-    }
-    /**
-     * Create an artificial timeout for any Generator or Promise.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param int $timeout In milliseconds
-     */
-    public static function timeout(\Generator|\Amp\Future $promise, int $timeout): mixed
-    {
-        return \danog\MadelineProto\AsyncTools::timeout($promise, $timeout);
-    }
-    /**
-     * Creates an artificial timeout for any `Promise`.
-     *
-     * If the promise is resolved before the timeout expires, the result is returned
-     *
-     * If the timeout expires before the promise is resolved, a default value is returned
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @template TReturnAlt
-     * @template TReturn
-     * @template TGenerator of Generator<mixed, mixed, mixed, TReturn>
-     * @param Future<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @param int                        $timeout Timeout in milliseconds.
-     * @param TReturnAlt                 $default
-     * @return TReturn|TReturnAlt
-     */
-    public static function timeoutWithDefault($promise, int $timeout, $default = null): mixed
-    {
-        return \danog\MadelineProto\AsyncTools::timeoutWithDefault($promise, $timeout, $default);
     }
     /**
      * Convert to camelCase.
@@ -1956,7 +1928,7 @@ abstract class InternalDoc
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
-     * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                                              $cb        Callback
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
     public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -1968,7 +1940,7 @@ abstract class InternalDoc
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                           $cb        Callback
      */
     public function uploadEncrypted(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null)
     {
@@ -1988,7 +1960,7 @@ abstract class InternalDoc
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
     }
@@ -1999,10 +1971,10 @@ abstract class InternalDoc
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
@@ -2050,16 +2022,6 @@ abstract class InternalDoc
     public function viewSponsoredMessage(array|int $peer, array|string $message): bool
     {
         return $this->wrapper->getAPI()->viewSponsoredMessage($peer, $message);
-    }
-    /**
-     * Synchronously wait for a Future|generator.
-     *
-     * @deprecated Coroutines are deprecated since amp v3
-     * @param Generator|Future $promise The promise to wait for
-     */
-    public static function wait(\Generator|\Amp\Future $promise)
-    {
-        return \danog\MadelineProto\AsyncTools::wait($promise);
     }
     /**
      * Wrap a media constructor into an abstract Media object.

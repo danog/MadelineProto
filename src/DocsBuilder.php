@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\DocsBuilder\Constructors;
 use danog\MadelineProto\DocsBuilder\Methods;
-use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 
 // This code was written a few years ago: it is garbage, and has to be rewritten
@@ -56,12 +55,7 @@ final class DocsBuilder
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(null);
-        $new = new TLSchema;
-        $new->mergeArray($settings);
-        $this->TL->init($new);
-        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
-            $this->td = true;
-        }
+        $this->TL->init($settings['TL']);
         $this->settings = $settings;
         if (!\file_exists($this->settings['output_dir'])) {
             \mkdir($this->settings['output_dir']);

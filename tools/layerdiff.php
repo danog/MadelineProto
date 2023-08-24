@@ -30,6 +30,8 @@ if ($argc !== 3) {
  *
  * @param int $layer Layer number
  *
+ * @internal
+ *
  * @return void
  */
 function getTL($layer)
@@ -40,6 +42,7 @@ function getTL($layer)
 
     return ['methods' => $layer->getMethods(), 'constructors' => $layer->getConstructors()];
 }
+/** @internal */
 function getUrl($constructor, $type)
 {
     $orig = $constructor;

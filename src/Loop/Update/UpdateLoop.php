@@ -34,6 +34,8 @@ use function Amp\delay;
 /**
  * Update loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class UpdateLoop extends Loop

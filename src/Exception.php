@@ -107,6 +107,10 @@ class Exception extends \Exception
     {
         $print = function (string $s): void {
             Logger::log($s, Logger::FATAL_ERROR);
+            if (\headers_sent()) {
+                return;
+            }
+            \http_response_code(500);
             if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
                 echo($s.PHP_EOL);
             } else {

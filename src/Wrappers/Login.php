@@ -55,7 +55,7 @@ trait Login
         if ($this->authorized === \danog\MadelineProto\API::LOGGED_IN) {
             return null;
         }
-        $callbacks = [$this, $this->referenceDatabase];
+        $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];
         /** @psalm-suppress InvalidArgument */
         $this->TL->updateCallbacks($callbacks);
         $this->logger->logger(Lang::$current_lang['login_bot'], Logger::NOTICE);
@@ -274,7 +274,7 @@ trait Login
         $this->initAuthorization();
         $this->getPhoneConfig();
         $res = ($this->fullGetSelf());
-        $callbacks = [$this, $this->referenceDatabase];
+        $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }

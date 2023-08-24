@@ -283,6 +283,7 @@ trait BotAPI
                 $data['type'] = 'text_url';
                 return $data;
             case 'messageEntityMentionName':
+            case 'inputMessageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
                 $data['user'] = ($this->getPwrChat($data['user_id'], false));

@@ -35,11 +35,13 @@ use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
+use danog\MadelineProto\VoIP;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -55,6 +57,9 @@ if (class_exists(API::class)) {
 }
 /**
  * Event handler class.
+ *
+ * NOTE: ALL of the following methods are OPTIONAL.
+ * You can even provide an empty event handler if you want.
  *
  * All properties returned by __sleep are automatically stored in the database.
  */
@@ -107,18 +112,6 @@ class MyEventHandler extends SimpleEventHandler
         $this->sendMessageToAdmins("The bot is online, current time ".date(DATE_RFC850)."!");
     }
 
-    private int $lastLog = 0;
-    /**
-     * Handles updates to an in-progress broadcast.
-     */
-    public function onUpdateBroadcastProgress(Progress $progress): void
-    {
-        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
-            $this->lastLog = time();
-            $this->sendMessageToAdmins((string) $progress);
-        }
-    }
-
     /**
      * Handle incoming updates from users, chats and channels.
      */
@@ -137,11 +130,12 @@ class MyEventHandler extends SimpleEventHandler
         }
     }
 
+    /**
+     * If the message is a /restart command from an admin, restart to reload changes to the event handler code.
+     */
     #[FilterCommand('restart')]
     public function restartCommand(Incoming & Message & FromAdmin $message): void
     {
-        // If the message is a /restart command from an admin, restart to reload changes to the event handler code.
-
         // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
         $this->restart();
     }
@@ -219,6 +213,19 @@ class MyEventHandler extends SimpleEventHandler
         );
     }
 
+    private int $lastLog = 0;
+    /**
+     * Handles updates to an in-progress broadcast.
+     */
+    #[Handler]
+    public function handleBroadcastProgress(Progress $progress): void
+    {
+        if (time() - $this->lastLog > 5 || $progress->status === Status::FINISHED) {
+            $this->lastLog = time();
+            $this->sendMessageToAdmins((string) $progress);
+        }
+    }
+
     #[FilterCommand('echo')]
     public function echoCmd(Message $message): void
     {
@@ -228,7 +235,7 @@ class MyEventHandler extends SimpleEventHandler
         $message->reply($args[0] ?? '');
     }
 
-    #[FilterRegex('/.*(mt?proto).*/i')]
+    #[FilterRegex('/.*(mt?proto)[^.]?.*/i')]
     public function testRegex(Incoming & Message $message): void
     {
         $message->reply("Did you mean to write MadelineProto instead of ".$message->matches[1].'?');
@@ -288,6 +295,18 @@ class MyEventHandler extends SimpleEventHandler
         $reply->reply("Download link: ".$reply->media->getDownloadLink());
     }
 
+    #[FilterCommand('call')]
+    public function callVoip(Incoming&Message $message): void
+    {
+        $this->requestCall($message->senderId)->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+    }
+
+    #[Handler]
+    public function handleIncomingCall(VoIP&Incoming $call): void
+    {
+        $call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+    }
+
     public static function getPluginPaths(): string|array|null
     {
         return 'plugins/';
@@ -297,7 +316,9 @@ class MyEventHandler extends SimpleEventHandler
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
-// You can also use Redis, MySQL or PostgreSQL
+// You can also use Redis, MySQL or PostgreSQL.
+// Data is migrated automatically.
+//
 // $settings->setDb((new Redis)->setDatabase(0)->setPassword('pony'));
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));

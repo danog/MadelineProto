@@ -58,7 +58,7 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
-use danog\MadelineProto\VoIP;
+use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -129,9 +129,6 @@ trait UpdateHandler
     private function eventUpdateHandler(array $update): void
     {
         $updateType = $update['_'];
-        if ($update['_'] === 'updateBroadcastProgress') {
-            $update = $update['progress'];
-        }
         if ($f = $this->event_handler_instance->waitForInternalStart()) {
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
@@ -149,6 +146,9 @@ trait UpdateHandler
                     $closure($obj);
                 }
             }
+        }
+        if ($updateType === 'updateBroadcastProgress') {
+            $update = $update['progress'];
         }
         if (isset($this->eventHandlerMethods[$updateType])) {
             foreach ($this->eventHandlerMethods[$updateType] as $closure) {
@@ -346,6 +346,8 @@ trait UpdateHandler
                 ? new InlineGameQuery($this, $update)
                 : new InlineButtonQuery($this, $update),
             'updateBotInlineQuery' => new InlineQuery($this, $update),
+            'updatePhoneCall' => $update['phone_call'],
+            'updateBroadcastProgress' => $update['progress'],
             default => null
         };
     }
@@ -409,7 +411,7 @@ trait UpdateHandler
                 default => null
             };
         }
-        if (($this->chats[$info['bot_api_id']]['username'] ?? '') === 'replies') {
+        if (($info['User']['username'] ?? '') === 'replies') {
             return null;
         }
         return match ($info['type']) {
@@ -751,38 +753,52 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
-            if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-                $this->logger->logger('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', Logger::WARNING);
-                return;
-            }
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $controller = new VoIP(false, $update['phone_call']['admin_id'], $this, VoIP::CALL_STATE_INCOMING);
-                    $controller->setCall($update['phone_call']);
-                    $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
-                    $controller->storage['video'] = $update['phone_call']['video'] ?? false;
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
+                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
+                        $this,
+                        $update['phone_call'],
+                    );
+                    $this->callsByPeer[$controller->public->otherID] = $controller;
+                    $update['phone_call'] = $controller->public;
+                    break;
+                case 'phoneCallWaiting':
+                    if (isset($this->calls[$update['phone_call']['id']])) {
+                        return;
+                    }
+                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
+                        $this,
+                        $update['phone_call']
+                    );
+                    $this->callsByPeer[$controller->public->otherID] = $controller;
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallAccepted':
-                    if (!($this->confirmCall($update['phone_call']))) {
+                    if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']];
+                    $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->confirm($update['phone_call']);
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCall':
-                    if (!($this->completeCall($update['phone_call']))) {
+                    if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']];
+                    $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->complete($update['phone_call']);
+                    $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallDiscarded':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $update['phone_call'] = $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? ['_' => 'phoneCallDiscardReasonDisconnect'], [], $update['phone_call']['need_debug'] ?? false);
+                    $controller = $this->calls[$update['phone_call']['id']];
+                    $controller->discard();
+                    $update['phone_call'] = $controller->public;
                     break;
             }
         }

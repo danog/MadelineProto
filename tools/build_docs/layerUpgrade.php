@@ -4,7 +4,7 @@
  * Upgrade layer number.
  *
  * @param integer $layer Layer number
- *
+ * @internal
  */
 function layerUpgrade(int $layer): void
 {

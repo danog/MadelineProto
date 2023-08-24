@@ -40,7 +40,6 @@ use danog\MadelineProto\TON\ADNLConnection;
 use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
 use danog\MadelineProto\TON\InternalDoc as TONInternalDoc;
 use danog\MadelineProto\TON\Lite;
-use danog\MadelineProto\VoIP;
 use danog\PhpDoc\PhpDocBuilder;
 
 require 'vendor/autoload.php';
@@ -73,7 +72,6 @@ $ignore = [ // Disallow list
     SettingsAbstract::class,
     Snitch::class,
     AsyncConstruct::class,
-    VoIP::class,
 
     Crypt::class,
     NothingInTheSocketException::class,

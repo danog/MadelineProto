@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Ipc;
 
@@ -8,7 +20,6 @@ use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Parallel\Context\Internal\ExitFailure;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
@@ -92,7 +103,6 @@ final class Wrapper extends ClientAbstract
      *
      * @param mixed           $callback    Callback to wrap
      * @param bool            $wrapObjects Whether to wrap object methods, too
-     * @param-out int $callback Callback ID
      */
     public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
@@ -103,15 +113,18 @@ final class Wrapper extends ClientAbstract
                 $this->callbacks[$id] = [$callback, $method];
                 $ids[$method] = $id;
             }
-            $class = Obj::class;
-            if ($callback instanceof ByteStreamWritableStream) {
-                $class = \method_exists($callback, 'seek') ? WritableStream::class : SeekableWritableStream::class;
-            } elseif ($callback instanceof ByteStreamReadableStream) {
+            $class = null;
+            if ($callback instanceof ByteStreamReadableStream) {
                 $class = \method_exists($callback, 'seek') ? ReadableStream::class : SeekableReadableStream::class;
+            } elseif ($callback instanceof ByteStreamWritableStream) {
+                $class = \method_exists($callback, 'seek') ? WritableStream::class : SeekableWritableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
             } elseif ($callback instanceof Cancellation) {
                 $class = WrapperCancellation::class;
+            }
+            if (!$class) {
+                return;
             }
             $callback = [$class, $ids]; // Will be re-filled later
             $this->callbackIds[] = &$callback;

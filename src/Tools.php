@@ -20,8 +20,15 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
+use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableBuffer;
+use Amp\Cancellation;
 use Amp\File\File;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use ArrayAccess;
 use Closure;
 use Countable;
@@ -31,12 +38,15 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\Yield_;
+use PhpParser\Node\Expr\YieldFrom;
 use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassLike;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
@@ -597,8 +607,59 @@ abstract class Tools extends AsyncTools
         return openFile($path, "a");
     }
 
+    /**
+     * Obtains a pipe that can be used to upload a file from a stream.
+     *
+     */
+    public static function getStreamPipe(): Pipe
+    {
+        return new Pipe(512*1024);
+    }
+    private static ?HttpClient $client = null;
+    /**
+     * Provide a buffered reader for a file, URL or amp stream.
+     *
+     * @return Closure(int): ?string
+     */
+    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null): Closure
+    {
+        if ($stream instanceof LocalFile) {
+            $stream = openFile($stream->file, 'r');
+            return fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
+        }
+        if ($stream instanceof RemoteUrl) {
+            self::$client ??= HttpClientBuilder::buildDefault();
+            $request = new Request($stream->url);
+            $request->setTransferTimeout(INF);
+            $stream = self::$client->request(
+                $request,
+                $cancellation
+            )->getBody();
+        }
+        $buffer = '';
+        return function (int $len) use (&$buffer, $stream, $cancellation): ?string {
+            if ($buffer === null) {
+                return null;
+            }
+            do {
+                if (\strlen($buffer) >= $len) {
+                    $piece = \substr($buffer, 0, $len);
+                    $buffer = \substr($buffer, $len);
+                    return $piece;
+                }
+                $chunk = $stream->read($cancellation);
+                if ($chunk === null) {
+                    $buffer = null;
+                    $stream->close();
+                    return null;
+                }
+                $buffer .= $chunk;
+            } while (true);
+        };
+    }
+
     private const BLOCKING_FUNCTIONS = [
-        'file_get_contents' => 'https://github.com/amphp/file, https://github.com/amphp/http-client',
+        'file_get_contents' => 'https://github.com/amphp/file, https://github.com/amphp/http-client or $this->fileGetContents()',
         'file_put_contents' => 'https://github.com/amphp/file',
         'curl_exec' => 'https://github.com/amphp/http-client',
         'mysqli_query' => 'https://github.com/amphp/mysql',
@@ -627,6 +688,11 @@ abstract class Tools extends AsyncTools
         'amp\\file\\read',
         'amp\\file\\write',
         'amp\\file\\openFile',
+    ];
+    private const NO_YIELD_FUNCTIONS = [
+        'onstart',
+        'onupdatenewmessage',
+        'onupdatenewchannelmessage'
     ];
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
@@ -783,6 +849,48 @@ abstract class Tools extends AsyncTools
             }
         }
 
+        /** @var Yield_|YieldFrom $include */
+        foreach ([
+            ...$finder->findInstanceOf($code, Yield_::class),
+            ...$finder->findInstanceOf($code, YieldFrom::class),
+        ] as $include) {
+            if ($include->getAttribute('parent')) {
+                $parent = $include;
+                while ($parent = $parent->getAttribute('parent')) {
+                    if ($parent instanceof ClassMethod
+                        && $parent->isPublic()
+                        && \in_array($parent->name->toLowerString(), self::NO_YIELD_FUNCTIONS, true)
+                    ) {
+                        $issues []= new EventHandlerIssue(
+                            message: Lang::$current_lang['do_not_use_yield'],
+                            file: $file,
+                            line: $include->getStartLine(),
+                            severe: true
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
         return $issues;
+    }
+
+    private static ?bool $canConvert = null;
+    /**
+     * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
+     */
+    public static function canConvertOgg(): bool
+    {
+        if (self::$canConvert !== null) {
+            return self::$canConvert;
+        }
+        try {
+            Ogg::convert(new LocalFile(__DIR__.'/empty.wav'), new WritableBuffer);
+            self::$canConvert = true;
+        } catch (\Throwable $e) {
+            self::$canConvert = false;
+        }
+        return self::$canConvert;
     }
 }

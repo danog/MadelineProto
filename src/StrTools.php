@@ -141,7 +141,7 @@ abstract class StrTools extends Extension
                 'messageEntityMention' => '<a href="https://t.me/'.\htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
                 'messageEntitySpoiler' => $allowTelegramTags ? '<tg-spoiler>' : '',
                 'messageEntityCustomEmoji' => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity['document_id'].'">' : '',
-                'messageEntityMentionName' => $allowTelegramTags ? '<a href="tg://user?id='.$entity['user_id'].'">' : '',
+                'messageEntityMentionName', 'inputMessageEntityMentionName' => $allowTelegramTags ? '<a href="tg://user?id='.$entity['user_id'].'">' : '',
                 default => '',
             };
             $offset += $length;
@@ -156,7 +156,7 @@ abstract class StrTools extends Extension
                 'messageEntityBlockquote' => '</blockquote>',
                 'messageEntitySpoiler' => $allowTelegramTags ? '</tg-spoiler>' : '',
                 'messageEntityCustomEmoji' => $allowTelegramTags ? "</tg-emoji>" : '',
-                'messageEntityMentionName' => $allowTelegramTags ? '</a>' : '',
+                'messageEntityMentionName', 'inputMessageEntityMentionName' => $allowTelegramTags ? '</a>' : '',
                 default => '',
             } . ($insertions[$offset] ?? '');
         }

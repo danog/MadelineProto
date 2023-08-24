@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Settings;
 
@@ -34,22 +46,6 @@ final class RPC extends SettingsAbstract
      * Encode payload with GZIP if bigger than.
      */
     protected int $gzipEncodeIfGt = 1024 * 1024;
-
-    public function mergeArray(array $settings): void
-    {
-        if (isset($settings['connection_settings']['all']['drop_timeout'])) {
-            $this->setRpcDropTimeout($settings['connection_settings']['all']['drop_timeout']);
-        }
-        if (isset($settings['flood_timeout']['wait_if_lt'])) {
-            $this->setFloodTimeout($settings['flood_timeout']['wait_if_lt']);
-        }
-        if (isset($settings['msg_array_limit']['call_queue'])) {
-            $this->setLimitCallQueue($settings['msg_array_limit']['call_queue']);
-        }
-        if (isset($settings['requests']['gzip_encode_if_gt'])) {
-            $this->setLimitCallQueue($settings['requests']['gzip_encode_if_gt']);
-        }
-    }
 
     /**
      * Get RPC drop timeout.

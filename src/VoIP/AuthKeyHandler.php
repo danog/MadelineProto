@@ -20,17 +20,21 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Lang;
+use Amp\ByteStream\ReadableStream;
+use Amp\DeferredFuture;
+use AssertionError;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Ogg;
 use danog\MadelineProto\PeerNotInDbException;
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\SecurityException;
+use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
+use danog\MadelineProto\VoIPController;
 use phpseclib3\Math\BigInteger;
+use Throwable;
 
 use const STR_PAD_LEFT;
 
@@ -44,261 +48,242 @@ use const STR_PAD_LEFT;
  */
 trait AuthKeyHandler
 {
+    /** @var array<int, VoIPController> */
     private array $calls = [];
-    /**
-     * Accept call from VoIP instance.
-     *
-     * @param VoIP $instance Call instance
-     * @param array                     $user     User
-     * @internal
-     */
-    public function acceptCallFrom(VoIP $instance, array $user): ?VoIP
-    {
-        if (!$this->acceptCall($user)) {
-            $instance->discard();
-            return null;
-        }
-        return $instance;
-    }
-    /**
-     * @param VoIP $instance Call instance
-     * @param array                     $call       Call info
-     * @param array                     $reason     Discard reason
-     * @param array                     $rating     Rating
-     * @param boolean                   $need_debug Needs debug?
-     * @internal
-     */
-    public function discardCallFrom(VoIP $instance, array $call, array $reason, array $rating = [], bool $need_debug = true): VoIP
-    {
-        $this->discardCall($call, $reason, $rating, $need_debug);
-        return $instance;
-    }
+    /** @var array<int, VoIPController> */
+    private array $callsByPeer = [];
+    private array $pendingCalls = [];
     /**
      * Request VoIP call.
      *
      * @param mixed $user User
      */
-    public function requestCall(mixed $user)
+    public function requestCall(mixed $user): VoIP
     {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
             throw new PeerNotInDbException();
         }
-        $user = $user['InputUser'];
-        $this->logger->logger(\sprintf('Calling %s...', $user['user_id']), Logger::VERBOSE);
-        $dh_config = ($this->getDhConfig());
-        $this->logger->logger('Generating a...', Logger::VERBOSE);
-        $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
-        $this->logger->logger('Generating g_a...', Logger::VERBOSE);
-        $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
-        Crypt::checkG($g_a, $dh_config['p']);
-        $controller = new VoIP(true, $user['user_id'], $this, VoIP::CALL_STATE_REQUESTED);
-        $controller->storage = ['a' => $a, 'g_a' => \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        $res = $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
-        $controller->setCall($res['phone_call']);
-        $this->calls[$res['phone_call']['id']] = $controller;
-        $this->updaters[UpdateLoop::GENERIC]->resume();
-        return $controller;
+        $user = $user['bot_api_id'];
+        if (isset($this->pendingCalls[$user])) {
+            return $this->pendingCalls[$user]->await();
+        }
+        $deferred = new DeferredFuture;
+        $this->pendingCalls[$user] = $deferred->getFuture();
+
+        try {
+            $this->logger->logger(\sprintf('Calling %s...', $user), Logger::VERBOSE);
+            $dh_config = ($this->getDhConfig());
+            $this->logger->logger('Generating a...', Logger::VERBOSE);
+            $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
+            $this->logger->logger('Generating g_a...', Logger::VERBOSE);
+            $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
+            Crypt::checkG($g_a, $dh_config['p']);
+            $res = $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 92]])['phone_call'];
+            $res['a'] = $a;
+            $res['g_a'] = \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
+            $this->callsByPeer[$controller->public->otherID] = $controller;
+            unset($this->pendingCalls[$user]);
+            $deferred->complete($controller->public);
+        } catch (Throwable $e) {
+            unset($this->pendingCalls[$user]);
+            $deferred->error($e);
+        }
+        return $deferred->getFuture()->await();
     }
+
+    /** @internal */
+    public function cleanupCall(int $id): void
+    {
+        if (isset($this->calls[$id])) {
+            $call = $this->calls[$id];
+            unset($this->callsByPeer[$call->public->otherID], $this->calls[$id]);
+        }
+    }
+
+    /**
+     * Get call emojis (will return null if the call is not inited yet).
+     *
+     * @internal
+     *
+     * @return ?list{string, string, string, string}
+     */
+    public function getCallVisualization(int $id): ?array
+    {
+        return ($this->calls[$id] ?? null)?->getVisualization();
+    }
+
     /**
      * Accept call.
-     *
-     * @param array $call Call
      */
-    public function acceptCall(array $call): bool
+    public function acceptCall(int $id): void
     {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new Exception();
-        }
-        if ($this->callStatus($call['id']) !== VoIP::CALL_STATE_ACCEPTED) {
-            $this->logger->logger(\sprintf(Lang::$current_lang['call_error_1'], $call['id']));
-            return false;
-        }
-        $this->logger->logger(\sprintf(Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = ($this->getDhConfig());
-        $this->logger->logger('Generating b...', Logger::VERBOSE);
-        $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
-        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
-        Crypt::checkG($g_b, $dh_config['p']);
-        try {
-            $res = $this->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $call['id'], 'access_hash' => $call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]);
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                $this->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $call['id']));
-                return true;
-            }
-            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                $this->logger->logger(Lang::$current_lang['call_already_declined']);
-                $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
-                return false;
-            }
-            throw $e;
-        }
-        $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
-        $this->updaters[UpdateLoop::GENERIC]->resume();
-        return true;
+        ($this->calls[$id] ?? null)?->accept();
     }
-    /**
-     * Confirm call.
-     *
-     * @param array $params Params
-     */
-    public function confirmCall(array $params)
-    {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
-        if ($this->callStatus($params['id']) !== VoIP::CALL_STATE_REQUESTED) {
-            $this->logger->logger(\sprintf(Lang::$current_lang['call_error_2'], $params['id']));
-            return false;
-        }
-        $this->logger->logger(\sprintf(Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = ($this->getDhConfig());
-        $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
-        Crypt::checkG($params['g_b'], $dh_config['p']);
-        $key = \str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-        try {
-            $res = ($this->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => VoIP::getConnectionMaxLayer()]]))['phone_call'];
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                $this->logger->logger(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
-                return true;
-            }
-            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                $this->logger->logger(Lang::$current_lang['call_already_declined']);
-                $this->discardCall($params['id'], ['_' => 'phoneCallDiscardReasonHangup']);
-                return false;
-            }
-            throw $e;
-        }
-        $this->calls[$params['id']]->setCall($res);
-        $visualization = [];
-        $length = new BigInteger(\count(Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
-            $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
-        }
-        $this->calls[$params['id']]->setVisualization($visualization);
-        $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($res['connections'], $this->calls[$params['id']]->configuration['endpoints']);
-        $this->calls[$params['id']]->configuration = \array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => \substr(\sha1($key, true), -8), 'call_id' => \substr(\hash('sha256', $key, true), -16), 'network_type' => VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
-        $this->calls[$params['id']]->parseConfig();
-        return $this->calls[$params['id']]->startTheMagic();
-    }
-    /**
-     * Complete call handshake.
-     *
-     * @param array $params Params
-     */
-    public function completeCall(array $params)
-    {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
-        if ($this->callStatus($params['id']) !== VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
-            $this->logger->logger(\sprintf(Lang::$current_lang['call_error_3'], $params['id']));
-            return false;
-        }
-        $this->logger->logger(\sprintf(Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), Logger::VERBOSE);
-        $dh_config = ($this->getDhConfig());
-        if (\hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
-            throw new SecurityException('Invalid g_a!');
-        }
-        $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
-        Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
-        $key = \str_pad($params['g_a_or_b']->powMod($this->calls[$params['id']]->storage['b'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-        if (\substr(\sha1($key, true), -8) != $params['key_fingerprint']) {
-            throw new SecurityException(Lang::$current_lang['fingerprint_invalid']);
-        }
-        $visualization = [];
-        $length = new BigInteger(\count(Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
-            $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
-        }
-        $this->calls[$params['id']]->setVisualization($visualization);
-        $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($params['connections'], $this->calls[$params['id']]->configuration['endpoints']);
-        $this->calls[$params['id']]->configuration = \array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => \substr(\sha1($key, true), -8), 'call_id' => \substr(\hash('sha256', $key, true), -16), 'network_type' => VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
-        $this->calls[$params['id']]->parseConfig();
-        return $this->calls[$params['id']]->startTheMagic();
-    }
-    /**
-     * Get call status.
-     *
-     * @param int $id Call ID
-     */
-    public function callStatus(int $id): int
-    {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
-        if (isset($this->calls[$id])) {
-            return $this->calls[$id]->getCallState();
-        }
-        return VoIP::CALL_STATE_NONE;
-    }
-    /**
-     * Get call info.
-     *
-     * @param int $call Call ID
-     */
-    public function getCall(int $call): array
-    {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
-        return $this->calls[$call];
-    }
+
     /**
      * Discard call.
      *
-     * @param array   $call       Call
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
+     * @param int<1, 5> $rating Call rating in stars
+     * @param string $comment Additional comment on call quality.
      */
-    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): ?VoIP
+    public function discardCall(int $id, DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
-        if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw Exception::extension('libtgvoip');
-        }
-        if (!isset($this->calls[$call['id']])) {
-            return null;
-        }
-        $this->logger->logger(\sprintf(Lang::$current_lang['call_discarding'], $call['id']), Logger::VERBOSE);
-        try {
-            $res = $this->methodCallAsyncRead('phone.discardCall', ['peer' => $call, 'duration' => \time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason]);
-        } catch (RPCErrorException $e) {
-            if (!\in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'], true)) {
-                throw $e;
+        ($this->calls[$id] ?? null)?->discard($reason, $rating, $comment);
+    }
+
+    /**
+     * Get the phone call with the specified user ID.
+     */
+    public function getCallByPeer(int $userId): ?VoIP
+    {
+        return ($this->callsByPeer[$userId] ?? null)?->public;
+    }
+
+    /**
+     * Get all pending and running calls, indexed by user ID.
+     *
+     * @return array<int, VoIP>
+     */
+    public function getAllCalls(): array
+    {
+        return \array_map(fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+    }
+
+    /**
+     * Get phone call information.
+     */
+    public function getCall(int $id): ?VoIP
+    {
+        return ($this->calls[$id] ?? null)?->public;
+    }
+
+    /**
+     * Play file in call.
+     */
+    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        if (!Tools::canConvertOgg()) {
+            if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
+                Ogg::validateOgg($file);
+            } else {
+                throw new AssertionError("The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!");
             }
         }
-        if (!empty($rating)) {
-            $this->logger->logger(\sprintf('Setting rating for call %s...', $call['id']), Logger::VERBOSE);
-            $this->methodCallAsyncRead('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']]);
-        }
-        if ($need_debug && isset($this->calls[$call['id']])) {
-            $this->logger->logger(\sprintf('Saving debug data for call %s...', $call['id']), Logger::VERBOSE);
-            $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()]);
-        }
-        $c = $this->calls[$call['id']];
-        unset($this->calls[$call['id']]);
-        return $c;
+        ($this->calls[$id] ?? null)?->play($file);
     }
+
     /**
-     * Check state of calls.
+     * Play file in call, blocking until the file has finished playing if a stream is provided.
      *
      * @internal
      */
-    public function checkCalls(): void
+    public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        \array_walk($this->calls, function ($controller, $id): void {
-            if ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
-                $this->logger('Discarding ended call...');
-                $controller->discard();
-                unset($this->calls[$id]);
+        if (!isset($this->calls[$id])) {
+            return;
+        }
+        $this->callPlay($id, $file);
+        if ($file instanceof ReadableStream) {
+            $deferred = new DeferredFuture;
+            $file->onClose($deferred->complete(...));
+            $deferred->getFuture()->await();
+        }
+    }
+
+    /**
+     * When called, skips to the next file in the playlist.
+     */
+    public function skipPlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->skip();
+    }
+
+    /**
+     * Stops playing all files in the call, clears the main and the hold playlist.
+     */
+    public function stopPlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->stop();
+    }
+
+    /**
+     * Pauses playback of the current audio file in the call.
+     */
+    public function pausePlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->pause();
+    }
+
+    /**
+     * Resumes playback of the current audio file in the call.
+     */
+    public function resumePlay(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->resume();
+    }
+
+    /**
+     * Whether the currently playing audio file is paused.
+     */
+    public function isPlayPaused(int $id): bool
+    {
+        return ($this->calls[$id] ?? null)?->isPaused() ?? false;
+    }
+
+    /**
+     * Play files on hold in call.
+     */
+    public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        if (!Tools::canConvertOgg()) {
+            foreach ($files as $file) {
+                if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
+                    Ogg::validateOgg($file);
+                } else {
+                    throw new AssertionError("The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!");
+                }
             }
-        });
+        }
+        ($this->calls[$id] ?? null)?->playOnHold(...$files);
+    }
+
+    /**
+     * Play files on hold in call.
+     *
+     * @internal
+     */
+    public function callPlayOnHoldBlocking(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        if (!isset($this->calls[$id])) {
+            return;
+        }
+        $this->callPlayOnHold($id, ...$files);
+        foreach ($files as $file) {
+            if ($file instanceof ReadableStream) {
+                $deferred = new DeferredFuture;
+                $file->onClose($deferred->complete(...));
+                $deferred->getFuture()->await();
+            }
+        }
+    }
+
+    /**
+     * Get the file that is currently being played.
+     *
+     * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     */
+    public function callGetCurrent(int $id): RemoteUrl|LocalFile|string|null
+    {
+        return ($this->calls[$id] ?? null)?->getCurrent();
+    }
+
+    /**
+     * Get call state.
+     */
+    public function getCallState(int $id): ?CallState
+    {
+        return ($this->calls[$id] ?? null)?->getCallState();
     }
 }

@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto;
 
@@ -8,9 +20,6 @@ use danog\MadelineProto\Settings\AppInfo;
 use danog\MadelineProto\Settings\Auth;
 use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Settings\Database\Memory as DatabaseMemory;
-use danog\MadelineProto\Settings\Database\Mysql;
-use danog\MadelineProto\Settings\Database\Postgres;
-use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\MadelineProto\Settings\Files;
 use danog\MadelineProto\Settings\Ipc;
@@ -86,40 +95,6 @@ final class Settings extends SettingsAbstract
     protected VoIP $voip;
 
     /**
-     * Create settings object from possibly legacy settings array.
-     *
-     * @internal
-     * @param SettingsAbstract|array $settings Settings
-     */
-    public static function parseFromLegacy(SettingsAbstract|array $settings): SettingsAbstract
-    {
-        if (\is_array($settings)) {
-            if (empty($settings)) {
-                return new SettingsEmpty;
-            }
-            $settingsNew = new Settings;
-            $settingsNew->mergeArray($settings);
-            return $settingsNew;
-        }
-        return $settings;
-    }
-    /**
-     * Create full settings object from possibly legacy settings array.
-     *
-     * @internal
-     * @param SettingsAbstract|array $settings Settings
-     */
-    public static function parseFromLegacyFull(SettingsAbstract|array $settings): Settings
-    {
-        $settings = self::parseFromLegacy($settings);
-        if (!$settings instanceof Settings) {
-            $newSettings = new Settings;
-            $newSettings->merge($settings);
-            $settings = $newSettings;
-        }
-        return $settings;
-    }
-    /**
      * Constructor.
      */
     public function __construct()
@@ -145,44 +120,6 @@ final class Settings extends SettingsAbstract
             $this->voip = new VoIP;
         }
     }
-    /**
-     * Merge legacy array settings.
-     *
-     * @param array $settings Settings
-     * @internal
-     */
-    public function mergeArray(array $settings): void
-    {
-        $this->appInfo->mergeArray($settings);
-        $this->auth->mergeArray($settings);
-        $this->connection->mergeArray($settings);
-        $this->files->mergeArray($settings);
-        $this->logger->mergeArray($settings);
-        $this->peer->mergeArray($settings);
-        $this->rpc->mergeArray($settings);
-        $this->secretChats->mergeArray($settings);
-        $this->serialization->mergeArray($settings);
-        $this->schema->mergeArray($settings);
-        $this->ipc->mergeArray($settings);
-        $this->voip->mergeArray($settings);
-
-        switch ($settings['db']['type'] ?? 'memory') {
-            case 'memory':
-                $this->db = new DatabaseMemory;
-                break;
-            case 'mysql':
-                $this->db = new Mysql;
-                break;
-            case 'postgres':
-                $this->db = new Postgres;
-                break;
-            case 'redis':
-                $this->db = new Redis;
-                break;
-        }
-        $this->db->mergeArray($settings);
-    }
-
     /**
      * Merge another instance of settings.
      *

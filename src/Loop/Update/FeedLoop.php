@@ -30,6 +30,8 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 /**
  * Update feed loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class FeedLoop extends Loop

@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.0.0-beta130';
+    public const RELEASE = '8.0.0-beta143';
     /**
      * Secret chat was not found.
      *
@@ -196,12 +196,12 @@ final class API extends AbstractAPI
      * Constructor function.
      *
      * @param string                 $session  Session name
-     * @param array|SettingsAbstract $settings Settings
+     * @param SettingsAbstract $settings Settings
      */
-    public function __construct(string $session, array|SettingsAbstract $settings = [])
+    public function __construct(string $session, ?SettingsAbstract $settings = null)
     {
         Magic::start(light: true);
-        $settings = Settings::parseFromLegacy($settings);
+        $settings ??= new SettingsEmpty;
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this->session);
         $this->exportNamespaces();

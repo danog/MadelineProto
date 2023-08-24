@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Sync\LocalMutex;
-use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\API;
@@ -30,12 +28,10 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
-use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
-use InvalidArgumentException;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -51,6 +47,7 @@ use function Amp\Future\await;
  * Manages peers.
  *
  * @property Settings $settings Settings
+ * @property PeerDatabase $peerDatabase
  *
  * @internal
  */
@@ -104,206 +101,6 @@ trait PeerHandler
     {
         return $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
     }
-    /**
-     * Add user info.
-     *
-     * @internal
-     *
-     * @param array $user User info
-     */
-    public function addUser(array $user): void
-    {
-        if ($user['_'] === 'userEmpty') {
-            return;
-        }
-        if ($user['_'] !== 'user') {
-            throw new AssertionError('Invalid user type '.$user['_']);
-        }
-        if ($user['id'] === ($this->authorization['user']['id'] ?? null)) {
-            $this->authorization['user'] = $user;
-        }
-        $existingChat = $this->chats[$user['id']];
-        if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
-            if (isset($existingChat['access_hash'])) {
-                $this->logger->logger("No access hash with user {$user['id']}, using backup");
-                $user['access_hash'] = $existingChat['access_hash'];
-                $user['min'] = false;
-            } else {
-                Assert::null($existingChat);
-                try {
-                    $this->methodCallAsyncRead('users.getUsers', ['id' => [[
-                        '_' => 'inputUser',
-                        'user_id' => $user['id'],
-                        'access_hash' => 0,
-                    ]]]);
-                    return;
-                } catch (RPCErrorException $e) {
-                    $this->logger->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
-                }
-                foreach ($this->getUsernames($user) as $username) {
-                    if (($this->resolveUsername($username)) === $user['id']) {
-                        return;
-                    }
-                }
-                return;
-            }
-        }
-        if ($existingChat !== $user) {
-            $this->logger->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
-            if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
-                $this->logger->logger("{$user['id']} is min, filling missing fields", Logger::ULTRA_VERBOSE);
-                if (isset($existingChat['access_hash'])) {
-                    $user['min'] = false;
-                    $user['access_hash'] = $existingChat['access_hash'];
-                }
-            }
-            $this->recacheChatUsername($user['id'], $existingChat, $user);
-            if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
-                $user = [
-                    '_' => $user['_'],
-                    'id' => $user['id'],
-                    'access_hash' => $user['access_hash'] ?? null,
-                    'min' => $user['min'] ?? false,
-                ];
-            }
-            $this->chats->set($user['id'], $user);
-            if (!($user['min'] ?? false)) {
-                $this->minDatabase->clearPeer($user['id']);
-            }
-        }
-    }
-    /**
-     * Add chat to database.
-     *
-     * @param array $chat Chat
-     * @internal
-     */
-    public function addChat(array $chat): void
-    {
-        if ($chat['_'] === 'chat'
-            || $chat['_'] === 'chatEmpty'
-            || $chat['_'] === 'chatForbidden'
-        ) {
-            $existingChat = $this->chats[-$chat['id']];
-            if (!$existingChat || $existingChat !== $chat) {
-                $this->logger->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
-                if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
-                    $chat = [
-                        '_' => $chat['_'],
-                        'id' => $chat['id'],
-                        'access_hash' => $chat['access_hash'] ?? null,
-                        'min' => $chat['min'] ?? false,
-                    ];
-                }
-                $this->chats->set(-$chat['id'], $chat);
-            }
-            return;
-        }
-        if ($chat['_'] === 'channelEmpty') {
-            return;
-        }
-        if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
-            throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
-        }
-        $bot_api_id = $this->toSupergroup($chat['id']);
-        $existingChat = $this->chats[$bot_api_id];
-        if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
-            if (isset($existingChat['access_hash'])) {
-                $this->logger->logger("No access hash with channel {$bot_api_id}, using backup");
-                $chat['access_hash'] = $existingChat['access_hash'];
-            } else {
-                Assert::null($existingChat);
-                try {
-                    $this->methodCallAsyncRead('channels.getChannels', ['id' => [[
-                        '_' => 'inputChannel',
-                        'channel_id' => $chat['id'],
-                        'access_hash' => 0,
-                    ]]]);
-                    return;
-                } catch (RPCErrorException $e) {
-                    $this->logger->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
-                }
-                foreach ($this->getUsernames($chat) as $username) {
-                    if (($this->resolveUsername($username)) === $bot_api_id) {
-                        return;
-                    }
-                }
-                return;
-            }
-        }
-        if ($existingChat !== $chat) {
-            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
-            $this->logger->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
-            if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
-                $this->logger->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
-                $newchat = $existingChat;
-                foreach (['title', 'username', 'usernames', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
-                    if (isset($chat[$field])) {
-                        $newchat[$field] = $chat[$field];
-                    }
-                }
-                $chat = $newchat;
-            }
-            if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
-                $chat = [
-                    '_' => $chat['_'],
-                    'id' => $chat['id'],
-                    'access_hash' => $chat['access_hash'] ?? null,
-                    'min' => $chat['min'] ?? false,
-                ];
-            }
-            $this->chats->set($bot_api_id, $chat);
-            if (!($chat['min'] ?? false)) {
-                $this->minDatabase->clearPeer($bot_api_id);
-            }
-        }
-    }
-
-    private ?LocalMutex $decacheMutex = null;
-    private function recacheChatUsername(int $id, ?array $old, array $new): void
-    {
-        if (!$this->getSettings()->getDb()->getEnableUsernameDb()) {
-            return;
-        }
-        $new = $this->getUsernames($new);
-        $old = $old ? $this->getUsernames($old) : [];
-        $diffToRemove = \array_diff($old, $new);
-        $diffToAdd = \array_diff($new, $old);
-        if (!$diffToAdd && !$diffToRemove) {
-            return;
-        }
-        $this->decacheMutex ??= new LocalMutex;
-        $lock = $this->decacheMutex->acquire();
-        try {
-            foreach ($diffToRemove as $username) {
-                if ($this->usernames[$username] === $id) {
-                    unset($this->usernames[$username]);
-                }
-            }
-            foreach ($diffToAdd as $username) {
-                $this->usernames[$username] = $id;
-            }
-        } finally {
-            $lock->release();
-        }
-    }
-
-    /**
-     * @return list<lowercase-string>
-     */
-    private static function getUsernames(array $constructor): array
-    {
-        $usernames = [];
-        if ($constructor['_'] === 'user' || $constructor['_'] === 'channel') {
-            if (isset($constructor['username'])) {
-                $usernames []= \strtolower($constructor['username']);
-            }
-            foreach ($constructor['usernames'] ?? [] as ['username' => $username]) {
-                $usernames []= \strtolower($username);
-            }
-        }
-        return $usernames;
-    }
 
     /**
      * Check if peer is present in internal peer database.
@@ -313,7 +110,7 @@ trait PeerHandler
     public function peerIsset(mixed $id): bool
     {
         try {
-            return isset($this->chats[$this->getIdInternal($id)]);
+            return $this->peerDatabase->isset($this->getIdInternal($id));
         } catch (Exception $e) {
             return false;
         } catch (RPCErrorException $e) {
@@ -590,7 +387,7 @@ trait PeerHandler
      *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
      *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
      *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
-     *      bot_api_id: int|string,
+     *      bot_api_id: int,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
@@ -629,21 +426,15 @@ trait PeerHandler
         if (\is_numeric($id)) {
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
-            if (!$this->chats[$id]) {
+            if (!$this->peerDatabase->isset($id)) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
                     if ($this->isSupergroup($id)) {
-                        $this->addChat([
-                            '_' => 'channel',
-                            'id' => $this->fromSupergroup($id),
-                        ]);
+                        $this->peerDatabase->addChatBlocking($id);
                     } elseif ($id < 0) {
                         $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id]]);
                     } else {
-                        $this->addUser([
-                            '_' => 'user',
-                            'id' => $id,
-                        ]);
+                        $this->peerDatabase->addUserBlocking($id);
                     }
                 } catch (Exception $e) {
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
@@ -651,7 +442,7 @@ trait PeerHandler
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
                 }
             }
-            $chat = $this->chats[$id];
+            $chat = $this->peerDatabase->get($id);
             if (!$chat) {
                 if ($this->cacheFullDialogs()) {
                     return $this->getInfo($id, $type);
@@ -681,7 +472,7 @@ trait PeerHandler
             try {
                 return $this->genAll($chat, $folder_id, $type);
             } catch (PeerNotInDbException $e) {
-                unset($this->chats[$id]);
+                $this->peerDatabase->clear($id);
                 throw $e;
             }
         }
@@ -707,10 +498,10 @@ trait PeerHandler
             }
             return $this->getInfo($this->supportUser, $type);
         }
-        if ($bot_api_id = $this->usernames[$id]) {
+        if ($bot_api_id = $this->peerDatabase->getIdFromUsername($id)) {
             return $this->getInfo($bot_api_id, $type);
         }
-        if ($bot_api_id = $this->resolveUsername($id)) {
+        if ($bot_api_id = $this->peerDatabase->resolveUsername($id)) {
             return $this->getInfo($bot_api_id, $type);
         }
         if ($this->cacheFullDialogs()) {
@@ -781,7 +572,7 @@ trait PeerHandler
             }
         }
         if ($type === \danog\MadelineProto\API::INFO_TYPE_USERNAMES) {
-            return $this->getUsernames($constructor);
+            return PeerDatabase::getUsernames($constructor);
         }
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
@@ -845,6 +636,15 @@ trait PeerHandler
         return $res;
     }
     /**
+     * Refresh full peer cache for a certain peer.
+     *
+     * @param mixed $id The peer to refresh
+     */
+    public function refreshFullPeerCache(mixed $id): void
+    {
+        $this->peerDatabase->refreshFullPeerCache($id);
+    }
+    /**
      * Refresh peer cache for a certain peer.
      *
      */
@@ -874,7 +674,7 @@ trait PeerHandler
                     $this->methodCallAsyncRead('help.getSupport', []);
                     continue;
                 } else {
-                    $id = $this->resolveUsername($id);
+                    $id = $this->peerDatabase->resolveUsername($id);
                 }
             }
             $id = $this->getIdInternal($id);
@@ -898,45 +698,13 @@ trait PeerHandler
         }
     }
     /**
-     * Refresh full peer cache for a certain peer.
-     *
-     * @param mixed $id The peer to refresh
-     */
-    public function refreshFullPeerCache(mixed $id): void
-    {
-        if (\is_string($id)) {
-            if ($r = Tools::parseLink($id)) {
-                [$invite, $content] = $r;
-                if ($invite) {
-                    $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
-                    if (!isset($invite['chat'])) {
-                        throw new Exception('You have not joined this chat');
-                    }
-                    $id = $invite['chat'];
-                } else {
-                    $id = $content;
-                }
-            }
-            $id = \strtolower(\str_replace('@', '', $id));
-            if ($id === 'me') {
-                $id = $this->authorization['user']['id'];
-            } elseif ($id === 'support') {
-                $id = $this->methodCallAsyncRead('help.getSupport', [])['user'];
-            } else {
-                $id = $this->resolveUsername($id);
-            }
-        }
-        unset($this->full_chats[$this->getIdInternal($id)]);
-        $this->getFullInfo($id);
-    }
-    /**
-     * When were full info for this chat last cached.
+     * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID
      */
     public function fullChatLastUpdated(mixed $id): int
     {
-        return ($this->full_chats[$id])['last_update'] ?? 0;
+        return $this->peerDatabase->getFull($this->getIdInternal($id))['last_update'] ?? 0;
     }
     /**
      * Get full info about peer, returns an FullInfo object.
@@ -947,10 +715,10 @@ trait PeerHandler
     public function getFullInfo(mixed $id): array
     {
         $partial = $this->getInfo($id);
-        if (\time() - ($this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
-            return \array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
+        $full = $this->peerDatabase->getFull($partial['bot_api_id']);
+        if (\time() - ($full['last_update'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
+            return \array_merge($partial, $full);
         }
-        $full = null;
         switch ($partial['type']) {
             case 'user':
             case 'bot':
@@ -964,17 +732,7 @@ trait PeerHandler
                 $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['InputChannel']]);
                 break;
         }
-        return \array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
-    }
-    /**
-     * @internal
-     */
-    public function addFullChat(array $full): void
-    {
-        $this->full_chats[$this->getIdInternal($full)] = [
-            'full' => $full,
-            'last_update' => \time(),
-        ];
+        return \array_merge($partial, $this->peerDatabase->getFull($partial['bot_api_id']));
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
@@ -1290,38 +1048,5 @@ trait PeerHandler
     private function getParticipantsHash($channel, $filter, $q, $offset, $limit)
     {
         return ($this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)])['hash'] ?? 0;
-    }
-
-    private array $caching_simple_username = [];
-    /**
-     * @param string $username Username
-     */
-    private function resolveUsername(string $username): ?int
-    {
-        $username = \strtolower(\str_replace('@', '', $username));
-        if (!$username) {
-            return null;
-        }
-        if (isset($this->caching_simple_username[$username])) {
-            // Used to avoid possible issues from addUser
-            return null;
-        }
-        $this->caching_simple_username[$username] = true;
-        $result = null;
-        try {
-            $result = $this->getIdInternal(
-                ($this->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
-            );
-        } catch (FloodWaitError $e) {
-            throw $e;
-        } catch (RPCErrorException $e) {
-            $this->logger->logger('Username resolution failed with error '.$e->getMessage(), Logger::ERROR);
-            if ($e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
-                throw $e;
-            }
-        } finally {
-            unset($this->caching_simple_username[$username]);
-        }
-        return $result;
     }
 }

@@ -234,7 +234,7 @@ abstract class Serialization
                 $unserialized = DbPropertiesFactory::get(
                     $settings,
                     $tableName,
-                    [],
+                    ['enableCache' => false],
                     $unserialized,
                 );
             } else {
@@ -267,7 +267,7 @@ abstract class Serialization
         for ($x = 0; $x < 25; $x++) {
             Logger::log('MadelineProto is starting, please wait...');
             if (\PHP_OS_FAMILY === 'Windows') {
-                Logger::log('For Windows users: please switch to Linux if this fails.');
+                Logger::log(Lang::$current_lang['windows_warning']);
             }
             try {
                 \clearstatcache(true, $ipcPath);

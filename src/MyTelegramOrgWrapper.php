@@ -72,9 +72,8 @@ final class MyTelegramOrgWrapper
     /**
      * Constructor.
      */
-    public function __construct(array|SettingsAbstract $settings)
+    public function __construct(SettingsAbstract $settings)
     {
-        $settings = Settings::parseFromLegacy($settings);
         if (!$settings instanceof Settings) {
             $settings = new Settings;
             $settings->merge($this->settings);
@@ -289,14 +288,5 @@ final class MyTelegramOrgWrapper
             $final_headers[\trim($key)] = \trim($value);
         }
         return $final_headers;
-    }
-    /**
-     * Run specified callable synchronously.
-     *
-     * @param callable $callable Callable
-     */
-    public function loop(callable $callable)
-    {
-        return Tools::wait($callable());
     }
 }

@@ -53,11 +53,14 @@ final class ActionForward implements Action
                         $id = \max($id, $update['message']['id']);
                     }
                 }
-                $this->API->methodCallAsyncRead(
-                    'messages.updatePinnedMessage',
-                    ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
-                    ['FloodWaitLimit' => 2*86400]
-                );
+                try {
+                    $this->API->methodCallAsyncRead(
+                        'messages.updatePinnedMessage',
+                        ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
+                        ['FloodWaitLimit' => 2*86400]
+                    );
+                } catch (RPCErrorException) {
+                }
             }
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'INPUT_USER_DEACTIVATED') {

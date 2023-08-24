@@ -13,8 +13,6 @@
 
 use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Lang;
@@ -32,6 +30,8 @@ use phpDocumentor\Reflection\DocBlockFactory;
 use function Amp\File\read;
 
 chdir($d=__DIR__.'/..');
+
+`git checkout src/InternalDoc.php`;
 
 require 'vendor/autoload.php';
 
@@ -57,7 +57,7 @@ layerUpgrade($layer);
 $logger->logger("Initing docs (layer $layer)...", Logger::NOTICE);
 $docs = [
     [
-        'tl_schema'   => ['mtproto' => '', 'telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
+        'TL'   => (new TLSchema)->setMTProtoSchema('')->setAPISchema("$d/schemas/TL_telegram_v$layer.tl")->setSecretSchema("$d/schemas/TL_secret.tl"),
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",
@@ -115,6 +115,7 @@ $order = [
     'PROXY',
     'ASYNC',
     'FAQ',
+    'UPGRADING',
     'USING_METHODS',
     'CONTRIB',
     'TEMPLATES',
@@ -169,11 +170,16 @@ foreach ($orderedfiles as $key => $filename) {
     $lines = preg_replace_callback('/\<\!--\s+cut_here\s+(\S+)\s+-->.*\<\!--\s+cut_here_end\s+\1\s+--\>/sim', function ($matches) {
         [, $match] = $matches;
         if ($match === "concretefilters") {
-            $result = [Update::class, AbstractMessage::class, Message::class, ServiceMessage::class];
-            $result = array_merge($result, ClassFinder::getClassesInNamespace(
-                \danog\MadelineProto\EventHandler\Message::class,
+            $result = ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto::class,
                 ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
-            ));
+            );
+            $result []= ServiceMessage::class;
+            $result = array_filter(
+                $result,
+                fn ($class) => is_subclass_of($class, Update::class)
+            );
+            sort($result);
             $data = printTypes($result, $match);
         } elseif ($match === "simplefilters") {
             $result = ClassFinder::getClassesInNamespace(
@@ -248,7 +254,7 @@ foreach ($orderedfiles as $key => $filename) {
 
     preg_match_all('|( *)\* \[(.*)\]\((.*)\)|', $file, $matches);
     $file = 'https://docs.madelineproto.xyz/docs/'.basename($filename, '.md').'.html';
-    $index .= "* [$title]($file)\n";
+    $index .= "* [$title]($file) - $description\n";
     if (basename($filename) !== 'FEATURES.md') {
         foreach ($matches[1] as $key => $match) {
             $spaces = "  $match";

@@ -372,6 +372,19 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
+                '[link]('.StrTools::markdownUrlEscape('https://transfer.sh/(/test/test.PNG,/test/test.MP4).zip').')',
+                'link',
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 4,
+                        'type' => 'text_url',
+                        'url' => 'https://transfer.sh/(/test/test.PNG,/test/test.MP4).zip'
+                    ]
+                ]
+            ],
+            [
+                'markdown',
                 '[link]('.StrTools::markdownUrlEscape('https://google.com/').')',
                 'link',
                 [

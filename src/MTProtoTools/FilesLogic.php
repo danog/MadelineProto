@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\MTProtoTools;
 
@@ -41,7 +53,6 @@ use Throwable;
 use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
-use function Amp\File\deleteFile;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -113,11 +124,32 @@ trait FilesLogic
         }
     }
     /**
+     * Download file to an amphp stream, returning it.
+     *
+     * @param mixed                       $messageMedia File to download
+     * @param callable                    $cb            Callback
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     */
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    {
+        $pipe = new Pipe(1024*1024);
+        $sink = $pipe->getSink();
+        EventLoop::queue(function () use ($messageMedia, $sink, $cb, $offset, $end): void {
+            try {
+                $this->downloadToStream($messageMedia, $sink, $cb, $offset, $end);
+            } finally {
+                $sink->close();
+            }
+        });
+        return $pipe->getSource();
+    }
+    /**
      * Download file to stream.
      *
      * @param mixed                       $messageMedia File to download
      * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
-     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                    $cb            Callback
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
@@ -215,7 +247,7 @@ trait FilesLogic
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                           $cb        Callback
      */
     public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null)
     {
@@ -227,7 +259,7 @@ trait FilesLogic
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                $fileName  File name
-     * @param callable                                              $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable                                              $cb        Callback
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
      */
     public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
@@ -290,10 +322,10 @@ trait FilesLogic
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromStream(mixed $stream, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -354,26 +386,8 @@ trait FilesLogic
             $stream->seek(0, Whence::End);
             $size = $stream->tell();
             $stream->seek(0);
-        } elseif (!$size) {
-            $this->logger->logger('No content length for stream, caching first');
-            $body = $stream;
-            $temp = \tempnam(\sys_get_temp_dir(), 'madeline_temp_file');
-            try {
-                $stream = openFile($temp, 'r+');
-                while (($chunk = $body->read()) !== null) {
-                    $stream->write($chunk);
-                }
-                $size = $stream->tell();
-                if (!$size) {
-                    throw new Exception('Wrong size!');
-                }
-                $stream->seek(0);
-                return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
-            } finally {
-                deleteFile($temp);
-            }
         }
-        $res = ($this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted));
+        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
         if ($created) {
             /** @var StreamInterface $stream */
             $stream->disconnect();

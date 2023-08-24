@@ -1,6 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Db;
 
@@ -70,9 +82,6 @@ abstract class SqlArray extends DriverArray
     public function offsetGet(mixed $key): mixed
     {
         $key = (string) $key;
-        if ($this->hasCache($key)) {
-            return $this->getCache($key);
-        }
 
         $row = $this->execute($this->queries[self::SQL_GET], ['index' => $key])->fetchRow();
         if ($row === null) {
@@ -80,7 +89,6 @@ abstract class SqlArray extends DriverArray
         }
 
         $value = ($this->deserializer)($row['value']);
-        $this->setCache($key, $value);
 
         return $value;
     }
@@ -88,11 +96,6 @@ abstract class SqlArray extends DriverArray
     public function set(string|int $key, mixed $value): void
     {
         $key = (string) $key;
-        if ($this->hasCache($key) && $this->getCache($key) === $value) {
-            return;
-        }
-
-        $this->setCache($key, $value);
 
         $this->execute(
             $this->queries[self::SQL_SET],
@@ -101,7 +104,6 @@ abstract class SqlArray extends DriverArray
                 'value' => ($this->serializer)($value),
             ],
         );
-        $this->setCache($key, $value);
     }
 
     /**
@@ -112,7 +114,6 @@ abstract class SqlArray extends DriverArray
     public function unset(string|int $key): void
     {
         $key = (string) $key;
-        $this->unsetCache($key);
 
         $this->execute(
             $this->queries[self::SQL_UNSET],
@@ -139,7 +140,6 @@ abstract class SqlArray extends DriverArray
      */
     public function clear(): void
     {
-        $this->clearCache();
         $this->execute($this->queries[self::SQL_CLEAR]);
     }
 

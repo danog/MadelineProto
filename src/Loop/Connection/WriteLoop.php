@@ -34,6 +34,8 @@ use function strlen;
 /**
  * Socket write loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class WriteLoop extends Loop

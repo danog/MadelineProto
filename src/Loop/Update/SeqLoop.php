@@ -30,6 +30,8 @@ use function Amp\delay;
 /**
  * update feed loop.
  *
+ * @internal
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 final class SeqLoop extends Loop

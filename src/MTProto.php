@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cache\Cache;
+use Amp\Cache\LocalCache;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
@@ -43,6 +45,7 @@ use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
+use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
@@ -50,7 +53,6 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\SecretChats\MessageHandler;
 use danog\MadelineProto\SecretChats\ResponseHandler;
 use danog\MadelineProto\SecretChats\SeqNoHandler;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -79,6 +81,8 @@ use function time;
 
 /**
  * Manages all of the mtproto stuff.
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  *
  * @internal
  */
@@ -116,7 +120,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 170;
+    const V = 171;
     /**
      * Bad message error codes.
      *
@@ -220,17 +224,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $dh_config = ['version' => 0];
     /**
-     * Internal peer database.
-     *
-     */
-    public DbArray $chats;
-
-    /**
-     * Cache of usernames for chats.
-     *
-     */
-    public DbArray $usernames;
-    /**
      * Cached parameters for fetching channel participants.
      *
      */
@@ -245,11 +238,6 @@ final class MTProto implements TLCallback, LoggerGetter
      *
      */
     public array $qres = [];
-    /**
-     * Full chat info database.
-     *
-     */
-    public DbArray $full_chats;
     /**
      * Sponsored message database.
      *
@@ -281,10 +269,15 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public ?ReferenceDatabase $referenceDatabase = null;
     /**
-     * min database.
+     * Min database.
      *
      */
     public MinDatabase $minDatabase;
+    /**
+     * Peer database.
+     *
+     */
+    public PeerDatabase $peerDatabase;
     /**
      * Phone config loop.
      */
@@ -293,10 +286,6 @@ final class MTProto implements TLCallback, LoggerGetter
      * Config loop.
      */
     public ?PeriodicLoopInternal $configLoop = null;
-    /**
-     * Call checker loop.
-     */
-    private ?PeriodicLoopInternal $callCheckerLoop = null;
     /**
      * Autoserialization loop.
      */
@@ -342,6 +331,8 @@ final class MTProto implements TLCallback, LoggerGetter
      * TL serializer.
      */
     private TL $TL;
+
+    private Cache $reportCache;
 
     /**
      * Snitch.
@@ -411,11 +402,8 @@ final class MTProto implements TLCallback, LoggerGetter
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'chats' => ['innerMadelineProto' => true],
-        'full_chats' => ['innerMadelineProto' => true],
         'sponsoredMessages' => ['innerMadelineProto' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
-        'usernames' => ['innerMadelineProto' => true, 'innerMadelineProtoSerializer' => SerializerType::STRING],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
 
@@ -529,22 +517,11 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->cleanupProperties();
         // Start IPC server
         if (!$this->ipcServer) {
-            try {
-                $this->ipcServer = new Server($this);
-                $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->getSession());
-            } catch (Throwable $e) {
-                $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
-            }
+            $this->ipcServer = new Server($this);
+            $this->ipcServer->setSettings($this->settings->getIpc());
+            $this->ipcServer->setIpcPath($this->wrapper->getSession());
         }
-        try {
-            $this->ipcServer->start();
-        } catch (Throwable $e) {
-            if (Magic::$isIpcWorker) {
-                throw $e;
-            }
-            $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
-        }
+        $this->ipcServer->start();
         // Load rsa keys
         $this->rsa_keys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
@@ -557,7 +534,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->test_rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
-        $callbacks = [$this];
+        $callbacks = [$this, $this->peerDatabase];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
             $callbacks []= $this->referenceDatabase;
         }
@@ -603,6 +580,20 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         return $this->wrapper->getSession()->getSessionDirectoryPath();
     }
+
+    private ?string $tmpDbPrefix = null;
+
+    /** @internal */
+    public function getDbPrefix(): string
+    {
+        $prefix = $this->getSelf()['id'] ?? null;
+        if (!$prefix) {
+            $this->tmpDbPrefix ??= 'tmp_'.\spl_object_id($this);
+            $prefix = $this->tmpDbPrefix;
+        }
+        return (string) $prefix;
+    }
+
     /**
      * Sleep function.
      *
@@ -612,12 +603,10 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         return [
             // Databases
-            'chats',
-            'full_chats',
             'referenceDatabase',
             'minDatabase',
+            'peerDatabase',
             'channelParticipants',
-            'usernames',
             'sponsoredMessages',
 
             'tmpDbPrefix',
@@ -685,47 +674,9 @@ final class MTProto implements TLCallback, LoggerGetter
             'reportDest',
 
             'calls',
+            'callsByPeer',
             'snitch',
         ];
-    }
-
-    private bool $runningUsernameMigration = false;
-    private function fillUsernamesCache(): void
-    {
-        if (!$this->settings->getDb()->getEnableUsernameDb()) {
-            $this->usernames->clear();
-            return;
-        }
-        if (!isset($this->usernames[' '])) {
-            if ($this->runningUsernameMigration) {
-                return;
-            }
-            $this->runningUsernameMigration = true;
-            $this->logger('Filling database cache. This can take a few minutes.', Logger::WARNING);
-
-            async(function (): void {
-                try {
-                    $counter = 0;
-                    foreach ($this->chats as $id => $chat) {
-                        $counter++;
-                        $id = (int) $id;
-                        if (isset($chat['username'])) {
-                            $this->usernames[\strtolower($chat['username'])] = $id;
-                        }
-                        foreach ($chat['usernames'] ?? [] as ['username' => $username]) {
-                            $this->usernames[\strtolower($username)] = $id;
-                        }
-                        if ($counter % 1000 === 0) {
-                            $this->logger("Filling database cache. $counter", Logger::WARNING);
-                        }
-                    }
-                    $this->usernames[' '] = 0;
-                    $this->logger('Cache filled.', Logger::WARNING);
-                } finally {
-                    $this->runningUsernameMigration = false;
-                }
-            });
-        }
     }
 
     /**
@@ -831,7 +782,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function startLoops(): void
     {
-        $this->callCheckerLoop ??= new PeriodicLoopInternal($this, $this->checkCalls(...), 'call check', 10);
         $this->serializeLoop ??= new PeriodicLoopInternal($this, $this->serialize(...), 'serialize', $this->settings->getSerialization()->getInterval());
         $this->phoneConfigLoop ??= new PeriodicLoopInternal($this, $this->getPhoneConfig(...), 'phone config', 3600);
         $this->configLoop ??= new PeriodicLoopInternal($this, $this->getConfig(...), 'config', 3600);
@@ -845,7 +795,6 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
             }
         }
-        $this->callCheckerLoop->start();
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
@@ -863,10 +812,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function stopLoops(): void
     {
-        if ($this->callCheckerLoop) {
-            $this->callCheckerLoop->stop();
-            $this->callCheckerLoop = null;
-        }
         if ($this->serializeLoop) {
             $this->serializeLoop->stop();
             $this->serializeLoop = null;
@@ -897,53 +842,29 @@ final class MTProto implements TLCallback, LoggerGetter
 
         $this->referenceDatabase ??= new ReferenceDatabase($this);
         $this->minDatabase ??= new MinDatabase($this);
+        $this->peerDatabase ??= new PeerDatabase($this);
 
         $db = [];
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
+        $db []= async($this->peerDatabase->init(...));
         $db []= async($this->initDb(...), $this);
         await($db);
 
+        if (isset($this->chats) && $this->chats instanceof MemoryArray) {
+            $this->peerDatabase->importLegacy(
+                $this->chats,
+                $this->full_chats,
+            );
+        }
+
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
-            $callbacks = [$this, $this->referenceDatabase];
+            $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];
             if (!($this->authorization['user']['bot'] ?? false)) {
                 $callbacks[] = $this->minDatabase;
             }
             $this->TL->init($this->settings->getSchema(), $callbacks);
-        }
-
-        $this->fillUsernamesCache();
-
-        if (!$this->settings->getDb()->getEnableFullPeerDb()) {
-            $this->full_chats->clear();
-        }
-        if (!$this->settings->getDb()->getEnablePeerInfoDb()) {
-            if (isset($this->chats[0])) {
-                return;
-            }
-            $this->logger('Cleaning up peer database...');
-            $k = 0;
-            $total = \count($this->chats);
-            foreach ($this->chats as $key => $value) {
-                $value = [
-                    '_' => $value['_'],
-                    'id' => $value['id'],
-                    'access_hash' => $value['access_hash'] ?? null,
-                    'min' => $value['min'] ?? false,
-                ];
-                $k++;
-                if ($k % 500 === 0 || $k === $total) {
-                    $this->logger("Cleaning up peer database ($k/$total)...");
-                    $this->chats->set($key, $value);
-                } else {
-                    $this->chats->set($key, $value);
-                }
-            }
-            $this->chats->set(0, []);
-            $this->logger('Cleaned up peer database!');
-        } elseif (isset($this->chats[0])) {
-            unset($this->chats[0]);
         }
     }
 
@@ -960,9 +881,6 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         $this->settings->setSchema(new TLSchema);
-        if (!isset($this->usernames[' '])) {
-            $this->usernames->clear();
-        }
 
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
@@ -976,8 +894,6 @@ final class MTProto implements TLCallback, LoggerGetter
             } catch (RPCErrorException $e) {
             }
         }
-
-        $this->minDatabase?->sync();
     }
     /**
      * Post-deserialization initialization function.
@@ -1007,7 +923,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->cleanupProperties();
 
             // Re-set TL closures
-            $callbacks = [$this];
+            $callbacks = [$this, $this->peerDatabase];
             if ($this->settings->getDb()->getEnableFileReferenceDb()) {
                 $callbacks []= $this->referenceDatabase;
             }
@@ -1016,18 +932,6 @@ final class MTProto implements TLCallback, LoggerGetter
             }
 
             $this->TL->updateCallbacks($callbacks);
-
-            // Clean up phone call array
-            foreach ($this->calls as $id => $controller) {
-                if (!\is_object($controller)) {
-                    unset($this->calls[$id]);
-                } elseif ($controller->getCallState() === VoIP::CALL_STATE_ENDED) {
-                    $controller->setMadeline($this);
-                    $controller->discard();
-                } else {
-                    $controller->setMadeline($this);
-                }
-            }
 
             $this->settings->getConnection()->init();
             // Setup logger
@@ -1042,7 +946,7 @@ final class MTProto implements TLCallback, LoggerGetter
             // Update settings from constructor
             $this->updateSettings($settings);
             // Update TL callbacks
-            $callbacks = [$this];
+            $callbacks = [$this, $this->peerDatabase];
             if ($this->settings->getDb()->getEnableFileReferenceDb()) {
                 $callbacks[] = $this->referenceDatabase;
             }
@@ -1096,7 +1000,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
         $this->logger->logger('Will unreference instance');
-        if (isset(self::$references[$this->getSessionName()])) {
+        if (isset($this->wrapper) && isset(self::$references[$this->getSessionName()])) {
             unset(self::$references[$this->getSessionName()]);
         }
         $this->stopLoops();
@@ -1253,6 +1157,8 @@ final class MTProto implements TLCallback, LoggerGetter
     }
     /**
      * Setup logger.
+     *
+     * @internal
      */
     public function setupLogger(): void
     {
@@ -1497,13 +1403,6 @@ final class MTProto implements TLCallback, LoggerGetter
         return $this->config;
     }
     /**
-     * @internal
-     */
-    public function addConfig(array $config): void
-    {
-        $this->config = $config;
-    }
-    /**
      * Parse cached config.
      */
     private function parseConfig(): void
@@ -1703,7 +1602,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
         }
         if (!\extension_loaded('uv')) {
-            $warning .= "<h2 style='color:red;'>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</h2>";
+            $warning .= "<p>".\htmlentities(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
         }
         return $warning;
     }
@@ -1805,6 +1704,13 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!$this->reportDest) {
             return;
         }
+
+        $this->reportCache ??= new LocalCache();
+        if ($this->reportCache->get($message)) {
+            return;
+        }
+        $this->reportCache->set($message, true, 60);
+
         $this->reportMutex ??= new LocalMutex;
         $lock = $this->reportMutex->acquire();
         try {
@@ -1914,13 +1820,14 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(
-            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
-            \array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
-            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
-            ['help.support' => [$this->addSupport(...)]],
-            ['config' => [$this->addConfig(...)]],
-        );
+        return [
+            'help.support' => [function (array $support): void {
+                $this->supportUser = $support['user']['id'];
+            }],
+            'config' => [function (array $config): void {
+                $this->config = $config;
+            }]
+        ];
     }
     /**
      * @internal
@@ -1977,19 +1884,12 @@ final class MTProto implements TLCallback, LoggerGetter
         );
     }
     /**
-     * @internal
-     */
-    public function areDeserializationCallbacksMutuallyExclusive(): bool
-    {
-        return false;
-    }
-    /**
      * Get debug information for var_dump.
      */
     public function __debugInfo(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['full_chats'], $vars['chats'], $vars['referenceDatabase'], $vars['minDatabase'], $vars['TL']);
+        unset($vars['peerDatabase'], $vars['referenceDatabase'], $vars['minDatabase'], $vars['TL']);
         return $vars;
     }
 }

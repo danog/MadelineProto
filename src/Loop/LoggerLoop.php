@@ -22,6 +22,9 @@ namespace danog\MadelineProto\Loop;
 
 use danog\MadelineProto\Logger;
 
+/**
+ * @internal
+ */
 trait LoggerLoop
 {
     private bool $logPauses = true;
@@ -33,46 +36,6 @@ trait LoggerLoop
      */
     public function __construct(private Logger $logger)
     {
-    }
-
-    /**
-     * Signal that loop has started.
-     */
-    protected function startedLoop(): void
-    {
-        $this->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
-        parent::startedLoop();
-    }
-
-    /**
-     * Signal that loop has exited.
-     */
-    protected function exitedLoop(): void
-    {
-        $this->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
-        parent::exitedLoop();
-    }
-
-    /**
-     * Report pause, can be overriden for logging.
-     *
-     * @param float $timeout Pause duration, 0 = forever
-     */
-    protected function reportPause(float $timeout): void
-    {
-        if ($this->logPauses) {
-            if ($timeout) {
-                $this->logger->logger(
-                    "Pausing $this for $timeout",
-                    Logger::ULTRA_VERBOSE,
-                );
-            } else {
-                $this->logger->logger(
-                    "Pausing $this until resume is called",
-                    Logger::ULTRA_VERBOSE,
-                );
-            }
-        }
     }
 
     /**

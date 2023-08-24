@@ -49,11 +49,14 @@ final class ActionSend implements Action
                 ));
             }
             if ($this->pin) {
-                $this->API->methodCallAsyncRead(
-                    'messages.updatePinnedMessage',
-                    ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
-                    ['FloodWaitLimit' => 2*86400]
-                );
+                try {
+                    $this->API->methodCallAsyncRead(
+                        'messages.updatePinnedMessage',
+                        ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
+                        ['FloodWaitLimit' => 2*86400]
+                    );
+                } catch (RPCErrorException) {
+                }
             }
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'INPUT_USER_DEACTIVATED') {

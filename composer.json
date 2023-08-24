@@ -41,7 +41,7 @@
         "amphp/socket": "^2",
         "amphp/dns": "^2",
         "amphp/byte-stream": "^2",
-        "amphp/file": "^3",
+        "amphp/file": "^3.0.1",
         "amphp/mysql": "^3",
         "amphp/postgres": "^2",
         "danog/dns-over-https": "^1",
@@ -58,7 +58,8 @@
         "psr/log": "^3",
         "webmozart/assert": "^1.11",
         "bacon/bacon-qr-code": "^2.0",
-        "nikic/php-parser": "^4.16"
+        "nikic/php-parser": "^4.16",
+        "revolt/event-loop": "^1.0.3"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "dev-master",
@@ -68,9 +69,10 @@
         "phpunit/phpunit": "^9",
         "amphp/phpunit-util": "^3",
         "bamarni/composer-bin-plugin": "1.8.2",
-        "roave/security-advisories": "dev-latest",
         "symfony/yaml": "^6.0",
         "amphp/http-server": "^3",
+        "leproxy/leproxy": "^0.2.2",
+        "revolt/event-loop-adapter-react": "^1",
         "dg/bypass-finals": "dev-master"
     },
     "suggest": {
@@ -92,8 +94,7 @@
             "danog\\MadelineProto\\": "src"
         },
         "files": [
-            "src/polyfill.php",
-            "src/loop.php"
+            "src/polyfill.php"
         ]
     },
     "autoload-dev": {

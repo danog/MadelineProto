@@ -224,6 +224,7 @@ final class InternalState
     public function getProgress(): Progress
     {
         return new Progress(
+            $this->API,
             $this->broadcastId,
             $this->getStatus(),
             $this->pendingCount,

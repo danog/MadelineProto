@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
-use Amp\Future;
-
 interface TLInterface
 {
     /**
@@ -68,7 +66,6 @@ interface TLInterface
      * @param array           $type   Type identifier
      */
     public function getLength($stream, array $type = ['type' => '']): int;
-    public function getSideEffects(): ?Future;
     /**
      * Deserialize TL object.
      *

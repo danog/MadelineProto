@@ -9,6 +9,7 @@ require 'vendor/autoload.php';
 $class = new \ReflectionClass(Tools::class);
 $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
 
+/** @internal */
 function ssort($a, $b)
 {
     return strlen($b->getName())-strlen($a->getName());
