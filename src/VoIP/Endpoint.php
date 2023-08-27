@@ -87,7 +87,7 @@ final class Endpoint
             $this->socket = $context->getStream();
             $f = $this->connectFuture;
             $this->connectFuture = null;
-            assert($f !== null);
+            \assert($f !== null);
             $f->complete();
             if ($this->udp) {
                 $this->udpPing();

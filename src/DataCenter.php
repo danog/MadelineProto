@@ -282,6 +282,10 @@ final class DataCenter
      */
     public function generateContexts(int $dc_number, ?ConnectContext $context = null): array
     {
+        if (!isset($this->dclist[$test][$ipv6][$dc_number])) {
+            return [];
+        }
+
         $ctxs = [];
         $combos = [];
         $test = $this->settings->getTestMode() ? 'test' : 'main';

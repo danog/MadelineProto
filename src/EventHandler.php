@@ -209,7 +209,7 @@ abstract class EventHandler extends AbstractAPI
                     throw new AssertionError("Please extend SimpleEventHandler to use filters!");
                 }
                 $handlers []= static function (Update $update) use ($closure, $filter): void {
-                    EventLoop::queue(static function () use ($closure, $filter, $update) {
+                    EventLoop::queue(static function () use ($closure, $filter, $update): void {
                         if ($filter->apply($update)) {
                             $closure($update);
                         }
