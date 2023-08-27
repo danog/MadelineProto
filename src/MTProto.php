@@ -511,14 +511,14 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         // Initialize needed stuffs
         Magic::start(light: false);
+        // Parse and store settings
+        $this->updateSettingsInternal($settings, false);
         // Start IPC server
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);
             $this->ipcServer->setIpcPath($this->wrapper->getSession());
         }
         $this->ipcServer->start();
-        // Parse and store settings
-        $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
         // Load rsa keys
@@ -909,6 +909,8 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->initPromise = $deferred->getFuture();
 
         try {
+            // Setup logger
+            $this->setupLogger();
             if (!$this->ipcServer) {
                 $this->ipcServer = new Server($this);
                 $this->ipcServer->setIpcPath($this->wrapper->getSession());
@@ -930,8 +932,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->TL->updateCallbacks($callbacks);
 
             $this->settings->getConnection()->init();
-            // Setup logger
-            $this->setupLogger();
             // Setup language
             Lang::$current_lang =& Lang::$lang['en'];
             if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
