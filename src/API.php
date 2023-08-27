@@ -211,6 +211,9 @@ final class API extends AbstractAPI
             : ($settings instanceof SettingsLogger ? $settings : new SettingsLogger));
 
         if ($this->connectToMadelineProto($settings)) {
+            if (!$settings instanceof SettingsEmpty) {
+                EventLoop::queue($this->updateSettings(...), $settings);
+            }
             return; // OK
         }
 
