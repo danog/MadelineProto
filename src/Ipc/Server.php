@@ -77,10 +77,6 @@ class Server extends Loop
      */
     private ServerCallback $callback;
     /**
-     * IPC settings.
-     */
-    private Ipc $settings;
-    /**
      * Set IPC path.
      *
      * @param SessionPaths $session Session
@@ -263,17 +259,5 @@ class Server extends Loop
     public function __toString(): string
     {
         return 'IPC server';
-    }
-
-    /**
-     * Set IPC settings.
-     *
-     * @param Ipc $settings IPC settings
-     */
-    public function setSettings(Ipc $settings): self
-    {
-        $this->settings = $settings;
-
-        return $this;
     }
 }
