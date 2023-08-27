@@ -195,6 +195,7 @@ class Server extends Loop
      */
     protected function clientLoop(ChannelledSocket $socket): void
     {
+        $this->API->waitForInit();
         $this->API->logger('Accepted IPC client connection!');
 
         $id = 0;
@@ -225,7 +226,6 @@ class Server extends Loop
     private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
     {
         try {
-            $this->API->waitForInit();
             if ($payload[1] instanceof Wrapper) {
                 $wrapper = $payload[1];
                 $payload[1] = $this->callback->unwrap($wrapper);

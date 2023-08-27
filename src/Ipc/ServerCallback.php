@@ -66,6 +66,7 @@ final class ServerCallback extends Server
     protected function clientLoop(ChannelledSocket $socket): void
     {
         $id = $this->id++;
+        $this->API->waitForInit();
         $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
         $this->socketList[$id] = $socket;
         $this->watcherList[$id] = EventLoop::delay(30, function () use ($id): void {
