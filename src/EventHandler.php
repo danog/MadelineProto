@@ -164,7 +164,7 @@ abstract class EventHandler extends AbstractAPI
                 $method_name = \lcfirst(\substr($method, 2));
                 if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
                     $methods[$method_name] = [
-                        function (array $update) use ($basic_handler, $closure): void {
+                        static function (array $update) use ($basic_handler, $closure): void {
                             EventLoop::queue($basic_handler, $update, $closure);
                         }
                     ];
@@ -179,7 +179,7 @@ abstract class EventHandler extends AbstractAPI
                     }
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
-                        function (PeriodicLoop $loop) use ($closure): bool {
+                        static function (PeriodicLoop $loop) use ($closure): bool {
                             return $closure($loop) ?? false;
                         },
                         $method,
@@ -208,10 +208,12 @@ abstract class EventHandler extends AbstractAPI
                 if (!$this instanceof SimpleEventHandler) {
                     throw new AssertionError("Please extend SimpleEventHandler to use filters!");
                 }
-                $handlers []= function (Update $update) use ($closure, $filter): void {
-                    if ($filter->apply($update)) {
-                        EventLoop::queue($closure, $update);
-                    }
+                $handlers []= static function (Update $update) use ($closure, $filter): void {
+                    EventLoop::queue(static function () use ($closure, $filter, $update) {
+                        if ($filter->apply($update)) {
+                            $closure($update);
+                        }
+                    });
                 };
             }
             if ($this instanceof SimpleEventHandler) {
@@ -435,7 +437,7 @@ abstract class EventHandler extends AbstractAPI
                     continue;
                 }
 
-                \spl_autoload_register(function (string $class) use ($p): void {
+                \spl_autoload_register(static function (string $class) use ($p): void {
                     if (!\str_starts_with($class, 'MadelinePlugin\\')) {
                         return;
                     }
