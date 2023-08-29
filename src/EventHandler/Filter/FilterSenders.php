@@ -18,42 +18,13 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Query\ButtonQuery;
-use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow incoming or outgoing group messages made by a certain list of senders.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterSender extends Filter
+final class FilterSenders extends AbstractFilterFromSenders
 {
-    /** @var array<string|int> */
-    private readonly array $peers;
-    /** @var list<int> */
-    private readonly array $peersResolved;
-    public function __construct(string|int ...$idOrUsername)
-    {
-        $this->peers = \array_unique($idOrUsername);
-    }
-    public function initialize(EventHandler $API): Filter
-    {
-        if (\count($this->peers) === 1) {
-            return (new FilterSender(\array_values($this->peers)[0]))->initialize($API);
-        }
-        $res = [];
-        foreach ($this->peers as $peer) {
-            $res []= $API->getId($peer);
-        }
-        /** @psalm-suppress InaccessibleProperty */
-        $this->peersResolved = $res;
-        return $this;
-    }
-    public function apply(Update $update): bool
-    {
-        return ($update instanceof AbstractMessage && \in_array($update->senderId, $this->peersResolved, true)) ||
-            ($update instanceof ButtonQuery && \in_array($update->userId, $this->peersResolved, true)) || 
-            ($update instanceof InlineQuery && \in_array($update->userId, $this->peersResolved, true));
-    }
 }

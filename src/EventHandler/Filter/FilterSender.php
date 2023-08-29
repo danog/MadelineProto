@@ -18,31 +18,13 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Query\ButtonQuery;
-use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow incoming or outgoing group messages made by a certain sender.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterSender extends Filter
+final class FilterSender extends AbstractFilterFromSender
 {
-    private readonly int $peerResolved;
-    public function __construct(private readonly string|int $peer)
-    {
-    }
-    public function initialize(EventHandler $API): Filter
-    {
-        /** @psalm-suppress InaccessibleProperty */
-        $this->peerResolved = $API->getId($this->peer);
-        return $this;
-    }
-    public function apply(Update $update): bool
-    {
-        return ($update instanceof AbstractMessage && $update->senderId === $this->peerResolved) ||
-        ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) || 
-        ($update instanceof InlineQuery && $update->userId === $this->peerResolved);
-    }
 }
