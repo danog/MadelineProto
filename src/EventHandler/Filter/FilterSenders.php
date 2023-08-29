@@ -25,6 +25,6 @@ use danog\MadelineProto\EventHandler\Update;
  * Allow incoming or outgoing group messages made by a certain list of senders.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterFromSenders extends AbstractFilterFromSenders
+final class FilterSenders extends AbstractFilterFromSenders
 {
 }
