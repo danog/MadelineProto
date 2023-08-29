@@ -227,7 +227,7 @@ final class InternalState
             $this->API,
             $this->broadcastId,
             $this->getStatus(),
-            count($this->peers),
+            \count($this->peers),
             $this->successCount,
             $this->failCount
         );

@@ -6,7 +6,7 @@ use danog\MadelineProto\EventHandler\Media\GeoPoint;
 use danog\MadelineProto\MTProto;
 
 /**
- * An incoming inline query
+ * An incoming inline query.
  */
 final class InlineQuery extends Update
 {

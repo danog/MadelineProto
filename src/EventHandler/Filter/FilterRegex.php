@@ -17,9 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
-use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 

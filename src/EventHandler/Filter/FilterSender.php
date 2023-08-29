@@ -17,9 +17,6 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Message\GroupMessage;
-use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow incoming or outgoing group messages made by a certain sender.
