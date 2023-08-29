@@ -5,9 +5,7 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use JsonSerializable;
 
-/**
- * Inline query peer type
- */
+/** @internal */
 enum InlineQueryPeerType implements JsonSerializable
 {
     /** private chat */
