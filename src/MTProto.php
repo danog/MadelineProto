@@ -513,15 +513,14 @@ final class MTProto implements TLCallback, LoggerGetter
         Magic::start(light: false);
         // Parse and store settings
         $this->updateSettingsInternal($settings, false);
-        // Actually instantiate needed classes like a boss
-        $this->cleanupProperties();
         // Start IPC server
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);
-            $this->ipcServer->setSettings($this->settings->getIpc());
             $this->ipcServer->setIpcPath($this->wrapper->getSession());
         }
         $this->ipcServer->start();
+        // Actually instantiate needed classes like a boss
+        $this->cleanupProperties();
         // Load rsa keys
         $this->rsa_keys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
@@ -786,15 +785,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->phoneConfigLoop ??= new PeriodicLoopInternal($this, $this->getPhoneConfig(...), 'phone config', 3600);
         $this->configLoop ??= new PeriodicLoopInternal($this, $this->getConfig(...), 'config', 3600);
 
-        if (!$this->ipcServer) {
-            try {
-                $this->ipcServer = new Server($this);
-                $this->ipcServer->setSettings($this->settings->getIpc());
-                $this->ipcServer->setIpcPath($this->wrapper->getSession());
-            } catch (Throwable $e) {
-                $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
-            }
-        }
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
@@ -919,6 +909,14 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->initPromise = $deferred->getFuture();
 
         try {
+            // Setup logger
+            $this->setupLogger();
+            if (!$this->ipcServer) {
+                $this->ipcServer = new Server($this);
+                $this->ipcServer->setIpcPath($this->wrapper->getSession());
+            }
+            $this->ipcServer->start();
+
             // Cleanup old properties, init new stuffs
             $this->cleanupProperties();
 
@@ -934,8 +932,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->TL->updateCallbacks($callbacks);
 
             $this->settings->getConnection()->init();
-            // Setup logger
-            $this->setupLogger();
             // Setup language
             Lang::$current_lang =& Lang::$lang['en'];
             if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
@@ -1121,12 +1117,6 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->logger->logger("The database settings have changed!", Logger::WARNING);
             $this->cleanupProperties();
             $this->settings->getDb()->applyChanges();
-        }
-        if ($this->settings->getIpc()->hasChanged()) {
-            $this->logger->logger("The IPC settings have changed!", Logger::WARNING);
-            if (isset($this->ipcServer)) {
-                $this->ipcServer->setSettings($this->settings->getIpc()->applyChanges());
-            }
         }
         if ($this->settings->getSerialization()->hasChanged()) {
             $this->logger->logger("The serialization settings have changed!", Logger::WARNING);

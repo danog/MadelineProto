@@ -916,6 +916,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isplaypaused-int-id-bool" name="isPlayPaused">Whether the currently playing audio file is paused: isPlayPaused</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContactSignUpNotification.html" name="account.getContactSignUpNotification">Whether the user will receive notifications when contacts sign up: account.getContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isaltervista-bool" name="isAltervista">Whether this is altervista: isAltervista</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#canconvertogg-bool" name="canConvertOgg">Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot: canConvertOgg</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipc-bool" name="isIpc">Whether we're an IPC client instance: isIpc</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isipcworker-bool" name="isIpcWorker">Whether we're an IPC server process (as opposed to an event handler): isIpcWorker</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#istestmode-bool" name="isTestMode">Whether we're currently connected to the test DCs: isTestMode</a>

@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.0.0-beta143';
+    public const RELEASE = '8.0.0-beta144';
     /**
      * Secret chat was not found.
      *
@@ -211,6 +211,9 @@ final class API extends AbstractAPI
             : ($settings instanceof SettingsLogger ? $settings : new SettingsLogger));
 
         if ($this->connectToMadelineProto($settings)) {
+            if (!$settings instanceof SettingsEmpty) {
+                EventLoop::queue($this->updateSettings(...), $settings);
+            }
             return; // OK
         }
 

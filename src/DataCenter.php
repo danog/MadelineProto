@@ -322,6 +322,10 @@ final class DataCenter
         }
         $combos[] = $default;
 
+        if (!isset($this->dclist[$test][$ipv6][$dc_number])) {
+            return [];
+        }
+
         $only = $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'];
         if ($only || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
             $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];

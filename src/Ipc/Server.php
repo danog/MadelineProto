@@ -77,10 +77,6 @@ class Server extends Loop
      */
     private ServerCallback $callback;
     /**
-     * IPC settings.
-     */
-    private Ipc $settings;
-    /**
      * Set IPC path.
      *
      * @param SessionPaths $session Session
@@ -199,6 +195,7 @@ class Server extends Loop
      */
     protected function clientLoop(ChannelledSocket $socket): void
     {
+        $this->API->waitForInit();
         $this->API->logger('Accepted IPC client connection!');
 
         $id = 0;
@@ -229,7 +226,6 @@ class Server extends Loop
     private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
     {
         try {
-            $this->API->waitForInit();
             if ($payload[1] instanceof Wrapper) {
                 $wrapper = $payload[1];
                 $payload[1] = $this->callback->unwrap($wrapper);
@@ -263,17 +259,5 @@ class Server extends Loop
     public function __toString(): string
     {
         return 'IPC server';
-    }
-
-    /**
-     * Set IPC settings.
-     *
-     * @param Ipc $settings IPC settings
-     */
-    public function setSettings(Ipc $settings): self
-    {
-        $this->settings = $settings;
-
-        return $this;
     }
 }
