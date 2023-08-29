@@ -29,7 +29,7 @@ enum InlineQueryPeerType implements JsonSerializable
      * @param string Type of the chat from which the inline query was sent.
      * @throws AssertionError
      */
-    public static function fromString(string $name)
+    public static function fromString(string $name): InlineQueryPeerType
     {
         $newName = ltrim($name, "inlineQueryPeerType");
         foreach (InlineQueryPeerType::cases() as $case) {
