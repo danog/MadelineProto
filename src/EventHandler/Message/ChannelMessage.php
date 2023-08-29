@@ -26,6 +26,8 @@ final class ChannelMessage extends Message
 {
     /** View counter */
     public readonly ?int $views;
+    /** Forward counter */
+    public readonly ?int $forwards;
     /** Author of the post, if signatures are enabled */
     public readonly ?string $signature;
 
@@ -38,6 +40,7 @@ final class ChannelMessage extends Message
         parent::__construct($API, $rawMessage, $info);
 
         $this->views = $rawMessage['views'] ?? null;
+        $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
     }
 }
