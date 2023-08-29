@@ -28,7 +28,7 @@ class MyEventHandler extends SimpleEventHandler
 {
     // !!! Change this to your username! !!!
     private const ADMIN = 'danogentili';
-    public function getReportPeers(): array
+    public function getReportPeers(): string
     {
         return self::ADMIN;
     }
