@@ -26,6 +26,12 @@ if (class_exists(API::class)) {
 
 class MyEventHandler extends SimpleEventHandler
 {
+    // !!! Change this to your username! !!!
+    private const ADMIN = 'danogentili';
+    public function getReportPeers(): array
+    {
+        return self::ADMIN;
+    }
     #[FilterCommand('start')]
     public function startCmd(Incoming&Message $message): void
     {
