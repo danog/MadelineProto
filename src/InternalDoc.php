@@ -1249,9 +1249,9 @@ abstract class InternalDoc
      *
      * @param int $id Bot API ID
      */
-    public static function isSupergroup(int $id): bool
+    public static function isSupergroupOrChannel(int $id): bool
     {
-        return \danog\MadelineProto\MTProto::isSupergroup($id);
+        return \danog\MadelineProto\MTProto::isSupergroupOrChannel($id);
     }
     /**
      * Whether we're currently connected to the test DCs.
