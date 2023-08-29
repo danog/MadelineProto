@@ -16,16 +16,15 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use Attribute;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
-use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow incoming or outgoing group messages made by a certain sender.
- * 
+ *
  * @internal
  */
 abstract class AbstractFilterFromSender extends Filter
@@ -43,7 +42,7 @@ abstract class AbstractFilterFromSender extends Filter
     public function apply(Update $update): bool
     {
         return ($update instanceof GroupMessage && $update->senderId === $this->peerResolved) ||
-            ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) || 
+            ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) ||
             ($update instanceof InlineQuery && $update->userId === $this->peerResolved);
     }
 }

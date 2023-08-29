@@ -22,17 +22,18 @@ enum InlineQueryPeerType implements JsonSerializable
     case SameBotPM;
 
     /**
-     * Get InlineQueryPeerType from update
-     * 
+     * Get InlineQueryPeerType from update.
+     *
      * @param string Type of the chat from which the inline query was sent.
      * @throws AssertionError
      */
     public static function fromString(string $name): InlineQueryPeerType
     {
-        $newName = substr($name, 19);
+        $newName = \substr($name, 19);
         foreach (InlineQueryPeerType::cases() as $case) {
-            if ($case->name === $newName)
+            if ($case->name === $newName) {
                 return $case;
+            }
         }
         throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
     }

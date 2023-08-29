@@ -31,6 +31,7 @@ use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
 use danog\MadelineProto\API;
 use danog\MadelineProto\BotApiFileId;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -280,7 +281,7 @@ trait FilesLogic
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
                 return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
             }
-        } elseif (\is_array($file)) {
+        } elseif (\is_array($file) || $file instanceof Media) {
             return $this->uploadFromTgfile($file, $cb, $encrypted);
         }
         if ($file instanceof ReadableStream || \is_resource($file)) {
