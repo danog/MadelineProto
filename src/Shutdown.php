@@ -73,6 +73,7 @@ final class Shutdown
         }
         API::finalize();
         MTProto::serializeAll();
+        Logger::finalize();
         if (\class_exists(Installer::class)) {
             Installer::unlock();
         }

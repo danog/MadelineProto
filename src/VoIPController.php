@@ -320,6 +320,7 @@ final class VoIPController
         if ($this->callState === CallState::ENDED) {
             return $this;
         }
+        $this->API->waitForInit();
         $this->API->cleanupCall($this->public->callID);
         $this->callState = CallState::ENDED;
         $this->diskJockey->discard();

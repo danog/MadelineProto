@@ -23,6 +23,8 @@ use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow incoming or outgoing group messages made by a certain sender.
+ * 
+ * @internal
  */
 abstract class AbstractFilterFromSender extends Filter
 {

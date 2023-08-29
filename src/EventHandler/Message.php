@@ -90,6 +90,13 @@ abstract class Message extends AbstractMessage
     public ?self $nextSent = null;
     // Todo media (photosizes, thumbs), albums, reactions, games eventually
 
+    /** View counter for messages from channels or forwarded from channels */
+    public readonly ?int $views;
+    /** Forward counter for messages from channels or forwarded from channels */
+    public readonly ?int $forwards;
+    /** Author of the post, if signatures are enabled for messages from channels or forwarded from channels */
+    public readonly ?string $signature;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -97,6 +104,10 @@ abstract class Message extends AbstractMessage
         array $info,
     ) {
         parent::__construct($API, $rawMessage, $info);
+
+        $this->views = $rawMessage['views'] ?? null;
+        $this->forwards = $rawMessage['forwards'] ?? null;
+        $this->signature = $rawMessage['post_author'] ?? null;
 
         $this->entities = $rawMessage['entities'] ?? null;
         $this->message = $rawMessage['message'];

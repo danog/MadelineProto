@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.14.1@b9d355e0829c397b9b3b47d0c0ed042a8a70284d">
+<files psalm-version="dev-master@d3463e30f3768de1f61d1ef4834b4bcd8aa179ef">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -824,7 +824,6 @@
     <PropertyNotSetInConstructor>
       <code>$callback</code>
       <code>$server</code>
-      <code>$settings</code>
     </PropertyNotSetInConstructor>
     <TypeDoesNotContainType>
       <code>$payload === self::SHUTDOWN</code>
@@ -893,14 +892,12 @@
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log']]></code>
       <code><![CDATA[$this->optional]]></code>
       <code><![CDATA[$this->optional]]></code>
-      <code><![CDATA[$this->stdout->getResource()]]></code>
+      <code><![CDATA[$this->optional]]></code>
+      <code><![CDATA[$this->stdoutUnbuffered->getResource()]]></code>
     </PossiblyInvalidArgument>
     <PossiblyInvalidOperand>
       <code>$optional</code>
     </PossiblyInvalidOperand>
-    <PossiblyNullFunctionCall>
-      <code><![CDATA[\call_user_func_array($this->optional, [$param, $level])]]></code>
-    </PossiblyNullFunctionCall>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
       <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
@@ -908,6 +905,7 @@
     <PropertyNotSetInConstructor>
       <code>$colors</code>
       <code>$stdout</code>
+      <code>$stdoutUnbuffered</code>
     </PropertyNotSetInConstructor>
     <UninitializedProperty>
       <code><![CDATA[$this->colors]]></code>
@@ -1447,6 +1445,7 @@
       <code>$size</code>
     </PossiblyNullArgument>
     <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
       <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
@@ -2238,9 +2237,6 @@
     <InaccessibleProperty>
       <code><![CDATA[$this->udp]]></code>
     </InaccessibleProperty>
-    <InvalidReturnType>
-      <code>?array</code>
-    </InvalidReturnType>
     <MissingParamType>
       <code>$stream</code>
     </MissingParamType>

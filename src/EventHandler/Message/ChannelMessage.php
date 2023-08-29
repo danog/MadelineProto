@@ -24,11 +24,6 @@ use danog\MadelineProto\MTProto;
  */
 final class ChannelMessage extends Message
 {
-    /** View counter */
-    public readonly ?int $views;
-    /** Author of the post, if signatures are enabled */
-    public readonly ?string $signature;
-
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -36,8 +31,5 @@ final class ChannelMessage extends Message
         array $info
     ) {
         parent::__construct($API, $rawMessage, $info);
-
-        $this->views = $rawMessage['views'] ?? null;
-        $this->signature = $rawMessage['post_author'] ?? null;
     }
 }
