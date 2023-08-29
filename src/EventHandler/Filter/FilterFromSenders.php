@@ -19,6 +19,8 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
+use danog\MadelineProto\EventHandler\Query\ButtonQuery;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
@@ -50,6 +52,8 @@ final class FilterFromSenders extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof GroupMessage && \in_array($update->senderId, $this->peersResolved, true);
+        return ($update instanceof GroupMessage && \in_array($update->senderId, $this->peersResolved, true)) ||
+            ($update instanceof ButtonQuery && \in_array($update->userId, $this->peersResolved, true)) || 
+            ($update instanceof InlineQuery && \in_array($update->userId, $this->peersResolved, true));
     }
 }
