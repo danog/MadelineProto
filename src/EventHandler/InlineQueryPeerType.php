@@ -2,37 +2,36 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use AssertionError;
+
 /**
  * Inline query peer type
  */
 enum InlineQueryPeerType
 {
     /** private chat */
-    case InlineQueryPeerTypePM;
+    case PM;
     /** [chat](https://core.telegram.org/api/channel) */
-    case InlineQueryPeerTypeChat;
+    case Chat;
     /** private chat with a bot. */
-    case InlineQueryPeerTypeBotPM;
+    case BotPM;
     /** [channel](https://core.telegram.org/api/channel) */
-    case InlineQueryPeerTypeBroadcast;
+    case Broadcast;
     /** [supergroup](https://core.telegram.org/api/channel) */
-    case InlineQueryPeerTypeMegagroup;
+    case Megagroup;
     /** private chat with the bot itself */
-    case InlineQueryPeerTypeSameBotPM;
+    case SameBotPM;
 
     /**
      * Get InlineQueryPeerType from update
      * 
      * @param string Type of the chat from which the inline query was sent.
+     * @throws AssertionError
      */
-    public static function fromString(string $name): ?InlineQueryPeerType
+    public static function fromString(string $name): InlineQueryPeerType
     {
-        $name = ucfirst($name);
-        foreach(InlineQueryPeerType::cases() as $status)
-        {
-            if($status->name === $name)
-                return $status;
-        }
-        return null;
+        $name = ltrim($name, "inlineQueryPeerType");
+        return (InlineQueryPeerType::cases())[$name]
+            ?? throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
     }
 }
