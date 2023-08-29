@@ -659,7 +659,7 @@ trait UpdateHandler
     public function subscribeToUpdates(mixed $channel): bool
     {
         $channelId = $this->getInfo($channel, API::INFO_TYPE_ID);
-        if (!MTProto::isSupergroup($channelId)) {
+        if (!MTProto::isSupergroupOrChannel($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
         $channelId = MTProto::fromSupergroup($channelId);

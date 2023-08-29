@@ -53,7 +53,7 @@ abstract class AbstractFilterFromSenders extends Filter
     public function apply(Update $update): bool
     {
         return $update instanceof GroupMessage && \in_array($update->senderId, $this->peersResolved, true);
-        ($update instanceof ButtonQuery && \in_array($update->userId, $this->peersResolved, true)) ||
-        ($update instanceof InlineQuery && \in_array($update->userId, $this->peersResolved, true));
+            ($update instanceof ButtonQuery && \in_array($update->userId, $this->peersResolved, true)) ||
+            ($update instanceof InlineQuery && \in_array($update->userId, $this->peersResolved, true));
     }
 }

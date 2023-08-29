@@ -76,7 +76,7 @@ trait PeerHandler
      *
      * @param int $id Bot API ID
      */
-    public static function isSupergroup(int $id): bool
+    public static function isSupergroupOrChannel(int $id): bool
     {
         return $id < Magic::ZERO_CHANNEL_ID;
     }
@@ -429,7 +429,7 @@ trait PeerHandler
             if (!$this->peerDatabase->isset($id)) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
-                    if ($this->isSupergroup($id)) {
+                    if (self::isSupergroupOrChannel($id)) {
                         $this->peerDatabase->addChatBlocking($id);
                     } elseif ($id < 0) {
                         $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id]]);
