@@ -37,7 +37,7 @@ final class InternalState
 {
     /** @var array<int> */
     private array $peers = [];
-    private int $pendingCount = 0;
+    private int $totalCount = 0;
     private int $successCount = 0;
     private int $failCount = 0;
     private StatusInternal $status = StatusInternal::IDLING_BEFORE_GATHERING_PEERS;
@@ -152,7 +152,7 @@ final class InternalState
                 return true;
             });
             $this->peers = $peers;
-            $this->pendingCount = \count($peers);
+            $this->totalCount = \count($peers);
             $this->setStatus(StatusInternal::IDLING_BEFORE_BROADCASTING);
             $this->startBroadcast();
         });
@@ -227,7 +227,7 @@ final class InternalState
             $this->API,
             $this->broadcastId,
             $this->getStatus(),
-            $this->pendingCount,
+            count($this->peers),
             $this->successCount,
             $this->failCount
         );
