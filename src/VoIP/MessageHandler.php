@@ -238,6 +238,7 @@ final class MessageHandler
                 return false;
             }
             $this->acksForReceived |= 1 << ($diff+1);
+            $this->acksForReceived &= 0xFFFF_FFFF;
         } else {
             Logger::log("Packet $packet_seq_no is out of order and too late");
             return false;
