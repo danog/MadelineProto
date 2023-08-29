@@ -31,7 +31,7 @@ enum InlineQueryPeerType implements JsonSerializable
      */
     public static function fromString(string $name): InlineQueryPeerType
     {
-        $newName = ltrim($name, "inlineQueryPeerType");
+        $newName = substr($name, 19);
         foreach (InlineQueryPeerType::cases() as $case) {
             if ($case->name === $newName)
                 return $case;
