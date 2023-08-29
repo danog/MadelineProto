@@ -39,13 +39,6 @@ final class InlineQuery extends Update
         $this->userId = $rawInlineQuery['user_id'];
         $this->offset = $rawInlineQuery['offset'];
         $this->geo = isset($rawInlineQuery['geo']) ? new GeoPoint($rawInlineQuery['geo']) : null;
-        $this->peerType = match ($rawInlineQuery['peerType']['_']) {
-            'inlineQueryPeerTypeBotPM' => new InlineQueryPeerType\InlineQueryPeerTypeBotPM,
-            'inlineQueryPeerTypeBroadcast' => new InlineQueryPeerType\InlineQueryPeerTypeBroadcast,
-            'inlineQueryPeerTypeChat' => new InlineQueryPeerType\InlineQueryPeerTypeChat,
-            'inlineQueryPeerTypeMegagroup' => new InlineQueryPeerType\InlineQueryPeerTypeMegagroup,
-            'inlineQueryPeerTypePM' => new InlineQueryPeerType\InlineQueryPeerTypePM,
-            'inlineQueryPeerTypeSameBotPM' => new InlineQueryPeerType\InlineQueryPeerTypeSameBotPM,
-        };
+        $this->peerType = InlineQueryPeerType::fromString($rawInlineQuery['peerType']['_']);
     }
 }
