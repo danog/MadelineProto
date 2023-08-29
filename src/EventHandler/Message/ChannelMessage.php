@@ -16,8 +16,16 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
+use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Participant\Left;
+use danog\MadelineProto\EventHandler\Participant\Admin;
+use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\MySelf;
+use danog\MadelineProto\EventHandler\Participant\Banned;
+use danog\MadelineProto\EventHandler\Participant\Creator;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -31,5 +39,70 @@ final class ChannelMessage extends Message
         array $info
     ) {
         parent::__construct($API, $rawMessage, $info);
+    }
+
+    /**
+     * Disable message signatures in channels
+     *
+     * @return boolean
+     */
+    public function disableSignatures(): bool
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleSignatures',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+        return true;
+    }
+
+    /**
+     * Enable message signatures in channels
+     * 
+     * @return boolean
+     */
+    public function enableSignatures(): bool
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleSignatures',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+        return true;
+    }
+
+    /**
+     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
+     *
+     * @param string|integer|null $member
+     * @return Participant
+     * @throws AssertionError
+     */
+    public function getMember(string|int $member = null): Participant
+    {
+        $client = $this->getClient();
+        $member ??= $this->senderId;
+        $member = $client->getId($member);
+        $result = $client->methodCallAsyncRead(
+            'channels.getParticipant',
+            [
+                'channel' => $this->chatId,
+                'participant' => $member,
+            ]
+        )['participant'];
+
+        return match ($result['_']) {
+            'channelParticipant' => new Member($result),
+            'channelParticipantLeft' => new Left($client, $result),
+            'channelParticipantSelf' => new MySelf($result),
+            'channelParticipantAdmin' => new Admin($result),
+            'channelParticipantBanned' => new Banned($client, $result),
+            'channelParticipantCreator' => new Creator($result),
+            default => throw new AssertionError("undefined Participant type: {$result['_']}")
+        };
     }
 }
