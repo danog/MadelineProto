@@ -3,11 +3,12 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
+use JsonSerializable;
 
 /**
  * Inline query peer type
  */
-enum InlineQueryPeerType
+enum InlineQueryPeerType implements JsonSerializable
 {
     /** private chat */
     case PM;
@@ -36,5 +37,11 @@ enum InlineQueryPeerType
                 return $case;
         }
         throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
+    }
+
+    /** @internal */
+    public function jsonSerialize(): mixed
+    {
+        return $this->name;
     }
 }
