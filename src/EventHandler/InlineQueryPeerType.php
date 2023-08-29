@@ -28,10 +28,13 @@ enum InlineQueryPeerType
      * @param string Type of the chat from which the inline query was sent.
      * @throws AssertionError
      */
-    public static function fromString(string $name): InlineQueryPeerType
+    public static function fromString(string $name)
     {
-        $name = ltrim($name, "inlineQueryPeerType");
-        return (InlineQueryPeerType::cases())[$name]
-            ?? throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
+        $newName = ltrim($name, "inlineQueryPeerType");
+        foreach (InlineQueryPeerType::cases() as $case) {
+            if ($case->name === $newName)
+                return $case;
+        }
+        throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
     }
 }
