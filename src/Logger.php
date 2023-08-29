@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
+use danog\Loop\Loop;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -39,8 +41,10 @@ use const PATHINFO_DIRNAME;
 use const PHP_EOL;
 use const PHP_SAPI;
 
+use function Amp\async;
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
+use function Amp\ByteStream\pipe;
 
 /**
  * Logger class.
@@ -99,6 +103,15 @@ final class Logger
      *
      */
     private readonly WritableStream $stdout;
+    /**
+     * Unbuffered logfile.
+     *
+     */
+    private readonly WritableStream $stdoutUnbuffered;
+    /**
+     * @var array<int, list{WritableStream, \Amp\Future}>
+     */
+    private static array $closePromises = [];
     /**
      * Log rotation loop ID.
      */
@@ -265,15 +278,15 @@ final class Logger
         $this->colors[self::FATAL_ERROR] = \implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $this->newline = PHP_EOL;
         if ($this->mode === self::ECHO_LOGGER) {
-            $this->stdout = getStdout();
+            $stdout = getStdout();
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            $this->stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
+            $stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
                 $optional = $this->optional;
-                $stdout = $this->stdout;
+                $stdout = $stdout;
                 $this->rotateId = EventLoop::repeat(
                     10,
                     static function () use ($maxSize, $optional, $stdout): void {
@@ -289,12 +302,27 @@ final class Logger
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
             $result = @\ini_get('error_log');
             if ($result === 'syslog') {
-                $this->stdout = getStderr();
+                $stdout = getStderr();
             } elseif ($result) {
-                $this->stdout = new WritableResourceStream(\fopen($result, 'a+'));
+                $stdout = new WritableResourceStream(\fopen($result, 'a+'));
             } else {
-                $this->stdout = getStderr();
+                $stdout = getStderr();
             }
+        }
+
+        if (isset($stdout)) {
+            $pipe = new Pipe(PHP_INT_MAX);
+            $this->stdoutUnbuffered = $stdout;
+            $this->stdout = $pipe->getSink();
+            $source = $pipe->getSource();
+            $promise = async(static function () use ($source, $stdout, &$promise): void {
+                try {
+                    pipe($source, $stdout);
+                } finally {
+                    unset(self::$closePromises[\spl_object_id($promise)]);
+                }
+            });
+            self::$closePromises[\spl_object_id($promise)] = [$this->stdout, $promise];
         }
 
         self::$default = $this;
@@ -326,8 +354,18 @@ final class Logger
     public function truncate(): void
     {
         if ($this->mode === self::FILE_LOGGER) {
-            Assert::true($this->stdout instanceof WritableResourceStream);
-            \ftruncate($this->stdout->getResource(), 0);
+            Assert::true($this->stdoutUnbuffered instanceof WritableResourceStream);
+            \ftruncate($this->stdoutUnbuffered->getResource(), 0);
+        }
+    }
+    /**
+     * @internal Internal function used to flush the log buffer on shutdown.
+     */
+    public static function finalize(): void
+    {
+        foreach (self::$closePromises as [$stdout, $promise]) {
+            $stdout->close();
+            $promise->await();
         }
     }
     /**
@@ -371,7 +409,7 @@ final class Logger
         }
 
         if ($this->mode === self::CALLABLE_LOGGER) {
-            \call_user_func_array($this->optional, [$param, $level]);
+            EventLoop::queue($this->optional, $param, $level);
             return;
         }
         $prefix = $this->prefix;
