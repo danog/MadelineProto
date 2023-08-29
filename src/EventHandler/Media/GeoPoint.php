@@ -19,8 +19,8 @@ final class GeoPoint implements JsonSerializable
     {
         $this->long = $rawGeoPoint['long'];
         $this->lat = $rawGeoPoint['lat'];
-        $this->accessHash = $rawGeoPoint['accessHash'];
-        $this->accuracyRadius = $rawGeoPoint['accuracyRadius'] ?? null;
+        $this->accessHash = $rawGeoPoint['access_hash'];
+        $this->accuracyRadius = $rawGeoPoint['accuracy_radius'] ?? null;
     }
 
     /** @internal */
