@@ -40,7 +40,7 @@ enum InlineQueryPeerType implements JsonSerializable
     }
 
     /** @internal */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): string
     {
         return $this->name;
     }
