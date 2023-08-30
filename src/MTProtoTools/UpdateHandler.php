@@ -32,12 +32,34 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
+use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
+use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
@@ -58,6 +80,7 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
+use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
@@ -407,6 +430,170 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
+                ),
+                'messageActionScreenshotTaken' => new DialogScreenshotTaken(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'messageActionChatJoinedByLink' => new DialogChatJoinedByLink(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['inviter_id'], 
+                ),
+                'messageActionChannelCreate' => new DialogChannelCreated(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['title'], 
+                ),
+                'messageActionChatMigrateTo' => new DialogChatMigrateTo(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['channel_id'],
+                ),
+                'messageActionChannelMigrateFrom' => new DialogChannelMigrateFrom(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['title'],
+                    $message['action']['chat_id'],
+                ),
+                'messageActionHistoryClear' => new DialogHistoryCleared(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'messageActionGameScore' => new DialogGameScore(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['game_id'],
+                    $message['action']['score'],
+                ),
+                'messageActionPhoneCall' => new DialogPhoneCall(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['video'],
+                    $message['action']['call_id'],
+                    DiscardReason::fromString($message['action']['reason'] ?? null),
+                    $message['action']['duration'] ?? null,
+                ),
+                'messageActionContactSignUp' => new DialogContactSignUp(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'messageActionGeoProximityReached' => new DialogGeoProximityReached(
+                    $this,
+                    $message,
+                    $info,
+                    $this->getIdInternal($message['action']['from_id']),
+                    $this->getIdInternal($message['action']['to_id']),
+                    $message['action']['distance'],
+                ),
+                'messageActionGroupCall' => new GroupCallEnded(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['call']['id'],
+                    $message['action']['call']['access_hash'],
+                    $message['action']['duration'],
+                ),
+
+                'messageActionInviteToGroupCall' => new GroupCallInvited(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['call']['id'],
+                    $message['action']['call']['access_hash'],
+                    $message['action']['users'],
+                ),
+                'messageActionGroupCallScheduled' => new GroupCallScheduled(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['call']['id'],
+                    $message['action']['call']['access_hash'],
+                    $message['action']['schedule_date'],
+                ),
+                'messageActionSetMessagesTTL' => new DialogSetTTL(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['period'],
+                    $message['action']['auto_setting_from'],
+                ),
+                'messageActionSetChatTheme' => new DialogSetChatTheme(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['emoticon'],
+                ),
+                'messageActionChatJoinedByRequest' => new DialogMemberJoinedByRequest(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'messageActionWebViewDataSentMe' => new DialogWebView(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['text'],
+                    $message['action']['data'],
+                ),
+                'messageActionWebViewDataSent' => new DialogWebView(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['text'],
+                    null
+                ),
+                'messageActionGiftPremium' => new DialogGiftPremium(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['currency'],
+                    $message['action']['amount'],
+                    $message['action']['months'],
+                    $message['action']['crypto_currency'] ?? null,
+                    $message['action']['crypto_amount'] ?? null,
+                ),
+                'messageActionTopicCreate' => new DialogTopicCreated(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['title'],
+                    $message['action']['icon_color'],
+                    $message['action']['icon_emoji_id'] ?? null,
+                ),
+                'messageActionTopicEdit' => new DialogTopicEdited(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['title'],
+                    $message['action']['icon_emoji_id'] ?? null,
+                    $message['action']['closed'] ?? null,
+                    $message['action']['hidden'] ?? null,
+                ),
+                'messageActionSuggestProfilePhoto' => new DialogSuggestProfilePhoto(
+                    $this,
+                    $message,
+                    $info,
+                    $this->wrapMedia([
+                        '_' => 'messageMediaPhoto',
+                        'photo' => $message['action']['photo']
+                    ])
+                ),
+                'messageActionRequestedPeer' => new DialogPeerRequested(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['button_id'],
+                    $this->getIdInternal($message['action']['peer']),
                 ),
                 default => null
             };

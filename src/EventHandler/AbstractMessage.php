@@ -222,4 +222,38 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             updateStickersetsOrder: $updateStickersetsOrder
         );
     }
+
+    /**
+     * Adds the user to the blacklist.
+     *
+     * @param boolean $stories
+     * @return boolean
+     */
+    public function block(bool $stories): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'contacts.block',
+            [
+                'id' => $this->senderId,
+                'my_stories_from' => $stories,
+            ]
+        );
+    }
+
+    /**
+     * Deletes the user from the blacklist.
+     *
+     * @param boolean $stories
+     * @return boolean
+     */
+    public function unblock(bool $stories): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'contacts.block',
+            [
+                'id' => $this->senderId,
+                'my_stories_from' => $stories,
+            ]
+        );
+    }
 }

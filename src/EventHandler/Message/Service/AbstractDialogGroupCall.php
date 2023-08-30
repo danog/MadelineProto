@@ -14,30 +14,24 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\MTProto;
 
-/**
- * Represents an incoming or outgoing private message.
- */
-final class PrivateMessage extends Message
+abstract class AbstractDialogGroupCall extends ServiceMessage
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
-     *
-     * @return DialogScreenshotTaken
-     */
-    public function screenShot(): DialogScreenshotTaken
-    {
-        $result = $this->getClient()->methodCallAsyncRead(
-            'messages.sendScreenshotNotification',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => [ '_' => 'inputReplyToMessage', 'reply_to_msg_id' => 0 ],
-            ]
-        );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    /** @internal */
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+
+        /** Group call ID */
+        public readonly int $id,
+        /** Group call access hash */
+        public readonly int $accessHash
+    ) {
+        parent::__construct($API, $rawMessage, $info);
     }
 }

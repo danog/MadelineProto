@@ -14,30 +14,30 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\MTProto;
 
 /**
- * Represents an incoming or outgoing private message.
+ * [Forum topic](https://core.telegram.org/api/forum#forum-topics) information was edited.
  */
-final class PrivateMessage extends Message
+final class DialogTopicEdited extends ServiceMessage
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
-     *
-     * @return DialogScreenshotTaken
-     */
-    public function screenShot(): DialogScreenshotTaken
-    {
-        $result = $this->getClient()->methodCallAsyncRead(
-            'messages.sendScreenshotNotification',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => [ '_' => 'inputReplyToMessage', 'reply_to_msg_id' => 0 ],
-            ]
-        );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+        
+        /** Topic name. */
+        public readonly string $title,
+        /** ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. */
+        public readonly ?int $iconEmojiId,
+        /** Whether the topic was closed. */
+        public readonly ?bool $closed,
+        /** Whether the topic was hidden (only valid for the “General” topic, id=1). */
+        public readonly ?bool $hidden
+    ) {
+        parent::__construct($API, $rawMessage, $info);
     }
 }

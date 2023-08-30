@@ -14,30 +14,27 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\MTProto;
 
 /**
- * Represents an incoming or outgoing private message.
+ * Data from an opened [reply keyboard bot web app](https://core.telegram.org/api/bots/webapps) was relayed to the bot that owns it (user & bot side service message).
+ * Clients should display a service message with the text Data from the «$text» button was transferred to the bot.
  */
-final class PrivateMessage extends Message
+final class DialogWebView extends ServiceMessage
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
-     *
-     * @return DialogScreenshotTaken
-     */
-    public function screenShot(): DialogScreenshotTaken
-    {
-        $result = $this->getClient()->methodCallAsyncRead(
-            'messages.sendScreenshotNotification',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => [ '_' => 'inputReplyToMessage', 'reply_to_msg_id' => 0 ],
-            ]
-        );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+
+        /** Text of the [keyboardButtonSimpleWebView](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonSimpleWebView.html) that was pressed to open the web app. */
+        public readonly string $text,
+        /** Relayed data. (bot side service message) */
+        public readonly ?string $data,
+    ) {
+        parent::__construct($API, $rawMessage, $info);
     }
 }
