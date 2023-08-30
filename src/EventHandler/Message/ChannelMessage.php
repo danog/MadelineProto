@@ -78,14 +78,13 @@ final class ChannelMessage extends Message
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
      *
-     * @param string|integer|null $member Participant to get info about
+     * @param string|integer|null $member Participant to get info about.
      * @return Participant 
      * @throws AssertionError
      */
-    public function getMember(string|int $member = null): Participant
+    public function getMember(string|int $member): Participant
     {
         $client = $this->getClient();
-        $member ??= $this->senderId;
         $member = $client->getId($member);
         $result = $client->methodCallAsyncRead(
             'channels.getParticipant',
