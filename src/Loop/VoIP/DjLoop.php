@@ -232,7 +232,7 @@ final class DjLoop extends VoIPLoop
         }
         $queue = $this->playingPrimary ? $this->packetQueuePrimary : $this->packetQueueSecondary;
         if ($queue->isEmpty()) {
-            if ($this->instance->getCallState() === CallState::ENDED) {
+            if ($this->instance->getCallState() === CallState::ENDED || !$this->isRunning()) {
                 return null;
             }
             if ($this->readingPrimary !== $this->playingPrimary) {
