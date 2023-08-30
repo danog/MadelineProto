@@ -679,7 +679,7 @@ trait PeerHandler
             }
             $id = $this->getIdInternal($id);
             Assert::notNull($id);
-            if (self::isSupergroup($id)) {
+            if (self::isSupergroupOrChannel($id)) {
                 $supergroups []= $id;
             } elseif ($id < 0) {
                 $chats []= $id;
