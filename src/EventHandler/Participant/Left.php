@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * A participant that left the channel/supergroup
  */
-class Left extends Participant
+final class Left extends Participant
 {
 
     /** The peer that left */

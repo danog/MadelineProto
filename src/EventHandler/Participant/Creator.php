@@ -22,7 +22,7 @@ use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 /**
  * Channel/supergroup creator
  */
-class Creator extends Participant
+final class Creator extends Participant
 {
     /** User ID */
     public readonly int $userId;

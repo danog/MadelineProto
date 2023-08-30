@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Participant\Rights;
 /**
  * Represents the rights of an admin in a [channel/supergroup](https://core.telegram.org/api/channel).
  */
-class Admin extends Rights
+final class Admin extends Rights
 {
     /** If set, allows the admin to modify the description of the [channel/supergroup](https://core.telegram.org/api/channel) */
     public readonly bool $changeInfo;

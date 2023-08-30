@@ -22,7 +22,7 @@ use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 /**
  * Admin
  */
-class Admin extends Participant
+final class Admin extends Participant
 {
     /** Can this admin promote other admins with the same permissions? */
     public readonly bool $canEdit;

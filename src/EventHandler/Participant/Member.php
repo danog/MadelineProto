@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Participant;
 /**
  * Channel/supergroup participant
  */
-class Member extends Participant
+final class Member extends Participant
 {
     /** Participant user ID */
     public readonly int $userId;

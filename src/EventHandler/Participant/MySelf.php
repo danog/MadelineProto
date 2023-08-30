@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Participant;
 /**
  * Myself
  */
-class MySelf extends Participant
+final class MySelf extends Participant
 {
     /** Whether I joined upon specific approval of an admin */
     public readonly bool $viaRequest;

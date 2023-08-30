@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Participant\Rights;
 /**
  * Represents the rights of a normal user in a [supergroup/channel/chat](https://core.telegram.org/api/channel). In this case, the flags are inverted: if set, a flag does not allow a user to do X.
  */
-class Banned extends Rights
+final class Banned extends Rights
 {
     /** If set, does not allow a user to view messages in a [supergroup/chat](https://core.telegram.org/api/channel) */
     public readonly bool $viewMessages;

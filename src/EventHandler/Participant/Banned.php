@@ -23,7 +23,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Banned/kicked user
  */
-class Banned extends Participant
+final class Banned extends Participant
 {
     /** Whether the user has left the group */
     public readonly bool $left;
