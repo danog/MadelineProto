@@ -38,6 +38,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
@@ -404,6 +405,11 @@ trait UpdateHandler
                     $message['action']['user_id']
                 ),
                 'messageActionPinMessage' => new DialogMessagePinned(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'messageActionScreenshotTaken' => new DialogScreenshotTaken(
                     $this,
                     $message,
                     $info,
