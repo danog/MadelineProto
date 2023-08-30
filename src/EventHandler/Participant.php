@@ -22,7 +22,7 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * The channel participant
+ * Info about a channel participant
  */
 class Participant implements JsonSerializable
 {
