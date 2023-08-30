@@ -43,4 +43,36 @@ final class Gif extends AbstractVideo
         }
         $this->hasStickers = $hasStickers;
     }
+
+    /**
+     * Add GIF to saved gifs list
+     *
+     * @return bool
+     */
+    public function save(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.saveGif',
+            [
+                'id' => $this->botApiFileId,
+                'unsave' => false
+            ]
+        );
+    }
+
+    /**
+     * Remove GIF from saved gifs list
+     *
+     * @return bool
+     */
+    public function unsave(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.saveGif',
+            [
+                'id' => $this->botApiFileId,
+                'unsave' => true
+            ]
+        );
+    }
 }

@@ -14,30 +14,26 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Participant;
 
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Participant;
 
 /**
- * Represents an incoming or outgoing private message.
+ * Channel/supergroup participant
  */
-final class PrivateMessage extends Message
+final class Member extends Participant
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
-     *
-     * @return DialogScreenshotTaken
-     */
-    public function screenShot(): DialogScreenshotTaken
-    {
-        $result = $this->getClient()->methodCallAsyncRead(
-            'messages.sendScreenshotNotification',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => [ '_' => 'inputReplyToMessage', 'reply_to_msg_id' => 0 ],
-            ]
-        );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    /** Participant user ID */
+    public readonly int $userId;
+
+    /** Date joined */
+    public readonly int $date;
+
+    /** @internal */
+    public function __construct(
+        array $rawParticipant
+    ) {
+        $this->userId = $rawParticipant['user_id'];
+        $this->date = $rawParticipant['date'];
     }
 }

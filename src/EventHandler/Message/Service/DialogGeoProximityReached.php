@@ -14,30 +14,28 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\MTProto;
 
 /**
- * Represents an incoming or outgoing private message.
+ * A user of the chat is now in proximity of another user.
  */
-final class PrivateMessage extends Message
+final class DialogGeoProximityReached extends ServiceMessage
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
-     *
-     * @return DialogScreenshotTaken
-     */
-    public function screenShot(): DialogScreenshotTaken
-    {
-        $result = $this->getClient()->methodCallAsyncRead(
-            'messages.sendScreenshotNotification',
-            [
-                'peer' => $this->chatId,
-                'reply_to' => [ '_' => 'inputReplyToMessage', 'reply_to_msg_id' => 0 ],
-            ]
-        );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+
+        /** The user or chat that is now in proximity of to_id */
+        public readonly int $fromId,
+        /** The user or chat that subscribed to [live geolocation proximity alerts](https://core.telegram.org/api/live-location#proximity-alert) */
+        public readonly int $toId,
+        /** Distance, in meters (0-100000) */
+        public readonly int $distance
+    ) {
+        parent::__construct($API, $rawMessage, $info);
     }
 }
