@@ -43,10 +43,8 @@ final class ChannelMessage extends Message
 
     /**
      * Disable message signatures in channels
-     *
-     * @return boolean
      */
-    public function disableSignatures(): bool
+    public function disableSignatures(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleSignatures',
@@ -55,15 +53,12 @@ final class ChannelMessage extends Message
                 'enabled' => false,
             ]
         );
-        return true;
     }
 
     /**
      * Enable message signatures in channels
-     * 
-     * @return boolean
      */
-    public function enableSignatures(): bool
+    public function enableSignatures(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleSignatures',
@@ -72,7 +67,6 @@ final class ChannelMessage extends Message
                 'enabled' => true,
             ]
         );
-        return true;
     }
 
     /**
