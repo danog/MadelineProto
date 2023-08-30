@@ -16,44 +16,29 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use AssertionError;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\VoIP\DiscardReason;
+use danog\MadelineProto\MTProto;
 
 /**
- * Why call ended
+ * A phone call.
  */
-enum PhoneCallDiscardReason
+final class DialogPhoneCall extends ServiceMessage
 {
-    /** The phone call was missed */
-    case Missed;
-    /** The phone call was disconnected */
-    case Disconnect;
-    /** The phone call was ended normally */
-    case Hangup;
-    /** The phone call was discarded because the user is busy in another call */
-    case Busy;
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
 
-    /**
-     * @internal
-     *
-     * @param ?string
-     * @throws AssertionError
-     */
-    public static function fromString(?string $name): ?PhoneCallDiscardReason
-    {
-        if ($name === null)
-            return null;
-        $newName = \substr($name, 22);
-        foreach (PhoneCallDiscardReason::cases() as $case) {
-            if ($case->name === $newName) {
-                return $case;
-            }
-        }
-        throw new AssertionError("Undefined case PhoneCallDiscardReason::".$name);
-    }
-
-    /** @internal */
-    public function jsonSerialize(): string
-    {
-        return $this->name;
+        /** Is this a video call? */
+        public readonly bool $video,
+        /** Call ID */
+        public readonly int $callId,
+        /** If the call has ended, the reason why it ended */
+        public readonly ?DiscardReason $reason,
+        /** Duration of the call in seconds */
+        public readonly ?int $duration,
+    ) {
+        parent::__construct($API, $rawMessage, $info);
     }
 }

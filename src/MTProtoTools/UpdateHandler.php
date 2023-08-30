@@ -37,17 +37,13 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
-use danog\MadelineProto\EventHandler\Message\Service\DialogCallGroup\Called;
-use danog\MadelineProto\EventHandler\Message\Service\DialogCallGroup\Invited;
-use danog\MadelineProto\EventHandler\Message\Service\DialogCallGroup\Scheduled;
 use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
-use danog\MadelineProto\EventHandler\Message\Service\DialogCallPhone;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
@@ -60,7 +56,10 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
-use danog\MadelineProto\EventHandler\Message\Service\PhoneCallDiscardReason;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
@@ -81,6 +80,7 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
+use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
@@ -473,13 +473,13 @@ trait UpdateHandler
                     $message['action']['game_id'],
                     $message['action']['score'],
                 ),
-                'messageActionPhoneCall' => new DialogCallPhone(
+                'messageActionPhoneCall' => new DialogPhoneCall(
                     $this,
                     $message,
                     $info,
                     $message['action']['video'],
                     $message['action']['call_id'],
-                    PhoneCallDiscardReason::fromString($message['action']['reason'] ?? null),
+                    DiscardReason::fromString($message['action']['reason'] ?? null),
                     $message['action']['duration'] ?? null,
                 ),
                 'messageActionContactSignUp' => new DialogContactSignUp(
@@ -495,7 +495,7 @@ trait UpdateHandler
                     $this->getIdInternal($message['action']['to_id']),
                     $message['action']['distance'],
                 ),
-                'messageActionGroupCall' => new Called(
+                'messageActionGroupCall' => new GroupCallEnded(
                     $this,
                     $message,
                     $info,
@@ -504,7 +504,7 @@ trait UpdateHandler
                     $message['action']['duration'],
                 ),
 
-                'messageActionInviteToGroupCall' => new Invited(
+                'messageActionInviteToGroupCall' => new GroupCallInvited(
                     $this,
                     $message,
                     $info,
@@ -512,7 +512,7 @@ trait UpdateHandler
                     $message['action']['call']['access_hash'],
                     $message['action']['users'],
                 ),
-                'messageActionGroupCallScheduled' => new Scheduled(
+                'messageActionGroupCallScheduled' => new GroupCallScheduled(
                     $this,
                     $message,
                     $info,
