@@ -33,11 +33,11 @@ final class GroupMessage extends Message
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
      *
-     * @param string|integer|null $member
+     * @param string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
      * @return Participant
      * @throws AssertionError
      */
-    public function getMember(string|int $member = null): Participant
+    public function getMember(string|int|null $member = null): Participant
     {
         $client = $this->getClient();
         $member ??= $this->senderId;
