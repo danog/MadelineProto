@@ -35,7 +35,7 @@ final class Banned extends Participant
     public readonly int $kickedBy;
 
     /** When did the user join the group */
-    public readonly ?int $date;
+    public readonly int $date;
 
     /** Banned [rights](https://core.telegram.org/api/rights) */
     public readonly BannedRights $bannedRights;
