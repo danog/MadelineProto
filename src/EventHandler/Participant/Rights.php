@@ -20,7 +20,6 @@ use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
-/** @internal */
 abstract class Rights implements JsonSerializable
 {
     /** @internal */
