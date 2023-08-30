@@ -49,7 +49,7 @@ final class Gif extends AbstractVideo
      *
      * @return bool
      */
-    public function add(): bool
+    public function save(): bool
     {
         return $this->getClient()->methodCallAsyncRead(
             'messages.saveGif',
@@ -65,7 +65,7 @@ final class Gif extends AbstractVideo
      *
      * @return bool
      */
-    public function remove(): bool
+    public function unsave(): bool
     {
         return $this->getClient()->methodCallAsyncRead(
             'messages.saveGif',
