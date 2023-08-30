@@ -98,8 +98,8 @@ abstract class Message extends AbstractMessage
     /** Author of the post, if signatures are enabled for messages from channels or forwarded from channels */
     public readonly ?string $signature;
 
-    /** @var array<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text */
-    public readonly ?array $entities;
+    /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text */
+    public readonly array $entities;
 
     /** @internal */
     public function __construct(
@@ -113,9 +113,7 @@ abstract class Message extends AbstractMessage
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
 
-        $this->entities = isset($rawMessage['entities']) && !empty($entities = $rawMessage['entities'])
-            ? MessageEntity::fromRawEntities($entities)
-            : null;
+        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'];
         $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
