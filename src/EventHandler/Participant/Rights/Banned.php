@@ -69,9 +69,6 @@ class Banned extends Rights
     public readonly bool $sendVideos;
 
     /** If set, does not allow a user to send round videos in a [supergroup/chat](https://core.telegram.org/api/channel) */
-    public readonly bool $send_roundvideos;
-
-    /** If set, does not allow a user to send polls in a [supergroup/chat](https://core.telegram.org/api/channel) */
     public readonly bool $sendRoundvideos;
 
     /** If set, does not allow a user to send audio files in a [supergroup/chat](https://core.telegram.org/api/channel) */
