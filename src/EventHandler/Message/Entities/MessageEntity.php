@@ -13,6 +13,7 @@ abstract class MessageEntity implements JsonSerializable
     /** Length of message entity within message (in UTF-16 code units) */
     public readonly int $length;
 
+    /** @internal  */
     protected function __construct(array $rawEntities)
     {
         $this->offset = $rawEntities['offset'];
