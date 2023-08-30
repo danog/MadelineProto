@@ -140,6 +140,7 @@ abstract class StrTools extends Extension
     {
         $insertions = [];
         foreach ($entities as $entity) {
+            $entity = isset($entity) && \is_array($entity) ? MessageEntity::fromRawEntities([$entity])[0] : $entity;
             [$offset, $length] = [$entity->offset, $entity->length];
             $insertions[$offset] ??= '';
             $insertions[$offset] .= match (true) {
