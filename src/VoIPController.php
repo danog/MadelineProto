@@ -527,7 +527,7 @@ final class VoIPController
 
     public function log(string $message, int $level = Logger::NOTICE): void
     {
-        EventLoop::queue($this->API->logger->logger(...), $message, $level);
+        $this->API->logger->logger($message, $level);
     }
     private bool $muted = true;
     /**
