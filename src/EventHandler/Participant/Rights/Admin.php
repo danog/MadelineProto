@@ -69,7 +69,7 @@ final class Admin extends Rights
     ) {
         $this->changeInfo = $rawRights['change_info'];
         $this->postMessages = $rawRights['post_messages'];
-        $this->editMessages = $rawRights['editMessages'];
+        $this->editMessages = $rawRights['edit_messages'];
         $this->deleteMessages = $rawRights['delete_messages'];
         $this->banUsers = $rawRights['ban_users'];
         $this->inviteUsers = $rawRights['invite_users'];
