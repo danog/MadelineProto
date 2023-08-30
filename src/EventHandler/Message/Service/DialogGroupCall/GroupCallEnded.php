@@ -14,15 +14,15 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service\DialogCallGroup;
+namespace danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 
-use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogCallGroup;
+use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
 use danog\MadelineProto\MTProto;
 
 /**
- * A set of users was invited to the group call.
+ * The group call has ended.
  */
-final class Invited extends AbstractDialogCallGroup
+final class GroupCallEnded extends AbstractDialogGroupCall
 {
     public function __construct(
         MTProto $API,
@@ -33,8 +33,8 @@ final class Invited extends AbstractDialogCallGroup
         int $id,
         /** Group call access hash */
         int $accessHash,
-        /** The invited users */
-        public readonly array $users
+        /** Group call duration */
+        public readonly int $duration
     ) {
         parent::__construct($API, $rawMessage, $info, $id, $accessHash);
     }

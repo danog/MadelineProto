@@ -14,13 +14,15 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service;
+namespace danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
 use danog\MadelineProto\MTProto;
 
-/** @internal */
-abstract class AbstractDialogCallGroup extends ServiceMessage
+/**
+ * A group call was scheduled.
+ */
+final class GroupCallScheduled extends AbstractDialogGroupCall
 {
     public function __construct(
         MTProto $API,
@@ -28,10 +30,12 @@ abstract class AbstractDialogCallGroup extends ServiceMessage
         array $info,
 
         /** Group call ID */
-        public readonly int $id,
+        int $id,
         /** Group call access hash */
-        public readonly int $accessHash
+        int $accessHash,
+        /** When is this group call scheduled to start */
+        public readonly int $scheduleDate
     ) {
-        parent::__construct($API, $rawMessage, $info);
+        parent::__construct($API, $rawMessage, $info, $id, $accessHash);
     }
 }
