@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Message entity mentioning the current user.
+ */
 final class Mention extends MessageEntity
 {
 }

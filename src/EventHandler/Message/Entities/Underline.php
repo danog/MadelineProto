@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Message entity representing underlined text.
+ */
 final class Underline extends MessageEntity
 {
 }

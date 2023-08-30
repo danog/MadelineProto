@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Indicates a credit card number.
+ */
 final class BankCard extends MessageEntity
 {
 }

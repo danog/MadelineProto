@@ -6,6 +6,9 @@ use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
+/**
+ * Master class for message entities.
+ */
 abstract class MessageEntity implements JsonSerializable
 {
     /** Offset of message entity within message (in UTF-16 code units) */

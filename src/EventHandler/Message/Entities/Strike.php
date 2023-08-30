@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Message entity representing strikethrough text.
+ */
 final class Strike extends MessageEntity
 {
 }

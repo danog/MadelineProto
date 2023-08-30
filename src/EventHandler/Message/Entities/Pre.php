@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Message entity representing a preformatted codeblock, allowing the user to specify a programming language for the codeblock.
+ */
 final class Pre extends MessageEntity
 {
     /** Programming language of the code */

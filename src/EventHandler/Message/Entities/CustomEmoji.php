@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Entities;
 
+/**
+ * Represents a custom emoji.
+ */
 final class CustomEmoji extends MessageEntity
 {
     /** Document ID of the [custom emoji](https://core.telegram.org/api/custom-emoji). */
