@@ -20,6 +20,22 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
+use danog\MadelineProto\EventHandler\Message\Entities\Bold;
+use danog\MadelineProto\EventHandler\Message\Entities\Code;
+use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
+use danog\MadelineProto\EventHandler\Message\Entities\Email;
+use danog\MadelineProto\EventHandler\Message\Entities\Italic;
+use danog\MadelineProto\EventHandler\Message\Entities\Mention;
+use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\Entities\Phone;
+use danog\MadelineProto\EventHandler\Message\Entities\Pre;
+use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
+use danog\MadelineProto\EventHandler\Message\Entities\Strike;
+use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
+use danog\MadelineProto\EventHandler\Message\Entities\Underline;
+use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\TL\Conversion\MarkdownEntities;
@@ -117,46 +133,47 @@ abstract class StrTools extends Extension
     /**
      * Convert a message and a set of entities to HTML.
      *
-     * @param list<array{_: string, offset: int, length: int, ...}> $entities
+     * @param list<MessageEntity> $entities
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
         $insertions = [];
         foreach ($entities as $entity) {
-            ['_' => $type, 'offset' => $offset, 'length' => $length] = $entity;
+            $entity = isset($entity) && \is_array($entity) ? MessageEntity::fromRawEntities([$entity])[0] : $entity;
+            [$offset, $length] = [$entity->offset, $entity->length];
             $insertions[$offset] ??= '';
-            $insertions[$offset] .= match ($type) {
-                'messageEntityBold' => '<b>',
-                'messageEntityItalic' => '<i>',
-                'messageEntityCode' => '<code>',
-                'messageEntityPre' => $entity['language'] !== '' ? '<pre language="'.$entity['language'].'">' : '<pre>',
-                'messageEntityTextUrl' => '<a href="'.$entity['url'].'">',
-                'messageEntityStrike' => '<s>',
-                'messageEntityUnderline' => '<u>',
-                'messageEntityBlockquote' => '<blockquote>',
-                'messageEntityUrl' => '<a href="'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                'messageEntityEmail' => '<a href="mailto:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                'messageEntityPhone' => '<a href="phone:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                'messageEntityMention' => '<a href="https://t.me/'.\htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
-                'messageEntitySpoiler' => $allowTelegramTags ? '<tg-spoiler>' : '',
-                'messageEntityCustomEmoji' => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity['document_id'].'">' : '',
-                'messageEntityMentionName', 'inputMessageEntityMentionName' => $allowTelegramTags ? '<a href="tg://user?id='.$entity['user_id'].'">' : '',
+            $insertions[$offset] .= match (true) {
+                $entity instanceof Bold => '<b>',
+                $entity instanceof Italic => '<i>',
+                $entity instanceof Code => '<code>',
+                $entity instanceof Pre => $entity->language !== '' ? '<pre language="'.$entity->language.'">' : '<pre>',
+                $entity instanceof TextUrl => '<a href="'.$entity->url.'">',
+                $entity instanceof Strike => '<s>',
+                $entity instanceof Underline => '<u>',
+                $entity instanceof Blockquote => '<blockquote>',
+                $entity instanceof Url => '<a href="'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Email => '<a href="mailto:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Phone => '<a href="phone:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Mention => '<a href="https://t.me/'.\htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
+                $entity instanceof Spoiler => $allowTelegramTags ? '<tg-spoiler>' : '',
+                $entity instanceof CustomEmoji => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity->documentId.'">' : '',
+                $entity instanceof MentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
                 default => '',
             };
             $offset += $length;
-            $insertions[$offset] = match ($type) {
-                'messageEntityBold' => '</b>',
-                'messageEntityItalic' => '</i>',
-                'messageEntityCode' => '</code>',
-                'messageEntityPre' => '</pre>',
-                'messageEntityTextUrl', 'messageEntityUrl', 'messageEntityEmail', 'messageEntityMention', 'messageEntityPhone' => '</a>',
-                'messageEntityStrike' => '</s>',
-                'messageEntityUnderline' => '</u>',
-                'messageEntityBlockquote' => '</blockquote>',
-                'messageEntitySpoiler' => $allowTelegramTags ? '</tg-spoiler>' : '',
-                'messageEntityCustomEmoji' => $allowTelegramTags ? "</tg-emoji>" : '',
-                'messageEntityMentionName', 'inputMessageEntityMentionName' => $allowTelegramTags ? '</a>' : '',
+            $insertions[$offset] = match (true) {
+                $entity instanceof Bold => '</b>',
+                $entity instanceof Italic => '</i>',
+                $entity instanceof Code => '</code>',
+                $entity instanceof Pre => '</pre>',
+                $entity instanceof TextUrl, $entity instanceof Url, $entity instanceof Email, $entity instanceof Mention, $entity instanceof Phone => '</a>',
+                $entity instanceof Strike => '</s>',
+                $entity instanceof Underline => '</u>',
+                $entity instanceof Blockquote => '</blockquote>',
+                $entity instanceof Spoiler => $allowTelegramTags ? '</tg-spoiler>' : '',
+                $entity instanceof CustomEmoji => $allowTelegramTags ? "</tg-emoji>" : '',
+                $entity instanceof MentionName => $allowTelegramTags ? '</a>' : '',
                 default => '',
             } . ($insertions[$offset] ?? '');
         }
