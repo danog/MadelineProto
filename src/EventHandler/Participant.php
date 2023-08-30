@@ -24,7 +24,7 @@ use ReflectionProperty;
 /**
  * Info about a channel participant
  */
-class Participant implements JsonSerializable
+abstract class Participant implements JsonSerializable
 {
     /** @internal */
     public function jsonSerialize(): mixed
