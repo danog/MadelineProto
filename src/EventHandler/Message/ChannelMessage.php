@@ -78,7 +78,7 @@ final class ChannelMessage extends Message
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
      *
-     * @param string|integer|null $member Participant to get info about.
+     * @param string|integer $member Participant to get info about.
      * @return Participant 
      * @throws AssertionError
      */
