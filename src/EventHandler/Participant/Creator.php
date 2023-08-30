@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Participant;
 
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 
 /**
  * Channel/supergroup creator
@@ -27,7 +28,7 @@ class Creator extends Participant
     public readonly int $userId;
 
     /** Creator admin rights */
-    public readonly int $adminRights; //!
+    public readonly AdminRights $adminRights;
 
     /** The role (rank) of the group creator in the group: just an arbitrary string, `admin` by default */
     public readonly string $rank;
@@ -37,7 +38,7 @@ class Creator extends Participant
         array $rawParticipant
     ) {
         $this->userId = $rawParticipant['user_id'];
-        $this->adminRights = new Rights\Admin($rawParticipant['adminRights']);
-        $this->rank = $rawParticipant['rank'] ?? '';
+        $this->adminRights = new AdminRights($rawParticipant['adminRights']);
+        $this->rank = $rawParticipant['rank'] ?? 'Owner';
     }
 }

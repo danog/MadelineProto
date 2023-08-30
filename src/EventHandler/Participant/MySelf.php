@@ -33,7 +33,7 @@ class MySelf extends Participant
     public readonly ?int $inviterId;
 
     /** When did I join the channel/supergroup */
-    public readonly ?int $date;
+    public readonly int $date;
 
     /** @internal */
     public function __construct(

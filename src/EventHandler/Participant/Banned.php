@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Participant;
 
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Participant\Rights\Banned as BannedRights;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -37,7 +38,7 @@ class Banned extends Participant
     public readonly ?int $date;
 
     /** Banned [rights](https://core.telegram.org/api/rights) */
-    public readonly bool $bannedRights; //!
+    public readonly BannedRights $bannedRights;
 
     /** @internal */
     public function __construct(
@@ -45,9 +46,9 @@ class Banned extends Participant
         array $rawParticipant
     ) {
         $this->left = $rawParticipant['left'];
-        $this->peer = $API->getId($rawParticipant['peer']);
+        $this->peer = $API->getIdInternal ($rawParticipant['peer']);
         $this->kickedBy = $rawParticipant['kicked_by'];
         $this->date = $rawParticipant['date'];
-        $this->bannedRights = new Rights\Banned($rawParticipant['banned_rights']);
+        $this->bannedRights = new BannedRights($rawParticipant['banned_rights']);
     }
 }

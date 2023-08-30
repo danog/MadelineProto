@@ -33,6 +33,6 @@ class Left extends Participant
         MTProto $API,
         array $rawParticipant
     ) {
-        $this->peer = $API->getId($rawParticipant['peer']);
+        $this->peer = $API->getIdInternal ($rawParticipant['peer']);
     }
 }

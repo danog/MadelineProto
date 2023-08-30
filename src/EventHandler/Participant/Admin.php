@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Participant;
 
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 
 /**
  * Admin
@@ -42,7 +43,7 @@ class Admin extends Participant
     public readonly int $date;
 
     /** Admin [rights](https://core.telegram.org/api/rights) */
-    public readonly bool $adminRights; //!
+    public readonly AdminRights $adminRights;
 
     /** The role (rank) of the admin in the group: just an arbitrary string, `admin` by default */
     public readonly string $rank;
@@ -57,7 +58,7 @@ class Admin extends Participant
         $this->inviterId = $rawParticipant['inviter_id'] ?? null;
         $this->promotedBy = $rawParticipant['promoted_by'];
         $this->date = $rawParticipant['date'];
-        $this->rank = $rawParticipant['rank'] ?? '';
-        $this->adminRights = new Rights\Admin($rawParticipant['admin_rights']);
+        $this->rank = $rawParticipant['rank'] ?? 'admin';
+        $this->adminRights = new AdminRights($rawParticipant['admin_rights']);
     }
 }
