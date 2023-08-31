@@ -66,6 +66,7 @@ use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
 use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -376,6 +377,7 @@ trait UpdateHandler
             'updateStory' => $update['story']['_'] === 'storyItemDeleted'
                 ? new StoryDeleted($this, $update)
                 : new Story($this, $update),
+            'updateSentStoryReaction' => new StoryReaction($this, $update),
             default => null
         };
     }
