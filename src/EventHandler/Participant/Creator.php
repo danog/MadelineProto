@@ -20,7 +20,7 @@ use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 
 /**
- * Channel/supergroup creator
+ * Channel/supergroup creator.
  */
 final class Creator extends Participant
 {

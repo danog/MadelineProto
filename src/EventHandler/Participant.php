@@ -16,13 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * Info about a channel participant
+ * Info about a channel participant.
  */
 abstract class Participant implements JsonSerializable
 {

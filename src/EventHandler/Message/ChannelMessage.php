@@ -18,14 +18,14 @@ namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Admin;
-use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Participant\MySelf;
 use danog\MadelineProto\EventHandler\Participant\Banned;
 use danog\MadelineProto\EventHandler\Participant\Creator;
+use danog\MadelineProto\EventHandler\Participant\Left;
+use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\MySelf;
+use danog\MadelineProto\MTProto;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -42,7 +42,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Disable message signatures in channels
+     * Disable message signatures in channels.
      */
     public function disableSignatures(): void
     {
@@ -56,7 +56,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Enable message signatures in channels
+     * Enable message signatures in channels.
      */
     public function enableSignatures(): void
     {
@@ -70,16 +70,14 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
+     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
      * @param string|integer $member Participant to get info about.
-     * @return Participant 
      * @throws AssertionError
      */
     public function getMember(string|int $member): Participant
     {
         $client = $this->getClient();
-        $member = $client->getId($member);
         $result = $client->methodCallAsyncRead(
             'channels.getParticipant',
             [

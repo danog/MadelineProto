@@ -39,14 +39,13 @@ enum DiscardReason implements JsonSerializable
 
     /**
      * @internal
-     *
-     * @param ?string
      * @throws AssertionError
      */
     public static function fromString(?string $name): ?DiscardReason
     {
-        if ($name === null)
+        if ($name === null) {
             return null;
+        }
         $newName = \strtoupper(\substr($name, 22));
         foreach (DiscardReason::cases() as $case) {
             if ($case->name === $newName) {

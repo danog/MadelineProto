@@ -20,7 +20,7 @@ use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Rights\Admin as AdminRights;
 
 /**
- * Admin
+ * Admin.
  */
 final class Admin extends Participant
 {

@@ -28,7 +28,7 @@ final class Admin extends Rights
 
     /** If set, allows the admin to post messages in the [channel](https://core.telegram.org/api/channel) */
     public readonly bool $postMessages;
-    
+
     /** If set, allows the admin to also edit messages from other admins in the [channel](https://core.telegram.org/api/channel) */
     public readonly bool $editMessages;
 
@@ -53,10 +53,10 @@ final class Admin extends Rights
     /** If set, allows the admin to change group call/livestream settings */
     public readonly bool $manageCall;
 
-    /** Set this flag if none of the other flags are set, 
+    /** Set this flag if none of the other flags are set,
      * but you still want the user to be an admin: if this or any of the other flags are set,
      * the admin can get the chat [admin log](https://core.telegram.org/api/recent-actions), get [chat statistics](https://core.telegram.org/api/stats), get [message statistics in channels](https://core.telegram.org/api/stats), get channel members,
-     * see anonymous administrators in supergroups and ignore slow mode. 
+     * see anonymous administrators in supergroups and ignore slow mode.
      */
     public readonly bool $other;
 

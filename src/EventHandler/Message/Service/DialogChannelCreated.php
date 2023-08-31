@@ -20,7 +20,7 @@ use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
 /**
- * The channel was created
+ * The channel was created.
  */
 final class DialogChannelCreated extends ServiceMessage
 {

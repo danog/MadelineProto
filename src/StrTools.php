@@ -133,14 +133,16 @@ abstract class StrTools extends Extension
     /**
      * Convert a message and a set of entities to HTML.
      *
-     * @param list<MessageEntity> $entities
+     * @param list<MessageEntity|array{_: string, offset: int, length: int}> $entities
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
         $insertions = [];
+        if (isset($entities[0]) && \is_array($entities[0])) {
+            $entities = MessageEntity::fromRawEntities($entities);
+        }
         foreach ($entities as $entity) {
-            $entity = isset($entity) && \is_array($entity) ? MessageEntity::fromRawEntities([$entity])[0] : $entity;
             [$offset, $length] = [$entity->offset, $entity->length];
             $insertions[$offset] ??= '';
             $insertions[$offset] .= match (true) {

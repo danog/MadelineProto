@@ -32,11 +32,18 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
 use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
@@ -44,22 +51,15 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
@@ -440,13 +440,13 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    $message['action']['inviter_id'], 
+                    $message['action']['inviter_id'],
                 ),
                 'messageActionChannelCreate' => new DialogChannelCreated(
                     $this,
                     $message,
                     $info,
-                    $message['action']['title'], 
+                    $message['action']['title'],
                 ),
                 'messageActionChatMigrateTo' => new DialogChatMigrateTo(
                     $this,

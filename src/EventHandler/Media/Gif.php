@@ -45,9 +45,8 @@ final class Gif extends AbstractVideo
     }
 
     /**
-     * Add GIF to saved gifs list
+     * Add GIF to saved gifs list.
      *
-     * @return bool
      */
     public function save(): bool
     {
@@ -61,9 +60,8 @@ final class Gif extends AbstractVideo
     }
 
     /**
-     * Remove GIF from saved gifs list
+     * Remove GIF from saved gifs list.
      *
-     * @return bool
      */
     public function unsave(): bool
     {

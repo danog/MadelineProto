@@ -146,6 +146,9 @@ function printTypes(array $types, string $type): string
         }
         $refl = new ReflectionClass($class);
         $link = "https://docs.madelineproto.xyz/PHP/".str_replace('\\', '/', $class).'.html';
+        if (!$refl->getDocComment()) {
+            throw new AssertionError("No documentation for $class!");
+        }
         $f = $b->create($refl->getDocComment())->getSummary();
         if ($refl->hasMethod('__construct')) {
             $c = $refl->getMethod('__construct');

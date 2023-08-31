@@ -26,6 +26,17 @@ use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\Entities\Code;
+use danog\MadelineProto\EventHandler\Message\Entities\Email;
+use danog\MadelineProto\EventHandler\Message\Entities\Mention;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\Entities\Phone;
+use danog\MadelineProto\EventHandler\Message\Entities\Pre;
+use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
+use danog\MadelineProto\EventHandler\Message\Entities\Url;
+use danog\MadelineProto\EventHandler\Participant\Admin;
+use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\Rights\Admin;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
@@ -501,7 +512,7 @@ abstract class InternalDoc
     /**
      * Convert a message and a set of entities to HTML.
      *
-     * @param list<array{_: string, offset: int, length: int, ...}> $entities
+     * @param list<MessageEntity|array{_: string, offset: int, length: int}> $entities
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string

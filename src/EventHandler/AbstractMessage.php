@@ -117,7 +117,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         return $this->replyToMsgId !== null;
     }
 
-    protected readonly ?self $replyCache;
+    protected ?self $replyCache = null;
     protected bool $replyCached = false;
     /**
      * Get replied-to message.

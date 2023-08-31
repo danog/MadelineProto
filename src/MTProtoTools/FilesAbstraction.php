@@ -89,7 +89,7 @@ trait FilesAbstraction
                 }
 
                 if ($has_document_photo === null) {
-                    throw new AssertionError("has_document_photo === null: ".json_encode($media['document']));
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
                 }
 
                 if ($attr['mask']) {
@@ -113,14 +113,14 @@ trait FilesAbstraction
             }
             if ($t === 'documentAttributeCustomEmoji') {
                 if ($has_document_photo === null) {
-                    throw new AssertionError("has_document_photo === null: ".json_encode($media['document']));
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
                 }
                 return new CustomEmoji($this, $media, $attr, $has_document_photo, $protected);
             }
         }
         if ($has_animated) {
             if ($has_video === null) {
-                throw new AssertionError("has_video === null: ".json_encode($media['document']));
+                throw new AssertionError("has_video === null: ".\json_encode($media['document']));
             }
             return new Gif($this, $media, $has_video, $protected);
         }

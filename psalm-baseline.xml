@@ -412,24 +412,21 @@
       <code><![CDATA[$this->replyCache]]></code>
       <code><![CDATA[$this->replyCache]]></code>
     </InvalidReturnStatement>
+  </file>
+  <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
-      <code>$replyCache</code>
+      <code>$peerResolved</code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/EventHandler/Filter/AbstractFilterFromSenders.php">
+    <PropertyNotSetInConstructor>
+      <code>$peersResolved</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Filter/FilterFromAdmin.php">
     <MissingConstructor>
       <code>$adminIds</code>
     </MissingConstructor>
-  </file>
-  <file src="src/EventHandler/Filter/FilterFromSender.php">
-    <PropertyNotSetInConstructor>
-      <code>$peerResolved</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/EventHandler/Filter/FilterFromSenders.php">
-    <PropertyNotSetInConstructor>
-      <code>$peersResolved</code>
-    </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Filter/FilterPeer.php">
     <PropertyNotSetInConstructor>
@@ -440,12 +437,8 @@
     <PropertyTypeCoercion>
       <code>$matches</code>
       <code>$matches</code>
+      <code>$matches</code>
     </PropertyTypeCoercion>
-  </file>
-  <file src="src/EventHandler/Filter/FilterSender.php">
-    <PropertyNotSetInConstructor>
-      <code>$peerResolved</code>
-    </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media.php">
     <PossiblyNullArrayAccess>
@@ -560,10 +553,6 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message.php">
-    <ArgumentTypeCoercion>
-      <code><![CDATA[$this->entities]]></code>
-      <code><![CDATA[$this->entities]]></code>
-    </ArgumentTypeCoercion>
     <LessSpecificReturnStatement>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </LessSpecificReturnStatement>
@@ -576,7 +565,6 @@
     <PropertyNotSetInConstructor>
       <code>$html</code>
       <code>$htmlTelegram</code>
-      <code>Message</code>
     </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
       <code><![CDATA[isset($rawMessage['media'])
@@ -591,52 +579,38 @@
     <PropertyNotSetInConstructor>
       <code>ChannelMessage</code>
       <code>ChannelMessage</code>
-      <code>ChannelMessage</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message/GroupMessage.php">
     <PropertyNotSetInConstructor>
       <code>GroupMessage</code>
       <code>GroupMessage</code>
-      <code>GroupMessage</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message/PrivateMessage.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>DialogScreenshotTaken</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+    </NullableReturnStatement>
     <PropertyNotSetInConstructor>
       <code>PrivateMessage</code>
       <code>PrivateMessage</code>
-      <code>PrivateMessage</code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="src/EventHandler/Message/Service/DialogCreated.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogCreated</code>
-    </PropertyNotSetInConstructor>
+  <file src="src/EventHandler/Participant/Banned.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
   </file>
-  <file src="src/EventHandler/Message/Service/DialogMemberLeft.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogMemberLeft</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/EventHandler/Message/Service/DialogMembersJoined.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogMembersJoined</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/EventHandler/Message/Service/DialogMessagePinned.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogMessagePinned</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/EventHandler/Message/Service/DialogPhotoChanged.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogPhotoChanged</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/EventHandler/Message/Service/DialogTitleChanged.php">
-    <PropertyNotSetInConstructor>
-      <code>DialogTitleChanged</code>
-    </PropertyNotSetInConstructor>
+  <file src="src/EventHandler/Participant/Left.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/Query/ChatTrait.php">
     <MoreSpecificReturnType>
@@ -1609,6 +1583,10 @@
                         '_' => 'messageMediaPhoto',
                         'photo' => $message['action']['photo']
                     ])]]></code>
+      <code><![CDATA[$this->wrapMedia([
+                        '_' => 'messageMediaPhoto',
+                        'photo' => $message['action']['photo']
+                    ])]]></code>
     </ArgumentTypeCoercion>
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
@@ -1620,6 +1598,11 @@
       <code>getUpdatesState</code>
       <code>loadUpdateState</code>
     </MissingReturnType>
+    <PossiblyNullArgument>
+      <code><![CDATA[$this->getIdInternal($message['action']['from_id'])]]></code>
+      <code><![CDATA[$this->getIdInternal($message['action']['peer'])]]></code>
+      <code><![CDATA[$this->getIdInternal($message['action']['to_id'])]]></code>
+    </PossiblyNullArgument>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
@@ -1801,6 +1784,9 @@
     <ArgumentTypeCoercion>
       <code><![CDATA[$length<<1]]></code>
     </ArgumentTypeCoercion>
+    <InvalidArgument>
+      <code>$entities</code>
+    </InvalidArgument>
   </file>
   <file src="src/Stream/ADNLTransport/ADNLStream.php">
     <MissingPropertyType>

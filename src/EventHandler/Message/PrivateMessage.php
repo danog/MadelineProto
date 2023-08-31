@@ -25,9 +25,8 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 final class PrivateMessage extends Message
 {
     /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken
+     * Notify the other user in a private chat that a screenshot of the chat was taken.
      *
-     * @return DialogScreenshotTaken
      */
     public function screenShot(): DialogScreenshotTaken
     {
