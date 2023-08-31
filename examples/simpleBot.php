@@ -12,7 +12,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\SimpleEventHandler;
 
-// Load via composer
+// Load via composer (RECOMMENDED, see https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
 if (file_exists('vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 } else {
