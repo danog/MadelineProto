@@ -64,6 +64,8 @@ use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
 use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
@@ -371,6 +373,9 @@ trait UpdateHandler
             'updateBotInlineQuery' => new InlineQuery($this, $update),
             'updatePhoneCall' => $update['phone_call'],
             'updateBroadcastProgress' => $update['progress'],
+            'updateStory' => $update['story']['_'] === 'storyItemDeleted'
+                ? new StoryDeleted($this, $update)
+                : new Story($this, $update),
             default => null
         };
     }
