@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
