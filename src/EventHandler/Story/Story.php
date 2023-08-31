@@ -21,9 +21,12 @@ use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Privacy;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
 
 /**
  *
@@ -116,5 +119,195 @@ final class Story extends AbstractStory
         $this->caption = $rawStory['caption'] ?? null;
         //$this->mediaAreas = $rawStory['mediaAreas'] ?? null; //!
         $this->sentReaction = $rawStory['sent_reaction']['emoticon'] ?? $rawStory['sent_reaction']['document_id'] ?? null;   
+    }
+
+    public function reply(
+        string $message,
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $noWebpage = false,
+        bool $updateStickersetsOrder = false,
+    ): Message {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.sendMessage',
+            [
+                'peer' => $this->userId,
+                'message' => $message,
+                'parse_mode' => $parseMode,
+                'reply_to' => ['_' => 'inputReplyToStory', 'user_id' => $this->userId, 'story_id' => $this->id],
+                'reply_markup' => $replyMarkup,
+                'schedule_date' => $scheduleDate,
+                'silent' => $silent,
+                'noforwards' => $noForwards,
+                'background' => $background,
+                'clear_draft' => $clearDraft,
+                'no_webpage' => $noWebpage,
+                'update_stickersets_order' => $updateStickersetsOrder
+            ]
+        );
+        if (isset($result['_'])) {
+            return $client->wrapMessage($client->extractMessage($result));
+        }
+
+        $last = null;
+        foreach ($result as $updates) {
+            /** @var Message */
+            $new = $client->wrapMessage($client->extractMessage($updates));
+            if ($last) {
+                $last->nextSent = $new;
+            } else {
+                $first = $new;
+            }
+            $last = $new;
+        }
+        return $first;
+    }
+
+    /**
+     * 
+     *
+     * @return void
+     */
+    public function delete(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'stories.deleteStories',
+            [
+                'id' => [$this->id],
+            ]
+        );
+    }
+
+    /**
+     * 
+     *
+     * @return string
+     */
+    public function exportLink(): string
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'stories.exportStoryLink',
+            [
+                'user_id' => $this->userId,
+                'id' => $this->id,
+            ]
+        )['link'];
+    }
+
+    /**
+     * 
+     *
+     * @param array $reason
+     * @param string $message
+     * @return boolean
+     */
+    public function report(array $reason, string $message = ''): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'stories.exportStoryLink',
+            [
+                'user_id' => $this->userId,
+                'id' => $this->id,
+                'reason' => $reason,
+                'message' => $message,
+            ]
+        );
+    }
+
+    /**
+     * 
+     *
+     * @return void
+     */
+    public function pin(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'stories.togglePinned',
+            [
+                'id' => $this->id,
+                'pinned' => true,
+            ]
+        );
+    }
+
+    /**
+     * 
+     *
+     * @return void
+     */
+    public function unpin(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'stories.togglePinned',
+            [
+                'id' => $this->id,
+                'pinned' => false,
+            ]
+        );
+    }
+    /**
+     * 
+     *
+     * @return boolean
+     */
+    public function read(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'stories.incrementStoryViews',
+            [
+                'user_id' => $this->userId,
+                'id' => $this->id,
+            ]
+        );
+    }
+
+    /**
+     * 
+     *
+     * @param integer|string|null|null $reaction
+     * @param boolean $recent
+     * @return StoryReaction
+     */
+    public function addReaction(int|string|null $reaction = null, bool $recent = true): StoryReaction
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'stories.sendReaction',
+            [
+                'add_to_recent' => $recent,
+                'user_id' => $this->userId,
+                'id' => $this->id,
+                'reaction' => \is_int($reaction)
+                ? [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]]
+                : [['_' => 'reactionEmoji', 'emoticon' => $reaction]],
+            ]
+        )['updates'][0];
+        return $client->wrapUpdate($result);
+    }
+
+    /**
+     * 
+     *
+     * @param boolean $recent
+     * @return StoryReaction
+     */
+    public function delReaction(bool $recent = true): StoryReaction
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'stories.sendReaction',
+            [
+                'add_to_recent' => $recent,
+                'user_id' => $this->userId,
+                'id' => $this->id,
+            ]
+        )['updates'][0];
+        return $client->wrapUpdate($result);
     }
 }
