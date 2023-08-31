@@ -36,7 +36,6 @@ use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Participant\Rights\Admin;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;

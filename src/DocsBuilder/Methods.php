@@ -225,7 +225,7 @@ trait Methods
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
             }
             if (\in_array($method, ['messages.getHistory', 'messages.getMessages', 'channels.getMessages'], true)) {
-                $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
+                $header .= "# Warning: flood wait\n**Warning: this method is prone to rate limiting with flood waits, **which can lead to !!! ACCOUNT BANS !!!**, please use the [updates event handler, instead (which is 100% safe) &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
                 $header .= "# Warning: non-realtime results\n**Warning: this method is not suitable for receiving messages in real-time from chats and users, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
                 $header .= "# Warning: this is probably NOT what you need\nYou probably need to use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven) :)\n\n";
             }
