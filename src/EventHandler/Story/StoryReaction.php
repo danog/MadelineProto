@@ -14,26 +14,23 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Story;
 
+use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\MTProto;
 
 /**
  *
  */
-abstract class AbstractStory extends Update
+final class StoryReaction extends AbstractStory
 {
-    /** ID of the sender of the story */
-    public readonly int $userId;
-
-    /** Story ID */
-    public readonly int $id;
+    /** */
+    public readonly int|string|null $reaction;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawStory)
     {
-        parent::__construct($API);
-        $this->userId = $rawStory['user_id'];
-        $this->id = $rawStory['story']['id'] ?? $rawStory['story_id'];
+        parent::__construct($API, $rawStory);
+        $this->reaction = $rawStory['reaction']['emoticon'] ?? $rawStory['reaction']['document_id'] ?? null;
     }
 }
