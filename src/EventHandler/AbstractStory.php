@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use danog\MadelineProto\MTProto;
 
 /**
- *
+ * Represents a Telegram Story.
  */
 abstract class AbstractStory extends Update
 {
