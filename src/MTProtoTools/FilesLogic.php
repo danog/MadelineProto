@@ -50,6 +50,7 @@ use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use const FILTER_VALIDATE_URL;
 
@@ -101,6 +102,8 @@ trait FilesLogic
                 $messageMedia['name'] = $name[0];
                 $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
             }
+
+            Assert::true(isset($_SERVER['REQUEST_METHOD']));
 
             $result = ResponseInfo::parseHeaders(
                 $_SERVER['REQUEST_METHOD'],
