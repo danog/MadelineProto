@@ -36,6 +36,3 @@ steps:
     commands:
       - apk add bash
       - /bin/bash -e tests/test.sh
-
-depends_on:
-  - build-docker
