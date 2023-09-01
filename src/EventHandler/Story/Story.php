@@ -60,7 +60,7 @@ final class Story extends AbstractStory
     /** When was the story sent */
     public readonly int $date;
 
-    /** */
+    /** Expiration date of the story */
     public readonly int $expireDate;
 
     /** */
