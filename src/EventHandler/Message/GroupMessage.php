@@ -155,7 +155,7 @@ final class GroupMessage extends Message
     /**
      * Revoke all supergroup message.
      */
-    public function revokeAll(bool $forEveryone = true, int $maxId = 0): Update
+    public function revokeAll(bool $forEveryone = true, int $maxId = 0): ?Update
     {
         return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
             'channels.deleteHistory',
