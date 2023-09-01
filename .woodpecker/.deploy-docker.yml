@@ -5,7 +5,7 @@ clone:
     when:
       event:
         - tag
-    image: woodpeckerci/plugin-git:v1.5.0
+    image: woodpeckerci/plugin-git
     settings:
       depth: 1
       lfs: false
