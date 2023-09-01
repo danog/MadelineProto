@@ -35,4 +35,4 @@ steps:
       - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - /bin/bash -e tests/test.sh
+      - tests/test.sh

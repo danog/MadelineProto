@@ -71,7 +71,6 @@
         "bamarni/composer-bin-plugin": "1.8.2",
         "symfony/yaml": "^6.0",
         "amphp/http-server": "^3",
-        "leproxy/leproxy": "^0.2.2",
         "revolt/event-loop-adapter-react": "^1",
         "dg/bypass-finals": "dev-master"
     },
