@@ -21,7 +21,7 @@ use danog\MadelineProto\MTProto;
 
 
 /**
- *
+ * Represents a deleted story.
  */
 final class StoryDeleted extends AbstractStory
 {
