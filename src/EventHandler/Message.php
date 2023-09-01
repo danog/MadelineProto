@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -388,6 +389,23 @@ abstract class Message extends AbstractMessage
             ]
         );
         return $result['result'][0]['text'];
+    }
+
+    /**
+     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat
+     *
+     * @param int|null $maxId
+     */
+    public function read(?int $maxId = null) : bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+            [
+                'peer' => $this->chatId,
+                'channel' => $this->chatId,
+                'max_id' => $maxId ?? $this->id
+            ]
+        );
     }
 
     /**

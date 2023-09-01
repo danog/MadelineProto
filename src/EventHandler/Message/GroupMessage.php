@@ -142,4 +142,32 @@ final class GroupMessage extends Message
             ]
         )));
     }
+
+    /**
+     * Kick message sender from current supergroup
+     */
+    public function kick(): void
+    {
+        $this->ban();
+        $this->unban();
+    }
+
+    /**
+     * Revoke all supergroup message
+     *
+     * @param bool $forEveryone
+     * @param int $maxId
+     */
+    public function revokeAll(bool $forEveryone = true,int $maxId = 0) :Update
+    {
+        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+            'channels.deleteHistory',
+            [
+                'channel' => $this->chatId,
+                'for_everyone' => $forEveryone,
+                'max_id' => $maxId
+            ]
+        )));
+    }
+
 }
