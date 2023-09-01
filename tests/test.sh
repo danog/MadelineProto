@@ -11,6 +11,9 @@ rm -rf docs
 curl -L https://github.com/danog/MadelineProtoDocs/archive/refs/heads/master.tar.gz | tar -xz
 mv MadelineProtoDocs-master/ docs
 
+git submodule init schemas
+git submodule update schemas
+
 composer update
 composer build
 
