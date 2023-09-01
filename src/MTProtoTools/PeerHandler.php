@@ -99,7 +99,16 @@ trait PeerHandler
      */
     public function isForum(mixed $peer): bool
     {
-        return $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+        return self::isSupergroupOrChannel($peer) && $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+    }
+
+    /**
+     * Check if the specified peer is a bot.
+     *
+     */
+    public function isBot(mixed $peer): bool
+    {
+        return $peer > 0 && $this->getType($peer) === API::PEER_TYPE_BOT;
     }
 
     /**
