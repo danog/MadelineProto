@@ -12,7 +12,7 @@ clone:
       recursive: false
       tags: true
 
-pipeline:
+steps:
   variants:
     image: docker:cli
     secrets: [docker_username, docker_password]

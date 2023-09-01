@@ -19,7 +19,7 @@ clone:
       recursive: false
       tags: true
 
-pipeline:
+steps:
   build:
     group: build
     image: danog/madelineproto:next

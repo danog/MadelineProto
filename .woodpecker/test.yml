@@ -20,7 +20,7 @@ clone:
       recursive: false
       tags: true
 
-pipeline:
+steps:
   test:
     group: test
     image: danog/madelineproto:next
@@ -29,12 +29,6 @@ pipeline:
         - tag
         - push
         - pull_request
-    secrets:
-      - GITHUB_TOKEN
-      - API_ID
-      - API_HASH
-      - BOT_TOKEN
-      - DEST
     environment:
       - PHP_VERSION=${php}
       - PLATFORM=${platform}
