@@ -13,7 +13,7 @@ clone:
         - tag
         - push
         - pull_request
-    image: woodpeckerci/plugin-git
+    image: woodpeckerci/plugin-git:2.1.0
     settings:
       depth: 1
       lfs: false
