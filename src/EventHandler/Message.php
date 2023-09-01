@@ -235,8 +235,8 @@ abstract class Message extends AbstractMessage
     /**
      * Report a message in a chat for violation of telegram’s Terms of Service.
      *
-     * @param ReportReason $reason
-     * @param string $message
+     * @param ReportReason $reason Why are these messages being reported
+     * @param string $message Comment for report moderation
      */
     public function report(ReportReason $reason, string $message): void
     {
