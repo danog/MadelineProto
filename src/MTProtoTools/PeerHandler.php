@@ -103,6 +103,15 @@ trait PeerHandler
     }
 
     /**
+     * Check if the specified peer is a bot.
+     *
+     */
+    public function isBot(mixed $peer): bool
+    {
+        return $this->getType($peer) === API::PEER_TYPE_BOT;
+    }
+
+    /**
      * Check if peer is present in internal peer database.
      *
      * @param mixed $id Peer

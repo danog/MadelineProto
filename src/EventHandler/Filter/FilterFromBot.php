@@ -24,22 +24,22 @@ use danog\MadelineProto\EventHandler\Query\ButtonQuery;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow only messages coming from the admin (defined as the peers returned by getReportPeers).
+ * Allow only messages coming from bots.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterFromAdmin extends Filter
+final class FilterFromBot extends Filter
 {
-    private readonly array $adminIds;
+    private readonly EventHandler $API;
+    /** Run some initialization logic, optionally returning a new filter to replace the current one. */
     public function initialize(EventHandler $API): Filter
     {
-        /** @psalm-suppress InaccessibleProperty */
-        $this->adminIds = $API->getAdminIds();
+        $this->API = $API;
         return $this;
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof AbstractMessage && \in_array($update->senderId, $this->adminIds, true)) ||
-            ($update instanceof ButtonQuery && \in_array($update->userId, $this->adminIds, true)) ||
-            ($update instanceof InlineQuery && \in_array($update->userId, $this->adminIds, true));
+        return ($update instanceof AbstractMessage && $this->API->isBot($update->senderId)) ||
+            ($update instanceof ButtonQuery && $this->API->isBot($update->userId)) ||
+            ($update instanceof InlineQuery && $this->API->isBot($update->userId));
     }
 }

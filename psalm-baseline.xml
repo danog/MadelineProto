@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@d3463e30f3768de1f61d1ef4834b4bcd8aa179ef">
+<files psalm-version="dev-master@96d83947615641734a5baa181d44da7f10ee0246">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -426,6 +426,14 @@
   <file src="src/EventHandler/Filter/FilterFromAdmin.php">
     <MissingConstructor>
       <code>$adminIds</code>
+    </MissingConstructor>
+  </file>
+  <file src="src/EventHandler/Filter/FilterFromBot.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$this->API]]></code>
+    </InaccessibleProperty>
+    <MissingConstructor>
+      <code>$API</code>
     </MissingConstructor>
   </file>
   <file src="src/EventHandler/Filter/FilterPeer.php">
@@ -1420,7 +1428,6 @@
     </PossiblyNullArgument>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
       <code>seek</code>
@@ -1478,6 +1485,9 @@
     </RedundantCastGivenDocblockType>
   </file>
   <file src="src/MTProtoTools/PeerHandler.php">
+    <InvalidArgument>
+      <code><![CDATA[self::isSupergroupOrChannel($peer) && $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
+    </InvalidArgument>
     <InvalidArrayOffset>
       <code><![CDATA[$this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
     </InvalidArrayOffset>
