@@ -387,7 +387,6 @@ abstract class Message extends AbstractMessage
 
     /**
      * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat.
-     *
      */
     public function read(?int $maxId = null): bool
     {

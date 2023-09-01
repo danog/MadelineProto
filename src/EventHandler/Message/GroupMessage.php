@@ -154,7 +154,6 @@ final class GroupMessage extends Message
 
     /**
      * Revoke all supergroup message.
-     *
      */
     public function revokeAll(bool $forEveryone = true, int $maxId = 0): Update
     {
