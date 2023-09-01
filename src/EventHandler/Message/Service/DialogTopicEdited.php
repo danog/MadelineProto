@@ -28,7 +28,7 @@ final class DialogTopicEdited extends ServiceMessage
         MTProto $API,
         array $rawMessage,
         array $info,
-        
+
         /** Topic name. */
         public readonly string $title,
         /** ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. */

@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant;
 
 /**
- * Myself
+ * Myself.
  */
 final class MySelf extends Participant
 {

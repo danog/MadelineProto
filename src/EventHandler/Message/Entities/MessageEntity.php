@@ -23,9 +23,13 @@ abstract class MessageEntity implements JsonSerializable
         $this->length = $rawEntities['length'];
     }
 
-    public static function fromRawEntities(array $entities)
+    /**
+     * @param list<array> $entities
+     * @return list<self>
+     */
+    public static function fromRawEntities(array $entities): array
     {
-        $create = static fn (array $entity): MessageEntity => match ($entity['_']) {
+        return \array_map(static fn (array $entity): MessageEntity => match ($entity['_']) {
             'messageEntityMention' => new Mention($entity),
             'messageEntityHashtag' => new Hashtag($entity),
             'messageEntityBotCommand' => new BotCommand($entity),
@@ -46,8 +50,7 @@ abstract class MessageEntity implements JsonSerializable
             'messageEntitySpoiler' => new Spoiler($entity),
             'messageEntityCustomEmoji' => new CustomEmoji($entity),
             default => new Unknown($entity)
-        };
-        return \array_map(fn (array $entity) => $create($entity), $entities);
+        }, $entities);
     }
     /** @internal */
     public function jsonSerialize(): mixed

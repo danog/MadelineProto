@@ -12,14 +12,14 @@ clone:
       event:
         - tag
         - push
-    image: woodpeckerci/plugin-git:v1.5.0
+    image: woodpeckerci/plugin-git
     settings:
       depth: 1
       lfs: false
       recursive: false
       tags: true
 
-pipeline:
+steps:
   build:
     group: build
     image: danog/madelineproto:next
@@ -63,3 +63,4 @@ services:
 
 depends_on:
   - build-docker
+  - test

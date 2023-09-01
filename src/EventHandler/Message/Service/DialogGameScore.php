@@ -28,7 +28,7 @@ final class DialogGameScore extends ServiceMessage
         MTProto $API,
         array $rawMessage,
         array $info,
-    
+
         /** Game ID */
         public readonly int $gameId,
         /** Score */

@@ -19,6 +19,9 @@ namespace danog\MadelineProto\EventHandler\Message\Service;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
+/**
+ * Represents a service message about a group call.
+ */
 abstract class AbstractDialogGroupCall extends ServiceMessage
 {
     /** @internal */

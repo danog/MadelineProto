@@ -88,7 +88,10 @@ trait FilesAbstraction
                     return new VideoSticker($this, $media, $attr, $has_video, $protected);
                 }
 
-                \assert($has_document_photo !== null);
+                if ($has_document_photo === null) {
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                }
+
                 if ($attr['mask']) {
                     return new MaskSticker($this, $media, $attr, $has_document_photo, $protected);
                 }
@@ -109,12 +112,16 @@ trait FilesAbstraction
                     : new Audio($this, $media, $attr, $protected);
             }
             if ($t === 'documentAttributeCustomEmoji') {
-                \assert($has_document_photo !== null);
+                if ($has_document_photo === null) {
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                }
                 return new CustomEmoji($this, $media, $attr, $has_document_photo, $protected);
             }
         }
         if ($has_animated) {
-            \assert($has_video !== null);
+            if ($has_video === null) {
+                throw new AssertionError("has_video === null: ".\json_encode($media['document']));
+            }
             return new Gif($this, $media, $has_video, $protected);
         }
         if ($has_video) {

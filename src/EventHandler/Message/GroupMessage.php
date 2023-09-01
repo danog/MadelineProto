@@ -19,29 +19,28 @@ namespace danog\MadelineProto\EventHandler\Message;
 use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Admin;
-use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Participant\MySelf;
 use danog\MadelineProto\EventHandler\Participant\Banned;
 use danog\MadelineProto\EventHandler\Participant\Creator;
+use danog\MadelineProto\EventHandler\Participant\Left;
+use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\MySelf;
+
 /**
  * Represents an incoming or outgoing group message.
  */
 final class GroupMessage extends Message
 {
     /**
-     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant
+     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
      * @param string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
-     * @return Participant
      * @throws AssertionError
      */
     public function getMember(string|int|null $member = null): Participant
     {
         $client = $this->getClient();
         $member ??= $this->senderId;
-        $member = $client->getId($member);
         $result = $client->methodCallAsyncRead(
             'channels.getParticipant',
             [

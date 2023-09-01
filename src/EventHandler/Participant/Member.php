@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant;
 
 /**
- * Channel/supergroup participant
+ * Channel/supergroup participant.
  */
 final class Member extends Participant
 {

@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Message\Service;
 
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
-use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\VoIP\DiscardReason;
 
 /**
  * A phone call.

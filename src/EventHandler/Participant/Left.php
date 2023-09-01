@@ -17,22 +17,22 @@
 namespace danog\MadelineProto\EventHandler\Participant;
 
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 
 /**
- * A participant that left the channel/supergroup
+ * A participant that left the channel/supergroup.
  */
 final class Left extends Participant
 {
-
     /** The peer that left */
     public readonly int $peer;
 
     /** @internal */
     public function __construct(
-        MTProto $API,
+        MTProto|Client $API,
         array $rawParticipant
     ) {
-        $this->peer = $API->getIdInternal ($rawParticipant['peer']);
+        $this->peer = $API->getIdInternal($rawParticipant['peer']);
     }
 }
