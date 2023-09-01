@@ -19,6 +19,8 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing message.
@@ -228,26 +230,30 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function block(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
                 'my_stories_from' => $stories,
-            ]
-        );
+                ]
+            );
     }
-
+    
     /**
      * Deletes the user from the blacklist.
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function unblock(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
