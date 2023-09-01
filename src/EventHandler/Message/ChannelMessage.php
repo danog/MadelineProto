@@ -98,9 +98,9 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Increase the view counter of a current message in the channel
+     * Increase the view counter of a current message in the channel.
      */
-    public function view() :void
+    public function view(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'messages.getMessagesViews',

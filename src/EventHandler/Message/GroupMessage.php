@@ -62,11 +62,11 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Ban message sender from current supergroup
+     * Ban message sender from current supergroup.
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
      */
-    public function ban(int $untilDate = 0) :?Update
+    public function ban(int $untilDate = 0): ?Update
     {
         $chatBannedRights = [
             '_' => 'chatBannedRights',
@@ -103,11 +103,11 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Unban message sender from current supergroup
+     * Unban message sender from current supergroup.
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
      */
-    public function unban(int $untilDate = 0) :?Update
+    public function unban(int $untilDate = 0): ?Update
     {
         $chatBannedRights = [
             '_' => 'chatBannedRights',
@@ -144,7 +144,7 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Kick message sender from current supergroup
+     * Kick message sender from current supergroup.
      */
     public function kick(): void
     {
@@ -153,12 +153,10 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Revoke all supergroup message
+     * Revoke all supergroup message.
      *
-     * @param bool $forEveryone
-     * @param int $maxId
      */
-    public function revokeAll(bool $forEveryone = true,int $maxId = 0) :Update
+    public function revokeAll(bool $forEveryone = true, int $maxId = 0): Update
     {
         return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
             'channels.deleteHistory',
@@ -169,5 +167,4 @@ final class GroupMessage extends Message
             ]
         )));
     }
-
 }

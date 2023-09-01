@@ -33,7 +33,6 @@ use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\StrTools;
 
 /**
@@ -223,8 +222,6 @@ abstract class Message extends AbstractMessage
         return $this->getClient()->wrapUpdate($result);
     }
 
-
-
     /**
      * Get our reactions on the message.
      *
@@ -236,10 +233,8 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Report a message in a chat for violation of telegram’s Terms of Service
+     * Report a message in a chat for violation of telegram’s Terms of Service.
      *
-     * @param ReportReason $reason
-     * @param string $message
      */
     public function report(ReportReason $reason, string $message): void
     {
@@ -255,7 +250,7 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Save message sender to your account contacts
+     * Save message sender to your account contacts.
      *
      * @param string $firstName First name
      * @param string|null $lastName Last name
@@ -267,8 +262,7 @@ abstract class Message extends AbstractMessage
         ?string $lastName = null,
         ?string $phoneNumber = null,
         bool    $addPhonePrivacyException = false
-    ): ?Update
-    {
+    ): ?Update {
         return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
             'contacts.addContact',
             [
@@ -282,7 +276,7 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Remove message sender from your account contacts
+     * Remove message sender from your account contacts.
      */
     public function removeContact(): ?Update
     {
@@ -295,19 +289,19 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Invite message sender to requested channel
+     * Invite message sender to requested channel.
      *
      * @param string|int $channel Username, chat ID, Update, Message or InputChannel
      */
-    public function inviteToChannel(string|int $channel) :?Update
+    public function inviteToChannel(string|int $channel): ?Update
     {
-         return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
-             'channels.inviteToChannel',
-             [
-                 'channel' => $channel,
-                 'users' => [$this->senderId]
-             ]
-         )));
+        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+            'channels.inviteToChannel',
+            [
+                'channel' => $channel,
+                'users' => [$this->senderId]
+            ]
+        )));
     }
 
     /**
@@ -392,11 +386,10 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat
+     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat.
      *
-     * @param int|null $maxId
      */
-    public function read(?int $maxId = null) : bool
+    public function read(?int $maxId = null): bool
     {
         return $this->getClient()->methodCallAsyncRead(
             API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
