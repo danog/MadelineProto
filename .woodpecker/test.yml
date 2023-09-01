@@ -17,7 +17,7 @@ clone:
     settings:
       depth: 1
       lfs: false
-      recursive: true
+      recursive: false
       tags: true
 
 steps:
