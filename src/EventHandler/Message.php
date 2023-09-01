@@ -29,6 +29,7 @@ use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
@@ -220,6 +221,8 @@ abstract class Message extends AbstractMessage
         return $this->getClient()->wrapUpdate($result);
     }
 
+
+
     /**
      * Get our reactions on the message.
      *
@@ -228,6 +231,25 @@ abstract class Message extends AbstractMessage
     public function getOurReactions(): array
     {
         return $this->reactions;
+    }
+
+    /**
+     * Report a message in a chat for violation of telegram’s Terms of Service
+     *
+     * @param ReportReason $reason
+     * @param string $message
+     */
+    public function report(ReportReason $reason, string $message): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.report',
+            [
+                'reason' => ['_' => $reason],
+                'message' => $message,
+                'id' => [$this->id],
+                'peer' => $this->chatId
+            ]
+        );
     }
 
     /**

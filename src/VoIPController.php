@@ -343,12 +343,7 @@ final class VoIPController
 
         $this->log(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
         try {
-            $this->API->methodCallAsyncRead('phone.discardCall', ['peer' => $this->call, 'duration' => \time() - $this->public->date, 'connection_id' => 0, 'reason' => ['_' => match ($reason) {
-                DiscardReason::BUSY => 'phoneCallDiscardReasonBusy',
-                DiscardReason::HANGUP => 'phoneCallDiscardReasonHangup',
-                DiscardReason::DISCONNECTED => 'phoneCallDiscardReasonDisconnect',
-                DiscardReason::MISSED => 'phoneCallDiscardReasonMissed'
-            }]]);
+            $this->API->methodCallAsyncRead('phone.discardCall', ['peer' => $this->call, 'duration' => \time() - $this->public->date, 'connection_id' => 0, 'reason' => ['_' => $reason]]);
         } catch (RPCErrorException $e) {
             if (!\in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'], true)) {
                 throw $e;
