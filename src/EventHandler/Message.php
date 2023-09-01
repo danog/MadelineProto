@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\StrTools;
 
 /**
@@ -252,6 +253,46 @@ abstract class Message extends AbstractMessage
         );
     }
 
+    /**
+     * Save message sender to your account contacts
+     *
+     * @param string $firstName
+     * @param string|null $lastName
+     * @param string|null $phoneNumber
+     * @param bool $addPhonePrivacyException
+     */
+    public function saveContact(
+        string  $firstName,
+        ?string $lastName = null,
+        ?string $phoneNumber = null,
+        bool    $addPhonePrivacyException = false
+    ): ?Update
+    {
+        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+            'contacts.addContact',
+            [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'phone_number' => $phoneNumber,
+                'add_phone_privacy_exception' => $addPhonePrivacyException,
+                'id' => $this->senderId
+            ]
+        )));
+    }
+
+    /**
+     * Remove message sender from your account contacts
+     */
+    public function removeContact(): ?Update
+    {
+        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+            'contacts.deleteContacts',
+            [
+                'id' => [$this->senderId]
+            ]
+        )));
+    }
+    
     /**
      * Add reaction to message.
      *
