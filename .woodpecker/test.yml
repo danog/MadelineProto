@@ -12,6 +12,7 @@ clone:
       event:
         - tag
         - push
+        - pull_request
     image: woodpeckerci/plugin-git:v1.5.0
     settings:
       depth: 1
@@ -20,13 +21,14 @@ clone:
       tags: true
 
 pipeline:
-  build:
-    group: build
+  test:
+    group: test
     image: danog/madelineproto:next
     when:
       event:
         - tag
         - push
+        - pull_request
     secrets:
       - GITHUB_TOKEN
       - API_ID
@@ -39,28 +41,7 @@ pipeline:
       - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - /bin/bash -e tests/makephar.sh
-
-services:
-  mariadb:
-    image: mariadb
-    environment:
-      - MARIADB_DATABASE=MadelineProto
-      - MARIADB_USER=MadelineProto
-      - MARIADB_PASSWORD=test
-      - MARIADB_RANDOM_ROOT_PASSWORD=yes
-
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_DB=MadelineProto
-      - POSTGRES_USER=MadelineProto
-      - POSTGRES_PASSWORD=test
-
-  redis:
-    image: redis
-
+      - /bin/bash -e tests/test.sh
 
 depends_on:
   - build-docker
-  - test
