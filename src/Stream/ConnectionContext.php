@@ -298,7 +298,6 @@ final class ConnectionContext
     /**
      * Get the inputClientProxy proxy MTProto object.
      *
-     * @return array
      */
     public function getInputClientProxy(): array|null
     {

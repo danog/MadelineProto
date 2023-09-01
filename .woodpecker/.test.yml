@@ -1,0 +1,38 @@
+matrix:
+  php:
+    - "8.1"
+  platform:
+    - linux/arm64
+
+platform: ${platform}
+
+clone:
+  git:
+    when:
+      event:
+        - tag
+        - push
+        - pull_request
+    image: woodpeckerci/plugin-git:2.1.0
+    settings:
+      depth: 1
+      lfs: false
+      recursive: false
+      tags: true
+
+steps:
+  test:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - tag
+        - push
+        - pull_request
+    environment:
+      - PHP_VERSION=${php}
+      - PLATFORM=${platform}
+      - TAG=${CI_COMMIT_TAG}
+    commands:
+      - apk add bash
+      - tests/test.sh

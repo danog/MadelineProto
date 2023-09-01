@@ -256,10 +256,10 @@ abstract class Message extends AbstractMessage
     /**
      * Save message sender to your account contacts
      *
-     * @param string $firstName
-     * @param string|null $lastName
-     * @param string|null $phoneNumber
-     * @param bool $addPhonePrivacyException
+     * @param string $firstName First name
+     * @param string|null $lastName Last name
+     * @param string|null $phoneNumber Telegram ID of the other user
+     * @param bool $addPhonePrivacyException Allow the other user to see our phone number?
      */
     public function saveContact(
         string  $firstName,
@@ -292,7 +292,23 @@ abstract class Message extends AbstractMessage
             ]
         )));
     }
-    
+
+    /**
+     * Invite message sender to requested channel
+     *
+     * @param string|int $channel Username, chat ID, Update, Message or InputChannel
+     */
+    public function inviteToChannel(string|int $channel) :?Update
+    {
+         return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+             'channels.inviteToChannel',
+             [
+                 'channel' => $channel,
+                 'users' => [$this->senderId]
+             ]
+         )));
+    }
+
     /**
      * Add reaction to message.
      *

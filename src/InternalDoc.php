@@ -1205,6 +1205,14 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::isArrayOrAlike($var);
     }
     /**
+     * Check if the specified peer is a bot.
+     *
+     */
+    public function isBot(mixed $peer): bool
+    {
+        return $this->wrapper->getAPI()->isBot($peer);
+    }
+    /**
      * Check if the specified peer is a forum.
      *
      */
