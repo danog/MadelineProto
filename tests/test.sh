@@ -7,7 +7,7 @@ mv composer.phar /usr/local/bin/composer
 
 apk add procps git unzip github-cli openssh
 
-rm -rf docs
+rmdir docs
 curl -L https://github.com/danog/MadelineProtoDocs/archive/refs/heads/master.tar.gz | tar -xz
 mv MadelineProtoDocs-master/ docs
 
