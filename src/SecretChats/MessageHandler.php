@@ -82,10 +82,10 @@ trait MessageHandler
             }
             $message .= Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32).$message, true), 8, 16);
-            [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], $this->secret_chats[$chat_id]['admin']);
+            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], $this->secret_chats[$chat_id]['admin']);
         } else {
             $message_key = \substr(\sha1($message, true), -16);
-            [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], true);
+            [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], true);
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
@@ -156,7 +156,7 @@ trait MessageHandler
 
     private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data): string
     {
-        [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
+        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
         $message_data = \substr($decrypted_data, 4, $message_data_length);
@@ -177,7 +177,7 @@ trait MessageHandler
 
     private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data): string
     {
-        [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
+        [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
         if ($message_key != \substr(\hash('sha256', \substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
             throw new SecurityException('Msg_key mismatch');

@@ -151,7 +151,7 @@ final class ReadLoop extends Loop
                 }
             } elseif ($auth_key_id === $this->shared->getTempAuthKey()->getID()) {
                 $message_key = $buffer->bufferRead(16);
-                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->shared->getTempAuthKey()->getAuthKey(), false);
+                [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey(), false);
                 $payload_length -= 24;
                 $left = $payload_length & 15;
                 $payload_length -= $left;

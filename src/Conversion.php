@@ -190,7 +190,7 @@ final class Conversion
         $message_key = \stream_get_contents($data, 16);
         $encrypted_data = \stream_get_contents($data);
 
-        [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $auth_key, false);
+        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $auth_key, false);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
         if ($message_key != \substr(\sha1($decrypted_data, true), 0, 16)) {

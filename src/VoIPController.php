@@ -45,7 +45,7 @@ final class VoIPController
         'udp_reflector' => true,
         'min_layer' => 65,
         'max_layer' => 92,
-        /*'library_versions' => [
+        'library_versions' => [
             "2.4.4",
             "2.7.7",
             "5.0.0",
@@ -55,7 +55,7 @@ final class VoIPController
             "9.0.0",
             "10.0.0",
             "11.0.0"
-        ]*/
+        ]
     ];
     const NET_TYPE_UNKNOWN = 0;
     const NET_TYPE_GPRS = 1;
@@ -391,9 +391,35 @@ final class VoIPController
         }
         return $this;
     }
+    
+    private const SIGNALING_MIN_SIZE = 21;
+    private const SIGNALING_MAX_SIZE = 128 * 1024 * 1024;
     public function onSignaling(string $data): void
     {
-        //\var_dump($data);
+        if (strlen($data) < self::SIGNALING_MIN_SIZE || strlen($data) > self::SIGNALING_MAX_SIZE) {
+            Logger::log('Wrong size in signaling!', Logger::ERROR);
+            return;
+        }
+        $message_key = substr($data, 0, 16);
+        $data = substr($data, 16);
+        [$aes_key, $aes_iv, $x] = Crypt::voipKdf($message_key, $this->authKey, $this->public->outgoing, false);
+        $packet = Crypt::ctrEncrypt($data, $aes_key, $aes_iv);
+
+        if ($message_key != \substr(\hash('sha256', \substr($this->authKey, 88 + $x, 32).$packet, true), 8, 16)) {
+            Logger::log('msg_key mismatch!', Logger::ERROR);
+            return;
+        }
+
+        for ($x = 0; $x < strlen($packet);) {
+            $seq = unpack('V', strrev(substr($packet, $x, 4)))[1];
+            $result = match (ord(substr($packet, $x+5))) {
+                1 => [
+                    '_' => ''
+                ]
+            }
+        }
+
+        \var_dump($packet);
     }
 
     private function setVoipState(VoIPState $state): bool
