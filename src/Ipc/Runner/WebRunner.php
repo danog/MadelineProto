@@ -70,7 +70,7 @@ final class WebRunner extends RunnerAbstract
             'cwd' => Magic::getcwd(),
             'MadelineSelfRestart' => 1
         ];
-        if (\function_exists('memprof_enabled') && memprof_enabled()) {
+        if (\function_exists('memprof_enabled') && \memprof_enabled()) {
             $params['MEMPROF_PROFILE'] = '1';
         }
 
