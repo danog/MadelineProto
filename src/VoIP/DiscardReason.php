@@ -26,32 +26,33 @@ use JsonSerializable;
 /**
  * Why was the call discarded?
  */
-enum DiscardReason: string implements JsonSerializable
+enum DiscardReason implements JsonSerializable
 {
-    /** The phone call was discarded because the user is busy in another call */
-    case BUSY = 'phoneCallDiscardReasonBusy';
-    /** The phone call was discarded because the user is busy in another call */
-    case HANGUP = 'phoneCallDiscardReasonHangup';
-    /** The phone call was disconnected */
-    case DISCONNECTED = 'phoneCallDiscardReasonDisconnect';
     /** We missed the call */
-    case MISSED = 'phoneCallDiscardReasonMissed';
+    case MISSED;
+    /** The phone call was disconnected */
+    case DISCONNECTED;
+    /** The phone call ended normally */
+    case HANGUP;
+    /** The phone call was discarded because the user is busy in another call */
+    case BUSY;
 
     /**
-     * @throws AssertionError
      * @internal
+     * @throws AssertionError
      */
     public static function fromString(?string $name): ?DiscardReason
     {
         if ($name === null) {
             return null;
         }
+        $newName = \strtoupper(\substr($name, 22));
         foreach (DiscardReason::cases() as $case) {
-            if ($case->value === $name) {
+            if ($case->name === $newName) {
                 return $case;
             }
         }
-        throw new AssertionError("Undefined case PhoneCallDiscardReason::" . $name);
+        throw new AssertionError("Undefined case PhoneCallDiscardReason::".$name);
     }
 
     /** @internal */
