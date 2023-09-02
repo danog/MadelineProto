@@ -23,9 +23,11 @@ use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\StrTools;
 
 /**
  * Represents a Telegram story.
@@ -216,19 +218,21 @@ final class Story extends AbstractStory
         )['link'];
     }
 
-    /**
-     * Report a story for violation of telegram’s Terms of Service.
-     *
-     * @return boolean
-     */
-    public function report(array $reason, string $message = ''): bool
+     /**
+      * Report a story for violation of telegram’s Terms of Service.
+      *
+      * @param ReportReason $reason Why is story being reported
+      * @param string $message Comment for report moderation
+      * @return boolean
+      */
+    public function report(ReportReason $reason, string $message = ''): bool
     {
         return $this->getClient()->methodCallAsyncRead(
-            'stories.exportStoryLink',
+            'stories.report',
             [
                 'user_id' => $this->userId,
                 'id' => $this->id,
-                'reason' => $reason,
+                'reason' => ['_' => $reason->value],
                 'message' => $message,
             ]
         );
@@ -265,6 +269,7 @@ final class Story extends AbstractStory
             ]
         );
     }
+
     /**
      * Mark story as read.
      *
@@ -323,5 +328,26 @@ final class Story extends AbstractStory
             ]
         )['updates'][0];
         return $client->wrapUpdate($result);
+    }
+
+    protected readonly string $html;
+    protected readonly string $htmlTelegram;
+
+    /**
+     * Get an HTML version of the story caption.
+     *
+     * @psalm-suppress InaccessibleProperty
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     */
+    public function getHTML(bool $allowTelegramTags = false): string
+    {
+        if (!$this->entities) {
+            return \htmlentities($this->caption);
+        }
+        if ($allowTelegramTags) {
+            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->caption, $this->entities, $allowTelegramTags);
+        }
+        return $this->html ??= StrTools::entitiesToHtml($this->caption, $this->entities, $allowTelegramTags);
     }
 }
