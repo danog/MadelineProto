@@ -238,12 +238,12 @@ abstract class Message extends AbstractMessage
      * @param ReportReason $reason Why are these messages being reported
      * @param string $message Comment for report moderation
      */
-    public function report(ReportReason $reason, string $message): void
+    public function report(ReportReason $reason, string $message): bool
     {
-        $this->getClient()->methodCallAsyncRead(
+        return $this->getClient()->methodCallAsyncRead(
             'messages.report',
             [
-                'reason' => ['_' => $reason],
+                'reason' => ['_' => $reason->value],
                 'message' => $message,
                 'id' => [$this->id],
                 'peer' => $this->chatId
@@ -265,7 +265,7 @@ abstract class Message extends AbstractMessage
         ?string $phoneNumber = null,
         bool    $addPhonePrivacyException = false
     ): ?Update {
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'contacts.addContact',
             [
                 'first_name' => $firstName,
@@ -274,7 +274,8 @@ abstract class Message extends AbstractMessage
                 'add_phone_privacy_exception' => $addPhonePrivacyException,
                 'id' => $this->senderId
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -282,28 +283,30 @@ abstract class Message extends AbstractMessage
      */
     public function removeContact(): ?Update
     {
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'contacts.deleteContacts',
             [
                 'id' => [$this->senderId]
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
      * Invite message sender to requested channel.
      *
-     * @param string|int $channel Username, chat ID, Update, Message or InputChannel
+     * @param string|int $channel Username, Channel ID
      */
     public function inviteToChannel(string|int $channel): ?Update
     {
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'channels.inviteToChannel',
             [
                 'channel' => $channel,
                 'users' => [$this->senderId]
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 
     /**

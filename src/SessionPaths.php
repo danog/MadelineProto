@@ -140,7 +140,7 @@ final class SessionPaths
                 .\chr(PHP_MAJOR_VERSION)
                 .\chr(PHP_MINOR_VERSION)
                 .\chr(Magic::$can_use_igbinary ? 1 : 0)
-                .(Magic::$can_use_igbinary ? \igbinary_serialize($object) : \serialize($object));
+                .(Magic::$can_use_igbinary ? igbinary_serialize($object) : \serialize($object));
 
             write(
                 "$path.temp.php",
@@ -198,7 +198,7 @@ final class SessionPaths
                 $headerLen++;
             }
             $unserialized = $file->read(null, $size - $headerLen) ?? '';
-            $unserialized = $igbinary ? \igbinary_unserialize($unserialized) : \unserialize($unserialized);
+            $unserialized = $igbinary ? igbinary_unserialize($unserialized) : \unserialize($unserialized);
             $file->close();
         } finally {
             $unlock();

@@ -91,7 +91,7 @@ class PostgresArrayBytea extends SqlArray
     {
         $this->serializer = match ($serializer) {
             SerializerType::SERIALIZE => fn ($v) => new ByteA(\serialize($v)),
-            SerializerType::IGBINARY => fn ($v) => new ByteA(\igbinary_serialize($v)),
+            SerializerType::IGBINARY => fn ($v) => new ByteA(igbinary_serialize($v)),
             SerializerType::JSON => fn ($v) => new ByteA(\json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
             SerializerType::STRING => fn ($v) => new ByteA(\strval($v)),
         };

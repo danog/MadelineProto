@@ -106,7 +106,7 @@ final class ChannelMessage extends Message
             'messages.getMessagesViews',
             [
                 'peer' => $this->chatId,
-                'id' => $this->id,
+                'id' => [$this->id],
                 'increment' => true
             ]
         );

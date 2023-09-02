@@ -92,14 +92,15 @@ final class GroupMessage extends Message
             'send_plain' => false,
             'until_date' => $untilDate
         ];
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
                 'participant' => $this->senderId,
                 'banned_rights' => $chatBannedRights
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -133,14 +134,15 @@ final class GroupMessage extends Message
             'send_plain' => true,
             'until_date' => $untilDate
         ];
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
                 'participant' => $this->senderId,
                 'banned_rights' => $chatBannedRights
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -153,17 +155,18 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Revoke all supergroup message.
+     * Delete all supergroup message.
      */
-    public function revokeAll(bool $forEveryone = true, int $maxId = 0): ?Update
+    public function deleteAll(bool $forEveryone = true, int $maxId = 0): ?Update
     {
-        return $this->getClient()->wrapUpdate($this->getClient()->extractUpdates($this->getClient()->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'channels.deleteHistory',
             [
                 'channel' => $this->chatId,
                 'for_everyone' => $forEveryone,
                 'max_id' => $maxId
             ]
-        )));
+        );
+        return $this->getClient()->wrapUpdate($result);
     }
 }

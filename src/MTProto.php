@@ -1757,13 +1757,13 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!\extension_loaded('memprof')) {
             throw Exception::extension('memprof');
         }
-        if (!\memprof_enabled()) {
+        if (!memprof_enabled()) {
             throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
         }
 
         $current = "Current memory usage: ".\round(\memory_get_usage()/1024/1024, 1) . " MB";
         $file = \fopen('php://memory', 'r+');
-        \memprof_dump_pprof($file);
+        memprof_dump_pprof($file);
         \fseek($file, 0);
         $file = [
             '_' => 'inputMediaUploadedDocument',
