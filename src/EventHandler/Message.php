@@ -263,8 +263,8 @@ abstract class Message extends AbstractMessage
         ?string $lastName = null,
         ?string $phoneNumber = null,
         bool    $addPhonePrivacyException = false
-    ): ?Update {
-        $result = $this->getClient()->methodCallAsyncRead(
+    ): void {
+        $this->getClient()->methodCallAsyncRead(
             'contacts.addContact',
             [
                 'first_name' => $firstName,
@@ -274,21 +274,19 @@ abstract class Message extends AbstractMessage
                 'id' => $this->senderId
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
      * Remove message sender from your account contacts.
      */
-    public function removeContact(): ?Update
+    public function removeContact(): void
     {
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'contacts.deleteContacts',
             [
                 'id' => [$this->senderId]
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -296,16 +294,15 @@ abstract class Message extends AbstractMessage
      *
      * @param string|int $channel Username, Channel ID
      */
-    public function inviteToChannel(string|int $channel): ?Update
+    public function inviteToChannel(string|int $channel): void
     {
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'channels.inviteToChannel',
             [
                 'channel' => $channel,
                 'users' => [$this->senderId]
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 
     /**

@@ -25,7 +25,6 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Represents an incoming or outgoing group message.
@@ -66,7 +65,7 @@ final class GroupMessage extends Message
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
      */
-    public function ban(int $untilDate = 0): ?Update
+    public function ban(int $untilDate = 0): void
     {
         $chatBannedRights = [
             '_' => 'chatBannedRights',
@@ -92,7 +91,7 @@ final class GroupMessage extends Message
             'send_plain' => false,
             'until_date' => $untilDate
         ];
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
@@ -100,7 +99,6 @@ final class GroupMessage extends Message
                 'banned_rights' => $chatBannedRights
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -108,7 +106,7 @@ final class GroupMessage extends Message
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
      */
-    public function unban(int $untilDate = 0): ?Update
+    public function unban(int $untilDate = 0): void
     {
         $chatBannedRights = [
             '_' => 'chatBannedRights',
@@ -134,7 +132,7 @@ final class GroupMessage extends Message
             'send_plain' => true,
             'until_date' => $untilDate
         ];
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
@@ -142,7 +140,6 @@ final class GroupMessage extends Message
                 'banned_rights' => $chatBannedRights
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 
     /**
@@ -157,9 +154,9 @@ final class GroupMessage extends Message
     /**
      * Delete all supergroup message.
      */
-    public function deleteAll(bool $forEveryone = true, int $maxId = 0): ?Update
+    public function deleteAll(bool $forEveryone = true, int $maxId = 0): void
     {
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'channels.deleteHistory',
             [
                 'channel' => $this->chatId,
@@ -167,6 +164,5 @@ final class GroupMessage extends Message
                 'max_id' => $maxId
             ]
         );
-        return $this->getClient()->wrapUpdate($result);
     }
 }
