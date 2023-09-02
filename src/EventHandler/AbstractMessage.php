@@ -19,6 +19,8 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing message.
@@ -228,9 +230,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function block(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
@@ -245,15 +249,47 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function unblock(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
                 'my_stories_from' => $stories,
             ]
+        );
+    }
+
+    /**
+     * Get user stories 
+     *
+     * @return list<AbstractStory>
+     * @throws InvalidArgumentException
+     */
+    public function getStory(): array
+    {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'stories.getUserStories',
+            [
+                'user_id' => $this->senderId,
+            ]
+        )['stories']['stories'];
+        $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        $result = $client->methodCallAsyncRead(
+            'stories.getStoriesByID',
+            [
+                'user_id' => $this->senderId,
+                'id' => array_column($result, 'id'),
+            ]
+        )['stories'];
+        return array_map(
+            $client->wrapUpdate(...),
+            $result
         );
     }
 }

@@ -25,6 +25,9 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
+use danog\MadelineProto\MTProto;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing group message.
@@ -164,5 +167,24 @@ final class GroupMessage extends Message
                 'max_id' => $maxId
             ]
         );
+    }
+
+    /**
+     * Turn a basic group into a supergroup
+     *
+     * @return integer the channel id that migrate to
+     * @throws InvalidArgumentException
+     */
+    public function toSuperGroup(): int
+    {
+        Assert::false(MTProto::isSupergroupOrChannel($this->chatId));
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.migrateChat',
+            [
+                'chat_id' => $this->chatId
+            ]
+        );
+        return $client->toSuperGroup($result['updates'][0]['channel_id']);
     }
 }
