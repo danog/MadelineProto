@@ -96,4 +96,19 @@ final class ChannelMessage extends Message
             default => throw new AssertionError("undefined Participant type: {$result['_']}")
         };
     }
+
+    /**
+     * Increase the view counter of a current message in the channel.
+     */
+    public function view(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.getMessagesViews',
+            [
+                'peer' => $this->chatId,
+                'id' => [$this->id],
+                'increment' => true
+            ]
+        );
+    }
 }

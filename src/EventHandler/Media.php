@@ -118,4 +118,20 @@ abstract class Media extends IpcCapable implements JsonSerializable
     {
         return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end);
     }
+
+    /**
+     * Download the media to working directory or passed path.
+     */
+    public function downloadToDir(?string $path = null): string
+    {
+        $path ??= \getcwd();
+        return $this->getClient()->downloadToDir($this, $path);
+    }
+    /**
+     * Download the media to file.
+     */
+    public function downloadToFile(string $path): string
+    {
+        return $this->getClient()->downloadToFile($this, $path);
+    }
 }

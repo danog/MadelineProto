@@ -59,4 +59,110 @@ final class GroupMessage extends Message
             default => throw new AssertionError("undefined Participant type: {$result['_']}")
         };
     }
+
+    /**
+     * Ban message sender from current supergroup.
+     *
+     * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
+     */
+    public function ban(int $untilDate = 0): void
+    {
+        $chatBannedRights = [
+            '_' => 'chatBannedRights',
+            'view_messages' => false,
+            'send_messages' => false,
+            'send_media' => false,
+            'send_stickers' => false,
+            'send_gifs' => false,
+            'send_games' => false,
+            'send_inline' => false,
+            'embed_links' => false,
+            'send_polls' => false,
+            'change_info' => false,
+            'invite_users' => false,
+            'pin_messages' => false,
+            'manage_topics' => false,
+            'send_photos' => false,
+            'send_videos' => false,
+            'send_roundvideos' => false,
+            'send_audios' => false,
+            'send_voices' => false,
+            'send_docs' => false,
+            'send_plain' => false,
+            'until_date' => $untilDate
+        ];
+        $this->getClient()->methodCallAsyncRead(
+            'channels.editBanned',
+            [
+                'channel' => $this->chatId,
+                'participant' => $this->senderId,
+                'banned_rights' => $chatBannedRights
+            ]
+        );
+    }
+
+    /**
+     * Unban message sender from current supergroup.
+     *
+     * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
+     */
+    public function unban(int $untilDate = 0): void
+    {
+        $chatBannedRights = [
+            '_' => 'chatBannedRights',
+            'view_messages' => true,
+            'send_messages' => true,
+            'send_media' => true,
+            'send_stickers' => true,
+            'send_gifs' => true,
+            'send_games' => true,
+            'send_inline' => true,
+            'embed_links' => true,
+            'send_polls' => true,
+            'change_info' => true,
+            'invite_users' => true,
+            'pin_messages' => true,
+            'manage_topics' => true,
+            'send_photos' => true,
+            'send_videos' => true,
+            'send_roundvideos' => true,
+            'send_audios' => true,
+            'send_voices' => true,
+            'send_docs' => true,
+            'send_plain' => true,
+            'until_date' => $untilDate
+        ];
+        $this->getClient()->methodCallAsyncRead(
+            'channels.editBanned',
+            [
+                'channel' => $this->chatId,
+                'participant' => $this->senderId,
+                'banned_rights' => $chatBannedRights
+            ]
+        );
+    }
+
+    /**
+     * Kick message sender from current supergroup.
+     */
+    public function kick(): void
+    {
+        $this->ban();
+        $this->unban();
+    }
+
+    /**
+     * Delete all supergroup message.
+     */
+    public function deleteAll(bool $forEveryone = true, int $maxId = 0): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.deleteHistory',
+            [
+                'channel' => $this->chatId,
+                'for_everyone' => $forEveryone,
+                'max_id' => $maxId
+            ]
+        );
+    }
 }

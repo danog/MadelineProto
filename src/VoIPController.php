@@ -39,6 +39,24 @@ use function Amp\Future\await;
 /** @internal */
 final class VoIPController
 {
+    public const CALL_PROTOCOL = [
+        '_' => 'phoneCallProtocol',
+        'udp_p2p' => true,
+        'udp_reflector' => true,
+        'min_layer' => 65,
+        'max_layer' => 92,
+        /*'library_versions' => [
+            "2.4.4",
+            "2.7.7",
+            "5.0.0",
+            "6.0.0",
+            "7.0.0",
+            "8.0.0",
+            "9.0.0",
+            "10.0.0",
+            "11.0.0"
+        ]*/
+    ];
     const NET_TYPE_UNKNOWN = 0;
     const NET_TYPE_GPRS = 1;
     const NET_TYPE_EDGE = 2;
@@ -196,7 +214,12 @@ final class VoIPController
         Crypt::checkG($params['g_b'], $dh_config['p']);
         $key = \str_pad($params['g_b']->powMod($this->call['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         try {
-            $res = ($this->API->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->call['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 92]]))['phone_call'];
+            $res = ($this->API->methodCallAsyncRead('phone.confirmCall', [
+                'key_fingerprint' => \substr(\sha1($key, true), -8),
+                'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
+                'g_a' => $this->call['g_a'],
+                'protocol' => self::CALL_PROTOCOL
+            ]))['phone_call'];
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
@@ -244,7 +267,15 @@ final class VoIPController
 
         $this->callState = CallState::ACCEPTED;
         try {
-            $this->API->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $this->call['id'], 'access_hash' => $this->call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 92]]);
+            $this->API->methodCallAsyncRead('phone.acceptCall', [
+                'peer' => [
+                    'id' => $this->call['id'],
+                    'access_hash' => $this->call['access_hash'],
+                    '_' => 'inputPhoneCall'
+                ],
+                'g_b' => $g_b->toBytes(),
+                'protocol' => self::CALL_PROTOCOL
+            ]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
@@ -360,6 +391,10 @@ final class VoIPController
         }
         return $this;
     }
+    public function onSignaling(string $data): void
+    {
+        //\var_dump($data);
+    }
 
     private function setVoipState(VoIPState $state): bool
     {
@@ -378,6 +413,9 @@ final class VoIPController
     {
         foreach ([true, false] as $udp) {
             foreach ($endpoints as $endpoint) {
+                if ($endpoint['_'] !== 'phoneConnection') {
+                    continue;
+                }
                 if (!isset($this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']])) {
                     $this->sockets[($udp ? 'udp' : 'tcp').' v6 '.$endpoint['id']] = new Endpoint(
                         $udp,

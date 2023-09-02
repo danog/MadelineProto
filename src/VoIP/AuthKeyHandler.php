@@ -79,7 +79,11 @@ trait AuthKeyHandler
             $this->logger->logger('Generating g_a...', Logger::VERBOSE);
             $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
             Crypt::checkG($g_a, $dh_config['p']);
-            $res = $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 92]])['phone_call'];
+            $res = $this->methodCallAsyncRead('phone.requestCall', [
+                'user_id' => $user,
+                'g_a_hash' => \hash('sha256', $g_a->toBytes(), true),
+                'protocol' => VoIPController::CALL_PROTOCOL
+            ])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $this->calls[$res['id']] = $controller = new VoIPController($this, $res);

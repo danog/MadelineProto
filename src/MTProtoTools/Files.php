@@ -67,8 +67,9 @@ trait Files
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
+     * @return array InputFile constructor
      */
-    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -99,8 +100,10 @@ trait Files
      * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false): array
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -262,8 +265,10 @@ trait Files
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false): array
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -815,8 +820,10 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback
+     *
+     * @return non-empty-string Downloaded file name
      */
-    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null): string
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
@@ -831,8 +838,10 @@ trait Files
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback
+     *
+     * @return non-empty-string Downloaded file name
      */
-    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null): false|string
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null): string
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -843,6 +852,7 @@ trait Files
             \touch($file);
         }
         $file = \realpath($file);
+        Assert::notEmpty($file);
         $messageMedia = ($this->getDownloadInfo($messageMedia));
         $size = getSize($file);
         $stream = openFile($file, 'cb');
@@ -874,7 +884,7 @@ trait Files
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      */
-    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null): void
     {
         $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
@@ -919,7 +929,7 @@ trait Files
         }
         if ($offset === $end) {
             $cb(100.0, 0.0, 0);
-            return true;
+            return;
         }
         $params = [];
         $start_at = $offset % $part_size;
@@ -939,7 +949,7 @@ trait Files
         }
         if (!$params) {
             $cb(100, 0, 0);
-            return true;
+            return;
         }
         $count = \count($params);
         $time = 0.0;
@@ -958,7 +968,7 @@ trait Files
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
             $origCb(100, 0, 0);
-            return true;
+            return;
         }
         $parallel_chunks = $seekable ? $parallel_chunks : 1;
         if ($params) {
@@ -1002,7 +1012,6 @@ trait Files
         if (!isset($messageMedia['size'])) {
             $origCb(100.0, $time, $speed);
         }
-        return true;
     }
     /**
      * Download file part.
