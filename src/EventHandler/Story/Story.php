@@ -29,33 +29,33 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 
 /**
- *
+ * Represents a Telegram story
  */
 final class Story extends AbstractStory
 {
-    /** */
+    /** Whether this story is pinned */
     public readonly bool $pinned;
 
-    /** */
+    /** ID of the user that posted the story */
+    public readonly int $senderId;
+
+    /** Whether this story is visible to everyone */
     public readonly bool $public;
 
-    /** */
+    /** Whether this story is visible to only close friends of the user (@see Privacy::AllowCloseFriends) */
     public readonly bool $closeFriends;
 
-    /** */
-    public readonly bool $min;
+    /** Whether this story is only visible to your countacts */
+    public readonly bool $contacts;
+
+    /** Whether this story is only visible to a select list of contacts */
+    public readonly bool $selectedContacts;
 
     /** Whether this media is protected */
     public readonly bool $protected;
 
-    /** */
+    /** Whether this story was edited */
     public readonly bool $edited;
-
-    /** */
-    public readonly bool $contacts;
-
-    /** */
-    public readonly bool $selectedContacts;
 
     /** When was the story sent */
     public readonly int $date;
@@ -63,43 +63,47 @@ final class Story extends AbstractStory
     /** Expiration date of the story */
     public readonly int $expireDate;
 
-    /** */
+    /** Story caption */
     public readonly ?string $caption;
 
-    /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text */
+    /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for story caption */
     public readonly array $entities;
 
     /** Attached media. */
     public readonly Gif|Photo|Video $media;
 
-    /** */
+    /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
 
     /** @var list<Privacy|AbstractPrivacy> */
     public readonly array $privacy;
 
-    /** Our message reaction? */
+    /** Our reaction to the story */
     public readonly int|string|null $sentReaction; 
 
-    /** */
-    public readonly ?int $reactionCount;
+    /** Reaction counter */
+    public readonly int $reactionCount;
 
-    /** */
-    public readonly ?int $viewsCount;
+    /** View counter */
+    public readonly int $viewsCount;
 
-    /** @var list<int> */
+    /** @var list<int> List of users who recently viewed the story */
     public readonly array $recentViewers;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawStory)
     {
         parent::__construct($API, $rawStory);
-        $rawStory = $rawStory['story'];
+        if ($rawStory['story']['min']) {
+            // TODO: cache
+            $rawStory = $API->methodCallAsyncRead('stories.getStoriesByID', ['user_id' => $rawStory['user_id'], 'id' => [$rawStory['story']['id']]])['stories'][0];
+        } else {
+            $rawStory = $rawStory['story'];
+        }
 
         $this->pinned = $rawStory['pinned'];
         $this->public = $rawStory['public'];
         $this->closeFriends = $rawStory['close_friends'];
-        $this->min = $rawStory['min'];
         $this->protected = $rawStory['noforwards'];
         $this->edited = $rawStory['edited'];
         $this->contacts = $rawStory['contacts'];
