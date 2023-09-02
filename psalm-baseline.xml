@@ -665,20 +665,11 @@
       <code>MTProtoToTd</code>
       <code>MTProtoToTdcli</code>
       <code>completePhoneLogin</code>
-      <code>downloadToCallable</code>
-      <code>downloadToDir</code>
-      <code>downloadToStream</code>
       <code>end</code>
       <code>phoneLogin</code>
       <code>requestSecretChat</code>
       <code>start</code>
       <code>tdToTdcli</code>
-      <code>upload</code>
-      <code>uploadEncrypted</code>
-      <code>uploadFromCallable</code>
-      <code>uploadFromStream</code>
-      <code>uploadFromTgfile</code>
-      <code>uploadFromUrl</code>
     </MissingReturnType>
     <PossiblyInvalidPropertyAssignmentValue>
       <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
@@ -1336,17 +1327,15 @@
     <DocblockTypeContradiction>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </DocblockTypeContradiction>
+    <InvalidNullableReturnType>
+      <code>array</code>
+    </InvalidNullableReturnType>
     <MissingParamType>
       <code>$data</code>
       <code>$media</code>
     </MissingParamType>
     <MissingReturnType>
-      <code>downloadToCallable</code>
-      <code>downloadToDir</code>
       <code>genAllFile</code>
-      <code>uploadFromCallable</code>
-      <code>uploadFromTgfile</code>
-      <code>uploadFromUrl</code>
     </MissingReturnType>
     <PossiblyInvalidArrayOffset>
       <code><![CDATA[$this->read[$offset]]]></code>
@@ -1412,12 +1401,6 @@
       <code>static function (int $offset, int $size) use ($stream, $seekable, $lock) {</code>
       <code>static function (string $payload, int $offset) use ($stream, $seekable, $lock) {</code>
     </MissingClosureReturnType>
-    <MissingReturnType>
-      <code>downloadToStream</code>
-      <code>upload</code>
-      <code>uploadEncrypted</code>
-      <code>uploadFromStream</code>
-    </MissingReturnType>
     <PossiblyInvalidArgument>
       <code>$file</code>
       <code>$file</code>
@@ -1426,9 +1409,6 @@
       <code>$body</code>
       <code>$size</code>
     </PossiblyNullArgument>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
-    </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
       <code>seek</code>
       <code>seek</code>
@@ -1485,9 +1465,6 @@
     </RedundantCastGivenDocblockType>
   </file>
   <file src="src/MTProtoTools/PeerHandler.php">
-    <InvalidArgument>
-      <code><![CDATA[self::isSupergroupOrChannel($peer) && $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
-    </InvalidArgument>
     <InvalidArrayOffset>
       <code><![CDATA[$this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
     </InvalidArrayOffset>

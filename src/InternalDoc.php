@@ -423,9 +423,9 @@ abstract class InternalDoc
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      */
-    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null)
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null): void
     {
-        return $this->wrapper->getAPI()->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size);
+        $this->wrapper->getAPI()->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size);
     }
     /**
      * Download file to directory.
@@ -433,8 +433,10 @@ abstract class InternalDoc
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback
+     *
+     * @return non-empty-string Downloaded file name
      */
-    public function downloadToDir(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $dir, ?callable $cb = null)
+    public function downloadToDir(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $dir, ?callable $cb = null): string
     {
         return $this->wrapper->getAPI()->downloadToDir($messageMedia, $dir, $cb);
     }
@@ -444,8 +446,10 @@ abstract class InternalDoc
      * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback
+     *
+     * @return non-empty-string Downloaded file name
      */
-    public function downloadToFile(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $file, ?callable $cb = null): string|false
+    public function downloadToFile(mixed $messageMedia, \danog\MadelineProto\FileCallbackInterface|string $file, ?callable $cb = null): string
     {
         return $this->wrapper->getAPI()->downloadToFile($messageMedia, $file, $cb);
     }
@@ -486,9 +490,9 @@ abstract class InternalDoc
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
-    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1)
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
     {
-        return $this->wrapper->getAPI()->downloadToStream($messageMedia, $stream, $cb, $offset, $end);
+        $this->wrapper->getAPI()->downloadToStream($messageMedia, $stream, $cb, $offset, $end);
     }
     /**
      * Asynchronously write to stdout/browser.
@@ -1948,8 +1952,10 @@ abstract class InternalDoc
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
     }
@@ -1959,8 +1965,10 @@ abstract class InternalDoc
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback
+     *
+     * @return array InputFile constructor
      */
-    public function uploadEncrypted(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null)
+    public function uploadEncrypted(\danog\MadelineProto\FileCallbackInterface|array|string $file, string $fileName = '', ?callable $cb = null): array
     {
         return $this->wrapper->getAPI()->uploadEncrypted($file, $fileName, $cb);
     }
@@ -1977,8 +1985,10 @@ abstract class InternalDoc
      * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false): array
     {
         return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
     }
@@ -1991,8 +2001,10 @@ abstract class InternalDoc
      * @param string   $fileName  File name
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
@@ -2002,8 +2014,10 @@ abstract class InternalDoc
      * @param mixed    $media     Telegram file
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false): array
     {
         return $this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted);
     }
@@ -2015,8 +2029,9 @@ abstract class InternalDoc
      * @param string                       $fileName  File name
      * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
+     * @return array InputFile constructor
      */
-    public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         return $this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted);
     }
