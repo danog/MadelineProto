@@ -124,13 +124,27 @@ final class Story extends AbstractStory
         $this->sentReaction = $rawStory['sent_reaction']['emoticon'] ?? $rawStory['sent_reaction']['document_id'] ?? null;
     }
 
+    /**
+     * Reply to the story.
+     *
+     * @param string $message Message to send
+     * @param ParseMode $parseMode Parse mode
+     * @param array|null $replyMarkup Keyboard information.
+     * @param integer|null $sendAs Peer to send the message as.
+     * @param integer|null $scheduleDate Schedule date.
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $background Send this message as background message
+     * @param boolean $clearDraft Clears the draft field
+     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     *
+     */
     public function reply(
         string $message,
         ParseMode $parseMode = ParseMode::TEXT,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         bool $silent = false,
-        bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
         bool $noWebpage = false,
@@ -147,7 +161,6 @@ final class Story extends AbstractStory
                 'reply_markup' => $replyMarkup,
                 'schedule_date' => $scheduleDate,
                 'silent' => $silent,
-                'noforwards' => $noForwards,
                 'background' => $background,
                 'clear_draft' => $clearDraft,
                 'no_webpage' => $noWebpage,
@@ -172,6 +185,11 @@ final class Story extends AbstractStory
         return $first;
     }
 
+    /**
+     * Delete the story.
+     *
+     * @return void
+     */
     public function delete(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -182,6 +200,11 @@ final class Story extends AbstractStory
         );
     }
 
+    /**
+     * Export story link e.g: https://t.me/username/s/storyid
+     *
+     * @return string
+     */
     public function exportLink(): string
     {
         return $this->getClient()->methodCallAsyncRead(
@@ -194,7 +217,7 @@ final class Story extends AbstractStory
     }
 
     /**
-     *
+     * Report a story for violation of telegram’s Terms of Service.
      *
      * @return boolean
      */
@@ -211,6 +234,11 @@ final class Story extends AbstractStory
         );
     }
 
+    /**
+     * Pin a story.
+     *
+     * @return void
+     */
     public function pin(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -222,6 +250,11 @@ final class Story extends AbstractStory
         );
     }
 
+    /**
+     * Unpin a story.
+     *
+     * @return void
+     */
     public function unpin(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -233,11 +266,11 @@ final class Story extends AbstractStory
         );
     }
     /**
-     *
+     * Mark story as read.
      *
      * @return boolean
      */
-    public function read(): bool
+    public function view(): bool
     {
         return $this->getClient()->methodCallAsyncRead(
             'stories.incrementStoryViews',
@@ -249,10 +282,11 @@ final class Story extends AbstractStory
     }
 
     /**
+     * Reaction to story.
      *
-     *
-     * @param integer|string|null|null $reaction
+     * @param integer|string|null $reaction string or int Reaction
      * @param boolean $recent
+     * @return StoryReaction
      */
     public function addReaction(int|string|null $reaction = null, bool $recent = true): StoryReaction
     {
@@ -272,9 +306,10 @@ final class Story extends AbstractStory
     }
 
     /**
+     * Delete reaction from story.
      *
-     *
-     * @param boolean $recent
+     * @param boolean $recent string or int Reaction
+     * @return StoryReaction
      */
     public function delReaction(bool $recent = true): StoryReaction
     {
