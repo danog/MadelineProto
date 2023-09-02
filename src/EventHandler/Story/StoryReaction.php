@@ -19,12 +19,9 @@ namespace danog\MadelineProto\EventHandler\Story;
 use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\MTProto;
 
-/**
- *
- */
 final class StoryReaction extends AbstractStory
 {
-    /** */
+
     public readonly int|string|null $reaction;
 
     /** @internal */

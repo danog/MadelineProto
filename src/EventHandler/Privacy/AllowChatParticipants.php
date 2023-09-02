@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\AbstractPrivacy;
 
 /**
- * Allow all participants of certain chats
+ * Allow all participants of certain chats.
  */
 final class AllowChatParticipants extends AbstractPrivacy
 {

@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\AbstractPrivacy;
 
 /**
- * Allow only certain user
+ * Allow only certain user.
  */
 final class AllowUsers extends AbstractPrivacy
 {

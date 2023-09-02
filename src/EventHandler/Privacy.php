@@ -18,10 +18,6 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use JsonSerializable;
-use danog\MadelineProto\EventHandler\Privacy\AllowUsers;
-use danog\MadelineProto\EventHandler\Privacy\DisallowUsers;
-use danog\MadelineProto\EventHandler\Privacy\AllowChatParticipants;
-use danog\MadelineProto\EventHandler\Privacy\DisallowChatParticipants;
 
 /** @internal */
 enum Privacy implements JsonSerializable
@@ -34,24 +30,21 @@ enum Privacy implements JsonSerializable
     case DisallowContacts;
     /** Disallow all users */
     case DisallowAll;
-    /**  */
+
     case AllowCloseFriends;
 
     /**
      *
-     * @param string $name
-     * 
-     * @return array
      * @throws AssertionError
      */
     public static function fromRawPrivacy(array $privacies): array
     {
-        $create = function (array $data): Privacy|AbstractPrivacy
-        {
+        $create = function (array $data): Privacy|AbstractPrivacy {
             $newName = \substr($data['_'], 12);
             foreach (Privacy::cases() as $case) {
-                if (\in_array($newName, ['AllowUsers', 'DisallowUsers', 'AllowChatParticipants', 'DisallowChatParticipants',]))
+                if (\in_array($newName, ['AllowUsers', 'DisallowUsers', 'AllowChatParticipants', 'DisallowChatParticipants',])) {
                     return new $newName($data);
+                }
                 if ($case->name === $newName) {
                     return $case;
                 }

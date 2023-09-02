@@ -17,8 +17,6 @@
 namespace danog\MadelineProto\EventHandler\Story;
 
 use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\MTProto;
-
 
 /**
  * Represents a deleted story.

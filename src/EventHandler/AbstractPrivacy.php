@@ -20,9 +20,6 @@ use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
-/**
- * 
- */
 abstract class AbstractPrivacy implements JsonSerializable
 {
     /** @internal */

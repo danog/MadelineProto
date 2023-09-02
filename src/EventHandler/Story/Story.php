@@ -24,12 +24,11 @@ use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Privacy;
-use danog\MadelineProto\EventHandler\Story\StoryReaction;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 
 /**
- * Represents a Telegram story
+ * Represents a Telegram story.
  */
 final class Story extends AbstractStory
 {
@@ -79,7 +78,7 @@ final class Story extends AbstractStory
     public readonly array $privacy;
 
     /** Our reaction to the story */
-    public readonly int|string|null $sentReaction; 
+    public readonly int|string|null $sentReaction;
 
     /** Reaction counter */
     public readonly int $reactionCount;
@@ -122,7 +121,7 @@ final class Story extends AbstractStory
 
         $this->caption = $rawStory['caption'] ?? null;
         //$this->mediaAreas = $rawStory['mediaAreas'] ?? null; //!
-        $this->sentReaction = $rawStory['sent_reaction']['emoticon'] ?? $rawStory['sent_reaction']['document_id'] ?? null;   
+        $this->sentReaction = $rawStory['sent_reaction']['emoticon'] ?? $rawStory['sent_reaction']['document_id'] ?? null;
     }
 
     public function reply(
@@ -173,11 +172,6 @@ final class Story extends AbstractStory
         return $first;
     }
 
-    /**
-     * 
-     *
-     * @return void
-     */
     public function delete(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -188,11 +182,6 @@ final class Story extends AbstractStory
         );
     }
 
-    /**
-     * 
-     *
-     * @return string
-     */
     public function exportLink(): string
     {
         return $this->getClient()->methodCallAsyncRead(
@@ -205,10 +194,8 @@ final class Story extends AbstractStory
     }
 
     /**
-     * 
      *
-     * @param array $reason
-     * @param string $message
+     *
      * @return boolean
      */
     public function report(array $reason, string $message = ''): bool
@@ -224,11 +211,6 @@ final class Story extends AbstractStory
         );
     }
 
-    /**
-     * 
-     *
-     * @return void
-     */
     public function pin(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -240,11 +222,6 @@ final class Story extends AbstractStory
         );
     }
 
-    /**
-     * 
-     *
-     * @return void
-     */
     public function unpin(): void
     {
         $this->getClient()->methodCallAsyncRead(
@@ -256,7 +233,7 @@ final class Story extends AbstractStory
         );
     }
     /**
-     * 
+     *
      *
      * @return boolean
      */
@@ -272,11 +249,10 @@ final class Story extends AbstractStory
     }
 
     /**
-     * 
+     *
      *
      * @param integer|string|null|null $reaction
      * @param boolean $recent
-     * @return StoryReaction
      */
     public function addReaction(int|string|null $reaction = null, bool $recent = true): StoryReaction
     {
@@ -296,10 +272,9 @@ final class Story extends AbstractStory
     }
 
     /**
-     * 
+     *
      *
      * @param boolean $recent
-     * @return StoryReaction
      */
     public function delReaction(bool $recent = true): StoryReaction
     {
