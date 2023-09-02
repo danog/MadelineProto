@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -29,6 +30,7 @@ use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
@@ -230,6 +232,80 @@ abstract class Message extends AbstractMessage
     }
 
     /**
+     * Report a message in a chat for violation of telegram’s Terms of Service.
+     *
+     * @param ReportReason $reason Why are these messages being reported
+     * @param string $message Comment for report moderation
+     */
+    public function report(ReportReason $reason, string $message): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.report',
+            [
+                'reason' => ['_' => $reason->value],
+                'message' => $message,
+                'id' => [$this->id],
+                'peer' => $this->chatId
+            ]
+        );
+    }
+
+    /**
+     * Save message sender to your account contacts.
+     *
+     * @param string $firstName First name
+     * @param string|null $lastName Last name
+     * @param string|null $phoneNumber Telegram ID of the other user
+     * @param bool $addPhonePrivacyException Allow the other user to see our phone number?
+     */
+    public function saveContact(
+        string  $firstName,
+        ?string $lastName = null,
+        ?string $phoneNumber = null,
+        bool    $addPhonePrivacyException = false
+    ): void {
+        $this->getClient()->methodCallAsyncRead(
+            'contacts.addContact',
+            [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'phone_number' => $phoneNumber,
+                'add_phone_privacy_exception' => $addPhonePrivacyException,
+                'id' => $this->senderId
+            ]
+        );
+    }
+
+    /**
+     * Remove message sender from your account contacts.
+     */
+    public function removeContact(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'contacts.deleteContacts',
+            [
+                'id' => [$this->senderId]
+            ]
+        );
+    }
+
+    /**
+     * Invite message sender to requested channel.
+     *
+     * @param string|int $channel Username, Channel ID
+     */
+    public function inviteToChannel(string|int $channel): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.inviteToChannel',
+            [
+                'channel' => $channel,
+                'users' => [$this->senderId]
+            ]
+        );
+    }
+
+    /**
      * Add reaction to message.
      *
      * @param string|int $reaction reaction
@@ -308,6 +384,21 @@ abstract class Message extends AbstractMessage
             ]
         );
         return $result['result'][0]['text'];
+    }
+
+    /**
+     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat.
+     */
+    public function read(?int $maxId = null): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+            [
+                'peer' => $this->chatId,
+                'channel' => $this->chatId,
+                'max_id' => $maxId ?? $this->id
+            ]
+        );
     }
 
     /**
