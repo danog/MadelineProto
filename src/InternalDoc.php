@@ -143,7 +143,7 @@ abstract class InternalDoc
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTd(mixed &$params)
+    public function MTProtoToTd(mixed &$params): array
     {
         return $this->wrapper->getAPI()->MTProtoToTd($params);
     }
@@ -152,7 +152,7 @@ abstract class InternalDoc
      *
      * @param mixed $params Params
      */
-    public function MTProtoToTdcli(mixed $params)
+    public function MTProtoToTdcli(mixed $params): array
     {
         return $this->wrapper->getAPI()->MTProtoToTdcli($params);
     }
@@ -355,7 +355,7 @@ abstract class InternalDoc
      *
      * @param string $code Login code
      */
-    public function completePhoneLogin(string $code)
+    public function completePhoneLogin(string $code): array
     {
         return $this->wrapper->getAPI()->completePhoneLogin($code);
     }
@@ -506,9 +506,11 @@ abstract class InternalDoc
     /**
      * Get final element of array.
      *
-     * @param array $what Array
+     * @template T
+     * @param array<T> $what Array
+     * @return T
      */
-    public static function end(array $what)
+    public static function end(array $what): mixed
     {
         return \danog\MadelineProto\Tools::end($what);
     }
@@ -1451,7 +1453,7 @@ abstract class InternalDoc
      * @param string  $number   Phone number
      * @param integer $sms_type SMS type
      */
-    public function phoneLogin(string $number, int $sms_type = 5)
+    public function phoneLogin(string $number, int $sms_type = 5): array
     {
         return $this->wrapper->getAPI()->phoneLogin($number, $sms_type);
     }
@@ -1568,7 +1570,7 @@ abstract class InternalDoc
      *
      * @param mixed $user User to start secret chat with
      */
-    public function requestSecretChat(mixed $user)
+    public function requestSecretChat(mixed $user): int
     {
         return $this->wrapper->getAPI()->requestSecretChat($user);
     }
@@ -1771,7 +1773,7 @@ abstract class InternalDoc
     /**
      * Log in to telegram (via CLI or web).
      */
-    public function start()
+    public function start(): array
     {
         return $this->wrapper->getAPI()->start();
     }
@@ -1821,7 +1823,7 @@ abstract class InternalDoc
      *
      * @param mixed $params Parameters
      */
-    public function tdToTdcli(mixed $params)
+    public function tdToTdcli(mixed $params): array
     {
         return $this->wrapper->getAPI()->tdToTdcli($params);
     }
