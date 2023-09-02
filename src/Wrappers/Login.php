@@ -175,7 +175,7 @@ trait Login
      * @param string  $number   Phone number
      * @param integer $sms_type SMS type
      */
-    public function phoneLogin(string $number, int $sms_type = 5)
+    public function phoneLogin(string $number, int $sms_type = 5): array
     {
         if ($this->authorized === \danog\MadelineProto\API::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
@@ -204,7 +204,7 @@ trait Login
      *
      * @param string $code Login code
      */
-    public function completePhoneLogin(string $code)
+    public function completePhoneLogin(string $code): array
     {
         if ($this->authorized !== \danog\MadelineProto\API::WAITING_CODE) {
             throw new Exception(Lang::$current_lang['login_code_uncalled']);

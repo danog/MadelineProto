@@ -186,9 +186,9 @@ abstract class Message extends AbstractMessage
      * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
      * @param bool $silent Pin the message silently, without triggering a notification
      */
-    public function pin(bool $pmOneside = false, bool $silent = false): ?AbstractMessage
+    public function pin(bool $pmOneside = false, bool $silent = false): void
     {
-        $result = $this->getClient()->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'messages.updatePinnedMessage',
             [
                 'peer' => $this->chatId,
@@ -198,7 +198,6 @@ abstract class Message extends AbstractMessage
                 'unpin' => false
             ]
         );
-        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
     /**

@@ -157,7 +157,7 @@ trait FilesLogic
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      */
-    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1)
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
     {
         $messageMedia = $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
@@ -195,7 +195,7 @@ trait FilesLogic
             }
             return \strlen($payload);
         };
-        return $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
+        $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
     }
 
     /**
@@ -252,8 +252,10 @@ trait FilesLogic
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback
+     *
+     * @return array InputFile constructor
      */
-    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null)
+    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null): array
     {
         return $this->upload($file, $fileName, $cb, true);
     }
@@ -265,8 +267,10 @@ trait FilesLogic
      * @param string                                                $fileName  File name
      * @param callable                                              $cb        Callback
      * @param boolean                                               $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -328,8 +332,10 @@ trait FilesLogic
      * @param string   $fileName  File name
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
      */
-    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;

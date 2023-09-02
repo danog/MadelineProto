@@ -661,25 +661,6 @@
     <MissingParamType>
       <code>$data</code>
     </MissingParamType>
-    <MissingReturnType>
-      <code>MTProtoToTd</code>
-      <code>MTProtoToTdcli</code>
-      <code>completePhoneLogin</code>
-      <code>downloadToCallable</code>
-      <code>downloadToDir</code>
-      <code>downloadToStream</code>
-      <code>end</code>
-      <code>phoneLogin</code>
-      <code>requestSecretChat</code>
-      <code>start</code>
-      <code>tdToTdcli</code>
-      <code>upload</code>
-      <code>uploadEncrypted</code>
-      <code>uploadFromCallable</code>
-      <code>uploadFromStream</code>
-      <code>uploadFromTgfile</code>
-      <code>uploadFromUrl</code>
-    </MissingReturnType>
     <PossiblyInvalidPropertyAssignmentValue>
       <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
       <code><![CDATA[$this->auth ??= new \danog\MadelineProto\Namespace\AbstractAPI('auth')]]></code>
@@ -1336,17 +1317,15 @@
     <DocblockTypeContradiction>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </DocblockTypeContradiction>
+    <InvalidNullableReturnType>
+      <code>array</code>
+    </InvalidNullableReturnType>
     <MissingParamType>
       <code>$data</code>
       <code>$media</code>
     </MissingParamType>
     <MissingReturnType>
-      <code>downloadToCallable</code>
-      <code>downloadToDir</code>
       <code>genAllFile</code>
-      <code>uploadFromCallable</code>
-      <code>uploadFromTgfile</code>
-      <code>uploadFromUrl</code>
     </MissingReturnType>
     <PossiblyInvalidArrayOffset>
       <code><![CDATA[$this->read[$offset]]]></code>
@@ -1412,12 +1391,6 @@
       <code>static function (int $offset, int $size) use ($stream, $seekable, $lock) {</code>
       <code>static function (string $payload, int $offset) use ($stream, $seekable, $lock) {</code>
     </MissingClosureReturnType>
-    <MissingReturnType>
-      <code>downloadToStream</code>
-      <code>upload</code>
-      <code>uploadEncrypted</code>
-      <code>uploadFromStream</code>
-    </MissingReturnType>
     <PossiblyInvalidArgument>
       <code>$file</code>
       <code>$file</code>
@@ -1426,9 +1399,6 @@
       <code>$body</code>
       <code>$size</code>
     </PossiblyNullArgument>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
-    </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
       <code>seek</code>
       <code>seek</code>
@@ -1485,9 +1455,6 @@
     </RedundantCastGivenDocblockType>
   </file>
   <file src="src/MTProtoTools/PeerHandler.php">
-    <InvalidArgument>
-      <code><![CDATA[self::isSupergroupOrChannel($peer) && $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
-    </InvalidArgument>
     <InvalidArrayOffset>
       <code><![CDATA[$this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
     </InvalidArrayOffset>
@@ -1721,7 +1688,6 @@
     </MissingParamType>
     <MissingReturnType>
       <code>completeSecretChat</code>
-      <code>requestSecretChat</code>
     </MissingReturnType>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$user['user_id']]]></code>
@@ -2058,11 +2024,6 @@
     </DocblockTypeContradiction>
   </file>
   <file src="src/TL/Conversion/TD.php">
-    <MissingReturnType>
-      <code>MTProtoToTd</code>
-      <code>MTProtoToTdcli</code>
-      <code>tdToTdcli</code>
-    </MissingReturnType>
     <PossiblyInvalidArgument>
       <code><![CDATA[$params['ID']]]></code>
     </PossiblyInvalidArgument>
@@ -2195,7 +2156,6 @@
       <code><![CDATA[fn &() => $this->{$var}]]></code>
     </MissingClosureReturnType>
     <MissingReturnType>
-      <code>end</code>
       <code>getVar</code>
     </MissingReturnType>
     <PossiblyInvalidArgument>
@@ -2342,10 +2302,6 @@
     <InvalidFalsableReturnType>
       <code>array</code>
     </InvalidFalsableReturnType>
-    <MissingReturnType>
-      <code>completePhoneLogin</code>
-      <code>phoneLogin</code>
-    </MissingReturnType>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->authorization['phone_code']]]></code>
       <code><![CDATA[$this->authorization['phone_code_hash']]]></code>
@@ -2369,9 +2325,9 @@
     <DocblockTypeContradiction>
       <code><![CDATA[$this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </DocblockTypeContradiction>
-    <MissingReturnType>
-      <code>start</code>
-    </MissingReturnType>
+    <InvalidFalsableReturnType>
+      <code>array</code>
+    </InvalidFalsableReturnType>
     <PossiblyInvalidArgument>
       <code><![CDATA[$_POST['first_name']]]></code>
       <code><![CDATA[$_POST['last_name'] ?? '']]></code>

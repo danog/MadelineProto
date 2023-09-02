@@ -939,6 +939,9 @@ trait UpdateHandler
             $this->parseConfig();
             return;
         }
+        if ($update['_'] === 'updatePhoneCallSignalingData') {
+            ($this->calls[$update['phone_call_id']] ?? null)?->onSignaling((string) $update['data']);
+        }
         if ($update['_'] === 'updatePhoneCall') {
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':

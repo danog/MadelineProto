@@ -112,7 +112,7 @@ trait AuthKeyHandler
      *
      * @param mixed $user User to start secret chat with
      */
-    public function requestSecretChat(mixed $user)
+    public function requestSecretChat(mixed $user): int
     {
         $user = ($this->getInfo($user));
         if (!isset($user['InputUser'])) {

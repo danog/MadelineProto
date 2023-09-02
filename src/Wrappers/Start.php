@@ -48,7 +48,7 @@ trait Start
     /**
      * Log in to telegram (via CLI or web).
      */
-    public function start()
+    public function start(): array
     {
         if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
