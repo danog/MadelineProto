@@ -21,14 +21,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\Dns\DnsResolver;
-use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Sync\LocalKeyedMutex;
-use danog\MadelineProto\MTProto\PermAuthKey;
-use danog\MadelineProto\MTProto\TempAuthKey;
-use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -128,27 +124,17 @@ final class DataCenter
      */
     public function dcConnect(int $dc_number, int $id = -1): bool
     {
+        $this->API->logger->logger("Acquiring connect lock for $dc_number $id!", Logger::VERBOSE);
         $lock = $this->connectMutex->acquire("$dc_number $id");
         try {
-            $old = isset($this->sockets[$dc_number]) && (
-                $this->sockets[$dc_number]->shouldReconnect()
-                    || (
-                        $id !== -1
-                        && $this->sockets[$dc_number]->hasConnection($id)
-                        && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect()
-                    )
-            );
-            if (isset($this->sockets[$dc_number]) && !$old) {
-                $this->API->logger->logger("Not reconnecting to DC {$dc_number} ({$id})");
-                return false;
-            }
             $ctxs = $this->generateContexts($dc_number);
             if (empty($ctxs)) {
+                $this->API->logger->logger("No contexts, not connecting to $dc_number!", Logger::ERROR);
                 return false;
             }
             foreach ($ctxs as $ctx) {
                 try {
-                    if ($old) {
+                    if (isset($this->sockets[$dc_number])) {
                         $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", Logger::WARNING);
                         $this->sockets[$dc_number]->setExtra($this->API);
                         $this->sockets[$dc_number]->connect($ctx, $id);
@@ -194,10 +180,14 @@ final class DataCenter
      */
     public function generateContexts(int $dc_number, ?ConnectContext $context = null): array
     {
-        $ctxs = [];
-        $combos = [];
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
+        if (!isset($this->API->dcList[$test][$ipv6][$dc_number])) {
+            return [];
+        }
+
+        $ctxs = [];
+        $combos = [];
         $default = match ($this->getSettings()->getProtocol()) {
             AbridgedStream::class =>
                 [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]],
@@ -217,7 +207,7 @@ final class DataCenter
         if ($this->getSettings()->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
         }
-        if ($this->getSettings()->getTransport() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
+        if (!\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             switch ($this->getSettings()->getTransport()) {
                 case DefaultStream::class:
                     if ($this->getSettings()->getObfuscated()) {
@@ -233,10 +223,6 @@ final class DataCenter
             }
         }
         $combos[] = $default;
-
-        if (!isset($this->API->dcList[$test][$ipv6][$dc_number])) {
-            return [];
-        }
 
         $only = $this->API->dcList[$test][$ipv6][$dc_number]['tcpo_only'];
         if ($only || isset($this->API->dcList[$test][$ipv6][$dc_number]['secret'])) {
@@ -376,7 +362,8 @@ final class DataCenter
     {
         return ($this->dohWrapper->HTTPClient->request(new Request($url)))->getBody()->buffer();
     }
-    public function waitGetConnection(int $dc): Connection {
+    public function waitGetConnection(int $dc): Connection
+    {
         return $this->getDataCenterConnection($dc)->waitGetConnection();
     }
     /**
@@ -386,10 +373,19 @@ final class DataCenter
      */
     public function getDataCenterConnection(int $dc): DataCenterConnection
     {
-        if (!isset($this->sockets[$dc])) {
+        if (!isset($this->sockets[$dc]) || !$this->sockets[$dc]->hasCtx()) {
             $this->dcConnect($dc);
         }
         return $this->sockets[$dc];
+    }
+    public function has(int $dc): bool
+    {
+        if (isset($this->sockets[$dc])) {
+            return true;
+        }
+        $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
+        return isset($this->API->dcList[$test][$ipv6][$dc]);
     }
     /**
      * Get all DataCenterConnection instances.

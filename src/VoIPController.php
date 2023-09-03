@@ -393,17 +393,17 @@ final class VoIPController
         }
         return $this;
     }
-    
+
     private const SIGNALING_MIN_SIZE = 21;
     private const SIGNALING_MAX_SIZE = 128 * 1024 * 1024;
     public function onSignaling(string $data): void
     {
-        if (strlen($data) < self::SIGNALING_MIN_SIZE || strlen($data) > self::SIGNALING_MAX_SIZE) {
+        if (\strlen($data) < self::SIGNALING_MIN_SIZE || \strlen($data) > self::SIGNALING_MAX_SIZE) {
             Logger::log('Wrong size in signaling!', Logger::ERROR);
             return;
         }
-        $message_key = substr($data, 0, 16);
-        $data = substr($data, 16);
+        $message_key = \substr($data, 0, 16);
+        $data = \substr($data, 16);
         [$aes_key, $aes_iv, $x] = Crypt::voipKdf($message_key, $this->authKey, $this->public->outgoing, false);
         $packet = Crypt::ctrEncrypt($data, $aes_key, $aes_iv);
 
@@ -416,20 +416,18 @@ final class VoIPController
 
         $packets = [];
         while ($packet->isReadable()) {
-            $seq = unpack('N', $packet->readLength(4))[1];
-            $length = unpack('N', $packet->readLength(4))[1];
-            var_dump($seq, $length);
+            $seq = \unpack('N', $packet->readLength(4))[1];
+            $length = \unpack('N', $packet->readLength(4))[1];
             $packets []= self::deserializeRtc($packet);
         }
-
-        var_dump($packets);
     }
 
-    public static function deserializeRtc(BufferedReader $buffer): array {
-        switch ($t = ord($buffer->readLength(1))) {
+    public static function deserializeRtc(BufferedReader $buffer): array
+    {
+        switch ($t = \ord($buffer->readLength(1))) {
             case 1:
                 $candidates = [];
-                for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                for ($x = \ord($buffer->readLength(1)); $x > 0; $x--) {
                     $candidates []= self::readString($buffer);
                 }
                 return [
@@ -439,10 +437,10 @@ final class VoIPController
                 ];
             case 2:
                 $formats = [];
-                for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                for ($x = \ord($buffer->readLength(1)); $x > 0; $x--) {
                     $name = self::readString($buffer);
                     $parameters = [];
-                    for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                    for ($x = \ord($buffer->readLength(1)); $x > 0; $x--) {
                         $key = self::readString($buffer);
                         $value = self::readString($buffer);
                         $parameters[$key] = $value;
@@ -455,12 +453,12 @@ final class VoIPController
                 return [
                     '_' => 'videoFormats',
                     'formats' => $formats,
-                    'encoders' => ord($buffer->readLength(1)),
+                    'encoders' => \ord($buffer->readLength(1)),
                 ];
             case 3:
                 return ['_' => 'requestVideo'];
             case 4:
-                $state = ord($buffer->readLength(1));
+                $state = \ord($buffer->readLength(1));
                 return ['_' => 'remoteMediaState', 'audio' => $state & 0x01, 'video' => ($state >> 1) & 0x03];
             case 5:
                 return ['_' => 'audioData', 'data' => self::readBuffer($buffer)];
@@ -469,21 +467,23 @@ final class VoIPController
             case 7:
                 return ['_' => 'unstructuredData', 'data' => self::readBuffer($buffer)];
             case 8:
-                return ['_' => 'videoParameters', 'aspectRatio' => unpack('V', $buffer->readLength(4))[1]];
+                return ['_' => 'videoParameters', 'aspectRatio' => \unpack('V', $buffer->readLength(4))[1]];
             case 9:
-                return ['_' => 'remoteBatteryLevelIsLow', 'isLow' => (bool)ord($buffer->readLength(1))];
+                return ['_' => 'remoteBatteryLevelIsLow', 'isLow' => (bool) \ord($buffer->readLength(1))];
             case 10:
-                $lowCost = (bool)ord($buffer->readLength(1));
-                $isLowDataRequested = (bool)ord($buffer->readLength(1));
+                $lowCost = (bool) \ord($buffer->readLength(1));
+                $isLowDataRequested = (bool) \ord($buffer->readLength(1));
                 return ['_' => 'remoteNetworkStatus', 'lowCost' => $lowCost, 'isLowDataRequested' => $isLowDataRequested];
         }
         return ['_' => 'unknown', 'type' => $t];
     }
-    private static function readString(BufferedReader $buffer): string {
-        return $buffer->readLength(ord($buffer->readLength(1)));
+    private static function readString(BufferedReader $buffer): string
+    {
+        return $buffer->readLength(\ord($buffer->readLength(1)));
     }
-    private static function readBuffer(BufferedReader $buffer): string {
-        return $buffer->readLength(unpack('n', $buffer->readLength(2))[1]);
+    private static function readBuffer(BufferedReader $buffer): string
+    {
+        return $buffer->readLength(\unpack('n', $buffer->readLength(2))[1]);
     }
 
     private function setVoipState(VoIPState $state): bool

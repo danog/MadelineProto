@@ -78,20 +78,20 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN 
+                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                         && isset($this->API->updaters[UpdateLoop::GENERIC])
                     ) {
                         $this->API->updaters[UpdateLoop::GENERIC]->resume();
                     }
                     break;
                 case 'msg_container':
-                    foreach ($message->read()['messages'] as $message) {
-                        $this->msgIdHandler->checkMessageId($message['msg_id'], outgoing: false, container: true);
-                        $newMessage = new MTProtoIncomingMessage($message['body'], $message['msg_id'], true);
-                        $newMessage->setSeqNo($message['seqno']);
-                        $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
+                    foreach ($message->read()['messages'] as $msg) {
+                        $this->msgIdHandler->checkMessageId($msg['msg_id'], outgoing: false, container: true);
+                        $newMessage = new MTProtoIncomingMessage($msg['body'], $msg['msg_id'], $message->unencrypted, true);
+                        $newMessage->setSeqNo($msg['seqno']);
+                        $this->new_incoming[$msg['msg_id']] = $this->incoming_messages[$msg['msg_id']] = $newMessage;
                     }
-                    unset($newMessage, $message);
+                    unset($newMessage, $message, $msg);
                     \ksort($this->new_incoming);
                     break;
                 case 'msg_copy':
@@ -102,7 +102,7 @@ trait ResponseHandler
                         $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
                     } else {
                         $this->msgIdHandler->checkMessageId($referencedMsgId, outgoing: false, container: true);
-                        $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId);
+                        $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId, $message->unencrypted);
                         $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
                         unset($message);
                     }
@@ -221,7 +221,6 @@ trait ResponseHandler
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
                     EventLoop::queue(function () use ($requestId): void {
-                        $this->API->initAuthorization();
                         $this->methodRecall(message_id: $requestId);
                     });
                     return;
@@ -331,7 +330,6 @@ trait ResponseHandler
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
                             EventLoop::queue(function () use ($request, $response): void {
-                                $this->API->initAuthorization();
                                 $this->handleReject($request, fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
                             });
                             return null;
@@ -348,7 +346,6 @@ trait ResponseHandler
                             throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
                         EventLoop::queue(function () use ($request): void {
-                            $this->API->initAuthorization();
                             $this->methodRecall($request->getMsgId());
                         });
                         return null;
@@ -356,7 +353,6 @@ trait ResponseHandler
                         $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
                         EventLoop::queue(function () use ($request): void {
-                            $this->API->initAuthorization();
                             $this->methodRecall($request->getMsgId());
                         });
                         return null;

@@ -73,6 +73,9 @@ final class UpdateLoop extends Loop
      */
     public function loop(): ?float
     {
+        if (!$this->isLoggedIn()) {
+            return self::PAUSE;
+        }
         $this->feeder = $this->API->feeders[$this->channelId];
         $state = $this->channelId === self::GENERIC ? $this->API->loadUpdateState() : $this->API->loadChannelState($this->channelId);
 

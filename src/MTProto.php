@@ -120,7 +120,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 171;
+    const V = 172;
     /**
      * Bad message error codes.
      *
@@ -1262,18 +1262,8 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->updaters[$channelId]->resume();
             }
         }
-        $this->flushAll();
         $this->seqUpdater->start();
         $this->seqUpdater->resume();
-    }
-    /**
-     * Flush all datacenter connections.
-     */
-    private function flushAll(): void
-    {
-        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
-            $datacenter->flush();
-        }
     }
     /**
      * Store shared phone config.

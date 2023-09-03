@@ -290,7 +290,7 @@ final class WriteLoop extends Loop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $this->logger->logger("NO MESSAGE SENT in DC {$this->datacenter}", Logger::WARNING);
+                $this->logger->logger("NO MESSAGE SENT in $this, pending ".\implode(', ', \array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
                 return true;
             }
             unset($messages);
@@ -333,6 +333,6 @@ final class WriteLoop extends Loop
      */
     public function __toString(): string
     {
-        return "write loop in DC {$this->datacenter}";
+        return "write loop in DC {$this->datacenter} ";
     }
 }

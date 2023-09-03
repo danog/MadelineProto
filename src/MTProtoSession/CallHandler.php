@@ -34,7 +34,7 @@ use function Amp\Future\await;
 /**
  * Manages method and object calls.
  *
- * 
+ *
  * @property DataCenterConnection $shared
  * @internal
  */
@@ -158,8 +158,14 @@ trait CallHandler
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
         }
-        if ($methodInfo['encrypted'] && !$this->shared->hasTempAuthKey()) {
-            $this->shared->initAuthorization();
+        $encrypted = $methodInfo['encrypted'];
+        if ($encrypted) {
+            if (!$this->shared->hasTempAuthKey()) {
+                $this->logger->logger("Initing auth in DC {$this->datacenter} due to call to $method!");
+                $this->shared->initAuthorization();
+            }
+        } elseif ($this->shared->hasTempAuthKey()) {
+            $encrypted = true;
         }
         $response = new DeferredFuture;
         $message = new MTProtoOutgoingMessage(
@@ -167,7 +173,7 @@ trait CallHandler
             $method,
             $methodInfo['type'],
             true,
-            !$methodInfo['encrypted'],
+            !$encrypted,
             $response,
             $aargs['cancellation'] ?? null
         );

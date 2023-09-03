@@ -61,6 +61,9 @@ final class SecretFeedLoop extends Loop
      */
     public function loop(): ?float
     {
+        if (!$this->isLoggedIn()) {
+            return self::PAUSE;
+        }
         $this->logger->logger("Resumed {$this}");
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;

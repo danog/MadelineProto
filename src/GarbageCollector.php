@@ -157,6 +157,9 @@ final class GarbageCollector
     {
         self::$map ??= new WeakMap;
         $memory = \round(\memory_get_usage()/1024/1024, 1);
+        if (!Magic::$suspendPeriodicLogging) {
+            Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
+        }
         /*if (!Magic::$suspendPeriodicLogging) {
             $k = 0;
             foreach (self::$map as $fiber => $_) {
@@ -181,7 +184,6 @@ final class GarbageCollector
                 }
                 \var_dump($tlTrace);
             }
-            Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
             $fibers = self::$map->count();
             $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
             Logger::log("Running fibers: $fibers, maps: $maps", Logger::ULTRA_VERBOSE);

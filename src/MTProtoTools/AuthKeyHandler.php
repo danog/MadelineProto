@@ -16,13 +16,9 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
 use phpseclib3\Math\BigInteger;
-
-use function Amp\async;
-use function Amp\Future\await;
 
 /**
  * @property DataCenter $datacenter

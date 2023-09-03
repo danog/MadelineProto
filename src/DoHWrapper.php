@@ -40,7 +40,6 @@ use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsSocketConnector;
 use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
-use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;

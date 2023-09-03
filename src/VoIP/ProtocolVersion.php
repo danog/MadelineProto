@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
 /** @internal */
-enum ProtocolVersion {
+enum ProtocolVersion
+{
     case V1;
     case V2;
     case V3;
 
-    public static function fromLibraryVersion(string $version): self {
+    public static function fromLibraryVersion(string $version): self
+    {
         return match ($version) {
             '7.0.0' => self::V1,
             '8.0.0' => self::V2,
@@ -18,7 +20,8 @@ enum ProtocolVersion {
         };
     }
 
-    public function supportsCompression(): bool {
+    public function supportsCompression(): bool
+    {
         return $this === self::V3;
     }
 }

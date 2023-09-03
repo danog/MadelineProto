@@ -52,9 +52,12 @@ final class ReadLoop extends Loop
     protected function loop(): ?float
     {
         try {
+            $this->logger->logger("Reading in $this...", Logger::ULTRA_VERBOSE);
             $error = $this->readMessage();
+            $this->logger->logger("Finished reading in $this!", Logger::ULTRA_VERBOSE);
         } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
             if ($this->connection->shouldReconnect()) {
+                $this->logger->logger("Stopping $this due to reconnect...", Logger::ERROR);
                 return self::STOP;
             }
             EventLoop::queue(function () use ($e): void {
@@ -82,7 +85,6 @@ final class ReadLoop extends Loop
                             $message->resetSent();
                         }
                         $this->shared->reconnect();
-                        $this->API->initAuthorization();
                     } else {
                         $this->connection->reconnect();
                     }
@@ -101,6 +103,7 @@ final class ReadLoop extends Loop
                     throw new RPCErrorException((string) $error, $error);
                 }
             });
+            $this->logger->logger("Stopping $this due to $error...", Logger::ERROR);
             return self::STOP;
         }
         $this->connection->httpReceived();
@@ -136,7 +139,10 @@ final class ReadLoop extends Loop
         try {
             $seq_no = null;
             $auth_key_id = $buffer->bufferRead(8);
-            if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+            if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
+                if ($this->shared->hasTempAuthKey()) {
+                    throw new SecurityException("Got unencrypted message from encrypted socket!");
+                }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
                 $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
                 $message_length = \unpack('V', $buffer->bufferRead(4))[1];
@@ -207,7 +213,7 @@ final class ReadLoop extends Loop
                 throw $e;
             }
 
-            $message = new MTProtoIncomingMessage($deserialized, $message_id);
+            $message = new MTProtoIncomingMessage($deserialized, $message_id, $unencrypted);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }
