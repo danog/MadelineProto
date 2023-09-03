@@ -61,11 +61,17 @@ final class ReadLoop extends Loop
                 return self::STOP;
             }
             EventLoop::queue(function () use ($e): void {
-                if (!$e instanceof NothingInTheSocketException) {
+                if ($e instanceof NothingInTheSocketException
+                    && !$this->connection->hasPendingCalls()
+                    && $this->shared->isMedia()
+                ) {
+                    $this->logger->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
+                    $this->connection->disconnect(true);
+                } else {
                     $this->logger->logger($e);
+                    $this->logger->logger("Got exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+                    $this->connection->reconnect();
                 }
-                $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
-                $this->connection->reconnect();
             });
             return self::STOP;
         } catch (SecurityException $e) {

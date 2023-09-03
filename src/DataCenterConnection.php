@@ -470,7 +470,7 @@ final class DataCenterConnection implements JsonSerializable
         } else {
             $this->ctx = $ctx->getCtx();
             $this->availableConnections[$id] = 0;
-            $this->connections[$id]->connect($ctx);
+            $this->connections[$id]->setExtra($this, $id, $ctx);
         }
     }
     /**
@@ -484,8 +484,7 @@ final class DataCenterConnection implements JsonSerializable
         $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
             $connection = new Connection();
-            $connection->setExtra($this, $x);
-            $connection->connect($ctx);
+            $connection->setExtra($this, $x, $ctx);
             $this->connections[$x] = $connection;
             $this->availableConnections[$x] = 0;
             $ctx = $this->ctx->getCtx();
@@ -575,9 +574,9 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Get connection for authorization.
      */
-    public function getAuthConnection(): Connection
+    private function getAuthConnection(): Connection
     {
-        return $this->connections[0];
+        return $this->connections[0]->connect();
     }
     /**
      * Check if any connection is available.
@@ -596,7 +595,7 @@ final class DataCenterConnection implements JsonSerializable
         if (empty($this->availableConnections)) {
             $this->connectionsPromise->await();
         }
-        return $this->getConnection();
+        return $this->getConnection()->connect();
     }
     /**
      * Get best socket in round robin.

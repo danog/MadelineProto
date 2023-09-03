@@ -66,15 +66,9 @@ final class WriteLoop extends Loop
             }
             $this->connection->writing(true);
             try {
-                $this->logger->logger("About to write in $this ".($this->shared->hasTempAuthKey() ? 'encrypted' : 'unencrypted'));
                 $please_wait = $this->shared->hasTempAuthKey()
                     ? $this->encryptedWriteLoop()
                     : $this->unencryptedWriteLoop();
-                if ($please_wait) {
-                    $this->logger->logger("Did not write anything in $this");
-                } else {
-                    $this->logger->logger("Wrote in $this");
-                }
             } catch (StreamException $e) {
                 if ($this->connection->shouldReconnect()) {
                     $this->logger->logger("Stopping $this because we have to reconnect");

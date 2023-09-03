@@ -249,17 +249,18 @@ final class Connection
     }
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
-     *
-     * @param ConnectionContext $ctx Connection context
      */
-    public function connect(ConnectionContext $ctx): void
+    public function connect(): self
     {
+        if ($this->stream) {
+            return $this;
+        }
+        $ctx = $this->ctx;
         $this->ctx = $ctx->getCtx();
-        $this->datacenter = $ctx->getDc();
-        $this->datacenterId = $this->datacenter . '.' . $this->id;
-        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
+
         $this->createSession();
-        $this->stream = ($ctx->getStream());
+        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
+        $this->stream = $ctx->getStream();
         $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
@@ -290,6 +291,7 @@ final class Connection
         if ($this->pinger) {
             Assert::true($this->pinger->start(), "Could not start pinger stream");
         }
+        return $this;
     }
     /**
      * Apply method abstractions.
@@ -495,12 +497,15 @@ final class Connection
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
      */
-    public function setExtra(DataCenterConnection $extra, int $id): void
+    public function setExtra(DataCenterConnection $extra, int $id, ConnectionContext $ctx): void
     {
         $this->shared = $extra;
         $this->id = $id;
         $this->API = $extra->getExtra();
         $this->logger = $this->API->logger;
+        $this->ctx = $ctx->getCtx();
+        $this->datacenter = $ctx->getDc();
+        $this->datacenterId = $this->datacenter . '.' . $this->id;
     }
     /**
      * Get main instance.
@@ -527,7 +532,9 @@ final class Connection
         $this->needsReconnect = true;
         if ($this->stream) {
             try {
-                $this->stream->disconnect();
+                $stream = $this->stream;
+                $this->stream = null;
+                $stream->disconnect();
             } catch (ClosedException $e) {
                 $this->API->logger->logger($e);
             }
