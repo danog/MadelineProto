@@ -18,6 +18,8 @@ namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Banned;
@@ -25,6 +27,7 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
+use danog\MadelineProto\EventHandler\Topic\IconColor;
 use danog\MadelineProto\MTProto;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
@@ -170,7 +173,7 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Turn a basic group into a supergroup
+     * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration)
      *
      * @return integer the channel id that migrate to
      * @throws InvalidArgumentException
@@ -182,9 +185,165 @@ final class GroupMessage extends Message
         $result = $client->methodCallAsyncRead(
             'messages.migrateChat',
             [
-                'chat_id' => $this->chatId
+                'chat_id' => $this->chatId,
             ]
         );
         return $client->toSuperGroup($result['updates'][0]['channel_id']);
+    }
+
+    /**
+     * Enable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
+     *
+     * @return void
+     */
+    public function enableTopic(): void
+    {
+        if (!$this->topicId)
+            $this->getClient()->methodCallAsyncRead(
+                'channels.toggleForum',
+                [
+                    'channel' => $this->chatId,
+                    'enabled' => true,
+                ]
+            );
+    }
+
+    /**
+     * Disable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
+     *
+     * @return void
+     */
+    public function disableTopic(): void
+    {
+        if ($this->topicId)
+            $this->getClient()->methodCallAsyncRead(
+                'channels.toggleForum',
+                [
+                    'channel' => $this->chatId,
+                    'enabled' => false,
+                ]
+            );
+    }
+
+    /**
+     * Create a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param string $title Topic title (maximum UTF-8 length: 128)	
+     * @param integer $icon ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * @param IconColor $color If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB)
+     * @return DialogTopicCreated
+     * @throws InvalidArgumentException
+     */
+    public function createTopic(string $title, int $icon, IconColor $color = IconColor::NONE): DialogTopicCreated
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        if (!$this->topicId)
+            $this->enableTopic();
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.createForumTopic',
+            [
+                'channel' => $this->chatId,
+                'title' => $title,
+                'icon_color' => $color->value,
+                'icon_emoji_id' => $icon,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Edit a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param string $title Topic title (maximum UTF-8 length: 128)	
+     * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * @param integer|null $topicId Topic ID
+     * @return DialogTopicEdited|null
+     * @throws InvalidArgumentException
+     */
+    public function editTopic(string $title, int $icon, ?int $topicId = null): ?DialogTopicEdited
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        if (! ($topicId ??= $this->topicId))
+            return null;
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'title' => $title,
+                'icon_emoji_id' => $icon,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Open a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param integer|null $topicId Topic ID
+     * @return DialogTopicEdited|null
+     * @throws InvalidArgumentException
+     */
+    public function openTopic(?int $topicId = null): ?DialogTopicEdited
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        if (! ($topicId ??= $this->topicId))
+            return null;
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'closed' => false,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Close a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param integer|null $topicId Topic ID
+     * @return DialogTopicEdited|null
+     * @throws InvalidArgumentException
+     */
+    public function closeTopic(?int $topicId = null): ?DialogTopicEdited
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        if (! ($topicId ??= $this->topicId))
+            return null;
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'closed' => true,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Delete message history of a [forum topic](https://core.telegram.org/api/forum)
+     *
+     * @param integer|null $topicId Topic ID
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function deleteTopic(?int $topicId = null): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        if ($topicId ??= $this->topicId)
+            $this->getClient()->methodCallAsyncRead(
+                'channels.deleteTopicHistory',
+                [
+                    'channel' => $this->chatId,
+                    'top_msg_id' => $topicId,
+                ]
+            );
     }
 }
