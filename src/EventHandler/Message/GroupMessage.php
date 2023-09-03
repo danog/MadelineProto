@@ -67,6 +67,80 @@ final class GroupMessage extends Message
     }
 
     /**
+     * Display the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function showMembers(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function hideMembers(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Hide message history for new channel/supergroup users
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function hideHistory(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Unhide message history for new channel/supergroup users
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function showHistory(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
      * Ban message sender from current supergroup.
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
@@ -173,6 +247,26 @@ final class GroupMessage extends Message
     }
 
     /**
+     * Delete all messages sent by a specific participant of a given supergroup.
+     *
+     * @param string|integer|null $member The participant whose messages should be deleted	
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function deleteUserMessages(string|int|null $member): void
+    {
+        Assert::false(MTProto::isSupergroupOrChannel($this->chatId));
+        $member ??= $this->senderId;
+        $this->getClient()->methodCallAsyncRead(
+            'channels.deleteParticipantHistory',
+            [
+                'channel' => $this->chatId,
+                'participant' => $member,
+            ]
+        );
+    }
+
+    /**
      * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration)
      *
      * @return integer the channel id that migrate to
@@ -189,6 +283,42 @@ final class GroupMessage extends Message
             ]
         );
         return $client->toSuperGroup($result['updates'][0]['channel_id']);
+    }
+
+    /**
+     * Enable the [native antispam system](https://core.telegram.org/api/antispam).
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function enableAntiSpam(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleAntiSpam',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Disable the [native antispam system](https://core.telegram.org/api/antispam).
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function disableAntiSpam(): void
+    {
+        Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleAntiSpam',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
     }
 
     /**
