@@ -18,6 +18,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\BufferedReader;
+use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -410,16 +412,78 @@ final class VoIPController
             return;
         }
 
-        for ($x = 0; $x < strlen($packet);) {
-            $seq = unpack('V', strrev(substr($packet, $x, 4)))[1];
-            $result = match (ord(substr($packet, $x+5))) {
-                1 => [
-                    '_' => ''
-                ]
-            }
+        $packet = new BufferedReader(new ReadableBuffer($packet));
+
+        $packets = [];
+        while ($packet->isReadable()) {
+            $seq = unpack('N', $packet->readLength(4))[1];
+            $length = unpack('N', $packet->readLength(4))[1];
+            var_dump($seq, $length);
+            $packets []= self::deserializeRtc($packet);
         }
 
-        \var_dump($packet);
+        var_dump($packets);
+    }
+
+    public static function deserializeRtc(BufferedReader $buffer): array {
+        switch ($t = ord($buffer->readLength(1))) {
+            case 1:
+                $candidates = [];
+                for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                    $candidates []= self::readString($buffer);
+                }
+                return [
+                    '_' => 'candidatesList',
+                    'ufrag' => self::readString($buffer),
+                    'pwd' => self::readString($buffer),
+                ];
+            case 2:
+                $formats = [];
+                for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                    $name = self::readString($buffer);
+                    $parameters = [];
+                    for ($x = ord($buffer->readLength(1)); $x > 0; $x--) {
+                        $key = self::readString($buffer);
+                        $value = self::readString($buffer);
+                        $parameters[$key] = $value;
+                    }
+                    $formats[]= [
+                        'name' => $name,
+                        'parameters' => $parameters
+                    ];
+                }
+                return [
+                    '_' => 'videoFormats',
+                    'formats' => $formats,
+                    'encoders' => ord($buffer->readLength(1)),
+                ];
+            case 3:
+                return ['_' => 'requestVideo'];
+            case 4:
+                $state = ord($buffer->readLength(1));
+                return ['_' => 'remoteMediaState', 'audio' => $state & 0x01, 'video' => ($state >> 1) & 0x03];
+            case 5:
+                return ['_' => 'audioData', 'data' => self::readBuffer($buffer)];
+            case 6:
+                return ['_' => 'videoData', 'data' => self::readBuffer($buffer)];
+            case 7:
+                return ['_' => 'unstructuredData', 'data' => self::readBuffer($buffer)];
+            case 8:
+                return ['_' => 'videoParameters', 'aspectRatio' => unpack('V', $buffer->readLength(4))[1]];
+            case 9:
+                return ['_' => 'remoteBatteryLevelIsLow', 'isLow' => (bool)ord($buffer->readLength(1))];
+            case 10:
+                $lowCost = (bool)ord($buffer->readLength(1));
+                $isLowDataRequested = (bool)ord($buffer->readLength(1));
+                return ['_' => 'remoteNetworkStatus', 'lowCost' => $lowCost, 'isLowDataRequested' => $isLowDataRequested];
+        }
+        return ['_' => 'unknown', 'type' => $t];
+    }
+    private static function readString(BufferedReader $buffer): string {
+        return $buffer->readLength(ord($buffer->readLength(1)));
+    }
+    private static function readBuffer(BufferedReader $buffer): string {
+        return $buffer->readLength(unpack('n', $buffer->readLength(2))[1]);
     }
 
     private function setVoipState(VoIPState $state): bool
