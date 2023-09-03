@@ -181,11 +181,6 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private array $config = ['expires' => -1];
     /**
-     * Whether we're initing authorization.
-     *
-     */
-    private bool $initing_authorization = false;
-    /**
      * Authorization info (User).
      *
      */
@@ -342,7 +337,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * DC list.
      */
-    protected array $dcList = [
+    public array $dcList = [
         'test' => [
             // Test datacenters
             'ipv4' => [
@@ -541,9 +536,9 @@ final class MTProto implements TLCallback, LoggerGetter
             $callbacks[] = $this->minDatabase;
         }
         $this->TL->init($this->settings->getSchema(), $callbacks);
-        $this->connectToAllDcs();
         $this->startLoops();
-        $this->datacenter->currentDatacenter = $this->config['test_mode'] ? 10002 : 2;
+        $this->datacenter->currentDatacenter = $this->settings->getConnection()->getTestMode() ? 10002 : 2;
+        $this->getConfig();
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->hasTempAuthKey()) {
             try {
                 $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
@@ -827,8 +822,10 @@ final class MTProto implements TLCallback, LoggerGetter
     private function cleanupProperties(): void
     {
         $this->channels_state ??= new CombinedUpdatesState;
-        $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
+        $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;
+
+        $this->datacenter->__construct($this);
 
         $this->referenceDatabase ??= new ReferenceDatabase($this);
         $this->minDatabase ??= new MinDatabase($this);
@@ -950,13 +947,11 @@ final class MTProto implements TLCallback, LoggerGetter
                 $callbacks[] = $this->minDatabase;
             }
             // Connect to all DCs, start internal loops
-            $this->connectToAllDcs();
             if ($this->fullGetSelf()) {
                 $this->authorized = API::LOGGED_IN;
                 $this->setupLogger();
                 $this->startLoops();
                 $this->getCdnConfig();
-                $this->initAuthorization();
             } else {
                 $this->startLoops();
             }
@@ -1179,79 +1174,6 @@ final class MTProto implements TLCallback, LoggerGetter
         }
     }
     /**
-     * Checks whether all datacenters are authorized.
-     *
-     * @internal
-     */
-    public function hasAllAuth(): bool
-    {
-        if ($this->isInitingAuthorization()) {
-            $this->logger('Initing auth');
-            return false;
-        }
-        foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
-            if ((!$dc->isAuthorized() || !$dc->hasTempAuthKey()) && !$dc->isCDN()) {
-                $this->logger("Initing auth $id");
-                return false;
-            }
-        }
-        return true;
-    }
-    /**
-     * Whether we're initing authorization.
-     *
-     * @internal
-     */
-    public function isInitingAuthorization(): bool
-    {
-        return $this->initing_authorization;
-    }
-    /**
-     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
-     *
-     * @internal
-     *
-     * @param boolean $reconnectAll Whether to reconnect to all DCs
-     */
-    public function connectToAllDcs(bool $reconnectAll = true): void
-    {
-        $this->channels_state->get(FeedLoop::GENERIC);
-        foreach ($this->channels_state->get() as $state) {
-            $channelId = $state->getChannel();
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
-        }
-        if (!isset($this->seqUpdater)) {
-            $this->seqUpdater = new SeqLoop($this);
-        }
-        $this->datacenter->__construct($this, $this->dcList, $this->settings->getConnection(), $reconnectAll);
-        $dcs = [];
-        foreach ($this->datacenter->getDcs(true) as $new_dc) {
-            if (!\is_int($new_dc)) {
-                continue;
-            }
-            $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
-        }
-        await($dcs);
-        $this->initAuthorization();
-        $this->parseConfig();
-        $dcs = [];
-        foreach ($this->datacenter->getDcs(false) as $new_dc) {
-            if (!\is_int($new_dc)) {
-                continue;
-            }
-            $dcs[] = async($this->datacenter->dcConnect(...), $new_dc);
-        }
-        await($dcs);
-        $this->initAuthorization();
-        $this->parseConfig();
-        $this->getPhoneConfig();
-    }
-    /**
      * Reset the update state and fetch all updates from the beginning.
      */
     public function resetUpdateState(): void
@@ -1300,6 +1222,19 @@ final class MTProto implements TLCallback, LoggerGetter
             $this->secretFeeders[$id]->start();
             if (isset($this->secretFeeders[$id])) {
                 $this->secretFeeders[$id]->resume();
+            }
+        }
+        if (!isset($this->seqUpdater)) {
+            $this->seqUpdater = new SeqLoop($this);
+        }
+        $this->channels_state->get(FeedLoop::GENERIC);
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
             }
         }
         if (!isset($this->seqUpdater)) {
@@ -1410,7 +1345,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function isTestMode(): bool
     {
-        return $this->config['test_mode'];
+        return $this->settings->getConnection()->getTestMode();
     }
     /**
      * Parse DC options from config.
@@ -1437,14 +1372,7 @@ final class MTProto implements TLCallback, LoggerGetter
             unset($dc['media_only'], $dc['id'], $dc['ipv6']);
             $new[$test][$ipv6][$id] = $dc;
         }
-        $previous = $this->dcList;
         $this->dcList = $new;
-        $currentDatacenter = $this->datacenter->currentDatacenter;
-        if ($previous !== $this->dcList && (!$this->datacenter->has($currentDatacenter) || $this->datacenter->getDataCenterConnection($currentDatacenter)->byIPAddress())) {
-            $this->logger->logger('Got new DC options, reconnecting');
-            $this->connectToAllDcs(false);
-        }
-        $this->datacenter->currentDatacenter = $currentDatacenter;
     }
     /**
      * Get info about the logged-in user, cached.

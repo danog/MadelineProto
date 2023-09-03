@@ -58,9 +58,6 @@ final class SeqLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
-            return self::PAUSE;
-        }
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
         $this->state = $this->API->loadUpdateState();
         $this->logger->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);

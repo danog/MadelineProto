@@ -61,9 +61,6 @@ final class SecretFeedLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
-            return self::PAUSE;
-        }
         $this->logger->logger("Resumed {$this}");
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;

@@ -175,6 +175,7 @@ trait UpdateHandler
         }
         if (isset($this->eventHandlerMethods[$updateType])) {
             foreach ($this->eventHandlerMethods[$updateType] as $closure) {
+var_dump($closure);
                 $closure($update);
             }
         }

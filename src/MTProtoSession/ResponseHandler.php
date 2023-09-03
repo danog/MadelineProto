@@ -78,7 +78,9 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->ackIncomingMessage($message);
                     $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->currentDatacenter)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
+                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN 
+                        && isset($this->API->updaters[UpdateLoop::GENERIC])
+                    ) {
                         $this->API->updaters[UpdateLoop::GENERIC]->resume();
                     }
                     break;

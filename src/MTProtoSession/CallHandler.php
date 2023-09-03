@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
+use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
@@ -33,6 +34,8 @@ use function Amp\Future\await;
 /**
  * Manages method and object calls.
  *
+ * 
+ * @property DataCenterConnection $shared
  * @internal
  */
 trait CallHandler
@@ -155,13 +158,16 @@ trait CallHandler
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
         }
+        if ($methodInfo['encrypted'] && !$this->shared->hasTempAuthKey()) {
+            $this->shared->initAuthorization();
+        }
         $response = new DeferredFuture;
         $message = new MTProtoOutgoingMessage(
             $args,
             $method,
             $methodInfo['type'],
             true,
-            !$this->shared->hasTempAuthKey() && !\str_contains($method, '.') && $method !== 'ping_delay_disconnect',
+            !$methodInfo['encrypted'],
             $response,
             $aargs['cancellation'] ?? null
         );

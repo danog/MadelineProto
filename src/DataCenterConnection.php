@@ -147,6 +147,7 @@ final class DataCenterConnection implements JsonSerializable
     {
         $logger = $this->API->logger;
         $this->initingAuth ??= new LocalMutex;
+        $logger->logger("Acquiring lock in order to init auth for DC {$this->datacenter}", Logger::NOTICE);
         $lock = $this->initingAuth->acquire();
         try {
             $logger->logger("Initing auth for DC {$this->datacenter}", Logger::NOTICE);

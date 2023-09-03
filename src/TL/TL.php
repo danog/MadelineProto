@@ -308,7 +308,7 @@ final class TL implements TLInterface
             }
             $this->API?->logger?->logger('Translating methods...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->methods->add($elem);
+                $this->methods->add($elem, $scheme_type);
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }

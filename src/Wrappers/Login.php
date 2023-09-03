@@ -270,7 +270,6 @@ trait Login
         }
         $this->authorized_dc = $mainDcID;
         $this->authorized = \danog\MadelineProto\API::LOGGED_IN;
-        $this->connectToAllDcs(true);
         $this->initAuthorization();
         $this->getPhoneConfig();
         $res = ($this->fullGetSelf());
