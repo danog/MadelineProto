@@ -460,13 +460,13 @@ final class DataCenterConnection implements JsonSerializable
             $this->connectionsPromise = $f->getFuture();
             $this->ctx = $ctx->getCtx();
             $this->connectMore(1);
-            $this->restoreBackup();
             $f->complete();
             if (isset($this->connectionsDeferred)) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
                 $connectionsDeferred->complete();
             }
+            $this->restoreBackup();
         } else {
             $this->ctx = $ctx->getCtx();
             $this->availableConnections[$id] = 0;
@@ -550,7 +550,7 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Restore backed up messages.
      */
-    public function restoreBackup(): void
+    private function restoreBackup(): void
     {
         $backup = $this->backup;
         $this->backup = [];
@@ -565,10 +565,12 @@ final class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                EventLoop::queue($this->getConnection()->sendMessage(...), $message, false);
+                $this->API->logger->logger("Resending $message to DC {$this->datacenter}");
+                EventLoop::queue($this->getConnection()->sendMessage(...), $message);
+            } else {
+                $this->API->logger->logger("Dropping $message to DC {$this->datacenter}");
             }
         }
-        $this->flush();
     }
     /**
      * Get connection for authorization.

@@ -53,19 +53,31 @@ final class WriteLoop extends Loop
         $please_wait = false;
         while (true) {
             if ($this->connection->shouldReconnect()) {
-                $this->logger->logger('Not writing because connection is old');
+                $this->logger->logger("Exiting $this because connection is old");
                 return self::STOP;
             }
-            while (!$this->connection->pendingOutgoing || $please_wait) {
+            if (!$this->connection->pendingOutgoing) {
+                $this->logger->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
+                return self::PAUSE;
+            }
+            if ($please_wait) {
+                $this->logger->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
                 return self::PAUSE;
             }
             $this->connection->writing(true);
             try {
+                $this->logger->logger("About to write in $this ".($this->shared->hasTempAuthKey() ? 'encrypted' : 'unencrypted'));
                 $please_wait = $this->shared->hasTempAuthKey()
                     ? $this->encryptedWriteLoop()
                     : $this->unencryptedWriteLoop();
+                if ($please_wait) {
+                    $this->logger->logger("Did not write anything in $this");
+                } else {
+                    $this->logger->logger("Wrote in $this");
+                }
             } catch (StreamException $e) {
                 if ($this->connection->shouldReconnect()) {
+                    $this->logger->logger("Stopping $this because we have to reconnect");
                     return self::STOP;
                 }
                 EventLoop::queue(function () use ($e): void {
@@ -73,6 +85,7 @@ final class WriteLoop extends Loop
                     $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
                 });
+                $this->logger->logger("Stopping $this");
                 return self::STOP;
             } finally {
                 $this->connection->writing(false);
@@ -333,6 +346,6 @@ final class WriteLoop extends Loop
      */
     public function __toString(): string
     {
-        return "write loop in DC {$this->datacenter} ";
+        return "write loop in DC {$this->datacenter}";
     }
 }

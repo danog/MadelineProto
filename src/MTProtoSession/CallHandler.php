@@ -159,12 +159,7 @@ trait CallHandler
             throw new Exception("Could not find method $method!");
         }
         $encrypted = $methodInfo['encrypted'];
-        if ($encrypted) {
-            if (!$this->shared->hasTempAuthKey()) {
-                $this->logger->logger("Initing auth in DC {$this->datacenter} due to call to $method!");
-                $this->shared->initAuthorization();
-            }
-        } elseif ($this->shared->hasTempAuthKey()) {
+        if (!$encrypted && $this->shared->hasTempAuthKey()) {
             $encrypted = true;
         }
         $response = new DeferredFuture;

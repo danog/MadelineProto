@@ -434,6 +434,10 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {
+        if (!$message->isUnencrypted() && !$this->shared->hasTempAuthKey()) {
+            $this->logger->logger("Initing auth in DC {$this->datacenter} due to call to $message!");
+            $this->shared->initAuthorization();
+        }
         $message->trySend();
         $promise = $message->getSendPromise();
         if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
