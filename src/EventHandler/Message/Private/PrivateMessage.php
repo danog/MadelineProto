@@ -14,20 +14,18 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Filter;
+namespace danog\MadelineProto\EventHandler\Message\Private;
 
-use Attribute;
-use danog\MadelineProto\EventHandler\Message\Private\PrivateMessage;
-use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 
 /**
- * Allow only updates coming from private chats.
+ * Represents an incoming or outgoing private message.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
-final class FilterPrivate extends Filter
+final class PrivateMessage extends AbstractPrivateMessage
 {
-    public function apply(Update $update): bool
+    /** @internal */
+    public function __construct(MTProto $API, array $rawMessage, array $info)
     {
-        return $update instanceof PrivateMessage;
+        parent::__construct($API, $rawMessage, $info);
     }
 }

@@ -64,11 +64,17 @@ trait FilesAbstraction
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] !== 'messageMediaDocument') {
+        if ($media['_'] == 'decryptedMessageMediaPhoto') {
+            return new Media\Decrypted\Photo($this, $media, true);
+        }
+        if ($media['_'] !== 'messageMediaDocument' && $media['_'] !== 'decryptedMessageMediaDocument') {
             return null;
         }
-        if (!isset($media['document'])) {
+        if (!isset($media['document']) && $media['_'] !== 'decryptedMessageMediaDocument') {
             return null;
+        }
+        if ($media['_'] === 'decryptedMessageMediaDocument') {
+            $media['document']['attributes'] = $media['attributes'];
         }
         $has_video = null;
         $has_document_photo = null;
@@ -124,6 +130,11 @@ trait FilesAbstraction
             }
             return new Gif($this, $media, $has_video, $protected);
         }
+        if ($has_video && $media['_'] === 'decryptedMessageMediaDocument') {
+            return $has_video['round_message']
+                ? new RoundVideo($this, $media, $has_video, $protected)
+                : new Media\Decrypted\Video($this, $media, $has_video, $protected);
+        }
         if ($has_video) {
             return $has_video['round_message']
                 ? new RoundVideo($this, $media, $has_video, $protected)
@@ -131,6 +142,9 @@ trait FilesAbstraction
         }
         if ($has_document_photo) {
             return new DocumentPhoto($this, $media, $has_document_photo, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaDocument') {
+            return new Media\Decrypted\Document($this, $media, $protected);
         }
         return new Document($this, $media, $protected);
     }

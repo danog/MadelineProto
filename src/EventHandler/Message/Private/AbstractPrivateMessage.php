@@ -8,21 +8,18 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Private;
 
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 
-/**
- * Represents an incoming or outgoing private message.
- */
-final class PrivateMessage extends Message
+abstract class AbstractPrivateMessage extends Message
 {
     /**
      * Notify the other user in a private chat that a screenshot of the chat was taken.

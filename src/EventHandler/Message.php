@@ -20,6 +20,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
+use danog\MadelineProto\EventHandler\Media\Decrypted as SecretMedias;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
 use danog\MadelineProto\EventHandler\Media\Gif;
@@ -69,7 +70,7 @@ abstract class Message extends AbstractMessage
     /**
      * Attached media.
      */
-    public readonly Audio|Document|DocumentPhoto|Gif|MaskSticker|Photo|RoundVideo|Sticker|Video|Voice|null $media;
+    public readonly Audio|Document|DocumentPhoto|Gif|MaskSticker|Photo|RoundVideo|Sticker|Video|Voice|SecretMedias\Document|SecretMedias\Photo|SecretMedias\Video|null $media;
 
     /** Whether this message is a sent scheduled message */
     public readonly bool $fromScheduled;
@@ -106,8 +107,8 @@ abstract class Message extends AbstractMessage
     /** @internal */
     public function __construct(
         MTProto $API,
-        array $rawMessage,
-        array $info,
+        array   $rawMessage,
+        array   $info,
     ) {
         parent::__construct($API, $rawMessage, $info);
 
@@ -155,10 +156,10 @@ abstract class Message extends AbstractMessage
 
         if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {
             $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
-            $this->command = \substr($this->message, 1, $space-1);
+            $this->command = \substr($this->message, 1, $space - 1);
             $args = \explode(
                 ' ',
-                \substr($this->message, $space+1)
+                \substr($this->message, $space + 1)
             );
             $this->commandArgs = $args === [''] ? [] : $args;
             $this->commandType = match ($this->message[0]) {
@@ -175,7 +176,7 @@ abstract class Message extends AbstractMessage
         foreach ($rawMessage['reactions']['results'] ?? [] as $r) {
             if (isset($r['chosen_order'])) {
                 // Todo: live synchronization using a message database...
-                $this->reactions []= $r['reaction']['emoticon'] ?? $r['reaction']['document_id'];
+                $this->reactions [] = $r['reaction']['emoticon'] ?? $r['reaction']['document_id'];
             }
         }
     }
@@ -351,13 +352,13 @@ abstract class Message extends AbstractMessage
         unset($this->reactions[$key]);
         $this->reactions = \array_values($this->reactions);
         $r = \array_map(fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
-        $r[]= ['_' => 'reactionEmpty'];
+        $r[] = ['_' => 'reactionEmpty'];
         $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
             [
                 'peer' => $this->chatId,
                 'msg_id' => $this->id,
-                'reaction' =>  $r,
+                'reaction' => $r,
             ]
         );
         return $this->reactions;
@@ -392,7 +393,7 @@ abstract class Message extends AbstractMessage
     public function read(?int $maxId = null): bool
     {
         return $this->getClient()->methodCallAsyncRead(
-            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory' : 'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,

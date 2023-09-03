@@ -8,26 +8,30 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Filter;
+namespace danog\MadelineProto\EventHandler\Media\Decrypted;
 
-use Attribute;
-use danog\MadelineProto\EventHandler\Message\Private\PrivateMessage;
-use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 
 /**
- * Allow only updates coming from private chats.
+ * GeoPoint attached to an encrypted message.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
-final class FilterPrivate extends Filter
+final class GeoPoint extends DecryptedMedia
 {
-    public function apply(Update $update): bool
+    /** Latitude of point */
+    public readonly float $lat;
+    /** Longitude of point */
+    public readonly float $long;
+    /** @internal */
+    public function __construct(MTProto $API, array $rawMedia, bool $protected)
     {
-        return $update instanceof PrivateMessage;
+        parent::__construct($API, $rawMedia, $protected);
+        $this->lat = $rawMedia['lat'];
+        $this->long = $rawMedia['long'];
     }
 }

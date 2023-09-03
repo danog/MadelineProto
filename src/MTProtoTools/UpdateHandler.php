@@ -31,7 +31,7 @@ use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Private\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
@@ -85,7 +85,6 @@ use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
-
 use function Amp\delay;
 
 /**
@@ -361,7 +360,7 @@ trait UpdateHandler
     public function wrapUpdate(array $update): ?Update
     {
         return match ($update['_']) {
-            'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
+            'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage' => $this->wrapMessage($update['message']),
             'updateBotCallbackQuery' => isset($update['game_short_name'])
                 ? new ChatGameQuery($this, $update)
                 : new ChatButtonQuery($this, $update),
@@ -602,6 +601,7 @@ trait UpdateHandler
             return null;
         }
         return match ($info['type']) {
+            API::PEER_TYPE_USER && $message['_'] == 'encryptedMessage' => new Message\Private\SecretMessage($this, $message, $info),
             API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
             API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info),
             API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info),
