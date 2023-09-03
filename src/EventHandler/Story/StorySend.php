@@ -32,7 +32,7 @@ use danog\MadelineProto\StrTools;
 /**
  * Represents a Telegram story.
  */
-final class Story extends AbstractStory
+final class StorySend extends AbstractStory
 {
     /** Whether this story is pinned */
     public readonly bool $pinned;
