@@ -96,7 +96,7 @@ final class DataCenter
 
     public function __sleep()
     {
-        return ['sockets', 'currentDatacenter', 'API'];
+        return isset($this->API) ? ['sockets', 'currentDatacenter', 'API'] : ['sockets', 'currentDatacenter'];
     }
     public static function isTest(int $dc): bool
     {
