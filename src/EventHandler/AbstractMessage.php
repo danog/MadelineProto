@@ -269,7 +269,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @return list<AbstractStory>
      * @throws InvalidArgumentException
      */
-    public function getStory(): array
+    public function getStories(): array
     {
         Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         $client = $this->getClient();
@@ -280,6 +280,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         )['stories']['stories'];
         $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        // Recall it because storyItemSkipped
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
@@ -290,6 +291,25 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         return array_map(
             $client->wrapUpdate(...),
             $result
+        );
+    }
+
+    /**
+     * Sends a current user typing event
+     * (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
+     *
+     * @param MessageAction $action
+     * @return boolean
+     */
+    public function setAction(MessageAction $action = MessageAction::TYPING, int|string $value = 0): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.setTyping',
+            [
+                'peer' => $this->senderId,
+                'action' => ['_' => $action->value],
+                \is_int($value) ? 'progress' : 'emoticon' => $value
+            ]
         );
     }
 }
