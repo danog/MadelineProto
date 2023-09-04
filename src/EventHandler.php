@@ -230,7 +230,9 @@ abstract class EventHandler extends AbstractAPI
             }
             if ($has_any) {
                 /** @psalm-suppress UndefinedMethod */
-                $onAny = $this->onAny(...);
+                $onAny = function (array $update): void {
+                    EventLoop::queue($this->onAny(...), $update);
+                };
                 foreach ($constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {
                         $methods[$constructor['predicate']] = [$onAny];
@@ -248,8 +250,7 @@ abstract class EventHandler extends AbstractAPI
                     continue;
                 }
                 foreach ($newMethods as $update => $method) {
-                    $methods[$update] ??= [];
-                    $methods[$update][] = $method;
+                    $methods[$update] = \array_merge($method, $methods[$update] ?? []);
                 }
                 $handlers = \array_merge($handlers, $newHandlers);
             }

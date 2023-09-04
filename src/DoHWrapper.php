@@ -40,7 +40,6 @@ use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsSocketConnector;
 use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
-use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -84,8 +83,7 @@ final class DoHWrapper
     public readonly Rfc6455Connector $webSocketConnector;
 
     public function __construct(
-        private Connection $settings,
-        private LoggerGetter $loggerGetter,
+        private MTProto $API,
         ?CookieJar $jar = null
     ) {
         $configProvider = new class implements DnsConfigLoader {
@@ -106,14 +104,14 @@ final class DoHWrapper
         };
 
         $this->CookieJar = $jar ?? new LocalCookieJar();
-        $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter))))->build();
-        $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $loggerGetter, true))))->build();
+        $this->HTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $API))))->build();
+        $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, $API, true))))->build();
         $DoHConfig = new DoHConfig([new DoHNameserver('https://mozilla.cloudflare-dns.com/dns-query'), new DoHNameserver('https://dns.google/resolve')], $DoHHTTPClient);
         $nonProxiedDoHConfig = new DoHConfig([new DoHNameserver('https://mozilla.cloudflare-dns.com/dns-query'), new DoHNameserver('https://dns.google/resolve')]);
-        $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
+        $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$API->getSettings()->getConnection()->getUseDoH()
             ? new Rfc1035StubDnsResolver(null, $configProvider)
             : new Rfc8484StubDoHResolver($DoHConfig);
-        $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
+        $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$API->getSettings()->getConnection()->getUseDoH()
             ? new Rfc1035StubDnsResolver(null, $configProvider)
             : new Rfc8484StubDoHResolver($nonProxiedDoHConfig);
 
@@ -135,9 +133,9 @@ final class DoHWrapper
         $combos = [
             [[DefaultStream::class, []], [BufferedRawStream::class, []]]
         ];
-        if ($this->settings->getRetry()) {
+        if ($this->API->getSettings()->getConnection()->getRetry()) {
             $proxyCombos = [];
-            foreach ($this->settings->getProxies() as $proxy => $extras) {
+            foreach ($this->API->getSettings()->getConnection()->getProxies() as $proxy => $extras) {
                 if ($proxy === ObfuscatedStream::class) {
                     continue;
                 }
@@ -162,12 +160,12 @@ final class DoHWrapper
             $combos = \array_unique($combos, SORT_REGULAR);
         }
 
-        $context ??= (new ConnectContext())->withConnectTimeout($this->settings->getTimeout())->withBindTo($this->settings->getBindTo());
+        $context ??= (new ConnectContext())->withConnectTimeout($this->API->getSettings()->getConnection()->getTimeout())->withBindTo($this->API->getSettings()->getConnection()->getBindTo());
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [
-                    $this->settings->getIpv6(),
-                    !$this->settings->getIpv6(),
+                    $this->API->getSettings()->getConnection()->getIpv6(),
+                    !$this->API->getSettings()->getConnection()->getIpv6(),
                 ];
                 foreach ($ipv6Combos as $ipv6) {
                     $ctx = (new ConnectionContext())->setSocketContext($context)->setUri($uri)->setIpv6($ipv6);

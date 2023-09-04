@@ -43,7 +43,7 @@ final class Crypt
      * @param boolean $to_server To server/from server direction
      * @internal
      */
-    public static function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
+    public static function kdf(string $msg_key, string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha256_a = \hash('sha256', $msg_key.\substr($auth_key, $x, 36), true);
@@ -53,6 +53,21 @@ final class Crypt
         return [$aes_key, $aes_iv];
     }
     /**
+     * AES KDF function for MTProto v2, VoIP.
+     *
+     * @internal
+     */
+    public static function voipKdf(string $msg_key, string $auth_key, bool $outgoing, bool $transport): array
+    {
+        $x = $outgoing ? 8 : 0;
+        $x += $transport ? 0 : 128;
+        $sha256_a = \hash('sha256', $msg_key.\substr($auth_key, $x, 36), true);
+        $sha256_b = \hash('sha256', \substr($auth_key, 40 + $x, 36).$msg_key, true);
+        $aes_key = \substr($sha256_a, 0, 8).\substr($sha256_b, 8, 16).\substr($sha256_a, 24, 8);
+        $aes_iv = \substr($sha256_b, 0, 4).\substr($sha256_a, 8, 8).\substr($sha256_b, 24, 4);
+        return [$aes_key, $aes_iv, $x];
+    }
+    /**
      * AES KDF function for MTProto v1.
      *
      * @param string  $msg_key   Message key
@@ -60,7 +75,7 @@ final class Crypt
      * @param boolean $to_server To server/from server direction
      * @internal
      */
-    public static function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
+    public static function oldKdf(string $msg_key, string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha1_a = \sha1($msg_key.\substr($auth_key, $x, 32), true);
@@ -187,7 +202,7 @@ final class Crypt
          * Check validity of p
          * Is (p - 1) / 2 a prime?
          *
-         * Almost always fails
+         * Almost always fails quite possibly due to phpseclib
          */
         /*
                 $this->logger->logger('Executing p/g checks (2/3)...', \danog\MadelineProto\Logger::VERBOSE);

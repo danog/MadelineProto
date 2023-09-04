@@ -81,6 +81,37 @@ trait PeerHandler
         return $id < Magic::ZERO_CHANNEL_ID;
     }
     /**
+     * Convert MTProto secret chat ID to bot API secret chat ID.
+     *
+     * @param int $id MTProto secret chat ID
+     *
+     * @return int Bot API secret chat ID
+     */
+    public static function MTProtoToBotApiSecretChatId(int $id): int
+    {
+        return Magic::ZERO_SECRET_CHAT_ID + $id;
+    }
+    /**
+     * Convert bot API secret chat ID to MTProto secret chat ID.
+     *
+     * @param int $id Bot API secret chat ID
+     *
+     * @return int MTProto secret chat ID
+     */
+    public static function botApiToMTProtoSecretChatId(int $id): int
+    {
+        return $id - Magic::ZERO_SECRET_CHAT_ID;
+    }
+    /**
+     * Check whether provided bot API ID is a secret chat.
+     *
+     * @param int $id Bot API ID
+     */
+    public static function isSecretChat(int $id): bool
+    {
+        return $id >= Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 && $id !== Magic::ZERO_SECRET_CHAT_ID;
+    }
+    /**
      * Set support info.
      *
      * @internal
@@ -435,6 +466,9 @@ trait PeerHandler
         if (\is_numeric($id)) {
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
+            if (self::isSecretChat($id)) {
+                return $this->getSecretChat(self::botApiToMTProtoSecretChatId($id));
+            }
             if (!$this->peerDatabase->isset($id)) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
@@ -724,6 +758,9 @@ trait PeerHandler
     public function getFullInfo(mixed $id): array
     {
         $partial = $this->getInfo($id);
+        if (self::isSecretChat($partial['bot_api_id'])) {
+            return $partial;
+        }
         $full = $this->peerDatabase->getFull($partial['bot_api_id']);
         if (\time() - ($full['last_update'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
             return \array_merge($partial, $full);

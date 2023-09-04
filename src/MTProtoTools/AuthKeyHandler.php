@@ -16,13 +16,9 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Sync\LocalMutex;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
 use phpseclib3\Math\BigInteger;
-
-use function Amp\async;
-use function Amp\Future\await;
 
 /**
  * @property DataCenter $datacenter
@@ -31,43 +27,6 @@ use function Amp\Future\await;
  */
 trait AuthKeyHandler
 {
-    private ?LocalMutex $auth_mutex = null;
-    /**
-     * Asynchronously create, bind and check auth keys for all DCs.
-     *
-     * @internal
-     */
-    public function initAuthorization(): void
-    {
-        $this->auth_mutex ??= new LocalMutex;
-        $lock = $this->auth_mutex->acquire();
-        $this->logger('Initing authorization...');
-        $this->initing_authorization = true;
-        try {
-            $main = [];
-            $media = [];
-            foreach ($this->datacenter->getDataCenterConnections() as $socket) {
-                if (!$socket->hasCtx()) {
-                    continue;
-                }
-                if ($socket->isMedia()) {
-                    $media []= $socket->initAuthorization(...);
-                } else {
-                    $main []= $socket->initAuthorization(...);
-                }
-            }
-            if ($main) {
-                \array_shift($main)();
-            }
-            await(\array_map(async(...), $main));
-            await(\array_map(async(...), $media));
-        } finally {
-            $lock->release();
-            $this->logger('Done initing authorization!');
-            $this->initing_authorization = false;
-        }
-        $this->startUpdateSystem(true);
-    }
     /**
      * Get diffie-hellman configuration.
      */

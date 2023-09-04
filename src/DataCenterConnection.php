@@ -147,6 +147,7 @@ final class DataCenterConnection implements JsonSerializable
     {
         $logger = $this->API->logger;
         $this->initingAuth ??= new LocalMutex;
+        $logger->logger("Acquiring lock in order to init auth for DC {$this->datacenter}", Logger::NOTICE);
         $lock = $this->initingAuth->acquire();
         try {
             $logger->logger("Initing auth for DC {$this->datacenter}", Logger::NOTICE);
@@ -224,7 +225,7 @@ final class DataCenterConnection implements JsonSerializable
                 $encrypted_data = Tools::random(16).Tools::packSignedLong($message_id).\pack('VV', $seq_no, \strlen($message_data)).$message_data;
                 $message_key = \substr(\sha1($encrypted_data, true), -16);
                 $padding = Tools::random(Tools::posmod(-\strlen($encrypted_data), 16));
-                [$aes_key, $aes_iv] = Crypt::oldAesCalculate($message_key, $this->getPermAuthKey()->getAuthKey());
+                [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->getPermAuthKey()->getAuthKey());
                 $encrypted_message = $this->getPermAuthKey()->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
                 if ($res === true) {
@@ -459,17 +460,17 @@ final class DataCenterConnection implements JsonSerializable
             $this->connectionsPromise = $f->getFuture();
             $this->ctx = $ctx->getCtx();
             $this->connectMore(1);
-            $this->restoreBackup();
             $f->complete();
             if (isset($this->connectionsDeferred)) {
                 $connectionsDeferred = $this->connectionsDeferred;
                 $this->connectionsDeferred = null;
                 $connectionsDeferred->complete();
             }
+            $this->restoreBackup();
         } else {
             $this->ctx = $ctx->getCtx();
             $this->availableConnections[$id] = 0;
-            $this->connections[$id]->connect($ctx);
+            $this->connections[$id]->setExtra($this, $id, $ctx);
         }
     }
     /**
@@ -483,8 +484,7 @@ final class DataCenterConnection implements JsonSerializable
         $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
             $connection = new Connection();
-            $connection->setExtra($this, $x);
-            $connection->connect($ctx);
+            $connection->setExtra($this, $x, $ctx);
             $this->connections[$x] = $connection;
             $this->availableConnections[$x] = 0;
             $ctx = $this->ctx->getCtx();
@@ -549,7 +549,7 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Restore backed up messages.
      */
-    public function restoreBackup(): void
+    private function restoreBackup(): void
     {
         $backup = $this->backup;
         $this->backup = [];
@@ -564,17 +564,19 @@ final class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                EventLoop::queue($this->getConnection()->sendMessage(...), $message, false);
+                $this->API->logger->logger("Resending $message to DC {$this->datacenter}");
+                EventLoop::queue($this->getConnection()->sendMessage(...), $message);
+            } else {
+                $this->API->logger->logger("Dropping $message to DC {$this->datacenter}");
             }
         }
-        $this->flush();
     }
     /**
      * Get connection for authorization.
      */
-    public function getAuthConnection(): Connection
+    private function getAuthConnection(): Connection
     {
-        return $this->connections[0];
+        return $this->connections[0]->connect();
     }
     /**
      * Check if any connection is available.
@@ -593,7 +595,7 @@ final class DataCenterConnection implements JsonSerializable
         if (empty($this->availableConnections)) {
             $this->connectionsPromise->await();
         }
-        return $this->getConnection();
+        return $this->getConnection()->connect();
     }
     /**
      * Get best socket in round robin.

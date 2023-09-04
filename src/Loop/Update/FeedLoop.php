@@ -71,7 +71,7 @@ final class FeedLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
+        if (!$this->isLoggedIn()) {
             return self::PAUSE;
         }
         $this->updater = $this->API->updaters[$this->channelId];

@@ -130,13 +130,35 @@ abstract class InternalDoc
         $this->stories->setWrapper($this->wrapper);
     }
     /**
-         * Convert MTProto parameters to bot API parameters.
+         * Convert bot API secret chat ID to MTProto secret chat ID.
          *
-         * @param array $data Data
+         * @param int $id Bot API secret chat ID
+         *
+         * @return int MTProto secret chat ID
          */
+    public static function botAPIToMTProtoSecretChatId(int $id): int
+    {
+        return \danog\MadelineProto\MTProto::botAPIToMTProtoSecretChatId($id);
+    }
+    /**
+     * Convert MTProto parameters to bot API parameters.
+     *
+     * @param array $data Data
+     */
     public function MTProtoToBotAPI(array $data): array
     {
         return $this->wrapper->getAPI()->MTProtoToBotAPI($data);
+    }
+    /**
+     * Convert MTProto secret chat ID to bot API secret chat ID.
+     *
+     * @param int $id MTProto secret chat ID
+     *
+     * @return int Bot API secret chat ID
+     */
+    public static function MTProtoToBotAPISecretChatId(int $id): int
+    {
+        return \danog\MadelineProto\MTProto::MTProtoToBotAPISecretChatId($id);
     }
     /**
      * MTProto to TD params.
@@ -1253,6 +1275,15 @@ abstract class InternalDoc
     public function isPremium(): bool
     {
         return $this->wrapper->getAPI()->isPremium();
+    }
+    /**
+     * Check whether provided bot API ID is a secret chat.
+     *
+     * @param int $id Bot API ID
+     */
+    public static function isSecretChat(int $id): bool
+    {
+        return \danog\MadelineProto\MTProto::isSecretChat($id);
     }
     /**
      * Returns whether the current user is a bot.

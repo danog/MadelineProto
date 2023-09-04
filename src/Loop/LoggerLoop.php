@@ -39,6 +39,31 @@ trait LoggerLoop
     }
 
     /**
+     * Report pause, can be overriden for logging.
+     *
+     * @param float $timeout Pause duration, 0 = forever
+     */
+    protected function reportPause(float $timeout): void
+    {
+        $timeout = $timeout ? "for $timeout" : "until resume";
+        $this->logger->logger("Pausing $this $timeout...", Logger::ULTRA_VERBOSE);
+    }
+
+    /**
+     * Signal that loop was started.
+     */
+    protected function startedLoop(): void
+    {
+        $this->logger->logger("Started $this!", Logger::ULTRA_VERBOSE);
+    }
+    /**
+     * Signal that loop has exited.
+     */
+    protected function exitedLoop(): void
+    {
+        $this->logger->logger("Exited $this!", Logger::ULTRA_VERBOSE);
+    }
+    /**
      * Get loop name.
      */
     abstract public function __toString(): string;
