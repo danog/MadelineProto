@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -247,6 +248,7 @@ final class Connection
     {
         return $this->ctx->isCDN();
     }
+    private ?LocalMutex $connectMutex = null;
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      */
@@ -255,43 +257,49 @@ final class Connection
         if ($this->stream) {
             return $this;
         }
-        $ctx = $this->ctx;
-        $this->ctx = $ctx->getCtx();
+        $this->connectMutex ??= new LocalMutex;
+        $lock = $this->connectMutex->acquire();
+        try {
+            $ctx = $this->ctx;
+            $this->ctx = $ctx->getCtx();
 
-        $this->createSession();
-        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
-        $this->stream = $ctx->getStream();
-        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
-        if ($this->needsReconnect) {
-            $this->needsReconnect = false;
-        }
-        $this->httpReqCount = 0;
-        $this->httpResCount = 0;
-        $this->writer ??= new WriteLoop($this);
-        $this->reader ??= new ReadLoop($this);
-        $this->checker ??= new CheckLoop($this);
-        $this->cleanup ??= new CleanupLoop($this);
-        $this->waiter ??= new HttpWaitLoop($this);
-        if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN() && !$this->shared->isHttp()) {
-            $this->pinger = new PingLoop($this);
-        }
-        foreach ($this->new_outgoing as $message_id => $message) {
-            if ($message->isUnencrypted()) {
-                if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                    $message->reply(fn () => new Exception('Restart because we were reconnected'));
-                }
-                unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
+            $this->createSession();
+            $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
+            $this->stream = $ctx->getStream();
+            $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
+            if ($this->needsReconnect) {
+                $this->needsReconnect = false;
             }
+            $this->httpReqCount = 0;
+            $this->httpResCount = 0;
+            $this->writer ??= new WriteLoop($this);
+            $this->reader ??= new ReadLoop($this);
+            $this->checker ??= new CheckLoop($this);
+            $this->cleanup ??= new CleanupLoop($this);
+            $this->waiter ??= new HttpWaitLoop($this);
+            if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN() && !$this->shared->isHttp()) {
+                $this->pinger = new PingLoop($this);
+            }
+            foreach ($this->new_outgoing as $message_id => $message) {
+                if ($message->isUnencrypted()) {
+                    if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
+                        $message->reply(fn () => new Exception('Restart because we were reconnected'));
+                    }
+                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
+                }
+            }
+            Assert::true($this->writer->start(), "Could not start writer stream");
+            Assert::true($this->reader->start(), "Could not start reader stream");
+            Assert::true($this->checker->start(), "Could not start checker stream");
+            Assert::true($this->cleanup->start(), "Could not start cleanup stream");
+            Assert::true($this->waiter->start(), "Could not start waiter stream");
+            if ($this->pinger) {
+                Assert::true($this->pinger->start(), "Could not start pinger stream");
+            }
+            return $this;
+        } finally {
+            $lock->release();
         }
-        Assert::true($this->writer->start(), "Could not start writer stream");
-        Assert::true($this->reader->start(), "Could not start reader stream");
-        Assert::true($this->checker->start(), "Could not start checker stream");
-        Assert::true($this->cleanup->start(), "Could not start cleanup stream");
-        Assert::true($this->waiter->start(), "Could not start waiter stream");
-        if ($this->pinger) {
-            Assert::true($this->pinger->start(), "Could not start pinger stream");
-        }
-        return $this;
     }
     /**
      * Apply method abstractions.
