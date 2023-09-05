@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class Offline extends Status
 {
-    /** @var Time the user was last seen online */
+    /** Time the user was last seen online */
     public readonly int $wasOnline;
 
     public function __construct(MTProto $API, array $rowUserStatus)

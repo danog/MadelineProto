@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class Online extends Status
 {
-    /** @var Time to expiration of the current online status */
+    /** Time to expiration of the current online status */
     public readonly int $expires;
 
     public function __construct(MTProto $API, array $rowUserStatus)
