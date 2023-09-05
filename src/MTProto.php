@@ -26,6 +26,7 @@ use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\Request;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
@@ -740,16 +741,7 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function fileGetContents(string $url): string
     {
-        return $this->datacenter->fileGetContents($url);
-    }
-    /**
-     * Get all datacenter connections.
-     * @internal
-     * @return array<DataCenterConnection>
-     */
-    public function getDataCenterConnections(): array
-    {
-        return $this->datacenter->getDataCenterConnections();
+        return $this->getHTTPClient()->request(new Request($url))->getBody()->buffer();
     }
     /**
      * Get main DC ID.
@@ -1022,6 +1014,13 @@ final class MTProto implements TLCallback, LoggerGetter
         if ($this->authorized === API::LOGGED_OUT) {
             $this->wrapper->getSession()->delete();
         }
+    }
+    /** @internal */
+    public function isCdn(int $dc): bool
+    {
+        $test = $this->settings->getConnection()->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->settings->getConnection()->getIpv6() ? 'ipv6' : 'ipv4';
+        return $this->dcList[$test][$ipv6][$dc]['cdn'] ?? false;
     }
     /**
      * Destructor.

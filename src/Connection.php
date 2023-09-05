@@ -34,7 +34,6 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\TL\Conversion\Extension;
 use Webmozart\Assert\Assert;
@@ -91,7 +90,6 @@ final class Connection
      * Connection context.
      */
     private ?ConnectionContext $chosenCtx = null;
-    private ?ContextIterator $ctxs = null;
     /**
      * HTTP request count.
      *
@@ -239,14 +237,14 @@ final class Connection
      */
     public function isMedia(): bool
     {
-        return $this->ctxs->isMedia();
+        return DataCenter::isMedia($this->datacenter);
     }
     /**
      * Check if is a CDN connection.
      */
     public function isCDN(): bool
     {
-        return $this->ctxs->isCDN();
+        return $this->API->isCDN($this->datacenter);
     }
     private ?LocalMutex $connectMutex = null;
     /**
@@ -264,7 +262,7 @@ final class Connection
                 return $this;
             }
             $this->createSession();
-            foreach ($this->ctxs as $ctx) {
+            foreach ($this->shared->getCtxs() as $ctx) {
                 $this->API->logger->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
                 try {
                     $this->stream = $ctx->getStream();
@@ -518,14 +516,13 @@ final class Connection
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
      */
-    public function setExtra(DataCenterConnection $extra, int $id, ContextIterator $ctx): void
+    public function setExtra(DataCenterConnection $extra, int $datacenter, int $id): void
     {
         $this->shared = $extra;
         $this->id = $id;
         $this->API = $extra->getExtra();
         $this->logger = $this->API->logger;
-        $this->ctxs = $ctx;
-        $this->datacenter = $ctx->getDc();
+        $this->datacenter = $datacenter;
         $this->datacenterId = $this->datacenter . '.' . $this->id;
     }
     /**

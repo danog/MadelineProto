@@ -133,6 +133,11 @@ final class DataCenterConnection implements JsonSerializable
     {
         return $this->needsReconnect;
     }
+    public function getCtxs(): ContextIterator
+    {
+        \assert($this->ctx !== null);
+        return $this->ctx;
+    }
     private ?LocalMutex $initingAuth = null;
     /**
      * Init auth keys for single DC.
@@ -256,7 +261,7 @@ final class DataCenterConnection implements JsonSerializable
                     && $authorized_socket->isAuthorized()
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                     && !$this->isAuthorized()
-                    && !$authorized_socket->ctx->isCDN()
+                    && !$this->API->isCDN($authorized_dc_id)
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
@@ -423,8 +428,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function connect(int $id = -1): void
     {
-        $this->datacenter = $this->ctx->getDc();
-        $media = $this->ctx->isMedia() || $this->ctx->isCDN();
+        $media = DataCenter::isMedia($this->datacenter) || $this->API->isCDN($this->datacenter);
         if ($media) {
             if (!$this->robinLoop) {
                 $this->robinLoop = new PeriodicLoopInternal(
@@ -455,7 +459,7 @@ final class DataCenterConnection implements JsonSerializable
             $this->restoreBackup();
         } else {
             $this->availableConnections[$id] = 0;
-            $this->connections[$id]->setExtra($this, $id, $this->ctx);
+            $this->connections[$id]->setExtra($this, $this->datacenter, $id);
         }
     }
     /**
@@ -468,7 +472,7 @@ final class DataCenterConnection implements JsonSerializable
         $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
             $connection = new Connection();
-            $connection->setExtra($this, $x, $this->ctx);
+            $connection->setExtra($this, $this->datacenter, $x);
             $this->connections[$x] = $connection;
             $this->availableConnections[$x] = 0;
         }
@@ -613,7 +617,7 @@ final class DataCenterConnection implements JsonSerializable
                 $count += 50;
             }
         } elseif ($min < 100) {
-            $max = $this->ctx->isMedia() || $this->ctx->isCDN() ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
+            $max = DataCenter::isMedia($this->datacenter) || $this->API->isCDN($this->datacenter) ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
             if (\count($this->availableConnections) < $max) {
                 $this->connectMore(2);
             } else {
@@ -654,8 +658,9 @@ final class DataCenterConnection implements JsonSerializable
      *
      * @param MTProto $API Main instance
      */
-    public function setExtra(MTProto $API, ContextIterator $ctx): void
+    public function setExtra(MTProto $API, int $datacenter, ContextIterator $ctx): void
     {
+        $this->datacenter = $datacenter;
         $this->API = $API;
         $this->ctx = $ctx;
     }

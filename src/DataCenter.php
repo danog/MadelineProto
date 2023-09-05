@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\Dns\DnsResolver;
 use Amp\Http\Client\HttpClient;
-use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\InternetAddress;
 use Amp\Socket\InternetAddressVersion;
@@ -95,6 +94,13 @@ final class DataCenter
             unset($this->dohWrapper);
         }
         $this->dohWrapper ??= new DoHWrapper($API);
+        if ($this->getSettings()->hasChanged()) {
+            foreach ($this->sockets as $dc => $socket) {
+                $socket->setExtra($this->API, $dc, $this->generateContexts($dc));
+                $socket->reconnect();
+            }
+            $this->getSettings()->applyChanges();
+        }
     }
 
     public function __sleep()
@@ -113,12 +119,6 @@ final class DataCenter
     {
         return $this->API->getSettings()->getConnection();
     }
-    public function isCdn(int $dc): bool
-    {
-        $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
-        $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
-        return $this->API->dcList[$test][$ipv6][$dc]['cdn'] ?? false;
-    }
     public function getHTTPClient(): HttpClient
     {
         return $this->dohWrapper->HTTPClient;
@@ -130,12 +130,57 @@ final class DataCenter
     }
 
     /**
+     * Normalizes "bindto" options to add a ":0" in case no port is present, otherwise PHP will silently ignore those.
+     *
+     * @throws \Error If an invalid option has been passed.
+     *
+     * @internal
+     */
+    private static function normalizeBindToOption(string $bindTo = null): ?string
+    {
+        if ($bindTo === null) {
+            return null;
+        }
+
+        if (\preg_match("/\\[(?P<ip>[0-9a-f:]+)](:(?P<port>\\d+))?$/", $bindTo, $match)) {
+            $ip = $match['ip'];
+            $port = (int) ($match['port'] ?? 0);
+
+            if (\inet_pton($ip) === false) {
+                throw new \Error("Invalid IPv6 address: $ip");
+            }
+
+            if ($port < 0 || $port > 65535) {
+                throw new \Error("Invalid port: $port");
+            }
+
+            return "[$ip]:$port";
+        }
+
+        if (\preg_match("/(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)(:(?P<port>\\d+))?$/", $bindTo, $match)) {
+            $ip = $match['ip'];
+            $port = (int) ($match['port'] ?? 0);
+
+            if (\inet_pton($ip) === false) {
+                throw new \Error("Invalid IPv4 address: $ip");
+            }
+
+            if ($port < 0 || $port > 65535) {
+                throw new \Error("Invalid port: $port");
+            }
+
+            return "$ip:$port";
+        }
+
+        throw new \Error("Invalid bindTo value: $bindTo");
+    }
+
+    /**
      * Generate contexts.
      *
      * @param integer        $dc_number DC ID to generate contexts for
-     * @return non-empty-list<ConnectionContext>
      */
-    private function generateContexts(int $dc_number): array
+    private function generateContexts(int $dc_number): ContextIterator
     {
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
@@ -232,7 +277,7 @@ final class DataCenter
         }
         $combos = \array_unique($combos, SORT_REGULAR);
 
-        $bind = $this->getSettings()->getBindTo();
+        $bind = self::normalizeBindToOption($this->getSettings()->getBindTo());
         $onlyIPv6 = null;
         if ($bind !== null) {
             $onlyIPv6 = InternetAddress::fromString($bind)->getVersion() === InternetAddressVersion::IPv6
@@ -277,7 +322,7 @@ final class DataCenter
                         }
                         $ctx = (new ConnectionContext())
                             ->setDc($dc_number)
-                            ->setCdn($this->isCdn($dc_number))
+                            ->setCdn($this->API->isCdn($dc_number))
                             ->setSocketContext($context)
                             ->setUri($uri)
                             ->setIpv6($ipv6 === 'ipv6');
@@ -315,16 +360,7 @@ final class DataCenter
         if (empty($ctxs)) {
             throw new AssertionError("No info for DC $dc_number!");
         }
-        return $ctxs;
-    }
-    /**
-     * Get contents of file.
-     *
-     * @param string $url URL to fetch
-     */
-    public function fileGetContents(string $url): string
-    {
-        return ($this->dohWrapper->HTTPClient->request(new Request($url)))->getBody()->buffer();
+        return new ContextIterator($ctxs);
     }
     public function waitGetConnection(int $dc): Connection
     {
@@ -348,7 +384,7 @@ final class DataCenter
 
                 $this->API->logger->logger("Connecting to DC {$dc}", Logger::WARNING);
                 $this->sockets[$dc] ??= new DataCenterConnection();
-                $this->sockets[$dc]->setExtra($this->API, new ContextIterator($ctxs));
+                $this->sockets[$dc]->setExtra($this->API, $dc, $ctxs);
                 $this->sockets[$dc]->connect();
             } finally {
                 $lock->release();
