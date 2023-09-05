@@ -26,14 +26,19 @@ final class InlineQuery extends Update
 {
     /** @var int Query ID */
     public readonly int $queryId;
+
     /** @var string Text of query */
     public readonly string $query;
+
     /** @var int User that sent the query */
     public readonly int $userId;
+
     /** @var string Offset to navigate through results */
     public readonly string $offset;
+
     /** @var GeoPoint Attached geolocation */
     public readonly ?GeoPoint $geo;
+
     /** @var InlineQueryPeerType Type of the chat from which the inline query was sent. */
     public readonly InlineQueryPeerType $peerType;
 
@@ -53,6 +58,6 @@ final class InlineQuery extends Update
         $this->userId = $rawInlineQuery['user_id'];
         $this->offset = $rawInlineQuery['offset'];
         $this->geo = isset($rawInlineQuery['geo']) ? new GeoPoint($rawInlineQuery['geo']) : null;
-        $this->peerType = InlineQueryPeerType::fromString($rawInlineQuery['peer_type']['_']);
+        $this->peerType = InlineQueryPeerType::fromRawInlineQuery($rawInlineQuery['peer_type']['_']);
     }
 }

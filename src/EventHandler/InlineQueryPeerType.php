@@ -41,15 +41,15 @@ enum InlineQueryPeerType implements JsonSerializable
      * @param string Type of the chat from which the inline query was sent.
      * @throws AssertionError
      */
-    public static function fromString(string $name): InlineQueryPeerType
+    public static function fromRawInlineQuery(string $rawInlineQuery): InlineQueryPeerType
     {
-        $newName = \substr($name, 19);
+        $newName = \substr($rawInlineQuery, 19);
         foreach (InlineQueryPeerType::cases() as $case) {
             if ($case->name === $newName) {
                 return $case;
             }
         }
-        throw new AssertionError("Undefined case InlineQueryPeerType::".$name);
+        throw new AssertionError("Undefined case InlineQueryPeerType::".$rawInlineQuery);
     }
 
     /** @internal */

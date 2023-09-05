@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\EventHandler\Action\Typing;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -298,17 +299,18 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Sends a current user typing event
      * (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
      *
-     * @param MessageAction $action
+     * @param AbstractAction $action
      * @return boolean
      */
-    public function setAction(MessageAction $action = MessageAction::TYPING, int|string $value = 0): bool
+    public function setAction(AbstractAction $action = new Typing): bool
     {
+        $action = $action->toRawAction() + [ 'msg_id' => $this->id ];
         return $this->getClient()->methodCallAsyncRead(
             'messages.setTyping',
             [
                 'peer' => $this->senderId,
-                'action' => ['_' => $action->value],
-                \is_int($value) ? 'progress' : 'emoticon' => $value
+                'top_msg_id' => $this->topicId,
+                'action' => $action
             ]
         );
     }

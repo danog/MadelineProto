@@ -73,7 +73,7 @@ final class GroupMessage extends Message
      * @return void
      * @throws InvalidArgumentException
      */
-    public function showMembers(): void
+    public function unhideMembers(): void
     {
         Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
@@ -128,7 +128,7 @@ final class GroupMessage extends Message
      * @return void
      * @throws InvalidArgumentException
      */
-    public function showHistory(): void
+    public function unhideHistory(): void
     {
         Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
@@ -282,7 +282,7 @@ final class GroupMessage extends Message
                 'chat_id' => $this->chatId,
             ]
         );
-        return $client->toSuperGroup($result['updates'][0]['channel_id']);
+        return MTProto::toSuperGroup($result['updates'][0]['channel_id']);
     }
 
     /**
@@ -326,7 +326,7 @@ final class GroupMessage extends Message
      *
      * @return void
      */
-    public function enableTopic(): void
+    public function enableTopics(): void
     {
         if (!$this->topicId)
             $this->getClient()->methodCallAsyncRead(
@@ -343,7 +343,7 @@ final class GroupMessage extends Message
      *
      * @return void
      */
-    public function disableTopic(): void
+    public function disableTopics(): void
     {
         if ($this->topicId)
             $this->getClient()->methodCallAsyncRead(
@@ -368,7 +368,7 @@ final class GroupMessage extends Message
     {
         Assert::true(MTProto::isSupergroupOrChannel($this->chatId));
         if (!$this->topicId)
-            $this->enableTopic();
+            $this->enableTopics();
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'channels.createForumTopic',

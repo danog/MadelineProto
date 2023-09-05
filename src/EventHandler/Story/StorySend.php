@@ -16,18 +16,17 @@
 
 namespace danog\MadelineProto\EventHandler\Story;
 
-use danog\MadelineProto\EventHandler\AbstractPrivacy;
-use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\EventHandler\Media\Gif;
-use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\EventHandler\Media\Video;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
-use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
 
 /**
  * Represents a Telegram story.
@@ -76,7 +75,7 @@ final class StorySend extends AbstractStory
     /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
 
-    /** @var list<Privacy|AbstractPrivacy> */
+    /** @var list<AbstractRule> */
     public readonly array $privacy;
 
     /** Our reaction to the story */
@@ -115,7 +114,7 @@ final class StorySend extends AbstractStory
 
         $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
-        $this->privacy = Privacy::fromRawPrivacy($rawStory['privacy'] ?? []);
+        $this->privacy = array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
         $this->reactionCount = $rawStory['views']['views_count'] ?? null;
