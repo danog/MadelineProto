@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@56310333dc7ca0dbb4c60421816db50d8a16f9f7">
+<files psalm-version="dev-master@37cc4fd33fe8bbdfca6e056f17fcf2e9c41b9a65">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -88,20 +88,18 @@
     <DocblockTypeContradiction>
       <code><![CDATA[$this->stream]]></code>
     </DocblockTypeContradiction>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[$ctx->getStream()]]></code>
+    </InvalidPropertyAssignmentValue>
     <MissingConstructor>
       <code>$API</code>
       <code>$datacenter</code>
       <code>$logger</code>
       <code>$shared</code>
     </MissingConstructor>
-    <PossiblyNullIterator>
-      <code><![CDATA[$this->ctxs]]></code>
-    </PossiblyNullIterator>
     <PossiblyNullReference>
       <code>getInputClientProxy</code>
-      <code>isCDN</code>
       <code>isHttp</code>
-      <code>isMedia</code>
       <code>refreshNext</code>
       <code>refreshNext</code>
     </PossiblyNullReference>
@@ -175,14 +173,8 @@
       <code>$connectionsPromise</code>
       <code>$datacenter</code>
     </MissingConstructor>
-    <PossiblyNullArgument>
-      <code><![CDATA[$this->ctx]]></code>
-    </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>bind</code>
-      <code>getDc</code>
-      <code>isCDN</code>
-      <code>isMedia</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$authorized_socket->hasTempAuthKey()
@@ -378,9 +370,15 @@
     </PossiblyInvalidArgument>
   </file>
   <file src="src/DoHWrapper.php">
+    <PropertyNotSetInConstructor>
+      <code>$webSocketConnector</code>
+    </PropertyNotSetInConstructor>
     <RedundantCondition>
       <code>$orig[1][0] === BufferedRawStream::class</code>
     </RedundantCondition>
+    <UndefinedClass>
+      <code>Rfc6455Connector</code>
+    </UndefinedClass>
   </file>
   <file src="src/EventHandler.php">
     <ArgumentTypeCoercion>
@@ -940,6 +938,12 @@
     </UninitializedProperty>
   </file>
   <file src="src/Loop/Connection/ReadLoop.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[\str_starts_with($e->getReason(), '       ')]]></code>
+    </DocblockTypeContradiction>
+    <InvalidThrow>
+      <code>throw $e;</code>
+    </InvalidThrow>
     <PossiblyNullArgument>
       <code><![CDATA[$buffer->bufferRead($payload_length)]]></code>
       <code><![CDATA[$buffer->bufferRead(4)]]></code>
@@ -955,6 +959,12 @@
     <PropertyNotSetInConstructor>
       <code>ReadLoop</code>
     </PropertyNotSetInConstructor>
+    <UndefinedClass>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>ClosedException</code>
+    </UndefinedClass>
   </file>
   <file src="src/Loop/Connection/WriteLoop.php">
     <PossiblyNullArgument>
@@ -2008,6 +2018,27 @@
     <PossiblyUndefinedVariable>
       <code>$data</code>
     </PossiblyUndefinedVariable>
+    <UndefinedClass>
+      <code><![CDATA[$this->stream]]></code>
+      <code><![CDATA[$this->stream]]></code>
+      <code><![CDATA[$this->stream]]></code>
+      <code>?WebsocketMessage</code>
+      <code>ClosedException</code>
+      <code>Rfc6455ConnectionFactory</code>
+      <code>Rfc6455Connector</code>
+      <code>WebsocketConnection</code>
+      <code>WebsocketConnector</code>
+      <code>WebsocketConnector</code>
+      <code>WebsocketHandshake</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass>
+      <code>WsStream</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Stream/Transport/WssStream.php">
+    <UndefinedDocblockClass>
+      <code>WssStream</code>
+    </UndefinedDocblockClass>
   </file>
   <file src="src/TL/Conversion/BotAPI.php">
     <MissingParamType>
@@ -2266,6 +2297,10 @@
     <TypeDoesNotContainType>
       <code>true</code>
     </TypeDoesNotContainType>
+    <UndefinedClass>
+      <code>ClosedException</code>
+      <code>ClosedException</code>
+    </UndefinedClass>
   </file>
   <file src="src/VoIPController.php">
     <ArgumentTypeCoercion>

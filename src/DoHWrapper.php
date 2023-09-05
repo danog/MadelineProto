@@ -116,10 +116,11 @@ final class DoHWrapper
             : new Rfc8484StubDoHResolver($nonProxiedDoHConfig);
 
         $this->dnsConnector = new DnsSocketConnector(new Rfc1035StubDnsResolver(null, $configProvider));
+        /*
         $this->webSocketConnector = new Rfc6455Connector(
             new Rfc6455ConnectionFactory(),
             $this->HTTPClient
-        );
+        );*/
     }
 
     /**
