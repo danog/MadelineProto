@@ -85,17 +85,23 @@
     </RedundantCondition>
   </file>
   <file src="src/Connection.php">
-    <InvalidPropertyAssignmentValue>
-      <code><![CDATA[$ctx->getStream()]]></code>
-    </InvalidPropertyAssignmentValue>
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->stream]]></code>
+    </DocblockTypeContradiction>
     <MissingConstructor>
       <code>$API</code>
-      <code>$ctx</code>
       <code>$datacenter</code>
       <code>$logger</code>
       <code>$shared</code>
     </MissingConstructor>
+    <PossiblyNullIterator>
+      <code><![CDATA[$this->ctxs]]></code>
+    </PossiblyNullIterator>
     <PossiblyNullReference>
+      <code>getInputClientProxy</code>
+      <code>isCDN</code>
+      <code>isHttp</code>
+      <code>isMedia</code>
       <code>refreshNext</code>
       <code>refreshNext</code>
     </PossiblyNullReference>
@@ -167,11 +173,16 @@
     <MissingConstructor>
       <code>$API</code>
       <code>$connectionsPromise</code>
-      <code>$ctx</code>
       <code>$datacenter</code>
     </MissingConstructor>
+    <PossiblyNullArgument>
+      <code><![CDATA[$this->ctx]]></code>
+    </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>bind</code>
+      <code>getDc</code>
+      <code>isCDN</code>
+      <code>isMedia</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$authorized_socket->hasTempAuthKey()
@@ -387,6 +398,10 @@
     <RedundantFunctionCall>
       <code>\array_values</code>
     </RedundantFunctionCall>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->startedInternal]]></code>
+      <code><![CDATA[$this->startedInternal]]></code>
+    </TypeDoesNotContainType>
     <UnresolvableInclude>
       <code>require $file</code>
     </UnresolvableInclude>
@@ -959,7 +974,7 @@
       <code>WriteLoop</code>
     </PropertyNotSetInConstructor>
     <TypeDoesNotContainType>
-      <code><![CDATA[$this->shared->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
+      <code><![CDATA[$this->connection->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
     </TypeDoesNotContainType>
   </file>
   <file src="src/Loop/Generic/PeriodicLoopInternal.php">
@@ -2299,6 +2314,10 @@
     <PossiblyNullArrayOffset>
       <code>$dialogs</code>
     </PossiblyNullArrayOffset>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->cachedAllBotUsers]]></code>
+      <code><![CDATA[$this->cachedAllBotUsers]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/Wrappers/Events.php">
     <DocblockTypeContradiction>
