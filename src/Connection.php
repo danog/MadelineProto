@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -33,9 +34,8 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use Webmozart\Assert\Assert;
 
@@ -89,9 +89,9 @@ final class Connection
     public MTProtoBufferInterface|null $stream = null;
     /**
      * Connection context.
-     *
      */
-    private ConnectionContext $ctx;
+    private ?ConnectionContext $chosenCtx = null;
+    private ?ContextIterator $ctxs = null;
     /**
      * HTTP request count.
      *
@@ -223,30 +223,30 @@ final class Connection
     /**
      * Get connection context.
      */
-    public function getCtx(): ConnectionContext
+    public function getInputClientProxy(): ?array
     {
-        return $this->ctx;
+        return $this->chosenCtx->getInputClientProxy();
     }
     /**
      * Check if is an HTTP connection.
      */
     public function isHttp(): bool
     {
-        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class], true);
+        return $this->chosenCtx->isHttp();
     }
     /**
      * Check if is a media connection.
      */
     public function isMedia(): bool
     {
-        return $this->ctx->isMedia();
+        return $this->ctxs->isMedia();
     }
     /**
      * Check if is a CDN connection.
      */
     public function isCDN(): bool
     {
-        return $this->ctx->isCDN();
+        return $this->ctxs->isCDN();
     }
     private ?LocalMutex $connectMutex = null;
     /**
@@ -260,43 +260,56 @@ final class Connection
         $this->connectMutex ??= new LocalMutex;
         $lock = $this->connectMutex->acquire();
         try {
-            $ctx = $this->ctx;
-            $this->ctx = $ctx->getCtx();
-
+            if ($this->stream) {
+                return $this;
+            }
             $this->createSession();
-            $this->API->logger->logger("Connecting to DC {$this->datacenterId}", Logger::WARNING);
-            $this->stream = $ctx->getStream();
-            $this->API->logger->logger("Connected to DC {$this->datacenterId}!", Logger::WARNING);
-            if ($this->needsReconnect) {
-                $this->needsReconnect = false;
-            }
-            $this->httpReqCount = 0;
-            $this->httpResCount = 0;
-            $this->writer ??= new WriteLoop($this);
-            $this->reader ??= new ReadLoop($this);
-            $this->checker ??= new CheckLoop($this);
-            $this->cleanup ??= new CleanupLoop($this);
-            $this->waiter ??= new HttpWaitLoop($this);
-            if (!isset($this->pinger) && !$this->ctx->isMedia() && !$this->ctx->isCDN() && !$this->shared->isHttp()) {
-                $this->pinger = new PingLoop($this);
-            }
-            foreach ($this->new_outgoing as $message_id => $message) {
-                if ($message->isUnencrypted()) {
-                    if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                        $message->reply(fn () => new Exception('Restart because we were reconnected'));
-                    }
-                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
+            foreach ($this->ctxs as $ctx) {
+                $this->API->logger->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
+                try {
+                    $this->stream = $ctx->getStream();
+                } catch (\Throwable $e) {
+                    $this->API->logger->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::WARNING);
+                    continue;
                 }
+                $this->API->logger->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
+                $this->chosenCtx = $ctx;
+
+                if ($ctx->getIpv6()) {
+                    Magic::setIpv6(true);
+                }
+                if ($this->needsReconnect) {
+                    $this->needsReconnect = false;
+                }
+                $this->httpReqCount = 0;
+                $this->httpResCount = 0;
+                $this->writer ??= new WriteLoop($this);
+                $this->reader ??= new ReadLoop($this);
+                $this->checker ??= new CheckLoop($this);
+                $this->cleanup ??= new CleanupLoop($this);
+                $this->waiter ??= new HttpWaitLoop($this);
+                if (!isset($this->pinger) && !$ctx->isMedia() && !$ctx->isCDN() && !$this->isHttp()) {
+                    $this->pinger = new PingLoop($this);
+                }
+                foreach ($this->new_outgoing as $message_id => $message) {
+                    if ($message->isUnencrypted()) {
+                        if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
+                            $message->reply(fn () => new Exception('Restart because we were reconnected'));
+                        }
+                        unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
+                    }
+                }
+                Assert::true($this->writer->start(), "Could not start writer stream");
+                Assert::true($this->reader->start(), "Could not start reader stream");
+                Assert::true($this->checker->start(), "Could not start checker stream");
+                Assert::true($this->cleanup->start(), "Could not start cleanup stream");
+                Assert::true($this->waiter->start(), "Could not start waiter stream");
+                if ($this->pinger) {
+                    Assert::true($this->pinger->start(), "Could not start pinger stream");
+                }
+                return $this;
             }
-            Assert::true($this->writer->start(), "Could not start writer stream");
-            Assert::true($this->reader->start(), "Could not start reader stream");
-            Assert::true($this->checker->start(), "Could not start checker stream");
-            Assert::true($this->cleanup->start(), "Could not start cleanup stream");
-            Assert::true($this->waiter->start(), "Could not start waiter stream");
-            if ($this->pinger) {
-                Assert::true($this->pinger->start(), "Could not start pinger stream");
-            }
-            return $this;
+            throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
         } finally {
             $lock->release();
         }
@@ -505,13 +518,13 @@ final class Connection
      * @param DataCenterConnection $extra Shared instance
      * @param int                  $id    Connection ID
      */
-    public function setExtra(DataCenterConnection $extra, int $id, ConnectionContext $ctx): void
+    public function setExtra(DataCenterConnection $extra, int $id, ContextIterator $ctx): void
     {
         $this->shared = $extra;
         $this->id = $id;
         $this->API = $extra->getExtra();
         $this->logger = $this->API->logger;
-        $this->ctx = $ctx->getCtx();
+        $this->ctxs = $ctx;
         $this->datacenter = $ctx->getDc();
         $this->datacenterId = $this->datacenter . '.' . $this->id;
     }
@@ -566,7 +579,7 @@ final class Connection
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
+        $this->shared->connect($this->id);
     }
     /**
      * Get name.

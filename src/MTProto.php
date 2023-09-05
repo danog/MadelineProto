@@ -1015,7 +1015,6 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         if (isset($this->datacenter)) {
             foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
-                $datacenter->setExtra($this);
                 $datacenter->disconnect();
             }
         }

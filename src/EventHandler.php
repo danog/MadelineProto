@@ -122,6 +122,9 @@ abstract class EventHandler extends AbstractAPI
         $startDeferred = $this->startDeferred;
         $lock = $this->startMutex->acquire();
         try {
+            if ($this->startedInternal) {
+                return null;
+            }
             $this->wrapper = $MadelineProto;
             $this->exportNamespaces();
 

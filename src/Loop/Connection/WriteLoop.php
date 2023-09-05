@@ -133,7 +133,7 @@ final class WriteLoop extends Loop
             if (!$this->shared->hasTempAuthKey()) {
                 return false;
             }
-            if ($this->shared->isHttp() && empty($this->connection->pendingOutgoing)) {
+            if ($this->connection->isHttp() && empty($this->connection->pendingOutgoing)) {
                 return false;
             }
 
@@ -209,7 +209,7 @@ final class WriteLoop extends Loop
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
                             $this->logger->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
-                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
+                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                         } else {
                             $this->logger->logger("Skipping $message due to uninited connection in DC $this->datacenter");
                             $skipped = true;
@@ -268,7 +268,7 @@ final class WriteLoop extends Loop
                 $count++;
                 unset($acks, $body);
             }
-            if ($this->shared->isHttp() && !$has_http_wait) {
+            if ($this->connection->isHttp() && !$has_http_wait) {
                 $this->logger->logger('Adding http_wait', Logger::ULTRA_VERBOSE);
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait');
                 $messages []= [

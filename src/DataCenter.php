@@ -25,9 +25,11 @@ use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Sync\LocalKeyedMutex;
+use AssertionError;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
@@ -38,7 +40,6 @@ use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use Throwable;
 
 /**
  * @psalm-type TDcOption=array{
@@ -116,51 +117,6 @@ final class DataCenter
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
         return $this->API->dcList[$test][$ipv6][$dc]['cdn'] ?? false;
     }
-    /**
-     * Connect to specified DC.
-     *
-     * @param int     $dc_number DC to connect to
-     * @param integer $id        Connection ID to re-establish (optional)
-     */
-    public function dcConnect(int $dc_number, int $id = -1): bool
-    {
-        $this->API->logger->logger("Acquiring connect lock for $dc_number $id!", Logger::VERBOSE);
-        $lock = $this->connectMutex->acquire("$dc_number $id");
-        try {
-            $ctxs = $this->generateContexts($dc_number);
-            if (empty($ctxs)) {
-                $this->API->logger->logger("No contexts, not connecting to $dc_number!", Logger::ERROR);
-                return false;
-            }
-            foreach ($ctxs as $ctx) {
-                try {
-                    if (isset($this->sockets[$dc_number])) {
-                        $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", Logger::WARNING);
-                        $this->sockets[$dc_number]->setExtra($this->API);
-                        $this->sockets[$dc_number]->connect($ctx, $id);
-                    } else {
-                        $this->API->logger->logger("Connecting to DC {$dc_number} from scratch", Logger::WARNING);
-                        $this->sockets[$dc_number] = new DataCenterConnection();
-                        $this->sockets[$dc_number]->setExtra($this->API);
-                        $this->sockets[$dc_number]->connect($ctx);
-                    }
-                    if ($ctx->getIpv6()) {
-                        Magic::setIpv6(true);
-                    }
-                    $this->API->logger->logger("OK, connected to DC $dc_number!", Logger::WARNING);
-                    return true;
-                } catch (Throwable $e) {
-                    if (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
-                        throw $e;
-                    }
-                    $this->API->logger->logger("Connection failed ({$dc_number}): $e", Logger::ERROR);
-                }
-            }
-            throw new Exception("Could not connect to DC {$dc_number}");
-        } finally {
-            $lock->release();
-        }
-    }
     public function getHTTPClient(): HttpClient
     {
         return $this->dohWrapper->HTTPClient;
@@ -176,14 +132,14 @@ final class DataCenter
      *
      * @param integer        $dc_number DC ID to generate contexts for
      * @param ConnectContext $context   Connection context
-     * @return array<ConnectionContext>
+     * @return non-empty-list<ConnectionContext>
      */
-    public function generateContexts(int $dc_number, ?ConnectContext $context = null): array
+    private function generateContexts(int $dc_number, ?ConnectContext $context = null): array
     {
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
         if (!isset($this->API->dcList[$test][$ipv6][$dc_number])) {
-            return [];
+            throw new AssertionError("No info for DC $dc_number!");
         }
 
         $ctxs = [];
@@ -346,10 +302,7 @@ final class DataCenter
             }
         }
         if (empty($ctxs)) {
-            unset($this->sockets[$dc_number]);
-            $this->API->logger->logger("No info for DC {$dc_number}", Logger::ERROR);
-        } elseif (\defined('MADELINEPROTO_TEST') && \constant('MADELINEPROTO_TEST') === 'pony') {
-            return [$ctxs[0]];
+            throw new AssertionError("No info for DC $dc_number!");
         }
         return $ctxs;
     }
@@ -374,7 +327,21 @@ final class DataCenter
     public function getDataCenterConnection(int $dc): DataCenterConnection
     {
         if (!isset($this->sockets[$dc]) || !$this->sockets[$dc]->hasCtx()) {
-            $this->dcConnect($dc);
+            $this->API->logger->logger("Acquiring connect lock for $dc!", Logger::VERBOSE);
+            $lock = $this->connectMutex->acquire((string) $dc);
+            try {
+                if (isset($this->sockets[$dc]) && $this->sockets[$dc]->hasCtx()) {
+                    return $this->sockets[$dc];
+                }
+                $ctxs = $this->generateContexts($dc);
+
+                $this->API->logger->logger("Connecting to DC {$dc}", Logger::WARNING);
+                $this->sockets[$dc] ??= new DataCenterConnection();
+                $this->sockets[$dc]->setExtra($this->API, new ContextIterator($ctxs));
+                $this->sockets[$dc]->connect();
+            } finally {
+                $lock->release();
+            }
         }
         return $this->sockets[$dc];
     }

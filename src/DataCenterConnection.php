@@ -29,10 +29,7 @@ use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
-use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
-use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\ContextIterator;
 use JsonSerializable;
 use Revolt\EventLoop;
 
@@ -84,10 +81,9 @@ final class DataCenterConnection implements JsonSerializable
      */
     private MTProto $API;
     /**
-     * Connection context.
-     *
+     * Connection contexts.
      */
-    private ConnectionContext $ctx;
+    private ?ContextIterator $ctx = null;
     /**
      * DC ID.
      */
@@ -154,8 +150,8 @@ final class DataCenterConnection implements JsonSerializable
             $this->waitGetConnection();
             $connection = $this->getAuthConnection();
             $this->createSession();
-            $cdn = $this->isCDN();
-            $media = $this->isMedia();
+            $cdn = $connection->isCDN();
+            $media = $connection->isMedia();
             $pfs = $this->API->settings->getAuth()->getPfs();
             if (!$this->hasTempAuthKey() || !$this->hasPermAuthKey() || !$this->isBound()) {
                 if (!$this->hasPermAuthKey() && !$cdn && !$media) {
@@ -260,7 +256,7 @@ final class DataCenterConnection implements JsonSerializable
                     && $authorized_socket->isAuthorized()
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                     && !$this->isAuthorized()
-                    && !$authorized_socket->isCDN()
+                    && !$authorized_socket->ctx->isCDN()
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
@@ -414,13 +410,6 @@ final class DataCenterConnection implements JsonSerializable
         }
     }
     /**
-     * Get connection context.
-     */
-    public function getCtx(): ConnectionContext
-    {
-        return $this->ctx;
-    }
-    /**
      * Has connection context?
      */
     public function hasCtx(): bool
@@ -430,14 +419,12 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Connect function.
      *
-     * @param ConnectionContext $ctx Connection context
      * @param int               $id  Optional connection ID to reconnect
      */
-    public function connect(ConnectionContext $ctx, int $id = -1): void
+    public function connect(int $id = -1): void
     {
-        $this->API->logger->logger("Trying shared connection via {$ctx} ({$id})");
-        $this->datacenter = $ctx->getDc();
-        $media = $ctx->isMedia() || $ctx->isCDN();
+        $this->datacenter = $this->ctx->getDc();
+        $media = $this->ctx->isMedia() || $this->ctx->isCDN();
         if ($media) {
             if (!$this->robinLoop) {
                 $this->robinLoop = new PeriodicLoopInternal(
@@ -458,7 +445,6 @@ final class DataCenterConnection implements JsonSerializable
             }
             $f = new DeferredFuture;
             $this->connectionsPromise = $f->getFuture();
-            $this->ctx = $ctx->getCtx();
             $this->connectMore(1);
             $f->complete();
             if (isset($this->connectionsDeferred)) {
@@ -468,9 +454,8 @@ final class DataCenterConnection implements JsonSerializable
             }
             $this->restoreBackup();
         } else {
-            $this->ctx = $ctx->getCtx();
             $this->availableConnections[$id] = 0;
-            $this->connections[$id]->setExtra($this, $id, $ctx);
+            $this->connections[$id]->setExtra($this, $id, $this->ctx);
         }
     }
     /**
@@ -480,14 +465,12 @@ final class DataCenterConnection implements JsonSerializable
      */
     private function connectMore(int $count): void
     {
-        $ctx = $this->ctx->getCtx();
         $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
             $connection = new Connection();
-            $connection->setExtra($this, $x, $ctx);
+            $connection->setExtra($this, $x, $this->ctx);
             $this->connections[$x] = $connection;
             $this->availableConnections[$x] = 0;
-            $ctx = $this->ctx->getCtx();
         }
     }
     /**
@@ -544,7 +527,7 @@ final class DataCenterConnection implements JsonSerializable
     {
         $this->API->logger->logger("Reconnecting shared DC {$this->datacenter}");
         $this->disconnect();
-        $this->connect($this->ctx);
+        $this->connect();
     }
     /**
      * Restore backed up messages.
@@ -630,7 +613,7 @@ final class DataCenterConnection implements JsonSerializable
                 $count += 50;
             }
         } elseif ($min < 100) {
-            $max = $this->isMedia() || $this->isCDN() ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
+            $max = $this->ctx->isMedia() || $this->ctx->isCDN() ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
             if (\count($this->availableConnections) < $max) {
                 $this->connectMore(2);
             } else {
@@ -671,9 +654,10 @@ final class DataCenterConnection implements JsonSerializable
      *
      * @param MTProto $API Main instance
      */
-    public function setExtra(MTProto $API): void
+    public function setExtra(MTProto $API, ContextIterator $ctx): void
     {
         $this->API = $API;
+        $this->ctx = $ctx;
     }
     /**
      * Get main instance.
@@ -681,34 +665,6 @@ final class DataCenterConnection implements JsonSerializable
     public function getExtra(): MTProto
     {
         return $this->API;
-    }
-    /**
-     * Check if is an HTTP connection.
-     */
-    public function isHttp(): bool
-    {
-        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class], true);
-    }
-    /**
-     * Check if is connected directly by IP address.
-     */
-    public function byIPAddress(): bool
-    {
-        return !$this->ctx->hasStreamName(WssStream::class) && !$this->ctx->hasStreamName(HttpsStream::class);
-    }
-    /**
-     * Check if is a media connection.
-     */
-    public function isMedia(): bool
-    {
-        return $this->ctx->isMedia();
-    }
-    /**
-     * Check if is a CDN connection.
-     */
-    public function isCDN(): bool
-    {
-        return $this->ctx->isCDN();
     }
     /**
      * Get DC-specific settings.

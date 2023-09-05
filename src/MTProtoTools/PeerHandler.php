@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\API;
@@ -72,13 +73,37 @@ trait PeerHandler
         return (-$id) + Magic::ZERO_CHANNEL_ID;
     }
     /**
+     * Get the type of a dialog using just its bot API ID.
+     *
+     * For more detailed types, use getType, instead.
+     *
+     * @param integer $id Bot API ID.
+     */
+    public static function getDialogIdType(int $id): DialogIdType
+    {
+        if ($id < 0) {
+            if (-Magic::MAX_CHAT_ID <= $id) {
+                return DialogIdType::CHAT;
+            }
+            if (Magic::ZERO_CHANNEL_ID - Magic::MAX_CHANNEL_ID <= $id && $id !== Magic::ZERO_CHANNEL_ID) {
+                return DialogIdType::CHANNEL_OR_SUPERGROUP;
+            }
+            if (Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 <= $id && $id !== Magic::ZERO_SECRET_CHAT_ID) {
+                return DialogIdType::SECRET_CHAT;
+            }
+        } elseif (0 < $id && $id <= Magic::MAX_USER_ID) {
+            return DialogIdType::USER;
+        }
+        throw new AssertionError("Invalid ID $id provided!");
+    }
+    /**
      * Check whether provided bot API ID is a channel or supergroup.
      *
      * @param int $id Bot API ID
      */
     public static function isSupergroupOrChannel(int $id): bool
     {
-        return $id < Magic::ZERO_CHANNEL_ID;
+        return self::getDialogIdType($id) === DialogIdType::CHANNEL_OR_SUPERGROUP;
     }
     /**
      * Convert MTProto secret chat ID to bot API secret chat ID.
@@ -109,7 +134,7 @@ trait PeerHandler
      */
     public static function isSecretChat(int $id): bool
     {
-        return $id >= Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 && $id !== Magic::ZERO_SECRET_CHAT_ID;
+        return self::getDialogIdType($id) === DialogIdType::SECRET_CHAT;
     }
     /**
      * Set support info.

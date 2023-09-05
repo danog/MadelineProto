@@ -1,0 +1,19 @@
+bot_thumbnail#0 dc_id:int id:long access_hash:long volume_id:long = File;
+bot_profile_photo#1 dc_id:int id:long access_hash:long volume_id:long = File;
+bot_photo#2 dc_id:int id:long access_hash:long volume_id:long = File;
+
+bot_voice#3 dc_id:int id:long access_hash:long = File;
+bot_video#4 dc_id:int id:long access_hash:long = File;
+bot_document#5 dc_id:int id:long access_hash:long = File;
+bot_encrypted#6 dc_id:int id:long access_hash:long = File;
+bot_temp#7 dc_id:int id:long access_hash:long = File;
+bot_sticker#8 dc_id:int id:long access_hash:long = File;
+bot_audio#9 dc_id:int id:long access_hash:long = File;
+bot_gif#A dc_id:int id:long access_hash:long = File;
+bot_encrypted_thumbnail#B dc_id:int id:long access_hash:long = File;
+bot_wallpaper#C dc_id:int id:long access_hash:long = File;
+bot_video_note#D dc_id:int id:long access_hash:long = File;
+bot_secure_raw#F dc_id:int id:long access_hash:long = File;
+bot_secure#10 dc_id:int id:long access_hash:long = File;
+bot_background#11 dc_id:int id:long access_hash:long = File;
+bot_size#12 dc_id:int id:long access_hash:long = File;

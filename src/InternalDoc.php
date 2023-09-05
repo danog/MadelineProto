@@ -130,21 +130,10 @@ abstract class InternalDoc
         $this->stories->setWrapper($this->wrapper);
     }
     /**
-         * Convert bot API secret chat ID to MTProto secret chat ID.
+         * Convert MTProto parameters to bot API parameters.
          *
-         * @param int $id Bot API secret chat ID
-         *
-         * @return int MTProto secret chat ID
+         * @param array $data Data
          */
-    public static function botAPIToMTProtoSecretChatId(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::botAPIToMTProtoSecretChatId($id);
-    }
-    /**
-     * Convert MTProto parameters to bot API parameters.
-     *
-     * @param array $data Data
-     */
     public function MTProtoToBotAPI(array $data): array
     {
         return $this->wrapper->getAPI()->MTProtoToBotAPI($data);
@@ -229,6 +218,17 @@ abstract class InternalDoc
     public function botAPIToMTProto(array $arguments): array
     {
         return $this->wrapper->getAPI()->botAPIToMTProto($arguments);
+    }
+    /**
+     * Convert bot API secret chat ID to MTProto secret chat ID.
+     *
+     * @param int $id Bot API secret chat ID
+     *
+     * @return int MTProto secret chat ID
+     */
+    public static function botAPIToMTProtoSecretChatId(int $id): int
+    {
+        return \danog\MadelineProto\MTProto::botAPIToMTProtoSecretChatId($id);
     }
     /**
      * Login as bot.
@@ -757,6 +757,17 @@ abstract class InternalDoc
     public function getDhConfig(): array
     {
         return $this->wrapper->getAPI()->getDhConfig();
+    }
+    /**
+     * Get the type of a dialog using just its bot API ID.
+     *
+     * For more detailed types, use getType, instead.
+     *
+     * @param integer $id Bot API ID.
+     */
+    public static function getDialogIdType(int $id): \danog\MadelineProto\MTProtoTools\DialogIdType
+    {
+        return \danog\MadelineProto\MTProto::getDialogIdType($id);
     }
     /**
      * Get dialog IDs.

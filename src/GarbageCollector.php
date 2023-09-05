@@ -157,9 +157,9 @@ final class GarbageCollector
     {
         self::$map ??= new WeakMap;
         $memory = \round(\memory_get_usage()/1024/1024, 1);
-        if (!Magic::$suspendPeriodicLogging) {
+        /*if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
-        }
+        }*/
         /*if (!Magic::$suspendPeriodicLogging) {
             $k = 0;
             foreach (self::$map as $fiber => $_) {

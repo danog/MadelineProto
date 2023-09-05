@@ -38,7 +38,7 @@ final class HttpsStream extends HttpStream implements MTProtoBufferInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        parent::connect($ctx->getCtx()->secure(true), $header);
+        parent::connect($ctx->clone()->secure(true), $header);
     }
     /**
      * {@inheritDoc}

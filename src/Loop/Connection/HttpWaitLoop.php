@@ -38,7 +38,7 @@ final class HttpWaitLoop extends Loop
      */
     protected function loop(): ?float
     {
-        if (!$this->shared->isHttp() || !$this->connection->isHttp()) {
+        if (!$this->connection->isHttp()) {
             return self::STOP;
         }
         if (!$this->shared->hasTempAuthKey()) {
