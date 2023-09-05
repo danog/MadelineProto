@@ -20,7 +20,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Changes the user’s first name, last name and username.
+ * Changes were made to the user’s first name, last name or username.
  */
 final class Username extends Update
 {

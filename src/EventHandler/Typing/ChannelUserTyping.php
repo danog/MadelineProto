@@ -28,13 +28,13 @@ final class ChannelUserTyping extends AbstractTyping
     public readonly int $chatId;
 
     /** @var int [Thread](https://core.telegram.org/api/threads) ID. */
-    public readonly int $threadId;
+    public readonly ?int $threadId;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);
         $this->chatId = $API->toSupergroup($rawTyping['channel_id']);
-        $this->threadId = $rawTyping['top_msg_id'];
+        $this->threadId = $rawTyping['top_msg_id'] ?? null;
     }
 }

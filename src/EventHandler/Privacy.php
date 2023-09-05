@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Privacy\Key;
 use danog\MadelineProto\MTProto;
 
 /**
- * Privacy rules were changed.
+ * Indicates some privacy rules for a user or set of users.
  */
 final class Privacy extends Update
 {

@@ -133,7 +133,7 @@ final class ChannelMessage extends Message
      *
      * @return void
      */
-    public function showHistory(): void
+    public function unhideHistory(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleParticipantsHidden',

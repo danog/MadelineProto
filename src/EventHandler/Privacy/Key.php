@@ -19,7 +19,9 @@ namespace danog\MadelineProto\EventHandler\Privacy;
 use AssertionError;
 use JsonSerializable;
 
-/** @internal */
+/**
+ * 
+ */
 enum Key: string implements JsonSerializable
 {
     /** Whether we can see the last online timestamp of this user */

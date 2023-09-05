@@ -34,6 +34,6 @@ abstract class AbstractStory extends Update
     {
         parent::__construct($API);
         $this->userId = $rawStory['user_id'];
-        $this->id = $rawStory['story']['id'] ?? $rawStory['story_id'];
+        $this->id = $rawStory['story']['id'];
     }
 }

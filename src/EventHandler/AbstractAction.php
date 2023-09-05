@@ -68,12 +68,12 @@ abstract class AbstractAction implements JsonSerializable
             'sendMessageRecordRoundAction' => new RecordRound,
             'sendMessageRecordVideoAction' => new RecordVideo,
             'speakingInGroupCallAction' => new GroupCallSpeaking,
-            'sendMessageUploadVideoAction' => new UploadVideo($rawAction['progress'] ?? null), 
-            'sendMessageUploadRoundAction' => new UploadRound($rawAction['progress'] ?? null),
-            'sendMessageUploadAudioAction' => new UploadAudio($rawAction['progress'] ?? null),
-            'sendMessageUploadPhotoAction' => new UploadPhoto($rawAction['progress'] ?? null),
-            'sendMessageUploadDocumentAction' => new UploadDocument($rawAction['progress'] ?? null),
-            'sendMessageHistoryImportAction' => new HistoryImport($rawAction['progress'] ?? null),
+            'sendMessageUploadVideoAction' => new UploadVideo($rawAction['progress']), 
+            'sendMessageUploadRoundAction' => new UploadRound($rawAction['progress']),
+            'sendMessageUploadAudioAction' => new UploadAudio($rawAction['progress']),
+            'sendMessageUploadPhotoAction' => new UploadPhoto($rawAction['progress']),
+            'sendMessageUploadDocumentAction' => new UploadDocument($rawAction['progress']),
+            'sendMessageHistoryImportAction' => new HistoryImport($rawAction['progress']),
             'sendMessageEmojiInteractionSeen' => new EmojiSeen($rawAction['emoticon']),
         };
     }

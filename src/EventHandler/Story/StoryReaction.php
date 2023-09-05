@@ -16,20 +16,29 @@
 
 namespace danog\MadelineProto\EventHandler\Story;
 
-use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 
 /**
  * Represents a reaction to a story.
  */
-final class StoryReaction extends AbstractStory
+final class StoryReaction extends Update
 {
+    /** @var int ID of the sender of the story */
+    public readonly int $userId;
+
+    /** @var int Story ID */
+    public readonly int $id;
+    
+    /** */
     public readonly int|string|null $reaction;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawStory)
     {
-        parent::__construct($API, $rawStory);
+        parent::__construct($API);
+        $this->userId = $rawStory['user_id'];
+        $this->id = $rawStory['story_id'];
         $this->reaction = $rawStory['reaction']['emoticon'] ?? $rawStory['reaction']['document_id'] ?? null;
     }
 }
