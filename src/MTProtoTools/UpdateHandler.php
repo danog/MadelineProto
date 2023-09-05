@@ -68,7 +68,6 @@ use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
-use danog\MadelineProto\EventHandler\Story\StorySend;
 use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
 use danog\MadelineProto\EventHandler\Typing\UserTyping;
 use danog\MadelineProto\EventHandler\Update;
@@ -871,7 +870,7 @@ trait UpdateHandler
     public function subscribeToUpdates(mixed $channel): bool
     {
         $channelId = $this->getId($channel);
-        if (DialogId::getType($channelId) !== DialogId::CHANNEL_OR_SUPERGROUP) {
+        if (!DialogId::isSupergroupOrChannel($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
         $channelId = DialogId::toSupergroupOrChannel($channelId);

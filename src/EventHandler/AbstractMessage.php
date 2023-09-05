@@ -294,7 +294,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         )['stories'];
         return \array_map(
-            fn (array $arr): AbstractStory => 
+            fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
                     : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
