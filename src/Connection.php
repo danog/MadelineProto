@@ -580,6 +580,7 @@ final class Connection
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
         $this->shared->connect($this->id);
+        $this->connect();
     }
     /**
      * Get name.

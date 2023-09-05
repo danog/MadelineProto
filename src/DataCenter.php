@@ -24,6 +24,8 @@ use Amp\Dns\DnsResolver;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
+use Amp\Socket\InternetAddress;
+use Amp\Socket\InternetAddressVersion;
 use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
@@ -131,10 +133,9 @@ final class DataCenter
      * Generate contexts.
      *
      * @param integer        $dc_number DC ID to generate contexts for
-     * @param ConnectContext $context   Connection context
      * @return non-empty-list<ConnectionContext>
      */
-    private function generateContexts(int $dc_number, ?ConnectContext $context = null): array
+    private function generateContexts(int $dc_number): array
     {
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
@@ -231,7 +232,14 @@ final class DataCenter
         }
         $combos = \array_unique($combos, SORT_REGULAR);
 
-        $context ??= (new ConnectContext())->withConnectTimeout($this->getSettings()->getTimeout())->withBindTo($this->getSettings()->getBindTo());
+        $bind = $this->getSettings()->getBindTo();
+        $onlyIPv6 = null;
+        if ($bind !== null) {
+            $onlyIPv6 = InternetAddress::fromString($bind)->getVersion() === InternetAddressVersion::IPv6
+                ? 'ipv6'
+                : 'ipv4';
+        }
+        $context = (new ConnectContext())->withConnectTimeout($this->getSettings()->getTimeout())->withBindTo($bind);
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [
@@ -239,6 +247,9 @@ final class DataCenter
                     $this->getSettings()->getIpv6() ? 'ipv4' : 'ipv6'
                 ];
                 foreach ($ipv6Combos as $ipv6) {
+                    if ($onlyIPv6 !== null && $onlyIPv6 !== $ipv6) {
+                        continue;
+                    }
                     if (!isset($this->API->dcList[$test][$ipv6][$dc_number]['ip_address'])) {
                         continue;
                     }
