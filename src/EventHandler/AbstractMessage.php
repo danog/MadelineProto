@@ -18,6 +18,8 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
@@ -292,7 +294,10 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         )['stories'];
         return \array_map(
-            $client->wrapUpdate(...),
+            fn (array $arr): AbstractStory => 
+                $arr['_'] === 'storyItemDeleted'
+                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
+                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
             $result
         );
     }

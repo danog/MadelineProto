@@ -407,11 +407,28 @@
       <code>new $class</code>
     </UnsafeInstantiation>
   </file>
+  <file src="src/EventHandler/AbstractAction.php">
+    <UnhandledMatchCondition>
+      <code>$type</code>
+    </UnhandledMatchCondition>
+  </file>
   <file src="src/EventHandler/AbstractMessage.php">
     <InvalidReturnStatement>
       <code><![CDATA[$this->replyCache]]></code>
       <code><![CDATA[$this->replyCache]]></code>
     </InvalidReturnStatement>
+    <LessSpecificReturnStatement>
+      <code><![CDATA[\array_map(
+            fn (array $arr): AbstractStory => 
+                $arr['_'] === 'storyItemDeleted'
+                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
+                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+            $result
+        )]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[list<AbstractStory>]]></code>
+    </MoreSpecificReturnType>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -562,12 +579,18 @@
   </file>
   <file src="src/EventHandler/Message.php">
     <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
+      <code>DialogSetTTL</code>
+      <code>DialogSetTTL</code>
       <code>Message</code>
     </MoreSpecificReturnType>
     <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </NullableReturnStatement>
     <PropertyNotSetInConstructor>
@@ -590,6 +613,24 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message/GroupMessage.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>DialogTopicCreated</code>
+      <code>DialogTopicEdited</code>
+      <code>DialogTopicEdited</code>
+      <code>DialogTopicEdited</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+    </NullableReturnStatement>
     <PropertyNotSetInConstructor>
       <code>GroupMessage</code>
       <code>GroupMessage</code>
@@ -627,6 +668,49 @@
     <PossiblyNullPropertyAssignmentValue>
       <code><![CDATA[$API->getIdInternal($rawCallback['peer'])]]></code>
     </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/Story/Story.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$last->nextSent]]></code>
+    </InaccessibleProperty>
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>StoryReaction</code>
+      <code>StoryReaction</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+    </NullableReturnStatement>
+    <PossiblyUndefinedVariable>
+      <code>$first</code>
+    </PossiblyUndefinedVariable>
+    <PropertyNotSetInConstructor>
+      <code>$html</code>
+      <code>$htmlTelegram</code>
+    </PropertyNotSetInConstructor>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$API->wrapMedia($rawStory['media'], $this->protected)]]></code>
+      <code><![CDATA[\array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/EventHandler/User/Blocked.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawPeerBlocked['peer_id'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/User/Username.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[\array_map(
+            fn (array $username) => new UsernameInfo($username),
+            $rawUserName['usernames']
+        )]]></code>
+    </PropertyTypeCoercion>
   </file>
   <file src="src/Exception.php">
     <MissingParamType>

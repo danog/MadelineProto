@@ -65,6 +65,7 @@ use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
 use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
 use danog\MadelineProto\EventHandler\Story\StorySend;
@@ -384,7 +385,7 @@ trait UpdateHandler
             'updateBroadcastProgress' => $update['progress'],
             'updateStory' => $update['story']['_'] === 'storyItemDeleted'
                 ? new StoryDeleted($this, $update)
-                : new StorySend($this, $update),
+                : new Story($this, $update),
             'updateSentStoryReaction' => new StoryReaction($this, $update),
             'updateUserStatus' => Status::fromRawStatus($this, $update),
             'updatePeerBlocked' => new Blocked($this, $update),

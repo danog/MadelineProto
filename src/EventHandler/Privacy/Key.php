@@ -54,7 +54,7 @@ enum Key: string implements JsonSerializable
                 return $case;
             }
         }
-        throw new AssertionError("Undefined case Privacy::".$key['_']);
+        throw new AssertionError("Undefined case Privacy::".$key);
     }
 
     /** @internal */

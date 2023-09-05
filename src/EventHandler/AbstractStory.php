@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -24,16 +25,16 @@ use danog\MadelineProto\MTProto;
 abstract class AbstractStory extends Update
 {
     /** ID of the sender of the story */
-    public readonly int $userId;
+    public readonly int $senderId;
 
     /** Story ID */
     public readonly int $id;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawStory)
+    public function __construct(MTProto|Client $API, array $rawStory)
     {
         parent::__construct($API);
-        $this->userId = $rawStory['user_id'];
+        $this->senderId = $rawStory['user_id'];
         $this->id = $rawStory['story']['id'];
     }
 }

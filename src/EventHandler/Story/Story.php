@@ -24,6 +24,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
@@ -31,13 +32,10 @@ use danog\MadelineProto\StrTools;
 /**
  * Represents a Telegram story.
  */
-final class StorySend extends AbstractStory
+final class Story extends AbstractStory
 {
     /** Whether this story is pinned */
     public readonly bool $pinned;
-
-    /** ID of the user that posted the story */
-    public readonly int $senderId;
 
     /** Whether this story is visible to everyone */
     public readonly bool $public;
@@ -64,7 +62,7 @@ final class StorySend extends AbstractStory
     public readonly int $expireDate;
 
     /** Story caption */
-    public readonly ?string $caption;
+    public readonly string $caption;
 
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for story caption */
     public readonly array $entities;
@@ -91,7 +89,7 @@ final class StorySend extends AbstractStory
     public readonly array $recentViewers;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawStory)
+    public function __construct(MTProto|Client $API, array $rawStory)
     {
         parent::__construct($API, $rawStory);
         if ($rawStory['story']['min']) {
@@ -120,7 +118,7 @@ final class StorySend extends AbstractStory
         $this->reactionCount = $rawStory['views']['views_count'] ?? null;
         $this->viewsCount = $rawStory['views']['reactions_count'] ?? null;
 
-        $this->caption = $rawStory['caption'] ?? null;
+        $this->caption = $rawStory['caption'] ?? '';
         //$this->mediaAreas = $rawStory['mediaAreas'] ?? null; //!
         $this->sentReaction = $rawStory['sent_reaction']['emoticon'] ?? $rawStory['sent_reaction']['document_id'] ?? null;
     }
@@ -154,10 +152,10 @@ final class StorySend extends AbstractStory
         $result = $client->methodCallAsyncRead(
             'messages.sendMessage',
             [
-                'peer' => $this->userId,
+                'peer' => $this->senderId,
                 'message' => $message,
                 'parse_mode' => $parseMode,
-                'reply_to' => ['_' => 'inputReplyToStory', 'user_id' => $this->userId, 'story_id' => $this->id],
+                'reply_to' => ['_' => 'inputReplyToStory', 'user_id' => $this->senderId, 'story_id' => $this->id],
                 'reply_markup' => $replyMarkup,
                 'schedule_date' => $scheduleDate,
                 'silent' => $silent,
@@ -208,7 +206,7 @@ final class StorySend extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.exportStoryLink',
             [
-                'user_id' => $this->userId,
+                'user_id' => $this->senderId,
                 'id' => $this->id,
             ]
         )['link'];
@@ -226,7 +224,7 @@ final class StorySend extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.report',
             [
-                'user_id' => $this->userId,
+                'user_id' => $this->senderId,
                 'id' => $this->id,
                 'reason' => ['_' => $reason->value],
                 'message' => $message,
@@ -274,7 +272,7 @@ final class StorySend extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.incrementStoryViews',
             [
-                'user_id' => $this->userId,
+                'user_id' => $this->senderId,
                 'id' => $this->id,
             ]
         );
@@ -293,7 +291,7 @@ final class StorySend extends AbstractStory
             'stories.sendReaction',
             [
                 'add_to_recent' => $recent,
-                'user_id' => $this->userId,
+                'user_id' => $this->senderId,
                 'id' => $this->id,
                 'reaction' => \is_int($reaction)
                 ? [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]]
@@ -315,7 +313,7 @@ final class StorySend extends AbstractStory
             'stories.sendReaction',
             [
                 'add_to_recent' => $recent,
-                'user_id' => $this->userId,
+                'user_id' => $this->senderId,
                 'id' => $this->id,
             ]
         )['updates'][0];
