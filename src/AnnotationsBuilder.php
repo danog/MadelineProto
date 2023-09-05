@@ -539,7 +539,7 @@ final class Blacklist {
                 $had = [];
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler::class, ClassFinder::RECURSIVE_MODE) as $class) {
                     $name = \basename(\str_replace('\\', '//', $class));
-                    if (isset($had[$name])) {
+                    if (isset($had[$name]) || $name === 'Status') {
                         continue;
                     }
                     $had[$name] = true;

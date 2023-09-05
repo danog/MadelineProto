@@ -69,11 +69,12 @@ use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
 use danog\MadelineProto\EventHandler\Story\StorySend;
 use danog\MadelineProto\EventHandler\Typing\ChannelUserTyping;
+use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
 use danog\MadelineProto\EventHandler\Typing\UserTyping;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Blocked;
 use danog\MadelineProto\EventHandler\User\BotStopped;
-use danog\MadelineProto\EventHandler\User\Emoji;
+use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Phone;
 use danog\MadelineProto\EventHandler\User\Status;
 use danog\MadelineProto\EventHandler\User\Username;
@@ -394,7 +395,7 @@ trait UpdateHandler
             'updateUserPhone' => new Phone($this, $update),
             'updatePrivacy' => new Privacy($this, $update),
             'updateUserTyping' => new UserTyping($this, $update),
-            'updateChannelUserTyping' => new ChannelUserTyping($this, $update),
+            'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
             default => null
         };
     }

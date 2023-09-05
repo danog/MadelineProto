@@ -39,7 +39,6 @@ use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Privacy\Key;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\User\Status;
 use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\Ipc\Client;

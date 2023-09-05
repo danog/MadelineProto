@@ -26,7 +26,7 @@ use danog\MadelineProto\EventHandler\User\Status\Recently;
 use danog\MadelineProto\MTProto;
 
 /**
- * Contact status update.
+ * Contains a status update.
  */
 abstract class Status extends Update
 {

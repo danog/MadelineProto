@@ -17,16 +17,14 @@
 namespace danog\MadelineProto\EventHandler\User\Status;
 
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\User\Status;
 use danog\MadelineProto\MTProto;
 
 /**
  * The [emoji status](https://core.telegram.org/api/emoji-status) of a certain user has changed or removed.
  */
-final class Emoji extends Update
+final class Emoji extends Status
 {
-    /** @var int User identifier */
-    public readonly int $userId;
-
     /** @var ?int [Custom emoji document ID](https://core.telegram.org/api/custom-emoji) */
     public readonly ?int $emojiId;
 
@@ -35,8 +33,7 @@ final class Emoji extends Update
 
     public function __construct(MTProto $API, array $rawEmojiStatus)
     {
-        parent::__construct($API);
-        $this->userId = $rawEmojiStatus['user_id'];
+        parent::__construct($API, $rawEmojiStatus);
         $this->emojiId = $rawEmojiStatus['emoji_status']['document_id'] ?? null;
         $this->until = $rawEmojiStatus['emoji_status']['until'] ?? null;
     }

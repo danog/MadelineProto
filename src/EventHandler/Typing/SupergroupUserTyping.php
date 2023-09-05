@@ -28,14 +28,14 @@ final class SupergroupUserTyping extends AbstractTyping
     /** @var int Channel ID. */
     public readonly int $chatId;
 
-    /** @var int [Thread](https://core.telegram.org/api/threads) ID. */
-    public readonly ?int $threadId;
+    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
+    public readonly ?int $topicId;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);
         $this->chatId = DialogId::fromSupergroupOrChannel($rawTyping['channel_id']);
-        $this->threadId = $rawTyping['top_msg_id'] ?? null;
+        $this->topicId = $rawTyping['top_msg_id'] ?? null;
     }
 }
