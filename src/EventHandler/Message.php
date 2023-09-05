@@ -394,7 +394,7 @@ abstract class Message extends AbstractMessage
     public function read(?int $maxId = null): bool
     {
         return $this->getClient()->methodCallAsyncRead(
-            DialogId::getType($this->chatId) === DialogId::CHANNEL_OR_SUPERGROUP ? 'channels.readHistory':'messages.readHistory',
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,

@@ -460,7 +460,7 @@ final class PeerDatabase implements TLCallback
         } else {
             $this->pendingDb[$chat] = [
                 '_' => 'channel',
-                'id' => DialogId::fromSupergroupOrChannel($chat),
+                'id' => DialogId::toSupergroupOrChannel($chat),
             ];
             $this->processChat($chat);
         }
@@ -528,7 +528,7 @@ final class PeerDatabase implements TLCallback
             if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
                 throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
             }
-            $bot_api_id = DialogId::toSupergroupOrChannel($chat['id']);
+            $bot_api_id = DialogId::fromSupergroupOrChannel($chat['id']);
             $existingChat = $this->db[$bot_api_id];
             if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {

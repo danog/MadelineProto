@@ -208,7 +208,7 @@ trait BotAPI
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
-                        $newd['forward_from_chat'] = $this->getPwrChat(DialogId::toSupergroupOrChannel($data['fwd_from']['channel_id']), false);
+                        $newd['forward_from_chat'] = $this->getPwrChat(DialogId::fromSupergroupOrChannel($data['fwd_from']['channel_id']), false);
                     } catch (Throwable $e) {
                     }
                 }

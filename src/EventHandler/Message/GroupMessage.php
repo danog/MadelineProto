@@ -277,7 +277,7 @@ final class GroupMessage extends Message
                 'chat_id' => $this->chatId,
             ]
         );
-        return DialogId::toSupergroupOrChannel($result['updates'][0]['channel_id']);
+        return DialogId::fromSupergroupOrChannel($result['updates'][0]['channel_id']);
     }
 
     /**

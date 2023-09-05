@@ -137,7 +137,7 @@ trait PeerHandler
             if (isset($fwd['user_id']) && !($this->peerIsset($fwd['user_id']))) {
                 return false;
             }
-            if (isset($fwd['channel_id']) && !($this->peerIsset(DialogId::toSupergroupOrChannel($fwd['channel_id'])))) {
+            if (isset($fwd['channel_id']) && !($this->peerIsset(DialogId::fromSupergroupOrChannel($fwd['channel_id'])))) {
                 return false;
             }
         } catch (Exception $e) {
@@ -204,7 +204,7 @@ trait PeerHandler
                 case 'inputChannelFromMessage':
                 case 'inputPeerChannelFromMessage':
                 case 'updateChannelParticipant':
-                    return DialogId::toSupergroupOrChannel($id['channel_id']);
+                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
                     return $this->authorization['user']['id'];
@@ -230,11 +230,11 @@ trait PeerHandler
                 case 'channelForbidden':
                 case 'channel':
                 case 'channelFull':
-                    return DialogId::toSupergroupOrChannel($id['id']);
+                    return DialogId::fromSupergroupOrChannel($id['id']);
                 case 'inputPeerChannel':
                 case 'inputChannel':
                 case 'peerChannel':
-                    return DialogId::toSupergroupOrChannel($id['channel_id']);
+                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
                 case 'message':
                 case 'messageService':
                     if (!isset($id['from_id']) // No other option
@@ -256,7 +256,7 @@ trait PeerHandler
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
                 case 'updateChannelTooLong':
-                    return DialogId::toSupergroupOrChannel($id['channel_id']);
+                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
                     // no break
@@ -302,7 +302,7 @@ trait PeerHandler
         if (\is_string($id)) {
             if (\strpos($id, '#') !== false) {
                 if (\preg_match('/^channel#(\\d*)/', $id, $matches)) {
-                    return DialogId::toSupergroupOrChannel((int) $matches[1]);
+                    return DialogId::fromSupergroupOrChannel((int) $matches[1]);
                 }
                 if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
                     $id = '-'.$matches[1];
@@ -538,7 +538,7 @@ trait PeerHandler
                 return $constructor['id'];
             }
             if ($constructor['_'] === 'channel') {
-                return DialogId::toSupergroupOrChannel($constructor['id']);
+                return DialogId::fromSupergroupOrChannel($constructor['id']);
             }
             if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
                 return -$constructor['id'];
@@ -605,7 +605,7 @@ trait PeerHandler
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                 $res['channel_id'] = $constructor['id'];
-                $res['bot_api_id'] = DialogId::toSupergroupOrChannel($constructor['id']);
+                $res['bot_api_id'] = DialogId::fromSupergroupOrChannel($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ?? false ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':

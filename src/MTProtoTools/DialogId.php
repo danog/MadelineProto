@@ -72,6 +72,7 @@ enum DialogId
      */
     public static function fromSupergroupOrChannel(int $id): int
     {
+        Assert::true($id > 0);
         return Magic::ZERO_CHANNEL_ID - $id;
     }
     /**

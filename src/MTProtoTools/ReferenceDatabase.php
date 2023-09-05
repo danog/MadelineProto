@@ -308,7 +308,7 @@ final class ReferenceDatabase implements TLCallback
                 break;
             case 'channelFull':
             case 'channel':
-                $origin['peer'] = DialogId::toSupergroupOrChannel($data['id']);
+                $origin['peer'] = DialogId::fromSupergroupOrChannel($data['id']);
                 break;
             case 'document':
                 foreach ($data['attributes'] as $attribute) {

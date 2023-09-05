@@ -233,7 +233,7 @@ final class FeedLoop extends Loop
                 }
                 break;
             default:
-                if ($channelId && !($this->API->peerIsset(DialogId::toSupergroupOrChannel($channelId)))) {
+                if ($channelId && !($this->API->peerIsset(DialogId::fromSupergroupOrChannel($channelId)))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
                     return false;
                 }

@@ -870,11 +870,11 @@ trait UpdateHandler
      */
     public function subscribeToUpdates(mixed $channel): bool
     {
-        $channelId = $this->getInfo($channel, API::INFO_TYPE_ID);
+        $channelId = $this->getId($channel);
         if (DialogId::getType($channelId) !== DialogId::CHANNEL_OR_SUPERGROUP) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
-        $channelId = DialogId::fromSupergroupOrChannel($channelId);
+        $channelId = DialogId::toSupergroupOrChannel($channelId);
         if (!$this->getChannelStates()->has($channelId)) {
             $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
             $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
