@@ -41,7 +41,7 @@ abstract class Status extends Update
 
     public static function fromRawStatus(MTProto $API, array $rowUserStatus): ?Status
     {
-        return match ($rowUserStatus['_']) {
+        return match ($rowUserStatus['status']['_']) {
             'userStatusEmpty' => new EmptyStatus($API, $rowUserStatus),
             'userStatusOnline' => new Online($API, $rowUserStatus),
             'userStatusOffline' => new Offline($API, $rowUserStatus),
