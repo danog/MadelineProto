@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
 
 /**
@@ -145,7 +146,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             return $this->replyCache;
         }
         $messages = $this->getClient()->methodCallAsyncRead(
-            MTProto::isSupergroupOrChannel($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
+            DialogId::getType($this->chatId) === DialogId::CHANNEL_OR_SUPERGROUP ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
@@ -168,7 +169,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public function delete(bool $revoke = true): void
     {
         $this->getClient()->methodCallAsyncRead(
-            MTProto::isSupergroupOrChannel($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            DialogId::getType($this->chatId) === DialogId::CHANNEL_OR_SUPERGROUP ? 'channels.deleteMessages' : 'messages.deleteMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [$this->id],

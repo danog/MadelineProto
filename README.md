@@ -604,6 +604,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipants.html" name="channels.getParticipants">Get the participants of a supergroup/channel: channels.getParticipants</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcallbypeer" name="getCallByPeer">Get the phone call with the specified user ID: getCallByPeer</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getbroadcastprogress" name="getBroadcastProgress">Get the progress of a currently running broadcast: getBroadcastProgress</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getdialogidtype" name="getDialogIdType">Get the type of a dialog using just its bot API ID: getDialogIdType</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getTheme.html" name="account.getTheme">Get theme information: account.getTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopics.html" name="channels.getForumTopics">Get topics of a forum: channels.getForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#gettype" name="getType">Get type of peer: getType</a>

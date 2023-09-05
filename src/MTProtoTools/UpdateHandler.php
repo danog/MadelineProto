@@ -70,7 +70,6 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\ResponseException;
@@ -846,10 +845,10 @@ trait UpdateHandler
     public function subscribeToUpdates(mixed $channel): bool
     {
         $channelId = $this->getInfo($channel, API::INFO_TYPE_ID);
-        if (!MTProto::isSupergroupOrChannel($channelId)) {
+        if (DialogId::getType($channelId) !== DialogId::CHANNEL_OR_SUPERGROUP) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
-        $channelId = MTProto::fromSupergroup($channelId);
+        $channelId = DialogId::fromSupergroupOrChannel($channelId);
         if (!$this->getChannelStates()->has($channelId)) {
             $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
             $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);

@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
 
@@ -392,7 +393,7 @@ abstract class Message extends AbstractMessage
     public function read(?int $maxId = null): bool
     {
         return $this->getClient()->methodCallAsyncRead(
-            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+            DialogId::getType($this->chatId) === DialogId::CHANNEL_OR_SUPERGROUP ? 'channels.readHistory':'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,

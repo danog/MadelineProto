@@ -139,17 +139,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->MTProtoToBotAPI($data);
     }
     /**
-     * Convert MTProto secret chat ID to bot API secret chat ID.
-     *
-     * @param int $id MTProto secret chat ID
-     *
-     * @return int Bot API secret chat ID
-     */
-    public static function MTProtoToBotAPISecretChatId(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::MTProtoToBotAPISecretChatId($id);
-    }
-    /**
      * MTProto to TD params.
      *
      * @param mixed $params Params
@@ -218,17 +207,6 @@ abstract class InternalDoc
     public function botAPIToMTProto(array $arguments): array
     {
         return $this->wrapper->getAPI()->botAPIToMTProto($arguments);
-    }
-    /**
-     * Convert bot API secret chat ID to MTProto secret chat ID.
-     *
-     * @param int $id Bot API secret chat ID
-     *
-     * @return int MTProto secret chat ID
-     */
-    public static function botAPIToMTProtoSecretChatId(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::botAPIToMTProtoSecretChatId($id);
     }
     /**
      * Login as bot.
@@ -619,15 +597,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
-     * Convert bot API channel ID to MTProto channel ID.
-     *
-     * @param int $id Bot API channel ID
-     */
-    public static function fromSupergroup(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::fromSupergroup($id);
-    }
-    /**
      * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID
@@ -757,17 +726,6 @@ abstract class InternalDoc
     public function getDhConfig(): array
     {
         return $this->wrapper->getAPI()->getDhConfig();
-    }
-    /**
-     * Get the type of a dialog using just its bot API ID.
-     *
-     * For more detailed types, use getType, instead.
-     *
-     * @param integer $id Bot API ID.
-     */
-    public static function getDialogIdType(int $id): \danog\MadelineProto\MTProtoTools\DialogIdType
-    {
-        return \danog\MadelineProto\MTProto::getDialogIdType($id);
     }
     /**
      * Get dialog IDs.
@@ -1288,15 +1246,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isPremium();
     }
     /**
-     * Check whether provided bot API ID is a secret chat.
-     *
-     * @param int $id Bot API ID
-     */
-    public static function isSecretChat(int $id): bool
-    {
-        return \danog\MadelineProto\MTProto::isSecretChat($id);
-    }
-    /**
      * Returns whether the current user is a bot.
      */
     public function isSelfBot(): bool
@@ -1309,15 +1258,6 @@ abstract class InternalDoc
     public function isSelfUser(): bool
     {
         return $this->wrapper->getAPI()->isSelfUser();
-    }
-    /**
-     * Check whether provided bot API ID is a channel or supergroup.
-     *
-     * @param int $id Bot API ID
-     */
-    public static function isSupergroupOrChannel(int $id): bool
-    {
-        return \danog\MadelineProto\MTProto::isSupergroupOrChannel($id);
     }
     /**
      * Whether we're currently connected to the test DCs.
@@ -1905,15 +1845,6 @@ abstract class InternalDoc
     public static function toSnakeCase(string $input): string
     {
         return \danog\MadelineProto\StrTools::toSnakeCase($input);
-    }
-    /**
-     * Convert MTProto channel ID to bot API channel ID.
-     *
-     * @param int $id MTProto channel ID
-     */
-    public static function toSupergroup(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::toSupergroup($id);
     }
     /**
      * Unpack binary double.

@@ -26,8 +26,6 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Magic;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
@@ -54,88 +52,6 @@ use function Amp\Future\await;
  */
 trait PeerHandler
 {
-    /**
-     * Convert MTProto channel ID to bot API channel ID.
-     *
-     * @param int $id MTProto channel ID
-     */
-    public static function toSupergroup(int $id): int
-    {
-        return Magic::ZERO_CHANNEL_ID - $id;
-    }
-    /**
-     * Convert bot API channel ID to MTProto channel ID.
-     *
-     * @param int $id Bot API channel ID
-     */
-    public static function fromSupergroup(int $id): int
-    {
-        return (-$id) + Magic::ZERO_CHANNEL_ID;
-    }
-    /**
-     * Get the type of a dialog using just its bot API ID.
-     *
-     * For more detailed types, use getType, instead.
-     *
-     * @param integer $id Bot API ID.
-     */
-    public static function getDialogIdType(int $id): DialogIdType
-    {
-        if ($id < 0) {
-            if (-Magic::MAX_CHAT_ID <= $id) {
-                return DialogIdType::CHAT;
-            }
-            if (Magic::ZERO_CHANNEL_ID - Magic::MAX_CHANNEL_ID <= $id && $id !== Magic::ZERO_CHANNEL_ID) {
-                return DialogIdType::CHANNEL_OR_SUPERGROUP;
-            }
-            if (Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 <= $id && $id !== Magic::ZERO_SECRET_CHAT_ID) {
-                return DialogIdType::SECRET_CHAT;
-            }
-        } elseif (0 < $id && $id <= Magic::MAX_USER_ID) {
-            return DialogIdType::USER;
-        }
-        throw new AssertionError("Invalid ID $id provided!");
-    }
-    /**
-     * Check whether provided bot API ID is a channel or supergroup.
-     *
-     * @param int $id Bot API ID
-     */
-    public static function isSupergroupOrChannel(int $id): bool
-    {
-        return self::getDialogIdType($id) === DialogIdType::CHANNEL_OR_SUPERGROUP;
-    }
-    /**
-     * Convert MTProto secret chat ID to bot API secret chat ID.
-     *
-     * @param int $id MTProto secret chat ID
-     *
-     * @return int Bot API secret chat ID
-     */
-    public static function MTProtoToBotApiSecretChatId(int $id): int
-    {
-        return Magic::ZERO_SECRET_CHAT_ID + $id;
-    }
-    /**
-     * Convert bot API secret chat ID to MTProto secret chat ID.
-     *
-     * @param int $id Bot API secret chat ID
-     *
-     * @return int MTProto secret chat ID
-     */
-    public static function botApiToMTProtoSecretChatId(int $id): int
-    {
-        return $id - Magic::ZERO_SECRET_CHAT_ID;
-    }
-    /**
-     * Check whether provided bot API ID is a secret chat.
-     *
-     * @param int $id Bot API ID
-     */
-    public static function isSecretChat(int $id): bool
-    {
-        return self::getDialogIdType($id) === DialogIdType::SECRET_CHAT;
-    }
     /**
      * Set support info.
      *
@@ -221,7 +137,7 @@ trait PeerHandler
             if (isset($fwd['user_id']) && !($this->peerIsset($fwd['user_id']))) {
                 return false;
             }
-            if (isset($fwd['channel_id']) && !($this->peerIsset($this->toSupergroup($fwd['channel_id'])))) {
+            if (isset($fwd['channel_id']) && !($this->peerIsset(DialogId::toSupergroupOrChannel($fwd['channel_id'])))) {
                 return false;
             }
         } catch (Exception $e) {
@@ -288,7 +204,7 @@ trait PeerHandler
                 case 'inputChannelFromMessage':
                 case 'inputPeerChannelFromMessage':
                 case 'updateChannelParticipant':
-                    return $this->toSupergroup($id['channel_id']);
+                    return DialogId::toSupergroupOrChannel($id['channel_id']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
                     return $this->authorization['user']['id'];
@@ -314,11 +230,11 @@ trait PeerHandler
                 case 'channelForbidden':
                 case 'channel':
                 case 'channelFull':
-                    return $this->toSupergroup($id['id']);
+                    return DialogId::toSupergroupOrChannel($id['id']);
                 case 'inputPeerChannel':
                 case 'inputChannel':
                 case 'peerChannel':
-                    return $this->toSupergroup($id['channel_id']);
+                    return DialogId::toSupergroupOrChannel($id['channel_id']);
                 case 'message':
                 case 'messageService':
                     if (!isset($id['from_id']) // No other option
@@ -340,7 +256,7 @@ trait PeerHandler
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
                 case 'updateChannelTooLong':
-                    return $this->toSupergroup($id['channel_id']);
+                    return DialogId::toSupergroupOrChannel($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
                     // no break
@@ -386,7 +302,7 @@ trait PeerHandler
         if (\is_string($id)) {
             if (\strpos($id, '#') !== false) {
                 if (\preg_match('/^channel#(\\d*)/', $id, $matches)) {
-                    return $this->toSupergroup((int) $matches[1]);
+                    return DialogId::toSupergroupOrChannel((int) $matches[1]);
                 }
                 if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
                     $id = '-'.$matches[1];
@@ -491,13 +407,13 @@ trait PeerHandler
         if (\is_numeric($id)) {
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
-            if (self::isSecretChat($id)) {
-                return $this->getSecretChat(self::botApiToMTProtoSecretChatId($id));
+            if (DialogId::getType($id) === DialogId::SECRET_CHAT) {
+                return $this->getSecretChat(DialogId::toSecretChatId($id));
             }
             if (!$this->peerDatabase->isset($id)) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
-                    if (self::isSupergroupOrChannel($id)) {
+                    if (DialogId::getType($id) === DialogId::CHANNEL_OR_SUPERGROUP) {
                         $this->peerDatabase->addChatBlocking($id);
                     } elseif ($id < 0) {
                         $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id]]);
@@ -622,7 +538,7 @@ trait PeerHandler
                 return $constructor['id'];
             }
             if ($constructor['_'] === 'channel') {
-                return $this->toSupergroup($constructor['id']);
+                return DialogId::toSupergroupOrChannel($constructor['id']);
             }
             if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
                 return -$constructor['id'];
@@ -689,7 +605,7 @@ trait PeerHandler
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
                 $res['channel_id'] = $constructor['id'];
-                $res['bot_api_id'] = $this->toSupergroup($constructor['id']);
+                $res['bot_api_id'] = DialogId::toSupergroupOrChannel($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ?? false ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':
@@ -747,12 +663,18 @@ trait PeerHandler
             }
             $id = $this->getIdInternal($id);
             Assert::notNull($id);
-            if (self::isSupergroupOrChannel($id)) {
-                $supergroups []= $id;
-            } elseif ($id < 0) {
-                $chats []= $id;
-            } else {
-                $users []= $id;
+            switch (DialogId::getType($id)) {
+                case DialogId::CHANNEL_OR_SUPERGROUP:
+                    $supergroups []= $id;
+                    break;
+                case DialogId::CHAT:
+                    $chats []= $id;
+                    break;
+                case DialogId::USER:
+                    $users []= $id;
+                    break;
+                default:
+                    throw new AssertionError("Invalid ID $id!");
             }
         }
         if ($supergroups) {
@@ -783,7 +705,7 @@ trait PeerHandler
     public function getFullInfo(mixed $id): array
     {
         $partial = $this->getInfo($id);
-        if (self::isSecretChat($partial['bot_api_id'])) {
+        if (DialogId::getType($partial['bot_api_id']) === DialogId::SECRET_CHAT) {
             return $partial;
         }
         $full = $this->peerDatabase->getFull($partial['bot_api_id']);

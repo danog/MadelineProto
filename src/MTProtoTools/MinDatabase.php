@@ -150,7 +150,7 @@ final class MinDatabase implements TLCallback
                     $peers[$this->API->getIdInternal($location['from_id'])] = true;
                 }
                 if (isset($location['channel_id'])) {
-                    $peers[$this->API->toSupergroup($location['channel_id'])] = true;
+                    $peers[DialogId::toSupergroupOrChannel($location['channel_id'])] = true;
                 }
                 break;
             case 'messageActionChatCreate':
