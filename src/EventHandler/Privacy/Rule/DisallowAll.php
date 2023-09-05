@@ -14,21 +14,13 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Privacy;
+namespace danog\MadelineProto\EventHandler\Privacy\Rule;
 
-use danog\MadelineProto\EventHandler\AbstractPrivacy;
+use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
 
 /**
- * Allow all participants of certain chats.
+ * Disallow all users.
  */
-final class AllowChatParticipants extends AbstractPrivacy
+final class DisallowAll extends AbstractRule
 {
-    /** Allowed chats */
-    public readonly array $chats;
-
-    /** @internal */
-    public function __construct(array $rawUsers)
-    {
-        $this->chats = $rawUsers['chats'];
-    }
 }

@@ -14,22 +14,13 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Privacy\Rule;
 
-use JsonSerializable;
-use ReflectionClass;
-use ReflectionProperty;
+use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
 
-abstract class AbstractPrivacy implements JsonSerializable
+/**
+ * Allow all users.
+ */
+final class AllowAll extends AbstractRule
 {
-    /** @internal */
-    public function jsonSerialize(): mixed
-    {
-        $res = ['_' => static::class];
-        $refl = new ReflectionClass($this);
-        foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
-            $res[$prop->getName()] = $prop->getValue($this);
-        }
-        return $res;
-    }
 }

@@ -14,28 +14,21 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Privacy\Rule;
 
 use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
-use danog\MadelineProto\EventHandler\Privacy\Key;
-use danog\MadelineProto\MTProto;
 
 /**
- * Privacy rules were changed.
+ * Disallow only participants of certain chats.
  */
-final class Privacy extends Update
+final class DisallowChatParticipants extends AbstractRule
 {
-    /** @var Key Peers to which the privacy rules apply */
-    public readonly Key $key;
-
-    /** @var list<AbstractRule> New privacy rules. */
-    public readonly array $rules;
+    /** Allowed chats */
+    public readonly array $chats;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawPrivacy)
+    public function __construct(array $rawUsers)
     {
-        parent::__construct($API);
-        $this->key = Key::fromRawKey($rawPrivacy['key']['_']);
-        $this->rules = array_map(AbstractRule::fromRawRule(...), $rawPrivacy['rules']);
+        $this->chats = $rawUsers['chats'];
     }
 }
