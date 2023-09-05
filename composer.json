@@ -54,6 +54,7 @@
         "phpseclib/phpseclib": "^3",
         "amphp/redis": "^2",
         "amphp/websocket-client": "^2",
+        "amphp/websocket": "2.0.0-beta.4",
         "psr/http-factory": "^1.0",
         "psr/log": "^3",
         "webmozart/assert": "^1.11",
