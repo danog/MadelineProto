@@ -42,7 +42,6 @@ use ReflectionProperty;
  */
 abstract class AbstractAction implements JsonSerializable
 {
-
     public static function fromRawAction(array $rawAction): AbstractAction
     {
         $type = $rawAction['_'];

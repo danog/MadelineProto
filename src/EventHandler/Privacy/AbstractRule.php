@@ -31,7 +31,6 @@ use ReflectionProperty;
 
 abstract class AbstractRule implements JsonSerializable
 {
-
     public static function fromRawRule(array $rawRule): AbstractRule
     {
         return match ($rawRule['_']) {
