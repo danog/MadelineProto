@@ -25,10 +25,10 @@ use danog\MadelineProto\MTProto;
  */
 final class Privacy extends Update
 {
-    /** @var Key Peers to which the privacy rules apply */
+    /** New privacy rule. */
     public readonly Key $key;
 
-    /** @var list<AbstractRule> New privacy rules. */
+    /** Peers to which the privacy rules apply  */
     public readonly array $rules;
 
     /** @internal */
@@ -36,6 +36,6 @@ final class Privacy extends Update
     {
         parent::__construct($API);
         $this->key = Key::fromRawKey($rawPrivacy['key']['_']);
-        $this->rules = array_map(AbstractRule::fromRawRule(...), $rawPrivacy['rules']);
+        $this->rules = \array_map(AbstractRule::fromRawRule(...), $rawPrivacy['rules']);
     }
 }

@@ -38,26 +38,22 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * Typing events
+ * Typing events.
  */
-abstract class AbstractAction implements JsonSerializable 
+abstract class AbstractAction implements JsonSerializable
 {
-    /**
-     * 
-     *
-     * @param array $rawAction
-     * @return AbstractAction
-     */
+
     public static function fromRawAction(array $rawAction): AbstractAction
     {
         $type = $rawAction['_'];
-        if ($type === 'sendMessageEmojiInteraction') 
+        if ($type === 'sendMessageEmojiInteraction') {
             return new EmojiTap(
                 $rawAction['emoticon'],
                 $rawAction['interaction']['a']['t'],
                 $rawAction['interaction']['a']['i'],
                 $rawAction['msg_id'],
             );
+        }
         return match ($type) {
             'sendMessageTypingAction' => new Typing,
             'sendMessageCancelAction' => new GamePlay,
@@ -68,7 +64,7 @@ abstract class AbstractAction implements JsonSerializable
             'sendMessageRecordRoundAction' => new RecordRound,
             'sendMessageRecordVideoAction' => new RecordVideo,
             'speakingInGroupCallAction' => new GroupCallSpeaking,
-            'sendMessageUploadVideoAction' => new UploadVideo($rawAction['progress']), 
+            'sendMessageUploadVideoAction' => new UploadVideo($rawAction['progress']),
             'sendMessageUploadRoundAction' => new UploadRound($rawAction['progress']),
             'sendMessageUploadAudioAction' => new UploadAudio($rawAction['progress']),
             'sendMessageUploadPhotoAction' => new UploadPhoto($rawAction['progress']),
@@ -89,7 +85,7 @@ abstract class AbstractAction implements JsonSerializable
             $this instanceof RecordAudio => [ '_' => 'sendMessageRecordAudioAction' ],
             $this instanceof RecordRound => [ '_' => 'sendMessageRecordRoundAction' ],
             $this instanceof RecordVideo => [ '_' => 'sendMessageRecordVideoAction' ],
-            $this instanceof UploadVideo => [ '_' => 'sendMessageUploadVideoAction'], 
+            $this instanceof UploadVideo => [ '_' => 'sendMessageUploadVideoAction'],
             $this instanceof UploadRound => [ '_' => 'sendMessageUploadRoundAction'],
             $this instanceof UploadAudio => [ '_' => 'sendMessageUploadAudioAction'],
             $this instanceof UploadPhoto => [ '_' => 'sendMessageUploadPhotoAction'],

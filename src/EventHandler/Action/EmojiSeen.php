@@ -26,15 +26,9 @@ final class EmojiSeen extends AbstractAction
     public function __construct(
         /** @var string Emoji */
         public readonly string $emoticon
-    )
-    {
+    ) {
     }
 
-    /**
-     *
-     *
-     * @return array
-     */
     public function toRawAction(): array
     {
         return parent::toRawAction() + [ 'emoticon' => $this->emoticon ];

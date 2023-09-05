@@ -18,9 +18,6 @@ namespace danog\MadelineProto\EventHandler\Privacy\Rule;
 
 use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
 
-/**
- *
- */
 final class AllowCloseFriends extends AbstractRule
 {
 }

@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is recording a voice message.
  */
-final class RecordAudio extends AbstractAction 
+final class RecordAudio extends AbstractAction
 {
 }

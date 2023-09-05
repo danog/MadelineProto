@@ -19,9 +19,6 @@ namespace danog\MadelineProto\EventHandler\Privacy;
 use AssertionError;
 use JsonSerializable;
 
-/**
- * 
- */
 enum Key: string implements JsonSerializable
 {
     /** Whether we can see the last online timestamp of this user */
@@ -42,14 +39,12 @@ enum Key: string implements JsonSerializable
     case ADDED_BY_PHONE = 'privacyKeyAddedByPhone';
     /** Whether the user accepts voice messages */
     case VOICE_MESSAGES = 'privacyKeyVoiceMessages';
-    /** */
+
     case ABOUT = 'privacyKeyAbout';
 
     /**
      *
      *
-     * @param string $privacies
-     * @return Key
      * @throws AssertionError
      */
     public static function fromRawKey(string $key): Key

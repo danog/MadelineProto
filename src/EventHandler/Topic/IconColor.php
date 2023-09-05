@@ -21,7 +21,7 @@ use JsonSerializable;
 /**
  * Specifies the color of the fallback topic icon (RGB) if no custom emoji icon is specified.
  */
-enum IconColor : int implements JsonSerializable
+enum IconColor: int implements JsonSerializable
 {
     case NONE = 0;
     case BLUE = 0x6fb9f0;

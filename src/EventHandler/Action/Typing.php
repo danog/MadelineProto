@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is typing.
  */
-final class Typing extends AbstractAction 
+final class Typing extends AbstractAction
 {
 }

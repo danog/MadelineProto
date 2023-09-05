@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler\User;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Status\EmptyStatus;
 use danog\MadelineProto\EventHandler\User\Status\LastMonth;
@@ -24,6 +23,7 @@ use danog\MadelineProto\EventHandler\User\Status\LastWeek;
 use danog\MadelineProto\EventHandler\User\Status\Offline;
 use danog\MadelineProto\EventHandler\User\Status\Online;
 use danog\MadelineProto\EventHandler\User\Status\Recently;
+use danog\MadelineProto\MTProto;
 
 /**
  * Contact status update.

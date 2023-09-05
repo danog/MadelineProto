@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is recording a round video to share.
  */
-final class RecordRound extends AbstractAction 
+final class RecordRound extends AbstractAction
 {
 }

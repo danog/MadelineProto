@@ -26,15 +26,9 @@ final class HistoryImport extends AbstractAction
     public function __construct(
         /** @var ?int Progress percentage */
         public readonly ?int $progress
-    )
-    {
+    ) {
     }
 
-    /**
-     *
-     *
-     * @return array
-     */
     public function toRawAction(): array
     {
         return parent::toRawAction() + [ 'progress' => $this->progress ];

@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is recording a video.
  */
-final class RecordVideo extends AbstractAction 
+final class RecordVideo extends AbstractAction
 {
 }

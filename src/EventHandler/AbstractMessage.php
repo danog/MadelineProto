@@ -17,10 +17,10 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
+use danog\MadelineProto\EventHandler\Action\Typing;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\EventHandler\Action\Typing;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -236,7 +236,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function block(bool $stories): bool
     {
-        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
+        Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
@@ -255,7 +255,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function unblock(bool $stories): bool
     {
-        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
+        Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
@@ -266,14 +266,14 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
-     * Get user stories 
+     * Get user stories.
      *
      * @return list<AbstractStory>
      * @throws InvalidArgumentException
      */
     public function getStories(): array
     {
-        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
+        Assert::true($this->senderId > 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'stories.getUserStories',
@@ -281,16 +281,17 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 'user_id' => $this->senderId,
             ]
         )['stories']['stories'];
-        $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        $result = \array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
         // Recall it because storyItemSkipped
+        // TODO: Do this more efficiently
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
                 'user_id' => $this->senderId,
-                'id' => array_column($result, 'id'),
+                'id' => \array_column($result, 'id'),
             ]
         )['stories'];
-        return array_map(
+        return \array_map(
             $client->wrapUpdate(...),
             $result
         );
@@ -300,7 +301,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Sends a current user typing event
      * (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
      *
-     * @param AbstractAction $action
      * @return boolean
      */
     public function setAction(AbstractAction $action = new Typing): bool

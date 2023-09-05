@@ -404,10 +404,9 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Set maximum Time-To-Live of all messages in the specified chat
+     * Set maximum Time-To-Live of all messages in the specified chat.
      *
-     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds	
-     * @return DialogSetTTL
+     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
      */
     public function enableTTL(int $seconds): DialogSetTTL
     {
@@ -423,9 +422,8 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * Disable Time-To-Live of all messages in the specified chat
+     * Disable Time-To-Live of all messages in the specified chat.
      *
-     * @return DialogSetTTL
      */
     public function disableTTL(): DialogSetTTL
     {

@@ -113,9 +113,8 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Hide message history for new channel/supergroup users
+     * Hide message history for new channel/supergroup users.
      *
-     * @return void
      */
     public function hideHistory(): void
     {
@@ -129,9 +128,8 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Unhide message history for new channel/supergroup users
+     * Unhide message history for new channel/supergroup users.
      *
-     * @return void
      */
     public function unhideHistory(): void
     {

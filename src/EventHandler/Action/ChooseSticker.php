@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is choosing a sticker.
  */
-final class ChooseSticker extends AbstractAction 
+final class ChooseSticker extends AbstractAction
 {
 }

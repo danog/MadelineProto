@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is selecting a location to share.
  */
-final class GeoLocation extends AbstractAction 
+final class GeoLocation extends AbstractAction
 {
 }

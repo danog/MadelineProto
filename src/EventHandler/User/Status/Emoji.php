@@ -14,7 +14,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\User;
+namespace danog\MadelineProto\EventHandler\User\Status;
 
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;

@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is playing a game.
  */
-final class GamePlay extends AbstractAction 
+final class GamePlay extends AbstractAction
 {
 }

@@ -31,16 +31,10 @@ use ReflectionProperty;
 
 abstract class AbstractRule implements JsonSerializable
 {
-    /**
-     *
-     *
-     * @param array $rawRule
-     * @return AbstractRule
-     */
+
     public static function fromRawRule(array $rawRule): AbstractRule
     {
-        return match ($rawRule['_'])
-        {
+        return match ($rawRule['_']) {
             'privacyValueAllowAll' => new AllowAll,
             'privacyValueDisallowAll' => new DisallowAll,
             'privacyValueAllowContacts' => new AllowContacts,

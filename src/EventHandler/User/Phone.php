@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\User;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 
 /**
  * A user’s phone number was changed.

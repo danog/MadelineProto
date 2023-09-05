@@ -70,7 +70,7 @@ enum DialogId
      *
      * @param int $id MTProto channel ID
      */
-    public static function toSupergroupOrChannel(int $id): int
+    public static function fromSupergroupOrChannel(int $id): int
     {
         return Magic::ZERO_CHANNEL_ID - $id;
     }
@@ -79,9 +79,39 @@ enum DialogId
      *
      * @param int $id Bot API channel ID
      */
-    public static function fromSupergroupOrChannel(int $id): int
+    public static function toSupergroupOrChannel(int $id): int
     {
-        Assert::eq(self::getType($id), self::SECRET_CHAT);
+        Assert::eq(self::getType($id), self::CHANNEL_OR_SUPERGROUP);
         return (-$id) + Magic::ZERO_CHANNEL_ID;
+    }
+
+    /**
+     * Checks whether the provided bot API ID is a supergroup or channel ID.
+     */
+    public static function isSupergroupOrChannel(int $id): bool
+    {
+        return self::getType($id) === self::CHANNEL_OR_SUPERGROUP;
+    }
+
+    /**
+     * Checks whether the provided bot API ID is a chat ID.
+     */
+    public static function isChat(int $id): bool
+    {
+        return self::getType($id) === self::CHAT;
+    }
+    /**
+     * Checks whether the provided bot API ID is a user ID.
+     */
+    public static function isUser(int $id): bool
+    {
+        return self::getType($id) === self::USER;
+    }
+    /**
+     * Checks whether the provided bot API ID is a secret chat ID.
+     */
+    public static function isSecretChat(int $id): bool
+    {
+        return self::getType($id) === self::SECRET_CHAT;
     }
 }

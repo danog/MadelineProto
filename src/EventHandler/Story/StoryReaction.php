@@ -29,8 +29,7 @@ final class StoryReaction extends Update
 
     /** @var int Story ID */
     public readonly int $id;
-    
-    /** */
+
     public readonly int|string|null $reaction;
 
     /** @internal */

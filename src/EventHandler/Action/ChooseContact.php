@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is selecting a contact to share.
  */
-final class ChooseContact extends AbstractAction 
+final class ChooseContact extends AbstractAction
 {
 }

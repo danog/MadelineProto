@@ -32,18 +32,12 @@ final class EmojiTap extends AbstractAction
 
         /** @var int  1-based index of the randomly chosen animation for the tap (equivalent to the index of a specific emoji-related animation in [stickerPack](https://core.telegram.org/constructor/stickerPack) + 1). */
         public readonly int $animation,
-        
+
         /** @var int Message ID of the animated emoji that was clicked */
         public readonly ?int $id,
-    )
-    {
+    ) {
     }
 
-    /**
-     *
-     *
-     * @return array
-     */
     public function toRawAction(): array
     {
         return parent::toRawAction() + [

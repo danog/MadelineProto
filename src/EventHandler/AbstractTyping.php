@@ -21,7 +21,7 @@ use danog\MadelineProto\MTProto;
 /**
  * A user is typing.
  */
-final class AbstractTyping extends Update
+abstract class AbstractTyping extends Update
 {
     /** @var int The user id that is typing. */
     public readonly int $userId;

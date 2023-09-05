@@ -16,17 +16,17 @@
 
 namespace danog\MadelineProto\EventHandler\Story;
 
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\StrTools;
 use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\StrTools;
 
 /**
  * Represents a Telegram story.
@@ -114,7 +114,7 @@ final class StorySend extends AbstractStory
 
         $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
-        $this->privacy = array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
+        $this->privacy = \array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
         $this->reactionCount = $rawStory['views']['views_count'] ?? null;
@@ -131,7 +131,6 @@ final class StorySend extends AbstractStory
      * @param string $message Message to send
      * @param ParseMode $parseMode Parse mode
      * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
      * @param integer|null $scheduleDate Schedule date.
      * @param boolean $silent Whether to send the message silently, without triggering notifications.
      * @param boolean $background Send this message as background message
@@ -189,7 +188,6 @@ final class StorySend extends AbstractStory
     /**
      * Delete the story.
      *
-     * @return void
      */
     public function delete(): void
     {
@@ -202,9 +200,8 @@ final class StorySend extends AbstractStory
     }
 
     /**
-     * Export story link e.g: https://t.me/username/s/storyid
+     * Export story link e.g: https://t.me/username/s/storyid.
      *
-     * @return string
      */
     public function exportLink(): string
     {
@@ -217,13 +214,13 @@ final class StorySend extends AbstractStory
         )['link'];
     }
 
-     /**
-      * Report a story for violation of telegram’s Terms of Service.
-      *
-      * @param ReportReason $reason Why is story being reported
-      * @param string $message Comment for report moderation
-      * @return boolean
-      */
+    /**
+     * Report a story for violation of telegram’s Terms of Service.
+     *
+     * @param ReportReason $reason Why is story being reported
+     * @param string $message Comment for report moderation
+     * @return boolean
+     */
     public function report(ReportReason $reason, string $message = ''): bool
     {
         return $this->getClient()->methodCallAsyncRead(
@@ -240,7 +237,6 @@ final class StorySend extends AbstractStory
     /**
      * Pin a story.
      *
-     * @return void
      */
     public function pin(): void
     {
@@ -256,7 +252,6 @@ final class StorySend extends AbstractStory
     /**
      * Unpin a story.
      *
-     * @return void
      */
     public function unpin(): void
     {
@@ -290,7 +285,6 @@ final class StorySend extends AbstractStory
      *
      * @param integer|string|null $reaction string or int Reaction
      * @param boolean $recent
-     * @return StoryReaction
      */
     public function addReaction(int|string|null $reaction = null, bool $recent = true): StoryReaction
     {
@@ -313,7 +307,6 @@ final class StorySend extends AbstractStory
      * Delete reaction from story.
      *
      * @param boolean $recent string or int Reaction
-     * @return StoryReaction
      */
     public function delReaction(bool $recent = true): StoryReaction
     {

@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * Invalidate all previous action updates. E.g. when user deletes entered text or aborts a video upload.
  */
-final class Cancel extends AbstractAction 
+final class Cancel extends AbstractAction
 {
 }

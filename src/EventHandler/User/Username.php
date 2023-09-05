@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\User;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 
 /**
  * Changes were made to the user’s first name, last name or username.
@@ -43,7 +43,7 @@ final class Username extends Update
         $this->userId = $rawUserName['user_id'];
         $this->firstName = $rawUserName['first_name'];
         $this->lastName = $rawUserName['last_name'];
-        $this->usernames = array_map(
+        $this->usernames = \array_map(
             fn ($username) => new UsernameInfo($username),
             $rawUserName['usernames']
         );

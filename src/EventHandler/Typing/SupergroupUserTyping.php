@@ -18,11 +18,12 @@ namespace danog\MadelineProto\EventHandler\Typing;
 
 use danog\MadelineProto\EventHandler\AbstractTyping;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * A user is typing in a [supergroup, channel](https://core.telegram.org/api/channel) or [message thread](https://core.telegram.org/api/threads)
+ * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
  */
-final class ChannelUserTyping extends AbstractTyping
+final class SupergroupUserTyping extends AbstractTyping
 {
     /** @var int Channel ID. */
     public readonly int $chatId;
@@ -34,7 +35,7 @@ final class ChannelUserTyping extends AbstractTyping
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);
-        $this->chatId = $API->toSupergroup($rawTyping['channel_id']);
+        $this->chatId = DialogId::fromSupergroupOrChannel($rawTyping['channel_id']);
         $this->threadId = $rawTyping['top_msg_id'] ?? null;
     }
 }

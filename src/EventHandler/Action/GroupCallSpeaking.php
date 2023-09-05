@@ -21,6 +21,6 @@ use danog\MadelineProto\EventHandler\AbstractAction;
 /**
  * User is currently speaking in the group call.
  */
-final class GroupCallSpeaking extends AbstractAction 
+final class GroupCallSpeaking extends AbstractAction
 {
 }
