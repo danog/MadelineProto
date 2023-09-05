@@ -14,43 +14,22 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Topic;
 
-use AssertionError;
 use JsonSerializable;
 
-/** @internal */
-enum InlineQueryPeerType implements JsonSerializable
+/**
+ * Specifies the color of the fallback topic icon (RGB) if no custom emoji icon is specified.
+ */
+enum IconColor : int implements JsonSerializable
 {
-    /** private chat */
-    case PM;
-    /** [chat](https://core.telegram.org/api/channel) */
-    case Chat;
-    /** private chat with a bot. */
-    case BotPM;
-    /** [channel](https://core.telegram.org/api/channel) */
-    case Broadcast;
-    /** [supergroup](https://core.telegram.org/api/channel) */
-    case Megagroup;
-    /** private chat with the bot itself */
-    case SameBotPM;
-
-    /**
-     * Get InlineQueryPeerType from update.
-     *
-     * @param string Type of the chat from which the inline query was sent.
-     * @throws AssertionError
-     */
-    public static function fromRawInlineQuery(string $rawInlineQuery): InlineQueryPeerType
-    {
-        $newName = \substr($rawInlineQuery, 19);
-        foreach (InlineQueryPeerType::cases() as $case) {
-            if ($case->name === $newName) {
-                return $case;
-            }
-        }
-        throw new AssertionError("Undefined case InlineQueryPeerType::".$rawInlineQuery);
-    }
+    case NONE = 0;
+    case BLUE = 0x6fb9f0;
+    case YELLOW = 0xffd67e;
+    case PURPLE = 0xcb86db;
+    case GREEN = 0x8eee98;
+    case PINK = 0xff93b2;
+    case RED = 0xfb6f5f;
 
     /** @internal */
     public function jsonSerialize(): string

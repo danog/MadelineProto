@@ -20,6 +20,9 @@ use AssertionError;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\EventHandler\Action\Typing;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing message.
@@ -229,9 +232,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function block(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
@@ -246,14 +251,67 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function unblock(bool $stories): bool
     {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
                 'my_stories_from' => $stories,
+            ]
+        );
+    }
+
+    /**
+     * Get user stories 
+     *
+     * @return list<AbstractStory>
+     * @throws InvalidArgumentException
+     */
+    public function getStories(): array
+    {
+        Assert::false(MTProto::isSupergroupOrChannel($this->senderId));
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'stories.getUserStories',
+            [
+                'user_id' => $this->senderId,
+            ]
+        )['stories']['stories'];
+        $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        // Recall it because storyItemSkipped
+        $result = $client->methodCallAsyncRead(
+            'stories.getStoriesByID',
+            [
+                'user_id' => $this->senderId,
+                'id' => array_column($result, 'id'),
+            ]
+        )['stories'];
+        return array_map(
+            $client->wrapUpdate(...),
+            $result
+        );
+    }
+
+    /**
+     * Sends a current user typing event
+     * (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
+     *
+     * @param AbstractAction $action
+     * @return boolean
+     */
+    public function setAction(AbstractAction $action = new Typing): bool
+    {
+        $action = $action->toRawAction() + [ 'msg_id' => $this->id ];
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.setTyping',
+            [
+                'peer' => $this->senderId,
+                'top_msg_id' => $this->topicId,
+                'action' => $action
             ]
         );
     }

@@ -26,8 +26,21 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Privacy;
+use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Emoji;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Story\StorySend;
 use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
+use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
+use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
+use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
@@ -41,9 +54,6 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
 use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
@@ -60,11 +70,13 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
-use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
-use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
-use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
-use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
-use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
+use danog\MadelineProto\EventHandler\Typing\ChannelUserTyping;
+use danog\MadelineProto\EventHandler\Typing\UserTyping;
+use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -370,6 +382,19 @@ trait UpdateHandler
             'updateBotInlineQuery' => new InlineQuery($this, $update),
             'updatePhoneCall' => $update['phone_call'],
             'updateBroadcastProgress' => $update['progress'],
+            'updateStory' => $update['story']['_'] === 'storyItemDeleted'
+                ? new StoryDeleted($this, $update)
+                : new StorySend($this, $update),
+            'updateSentStoryReaction' => new StoryReaction($this, $update),
+            'updateUserStatus' => Status::fromRawStatus($this, $update),
+            'updatePeerBlocked' => new Blocked($this, $update),
+            'updateBotStopped' => new BotStopped($this, $update),
+            'updateUserEmojiStatus' => new Emoji($this, $update),
+            'updateUserName' => new Username($this, $update),
+            'updateUserPhone' => new Phone($this, $update),
+            'updatePrivacy' => new Privacy($this, $update),
+            'updateUserTyping' => new UserTyping($this, $update),
+            'updateChannelUserTyping' => new ChannelUserTyping($this, $update),
             default => null
         };
     }
