@@ -122,7 +122,7 @@ final class ConnectionContext
      */
     public function setUri(string|UriInterface $uri): self
     {
-        $this->uri = $uri instanceof UriInterface ? $uri : Http::createFromString($uri);
+        $this->uri = $uri instanceof UriInterface ? $uri : Http::new($uri);
         return $this;
     }
     /**
