@@ -20,7 +20,7 @@ use danog\MadelineProto\EventHandler\User\Status;
 use danog\MadelineProto\MTProto;
 
 /**
- * The [emoji status](https://core.telegram.org/api/emoji-status) of a certain user has changed or removed.
+ * The [emoji status](https://core.telegram.org/api/emoji-status) of a certain user has changed or was removed.
  */
 final class Emoji extends Status
 {

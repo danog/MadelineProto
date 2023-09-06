@@ -14,14 +14,14 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Privacy\Rule;
+namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
 /**
- * Allow all participants of certain chats.
+ * Disallow only participants of certain chats.
  */
-final class AllowChatParticipants extends AbstractRule
+final class DisallowChatParticipants extends RuleDestination
 {
     /** Allowed chats */
     public readonly array $chats;

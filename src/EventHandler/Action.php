@@ -38,11 +38,12 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * Typing events.
+ * In-progress actions.
  */
-abstract class AbstractAction implements JsonSerializable
+abstract class Action implements JsonSerializable
 {
-    public static function fromRawAction(array $rawAction): AbstractAction
+    /** @internal */
+    public static function fromRawAction(array $rawAction): Action
     {
         $type = $rawAction['_'];
         if ($type === 'sendMessageEmojiInteraction') {
@@ -73,6 +74,7 @@ abstract class AbstractAction implements JsonSerializable
         };
     }
 
+    /** @internal */
     public function toRawAction(): array
     {
         return match (true) {

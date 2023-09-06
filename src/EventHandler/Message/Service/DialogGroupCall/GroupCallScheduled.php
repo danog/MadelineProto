@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 
-use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 use danog\MadelineProto\MTProto;
 
 /**
  * A group call was scheduled.
  */
-final class GroupCallScheduled extends AbstractDialogGroupCall
+final class GroupCallScheduled extends DialogGroupCall
 {
     public function __construct(
         MTProto $API,

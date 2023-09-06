@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 
-use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 use danog\MadelineProto\MTProto;
 
 /**
  * The group call has started or ended.
  */
-final class GroupCall extends AbstractDialogGroupCall
+final class GroupCall extends DialogGroupCall
 {
     /** @var bool Whether that group call ended or not. */
     public readonly bool $ended;

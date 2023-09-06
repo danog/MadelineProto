@@ -16,14 +16,14 @@
 
 namespace danog\MadelineProto\EventHandler\Typing;
 
-use danog\MadelineProto\EventHandler\AbstractTyping;
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
  */
-final class SupergroupUserTyping extends AbstractTyping
+final class SupergroupUserTyping extends Typing
 {
     /** @var int Channel ID. */
     public readonly int $chatId;

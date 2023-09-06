@@ -19,7 +19,8 @@ namespace danog\MadelineProto\EventHandler\Privacy;
 use AssertionError;
 use JsonSerializable;
 
-enum Key: string implements JsonSerializable
+/** Represents a privacy rule. */
+enum Rule: string implements JsonSerializable
 {
     /** Whether we can see the last online timestamp of this user */
     case STATUS_TIMESTAMP = 'privacyKeyStatusTimestamp';
@@ -39,17 +40,17 @@ enum Key: string implements JsonSerializable
     case ADDED_BY_PHONE = 'privacyKeyAddedByPhone';
     /** Whether the user accepts voice messages */
     case VOICE_MESSAGES = 'privacyKeyVoiceMessages';
-
+    /** Whether the user can see our bio. */
     case ABOUT = 'privacyKeyAbout';
 
     /**
-     *
+     * @internal
      *
      * @throws AssertionError
      */
-    public static function fromRawKey(string $key): Key
+    public static function fromRawKey(string $key): Rule
     {
-        foreach (Key::cases() as $case) {
+        foreach (Rule::cases() as $case) {
             if ($case->value === $key) {
                 return $case;
             }

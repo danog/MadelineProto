@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is typing.
  */
-final class Typing extends AbstractAction
+final class Typing extends Action
 {
 }

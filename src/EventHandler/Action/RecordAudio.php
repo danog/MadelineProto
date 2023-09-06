@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is recording a voice message.
  */
-final class RecordAudio extends AbstractAction
+final class RecordAudio extends Action
 {
 }

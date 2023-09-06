@@ -407,11 +407,6 @@
       <code>new $class</code>
     </UnsafeInstantiation>
   </file>
-  <file src="src/EventHandler/AbstractAction.php">
-    <UnhandledMatchCondition>
-      <code>$type</code>
-    </UnhandledMatchCondition>
-  </file>
   <file src="src/EventHandler/AbstractMessage.php">
     <InvalidReturnStatement>
       <code><![CDATA[$this->replyCache]]></code>
@@ -437,6 +432,11 @@
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
     </NullableReturnStatement>
+  </file>
+  <file src="src/EventHandler/Action.php">
+    <UnhandledMatchCondition>
+      <code>$type</code>
+    </UnhandledMatchCondition>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -663,6 +663,11 @@
       <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
+  <file src="src/EventHandler/Privacy.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[\array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules'])]]></code>
+    </PropertyTypeCoercion>
+  </file>
   <file src="src/EventHandler/Query/ChatTrait.php">
     <MoreSpecificReturnType>
       <code>Message</code>
@@ -698,7 +703,7 @@
     </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
       <code><![CDATA[$API->wrapMedia($rawStory['media'], $this->protected)]]></code>
-      <code><![CDATA[\array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
+      <code><![CDATA[\array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
     </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/User/Blocked.php">

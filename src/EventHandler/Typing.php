@@ -21,19 +21,19 @@ use danog\MadelineProto\MTProto;
 /**
  * A user is typing.
  */
-abstract class AbstractTyping extends Update
+abstract class Typing extends Update
 {
     /** @var int The user id that is typing. */
     public readonly int $userId;
 
-    /** @var AbstractAction Whether the user is typing, sending a media or doing something else. */
-    public readonly AbstractAction $action;
+    /** @var Action Whether the user is typing, sending a media or doing something else. */
+    public readonly Action $action;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API);
         $this->userId = $rawTyping['user_id'] ?? $API->getIdInternal($rawTyping['from_id']);
-        $this->action = AbstractAction::fromRawAction($rawTyping['action']);
+        $this->action = Action::fromRawAction($rawTyping['action']);
     }
 }

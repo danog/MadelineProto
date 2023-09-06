@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is selecting a contact to share.
  */
-final class ChooseContact extends AbstractAction
+final class ChooseContact extends Action
 {
 }

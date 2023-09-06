@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User has clicked on an animated emoji triggering a [reaction, click here for more info »](https://core.telegram.org/api/animated-emojis#emoji-reactions).
  */
-final class EmojiTap extends AbstractAction
+final class EmojiTap extends Action
 {
     public function __construct(
         /** @var string Emoji */

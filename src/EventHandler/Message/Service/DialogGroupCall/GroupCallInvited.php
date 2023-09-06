@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 
-use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall;
 use danog\MadelineProto\MTProto;
 
 /**
  * A set of users was invited to the group call.
  */
-final class GroupCallInvited extends AbstractDialogGroupCall
+final class GroupCallInvited extends DialogGroupCall
 {
     public function __construct(
         MTProto $API,

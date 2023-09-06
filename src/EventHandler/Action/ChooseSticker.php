@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is choosing a sticker.
  */
-final class ChooseSticker extends AbstractAction
+final class ChooseSticker extends Action
 {
 }

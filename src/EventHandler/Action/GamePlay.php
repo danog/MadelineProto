@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is playing a game.
  */
-final class GamePlay extends AbstractAction
+final class GamePlay extends Action
 {
 }

@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is recording a round video to share.
  */
-final class RecordRound extends AbstractAction
+final class RecordRound extends Action
 {
 }

@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
-use danog\MadelineProto\EventHandler\Privacy\Key;
+use danog\MadelineProto\EventHandler\Privacy\Rule;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -26,16 +26,16 @@ use danog\MadelineProto\MTProto;
 final class Privacy extends Update
 {
     /** New privacy rule. */
-    public readonly Key $key;
+    public readonly Rule $rule;
 
-    /** Peers to which the privacy rules apply  */
-    public readonly array $rules;
+    /** @var list<RuleDestination> Peers to which the privacy rules apply  */
+    public readonly array $appliesTo;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawPrivacy)
     {
         parent::__construct($API);
-        $this->key = Key::fromRawKey($rawPrivacy['key']['_']);
-        $this->rules = \array_map(AbstractRule::fromRawRule(...), $rawPrivacy['rules']);
+        $this->rule = Rule::fromRawKey($rawPrivacy['key']['_']);
+        $this->appliesTo = \array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules']);
     }
 }

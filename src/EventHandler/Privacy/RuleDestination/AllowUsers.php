@@ -14,13 +14,21 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Privacy\Rule;
+namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
 /**
- * Disallow only contacts.
+ * Allow only certain user.
  */
-final class DisallowContacts extends AbstractRule
+final class AllowUsers extends RuleDestination
 {
+    /** Allowed users */
+    public readonly array $users;
+
+    /** @internal */
+    public function __construct(array $rawUsers)
+    {
+        $this->users = $rawUsers['users'];
+    }
 }

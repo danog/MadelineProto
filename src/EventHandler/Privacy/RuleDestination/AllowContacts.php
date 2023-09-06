@@ -8,36 +8,19 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service;
+namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
-use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
 /**
- * Represents a service message about a group call.
+ * Allow all contacts.
  */
-abstract class AbstractDialogGroupCall extends ServiceMessage
+final class AllowContacts extends RuleDestination
 {
-    /** Group call ID */
-    public readonly int $callId;
-
-    /** Group call access hash */
-    public readonly int $accessHash;
-
-    /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
-    ) {
-        parent::__construct($API, $rawMessage, $info);
-        $this->callId = $rawMessage['action']['call']['id'];
-        $this->accessHash = $rawMessage['action']['call']['access_hash'];
-    }
 }

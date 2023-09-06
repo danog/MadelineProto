@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is selecting a location to share.
  */
-final class GeoLocation extends AbstractAction
+final class GeoLocation extends Action
 {
 }

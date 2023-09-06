@@ -37,7 +37,6 @@ use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Privacy\Key;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;

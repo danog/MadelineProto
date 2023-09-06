@@ -24,7 +24,7 @@ use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
@@ -74,7 +74,7 @@ final class Story extends AbstractStory
     /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
 
-    /** @var list<AbstractRule> */
+    /** @var list<RuleDestination> */
     public readonly array $privacy;
 
     /** Our reaction to the story */
@@ -113,7 +113,7 @@ final class Story extends AbstractStory
 
         $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
-        $this->privacy = \array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
+        $this->privacy = \array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
         $this->views = $rawStory['views']['views_count'] ?? null;

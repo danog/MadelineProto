@@ -14,10 +14,13 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Privacy\Rule;
+namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-use danog\MadelineProto\EventHandler\Privacy\AbstractRule;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-final class AllowCloseFriends extends AbstractRule
+/**
+ * Allow all users.
+ */
+final class AllowAll extends RuleDestination
 {
 }

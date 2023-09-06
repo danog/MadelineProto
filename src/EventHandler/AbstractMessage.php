@@ -305,7 +305,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @return boolean
      */
-    public function setAction(AbstractAction $action = new Typing): bool
+    public function setAction(Action $action = new Typing): bool
     {
         $action = $action->toRawAction() + [ 'msg_id' => $this->id ];
         return $this->getClient()->methodCallAsyncRead(

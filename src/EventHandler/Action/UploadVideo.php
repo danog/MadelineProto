@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is uploading a video.
  */
-final class UploadVideo extends AbstractAction
+final class UploadVideo extends Action
 {
     public function __construct(
         /** @var ?int Progress percentage */

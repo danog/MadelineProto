@@ -16,22 +16,25 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy;
 
-use danog\MadelineProto\EventHandler\Privacy\Rule\AllowAll;
-use danog\MadelineProto\EventHandler\Privacy\Rule\AllowChatParticipants;
-use danog\MadelineProto\EventHandler\Privacy\Rule\AllowCloseFriends;
-use danog\MadelineProto\EventHandler\Privacy\Rule\AllowContacts;
-use danog\MadelineProto\EventHandler\Privacy\Rule\AllowUsers;
-use danog\MadelineProto\EventHandler\Privacy\Rule\DisallowAll;
-use danog\MadelineProto\EventHandler\Privacy\Rule\DisallowChatParticipants;
-use danog\MadelineProto\EventHandler\Privacy\Rule\DisallowContacts;
-use danog\MadelineProto\EventHandler\Privacy\Rule\DisallowUsers;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowAll;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowChatParticipants;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowCloseFriends;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowContacts;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowUsers;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowAll;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowChatParticipants;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowContacts;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowUsers;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
-abstract class AbstractRule implements JsonSerializable
+/**
+ * To whom does a privacy rule apply?
+ */
+abstract class RuleDestination implements JsonSerializable
 {
-    public static function fromRawRule(array $rawRule): AbstractRule
+    public static function fromRawRule(array $rawRule): RuleDestination
     {
         return match ($rawRule['_']) {
             'privacyValueAllowAll' => new AllowAll,

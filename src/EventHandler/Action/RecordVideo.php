@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * User is recording a video.
  */
-final class RecordVideo extends AbstractAction
+final class RecordVideo extends Action
 {
 }

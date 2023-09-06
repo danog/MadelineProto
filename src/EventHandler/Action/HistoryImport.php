@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler\Action;
 
-use danog\MadelineProto\EventHandler\AbstractAction;
+use danog\MadelineProto\EventHandler\Action;
 
 /**
  * Chat history is being imported.
  */
-final class HistoryImport extends AbstractAction
+final class HistoryImport extends Action
 {
     public function __construct(
         /** @var ?int Progress percentage */
