@@ -62,6 +62,7 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
+use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -70,6 +71,7 @@ use danog\MadelineProto\Wrappers\Login;
 use danog\MadelineProto\Wrappers\Loop;
 use danog\MadelineProto\Wrappers\Start;
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -845,6 +847,20 @@ final class MTProto implements TLCallback, LoggerGetter
             }
             $this->TL->init($this->settings->getSchema(), $callbacks);
         }
+
+        $this->channels_state->get(FeedLoop::GENERIC);
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
+            }
+        }
+        if (!isset($this->seqUpdater)) {
+            $this->seqUpdater = new SeqLoop($this);
+        }
     }
 
     /**
@@ -961,6 +977,14 @@ final class MTProto implements TLCallback, LoggerGetter
 
             foreach ($this->broadcasts as $broadcast) {
                 $broadcast->resume();
+            }
+
+            foreach ($this->calls as $id => $call) {
+                if ($call->getCallState() === CallState::ENDED) {
+                    $this->cleanupCall($id);
+                } elseif ($call->getCallState() === CallState::REQUESTED && \time() - $call->public->date > 5*60) {
+                    EventLoop::queue($call->discard(...));
+                }
             }
         } catch (Throwable $e) {
             try {
@@ -1221,22 +1245,6 @@ final class MTProto implements TLCallback, LoggerGetter
             if (isset($this->secretFeeders[$id])) {
                 $this->secretFeeders[$id]->resume();
             }
-        }
-        if (!isset($this->seqUpdater)) {
-            $this->seqUpdater = new SeqLoop($this);
-        }
-        $this->channels_state->get(FeedLoop::GENERIC);
-        foreach ($this->channels_state->get() as $state) {
-            $channelId = $state->getChannel();
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
-        }
-        if (!isset($this->seqUpdater)) {
-            $this->seqUpdater = new SeqLoop($this);
         }
         $this->channels_state->get(FeedLoop::GENERIC);
         $channelIds = [];

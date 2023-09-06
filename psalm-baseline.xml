@@ -1264,6 +1264,7 @@
     <PossiblyNullReference>
       <code>logger</code>
       <code>start</code>
+      <code>start</code>
     </PossiblyNullReference>
     <PropertyTypeCoercion>
       <code><![CDATA[$this->sanitizeReportPeers($userOrId)]]></code>
@@ -1279,9 +1280,6 @@
       <code>\is_int($dc_id)</code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
-    <TypeDoesNotContainType>
-      <code><![CDATA[isset($this->seqUpdater)]]></code>
-    </TypeDoesNotContainType>
     <UndefinedThisPropertyFetch>
       <code><![CDATA[$this->full_chats]]></code>
     </UndefinedThisPropertyFetch>
