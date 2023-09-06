@@ -31,9 +31,9 @@ final class Photo extends Media
     /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
     public readonly string $thumb;
     /** Thumbnail height only for secret chats. */
-    public readonly string $thumbHeight;
+    public readonly int $thumbHeight;
     /** Thumbnail width only for secret chats. */
-    public readonly string $thumbWidth;
+    public readonly int $thumbWidth;
 
     /** @internal */
     public function __construct(
@@ -44,8 +44,8 @@ final class Photo extends Media
         parent::__construct($API, $rawMedia, $protected);
         $this->hasStickers = $rawMedia['photo']['has_stickers'] ?? null;
         $this->thumb = (string) $rawMedia['thumb'] ?? null;
-        $this->thumbHeight = (string) $rawMedia['thumb_h'] ?? null;
-        $this->thumbWidth = (string) $rawMedia['thumb_w'] ?? null;
+        $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
+        $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }
 
     /** @internal */
