@@ -79,11 +79,11 @@ final class GarbageCollector
             return;
         }
         $client = HttpClientBuilder::buildDefault();
-        $request = new Request(MADELINE_RELEASE_URL);
 
         $id = null;
-        $cb = function () use ($client, $request, &$id): void {
+        $cb = function () use ($client, &$id): void {
             try {
+                $request = new Request(MADELINE_RELEASE_URL);
                 $latest = $client->request($request);
                 Magic::$latest_release = \trim($latest->getBody()->buffer());
                 if (API::RELEASE !== Magic::$latest_release) {

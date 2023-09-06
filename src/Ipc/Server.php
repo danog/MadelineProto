@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\CompositeException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
@@ -101,6 +102,7 @@ class Server extends Loop
     {
         $id = Tools::randomInt(2000000000);
         $started = false;
+        $e = null;
         try {
             Logger::log("Starting IPC server $session (process)");
             ProcessRunner::start((string) $session, $id);
@@ -115,15 +117,20 @@ class Server extends Loop
             if (WebRunner::start((string) $session, $id)) {
                 $started = true;
             }
-        } catch (Throwable $e) {
-            Logger::log($e);
+        } catch (Throwable $e2) {
+            Logger::log($e2);
+            if ($e) {
+                $e = new CompositeException([$e, $e2]);
+            } else {
+                $e = $e2;
+            }
         }
-        return async(self::monitor(...), $session, $id, $started);
+        return async(self::monitor(...), $session, $id, $started, $e);
     }
     /**
      * Monitor session.
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started): bool|Throwable
+    private static function monitor(SessionPaths $session, int $id, bool $started, ?\Throwable $e): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -139,7 +146,7 @@ class Server extends Loop
                 Logger::log('IPC server started successfully!');
                 return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
-                return new Exception("We couldn't start the IPC server, please check the logs!");
+                return new Exception("We couldn't start the IPC server, please check the logs!", previous: $e);
             }
             delay(0.5);
             $count++;
