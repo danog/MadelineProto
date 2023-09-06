@@ -36,6 +36,7 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\TL\Conversion\Extension;
+use danog\MadelineProto\TL\Exception as TLException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -430,6 +431,12 @@ final class Connection
             $method = 'channels.deleteParticipantHistory';
             if (isset($arguments['user_id'])) {
                 $arguments['participant'] = $arguments['user_id'];
+            }
+        } elseif ($method === 'messages.getChatInviteImporters') {
+            if (isset($arguments['offset_user'])) {
+                if (!isset($arguments['offset_date'])) {
+                    throw new TLException(Lang::$current_lang['params_missing'].' offset_user');
+                }
             }
         }
         if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {

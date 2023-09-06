@@ -15,7 +15,7 @@ interface Messages
      * @param bool $exclude_pinned Exclude pinned dialogs
      * @param int $folder_id [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      * @param int $offset_date [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
-     * @param int $offset_id [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * @param int $offset_id [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets) (`top_message` ID used for pagination)
      * @param array|int|string $offset_peer [Offset peer for pagination](https://core.telegram.org/api/offsets) @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param int $limit Number of list elements to be returned
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
@@ -1305,7 +1305,7 @@ interface Messages
      * @param string $link Invite link
      * @param string $q Search for a user in the pending [join requests »](https://core.telegram.org/api/invites#join-requests) list: only available when the `requested` flag is set, cannot be used together with a specific `link`.
      * @param int $offset_date [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
-     * @param array|int|string $offset_user User ID for [pagination](https://core.telegram.org/api/offsets) @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $offset_user User ID for [pagination](https://core.telegram.org/api/offsets): if set, `offset_date`  **must also be set**. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @return array{_: 'messages.chatInviteImporters', count: int, importers: list<array{_: 'chatInviteImporter', requested: bool, via_chatlist: bool, user_id: int, date: int, about: string, approved_by: int}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.ChatInviteImporters.html
      */
