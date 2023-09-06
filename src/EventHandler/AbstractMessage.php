@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\MTProto;
@@ -204,11 +205,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,
+        bool $noWebpage = false,
         bool $silent = false,
         bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
-        bool $noWebpage = false,
         bool $updateStickersetsOrder = false,
     ): Message {
         return $this->getClient()->sendMessage(
@@ -232,11 +233,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Adds the user to the blacklist.
      *
-     * @param boolean $stories
+     * @param boolean $stories hide stories from user
      * @return boolean
      * @throws InvalidArgumentException
      */
-    public function block(bool $stories): bool
+    public function block(bool $stories = false): bool
     {
         Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
@@ -251,15 +252,15 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Deletes the user from the blacklist.
      *
-     * @param boolean $stories
+     * @param boolean $stories uhide stories from user
      * @return boolean
      * @throws InvalidArgumentException
      */
-    public function unblock(bool $stories): bool
+    public function unblock(bool $stories = false): bool
     {
         Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
-            'contacts.block',
+            'contacts.unblock',
             [
                 'id' => $this->senderId,
                 'my_stories_from' => $stories,
@@ -319,5 +320,55 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 'action' => $action
             ]
         );
+    }
+
+    /**
+     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat.
+     */
+    public function read(?int $maxId = null): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+            [
+                'peer' => $this->chatId,
+                'channel' => $this->chatId,
+                'max_id' => $maxId ?? $this->id
+            ]
+        );
+    }
+
+    /**
+     * Set maximum Time-To-Live of all messages in the specified chat.
+     *
+     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     */
+    public function enableTTL(int $seconds = 86400): DialogSetTTL
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.setHistoryTTL',
+            [
+                'peer' => $this->chatId,
+                'period' => $seconds,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Disable Time-To-Live of all messages in the specified chat.
+     *
+     */
+    public function disableTTL(): DialogSetTTL
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.setHistoryTTL',
+            [
+                'peer' => $this->chatId,
+                'period' => 0,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
     }
 }
