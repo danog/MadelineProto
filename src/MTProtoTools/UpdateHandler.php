@@ -60,17 +60,28 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
 use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
 use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
+use danog\MadelineProto\EventHandler\Typing\UserTyping;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Status\Emoji;
+use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\ResponseException;
@@ -370,6 +381,19 @@ trait UpdateHandler
             'updateBotInlineQuery' => new InlineQuery($this, $update),
             'updatePhoneCall' => $update['phone_call'],
             'updateBroadcastProgress' => $update['progress'],
+            'updateStory' => $update['story']['_'] === 'storyItemDeleted'
+                ? new StoryDeleted($this, $update)
+                : new Story($this, $update),
+            'updateSentStoryReaction' => new StoryReaction($this, $update),
+            'updateUserStatus' => Status::fromRawStatus($this, $update),
+            'updatePeerBlocked' => new Blocked($this, $update),
+            'updateBotStopped' => new BotStopped($this, $update),
+            'updateUserEmojiStatus' => new Emoji($this, $update),
+            'updateUserName' => new Username($this, $update),
+            'updateUserPhone' => new Phone($this, $update),
+            'updatePrivacy' => new Privacy($this, $update),
+            'updateUserTyping' => new UserTyping($this, $update),
+            'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
             default => null
         };
     }
@@ -845,11 +869,11 @@ trait UpdateHandler
      */
     public function subscribeToUpdates(mixed $channel): bool
     {
-        $channelId = $this->getInfo($channel, API::INFO_TYPE_ID);
-        if (!MTProto::isSupergroupOrChannel($channelId)) {
+        $channelId = $this->getId($channel);
+        if (!DialogId::isSupergroupOrChannel($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
-        $channelId = MTProto::fromSupergroup($channelId);
+        $channelId = DialogId::toSupergroupOrChannel($channelId);
         if (!$this->getChannelStates()->has($channelId)) {
             $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
             $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);

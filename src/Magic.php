@@ -47,6 +47,12 @@ use function function_exists;
 final class Magic
 {
     const ZERO_CHANNEL_ID = -1000000000000;
+    const ZERO_SECRET_CHAT_ID = -2000000000000;
+    const MIN_INT32 = -2147483648;
+
+    const MAX_USER_ID = (1 << 40) - 1;
+    const MAX_CHAT_ID = 999_999_999_999;
+    const MAX_CHANNEL_ID = 1000000000000 - (1 << 31);
     /**
      * Static storage.
      *

@@ -187,7 +187,7 @@ final class Endpoint
                 continue;
             }
             $message_key = $head.$payload->bufferRead(4);
-            [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, !$this->creator);
+            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->authKey, !$this->creator);
             $encrypted_data = $payload->bufferRead($l-($pos+16));
             $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
@@ -421,7 +421,7 @@ final class Endpoint
         }
         $plaintext .= Tools::random($padding);
         $message_key = \substr(\hash('sha256', \substr($this->authKey, 88 + ($this->creator ? 0 : 8), 32).$plaintext, true), 8, 16);
-        [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->authKey, $this->creator);
+        [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->authKey, $this->creator);
         $payload = $message_key.Crypt::igeEncrypt($plaintext, $aes_key, $aes_iv);
 
         if ($this->handler->peerVersion < 9 || $this->reflector) {

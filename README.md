@@ -119,6 +119,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message/Service/DialogTopicCreated.html) - A [forum topic](https://core.telegram.org/api/forum#forum-topics)
   * [danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message/Service/DialogTopicEdited.html) - [Forum topic](https://core.telegram.org/api/forum#forum-topics)
   * [danog\MadelineProto\EventHandler\Message\Service\DialogWebView &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message/Service/DialogWebView.html) - Data from an opened [reply keyboard bot web app](https://core.telegram.org/api/bots/webapps) was relayed to the bot that owns it (user & bot side service message)
+  * [danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Typing/SupergroupUserTyping.html) - A user is typing in a [supergroup](https://core.telegram.org/api/channel)
+  * [danog\MadelineProto\EventHandler\User\Status\Emoji &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/User/Status/Emoji.html) - The [emoji status](https://core.telegram.org/api/emoji-status)
   * [danog\MadelineProto\VoIP &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/VoIP.html)
     * [Full property list &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/VoIP.html#properties)
     * [Full bound method list &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/VoIP.html#method-list)
@@ -325,7 +327,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isforum" name="isForum">Check if the specified peer is a forum: isForum</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkChatInvite.html" name="messages.checkChatInvite">Check the validity of a chat invite link and get basic info about it: messages.checkChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkHistoryImportPeer.html" name="messages.checkHistoryImportPeer">Check whether chat history exported from another chat app can be imported into a specific Telegram chat, click here for more info »: messages.checkHistoryImportPeer</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#issupergrouporchannel" name="isSupergroupOrChannel">Check whether provided bot API ID is a channel or supergroup: isSupergroupOrChannel</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#hassecretchat" name="hasSecretChat">Check whether secret chat exists: hasSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.checkShortName.html" name="stickers.checkShortName">Check whether the given short name is available: stickers.checkShortName</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.checkGroupCall.html" name="phone.checkGroupCall">Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.  : phone.checkGroupCall</a>
@@ -344,13 +345,11 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.startHistoryImport.html" name="messages.startHistoryImport">Complete the history import process, importing all messages into the chat.  : messages.startHistoryImport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.confirmPhone.html" name="account.confirmPhone">Confirm a phone number to cancel account deletion, for more info click here »: account.confirmPhone</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.receivedMessages.html" name="messages.receivedMessages">Confirms receipt of messages by a client, cancels PUSH-notification sending: messages.receivedMessages</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tosupergroup" name="toSupergroup">Convert MTProto channel ID to bot API channel ID: toSupergroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mtprototobotapi" name="MTProtoToBotAPI">Convert MTProto parameters to bot API parameters: MTProtoToBotAPI</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tdtotdcli" name="tdToTdcli">Convert TD parameters to tdcli: tdToTdcli</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#tdtomtproto" name="tdToMTProto">Convert TD to MTProto parameters: tdToMTProto</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#entitiestohtml" name="entitiesToHtml">Convert a message and a set of entities to HTML: entitiesToHtml</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.convertToGigagroup.html" name="channels.convertToGigagroup">Convert a supergroup to a gigagroup, when requested by channel suggestions: channels.convertToGigagroup</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#fromsupergroup" name="fromSupergroup">Convert bot API channel ID to MTProto channel ID: fromSupergroup</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#botapitomtproto" name="botAPIToMTProto">Convert bot API parameters to MTProto parameters: botAPIToMTProto</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#packdouble" name="packDouble">Convert double to binary version: packDouble</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#packsignedlong" name="packSignedLong">Convert integer to base256 long: packSignedLong</a>

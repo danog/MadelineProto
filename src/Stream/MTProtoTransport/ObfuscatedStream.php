@@ -46,7 +46,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if (isset($this->extra['address'])) {
-            $ctx = $ctx->getCtx();
+            $ctx = $ctx->clone();
             $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
         do {

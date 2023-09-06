@@ -36,7 +36,7 @@ final class WssStream extends WsStream
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        parent::connect($ctx->getCtx()->secure(true), $header);
+        parent::connect($ctx->clone()->secure(true), $header);
     }
     public static function getName(): string
     {

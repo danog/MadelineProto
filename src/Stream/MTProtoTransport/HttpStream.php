@@ -60,7 +60,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->ctx = $ctx->getCtx();
+        $this->ctx = $ctx->clone();
         $this->stream = ($ctx->getStream($header));
         $this->uri = $ctx->getUri();
     }

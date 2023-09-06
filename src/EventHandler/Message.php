@@ -32,7 +32,9 @@ use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
 
@@ -393,13 +395,49 @@ abstract class Message extends AbstractMessage
     public function read(?int $maxId = null): bool
     {
         return $this->getClient()->methodCallAsyncRead(
-            API::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory' : 'messages.readHistory',
+
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,
                 'max_id' => $maxId ?? $this->id
             ]
         );
+    }
+
+    /**
+     * Set maximum Time-To-Live of all messages in the specified chat.
+     *
+     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     */
+    public function enableTTL(int $seconds): DialogSetTTL
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'period' => $seconds,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Disable Time-To-Live of all messages in the specified chat.
+     *
+     */
+    public function disableTTL(): DialogSetTTL
+    {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'period' => 0,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
     }
 
     /**

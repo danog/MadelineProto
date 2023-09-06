@@ -17,8 +17,14 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
+use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing message.
@@ -145,7 +151,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             return $this->replyCache;
         }
         $messages = $this->getClient()->methodCallAsyncRead(
-            MTProto::isSupergroupOrChannel($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
@@ -168,7 +174,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public function delete(bool $revoke = true): void
     {
         $this->getClient()->methodCallAsyncRead(
-            MTProto::isSupergroupOrChannel($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [$this->id],
@@ -228,9 +234,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function block(bool $stories): bool
     {
+        Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
@@ -245,14 +253,70 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param boolean $stories
      * @return boolean
+     * @throws InvalidArgumentException
      */
     public function unblock(bool $stories): bool
     {
+        Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
                 'my_stories_from' => $stories,
+            ]
+        );
+    }
+
+    /**
+     * Get user stories.
+     *
+     * @return list<AbstractStory>
+     * @throws InvalidArgumentException
+     */
+    public function getStories(): array
+    {
+        Assert::true($this->senderId > 0);
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'stories.getUserStories',
+            [
+                'user_id' => $this->senderId,
+            ]
+        )['stories']['stories'];
+        $result = \array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        // Recall it because storyItemSkipped
+        // TODO: Do this more efficiently
+        $result = $client->methodCallAsyncRead(
+            'stories.getStoriesByID',
+            [
+                'user_id' => $this->senderId,
+                'id' => \array_column($result, 'id'),
+            ]
+        )['stories'];
+        return \array_map(
+            fn (array $arr): AbstractStory =>
+                $arr['_'] === 'storyItemDeleted'
+                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
+                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+            $result
+        );
+    }
+
+    /**
+     * Sends a current user typing event
+     * (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
+     *
+     * @return boolean
+     */
+    public function setAction(AbstractAction $action = new Typing): bool
+    {
+        $action = $action->toRawAction() + [ 'msg_id' => $this->id ];
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.setTyping',
+            [
+                'peer' => $this->senderId,
+                'top_msg_id' => $this->topicId,
+                'action' => $action
             ]
         );
     }

@@ -52,17 +52,26 @@ final class ReadLoop extends Loop
     protected function loop(): ?float
     {
         try {
+            $this->logger->logger("Reading in $this...", Logger::ULTRA_VERBOSE);
             $error = $this->readMessage();
+            $this->logger->logger("Finished reading in $this!", Logger::ULTRA_VERBOSE);
         } catch (NothingInTheSocketException|StreamException|PendingReadError|Error $e) {
             if ($this->connection->shouldReconnect()) {
+                $this->logger->logger("Stopping $this due to reconnect...", Logger::ERROR);
                 return self::STOP;
             }
             EventLoop::queue(function () use ($e): void {
-                if (!$e instanceof NothingInTheSocketException) {
+                if ($e instanceof NothingInTheSocketException
+                    && !$this->connection->hasPendingCalls()
+                    && $this->connection->isMedia()
+                ) {
+                    $this->logger->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
+                    $this->connection->disconnect(true);
+                } else {
                     $this->logger->logger($e);
+                    $this->logger->logger("Got exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+                    $this->connection->reconnect();
                 }
-                $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
-                $this->connection->reconnect();
             });
             return self::STOP;
         } catch (SecurityException $e) {
@@ -82,7 +91,6 @@ final class ReadLoop extends Loop
                             $message->resetSent();
                         }
                         $this->shared->reconnect();
-                        $this->API->initAuthorization();
                     } else {
                         $this->connection->reconnect();
                     }
@@ -101,10 +109,11 @@ final class ReadLoop extends Loop
                     throw new RPCErrorException((string) $error, $error);
                 }
             });
+            $this->logger->logger("Stopping $this due to $error...", Logger::ERROR);
             return self::STOP;
         }
         $this->connection->httpReceived();
-        if ($this->shared->isHttp()) {
+        if ($this->connection->isHttp()) {
             EventLoop::queue($this->connection->pingHttpWaiter(...));
         }
         EventLoop::queue($this->connection->handleMessages(...));
@@ -136,7 +145,10 @@ final class ReadLoop extends Loop
         try {
             $seq_no = null;
             $auth_key_id = $buffer->bufferRead(8);
-            if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+            if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
+                if ($this->shared->hasTempAuthKey()) {
+                    throw new SecurityException("Got unencrypted message from encrypted socket!");
+                }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
                 $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
                 $message_length = \unpack('V', $buffer->bufferRead(4))[1];
@@ -151,7 +163,7 @@ final class ReadLoop extends Loop
                 }
             } elseif ($auth_key_id === $this->shared->getTempAuthKey()->getID()) {
                 $message_key = $buffer->bufferRead(16);
-                [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->shared->getTempAuthKey()->getAuthKey(), false);
+                [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey(), false);
                 $payload_length -= 24;
                 $left = $payload_length & 15;
                 $payload_length -= $left;
@@ -207,7 +219,7 @@ final class ReadLoop extends Loop
                 throw $e;
             }
 
-            $message = new MTProtoIncomingMessage($deserialized, $message_id);
+            $message = new MTProtoIncomingMessage($deserialized, $message_id, $unencrypted);
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }

@@ -111,4 +111,34 @@ final class ChannelMessage extends Message
             ]
         );
     }
+
+    /**
+     * Hide message history for new channel/supergroup users.
+     *
+     */
+    public function hideHistory(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Unhide message history for new channel/supergroup users.
+     *
+     */
+    public function unhideHistory(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
 }

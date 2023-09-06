@@ -48,7 +48,7 @@ final class CleanupLoop extends Loop
     protected function loop(): ?float
     {
         $this->connection->msgIdHandler?->cleanup();
-        return 1.0;
+        return 10.0;
     }
     /**
      * Loop name.

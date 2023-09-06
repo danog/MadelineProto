@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@96d83947615641734a5baa181d44da7f10ee0246">
+<files psalm-version="dev-master@37cc4fd33fe8bbdfca6e056f17fcf2e9c41b9a65">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -85,17 +85,21 @@
     </RedundantCondition>
   </file>
   <file src="src/Connection.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->stream]]></code>
+    </DocblockTypeContradiction>
     <InvalidPropertyAssignmentValue>
       <code><![CDATA[$ctx->getStream()]]></code>
     </InvalidPropertyAssignmentValue>
     <MissingConstructor>
       <code>$API</code>
-      <code>$ctx</code>
       <code>$datacenter</code>
       <code>$logger</code>
       <code>$shared</code>
     </MissingConstructor>
     <PossiblyNullReference>
+      <code>getInputClientProxy</code>
+      <code>isHttp</code>
       <code>refreshNext</code>
       <code>refreshNext</code>
     </PossiblyNullReference>
@@ -158,29 +162,15 @@
     </RedundantConditionGivenDocblockType>
   </file>
   <file src="src/DataCenter.php">
-    <DocblockTypeContradiction>
-      <code>$socket instanceof Connection</code>
-      <code>\is_int($id)</code>
-    </DocblockTypeContradiction>
     <PossiblyUndefinedArrayOffset>
       <code>$default[2]</code>
       <code>$default[2]</code>
     </PossiblyUndefinedArrayOffset>
-    <PropertyNotSetInConstructor>
-      <code>$dohWrapper</code>
-    </PropertyNotSetInConstructor>
-    <RedundantConditionGivenDocblockType>
-      <code>$socket instanceof DataCenterConnection</code>
-      <code><![CDATA[$socket instanceof DataCenterConnection && \is_int($key)]]></code>
-      <code><![CDATA[$this->settings->getTransport()]]></code>
-      <code>\is_int($key)</code>
-    </RedundantConditionGivenDocblockType>
   </file>
   <file src="src/DataCenterConnection.php">
     <MissingConstructor>
       <code>$API</code>
       <code>$connectionsPromise</code>
-      <code>$ctx</code>
       <code>$datacenter</code>
     </MissingConstructor>
     <PossiblyNullReference>
@@ -380,9 +370,15 @@
     </PossiblyInvalidArgument>
   </file>
   <file src="src/DoHWrapper.php">
+    <PropertyNotSetInConstructor>
+      <code>$webSocketConnector</code>
+    </PropertyNotSetInConstructor>
     <RedundantCondition>
       <code>$orig[1][0] === BufferedRawStream::class</code>
     </RedundantCondition>
+    <UndefinedClass>
+      <code>Rfc6455Connector</code>
+    </UndefinedClass>
   </file>
   <file src="src/EventHandler.php">
     <ArgumentTypeCoercion>
@@ -400,6 +396,10 @@
     <RedundantFunctionCall>
       <code>\array_values</code>
     </RedundantFunctionCall>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->startedInternal]]></code>
+      <code><![CDATA[$this->startedInternal]]></code>
+    </TypeDoesNotContainType>
     <UnresolvableInclude>
       <code>require $file</code>
     </UnresolvableInclude>
@@ -407,11 +407,28 @@
       <code>new $class</code>
     </UnsafeInstantiation>
   </file>
+  <file src="src/EventHandler/AbstractAction.php">
+    <UnhandledMatchCondition>
+      <code>$type</code>
+    </UnhandledMatchCondition>
+  </file>
   <file src="src/EventHandler/AbstractMessage.php">
     <InvalidReturnStatement>
       <code><![CDATA[$this->replyCache]]></code>
       <code><![CDATA[$this->replyCache]]></code>
     </InvalidReturnStatement>
+    <LessSpecificReturnStatement>
+      <code><![CDATA[\array_map(
+            fn (array $arr): AbstractStory =>
+                $arr['_'] === 'storyItemDeleted'
+                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
+                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+            $result
+        )]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[list<AbstractStory>]]></code>
+    </MoreSpecificReturnType>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -562,12 +579,18 @@
   </file>
   <file src="src/EventHandler/Message.php">
     <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
+      <code>DialogSetTTL</code>
+      <code>DialogSetTTL</code>
       <code>Message</code>
     </MoreSpecificReturnType>
     <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </NullableReturnStatement>
     <PropertyNotSetInConstructor>
@@ -590,6 +613,24 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message/GroupMessage.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>DialogTopicCreated</code>
+      <code>DialogTopicEdited</code>
+      <code>DialogTopicEdited</code>
+      <code>DialogTopicEdited</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+    </NullableReturnStatement>
     <PropertyNotSetInConstructor>
       <code>GroupMessage</code>
       <code>GroupMessage</code>
@@ -628,6 +669,49 @@
       <code><![CDATA[$API->getIdInternal($rawCallback['peer'])]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
+  <file src="src/EventHandler/Story/Story.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$last->nextSent]]></code>
+    </InaccessibleProperty>
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>StoryReaction</code>
+      <code>StoryReaction</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+    </NullableReturnStatement>
+    <PossiblyUndefinedVariable>
+      <code>$first</code>
+    </PossiblyUndefinedVariable>
+    <PropertyNotSetInConstructor>
+      <code>$html</code>
+      <code>$htmlTelegram</code>
+    </PropertyNotSetInConstructor>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$API->wrapMedia($rawStory['media'], $this->protected)]]></code>
+      <code><![CDATA[\array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/EventHandler/User/Blocked.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawPeerBlocked['peer_id'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/User/Username.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[\array_map(
+            fn (array $username) => new UsernameInfo($username),
+            $rawUserName['usernames']
+        )]]></code>
+    </PropertyTypeCoercion>
+  </file>
   <file src="src/Exception.php">
     <MissingParamType>
       <code>$code</code>
@@ -648,6 +732,7 @@
   <file src="src/GarbageCollector.php">
     <PropertyTypeCoercion>
       <code>self::$map</code>
+      <code>self::$map ??= new WeakMap</code>
       <code>self::$map ??= new WeakMap</code>
     </PropertyTypeCoercion>
   </file>
@@ -937,6 +1022,12 @@
     </UninitializedProperty>
   </file>
   <file src="src/Loop/Connection/ReadLoop.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[\str_starts_with($e->getReason(), '       ')]]></code>
+    </DocblockTypeContradiction>
+    <InvalidThrow>
+      <code>throw $e;</code>
+    </InvalidThrow>
     <PossiblyNullArgument>
       <code><![CDATA[$buffer->bufferRead($payload_length)]]></code>
       <code><![CDATA[$buffer->bufferRead(4)]]></code>
@@ -952,6 +1043,12 @@
     <PropertyNotSetInConstructor>
       <code>ReadLoop</code>
     </PropertyNotSetInConstructor>
+    <UndefinedClass>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>ClosedException</code>
+    </UndefinedClass>
   </file>
   <file src="src/Loop/Connection/WriteLoop.php">
     <PossiblyNullArgument>
@@ -971,7 +1068,7 @@
       <code>WriteLoop</code>
     </PropertyNotSetInConstructor>
     <TypeDoesNotContainType>
-      <code><![CDATA[$this->shared->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
+      <code><![CDATA[$this->connection->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
     </TypeDoesNotContainType>
   </file>
   <file src="src/Loop/Generic/PeriodicLoopInternal.php">
@@ -1087,7 +1184,7 @@
       <code><![CDATA[isset($this->TL)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
       <code><![CDATA[isset($this->settings)]]></code>
-      <code><![CDATA[new DataCenter($this, $this->dcList, $this->settings->getConnection())]]></code>
+      <code>new DataCenter($this)</code>
       <code>new PeerDatabase($this)</code>
     </DocblockTypeContradiction>
     <InvalidArgument>
@@ -1180,6 +1277,9 @@
       <code>\is_int($dc_id)</code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
+    <TypeDoesNotContainType>
+      <code><![CDATA[isset($this->seqUpdater)]]></code>
+    </TypeDoesNotContainType>
     <UndefinedThisPropertyFetch>
       <code><![CDATA[$this->full_chats]]></code>
     </UndefinedThisPropertyFetch>
@@ -1619,6 +1719,18 @@
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MyTelegramOrgWrapper.php">
+    <InvalidArgument>
+      <code><![CDATA[$this->settings->getConnection()]]></code>
+      <code><![CDATA[new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
+                public function __construct(private Logger $logger)
+                {
+                }
+                public function getLogger(): Logger
+                {
+                    return $this->logger;
+                }
+            }]]></code>
+    </InvalidArgument>
     <MissingReturnType>
       <code>completeLogin</code>
       <code>createApp</code>
@@ -1631,6 +1743,21 @@
     <PossiblyUndefinedArrayOffset>
       <code>$value</code>
     </PossiblyUndefinedArrayOffset>
+    <TooManyArguments>
+      <code><![CDATA[new DoHWrapper(
+            $this->settings->getConnection(),
+            new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
+                public function __construct(private Logger $logger)
+                {
+                }
+                public function getLogger(): Logger
+                {
+                    return $this->logger;
+                }
+            },
+            $this->jar
+        )]]></code>
+    </TooManyArguments>
     <UninitializedProperty>
       <code><![CDATA[$this->settings]]></code>
     </UninitializedProperty>
@@ -1975,6 +2102,27 @@
     <PossiblyUndefinedVariable>
       <code>$data</code>
     </PossiblyUndefinedVariable>
+    <UndefinedClass>
+      <code><![CDATA[$this->stream]]></code>
+      <code><![CDATA[$this->stream]]></code>
+      <code><![CDATA[$this->stream]]></code>
+      <code>?WebsocketMessage</code>
+      <code>ClosedException</code>
+      <code>Rfc6455ConnectionFactory</code>
+      <code>Rfc6455Connector</code>
+      <code>WebsocketConnection</code>
+      <code>WebsocketConnector</code>
+      <code>WebsocketConnector</code>
+      <code>WebsocketHandshake</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass>
+      <code>WsStream</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Stream/Transport/WssStream.php">
+    <UndefinedDocblockClass>
+      <code>WssStream</code>
+    </UndefinedDocblockClass>
   </file>
   <file src="src/TL/Conversion/BotAPI.php">
     <MissingParamType>
@@ -2233,8 +2381,15 @@
     <TypeDoesNotContainType>
       <code>true</code>
     </TypeDoesNotContainType>
+    <UndefinedClass>
+      <code>ClosedException</code>
+      <code>ClosedException</code>
+    </UndefinedClass>
   </file>
   <file src="src/VoIPController.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[\ord($buffer->readLength(1))]]></code>
+    </ArgumentTypeCoercion>
     <InaccessibleProperty>
       <code><![CDATA[$this->authKey]]></code>
       <code><![CDATA[$this->authKey]]></code>
@@ -2278,6 +2433,10 @@
     <PossiblyNullArrayOffset>
       <code>$dialogs</code>
     </PossiblyNullArrayOffset>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->cachedAllBotUsers]]></code>
+      <code><![CDATA[$this->cachedAllBotUsers]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/Wrappers/Events.php">
     <DocblockTypeContradiction>

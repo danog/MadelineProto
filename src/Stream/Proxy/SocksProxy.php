@@ -56,7 +56,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $ctx = $ctx->getCtx();
+        $ctx = $ctx->clone();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
         if ($secure) {

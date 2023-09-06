@@ -270,8 +270,6 @@ trait Login
         }
         $this->authorized_dc = $mainDcID;
         $this->authorized = \danog\MadelineProto\API::LOGGED_IN;
-        $this->connectToAllDcs(true);
-        $this->initAuthorization();
         $this->getPhoneConfig();
         $res = ($this->fullGetSelf());
         $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];
@@ -348,7 +346,6 @@ trait Login
         $this->authorization = $authorization;
         $this->authorized = \danog\MadelineProto\API::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
-        $this->initAuthorization();
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         $this->getPhoneConfig();
         $this->startUpdateSystem();

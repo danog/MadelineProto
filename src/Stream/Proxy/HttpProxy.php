@@ -54,7 +54,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $ctx = $ctx->getCtx();
+        $ctx = $ctx->clone();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
         if ($secure) {

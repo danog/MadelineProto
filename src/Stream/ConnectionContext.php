@@ -23,8 +23,11 @@ namespace danog\MadelineProto\Stream;
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\DataCenter;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Tools;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
 
@@ -154,7 +157,7 @@ final class ConnectionContext
     /**
      * Return a clone of the current connection context.
      */
-    public function getCtx(): self
+    public function clone(): self
     {
         return clone $this;
     }
@@ -262,11 +265,13 @@ final class ConnectionContext
         return $this;
     }
     /**
-     * Get the current stream name from the stream chain.
+     * Check if connected via HTTP.
+     *
+     * @return boolean
      */
-    public function getStreamName(): string
+    public function isHttp(): bool
     {
-        return $this->nextStreams[$this->key][0];
+        return \in_array(Tools::end($this->nextStreams)[0], [HttpStream::class, HttpsStream::class], true);
     }
     /**
      * Check if has stream within stream chain.

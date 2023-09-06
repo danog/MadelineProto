@@ -18,6 +18,7 @@ use Closure;
 use danog\MadelineProto\Broadcast\Action;
 use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
+use danog\MadelineProto\EventHandler\Action\Cancel;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Keyboard;
 use danog\MadelineProto\EventHandler\Media;
@@ -36,7 +37,10 @@ use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Privacy\Key;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\User\Status\Emoji;
+use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\Ipc\Server;
@@ -595,15 +599,6 @@ abstract class InternalDoc
     public static function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Cancellation $token = null, ?\Closure $failureCb = null): ?\Closure
     {
         return \danog\MadelineProto\AsyncTools::flock($file, $operation, $polling, $token, $failureCb);
-    }
-    /**
-     * Convert bot API channel ID to MTProto channel ID.
-     *
-     * @param int $id Bot API channel ID
-     */
-    public static function fromSupergroup(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::fromSupergroup($id);
     }
     /**
      * When was full info for this chat last cached.
@@ -1269,15 +1264,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isSelfUser();
     }
     /**
-     * Check whether provided bot API ID is a channel or supergroup.
-     *
-     * @param int $id Bot API ID
-     */
-    public static function isSupergroupOrChannel(int $id): bool
-    {
-        return \danog\MadelineProto\MTProto::isSupergroupOrChannel($id);
-    }
-    /**
      * Whether we're currently connected to the test DCs.
      *
      * @return boolean
@@ -1863,15 +1849,6 @@ abstract class InternalDoc
     public static function toSnakeCase(string $input): string
     {
         return \danog\MadelineProto\StrTools::toSnakeCase($input);
-    }
-    /**
-     * Convert MTProto channel ID to bot API channel ID.
-     *
-     * @param int $id MTProto channel ID
-     */
-    public static function toSupergroup(int $id): int
-    {
-        return \danog\MadelineProto\MTProto::toSupergroup($id);
     }
     /**
      * Unpack binary double.

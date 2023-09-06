@@ -47,7 +47,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $ctx = $ctx->getCtx();
+        $ctx = $ctx->clone();
         $uri = $ctx->getUri();
         $this->stream = (($this->connector ?? socketConnector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellation()));
         if (\strlen($header) === '') {

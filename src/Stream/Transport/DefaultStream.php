@@ -66,7 +66,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $ctx = $ctx->getCtx();
+        $ctx = $ctx->clone();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
         if ($secure) {

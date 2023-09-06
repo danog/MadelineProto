@@ -25,6 +25,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
@@ -59,7 +60,6 @@ final class UpdateLoop extends Loop
      * Feed loop.
      */
     private FeedLoop $feeder;
-    private bool $first = true;
     /**
      * Constructor.
      */
@@ -73,7 +73,7 @@ final class UpdateLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
+        if (!$this->isLoggedIn()) {
             return self::PAUSE;
         }
         $this->feeder = $this->API->feeders[$this->channelId];
@@ -94,7 +94,7 @@ final class UpdateLoop extends Loop
                 }
                 $request_pts = $state->pts();
                 try {
-                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->API->toSupergroup($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['postpone' => $this->first, 'FloodWaitLimit' => 86400]);
+                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => DialogId::fromSupergroupOrChannel($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['FloodWaitLimit' => 86400]);
                 } catch (RPCErrorException $e) {
                     if ($e->rpc === '-503') {
                         delay(1.0);
@@ -216,7 +216,6 @@ final class UpdateLoop extends Loop
             $this->API->feeders[$channelId]?->resume();
         }
         $this->logger->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
-        $this->first = false;
 
         return $timeout;
     }

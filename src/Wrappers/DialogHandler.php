@@ -56,6 +56,9 @@ trait DialogHandler
         $this->cachingAllBotUsers ??= new LocalMutex;
         $lock = $this->cachingAllBotUsers->acquire();
         try {
+            if ($this->cachedAllBotUsers) {
+                return;
+            }
             if ($this->searchingRightPts) {
                 $this->searchRightPts();
             }

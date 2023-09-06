@@ -58,7 +58,7 @@ final class SeqLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
+        if (!$this->isLoggedIn()) {
             return self::PAUSE;
         }
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];

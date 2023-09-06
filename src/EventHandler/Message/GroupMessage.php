@@ -18,6 +18,8 @@ namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Banned;
@@ -25,6 +27,10 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
+use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing group message.
@@ -58,6 +64,76 @@ final class GroupMessage extends Message
             'channelParticipantCreator' => new Creator($result),
             default => throw new AssertionError("undefined Participant type: {$result['_']}")
         };
+    }
+
+    /**
+     * Display the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function unhideMembers(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function hideMembers(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Hide message history for new supergroup users.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function hideHistory(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Unhide message history for new supergroup users.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function unhideHistory(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleParticipantsHidden',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
     }
 
     /**
@@ -162,6 +238,231 @@ final class GroupMessage extends Message
                 'channel' => $this->chatId,
                 'for_everyone' => $forEveryone,
                 'max_id' => $maxId
+            ]
+        );
+    }
+
+    /**
+     * Delete all messages sent by a specific participant of a given supergroup.
+     *
+     * @param string|integer|null $member The participant whose messages should be deleted, if null or absent defaults to the sender of the message.
+     * @throws InvalidArgumentException
+     */
+    public function deleteUserMessages(string|int|null $member = null): void
+    {
+        Assert::false(DialogId::isSupergroupOrChannel($this->chatId));
+        $member ??= $this->senderId;
+        $this->getClient()->methodCallAsyncRead(
+            'channels.deleteParticipantHistory',
+            [
+                'channel' => $this->chatId,
+                'participant' => $member,
+            ]
+        );
+    }
+
+    /**
+     * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration).
+     *
+     * @return integer the channel id that migrate to
+     * @throws InvalidArgumentException
+     */
+    public function toSuperGroup(): int
+    {
+        Assert::true(DialogId::isChat($this->chatId));
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.migrateChat',
+            [
+                'chat_id' => $this->chatId,
+            ]
+        );
+        return DialogId::fromSupergroupOrChannel($result['updates'][0]['channel_id']);
+    }
+
+    /**
+     * Enable the [native antispam system](https://core.telegram.org/api/antispam).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function enableAntiSpam(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleAntiSpam',
+            [
+                'channel' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Disable the [native antispam system](https://core.telegram.org/api/antispam).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function disableAntiSpam(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleAntiSpam',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Enable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
+     *
+     */
+    public function enableTopics(): void
+    {
+        if (!$this->topicId) {
+            $this->getClient()->methodCallAsyncRead(
+                'channels.toggleForum',
+                [
+                    'channel' => $this->chatId,
+                    'enabled' => true,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Disable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
+     *
+     */
+    public function disableTopics(): void
+    {
+        if ($this->topicId) {
+            $this->getClient()->methodCallAsyncRead(
+                'channels.toggleForum',
+                [
+                    'channel' => $this->chatId,
+                    'enabled' => false,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Create a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param string $title Topic title (maximum UTF-8 length: 128)
+     * @param integer $icon ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * @param IconColor $color If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB)
+     * @throws InvalidArgumentException
+     */
+    public function createTopic(string $title, int $icon, IconColor $color = IconColor::NONE): DialogTopicCreated
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        if (!$this->topicId) {
+            $this->enableTopics();
+        }
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.createForumTopic',
+            [
+                'channel' => $this->chatId,
+                'title' => $title,
+                'icon_color' => $color->value,
+                'icon_emoji_id' => $icon,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Edit a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param string $title Topic title (maximum UTF-8 length: 128)
+     * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * @param integer|null $topicId Topic ID
+     * @throws InvalidArgumentException
+     */
+    public function editTopic(string $title, int $icon, ?int $topicId = null): DialogTopicEdited
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $topicId ??= $this->topicId;
+        Assert::notNull($topicId, "No topic ID was provided!");
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'title' => $title,
+                'icon_emoji_id' => $icon,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Open a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param integer|null $topicId Topic ID
+     * @throws InvalidArgumentException
+     */
+    public function openTopic(?int $topicId = null): DialogTopicEdited
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $topicId ??= $this->topicId;
+        Assert::notNull($topicId, "No topic ID was provided!");
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'closed' => false,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Close a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
+     *
+     * @param integer|null $topicId Topic ID
+     * @throws InvalidArgumentException
+     */
+    public function closeTopic(?int $topicId = null): DialogTopicEdited
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $topicId ??= $this->topicId;
+        Assert::notNull($topicId, "No topic ID was provided!");
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'channels.editForumTopic',
+            [
+                'channel' => $this->chatId,
+                'topic_id' => $topicId,
+                'closed' => true,
+            ]
+        );
+        return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Delete message history of a [forum topic](https://core.telegram.org/api/forum).
+     *
+     * @param integer|null $topicId Topic ID
+     * @throws InvalidArgumentException
+     */
+    public function deleteTopic(?int $topicId = null): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $topicId ??= $this->topicId;
+        Assert::notNull($topicId, "No topic ID was provided!");
+        $this->getClient()->methodCallAsyncRead(
+            'channels.deleteTopicHistory',
+            [
+                'channel' => $this->chatId,
+                'top_msg_id' => $topicId,
             ]
         );
     }

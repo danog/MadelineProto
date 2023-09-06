@@ -53,10 +53,15 @@ final class WriteLoop extends Loop
         $please_wait = false;
         while (true) {
             if ($this->connection->shouldReconnect()) {
-                $this->logger->logger('Not writing because connection is old');
+                $this->logger->logger("Exiting $this because connection is old");
                 return self::STOP;
             }
-            while (!$this->connection->pendingOutgoing || $please_wait) {
+            if (!$this->connection->pendingOutgoing) {
+                $this->logger->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
+                return self::PAUSE;
+            }
+            if ($please_wait) {
+                $this->logger->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
                 return self::PAUSE;
             }
             $this->connection->writing(true);
@@ -66,6 +71,7 @@ final class WriteLoop extends Loop
                     : $this->unencryptedWriteLoop();
             } catch (StreamException $e) {
                 if ($this->connection->shouldReconnect()) {
+                    $this->logger->logger("Stopping $this because we have to reconnect");
                     return self::STOP;
                 }
                 EventLoop::queue(function () use ($e): void {
@@ -73,6 +79,7 @@ final class WriteLoop extends Loop
                     $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
                 });
+                $this->logger->logger("Stopping $this");
                 return self::STOP;
             } finally {
                 $this->connection->writing(false);
@@ -126,7 +133,7 @@ final class WriteLoop extends Loop
             if (!$this->shared->hasTempAuthKey()) {
                 return false;
             }
-            if ($this->shared->isHttp() && empty($this->connection->pendingOutgoing)) {
+            if ($this->connection->isHttp() && empty($this->connection->pendingOutgoing)) {
                 return false;
             }
 
@@ -202,7 +209,7 @@ final class WriteLoop extends Loop
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
                             $this->logger->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
-                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
+                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                         } else {
                             $this->logger->logger("Skipping $message due to uninited connection in DC $this->datacenter");
                             $skipped = true;
@@ -261,7 +268,7 @@ final class WriteLoop extends Loop
                 $count++;
                 unset($acks, $body);
             }
-            if ($this->shared->isHttp() && !$has_http_wait) {
+            if ($this->connection->isHttp() && !$has_http_wait) {
                 $this->logger->logger('Adding http_wait', Logger::ULTRA_VERBOSE);
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait');
                 $messages []= [
@@ -290,7 +297,7 @@ final class WriteLoop extends Loop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $this->logger->logger("NO MESSAGE SENT in DC {$this->datacenter}", Logger::WARNING);
+                $this->logger->logger("NO MESSAGE SENT in $this, pending ".\implode(', ', \array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
                 return true;
             }
             unset($messages);
@@ -301,7 +308,7 @@ final class WriteLoop extends Loop
             }
             $padding = Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($this->shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
-            [$aes_key, $aes_iv] = Crypt::aesCalculate($message_key, $this->shared->getTempAuthKey()->getAuthKey());
+            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey());
             $message = $this->shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
             $buffer = $this->connection->stream->getWriteBuffer(\strlen($message));
             $buffer->bufferWrite($message);

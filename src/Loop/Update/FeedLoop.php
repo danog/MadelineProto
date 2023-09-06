@@ -25,6 +25,7 @@ use danog\MadelineProto\AsyncTools;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 
 /**
@@ -71,7 +72,7 @@ final class FeedLoop extends Loop
      */
     public function loop(): ?float
     {
-        if (!$this->API->hasAllAuth()) {
+        if (!$this->isLoggedIn()) {
             return self::PAUSE;
         }
         $this->updater = $this->API->updaters[$this->channelId];
@@ -232,7 +233,7 @@ final class FeedLoop extends Loop
                 }
                 break;
             default:
-                if ($channelId && !($this->API->peerIsset($this->API->toSupergroup($channelId)))) {
+                if ($channelId && !($this->API->peerIsset(DialogId::fromSupergroupOrChannel($channelId)))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
                     return false;
                 }

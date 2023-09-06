@@ -33,9 +33,14 @@ final class TLMethods
     {
         return ['by_id', 'by_method', 'method_namespace'];
     }
-    public function add(array $json_dict): void
+    public function add(array $json_dict, string $scheme_type): void
     {
-        $this->by_id[$json_dict['id']] = ['method' => $json_dict['method'], 'type' => $json_dict['type'], 'params' => $json_dict['params']];
+        $this->by_id[$json_dict['id']] = [
+            'method' => $json_dict['method'],
+            'type' => $json_dict['type'],
+            'params' => $json_dict['params'],
+            'encrypted' => $scheme_type !== 'mtproto'
+        ];
         $this->by_method[$json_dict['method']] = $json_dict['id'];
         $namespace = \explode('.', $json_dict['method']);
         if (isset($namespace[1])) {

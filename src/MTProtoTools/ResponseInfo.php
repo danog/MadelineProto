@@ -106,7 +106,7 @@ final class ResponseInfo
         }
         $seek_start = empty($seek_start) ? 0 : \abs(\intval($seek_start));
 
-        $isSafari = !empty($headers['user-agent']) && preg_match('/^((?!chrome|android).)*safari/i', $headers['user-agent']);
+        $isSafari = !empty($headers['user-agent']) && \preg_match('/^((?!chrome|android).)*safari/i', $headers['user-agent']);
         if ($range !== '' && $isSafari) {
             //Safari video streaming fix
             $length = ($seek_end - $seek_start + 1);
