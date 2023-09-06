@@ -16,7 +16,7 @@ interface Langpack
      * @param string $lang_code Language code
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
      */
-    public function getLangPack(string $lang_pack = '', string $lang_code = ''): array;
+    public function getLangPack(string|null $lang_pack = '', string|null $lang_code = ''): array;
 
     /**
      * Get strings from a language pack.
@@ -26,7 +26,7 @@ interface Langpack
      * @param list<string>|array<never, never> $keys Strings to get
      * @return list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackString.html
      */
-    public function getStrings(string $lang_pack = '', string $lang_code = '', array $keys = []): array;
+    public function getStrings(string|null $lang_pack = '', string|null $lang_code = '', array $keys = []): array|null;
 
     /**
      * Get new strings in language pack.
@@ -36,7 +36,7 @@ interface Langpack
      * @param int $from_version Previous localization pack version
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value: string, one_value: string, two_value: string, few_value: string, many_value: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
      */
-    public function getDifference(string $lang_pack = '', string $lang_code = '', int $from_version = 0): array;
+    public function getDifference(string|null $lang_pack = '', string|null $lang_code = '', int|null $from_version = 0): array;
 
     /**
      * Get information about all languages in a localization pack.
@@ -44,7 +44,7 @@ interface Langpack
      * @param string $lang_pack Language pack
      * @return list<array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
      */
-    public function getLanguages(string $lang_pack = ''): array;
+    public function getLanguages(string|null $lang_pack = ''): array|null;
 
     /**
      * Get information about a language in a localization pack.
@@ -53,5 +53,5 @@ interface Langpack
      * @param string $lang_code Language code
      * @return array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string} @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
      */
-    public function getLanguage(string $lang_pack = '', string $lang_code = ''): array;
+    public function getLanguage(string|null $lang_pack = '', string|null $lang_code = ''): array;
 }

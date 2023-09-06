@@ -96,13 +96,13 @@ final class Blacklist {
         }
         return [false, $type];
     }
-    private function prepareTLType(string $type): string
+    private function prepareTLType(string $type, bool $optional): string
     {
         [$isVector, $type] = self::isVector($type);
         if ($isVector) {
-            return 'array';
+            return $optional ? 'array' : 'array|null';
         }
-        return match ($type) {
+        $type = match ($type) {
             'string' => 'string',
             'bytes' => 'string',
             'waveform' => 'array',
@@ -120,6 +120,10 @@ final class Blacklist {
             'JSONValue' => 'mixed',
             default => $this->special[$type] ?? 'array'
         };
+        if ($type === 'mixed' || !$optional) {
+            return $type;
+        }
+        return $type.'|null';
     }
     private function prepareTLPsalmType(string $type, bool $input, int $depth = -2, array $stack = []): string
     {
@@ -223,7 +227,7 @@ final class Blacklist {
             'true' => 'false',
             'DataJSON' => 'null',
             'JSONValue' => 'null',
-            default => '[]'
+            default => 'null'
         };
     }
     private function preparePsalmDefault(string $type): string
@@ -244,7 +248,7 @@ final class Blacklist {
             'true' => 'false',
             'DataJSON' => 'null',
             'JSONValue' => 'null',
-            default => 'array<never, never>'
+            default => 'null'
         };
     }
     private function prepareTLTypeDescription(string $type, string $description): string
@@ -313,6 +317,9 @@ final class Blacklist {
                 $param['type'] = 'Vector<'.$param['subtype'].'>';
                 $param['pow'] = 'optional';
             }
+            if ($this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) {
+                $param['pow'] = 'optional';
+            }
             $newParams[$param['name']] = $param;
         }
         \uasort($newParams, fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
@@ -331,7 +338,7 @@ final class Blacklist {
         foreach ($params as $name => $param) {
             $description = $this->prepareTLTypeDescription($param['type'], $param['description']);
             $psalmType = $this->prepareTLPsalmType($param['type'], true);
-            $type = $this->prepareTLType($param['type']);
+            $type = $this->prepareTLType($param['type'], isset($param['pow']));
             $param_var = $type.' $'.$name;
             if (isset($param['pow'])) {
                 $param_var .= ' = '.$this->prepareTLDefault($param['type']);
@@ -382,7 +389,7 @@ final class Blacklist {
             $contents .= "     *\n";
             [$params, $signature] = $this->prepareTLParams($data);
             $contents .= $params;
-            $returnType = $this->prepareTLType($data['type']);
+            $returnType = $this->prepareTLType($data['type'], isset($data['pow']));
             $psalmType = $this->prepareTLPsalmType($data['type'], false);
             $description = $this->prepareTLTypeDescription($data['type'], '');
             $contents .= "     * @return {$psalmType} {$description}\n";

@@ -17,7 +17,7 @@ interface Chatlists
      * @param list<array|int|string>|array<never, never> $peers Array of The list of channels, group and supergroups to share with the link. Basic groups will automatically be [converted to supergroups](https://core.telegram.org/api/channel#migration) when invoking the method. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'chatlists.exportedChatlistInvite', filter: array{_: 'dialogFilter', contacts: bool, non_contacts: bool, groups: bool, broadcasts: bool, bots: bool, exclude_muted: bool, exclude_read: bool, exclude_archived: bool, id: int, title: string, emoticon: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>, exclude_peers: list<array|int|string>}|array{_: 'dialogFilterDefault'}|array{_: 'dialogFilterChatlist', has_my_invites: bool, id: int, title: string, emoticon: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>}, invite: array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>}} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ExportedChatlistInvite.html
      */
-    public function exportChatlistInvite(array $chatlist, string $title = '', array $peers = []): array;
+    public function exportChatlistInvite(array $chatlist, string|null $title = '', array $peers = []): array;
 
     /**
      * Delete a previously created [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).
@@ -25,7 +25,7 @@ interface Chatlists
      * @param array{_: 'inputChatlistDialogFilter', filter_id?: int} $chatlist The related folder @see https://docs.madelineproto.xyz/API_docs/types/InputChatlist.html
      * @param string $slug `slug` obtained from the [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).
      */
-    public function deleteExportedInvite(array $chatlist, string $slug = ''): bool;
+    public function deleteExportedInvite(array $chatlist, string|null $slug = ''): bool;
 
     /**
      * Edit a [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).
@@ -36,7 +36,7 @@ interface Chatlists
      * @param list<array|int|string>|array<never, never> $peers Array of If set, changes the list of peers shared with the link @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/ExportedChatlistInvite.html
      */
-    public function editExportedInvite(array $chatlist, string $slug = '', string $title = '', array $peers = []): array;
+    public function editExportedInvite(array $chatlist, string|null $slug = '', string|null $title = '', array $peers = []): array;
 
     /**
      * List all [chat folder deep links »](https://core.telegram.org/api/links#chat-folder-links) associated to a folder.
@@ -52,7 +52,7 @@ interface Chatlists
      * @param string $slug `slug` obtained from the [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links)
      * @return array{_: 'chatlists.chatlistInviteAlready', filter_id: int, missing_peers: list<array|int|string>, already_peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'chatlists.chatlistInvite', title: string, emoticon: string, peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ChatlistInvite.html
      */
-    public function checkChatlistInvite(string $slug = ''): array;
+    public function checkChatlistInvite(string|null $slug = ''): array;
 
     /**
      * Import a [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links), joining some or all the chats in the folder.
@@ -61,7 +61,7 @@ interface Chatlists
      * @param list<array|int|string>|array<never, never> $peers Array of List of new chats to join, fetched using [chatlists.checkChatlistInvite](https://docs.madelineproto.xyz/API_docs/methods/chatlists.checkChatlistInvite.html) and filtered as specified in the [documentation »](https://core.telegram.org/api/folders#shared-folders). @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinChatlistInvite(string $slug = '', array $peers = []): array;
+    public function joinChatlistInvite(string|null $slug = '', array $peers = []): array;
 
     /**
      * Fetch new chats associated with an imported [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links). Must be invoked at most every `chatlist_update_period` seconds (as per the related [client configuration parameter »](https://core.telegram.org/api/config#chatlist-update-period)).
@@ -93,7 +93,7 @@ interface Chatlists
      * @param array{_: 'inputChatlistDialogFilter', filter_id?: int} $chatlist Folder ID @see https://docs.madelineproto.xyz/API_docs/types/InputChatlist.html
      * @return list<array|int|string> Array of  @see https://docs.madelineproto.xyz/API_docs/types/Peer.html
      */
-    public function getLeaveChatlistSuggestions(array $chatlist): array;
+    public function getLeaveChatlistSuggestions(array $chatlist): array|null;
 
     /**
      * Delete a folder imported using a [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).

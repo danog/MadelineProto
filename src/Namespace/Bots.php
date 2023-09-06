@@ -16,7 +16,7 @@ interface Bots
      * @param string $custom_method The method name
      * @return mixed Any JSON-encodable data
      */
-    public function sendCustomRequest(mixed $params, string $custom_method = ''): mixed;
+    public function sendCustomRequest(mixed $params, string|null $custom_method = ''): mixed;
 
     /**
      * Answers a custom query; for bots only.
@@ -24,41 +24,41 @@ interface Bots
      * @param mixed $data Any JSON-encodable data
      * @param int $query_id Identifier of a custom query
      */
-    public function answerWebhookJSONQuery(mixed $data, int $query_id = 0): bool;
+    public function answerWebhookJSONQuery(mixed $data, int|null $query_id = 0): bool;
 
     /**
      * Set bot command list.
      *
-     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer: array|int|string}|array{_: 'botCommandScopePeerUser', peer: array|int|string, user_id: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
+     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer?: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer?: array|int|string}|array{_: 'botCommandScopePeerUser', peer?: array|int|string, user_id?: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
      * @param string $lang_code Language code
      * @param list<array{_: 'botCommand', command?: string, description?: string}>|array<never, never> $commands Array of Bot commands @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
      */
-    public function setBotCommands(array $scope, string $lang_code = '', array $commands = []): bool;
+    public function setBotCommands(array $scope, string|null $lang_code = '', array $commands = []): bool;
 
     /**
      * Clear bot commands for the specified bot scope and language code.
      *
-     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer: array|int|string}|array{_: 'botCommandScopePeerUser', peer: array|int|string, user_id: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
+     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer?: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer?: array|int|string}|array{_: 'botCommandScopePeerUser', peer?: array|int|string, user_id?: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
      * @param string $lang_code Language code
      */
-    public function resetBotCommands(array $scope, string $lang_code = ''): bool;
+    public function resetBotCommands(array $scope, string|null $lang_code = ''): bool;
 
     /**
      * Obtain a list of bot commands for the specified bot scope and language code.
      *
-     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer: array|int|string}|array{_: 'botCommandScopePeerUser', peer: array|int|string, user_id: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
+     * @param array{_: 'botCommandScopeDefault'}|array{_: 'botCommandScopeUsers'}|array{_: 'botCommandScopeChats'}|array{_: 'botCommandScopeChatAdmins'}|array{_: 'botCommandScopePeer', peer?: array|int|string}|array{_: 'botCommandScopePeerAdmins', peer?: array|int|string}|array{_: 'botCommandScopePeerUser', peer?: array|int|string, user_id?: array|int|string} $scope Command scope @see https://docs.madelineproto.xyz/API_docs/types/BotCommandScope.html
      * @param string $lang_code Language code
      * @return list<array{_: 'botCommand', command: string, description: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
      */
-    public function getBotCommands(array $scope, string $lang_code = ''): array;
+    public function getBotCommands(array $scope, string|null $lang_code = ''): array|null;
 
     /**
      * Sets the [menu button action »](https://core.telegram.org/api/bots/menu) for a given user or for all users.
      *
-     * @param array|int|string $user_id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param array{_: 'botMenuButtonDefault'}|array{_: 'botMenuButtonCommands'}|array{_: 'botMenuButton', text?: string, url?: string} $button Bot menu button action @see https://docs.madelineproto.xyz/API_docs/types/BotMenuButton.html
+     * @param array|int|string $user_id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      */
-    public function setBotMenuButton(array|int|string $user_id, array $button): bool;
+    public function setBotMenuButton(array $button, array|int|string|null $user_id = null): bool;
 
     /**
      * Gets the menu button action for a given user or for all users, previously set using [bots.setBotMenuButton](https://docs.madelineproto.xyz/API_docs/methods/bots.setBotMenuButton.html); users can see this information in the [botInfo](https://docs.madelineproto.xyz/API_docs/constructors/botInfo.html) constructor.
@@ -66,7 +66,7 @@ interface Bots
      * @param array|int|string $user_id User ID or empty for the default menu button. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array{_: 'botMenuButtonDefault'}|array{_: 'botMenuButtonCommands'}|array{_: 'botMenuButton', text: string, url: string} @see https://docs.madelineproto.xyz/API_docs/types/BotMenuButton.html
      */
-    public function getBotMenuButton(array|int|string $user_id): array;
+    public function getBotMenuButton(array|int|string|null $user_id = null): array;
 
     /**
      * Set the default [suggested admin rights](https://core.telegram.org/api/rights#suggested-bot-rights) for bots being added as admins to channels, see [here for more info on how to handle them »](https://core.telegram.org/api/rights#suggested-bot-rights).
@@ -85,22 +85,22 @@ interface Bots
     /**
      * Set localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     * @param array|int|string|array<never, never> $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $lang_code Language code, if left empty update the fallback about text and description
      * @param string $name New bot name
      * @param string $about New about text
      * @param string $description New description
      */
-    public function setBotInfo(array|int|string $bot = [], string $lang_code = '', string $name = '', string $about = '', string $description = ''): bool;
+    public function setBotInfo(array|int|string|null $bot = null, string|null $lang_code = '', string|null $name = '', string|null $about = '', string|null $description = ''): bool;
 
     /**
      * Get localized name, about text and description of a bot (or of the current account, if called by a bot).
      *
-     * @param array|int|string|array<never, never> $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $bot If called by a user, **must** contain the peer of a bot we own. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $lang_code Language code, if left empty this method will return the fallback about text and description.
      * @return array{_: 'bots.botInfo', name: string, about: string, description: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.BotInfo.html
      */
-    public function getBotInfo(array|int|string $bot = [], string $lang_code = ''): array;
+    public function getBotInfo(array|int|string|null $bot = null, string|null $lang_code = ''): array;
 
     /**
      * Reorder usernames associated to a bot we own.
@@ -108,14 +108,14 @@ interface Bots
      * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param list<string>|array<never, never> $order The new order for active usernames. All active usernames must be specified.
      */
-    public function reorderUsernames(array|int|string $bot, array $order = []): bool;
+    public function reorderUsernames(array|int|string|null $bot = null, array $order = []): bool;
 
     /**
      * Activate or deactivate a purchased [fragment.com](https://fragment.com) username associated to a bot we own.
      *
-     * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param bool $active Whether to activate or deactivate it
+     * @param array|int|string $bot The bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $username Username
      */
-    public function toggleUsername(array|int|string $bot, bool $active, string $username = ''): bool;
+    public function toggleUsername(bool $active, array|int|string|null $bot = null, string|null $username = ''): bool;
 }

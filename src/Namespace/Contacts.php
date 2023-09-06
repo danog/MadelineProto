@@ -15,14 +15,14 @@ interface Contacts
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return list<int>
      */
-    public function getContactIDs(array $hash = []): array;
+    public function getContactIDs(array $hash = []): array|null;
 
     /**
      * Returns the list of contact statuses.
      *
-     * @return list<array{_: 'contactStatus', status: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}, user_id: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/ContactStatus.html
+     * @return list<array{_: 'contactStatus', user_id: int, status: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/ContactStatus.html
      */
-    public function getStatuses(): array;
+    public function getStatuses(): array|null;
 
     /**
      * Returns the current user's contact list.
@@ -62,14 +62,14 @@ interface Contacts
      *
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function block(array|int|string $id, bool $my_stories_from = false): bool;
+    public function block(bool|null $my_stories_from = false, array|int|string|null $id = null): bool;
 
     /**
      * Deletes the user from the blacklist.
      *
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function unblock(array|int|string $id, bool $my_stories_from = false): bool;
+    public function unblock(bool|null $my_stories_from = false, array|int|string|null $id = null): bool;
 
     /**
      * Returns the list of blocked users.
@@ -78,7 +78,7 @@ interface Contacts
      * @param int $limit The number of list elements to be returned
      * @return array{_: 'contacts.blocked', blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.blockedSlice', count: int, blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Blocked.html
      */
-    public function getBlocked(bool $my_stories_from = false, int $offset = 0, int $limit = 0): array;
+    public function getBlocked(bool|null $my_stories_from = false, int|null $offset = 0, int|null $limit = 0): array;
 
     /**
      * Returns users found by username substring.
@@ -87,7 +87,7 @@ interface Contacts
      * @param int $limit Maximum number of users to be returned
      * @return array{_: 'contacts.found', my_results: list<array|int|string>, results: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Found.html
      */
-    public function search(string $q = '', int $limit = 0): array;
+    public function search(string|null $q = '', int|null $limit = 0): array;
 
     /**
      * Get most used peers.
@@ -105,7 +105,7 @@ interface Contacts
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @return array{_: 'contacts.topPeersNotModified'}|array{_: 'contacts.topPeers', categories: list<array{_: 'topPeerCategoryPeers', category: array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'}, count: int, peers: list<array{_: 'topPeer', peer: array|int|string, rating: float}>}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.topPeersDisabled'} @see https://docs.madelineproto.xyz/API_docs/types/contacts.TopPeers.html
      */
-    public function getTopPeers(bool $correspondents = false, bool $bots_pm = false, bool $bots_inline = false, bool $phone_calls = false, bool $forward_users = false, bool $forward_chats = false, bool $groups = false, bool $channels = false, int $offset = 0, int $limit = 0, array $hash = []): array;
+    public function getTopPeers(bool|null $correspondents = false, bool|null $bots_pm = false, bool|null $bots_inline = false, bool|null $phone_calls = false, bool|null $forward_users = false, bool|null $forward_chats = false, bool|null $groups = false, bool|null $channels = false, int|null $offset = 0, int|null $limit = 0, array $hash = []): array;
 
     /**
      * Reset [rating](https://core.telegram.org/api/top-rating) of top peer.
@@ -113,7 +113,7 @@ interface Contacts
      * @param array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'} $category Top peer category @see https://docs.madelineproto.xyz/API_docs/types/TopPeerCategory.html
      * @param array|int|string $peer Peer whose rating should be reset @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function resetTopPeerRating(array $category, array|int|string $peer): bool;
+    public function resetTopPeerRating(array $category, array|int|string|null $peer = null): bool;
 
     /**
      * Delete saved contacts.
@@ -126,7 +126,7 @@ interface Contacts
      *
      * @return list<array{_: 'savedPhoneContact', phone: string, first_name: string, last_name: string, date: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SavedContact.html
      */
-    public function getSaved(): array;
+    public function getSaved(): array|null;
 
     /**
      * Enable/disable [top peers](https://core.telegram.org/api/top-rating).
@@ -140,14 +140,14 @@ interface Contacts
      *
      * Use [contacts.importContacts](https://docs.madelineproto.xyz/API_docs/methods/contacts.importContacts.html) to add contacts by phone number, without knowing their Telegram ID.
      *
-     * @param array|int|string $id Telegram ID of the other user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param bool $add_phone_privacy_exception Allow the other user to see our phone number?
+     * @param array|int|string $id Telegram ID of the other user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $first_name First name
      * @param string $last_name Last name
      * @param string $phone User's phone number
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function addContact(array|int|string $id, bool $add_phone_privacy_exception = false, string $first_name = '', string $last_name = '', string $phone = ''): array;
+    public function addContact(bool|null $add_phone_privacy_exception = false, array|int|string|null $id = null, string|null $first_name = '', string|null $last_name = '', string|null $phone = ''): array;
 
     /**
      * If the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of a new user allow us to add them as contact, add that user as contact.
@@ -155,17 +155,17 @@ interface Contacts
      * @param array|int|string $id The user to add as contact @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function acceptContact(array|int|string $id): array;
+    public function acceptContact(array|int|string|null $id = null): array;
 
     /**
      * Get contacts near you.
      *
-     * @param array{_: 'inputGeoPointEmpty'}|array{_: 'inputGeoPoint', lat: float, long: float, accuracy_radius?: int} $geo_point Geolocation @see https://docs.madelineproto.xyz/API_docs/types/InputGeoPoint.html
      * @param bool $background While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so, while setting this flag. <br>Do this only if the new location is more than 1 KM away from the previous one, or if the previous location is unknown.
+     * @param array{_: 'inputGeoPointEmpty'}|array{_: 'inputGeoPoint', lat: float, long: float, accuracy_radius?: int} $geo_point Geolocation @see https://docs.madelineproto.xyz/API_docs/types/InputGeoPoint.html
      * @param int $self_expires If set, the geolocation of the current user will be public for the specified number of seconds; pass 0x7fffffff to disable expiry, 0 to make the current geolocation private; if the flag isn't set, no changes will be applied.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function getLocated(array $geo_point, bool $background = false, int $self_expires = 0): array;
+    public function getLocated(bool|null $background = false, array|null $geo_point = null, int|null $self_expires = 0): array;
 
     /**
      * Stop getting notifications about [thread replies](https://core.telegram.org/api/threads) of a certain user in `@replies`.
@@ -176,7 +176,7 @@ interface Contacts
      * @param int $msg_id ID of the message in the [@replies](https://core.telegram.org/api/threads#replies) chat
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function blockFromReplies(bool $delete_message = false, bool $delete_history = false, bool $report_spam = false, int $msg_id = 0): array;
+    public function blockFromReplies(bool|null $delete_message = false, bool|null $delete_history = false, bool|null $report_spam = false, int|null $msg_id = 0): array;
 
     /**
      * Resolve a phone number to get user info, if their privacy settings allow it.
@@ -184,7 +184,7 @@ interface Contacts
      * @param string $phone Phone number in international format, possibly obtained from a [phone number deep link](https://core.telegram.org/api/links#phone-number-links).
      * @return array{_: 'contacts.resolvedPeer', peer: array|int|string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ResolvedPeer.html
      */
-    public function resolvePhone(string $phone = ''): array;
+    public function resolvePhone(string|null $phone = ''): array;
 
     /**
      * Generates a [temporary profile link](https://core.telegram.org/api/links#temporary-profile-links) for the currently logged-in user.
@@ -199,7 +199,7 @@ interface Contacts
      * @param string $token The token extracted from the [temporary profile link](https://core.telegram.org/api/links#temporary-profile-links).
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
      */
-    public function importContactToken(string $token = ''): array|int|string;
+    public function importContactToken(string|null $token = ''): array|int|string;
 
     /**
      *
@@ -213,12 +213,12 @@ interface Contacts
      *
      * @param array|int|string $id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      */
-    public function toggleStoriesHidden(array|int|string $id, bool $hidden): bool;
+    public function toggleStoriesHidden(bool $hidden, array|int|string|null $id = null): bool;
 
     /**
      *
      *
      * @param list<array|int|string>|array<never, never> $id Array of  @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function setBlocked(bool $my_stories_from = false, array $id = [], int $limit = 0): bool;
+    public function setBlocked(bool|null $my_stories_from = false, array $id = [], int|null $limit = 0): bool;
 }

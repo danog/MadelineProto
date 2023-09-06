@@ -108,7 +108,7 @@ class Server extends Loop
             ProcessRunner::start((string) $session, $id);
             $started = true;
             WebRunner::start((string) $session, $id);
-            return async(self::monitor(...), $session, $id, $started);
+            return async(self::monitor(...), $session, $id, $started, null);
         } catch (Throwable $e) {
             Logger::log($e);
         }

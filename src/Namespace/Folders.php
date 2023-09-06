@@ -12,7 +12,7 @@ interface Folders
     /**
      * Edit peers in [peer folder](https://core.telegram.org/api/folders#peer-folders).
      *
-     * @param list<array{_: 'inputFolderPeer', peer: array|int|string, folder_id?: int}>|array<never, never> $folder_peers Array of New peer list @see https://docs.madelineproto.xyz/API_docs/types/InputFolderPeer.html
+     * @param list<array{_: 'inputFolderPeer', peer?: array|int|string, folder_id?: int}>|array<never, never> $folder_peers Array of New peer list @see https://docs.madelineproto.xyz/API_docs/types/InputFolderPeer.html
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function editPeerFolders(array $folder_peers = []): array;

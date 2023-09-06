@@ -32,7 +32,7 @@ interface Phone
      * @param string $comment An additional comment
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function setCallRating(array $peer, bool $user_initiative = false, int $rating = 0, string $comment = ''): array;
+    public function setCallRating(array $peer, bool|null $user_initiative = false, int|null $rating = 0, string|null $comment = ''): array;
 
     /**
      * Send phone call debug data to server.
@@ -48,31 +48,31 @@ interface Phone
      * @param array{_: 'inputPhoneCall', id?: int, access_hash?: int} $peer Phone call @see https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html
      * @param string $data Signaling payload
      */
-    public function sendSignalingData(array $peer, string $data = ''): bool;
+    public function sendSignalingData(array $peer, string|null $data = ''): bool;
 
     /**
      * Create a group call or livestream.
      *
-     * @param array|int|string $peer Associate the group call or livestream to the provided [group/supergroup/channel](https://core.telegram.org/api/channel) @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param bool $rtmp_stream Whether RTMP stream support should be enabled: only the [group/supergroup/channel](https://core.telegram.org/api/channel) owner can use this flag.
+     * @param array|int|string $peer Associate the group call or livestream to the provided [group/supergroup/channel](https://core.telegram.org/api/channel) @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param string $title Call title
      * @param int $schedule_date For scheduled group call or livestreams, the absolute date when the group call will start
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function createGroupCall(array|int|string $peer, bool $rtmp_stream = false, string $title = '', int $schedule_date = 0): array;
+    public function createGroupCall(bool|null $rtmp_stream = false, array|int|string|null $peer = null, string|null $title = '', int|null $schedule_date = 0): array;
 
     /**
      * Join a group call.
      *
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
-     * @param array|int|string $join_as Join the group call, presenting yourself as the specified user/channel @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param mixed $params Any JSON-encodable data
      * @param bool $muted If set, the user will be muted by default upon joining.
      * @param bool $video_stopped If set, the user's video will be disabled by default upon joining.
+     * @param array|int|string $join_as Join the group call, presenting yourself as the specified user/channel @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param string $invite_hash The invitation hash from the [invite link »](https://core.telegram.org/api/links#video-chatlivestream-links), if provided allows speaking in a livestream or muted group chat.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinGroupCall(array $call, array|int|string $join_as, mixed $params, bool $muted = false, bool $video_stopped = false, string $invite_hash = ''): array;
+    public function joinGroupCall(array $call, mixed $params, bool|null $muted = false, bool|null $video_stopped = false, array|int|string|null $join_as = null, string|null $invite_hash = ''): array;
 
     /**
      * Leave a group call.
@@ -81,7 +81,7 @@ interface Phone
      * @param int $source Your source ID
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function leaveGroupCall(array $call, int $source = 0): array;
+    public function leaveGroupCall(array $call, int|null $source = 0): array;
 
     /**
      * Invite a set of users to a group call.
@@ -108,7 +108,7 @@ interface Phone
      * @param bool $join_muted Whether all users will that join this group call are muted by default upon joining the group call
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function toggleGroupCallSettings(array $call, bool $reset_invite_hash = false, bool $join_muted = false): array;
+    public function toggleGroupCallSettings(array $call, bool|null $reset_invite_hash = false, bool|null $join_muted = false): array;
 
     /**
      * Get info about a group call.
@@ -117,7 +117,7 @@ interface Phone
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @return array{_: 'phone.groupCall', call: array{_: 'groupCallDiscarded', id: int, access_hash: int, duration: int}|array{_: 'groupCall', join_muted: bool, can_change_join_muted: bool, join_date_asc: bool, schedule_start_subscribed: bool, can_start_video: bool, record_video_active: bool, rtmp_stream: bool, listeners_hidden: bool, id: int, access_hash: int, participants_count: int, title: string, stream_dc_id: int, record_start_date: int, schedule_date: int, unmuted_video_count: int, unmuted_video_limit: int, version: int}, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date: int, source: int, volume: int, about: string, raise_hand_rating: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}}>, participants_next_offset: string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCall.html
      */
-    public function getGroupCall(array $call, int $limit = 0): array;
+    public function getGroupCall(array $call, int|null $limit = 0): array;
 
     /**
      * Get group call participants.
@@ -129,7 +129,7 @@ interface Phone
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @return array{_: 'phone.groupParticipants', count: int, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date: int, source: int, volume: int, about: string, raise_hand_rating: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}}>, next_offset: string, chats: list<array|int|string>, users: list<array|int|string>, version: int} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupParticipants.html
      */
-    public function getGroupParticipants(array $call, array $ids = [], array $sources = [], string $offset = '', int $limit = 0): array;
+    public function getGroupParticipants(array $call, array $ids = [], array $sources = [], string|null $offset = '', int|null $limit = 0): array;
 
     /**
      * Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.
@@ -139,7 +139,7 @@ interface Phone
      * @param list<int>|array<never, never> $sources Source IDs
      * @return list<int>
      */
-    public function checkGroupCall(array $call, array $sources = []): array;
+    public function checkGroupCall(array $call, array $sources = []): array|null;
 
     /**
      * Start or stop recording a group call: the recorded audio and video streams will be automatically sent to `Saved messages` (the chat with ourselves).
@@ -151,7 +151,7 @@ interface Phone
      * @param bool $video_portrait If video stream recording is enabled, whether to record in portrait or landscape mode
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function toggleGroupCallRecord(array $call, bool $start = false, bool $video = false, string $title = '', bool $video_portrait = false): array;
+    public function toggleGroupCallRecord(array $call, bool|null $start = false, bool|null $video = false, string|null $title = '', bool|null $video_portrait = false): array;
 
     /**
      * Edit information about a given group call participant.
@@ -172,7 +172,7 @@ interface Phone
      * @param bool $presentation_paused Pause or resume the screen sharing stream
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function editGroupCallParticipant(array $call, array|int|string $participant, bool $muted = false, int $volume = 0, bool $raise_hand = false, bool $video_stopped = false, bool $video_paused = false, bool $presentation_paused = false): array;
+    public function editGroupCallParticipant(array $call, array|int|string|null $participant = null, bool|null $muted = false, int|null $volume = 0, bool|null $raise_hand = false, bool|null $video_stopped = false, bool|null $video_paused = false, bool|null $presentation_paused = false): array;
 
     /**
      * Edit the title of a group call or livestream.
@@ -181,7 +181,7 @@ interface Phone
      * @param string $title New title
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function editGroupCallTitle(array $call, string $title = ''): array;
+    public function editGroupCallTitle(array $call, string|null $title = ''): array;
 
     /**
      * Get a list of peers that can be used to join a group call, presenting yourself as a specific user/channel.
@@ -189,7 +189,7 @@ interface Phone
      * @param array|int|string $peer The dialog whose group call or livestream we're trying to join @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'phone.joinAsPeers', peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.JoinAsPeers.html
      */
-    public function getGroupCallJoinAs(array|int|string $peer): array;
+    public function getGroupCallJoinAs(array|int|string|null $peer = null): array;
 
     /**
      * Get an [invite link](https://core.telegram.org/api/links#video-chatlivestream-links) for a group call or livestream.
@@ -198,7 +198,7 @@ interface Phone
      * @param bool $can_self_unmute For livestreams or muted group chats, if set, users that join using this link will be able to speak without explicitly requesting permission by (for example by raising their hand).
      * @return array{_: 'phone.exportedGroupCallInvite', link: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.ExportedGroupCallInvite.html
      */
-    public function exportGroupCallInvite(array $call, bool $can_self_unmute = false): array;
+    public function exportGroupCallInvite(array $call, bool|null $can_self_unmute = false): array;
 
     /**
      * Subscribe or unsubscribe to a scheduled group call.
@@ -223,7 +223,7 @@ interface Phone
      * @param array|int|string $peer The dialog @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array|int|string $join_as The default peer that will be used to join group calls in this dialog, presenting yourself as a specific user/channel. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
-    public function saveDefaultGroupCallJoinAs(array|int|string $peer, array|int|string $join_as): bool;
+    public function saveDefaultGroupCallJoinAs(array|int|string|null $peer = null, array|int|string|null $join_as = null): bool;
 
     /**
      * Start screen sharing in a call.
@@ -255,11 +255,11 @@ interface Phone
     /**
      * Get RTMP URL and stream key for RTMP livestreams. Can be used even before creating the actual RTMP livestream with [phone.createGroupCall](https://docs.madelineproto.xyz/API_docs/methods/phone.createGroupCall.html) (the `rtmp_stream` flag must be set).
      *
-     * @param array|int|string $peer Peer to livestream into @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param bool $revoke Whether to revoke the previous stream key or simply return the existing one
+     * @param array|int|string $peer Peer to livestream into @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @return array{_: 'phone.groupCallStreamRtmpUrl', url: string, key: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStreamRtmpUrl.html
      */
-    public function getGroupCallStreamRtmpUrl(array|int|string $peer, bool $revoke): array;
+    public function getGroupCallStreamRtmpUrl(bool $revoke, array|int|string|null $peer = null): array;
 
     /**
      * Save phone call debug information.
