@@ -69,8 +69,8 @@ final class VoIP extends Update implements SimpleFilters
     /**
      * Discard call.
      *
-     * @param int<1, 5> $rating Call rating in stars
-     * @param string $comment Additional comment on call quality.
+     * @param int<1, 5> $rating  Call rating in stars
+     * @param string    $comment Additional comment on call quality.
      */
     public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
     {

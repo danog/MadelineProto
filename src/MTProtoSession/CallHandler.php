@@ -90,9 +90,9 @@ trait CallHandler
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
+     * @param string                    $method Method name
+     * @param array|(callable(): array) $args   Arguments
+     * @param array                     $aargs  Additional arguments
      */
     public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
@@ -105,9 +105,9 @@ trait CallHandler
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
+     * @param string                    $method Method name
+     * @param array|(callable(): array) $args   Arguments
+     * @param array                     $aargs  Additional arguments
      */
     public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null]): WrappedFuture
     {

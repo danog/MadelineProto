@@ -127,15 +127,15 @@ final class Story extends AbstractStory
     /**
      * Reply to the story.
      *
-     * @param string $message Message to send
-     * @param ParseMode $parseMode Parse mode
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param string       $message                Message to send
+     * @param ParseMode    $parseMode              Parse mode
+     * @param array|null   $replyMarkup            Keyboard information.
+     * @param integer|null $scheduleDate           Schedule date.
+     * @param boolean      $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean      $background             Send this message as background message
+     * @param boolean      $clearDraft             Clears the draft field
+     * @param boolean      $noWebpage              Set this flag to disable generation of the webpage preview
+     * @param boolean      $updateStickersetsOrder Whether to move used stickersets to top
      *
      */
     public function reply(
@@ -216,8 +216,8 @@ final class Story extends AbstractStory
     /**
      * Report a story for violation of telegram’s Terms of Service.
      *
-     * @param ReportReason $reason Why is story being reported
-     * @param string $message Comment for report moderation
+     * @param  ReportReason $reason  Why is story being reported
+     * @param  string       $message Comment for report moderation
      * @return boolean
      */
     public function report(ReportReason $reason, string $message = ''): bool
@@ -283,7 +283,7 @@ final class Story extends AbstractStory
      * Reaction to story.
      *
      * @param integer|string $reaction string or int Reaction
-     * @param boolean $recent
+     * @param boolean        $recent
      */
     public function addReaction(int|string $reaction, bool $recent = true): StoryReaction
     {

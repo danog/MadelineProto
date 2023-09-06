@@ -512,8 +512,8 @@ final class Ogg
     /**
      * Converts a file, URL, or stream of any format (including video) into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
      *
-     * @param LocalFile|RemoteUrl|ReadableStream $in The input file, URL or stream.
-     * @param LocalFile|WritableStream $oggOut The output file or stream.
+     * @param LocalFile|RemoteUrl|ReadableStream $in     The input file, URL or stream.
+     * @param LocalFile|WritableStream           $oggOut The output file or stream.
      */
     public static function convert(
         LocalFile|RemoteUrl|ReadableStream $in,
@@ -585,8 +585,8 @@ final class Ogg
     /**
      * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
      *
-     * @param LocalFile|RemoteUrl|ReadableStream $wavIn The input file, URL or stream.
-     * @param LocalFile|WritableStream $oggOut The output file or stream.
+     * @param LocalFile|RemoteUrl|ReadableStream $wavIn  The input file, URL or stream.
+     * @param LocalFile|WritableStream           $oggOut The output file or stream.
      */
     public static function convertWav(
         LocalFile|RemoteUrl|ReadableStream $wavIn,

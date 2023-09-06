@@ -42,10 +42,10 @@ use const danog\Decoder\VOICE;
 final class BotApiFileId
 {
     /**
-     * @param string $fileId The file ID
-     * @param integer $size The file size
-     * @param string $fileName The original file name
-     * @param bool $protected Whether the original file is protected
+     * @param string  $fileId    The file ID
+     * @param integer $size      The file size
+     * @param string  $fileName  The original file name
+     * @param bool    $protected Whether the original file is protected
      */
     public function __construct(
         public readonly string $fileId,

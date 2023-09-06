@@ -40,7 +40,7 @@ final class GroupMessage extends Message
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
-     * @param string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
+     * @param  string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
      * @throws AssertionError
      */
     public function getMember(string|int|null $member = null): Participant
@@ -245,7 +245,7 @@ final class GroupMessage extends Message
     /**
      * Delete all messages sent by a specific participant of a given supergroup.
      *
-     * @param string|integer|null $member The participant whose messages should be deleted, if null or absent defaults to the sender of the message.
+     * @param  string|integer|null      $member The participant whose messages should be deleted, if null or absent defaults to the sender of the message.
      * @throws InvalidArgumentException
      */
     public function deleteUserMessages(string|int|null $member = null): void
@@ -264,7 +264,7 @@ final class GroupMessage extends Message
     /**
      * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration).
      *
-     * @return integer the channel id that migrate to
+     * @return integer                  the channel id that migrate to
      * @throws InvalidArgumentException
      */
     public function toSuperGroup(): int
@@ -351,10 +351,10 @@ final class GroupMessage extends Message
     /**
      * Create a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param string $title Topic title (maximum UTF-8 length: 128)
-     * @param IconColor|int $icon Icon color, or ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon.
-     *                            [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
-     *                            If no custom emoji icon is specified, specifies the color of the fallback topic icon
+     * @param string        $title Topic title (maximum UTF-8 length: 128)
+     * @param IconColor|int $icon  Icon color, or ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon.
+     *                             [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     *                             If no custom emoji icon is specified, specifies the color of the fallback topic icon
      *
      * @throws InvalidArgumentException
      */
@@ -381,9 +381,9 @@ final class GroupMessage extends Message
     /**
      * Edit a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param string $title Topic title (maximum UTF-8 length: 128)
-     * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack. Pass 0 to switch to the fallback topic icon.
-     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
+     * @param  string                   $title   Topic title (maximum UTF-8 length: 128)
+     * @param  integer                  $icon    ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack. Pass 0 to switch to the fallback topic icon.
+     * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function editTopic(string $title, int $icon = 0, ?int $topicId = null): DialogTopicEdited
@@ -407,7 +407,7 @@ final class GroupMessage extends Message
     /**
      * Open a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
+     * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function openTopic(?int $topicId = null): DialogTopicEdited
@@ -430,7 +430,7 @@ final class GroupMessage extends Message
     /**
      * Close a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
+     * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function closeTopic(?int $topicId = null): DialogTopicEdited
@@ -453,7 +453,7 @@ final class GroupMessage extends Message
     /**
      * Delete message history of a [forum topic](https://core.telegram.org/api/forum).
      *
-     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
+     * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function deleteTopic(?int $topicId = null): void

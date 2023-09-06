@@ -145,12 +145,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Create outgoing message.
      *
-     * @param array|callable(): array $body Body
+     * @param array|callable(): array $body        Body
      * @param string                  $constructor Constructor name
      * @param string                  $type        Constructor type
      * @param boolean                 $method      Is this a method?
      * @param boolean                 $unencrypted Is this an unencrypted message?
-     * @param null|DeferredFuture         $deferred    Response deferred
+     * @param null|DeferredFuture     $deferred    Response deferred
      */
     public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null, ?Cancellation $cancellation = null)
     {

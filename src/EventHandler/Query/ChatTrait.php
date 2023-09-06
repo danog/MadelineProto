@@ -38,11 +38,11 @@ trait ChatTrait
     /**
      * Edit message text.
      *
-     * @param string $message New message
-     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
-     * @param array|null $replyMarkup Reply markup for inline keyboards
-     * @param int|null $scheduleDate Scheduled message date for scheduled messages
-     * @param bool $noWebpage Disable webpage preview
+     * @param string     $message      New message
+     * @param ParseMode  $parseMode    Whether to parse HTML or Markdown markup in the message
+     * @param array|null $replyMarkup  Reply markup for inline keyboards
+     * @param int|null   $scheduleDate Scheduled message date for scheduled messages
+     * @param bool       $noWebpage    Disable webpage preview
      */
     public function editText(
         string    $message,

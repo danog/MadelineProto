@@ -148,7 +148,7 @@ final class TL implements TLInterface
     /**
      * Initialize TL parser.
      *
-     * @param TLSchema     $files   Scheme files
+     * @param TLSchema         $files   Scheme files
      * @param list<TLCallback> $objects TL Callback objects
      */
     public function init(TLSchema $files, array $objects = []): void
@@ -634,9 +634,9 @@ final class TL implements TLInterface
     /**
      * Serialize parameters.
      *
-     * @param array   $tl        TL object definition
-     * @param string  $ctx       Context
-     * @param integer $layer     Layer
+     * @param array   $tl    TL object definition
+     * @param string  $ctx   Context
+     * @param integer $layer Layer
      */
     private function serializeParams(array $tl, array|Button $arguments, string|int $ctx, int $layer)
     {
@@ -823,8 +823,8 @@ final class TL implements TLInterface
     /**
      * Deserialize TL object.
      *
-     * @param string|resource $stream    Stream
-     * @param array           $type      Type identifier
+     * @param string|resource $stream Stream
+     * @param array           $type   Type identifier
      */
     public function deserialize($stream, array $type)
     {

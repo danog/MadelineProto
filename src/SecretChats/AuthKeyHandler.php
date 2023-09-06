@@ -296,7 +296,7 @@ trait AuthKeyHandler
     /**
      * Get secret chat status.
      *
-     * @param int $chat Chat ID
+     * @param  int $chat Chat ID
      * @return int One of \danog\MadelineProto\API::SECRET_EMPTY, \danog\MadelineProto\API::SECRET_REQUESTED, \danog\MadelineProto\API::SECRET_READY
      */
     public function secretChatStatus(int $chat): int

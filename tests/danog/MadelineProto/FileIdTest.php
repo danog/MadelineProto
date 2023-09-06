@@ -37,9 +37,9 @@ class FileIdTest extends MadelineTestCase
     /**
      * Asserts that two file IDs are equal.
      *
-     * @param string $fileIdAstr File ID A
-     * @param string $fileIdBstr File ID B
-     * @param string $message    Message
+     * @param  string                                 $fileIdAstr File ID A
+     * @param  string                                 $fileIdBstr File ID B
+     * @param  string                                 $message    Message
      * @throws PHPUnit\Framework\AssertionFailedError
      */
     public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, string $message = ''): void
@@ -53,8 +53,8 @@ class FileIdTest extends MadelineTestCase
     }
 
     /**
-     * @param string $type   Expected type
-     * @param string $type   Original type
+     * @param string $type Expected type
+     * @param string $type Original type
      * @dataProvider provideFileIdsAndType
      */
     public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
@@ -65,8 +65,8 @@ class FileIdTest extends MadelineTestCase
         $this->assertTrue(true);
     }
     /**
-     * @param string $type   Expected type
-     * @param string $type   Original type
+     * @param string $type Expected type
+     * @param string $type Original type
      * @dataProvider provideFileIdsAndType
      */
     public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void

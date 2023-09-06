@@ -75,7 +75,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
     /**
      * Get char at offset.
      *
-     * @param integer $offset Name
+     * @param  integer $offset Name
      * @return string
      */
     public function offsetGet(mixed $offset): mixed

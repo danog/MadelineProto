@@ -184,7 +184,7 @@ abstract class Message extends AbstractMessage
      * Pin a message.
      *
      * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
-     * @param bool $silent Pin the message silently, without triggering a notification
+     * @param bool $silent    Pin the message silently, without triggering a notification
      */
     public function pin(bool $pmOneside = false, bool $silent = false): void
     {
@@ -204,7 +204,7 @@ abstract class Message extends AbstractMessage
      * Unpin a message.
      *
      * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
-     * @param bool $silent Pin the message silently, without triggering a notification
+     * @param bool $silent    Pin the message silently, without triggering a notification
      */
     public function unpin(bool $pmOneside = false, bool $silent = false): ?Update
     {
@@ -234,8 +234,8 @@ abstract class Message extends AbstractMessage
     /**
      * Report a message in a chat for violation of telegram’s Terms of Service.
      *
-     * @param ReportReason $reason Why are these messages being reported
-     * @param string $message Comment for report moderation
+     * @param ReportReason $reason  Why are these messages being reported
+     * @param string       $message Comment for report moderation
      */
     public function report(ReportReason $reason, string $message): bool
     {
@@ -253,10 +253,10 @@ abstract class Message extends AbstractMessage
     /**
      * Save message sender to your account contacts.
      *
-     * @param string $firstName First name
-     * @param string|null $lastName Last name
-     * @param string|null $phoneNumber Telegram ID of the other user
-     * @param bool $addPhonePrivacyException Allow the other user to see our phone number?
+     * @param string      $firstName                First name
+     * @param string|null $lastName                 Last name
+     * @param string|null $phoneNumber              Telegram ID of the other user
+     * @param bool        $addPhonePrivacyException Allow the other user to see our phone number?
      */
     public function saveContact(
         string  $firstName,
@@ -308,9 +308,9 @@ abstract class Message extends AbstractMessage
     /**
      * Add reaction to message.
      *
-     * @param string|int $reaction reaction
-     * @param bool $big Whether a bigger and longer reaction should be shown
-     * @param bool $addToRecent Add this reaction to the recent reactions list.
+     * @param string|int $reaction    reaction
+     * @param bool       $big         Whether a bigger and longer reaction should be shown
+     * @param bool       $addToRecent Add this reaction to the recent reactions list.
      *
      * @return list<string|int>
      */
@@ -389,11 +389,11 @@ abstract class Message extends AbstractMessage
     /**
      * Edit message text.
      *
-     * @param string $message New message
-     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
-     * @param array|null $replyMarkup Reply markup for inline keyboards
-     * @param int|null $scheduleDate Scheduled message date for scheduled messages
-     * @param bool $noWebpage Disable webpage preview
+     * @param string     $message      New message
+     * @param ParseMode  $parseMode    Whether to parse HTML or Markdown markup in the message
+     * @param array|null $replyMarkup  Reply markup for inline keyboards
+     * @param int|null   $scheduleDate Scheduled message date for scheduled messages
+     * @param bool       $noWebpage    Disable webpage preview
      *
      */
     public function editText(

@@ -69,8 +69,8 @@ interface TLInterface
     /**
      * Deserialize TL object.
      *
-     * @param string|resource $stream    Stream
-     * @param array           $type      Type identifier
+     * @param string|resource $stream Stream
+     * @param array           $type   Type identifier
      */
     public function deserialize($stream, array $type);
 }

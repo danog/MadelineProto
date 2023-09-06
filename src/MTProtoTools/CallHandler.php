@@ -38,9 +38,9 @@ trait CallHandler
      *
      * @internal
      *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
+     * @param string                    $method Method name
+     * @param array|(callable(): array) $args   Arguments
+     * @param array                     $aargs  Additional arguments
      */
     public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {
@@ -51,9 +51,9 @@ trait CallHandler
      *
      * @internal
      *
-     * @param string            $method Method name
-     * @param array|(callable(): array)             $args Arguments
-     * @param array             $aargs  Additional arguments
+     * @param string                    $method Method name
+     * @param array|(callable(): array) $args   Arguments
+     * @param array                     $aargs  Additional arguments
      */
     public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
     {

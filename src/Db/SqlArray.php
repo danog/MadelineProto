@@ -126,7 +126,7 @@ abstract class SqlArray extends DriverArray
      *
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return int The number of elements or public properties in the associated
-     * array or object, respectively.
+     *             array or object, respectively.
      */
     public function count(): int
     {

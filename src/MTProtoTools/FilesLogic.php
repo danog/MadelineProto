@@ -73,10 +73,10 @@ trait FilesLogic
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
-     * @param null|callable     $cb           Status callback (can also use FileCallback)
-     * @param null|int $size Size of file to download, required for bot API file IDs.
-     * @param null|string $mime MIME type of file to download, required for bot API file IDs.
-     * @param null|string $name Name of file to download, required for bot API file IDs.
+     * @param null|callable                                                                $cb           Status callback (can also use FileCallback)
+     * @param null|int                                                                     $size         Size of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      */
     public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
@@ -130,10 +130,10 @@ trait FilesLogic
     /**
      * Download file to an amphp stream, returning it.
      *
-     * @param mixed                       $messageMedia File to download
-     * @param callable                    $cb            Callback
-     * @param int                         $offset        Offset where to start downloading
-     * @param int                         $end           Offset where to end download
+     * @param mixed    $messageMedia File to download
+     * @param callable $cb           Callback
+     * @param int      $offset       Offset where to start downloading
+     * @param int      $end          Offset where to end download
      */
     public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
     {
@@ -151,11 +151,11 @@ trait FilesLogic
     /**
      * Download file to stream.
      *
-     * @param mixed                       $messageMedia File to download
-     * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
-     * @param callable                    $cb            Callback
-     * @param int                         $offset        Offset where to start downloading
-     * @param int                         $end           Offset where to end download
+     * @param mixed                                               $messageMedia File to download
+     * @param mixed|FileCallbackInterface|resource|WritableStream $stream       Stream where to download file
+     * @param callable                                            $cb           Callback
+     * @param int                                                 $offset       Offset where to start downloading
+     * @param int                                                 $end          Offset where to end download
      */
     public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
     {
@@ -204,11 +204,11 @@ trait FilesLogic
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
-     * @param ServerRequest $request      Request
-     * @param callable      $cb           Status callback (can also use FileCallback)
-     * @param null|int          $size         Size of file to download, required for bot API file IDs.
-     * @param null|string       $name         Name of file to download, required for bot API file IDs.
-     * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
+     * @param ServerRequest                                                                $request      Request
+     * @param callable                                                                     $cb           Status callback (can also use FileCallback)
+     * @param null|int                                                                     $size         Size of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      */
     public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
     {
@@ -249,9 +249,9 @@ trait FilesLogic
     /**
      * Upload file to secret chat.
      *
-     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback
+     * @param FileCallbackInterface|string|array $file     File, URL or Telegram file to upload
+     * @param string                             $fileName File name
+     * @param callable                           $cb       Callback
      *
      * @return array InputFile constructor
      */
@@ -264,9 +264,9 @@ trait FilesLogic
      * Upload file.
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
-     * @param string                                                $fileName  File name
-     * @param callable                                              $cb        Callback
-     * @param boolean                                               $encrypted Whether to encrypt file for secret chats
+     * @param string                                                                       $fileName  File name
+     * @param callable                                                                     $cb        Callback
+     * @param boolean                                                                      $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */

@@ -133,7 +133,7 @@ final class PasswordCalculator
     /**
      * Create a random string (eventually prefixed by the specified string).
      *
-     * @param string $prefix Prefix
+     * @param  string $prefix Prefix
      * @return string Salt
      */
     public function createSalt(string $prefix = ''): string
@@ -145,8 +145,8 @@ final class PasswordCalculator
      *
      * The result will be the SHA256 hash of the salt concatenated with the data concatenated with the salt
      *
-     * @param string $data Data to hash
-     * @param string $salt Salt
+     * @param  string $data Data to hash
+     * @param  string $salt Salt
      * @return string Hash
      */
     public function hashSha256(string $data, string $salt): string
@@ -156,9 +156,9 @@ final class PasswordCalculator
     /**
      * Hashes the specified password.
      *
-     * @param string $password Password
-     * @param string $client_salt Client salt
-     * @param string $server_salt Server salt
+     * @param  string $password    Password
+     * @param  string $client_salt Client salt
+     * @param  string $server_salt Server salt
      * @return string Resulting hash
      */
     public function hashPassword(string $password, string $client_salt, string $server_salt): string
@@ -171,8 +171,8 @@ final class PasswordCalculator
     /**
      * Get the InputCheckPassword object for checking the validity of a password using account.checkPassword.
      *
-     * @param string $password The password
-     * @return array InputCheckPassword object
+     * @param  string $password The password
+     * @return array  InputCheckPassword object
      */
     public function getCheckPassword(string $password): array
     {

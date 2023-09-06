@@ -158,8 +158,8 @@ final class DocsBuilder
     /**
      * Get formatted template string.
      *
-     * @param string   $name      Template name
-     * @param string   ...$params Params
+     * @param string $name      Template name
+     * @param string ...$params Params
      */
     protected function template(string $name, string ...$params): string
     {

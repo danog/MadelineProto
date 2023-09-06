@@ -41,7 +41,7 @@ interface DbType extends Countable
     /**
      * Set element.
      *
-     * @param TKey $key
+     * @param TKey   $key
      * @param TValue $value
      */
     public function set(string|int $key, mixed $value): void;

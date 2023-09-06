@@ -84,8 +84,8 @@ trait BotAPIFiles
     /**
      * Unpack bot API file ID.
      *
-     * @param string $fileId Bot API file ID
-     * @return array Unpacked file ID
+     * @param  string $fileId Bot API file ID
+     * @return array  Unpacked file ID
      */
     public static function unpackFileId(string $fileId): array
     {

@@ -47,9 +47,9 @@ use function time;
  * https://core.telegram.org/mtproto/samples-auth_key
  *
  * @property DataCenterConnection $shared
- * @property int $datacenter
- * @property MTProto $API
- * @property Logger $logger
+ * @property int                  $datacenter
+ * @property MTProto              $API
+ * @property Logger               $logger
  *
  * @internal
  */

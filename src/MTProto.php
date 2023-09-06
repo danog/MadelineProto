@@ -476,7 +476,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * Constructor function.
      *
      * @param Settings|SettingsEmpty $settings Settings
-     * @param null|APIWrapper            $wrapper  API wrapper
+     * @param null|APIWrapper        $wrapper  API wrapper
      */
     public function __construct(Settings|SettingsEmpty $settings, ?APIWrapper $wrapper = null)
     {
@@ -1311,7 +1311,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Get cached (or eventually re-fetch) server-side config.
      *
-     * @param array $config  Current config
+     * @param array $config Current config
      */
     public function getConfig(array $config = []): array
     {
@@ -1568,14 +1568,14 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Sends a message to all report peers (admins of the bot).
      *
-     * @param string $message Message to send
-     * @param ParseMode $parseMode Parse mode
-     * @param array|null $replyMarkup Keyboard information.
+     * @param string       $message      Message to send
+     * @param ParseMode    $parseMode    Parse mode
+     * @param array|null   $replyMarkup  Keyboard information.
      * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean      $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean      $background   Send this message as background message
+     * @param boolean      $clearDraft   Clears the draft field
+     * @param boolean      $noWebpage    Set this flag to disable generation of the webpage preview
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */

@@ -139,22 +139,22 @@ trait FilesAbstraction
      *
      * Please use named arguments to call this method.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb Optional: Thumbnail to upload
-     * @param string $caption Caption of document
-     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
-     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param ParseMode $parseMode Text parse mode for the caption
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string                                                     $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream      $file                   File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
+     * @param string                                                             $caption                Caption of document
+     * @param ?callable(float, float, int)                                       $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                            $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                          $parseMode              Text parse mode for the caption
+     * @param integer|null                                                       $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                       $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                         $replyMarkup            Keyboard information.
+     * @param integer|null                                                       $sendAs                 Peer to send the message as.
+     * @param integer|null                                                       $scheduleDate           Schedule date.
+     * @param boolean                                                            $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                            $background             Send this message as background message
+     * @param boolean                                                            $clearDraft             Clears the draft field
+     * @param boolean                                                            $updateStickersetsOrder Whether to move used stickersets to top
      *
      */
     public function sendDocument(
@@ -242,21 +242,21 @@ trait FilesAbstraction
      *
      * Please use named arguments to call this method.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
-     * @param string $caption Caption of document
-     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
-     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param ParseMode $parseMode Text parse mode for the caption
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
      *
      */
     public function sendPhoto(

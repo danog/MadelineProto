@@ -35,7 +35,7 @@ interface DbArray extends DbType, ArrayAccess, Traversable
     /**
      * Set element.
      *
-     * @param TKey $index
+     * @param TKey   $index
      * @param TValue $value
      */
     public function offsetSet(mixed $index, mixed $value): void;

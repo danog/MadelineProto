@@ -103,7 +103,7 @@ use function Amp\delay;
  * Manages updates.
  *
  * @property Settings $settings Settings
- * @property TL $TL TL
+ * @property TL       $TL       TL
  *
  * @internal
  */
@@ -244,7 +244,7 @@ trait UpdateHandler
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
      * @return list<array{update_id: mixed, update: mixed}>
      */
     public function getUpdates(array $params = []): array
@@ -337,8 +337,8 @@ trait UpdateHandler
     /**
      * Load channel state.
      *
-     * @param null|int  $channelId Channel ID
-     * @param array $init      Init
+     * @param null|int $channelId Channel ID
+     * @param array    $init      Init
      * @internal
      * @return UpdatesState|array<UpdatesState>
      */
@@ -635,19 +635,19 @@ trait UpdateHandler
     /**
      * Sends a message.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param string $message Message to send
-     * @param ParseMode $parseMode Parse mode
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string $peer                   Destination peer or username.
+     * @param string         $message                Message to send
+     * @param ParseMode      $parseMode              Parse mode
+     * @param integer|null   $replyToMsgId           ID of message to reply to.
+     * @param integer|null   $topMsgId               ID of thread where to send the message.
+     * @param array|null     $replyMarkup            Keyboard information.
+     * @param integer|null   $sendAs                 Peer to send the message as.
+     * @param integer|null   $scheduleDate           Schedule date.
+     * @param boolean        $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean        $background             Send this message as background message
+     * @param boolean        $clearDraft             Clears the draft field
+     * @param boolean        $noWebpage              Set this flag to disable generation of the webpage preview
+     * @param boolean        $updateStickersetsOrder Whether to move used stickersets to top
      */
     public function sendMessage(
         int|string $peer,

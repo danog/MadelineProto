@@ -59,7 +59,7 @@ abstract class EventHandler extends AbstractAPI
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
-     * @param string $session Session name
+     * @param string            $session  Session name
      * @param ?SettingsAbstract $settings Settings
      */
     final public static function startAndLoop(string $session, ?SettingsAbstract $settings = null): void
@@ -77,8 +77,8 @@ abstract class EventHandler extends AbstractAPI
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
      *
-     * @param string $session Session name
-     * @param string $token Bot token
+     * @param string            $session  Session name
+     * @param string            $token    Bot token
      * @param ?SettingsAbstract $settings Settings
      */
     final public static function startAndLoopBot(string $session, string $token, ?SettingsAbstract $settings = null): void

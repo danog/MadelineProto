@@ -72,7 +72,7 @@ final class Wrapper extends ClientAbstract
     /**
      * Constructor.
      *
-     * @param mixed        $data Payload data
+     * @param mixed $data Payload data
      */
     public static function create(mixed &$data, SessionPaths $session, Logger $logger): self
     {
@@ -101,8 +101,8 @@ final class Wrapper extends ClientAbstract
     /**
      * Wrap a certain callback object.
      *
-     * @param mixed           $callback    Callback to wrap
-     * @param bool            $wrapObjects Whether to wrap object methods, too
+     * @param mixed $callback    Callback to wrap
+     * @param bool  $wrapObjects Whether to wrap object methods, too
      */
     public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
@@ -161,8 +161,8 @@ final class Wrapper extends ClientAbstract
     /**
      * Handle client request.
      *
-     * @param integer          $id      Request ID
-     * @param array            $payload Payload
+     * @param integer $id      Request ID
+     * @param array   $payload Payload
      */
     private function clientRequest(int $id, array $payload): void
     {

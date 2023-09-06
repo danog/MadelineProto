@@ -51,8 +51,8 @@ final class CombinedUpdatesState
     /**
      * Get or update multiple parameters.
      *
-     * @param int   $channel Channel to get info about (optional, if not provided returns the entire info array)
-     * @param array $init    Parameters to update
+     * @param  int                              $channel Channel to get info about (optional, if not provided returns the entire info array)
+     * @param  array                            $init    Parameters to update
      * @return UpdatesState|array<UpdatesState>
      */
     public function get(?int $channel = null, array $init = []): UpdatesState|array
@@ -88,7 +88,7 @@ final class CombinedUpdatesState
     /**
      * Are we currently busy?
      *
-     * @param int   $channel Channel to get info about
+     * @param int       $channel Channel to get info about
      * @param null|bool $set     Busy flag to set before returning
      */
     public function syncLoading(int $channel, ?bool $set = null): bool

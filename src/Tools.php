@@ -514,7 +514,7 @@ abstract class Tools extends AsyncTools
      * Get final element of array.
      *
      * @template T
-     * @param array<T> $what Array
+     * @param  array<T> $what Array
      * @return T
      */
     public static function end(array $what): mixed

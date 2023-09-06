@@ -64,7 +64,7 @@ abstract class RunnerAbstract
     /**
      * Runner.
      *
-     * @param string   $session Session path
+     * @param string $session Session path
      */
     abstract public static function start(string $session, int $startupId): bool;
 }

@@ -195,7 +195,7 @@ final class API extends AbstractAPI
     /**
      * Constructor function.
      *
-     * @param string                 $session  Session name
+     * @param string           $session  Session name
      * @param SettingsAbstract $settings Settings
      */
     public function __construct(string $session, ?SettingsAbstract $settings = null)
@@ -302,8 +302,8 @@ final class API extends AbstractAPI
     /**
      * Connect to MadelineProto.
      *
-     * @param SettingsAbstract $settings Settings
-     * @param bool $forceFull Whether to force full initialization
+     * @param SettingsAbstract $settings  Settings
+     * @param bool             $forceFull Whether to force full initialization
      */
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): bool
     {
@@ -408,7 +408,7 @@ final class API extends AbstractAPI
     /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
      *
-     * @param array<API> $instances Instances of madeline
+     * @param array<API>                                                   $instances    Instances of madeline
      * @param array<class-string<EventHandler>>|class-string<EventHandler> $eventHandler Event handler(s)
      */
     public static function startAndLoopMulti(array $instances, array|string $eventHandler): void

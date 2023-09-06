@@ -257,9 +257,9 @@ abstract class Serialization
     /**
      * Try connecting to IPC socket.
      *
-     * @param string    $ipcPath       IPC path
-     * @param Future<(Throwable|null)> $cancelConnect Cancelation token (triggers cancellation of connection)
-     * @param null|callable(): void $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
+     * @param  string                                            $ipcPath       IPC path
+     * @param  Future<(Throwable|null)>                          $cancelConnect Cancelation token (triggers cancellation of connection)
+     * @param  null|callable(): void                             $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
      */
     public static function tryConnect(string $ipcPath, Future $cancelConnect, ?callable $cancelFull = null, ?Throwable $customE = null): array

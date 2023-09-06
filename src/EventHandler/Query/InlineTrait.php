@@ -49,10 +49,10 @@ trait InlineTrait
     /**
      * Edit message text.
      *
-     * @param string $message New message
-     * @param ParseMode $parseMode Whether to parse HTML or Markdown markup in the message
+     * @param string     $message     New message
+     * @param ParseMode  $parseMode   Whether to parse HTML or Markdown markup in the message
      * @param array|null $replyMarkup Reply markup for inline keyboards
-     * @param bool $noWebpage Disable webpage preview
+     * @param bool       $noWebpage   Disable webpage preview
      */
     public function editText(
         string    $message,

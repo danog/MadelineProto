@@ -50,6 +50,7 @@ use Throwable;
 
 /**
  * @psalm-import-type TDcList from DataCenter
+ * @internal
  */
 final class DoHWrapper
 {

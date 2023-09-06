@@ -24,7 +24,7 @@ abstract class MessageEntity implements JsonSerializable
     }
 
     /**
-     * @param list<array> $entities
+     * @param  list<array> $entities
      * @return list<self>
      */
     public static function fromRawEntities(array $entities): array

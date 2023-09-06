@@ -250,10 +250,10 @@ abstract class InternalDoc
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param mixed $from_peer Bot API ID or Update, from where to forward the messages.
+     * @param mixed     $from_peer   Bot API ID or Update, from where to forward the messages.
      * @param list<int> $message_ids IDs of the messages to forward.
-     * @param bool $drop_author If true, will forward messages without quoting the original author.
-     * @param bool $pin Whether to also pin the last sent message.
+     * @param bool      $drop_author If true, will forward messages without quoting the original author.
+     * @param bool      $pin         Whether to also pin the last sent message.
      */
     public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false): int
     {
@@ -274,7 +274,7 @@ abstract class InternalDoc
      * containing a Progress object for all broadcasts currently in-progress.
      *
      * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool $pin Whether to also pin the last sent message.
+     * @param bool  $pin      Whether to also pin the last sent message.
      */
     public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false): int
     {
@@ -375,8 +375,8 @@ abstract class InternalDoc
     /**
      * Discard call.
      *
-     * @param int<1, 5> $rating Call rating in stars
-     * @param string $comment Additional comment on call quality.
+     * @param int<1, 5> $rating  Call rating in stars
+     * @param string    $comment Additional comment on call quality.
      */
     public function discardCall(int $id, \danog\MadelineProto\VoIP\DiscardReason $reason = \danog\MadelineProto\VoIP\DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
@@ -404,10 +404,10 @@ abstract class InternalDoc
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
-     * @param null|callable     $cb           Status callback (can also use FileCallback)
-     * @param null|int $size Size of file to download, required for bot API file IDs.
-     * @param null|string $mime MIME type of file to download, required for bot API file IDs.
-     * @param null|string $name Name of file to download, required for bot API file IDs.
+     * @param null|callable                                                                $cb           Status callback (can also use FileCallback)
+     * @param null|int                                                                     $size         Size of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      */
     public function downloadToBrowser(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\EventHandler\Message|array|string $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
     {
@@ -418,13 +418,13 @@ abstract class InternalDoc
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
      *
-     * @param mixed                          $messageMedia  File to download
-     * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback
-     * @param bool                           $seekable      Whether the callable can be called out of order
-     * @param int                            $offset        Offset where to start downloading
-     * @param int                            $end           Offset where to stop downloading (inclusive)
-     * @param int                            $part_size     Size of each chunk
+     * @param mixed                          $messageMedia File to download
+     * @param callable|FileCallbackInterface $callable     Chunk callback
+     * @param callable                       $cb           Status callback
+     * @param bool                           $seekable     Whether the callable can be called out of order
+     * @param int                            $offset       Offset where to start downloading
+     * @param int                            $end          Offset where to stop downloading (inclusive)
+     * @param int                            $part_size    Size of each chunk
      */
     public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null): void
     {
@@ -434,8 +434,8 @@ abstract class InternalDoc
      * Download file to directory.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $dir          Directory where to download the file
+     * @param callable                     $cb           Callback
      *
      * @return non-empty-string Downloaded file name
      */
@@ -447,8 +447,8 @@ abstract class InternalDoc
      * Download file.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $file         Downloaded file path
+     * @param callable                     $cb           Callback
      *
      * @return non-empty-string Downloaded file name
      */
@@ -462,11 +462,11 @@ abstract class InternalDoc
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
-     * @param ServerRequest $request      Request
-     * @param callable      $cb           Status callback (can also use FileCallback)
-     * @param null|int          $size         Size of file to download, required for bot API file IDs.
-     * @param null|string       $name         Name of file to download, required for bot API file IDs.
-     * @param null|string       $mime         MIME type of file to download, required for bot API file IDs.
+     * @param ServerRequest                                                                $request      Request
+     * @param callable                                                                     $cb           Status callback (can also use FileCallback)
+     * @param null|int                                                                     $size         Size of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
+     * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      */
     public function downloadToResponse(\danog\MadelineProto\FileCallbackInterface|\danog\MadelineProto\EventHandler\Message|array|string $messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): \Amp\Http\Server\Response
     {
@@ -475,10 +475,10 @@ abstract class InternalDoc
     /**
      * Download file to an amphp stream, returning it.
      *
-     * @param mixed                       $messageMedia File to download
-     * @param callable                    $cb            Callback
-     * @param int                         $offset        Offset where to start downloading
-     * @param int                         $end           Offset where to end download
+     * @param mixed    $messageMedia File to download
+     * @param callable $cb           Callback
+     * @param int      $offset       Offset where to start downloading
+     * @param int      $end          Offset where to end download
      */
     public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): \Amp\ByteStream\ReadableStream
     {
@@ -487,11 +487,11 @@ abstract class InternalDoc
     /**
      * Download file to stream.
      *
-     * @param mixed                       $messageMedia File to download
-     * @param mixed|FileCallbackInterface|resource|WritableStream $stream        Stream where to download file
-     * @param callable                    $cb            Callback
-     * @param int                         $offset        Offset where to start downloading
-     * @param int                         $end           Offset where to end download
+     * @param mixed                                               $messageMedia File to download
+     * @param mixed|FileCallbackInterface|resource|WritableStream $stream       Stream where to download file
+     * @param callable                                            $cb           Callback
+     * @param int                                                 $offset       Offset where to start downloading
+     * @param int                                                 $end          Offset where to end download
      */
     public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
     {
@@ -510,7 +510,7 @@ abstract class InternalDoc
      * Get final element of array.
      *
      * @template T
-     * @param array<T> $what Array
+     * @param  array<T> $what Array
      * @return T
      */
     public static function end(array $what): mixed
@@ -521,7 +521,7 @@ abstract class InternalDoc
      * Convert a message and a set of entities to HTML.
      *
      * @param list<MessageEntity|array{_: string, offset: int, length: int}> $entities
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     * @param bool                                                           $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
@@ -588,11 +588,11 @@ abstract class InternalDoc
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string    $file      File to lock
-     * @param integer   $operation Locking mode
-     * @param float     $polling   Polling interval
-     * @param ?Cancellation $token     Cancellation token
-     * @param ?Closure $failureCb Failure callback, called only once if the first locking attempt fails.
+     * @param  string                                                          $file      File to lock
+     * @param  integer                                                         $operation Locking mode
+     * @param  float                                                           $polling   Polling interval
+     * @param  ?Cancellation                                                   $token     Cancellation token
+     * @param  ?Closure                                                        $failureCb Failure callback, called only once if the first locking attempt fails.
      * @return ($token is null ? (Closure(): void) : ((Closure(): void)|null))
      */
     public static function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Cancellation $token = null, ?\Closure $failureCb = null): ?\Closure
@@ -709,7 +709,7 @@ abstract class InternalDoc
     /**
      * Get cached (or eventually re-fetch) server-side config.
      *
-     * @param array $config  Current config
+     * @param array $config Current config
      */
     public function getConfig(array $config = [
     ]): array
@@ -879,8 +879,8 @@ abstract class InternalDoc
     /**
      * Get info about peer, returns an Info object.
      *
-     * @param mixed                $id        Peer
-     * @param \danog\MadelineProto\API::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
+     * @param mixed                                 $id   Peer
+     * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
      * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
@@ -1086,7 +1086,7 @@ abstract class InternalDoc
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
      * @return list<array{update_id: mixed, update: mixed}>
      */
     public function getUpdates(array $params = [
@@ -1166,7 +1166,7 @@ abstract class InternalDoc
      * Import authorization.
      *
      * @param array<int, string> $authorization Authorization info
-     * @param int $mainDcID Main DC ID
+     * @param int                $mainDcID      Main DC ID
      */
     public function importAuthorization(array $authorization, int $mainDcID): array
     {
@@ -1334,8 +1334,8 @@ abstract class InternalDoc
     /**
      * Telegram UTF-8 multibyte split.
      *
-     * @param string  $text   Text
-     * @param integer $length Length
+     * @param  string        $text   Text
+     * @param  integer       $length Length
      * @return array<string>
      */
     public static function mbStrSplit(string $text, int $length): array
@@ -1354,9 +1354,9 @@ abstract class InternalDoc
     /**
      * Telegram UTF-8 multibyte substring.
      *
-     * @param string  $text   Text to substring
-     * @param integer $offset Offset
-     * @param null|int    $length Length
+     * @param string   $text   Text to substring
+     * @param integer  $offset Offset
+     * @param null|int $length Length
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
@@ -1608,7 +1608,7 @@ abstract class InternalDoc
     /**
      * Get secret chat status.
      *
-     * @param int $chat Chat ID
+     * @param  int $chat Chat ID
      * @return int One of \danog\MadelineProto\API::SECRET_EMPTY, \danog\MadelineProto\API::SECRET_REQUESTED, \danog\MadelineProto\API::SECRET_READY
      */
     public function secretChatStatus(int $chat): int
@@ -1627,22 +1627,22 @@ abstract class InternalDoc
      *
      * Please use named arguments to call this method.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb Optional: Thumbnail to upload
-     * @param string $caption Caption of document
-     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
-     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param ParseMode $parseMode Text parse mode for the caption
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string                                                     $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream      $file                   File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
+     * @param string                                                             $caption                Caption of document
+     * @param ?callable(float, float, int)                                       $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                            $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                          $parseMode              Text parse mode for the caption
+     * @param integer|null                                                       $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                       $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                         $replyMarkup            Keyboard information.
+     * @param integer|null                                                       $sendAs                 Peer to send the message as.
+     * @param integer|null                                                       $scheduleDate           Schedule date.
+     * @param boolean                                                            $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                            $background             Send this message as background message
+     * @param boolean                                                            $clearDraft             Clears the draft field
+     * @param boolean                                                            $updateStickersetsOrder Whether to move used stickersets to top
      *
      */
     public function sendDocument(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?string $mimeType = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
@@ -1652,19 +1652,19 @@ abstract class InternalDoc
     /**
      * Sends a message.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param string $message Message to send
-     * @param ParseMode $parseMode Parse mode
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string $peer                   Destination peer or username.
+     * @param string         $message                Message to send
+     * @param ParseMode      $parseMode              Parse mode
+     * @param integer|null   $replyToMsgId           ID of message to reply to.
+     * @param integer|null   $topMsgId               ID of thread where to send the message.
+     * @param array|null     $replyMarkup            Keyboard information.
+     * @param integer|null   $sendAs                 Peer to send the message as.
+     * @param integer|null   $scheduleDate           Schedule date.
+     * @param boolean        $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean        $background             Send this message as background message
+     * @param boolean        $clearDraft             Clears the draft field
+     * @param boolean        $noWebpage              Set this flag to disable generation of the webpage preview
+     * @param boolean        $updateStickersetsOrder Whether to move used stickersets to top
      */
     public function sendMessage(string|int $peer, string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
     {
@@ -1673,14 +1673,14 @@ abstract class InternalDoc
     /**
      * Sends a message to all report peers (admins of the bot).
      *
-     * @param string $message Message to send
-     * @param ParseMode $parseMode Parse mode
-     * @param array|null $replyMarkup Keyboard information.
+     * @param string       $message      Message to send
+     * @param ParseMode    $parseMode    Parse mode
+     * @param array|null   $replyMarkup  Keyboard information.
      * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $noWebpage Set this flag to disable generation of the webpage preview
+     * @param boolean      $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean      $background   Send this message as background message
+     * @param boolean      $clearDraft   Clears the draft field
+     * @param boolean      $noWebpage    Set this flag to disable generation of the webpage preview
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */
@@ -1693,21 +1693,21 @@ abstract class InternalDoc
      *
      * Please use named arguments to call this method.
      *
-     * @param integer|string $peer Destination peer or username.
-     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file File to upload: can be a message to reuse media present in a message.
-     * @param string $caption Caption of document
-     * @param ?callable(float, float, int) $callback Upload callback (percent, speed in mpbs, time elapsed)
-     * @param ?string $fileName Optional file name, if absent will be extracted from the passed $file.
-     * @param ParseMode $parseMode Text parse mode for the caption
-     * @param integer|null $replyToMsgId ID of message to reply to.
-     * @param integer|null $topMsgId ID of thread where to send the message.
-     * @param array|null $replyMarkup Keyboard information.
-     * @param integer|null $sendAs Peer to send the message as.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean $silent Whether to send the message silently, without triggering notifications.
-     * @param boolean $background Send this message as background message
-     * @param boolean $clearDraft Clears the draft field
-     * @param boolean $updateStickersetsOrder Whether to move used stickersets to top
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
      *
      */
     public function sendPhoto(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
@@ -1861,8 +1861,8 @@ abstract class InternalDoc
     /**
      * Unpack bot API file ID.
      *
-     * @param string $fileId Bot API file ID
-     * @return array Unpacked file ID
+     * @param  string $fileId Bot API file ID
+     * @return array  Unpacked file ID
      */
     public static function unpackFileId(string $fileId): array
     {
@@ -1927,9 +1927,9 @@ abstract class InternalDoc
      * Upload file.
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
-     * @param string                                                $fileName  File name
-     * @param callable                                              $cb        Callback
-     * @param boolean                                               $encrypted Whether to encrypt file for secret chats
+     * @param string                                                                       $fileName  File name
+     * @param callable                                                                     $cb        Callback
+     * @param boolean                                                                      $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */
@@ -1940,9 +1940,9 @@ abstract class InternalDoc
     /**
      * Upload file to secret chat.
      *
-     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback
+     * @param FileCallbackInterface|string|array $file     File, URL or Telegram file to upload
+     * @param string                             $fileName File name
+     * @param callable                           $cb       Callback
      *
      * @return array InputFile constructor
      */
@@ -2002,12 +2002,12 @@ abstract class InternalDoc
     /**
      * Upload file from URL.
      *
-     * @param string|FileCallbackInterface $url       URL of file
-     * @param integer                      $size      Size of file
-     * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback
-     * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     * @return array InputFile constructor
+     * @param  string|FileCallbackInterface $url       URL of file
+     * @param  integer                      $size      Size of file
+     * @param  string                       $fileName  File name
+     * @param  callable                     $cb        Callback
+     * @param  boolean                      $encrypted Whether to encrypt file for secret chats
+     * @return array                        InputFile constructor
      */
     public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
@@ -2027,7 +2027,7 @@ abstract class InternalDoc
     /**
      * Mark sponsored message as read.
      *
-     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @param int|array                       $peer    Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      */
     public function viewSponsoredMessage(array|int $peer, array|string $message): bool

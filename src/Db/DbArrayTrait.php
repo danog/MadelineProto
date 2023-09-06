@@ -27,8 +27,8 @@ trait DbArrayTrait
     /**
      * Check if key isset.
      *
-     * @param TTKey $key
-     * @return bool true if the offset exists, otherwise false
+     * @param  TTKey $key
+     * @return bool  true if the offset exists, otherwise false
      */
     final public function isset(string|int $key): bool
     {
@@ -42,7 +42,7 @@ trait DbArrayTrait
     }
 
     /**
-     * @param TTKey $index
+     * @param TTKey   $index
      * @param TTValue $value
      */
     final public function offsetSet(mixed $index, mixed $value): void

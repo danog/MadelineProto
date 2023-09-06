@@ -36,12 +36,12 @@ interface RawStreamInterface extends StreamInterface
      * Reads data from the stream.
      *
      * @param Cancellation|null $cancellation Cancel the read operation. The state in which the stream will be after
-     * a cancelled operation is implementation dependent.
+     *                                        a cancelled operation is implementation dependent.
      *
      * @return string|null Returns a string when new data is available or {@code null} if the stream has closed.
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
-     * @throws StreamException If the stream contains invalid data, e.g. invalid compression
+     * @throws StreamException  If the stream contains invalid data, e.g. invalid compression
      */
     public function read(?Cancellation $cancellation = null): ?string;
     /**

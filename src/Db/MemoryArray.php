@@ -58,7 +58,7 @@ final class MemoryArray extends ArrayIterator implements DbArray
     }
 
     /**
-     * @param TKey $key
+     * @param TKey   $key
      * @param TValue $value
      */
     public function set(string|int $key, mixed $value): void

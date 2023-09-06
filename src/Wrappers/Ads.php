@@ -59,7 +59,7 @@ trait Ads
     /**
      * Mark sponsored message as read.
      *
-     * @param int|array $peer Channel ID, or Update, or Message, or Peer.
+     * @param int|array                       $peer    Channel ID, or Update, or Message, or Peer.
      * @param string|array{random_id: string} $message Random ID or sponsored message to mark as read.
      */
     public function viewSponsoredMessage(int|array $peer, string|array $message): bool

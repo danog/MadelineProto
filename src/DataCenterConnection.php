@@ -37,6 +37,7 @@ use function count;
 
 /**
  * Datacenter connection.
+ * @internal
  */
 final class DataCenterConnection implements JsonSerializable
 {
@@ -424,7 +425,7 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Connect function.
      *
-     * @param int               $id  Optional connection ID to reconnect
+     * @param int $id Optional connection ID to reconnect
      */
     public function connect(int $id = -1): void
     {

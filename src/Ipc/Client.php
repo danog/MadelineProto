@@ -70,8 +70,8 @@ final class Client extends ClientAbstract
     /**
      * Constructor function.
      *
-     * @param SessionPaths     $session Session paths
-     * @param Logger           $logger  Logger
+     * @param SessionPaths $session Session paths
+     * @param Logger       $logger  Logger
      */
     public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger)
     {
@@ -232,7 +232,7 @@ final class Client extends ClientAbstract
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
      * @param string $method Method name
-     * @param array  $args Arguments
+     * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = [])
@@ -264,8 +264,8 @@ final class Client extends ClientAbstract
      * Download file to directory.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $dir          Directory where to download the file
+     * @param callable                     $cb           Callback
      */
     public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null)
     {
@@ -282,8 +282,8 @@ final class Client extends ClientAbstract
      * Download file.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $file         Downloaded file path
+     * @param callable                     $cb           Callback
      */
     public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null)
     {

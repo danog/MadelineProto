@@ -34,8 +34,8 @@ final class FilterCommand extends Filter
      */
     public readonly array $commandTypes;
     /**
-     * @param string $command Command
-     * @param list<CommandType> $types Command types, if empty all command types are allowed.
+     * @param string            $command Command
+     * @param list<CommandType> $types   Command types, if empty all command types are allowed.
      */
     public function __construct(private readonly string $command, array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH])
     {

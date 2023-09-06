@@ -178,7 +178,7 @@ final class DataCenter
     /**
      * Generate contexts.
      *
-     * @param integer        $dc_number DC ID to generate contexts for
+     * @param integer $dc_number DC ID to generate contexts for
      */
     private function generateContexts(int $dc_number): ContextIterator
     {

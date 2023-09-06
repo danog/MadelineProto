@@ -96,7 +96,7 @@ class Server extends Loop
     /**
      * Start IPC server in background.
      *
-     * @param SessionPaths $session   Session path
+     * @param SessionPaths $session Session path
      */
     public static function startMe(SessionPaths $session): Future
     {

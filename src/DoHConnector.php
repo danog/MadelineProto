@@ -41,6 +41,7 @@ use const STREAM_CLIENT_ASYNC_CONNECT;
 use const STREAM_CLIENT_CONNECT;
 use function Amp\Socket\Internal\parseUri;
 
+/** @internal */
 final class DoHConnector implements SocketConnector
 {
     public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)

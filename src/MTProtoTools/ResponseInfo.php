@@ -54,8 +54,8 @@ final class ResponseInfo
     /**
      * Parse headers.
      *
-     * @param string $method       HTTP method
-     * @param array  $headers      HTTP headers
+     * @param string    $method       HTTP method
+     * @param array     $headers      HTTP headers
      * @param array|int $messageMedia Media info
      */
     private function __construct(string $method, array $headers, array|int $messageMedia)

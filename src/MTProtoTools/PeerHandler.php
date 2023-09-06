@@ -45,7 +45,7 @@ use function Amp\Future\await;
 /**
  * Manages peers.
  *
- * @property Settings $settings Settings
+ * @property Settings     $settings     Settings
  * @property PeerDatabase $peerDatabase
  *
  * @internal
@@ -358,8 +358,8 @@ trait PeerHandler
     /**
      * Get info about peer, returns an Info object.
      *
-     * @param mixed                $id        Peer
-     * @param \danog\MadelineProto\API::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
+     * @param mixed                                 $id   Peer
+     * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
      * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
@@ -494,7 +494,7 @@ trait PeerHandler
         throw new PeerNotInDbException();
     }
     /**
-     * @param array $constructor
+     * @param array                                 $constructor
      * @param \danog\MadelineProto\API::INFO_TYPE_* $type
      * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? (array{
      *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},

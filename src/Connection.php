@@ -458,7 +458,7 @@ final class Connection
     /**
      * Send an MTProto message.
      *
-     * @param boolean         $flush   Whether to flush the message right away
+     * @param boolean $flush Whether to flush the message right away
      */
     public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {

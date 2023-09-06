@@ -115,7 +115,7 @@ final class UpdatesState
     /**
      * Get/set PTS.
      *
-     * @param int $set PTS to set
+     * @param  int $set PTS to set
      * @return int PTS
      */
     public function pts(int $set = 0): int
@@ -128,7 +128,7 @@ final class UpdatesState
     /**
      * Get/set QTS.
      *
-     * @param int $set QTS to set
+     * @param  int $set QTS to set
      * @return int QTS
      */
     public function qts(int $set = 0): int
@@ -141,7 +141,7 @@ final class UpdatesState
     /**
      * Get/set seq.
      *
-     * @param int $set Seq to set
+     * @param  int $set Seq to set
      * @return int seq
      */
     public function seq(int $set = 0): int
@@ -154,7 +154,7 @@ final class UpdatesState
     /**
      * Get/set date.
      *
-     * @param int $set Date to set
+     * @param  int $set Date to set
      * @return int Date
      */
     public function date(int $set = 0): int
@@ -167,8 +167,8 @@ final class UpdatesState
     /**
      * Check validity of PTS contained in update.
      *
-     * @param array $update Update
-     * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
+     * @param  array $update Update
+     * @return int   -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkPts(array $update): int
     {
@@ -177,7 +177,7 @@ final class UpdatesState
     /**
      * Check validity of seq contained in update.
      *
-     * @param int $seq Seq
+     * @param  int $seq Seq
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkSeq(int $seq): int

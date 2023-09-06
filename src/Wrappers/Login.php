@@ -39,7 +39,7 @@ use danog\MadelineProto\Tools;
 /**
  * Manages logging in and out.
  *
- * @property Settings $settings Settings
+ * @property Settings     $settings    Settings
  * @property ?LoginQrCode $loginQrCode
  * @internal
  */
@@ -244,7 +244,7 @@ trait Login
      * Import authorization.
      *
      * @param array<int, string> $authorization Authorization info
-     * @param int $mainDcID Main DC ID
+     * @param int                $mainDcID      Main DC ID
      */
     public function importAuthorization(array $authorization, int $mainDcID): array
     {

@@ -67,9 +67,9 @@ abstract class StrTools extends Extension
     /**
      * Telegram UTF-8 multibyte substring.
      *
-     * @param string  $text   Text to substring
-     * @param integer $offset Offset
-     * @param null|int    $length Length
+     * @param string   $text   Text to substring
+     * @param integer  $offset Offset
+     * @param null|int $length Length
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
@@ -86,8 +86,8 @@ abstract class StrTools extends Extension
     /**
      * Telegram UTF-8 multibyte split.
      *
-     * @param string  $text   Text
-     * @param integer $length Length
+     * @param  string        $text   Text
+     * @param  integer       $length Length
      * @return array<string>
      */
     public static function mbStrSplit(string $text, int $length): array
@@ -134,7 +134,7 @@ abstract class StrTools extends Extension
      * Convert a message and a set of entities to HTML.
      *
      * @param list<MessageEntity|array{_: string, offset: int, length: int}> $entities
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     * @param bool                                                           $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {

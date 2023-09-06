@@ -51,7 +51,7 @@ trait Broadcast
      * containing a Progress object for all broadcasts currently in-progress.
      *
      * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool $pin Whether to also pin the last sent message.
+     * @param bool  $pin      Whether to also pin the last sent message.
      */
     public function broadcastMessages(array $messages, ?Filter $filter = null, bool $pin = false): int
     {
@@ -69,10 +69,10 @@ trait Broadcast
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param mixed $from_peer Bot API ID or Update, from where to forward the messages.
+     * @param mixed     $from_peer   Bot API ID or Update, from where to forward the messages.
      * @param list<int> $message_ids IDs of the messages to forward.
-     * @param bool $drop_author If true, will forward messages without quoting the original author.
-     * @param bool $pin Whether to also pin the last sent message.
+     * @param bool      $drop_author If true, will forward messages without quoting the original author.
+     * @param bool      $pin         Whether to also pin the last sent message.
      */
     public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?Filter $filter = null, bool $pin = false): int
     {

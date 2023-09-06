@@ -62,12 +62,12 @@ trait Files
     /**
      * Upload file from URL.
      *
-     * @param string|FileCallbackInterface $url       URL of file
-     * @param integer                      $size      Size of file
-     * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback
-     * @param boolean                      $encrypted Whether to encrypt file for secret chats
-     * @return array InputFile constructor
+     * @param  string|FileCallbackInterface $url       URL of file
+     * @param  integer                      $size      Size of file
+     * @param  string                       $fileName  File name
+     * @param  callable                     $cb        Callback
+     * @param  boolean                      $encrypted Whether to encrypt file for secret chats
+     * @return array                        InputFile constructor
      */
     public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
     {
@@ -319,8 +319,8 @@ trait Files
             /**
              * Constructor.
              *
-             * @param integer  $size     Total file size
-             * @param integer  $partSize Part size
+             * @param integer       $size     Total file size
+             * @param integer       $partSize Part size
              * @param null|callable $cb       Callback
              */
             public function __construct(int $size, int $partSize, ?callable $cb)
@@ -818,8 +818,8 @@ trait Files
      * Download file to directory.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $dir          Directory where to download the file
+     * @param callable                     $cb           Callback
      *
      * @return non-empty-string Downloaded file name
      */
@@ -836,8 +836,8 @@ trait Files
      * Download file.
      *
      * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback
+     * @param string|FileCallbackInterface $file         Downloaded file path
+     * @param callable                     $cb           Callback
      *
      * @return non-empty-string Downloaded file name
      */
@@ -876,13 +876,13 @@ trait Files
      * The callable must accept two parameters: string $payload, int $offset
      * The callable will be called (possibly out of order, depending on the value of $seekable).
      *
-     * @param mixed                          $messageMedia  File to download
-     * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback
-     * @param bool                           $seekable      Whether the callable can be called out of order
-     * @param int                            $offset        Offset where to start downloading
-     * @param int                            $end           Offset where to stop downloading (inclusive)
-     * @param int                            $part_size     Size of each chunk
+     * @param mixed                          $messageMedia File to download
+     * @param callable|FileCallbackInterface $callable     Chunk callback
+     * @param callable                       $cb           Status callback
+     * @param bool                           $seekable     Whether the callable can be called out of order
+     * @param int                            $offset       Offset where to start downloading
+     * @param int                            $end          Offset where to stop downloading (inclusive)
+     * @param int                            $part_size    Size of each chunk
      */
     public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null): void
     {
@@ -1016,16 +1016,16 @@ trait Files
     /**
      * Download file part.
      *
-     * @param array    $messageMedia  File object
-     * @param bool     $cdn           Whether this is a CDN file
-     * @param int      $datacenter    DC ID
-     * @param null|int     $old_dc       Previous DC ID
-     * @param IGE      $ige           IGE decryptor instance
-     * @param callable $cb            Status callback
-     * @param array    $offset        Offset
-     * @param callable $callable      Chunk callback
-     * @param boolean  $seekable      Whether the download file is seekable
-     * @param boolean  $postpone      Whether to postpone method call
+     * @param array    $messageMedia File object
+     * @param bool     $cdn          Whether this is a CDN file
+     * @param int      $datacenter   DC ID
+     * @param null|int $old_dc       Previous DC ID
+     * @param IGE      $ige          IGE decryptor instance
+     * @param callable $cb           Status callback
+     * @param array    $offset       Offset
+     * @param callable $callable     Chunk callback
+     * @param boolean  $seekable     Whether the download file is seekable
+     * @param boolean  $postpone     Whether to postpone method call
      */
     private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false): int
     {
