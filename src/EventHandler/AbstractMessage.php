@@ -233,7 +233,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Adds the user to the blacklist.
      *
-     * @param boolean $stories hide stories from user
      * @return boolean
      * @throws InvalidArgumentException
      */
@@ -251,7 +250,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Deletes the user from the blacklist.
      *
-     * @param boolean $stories uhide stories from user
      * @return boolean
      * @throws InvalidArgumentException
      */

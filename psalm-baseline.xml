@@ -418,6 +418,8 @@
       <code><![CDATA[$this->replyCache]]></code>
     </InvalidReturnStatement>
     <LessSpecificReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[\array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
@@ -427,8 +429,14 @@
         )]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
+      <code>DialogSetTTL</code>
+      <code>DialogSetTTL</code>
       <code><![CDATA[list<AbstractStory>]]></code>
     </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
+    </NullableReturnStatement>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -579,18 +587,12 @@
   </file>
   <file src="src/EventHandler/Message.php">
     <LessSpecificReturnStatement>
-      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
-      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
-      <code>DialogSetTTL</code>
-      <code>DialogSetTTL</code>
       <code>Message</code>
     </MoreSpecificReturnType>
     <NullableReturnStatement>
-      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
-      <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </NullableReturnStatement>
     <PropertyNotSetInConstructor>
@@ -675,8 +677,8 @@
     </InaccessibleProperty>
     <LessSpecificReturnStatement>
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
-      <code><![CDATA[$client->wrapUpdate($result)]]></code>
-      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($update)]]></code>
+      <code><![CDATA[$client->wrapUpdate($update)]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
       <code>StoryReaction</code>
@@ -684,8 +686,8 @@
     </MoreSpecificReturnType>
     <NullableReturnStatement>
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
-      <code><![CDATA[$client->wrapUpdate($result)]]></code>
-      <code><![CDATA[$client->wrapUpdate($result)]]></code>
+      <code><![CDATA[$client->wrapUpdate($update)]]></code>
+      <code><![CDATA[$client->wrapUpdate($update)]]></code>
     </NullableReturnStatement>
     <PossiblyUndefinedVariable>
       <code>$first</code>

@@ -28,7 +28,7 @@ final class GroupCallScheduled extends AbstractDialogGroupCall
         MTProto $API,
         array $rawMessage,
         array $info,
-    
+
         /** When is this group call scheduled to start */
         public readonly int $scheduleDate
     ) {

@@ -352,9 +352,10 @@ final class GroupMessage extends Message
      * Create a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
      * @param string $title Topic title (maximum UTF-8 length: 128)
-     * @param IconColor|int $icon ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon.
-     * [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
-     * If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB)
+     * @param IconColor|int $icon Icon color, or ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon.
+     *                            [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     *                            If no custom emoji icon is specified, specifies the color of the fallback topic icon
+     *
      * @throws InvalidArgumentException
      */
     public function createTopic(string $title, IconColor|int $icon = IconColor::NONE): DialogTopicCreated
@@ -371,7 +372,7 @@ final class GroupMessage extends Message
                 'title' => $title,
                 ...\is_int($icon)
                     ? ['icon_emoji_id' => $icon]
-                    : [ 'icon_color' => $icon->value],
+                    : ['icon_color' => $icon->value],
             ]
         );
         return $client->wrapMessage($client->extractMessage($result));
@@ -382,7 +383,7 @@ final class GroupMessage extends Message
      *
      * @param string $title Topic title (maximum UTF-8 length: 128)
      * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack. Pass 0 to switch to the fallback topic icon.
-     * @param integer|null $topicId Topic ID
+     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function editTopic(string $title, int $icon = 0, ?int $topicId = null): DialogTopicEdited
@@ -406,7 +407,7 @@ final class GroupMessage extends Message
     /**
      * Open a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param integer|null $topicId Topic ID
+     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function openTopic(?int $topicId = null): DialogTopicEdited
@@ -429,7 +430,7 @@ final class GroupMessage extends Message
     /**
      * Close a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
-     * @param integer|null $topicId Topic ID
+     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function closeTopic(?int $topicId = null): DialogTopicEdited
@@ -452,7 +453,7 @@ final class GroupMessage extends Message
     /**
      * Delete message history of a [forum topic](https://core.telegram.org/api/forum).
      *
-     * @param integer|null $topicId Topic ID
+     * @param integer|null $topicId Topic ID, if absent defaults to the topic where this message was sent.
      * @throws InvalidArgumentException
      */
     public function deleteTopic(?int $topicId = null): void

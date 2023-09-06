@@ -27,7 +27,7 @@ final class Blocked extends Update
     /** @var bool Whether blocked or unblocked. */
     public readonly bool $blocked;
 
-    /** @var bool Whether we hid or unhid storeis of this user */
+    /** @var bool Whether we hid or unhid stories of this user */
     public readonly bool $stories;
 
     /** @var int The user ID */

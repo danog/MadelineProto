@@ -371,32 +371,38 @@ trait UpdateHandler
      */
     public function wrapUpdate(array $update): ?Update
     {
-        return match ($update['_']) {
-            'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
-            'updateBotCallbackQuery' => isset($update['game_short_name'])
-                ? new ChatGameQuery($this, $update)
-                : new ChatButtonQuery($this, $update),
-            'updateInlineBotCallbackQuery' => isset($update['game_short_name'])
-                ? new InlineGameQuery($this, $update)
-                : new InlineButtonQuery($this, $update),
-            'updateBotInlineQuery' => new InlineQuery($this, $update),
-            'updatePhoneCall' => $update['phone_call'],
-            'updateBroadcastProgress' => $update['progress'],
-            'updateStory' => $update['story']['_'] === 'storyItemDeleted'
-                ? new StoryDeleted($this, $update)
-                : new Story($this, $update),
-            'updateSentStoryReaction' => new StoryReaction($this, $update),
-            'updateUserStatus' => Status::fromRawStatus($this, $update),
-            'updatePeerBlocked' => new Blocked($this, $update),
-            'updateBotStopped' => new BotStopped($this, $update),
-            'updateUserEmojiStatus' => new Emoji($this, $update),
-            'updateUserName' => new Username($this, $update),
-            'updateUserPhone' => new Phone($this, $update),
-            'updatePrivacy' => new Privacy($this, $update),
-            'updateUserTyping' => new UserTyping($this, $update),
-            'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
-            default => null
-        };
+        try {
+            return match ($update['_']) {
+                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
+                'updateBotCallbackQuery' => isset($update['game_short_name'])
+                    ? new ChatGameQuery($this, $update)
+                    : new ChatButtonQuery($this, $update),
+                'updateInlineBotCallbackQuery' => isset($update['game_short_name'])
+                    ? new InlineGameQuery($this, $update)
+                    : new InlineButtonQuery($this, $update),
+                'updateBotInlineQuery' => new InlineQuery($this, $update),
+                'updatePhoneCall' => $update['phone_call'],
+                'updateBroadcastProgress' => $update['progress'],
+                'updateStory' => $update['story']['_'] === 'storyItemDeleted'
+                    ? new StoryDeleted($this, $update)
+                    : new Story($this, $update),
+                'updateSentStoryReaction' => new StoryReaction($this, $update),
+                'updateUserStatus' => Status::fromRawStatus($this, $update),
+                'updatePeerBlocked' => new Blocked($this, $update),
+                'updateBotStopped' => new BotStopped($this, $update),
+                'updateUserEmojiStatus' => new Emoji($this, $update),
+                'updateUserName' => new Username($this, $update),
+                'updateUserPhone' => new Phone($this, $update),
+                'updatePrivacy' => new Privacy($this, $update),
+                'updateUserTyping' => new UserTyping($this, $update),
+                'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
+                default => null
+            };
+        } catch (\Throwable $e) {
+            $update = \json_encode($update);
+            $this->logger->logger("An error occured while wrapping $update: $e", Logger::FATAL_ERROR);
+            return null;
+        }
     }
 
     /**
