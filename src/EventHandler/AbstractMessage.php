@@ -237,14 +237,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @return boolean
      * @throws InvalidArgumentException
      */
-    public function block(bool $stories = false): bool
+    public function block(): bool
     {
         Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
-                'my_stories_from' => $stories,
             ]
         );
     }
@@ -256,14 +255,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @return boolean
      * @throws InvalidArgumentException
      */
-    public function unblock(bool $stories = false): bool
+    public function unblock(): bool
     {
         Assert::true($this->senderId > 0);
         return $this->getClient()->methodCallAsyncRead(
             'contacts.unblock',
             [
                 'id' => $this->senderId,
-                'my_stories_from' => $stories,
             ]
         );
     }
@@ -323,16 +321,19 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
-     * Mark selected message as read pass 0 to $maxId parameter to read all messages in current chat.
+     * Mark selected message as read.
+     *
+     * @param boolean $readAll
+     * @return boolean if set, read all messages in current chat.
      */
-    public function read(?int $maxId = null): bool
+    public function read(bool $readAll = false): bool
     {
         return $this->getClient()->methodCallAsyncRead(
             DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,
-                'max_id' => $maxId ?? $this->id
+                'max_id' => $readAll ? 0 : $this->id
             ]
         );
     }
