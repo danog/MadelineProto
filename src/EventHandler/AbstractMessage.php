@@ -36,8 +36,10 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public readonly int $id;
     /** Whether the message is outgoing */
     public readonly bool $out;
+    //TODO add support for secret chats
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
+    //TODO add support for secret chats
     /** ID of the sender of the message */
     public readonly int $senderId;
     /** ID of the message to which this message is replying */
@@ -78,7 +80,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $this->date = $rawMessage['date'];
         $this->mentioned = $rawMessage['mentioned'];
         $this->silent = $rawMessage['silent'];
-        $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
+        $this->ttlPeriod = $rawMessage['ttl_period'] ?? $rawMessage['ttl'] ?? null;
 
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];

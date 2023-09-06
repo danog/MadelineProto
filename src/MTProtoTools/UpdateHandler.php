@@ -27,6 +27,7 @@ use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Action;
 use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
@@ -60,6 +61,12 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionDeleteMessages;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionFlushHistory;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionReadMessages;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionScreenshotMessages;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionSetMessageTTL;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionTyping;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -373,7 +380,7 @@ trait UpdateHandler
     {
         try {
             return match ($update['_']) {
-                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
+                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage' => $this->wrapMessage($update['message']),
                 'updateBotCallbackQuery' => isset($update['game_short_name'])
                     ? new ChatGameQuery($this, $update)
                     : new ChatButtonQuery($this, $update),
@@ -619,6 +626,41 @@ trait UpdateHandler
                     $info,
                     $message['action']['button_id'],
                     $this->getIdInternal($message['action']['peer']),
+                ),
+                'decryptedMessageActionSetMessageTTL' => new ActionSetMessageTTL(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['ttl_seconds']
+                ),
+                'decryptedMessageActionReadMessages' => new ActionReadMessages(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['random_ids']
+                ),
+                'decryptedMessageActionDeleteMessages' => new ActionDeleteMessages(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['random_ids']
+                ),
+                'decryptedMessageActionScreenshotMessages' => new ActionScreenshotMessages(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['random_ids']
+                ),
+                'decryptedMessageActionFlushHistory' => new ActionFlushHistory(
+                    $this,
+                    $message,
+                    $info
+                ),
+                'decryptedMessageActionTyping' => new ActionTyping(
+                    $this,
+                    $message,
+                    $info,
+                    Action::fromRawAction($message['action']['action'])
                 ),
                 default => null
             };

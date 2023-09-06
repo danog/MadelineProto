@@ -8,19 +8,24 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message;
+namespace danog\MadelineProto\EventHandler\Message\Service\SecretChat;
 
-use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\MTProto;
 
 /**
- * Represents an incoming or outgoing private message.
+ * The entire message history has been deleted.
  */
-final class PrivateMessage extends AbstractPrivateMessage
+class ActionFlushHistory extends ServiceMessage
 {
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
+        parent::__construct($API, $rawMessage, $info);
+    }
 }

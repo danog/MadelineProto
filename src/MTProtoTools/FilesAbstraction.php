@@ -58,17 +58,20 @@ trait FilesAbstraction
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
-        if ($media['_'] === 'messageMediaPhoto') {
+        if ($media['_'] === 'messageMediaPhoto' || $media['_'] == 'decryptedMessageMediaPhoto') {
             if (!isset($media['photo'])) {
                 return null;
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] !== 'messageMediaDocument') {
+        if ($media['_'] !== 'messageMediaDocument' && $media['_'] !== 'decryptedMessageMediaExternalDocument') {
             return null;
         }
-        if (!isset($media['document'])) {
+        if (!isset($media['document']) && $media['_'] !== 'messageMediaDocument') {
             return null;
+        }
+        if ($media['_'] !== 'decryptedMessageMediaExternalDocument') {
+            $media['document']['attributes'] = $media['attributes'];
         }
         $has_video = null;
         $has_document_photo = null;
