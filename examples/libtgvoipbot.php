@@ -47,7 +47,7 @@ class MyEventHandler extends SimpleEventHandler
     public function convertCmd((Incoming&Message&HasAudio)|(Incoming&Message&HasDocument) $message): void
     {
         $reply = $message->reply("Conversion in progress...");
-        async(function () use ($message, $reply) {
+        async(function () use ($message, $reply): void {
             $pipe = self::getStreamPipe();
             $sink = $pipe->getSink();
             async(
