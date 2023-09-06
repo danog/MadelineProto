@@ -47,7 +47,7 @@ final class VoIPController
         'udp_reflector' => true,
         'min_layer' => 65,
         'max_layer' => 92,
-        'library_versions' => [
+        /*'library_versions' => [
             "2.4.4",
             "2.7.7",
             "5.0.0",
@@ -57,7 +57,7 @@ final class VoIPController
             "9.0.0",
             "10.0.0",
             "11.0.0"
-        ]
+        ]*/
     ];
     const NET_TYPE_UNKNOWN = 0;
     const NET_TYPE_GPRS = 1;

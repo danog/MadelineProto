@@ -650,12 +650,6 @@ final class TL implements TLInterface
                         $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
                         unset($arguments[$cur_flag['name']]);
                         break;
-                    case 'Bool':
-                        $arguments[$cur_flag['name']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] && ($arguments[$cur_flag['flag']] & $cur_flag['pow']) != 0;
-                        if (($arguments[$cur_flag['flag']] & $cur_flag['pow']) === 0) {
-                            unset($arguments[$cur_flag['name']]);
-                        }
-                        break;
                     default:
                         $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
                         break;

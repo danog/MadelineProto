@@ -81,10 +81,10 @@ final class Story extends AbstractStory
     public readonly int|string|null $sentReaction;
 
     /** Reaction counter */
-    public readonly int $reactionCount;
+    public readonly ?int $reactionCount;
 
     /** View counter */
-    public readonly int $views;
+    public readonly ?int $views;
 
     /** @var list<int> List of users who recently viewed the story */
     public readonly array $recentViewers;
@@ -116,8 +116,8 @@ final class Story extends AbstractStory
         $this->privacy = \array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
-        $this->views = $rawStory['views']['views_count'];
-        $this->reactionCount = $rawStory['views']['reactions_count'];
+        $this->views = $rawStory['views']['views_count'] ?? null;
+        $this->reactionCount = $rawStory['views']['reactions_count'] ?? null;
 
         $this->caption = $rawStory['caption'] ?? '';
         //$this->mediaAreas = $rawStory['mediaAreas'] ?? null; //!

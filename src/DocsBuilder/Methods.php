@@ -229,6 +229,9 @@ trait Methods
                 $header .= "# Warning: non-realtime results\n**Warning: this method is not suitable for receiving messages in real-time from chats and users, please use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven)**\n\n";
                 $header .= "# Warning: this is probably NOT what you need\nYou probably need to use the [updates event handler, instead &raquo;](/docs/UPDATES.html#async-event-driven) :)\n\n";
             }
+            if (\in_array($method, ['updates.getDifference', 'updates.getState', 'updates.getChannelDifference'], true)) {
+                $header .= "# Warning: this is a low-level, complex method that **must never** be used directly.\nThe [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html) provides a high-level abstraction that **must** be used instead of this method to fetch updates.\nIf you want to fetch all users of a bot using a bot token, use [getDialogIds](https://docs.madelineproto.xyz/docs/DIALOGS.html) or the high-level [broadcast API](https://docs.madelineproto.xyz/docs/BROADCAST.html), instead.\n\n";
+            }
             $header .= isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
 

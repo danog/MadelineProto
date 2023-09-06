@@ -57,8 +57,12 @@ final class AnnotationsBuilder
         $this->TL = new TL();
         $this->TL->init($settings['TL']);
         $this->blacklist = \json_decode(\file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
+        $this->blacklist['updates.getDifference'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
+        $this->blacklist['updates.getChannelDifference'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
+        $this->blacklist['updates.getState'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
         $this->blacklistHard = $this->blacklist;
-        unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['messages.getMessages']);
+        unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['messages.getMessages'], $this->blacklistHard['updates.getDifference'], $this->blacklistHard['updates.getChannelDifference'], $this->blacklistHard['updates.getState']);
+
         \file_put_contents(__DIR__.'/Namespace/Blacklist.php', '<?php
 namespace danog\MadelineProto\Namespace;
 

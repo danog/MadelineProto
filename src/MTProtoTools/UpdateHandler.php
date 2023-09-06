@@ -401,6 +401,7 @@ trait UpdateHandler
         } catch (\Throwable $e) {
             $update = \json_encode($update);
             $this->logger->logger("An error occured while wrapping $update: $e", Logger::FATAL_ERROR);
+            $this->report("An error occured while wrapping $update: $e");
             return null;
         }
     }
