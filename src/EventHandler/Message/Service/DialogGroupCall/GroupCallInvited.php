@@ -29,13 +29,9 @@ final class GroupCallInvited extends AbstractDialogGroupCall
         array $rawMessage,
         array $info,
 
-        /** Group call ID */
-        int $id,
-        /** Group call access hash */
-        int $accessHash,
         /** The invited users */
         public readonly array $users
     ) {
-        parent::__construct($API, $rawMessage, $info, $id, $accessHash);
+        parent::__construct($API, $rawMessage, $info);
     }
 }

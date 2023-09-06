@@ -28,14 +28,10 @@ final class GroupCallScheduled extends AbstractDialogGroupCall
         MTProto $API,
         array $rawMessage,
         array $info,
-
-        /** Group call ID */
-        int $id,
-        /** Group call access hash */
-        int $accessHash,
+    
         /** When is this group call scheduled to start */
         public readonly int $scheduleDate
     ) {
-        parent::__construct($API, $rawMessage, $info, $id, $accessHash);
+        parent::__construct($API, $rawMessage, $info);
     }
 }
