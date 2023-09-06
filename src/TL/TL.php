@@ -981,12 +981,6 @@ final class TL implements TLInterface
                     case 'true':
                         $x[$arg['name']] = ($x[$arg['flag']] & $arg['pow']) !== 0;
                         continue 2;
-                    case 'Bool':
-                        if (($x[$arg['flag']] & $arg['pow']) === 0) {
-                            $x[$arg['name']] = false;
-                            continue 2;
-                        }
-                        // no break
                     default:
                         if (($x[$arg['flag']] & $arg['pow']) === 0) {
                             continue 2;
