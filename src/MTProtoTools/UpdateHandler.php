@@ -66,7 +66,7 @@ use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionFlushHisto
 use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionReadMessages;
 use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionScreenshotMessages;
 use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionSetMessageTTL;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionTyping;
+use danog\MadelineProto\EventHandler\Message\Service\SecretChat\SecretUserTyping;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -656,7 +656,7 @@ trait UpdateHandler
                     $message,
                     $info
                 ),
-                'decryptedMessageActionTyping' => new ActionTyping(
+                'decryptedMessageActionTyping' => new SecretUserTyping(
                     $this,
                     $message,
                     $info,

@@ -17,13 +17,13 @@
 namespace danog\MadelineProto\EventHandler\Message\Service\SecretChat;
 
 use danog\MadelineProto\EventHandler\Action;
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 
 /**
  * User is preparing a message: typing, recording, uploading, etc.
  */
-class ActionTyping extends ServiceMessage
+class SecretUserTyping extends Typing
 {
     public function __construct(
         MTProto $API,
@@ -33,6 +33,6 @@ class ActionTyping extends ServiceMessage
         /** Type of action */
         public readonly Action $action
     ) {
-        parent::__construct($API, $rawMessage, $info);
+        parent::__construct($API, $rawMessage);
     }
 }

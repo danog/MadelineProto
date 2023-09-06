@@ -27,11 +27,11 @@ final class Video extends AbstractVideo
     /** If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
     /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
-    public readonly string $thumb;
+    public readonly ?Bytes $thumb;
     /** Thumbnail height only for secret chats. */
-    public readonly int $thumbHeight;
+    public readonly ?int $thumbHeight;
     /** Thumbnail width only for secret chats. */
-    public readonly int $thumbWidth;
+    public readonly ?int $thumbWidth;
 
     /** @internal */
     public function __construct(
@@ -49,18 +49,8 @@ final class Video extends AbstractVideo
             }
         }
         $this->hasStickers = $hasStickers;
-        $this->thumb = (string) $rawMedia['thumb'] ?? null;
+        $this->thumb = new Bytes($rawMedia['thumb']) ?? null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
-    }
-
-    /** @internal */
-    public function jsonSerialize(): mixed
-    {
-        $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location']);
-        $v['_'] = static::class;
-        $v['thumb'] = new Bytes($v['thumb']);
-        return $v;
     }
 }

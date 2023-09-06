@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
+use AssertionError;
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
 use danog\MadelineProto\MTProto;
 
@@ -28,14 +30,27 @@ class SecretMessage extends AbstractPrivateMessage
     public readonly ?bool $noWebpage;
     /** Random message ID of the message this message replies to (parameter added in layer 45) */
     public readonly ?int $replyToRandomId;
-    /** Specifies the ID of the inline bot that generated the message (parameter added in layer 45) */
-    public readonly ?string $viaBotName;
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info)
     {
         parent::__construct($API, $decryptedMessage = $rawMessage['decrypted_message'], $info);
         $this->noWebpage = $decryptedMessage['no_webpage'] ?? null;
         $this->replyToRandomId = $decryptedMessage['reply_to_random_id'] ?? null;
-        $this->viaBotName = $decryptedMessage['via_bot_name'] ?? null;
     }
+    //TODO implement it using getSecretChat
+    /*public function getReply(string $class = AbstractMessage::class) : ?AbstractMessage
+    {
+        if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
+            throw new AssertionError("A class that extends AbstractMessage was expected.");
+        }
+        if ($this->replyToMsgId === null) {
+            return null;
+        }
+        if ($this->replyCached) {
+            if (!$this->replyCache instanceof $class) {
+                return null;
+            }
+            return $this->replyCache;
+        }
+    }*/
 }

@@ -118,7 +118,7 @@ abstract class Message extends AbstractMessage
         $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'];
-        $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
+        $this->viaBotId = $rawMessage['via_bot_id'] ?? $this->getClient()->getIdInternal($rawMessage['via_bot_name']) ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
 
         $this->keyboard = isset($rawMessage['reply_markup'])

@@ -27,12 +27,12 @@ use danog\MadelineProto\TL\Types\Bytes;
 final class Document extends Media
 {
     /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
-    public readonly string $thumb;
+    public readonly ?Bytes $thumb;
     /** Thumbnail height only for secret chats. */
-    public readonly int $thumbHeight;
+    public readonly ?int $thumbHeight;
     /** Thumbnail width only for secret chats. */
-    public readonly int $thumbWidth;
-    /** Caption only for secret chats. */
+    public readonly ?int $thumbWidth;
+    /** Caption. */
     public readonly ?string $caption;
 
     /** @internal */
@@ -42,7 +42,7 @@ final class Document extends Media
         bool $protected
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->thumb = (string) $rawMedia['thumb'] ?? null;
+        $this->thumb = new Bytes($rawMedia['thumb']) ?? null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
         $this->caption = $rawMedia['caption'] ?? null;
