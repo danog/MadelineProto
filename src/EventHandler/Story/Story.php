@@ -80,10 +80,10 @@ final class Story extends AbstractStory
     public readonly int|string|null $sentReaction;
 
     /** Reaction counter */
-    public readonly int $reactionCount;
+    public readonly ?int $reaction;
 
     /** View counter */
-    public readonly int $viewsCount;
+    public readonly ?int $views;
 
     /** @var list<int> List of users who recently viewed the story */
     public readonly array $recentViewers;
@@ -115,8 +115,8 @@ final class Story extends AbstractStory
         $this->privacy = \array_map(AbstractRule::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
-        $this->reactionCount = $rawStory['views']['views_count'] ?? null;
-        $this->viewsCount = $rawStory['views']['reactions_count'] ?? null;
+        $this->views = $rawStory['views']['views_count'] ?? null;
+        $this->reaction = $rawStory['views']['reactions_count'] ?? null;
 
         $this->caption = $rawStory['caption'] ?? '';
         //$this->mediaAreas = $rawStory['mediaAreas'] ?? null; //!
@@ -225,7 +225,7 @@ final class Story extends AbstractStory
             'stories.report',
             [
                 'user_id' => $this->senderId,
-                'id' => $this->id,
+                'id' => [$this->id],
                 'reason' => ['_' => $reason->value],
                 'message' => $message,
             ]
@@ -241,7 +241,7 @@ final class Story extends AbstractStory
         $this->getClient()->methodCallAsyncRead(
             'stories.togglePinned',
             [
-                'id' => $this->id,
+                'id' => [$this->id],
                 'pinned' => true,
             ]
         );
@@ -256,7 +256,7 @@ final class Story extends AbstractStory
         $this->getClient()->methodCallAsyncRead(
             'stories.togglePinned',
             [
-                'id' => $this->id,
+                'id' => [$this->id],
                 'pinned' => false,
             ]
         );
@@ -273,7 +273,7 @@ final class Story extends AbstractStory
             'stories.incrementStoryViews',
             [
                 'user_id' => $this->senderId,
-                'id' => $this->id,
+                'id' => [$this->id],
             ]
         );
     }
@@ -281,10 +281,10 @@ final class Story extends AbstractStory
     /**
      * Reaction to story.
      *
-     * @param integer|string|null $reaction string or int Reaction
+     * @param integer|string $reaction string or int Reaction
      * @param boolean $recent
      */
-    public function addReaction(int|string|null $reaction = null, bool $recent = true): StoryReaction
+    public function addReaction(int|string $reaction, bool $recent = true): StoryReaction
     {
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
@@ -292,13 +292,14 @@ final class Story extends AbstractStory
             [
                 'add_to_recent' => $recent,
                 'user_id' => $this->senderId,
-                'id' => $this->id,
+                'story_id' => $this->id,
                 'reaction' => \is_int($reaction)
-                ? [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]]
-                : [['_' => 'reactionEmoji', 'emoticon' => $reaction]],
+                ? ['_' => 'reactionCustomEmoji', 'document_id' => $reaction]
+                : ['_' => 'reactionEmoji', 'emoticon' => $reaction],
             ]
-        )['updates'][0];
-        return $client->wrapUpdate($result);
+        )['updates'];
+        $result = array_filter($result, fn($val) => $val['_'] == 'updateSentStoryReaction');
+        return $client->wrapUpdate(...$result);
     }
 
     /**
@@ -314,9 +315,10 @@ final class Story extends AbstractStory
             [
                 'add_to_recent' => $recent,
                 'user_id' => $this->senderId,
-                'id' => $this->id,
+                'story_id' => $this->id,
             ]
-        )['updates'][0];
+        )['updates'];
+        $result = array_filter($result, fn($val) => $val['_'] == 'updateSentStoryReaction');
         return $client->wrapUpdate($result);
     }
 

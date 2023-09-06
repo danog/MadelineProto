@@ -24,17 +24,20 @@ use danog\MadelineProto\MTProto;
  */
 abstract class AbstractDialogGroupCall extends ServiceMessage
 {
+    /** Group call ID */
+    public readonly int $callId;
+
+    /** Group call access hash */
+    public readonly int $accessHash;
+
     /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage,
         array $info,
-
-        /** Group call ID */
-        public readonly int $id,
-        /** Group call access hash */
-        public readonly int $accessHash
     ) {
         parent::__construct($API, $rawMessage, $info);
+        $this->callId = $rawMessage['action']['call']['id'];
+        $this->accessHash = $rawMessage['action']['call']['access_hash'];
     }
 }

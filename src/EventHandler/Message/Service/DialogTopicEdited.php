@@ -30,13 +30,13 @@ final class DialogTopicEdited extends ServiceMessage
         array $info,
 
         /** Topic name. */
-        public readonly string $title,
+        public readonly ?string $title,
         /** ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. */
         public readonly ?int $iconEmojiId,
         /** Whether the topic was closed. */
-        public readonly ?bool $closed,
+        public readonly bool $closed,
         /** Whether the topic was hidden (only valid for the “General” topic, id=1). */
-        public readonly ?bool $hidden
+        public readonly bool $hidden
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

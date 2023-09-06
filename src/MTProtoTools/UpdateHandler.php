@@ -41,7 +41,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallEnded;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
@@ -503,7 +503,7 @@ trait UpdateHandler
                     $info,
                     $message['action']['video'],
                     $message['action']['call_id'],
-                    DiscardReason::fromString($message['action']['reason'] ?? null),
+                    DiscardReason::fromString($message['action']['reason']['_'] ?? null),
                     $message['action']['duration'] ?? null,
                 ),
                 'messageActionContactSignUp' => new DialogContactSignUp(
@@ -519,29 +519,23 @@ trait UpdateHandler
                     $this->getIdInternal($message['action']['to_id']),
                     $message['action']['distance'],
                 ),
-                'messageActionGroupCall' => new GroupCallEnded(
+                'messageActionGroupCall' => new GroupCall(
                     $this,
                     $message,
                     $info,
-                    $message['action']['call']['id'],
-                    $message['action']['call']['access_hash'],
-                    $message['action']['duration'],
+                    $message['action']['duration'] ?? null,
                 ),
 
                 'messageActionInviteToGroupCall' => new GroupCallInvited(
                     $this,
                     $message,
                     $info,
-                    $message['action']['call']['id'],
-                    $message['action']['call']['access_hash'],
                     $message['action']['users'],
                 ),
                 'messageActionGroupCallScheduled' => new GroupCallScheduled(
                     $this,
                     $message,
                     $info,
-                    $message['action']['call']['id'],
-                    $message['action']['call']['access_hash'],
                     $message['action']['schedule_date'],
                 ),
                 'messageActionSetMessagesTTL' => new DialogSetTTL(
@@ -549,7 +543,7 @@ trait UpdateHandler
                     $message,
                     $info,
                     $message['action']['period'],
-                    $message['action']['auto_setting_from'],
+                    $message['action']['auto_setting_from'] ?? null,
                 ),
                 'messageActionSetChatTheme' => new DialogSetChatTheme(
                     $this,
@@ -598,10 +592,10 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    $message['action']['title'],
+                    $message['action']['title'] ?? null,
                     $message['action']['icon_emoji_id'] ?? null,
-                    $message['action']['closed'] ?? null,
-                    $message['action']['hidden'] ?? null,
+                    $message['action']['closed'],
+                    $message['action']['hidden'],
                 ),
                 'messageActionSuggestProfilePhoto' => new DialogSuggestProfilePhoto(
                     $this,

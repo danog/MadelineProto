@@ -32,7 +32,7 @@ final class DialogSetTTL extends ServiceMessage
         /** New Time-To-Live of all messages sent in this chat; if 0, autodeletion was disabled. */
         public readonly int $period,
         /** If set, the chat TTL setting was set not due to a manual change by one of participants, but automatically because one of the participants has the [default TTL settings enabled »](https://docs.madelineproto.xyz/API_docs/methods/messages.setDefaultHistoryTTL.html). For example, when a user writes to us for the first time and we have set a default messages TTL of 1 week, this service message (with auto_setting_from=our_userid) will be emitted before our first message. */
-        public readonly int $autoSettingFrom
+        public readonly ?int $autoSettingFrom
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

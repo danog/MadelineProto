@@ -20,22 +20,22 @@ use danog\MadelineProto\EventHandler\Message\Service\AbstractDialogGroupCall;
 use danog\MadelineProto\MTProto;
 
 /**
- * The group call has ended.
+ * The group call has started or ended.
  */
-final class GroupCallEnded extends AbstractDialogGroupCall
+final class GroupCall extends AbstractDialogGroupCall
 {
+    /** @var bool Whether that group call ended or not. */
+    public readonly bool $ended;
+
     public function __construct(
         MTProto $API,
         array $rawMessage,
         array $info,
 
-        /** Group call ID */
-        int $id,
-        /** Group call access hash */
-        int $accessHash,
         /** Group call duration */
-        public readonly int $duration
+        public readonly ?int $duration
     ) {
-        parent::__construct($API, $rawMessage, $info, $id, $accessHash);
+        parent::__construct($API, $rawMessage, $info);
+        $this->ended = (bool) $duration;
     }
 }

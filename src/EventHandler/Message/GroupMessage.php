@@ -67,12 +67,12 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Display the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
      *
      * @throws InvalidArgumentException
      */
-    public function unhideMembers(): void
+    public function hideMembers(): void
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
@@ -85,12 +85,12 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
+     * Display the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
      *
      * @throws InvalidArgumentException
      */
-    public function hideMembers(): void
+    public function unhideMembers(): void
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
@@ -111,7 +111,7 @@ final class GroupMessage extends Message
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
-            'channels.toggleParticipantsHidden',
+            'channels.togglePreHistoryHidden',
             [
                 'channel' => $this->chatId,
                 'enabled' => true,
@@ -128,7 +128,7 @@ final class GroupMessage extends Message
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $this->getClient()->methodCallAsyncRead(
-            'channels.toggleParticipantsHidden',
+            'channels.togglePreHistoryHidden',
             [
                 'channel' => $this->chatId,
                 'enabled' => false,
@@ -250,7 +250,7 @@ final class GroupMessage extends Message
      */
     public function deleteUserMessages(string|int|null $member = null): void
     {
-        Assert::false(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $member ??= $this->senderId;
         $this->getClient()->methodCallAsyncRead(
             'channels.deleteParticipantHistory',
@@ -352,11 +352,12 @@ final class GroupMessage extends Message
      * Create a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
      * @param string $title Topic title (maximum UTF-8 length: 128)
-     * @param integer $icon ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
-     * @param IconColor $color If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB)
+     * @param IconColor|int $icon ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon.
+     * [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB)
      * @throws InvalidArgumentException
      */
-    public function createTopic(string $title, int $icon, IconColor $color = IconColor::NONE): DialogTopicCreated
+    public function createTopic(string $title, IconColor|int $icon = IconColor::NONE): DialogTopicCreated
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         if (!$this->topicId) {
@@ -368,8 +369,9 @@ final class GroupMessage extends Message
             [
                 'channel' => $this->chatId,
                 'title' => $title,
-                'icon_color' => $color->value,
-                'icon_emoji_id' => $icon,
+                ...\is_int($icon)
+                    ? ['icon_emoji_id' => $icon]
+                    : [ 'icon_color' => $icon->value],
             ]
         );
         return $client->wrapMessage($client->extractMessage($result));
@@ -379,11 +381,11 @@ final class GroupMessage extends Message
      * Edit a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
      * @param string $title Topic title (maximum UTF-8 length: 128)
-     * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
+     * @param integer $icon  ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack. Pass 0 to switch to the fallback topic icon.
      * @param integer|null $topicId Topic ID
      * @throws InvalidArgumentException
      */
-    public function editTopic(string $title, int $icon, ?int $topicId = null): DialogTopicEdited
+    public function editTopic(string $title, int $icon = 0, ?int $topicId = null): DialogTopicEdited
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         $topicId ??= $this->topicId;
