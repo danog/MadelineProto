@@ -18,13 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
 use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\FileCallback;
-use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\VoIP;
 use Webmozart\Assert\Assert;
 
-use function Amp\File\openFile;
 use function Amp\File\read;
 
 $loader = false;

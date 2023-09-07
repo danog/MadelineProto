@@ -23,7 +23,21 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Http\Client\Request;
+use AssertionError;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
+use danog\MadelineProto\EventHandler\Media\Audio;
+use danog\MadelineProto\EventHandler\Media\CustomEmoji;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
+use danog\MadelineProto\EventHandler\Media\StaticSticker;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\VideoSticker;
+use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -58,6 +72,87 @@ trait Files
 {
     use FilesLogic;
     use FileServer;
+    /**
+     * Wrap a media constructor into an abstract Media object.
+     */
+    public function wrapMedia(array $media, bool $protected = false): ?Media
+    {
+        if ($media['_'] === 'messageMediaPhoto') {
+            if (!isset($media['photo'])) {
+                return null;
+            }
+            return new Photo($this, $media, $protected);
+        }
+        if ($media['_'] !== 'messageMediaDocument') {
+            return null;
+        }
+        if (!isset($media['document'])) {
+            return null;
+        }
+        $has_video = null;
+        $has_document_photo = null;
+        $has_animated = false;
+        foreach ($media['document']['attributes'] as $attr) {
+            $t = $attr['_'];
+            if ($t === 'documentAttributeImageSize') {
+                $has_document_photo = $attr;
+                continue;
+            }
+            if ($t === 'documentAttributeAnimated') {
+                $has_animated = true;
+                continue;
+            }
+            if ($t === 'documentAttributeSticker') {
+                if ($has_video) {
+                    return new VideoSticker($this, $media, $attr, $has_video, $protected);
+                }
+
+                if ($has_document_photo === null) {
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                }
+
+                if ($attr['mask']) {
+                    return new MaskSticker($this, $media, $attr, $has_document_photo, $protected);
+                }
+
+                if ($media['document']['mime_type'] === 'application/x-tgsticker') {
+                    return new AnimatedSticker($this, $media, $attr, $has_document_photo, $protected);
+                }
+
+                return new StaticSticker($this, $media, $attr, $has_document_photo, $protected);
+            }
+            if ($t === 'documentAttributeVideo') {
+                $has_video = $attr;
+                continue;
+            }
+            if ($t === 'documentAttributeAudio') {
+                return $attr['voice']
+                    ? new Voice($this, $media, $attr, $protected)
+                    : new Audio($this, $media, $attr, $protected);
+            }
+            if ($t === 'documentAttributeCustomEmoji') {
+                if ($has_document_photo === null) {
+                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                }
+                return new CustomEmoji($this, $media, $attr, $has_document_photo, $protected);
+            }
+        }
+        if ($has_animated) {
+            if ($has_video === null) {
+                throw new AssertionError("has_video === null: ".\json_encode($media['document']));
+            }
+            return new Gif($this, $media, $has_video, $protected);
+        }
+        if ($has_video) {
+            return $has_video['round_message']
+                ? new RoundVideo($this, $media, $has_video, $protected)
+                : new Video($this, $media, $has_video, $protected);
+        }
+        if ($has_document_photo) {
+            return new DocumentPhoto($this, $media, $has_document_photo, $protected);
+        }
+        return new Document($this, $media, $protected);
+    }
     /**
      * Upload file from URL.
      *
