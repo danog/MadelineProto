@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\ByteStream\Pipe;
+use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableResourceStream;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
@@ -34,6 +35,7 @@ use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LocalFile;
@@ -55,6 +57,7 @@ use Webmozart\Assert\Assert;
 use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
+use function Amp\ByteStream\buffer;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -255,6 +258,42 @@ trait FilesLogic
     }
 
     /**
+     * @internal
+     */
+    public function processMedia(array &$media, bool $upload = false): void
+    {
+        if ($media['_'] === 'inputMediaPhotoExternal') {
+            $media['_'] = 'inputMediaUploadedPhoto';
+            if ($media['url'] instanceof FileCallbackInterface) {
+                $media['file'] = new FileCallback(
+                    new RemoteUrl($media['url']->getFile()),
+                    $media['url']
+                );
+            } else {
+                $media['file'] = new RemoteUrl($media['url']);
+            }
+            unset($media['url']);
+        } elseif ($media['_'] === 'inputMediaDocumentExternal') {
+            $media['_'] = 'inputMediaUploadedDocument';
+            if ($media['url'] instanceof FileCallbackInterface) {
+                $media['file'] = new FileCallback(
+                    new RemoteUrl($url = $media['url']->getFile()),
+                    $media['url']
+                );
+            } else {
+                $media['file'] = new RemoteUrl($url = $media['url']);
+            }
+            unset($media['url']);
+            $media['mime_type'] = Extension::getMimeFromExtension(
+                \pathinfo($url, PATHINFO_EXTENSION),
+                'application/octet-stream'
+            );
+        }
+        if ($upload) {
+            $media['file'] = $this->upload($media['file']);
+        }
+    }
+    /**
      * Upload file.
      *
      * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
@@ -346,6 +385,17 @@ trait FilesLogic
             }
         }
         $created = false;
+        if (!$size) {
+            if ($seekable && \method_exists($stream, 'tell')) {
+                $stream->seek(0, Whence::End);
+                $size = $stream->tell();
+                $stream->seek(0);
+            } elseif ($stream instanceof ReadableBuffer) {
+                $stream = buffer($stream);
+                $size = \strlen($stream);
+                $stream = new ReadableBuffer($stream);
+            }
+        }
         if ($stream instanceof File) {
             $lock = new LocalMutex;
             $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock) {
@@ -381,11 +431,6 @@ trait FilesLogic
                 }
             };
             $seekable = false;
-        }
-        if (!$size && $seekable && \method_exists($stream, 'tell')) {
-            $stream->seek(0, Whence::End);
-            $size = $stream->tell();
-            $stream->seek(0);
         }
         $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
         if ($created) {

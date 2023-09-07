@@ -705,6 +705,9 @@ abstract class Tools extends AsyncTools
      */
     public static function validateEventHandlerClass(string $class): array
     {
+        if (!\extension_loaded('tokenizer')) {
+            throw \danog\MadelineProto\Exception::extension('tokenizer');
+        }
         $plugin = \is_subclass_of($class, PluginEventHandler::class);
         $file = (new ReflectionClass($class))->getFileName();
         $code = read($file);

@@ -34,7 +34,6 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Wrappers\Start;
 use Revolt\EventLoop;
-use Symfony\Component\Process\InputStream;
 use Throwable;
 
 use function Amp\async;
@@ -238,34 +237,19 @@ final class Client extends ClientAbstract
      */
     public function methodCallAsyncRead(string $method, array $args = [], array $aargs = [])
     {
-        if (($method === 'messages.editInlineBotMessage' ||
+        if ((
+            $method === 'messages.editInlineBotMessage' ||
             $method === 'messages.uploadMedia' ||
             $method === 'messages.sendMedia' ||
-            $method === 'messages.editMessage') &&
-            isset($args['media']['file']) &&
-            (
-                $args['media']['file'] instanceof FileCallbackInterface
-                || $args['media']['file'] instanceof InputStream
-            )
-        ) {
-            $params = [$method, &$args, $aargs];
-            $wrapper = Wrapper::create($params, $this->session, $this->logger);
-            $wrapper->wrap($args['media']['file'], true);
-            return $this->__call('methodCallAsyncRead', $wrapper);
+            $method === 'messages.editMessage'
+        ) && isset($args['media']) && \is_array($args['media'])) {
+            $this->processMedia($args['media'], true);
         } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
-            $params = [$method, &$args, $aargs];
-            $wrapper = Wrapper::create($params, $this->session, $this->logger);
             foreach ($args['multi_media'] as &$media) {
-                if (isset($media['media']['file']) &&
-                    (
-                        $media['media']['file'] instanceof FileCallbackInterface
-                        || $media['media']['file'] instanceof ReadableStream
-                    )
-                ) {
-                    $wrapper->wrap($media['media']['file'], true);
+                if (\is_array($media['media'])) {
+                    $this->processMedia($media['media'], true);
                 }
             }
-            return $this->__call('methodCallAsyncRead', $wrapper);
         }
         return $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
     }

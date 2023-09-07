@@ -20,6 +20,7 @@ use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
 use Amp\Ipc\Sync\ChannelledSocket;
+use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
@@ -107,6 +108,13 @@ final class Wrapper extends ClientAbstract
     public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
         if (\is_object($callback) && $wrapObjects) {
+            if ($callback instanceof FileCallbackInterface) {
+                $file = $callback->getFile();
+                if ($file instanceof ByteStreamReadableStream) {
+                    $this->wrap($file, true);
+                    $callback = new MadelineProtoFileCallback($file, $callback);
+                }
+            }
             $ids = [];
             foreach (\get_class_methods($callback) as $method) {
                 $id = $this->id++;
@@ -175,11 +183,11 @@ final class Wrapper extends ClientAbstract
         try {
             $this->server->send([$id, $result]);
         } catch (Throwable $e) {
-            $this->logger->logger("Got error while trying to send result of reverse method: $e", Logger::ERROR);
+            $this->logger->logger("Got error while trying to send result of reverse method {$payload[0]}: $e", Logger::ERROR);
             try {
                 $this->server->send([$id, new ExitFailure($e)]);
             } catch (Throwable $e) {
-                $this->logger->logger("Got error while trying to send error of error of reverse method: $e", Logger::ERROR);
+                $this->logger->logger("Got error while trying to send error of error of reverse method {$payload[0]}: $e", Logger::ERROR);
             }
         }
     }

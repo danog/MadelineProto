@@ -62,6 +62,6 @@ trait ClosableTrait
 
     final public function __destruct()
     {
-        $this->close();
+        EventLoop::queue($this->close(...));
     }
 }

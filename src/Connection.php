@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
+use Amp\ByteStream\ReadableBuffer;
+use Amp\ByteStream\ReadableStream;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use AssertionError;
@@ -35,10 +37,11 @@ use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\TL\Exception as TLException;
 use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
+
+use function Amp\ByteStream\buffer;
 
 /**
  * Connection class.
@@ -375,16 +378,24 @@ final class Connection
                 }
             }
             if (\is_array($arguments['media']) && isset($arguments['media']['_'])) {
-                if ($arguments['media']['_'] === 'inputMediaPhotoExternal') {
-                    $arguments['media']['_'] = 'inputMediaUploadedPhoto';
-                    $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
-                } elseif ($arguments['media']['_'] === 'inputMediaDocumentExternal') {
-                    $arguments['media']['_'] = 'inputMediaUploadedDocument';
-                    $arguments['media']['file'] = new RemoteUrl($arguments['media']['url']);
-                    $arguments['media']['mime_type'] = Extension::getMimeFromExtension(
-                        \pathinfo($arguments['media']['url'], PATHINFO_EXTENSION),
-                        'application/octet-stream'
-                    );
+                $this->API->processMedia($arguments['media']);
+                if ($arguments['media']['_'] === 'inputMediaUploadedPhoto'
+                    && (
+                        $arguments['media']['file'] instanceof ReadableStream
+                        || (
+                            $arguments['media']['file'] instanceof FileCallback
+                            && $arguments['media']['file']->file instanceof ReadableStream
+                        )
+                    )
+                ) {
+                    if ($arguments['media']['file'] instanceof FileCallback) {
+                        $arguments['media']['file'] = new FileCallback(
+                            new ReadableBuffer(buffer($arguments['media']['file']->file)),
+                            $arguments['media']['file']->callback
+                        );
+                    } else {
+                        $arguments['media']['file'] = new ReadableBuffer(buffer($arguments['media']['file']));
+                    }
                 }
             }
         } elseif ($method === 'messages.sendMultiMedia') {
