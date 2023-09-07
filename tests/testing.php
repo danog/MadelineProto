@@ -18,11 +18,13 @@ If not, see <http://www.gnu.org/licenses/>.
 use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\FileCallback;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\VoIP;
 use Webmozart\Assert\Assert;
 
+use function Amp\File\openFile;
 use function Amp\File\read;
 
 $loader = false;
@@ -300,13 +302,16 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
         'base' => $media
     ];
     if (isset($media['file']) && is_string($media['file'])) {
+        $MadelineProto->sendDocument(
+            peer: $peer,
+            file: new ReadableBuffer(read($media['file'])),
+            callback: fn ($v) => $MadelineProto->logger($v),
+            fileName: basename($media['file'])
+        );
         $medias['callback'] = array_merge(
             $media,
             ['file' => new FileCallback($media['file'], fn ($v) => $MadelineProto->logger(...))]
         );
-        if (is_array($media['file'])) {
-            var_dump($media['file']);
-        }
         $medias['stream'] = array_merge(
             $media,
             ['file' => new ReadableBuffer(read($media['file']))]

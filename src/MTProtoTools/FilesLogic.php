@@ -70,6 +70,7 @@ use function Amp\File\openFile;
  */
 trait FilesLogic
 {
+    use FilesAbstraction;
     /**
      * Download file to browser.
      *

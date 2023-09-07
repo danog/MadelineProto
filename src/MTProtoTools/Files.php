@@ -57,7 +57,6 @@ use function Amp\Future\awaitFirst;
 trait Files
 {
     use FilesLogic;
-    use FilesAbstraction;
     use FileServer;
     /**
      * Upload file from URL.
