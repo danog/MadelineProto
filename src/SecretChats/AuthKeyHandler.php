@@ -24,6 +24,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
@@ -316,6 +317,9 @@ trait AuthKeyHandler
      */
     public function getSecretChat(array|int $chat): array
     {
+        if (is_int($chat) && DialogId::isSecretChat($chat)) {
+            $chat = DialogId::toSecretChatId($chat);
+        }
         return $this->secret_chats[\is_array($chat) ? $chat['chat_id'] : $chat];
     }
     /**
