@@ -21,6 +21,7 @@ use Amp\Redis\RedisClient;
 use Amp\Redis\RedisConfig;
 use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
+use Revolt\EventLoop;
 
 use function Amp\Redis\createRedisConnector;
 
@@ -51,7 +52,7 @@ final class Redis
                 self::$connections[$dbKey]->ping();
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
 
         return self::$connections[$dbKey];

@@ -220,7 +220,7 @@ final class MinDatabase implements TLCallback
             }
         } finally {
             unset($this->pendingDb[$id]);
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     public function populateFrom(array $object)

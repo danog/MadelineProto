@@ -314,7 +314,8 @@ trait ResponseHandler
                 return null;
             case 400:
                 if ($request->hasQueue() &&
-                    ($response['error_message'] === 'MSG_WAIT_FAILED'
+                    (
+                        $response['error_message'] === 'MSG_WAIT_FAILED'
                         || $response['error_message'] === 'MSG_WAIT_TIMEOUT'
                     )
                 ) {

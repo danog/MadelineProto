@@ -291,7 +291,7 @@ foreach ($media as $key => $value) {
 
 foreach ($media as $key => $value) {
     if (isset($value['file'])) {
-        $value['file'] = new FileCallback($value['file'], function () {});
+        $value['file'] = new FileCallback($value['file'], function (): void {});
         $media["callback_$key"] = $value;
     }
 }

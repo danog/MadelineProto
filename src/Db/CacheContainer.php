@@ -157,7 +157,7 @@ final class CacheContainer
             $this->ttl = $newTtl;
             $this->cache = $newValues;
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
 }

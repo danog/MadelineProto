@@ -754,10 +754,11 @@ abstract class Tools extends AsyncTools
 
             $name = $call->name->toLowerString();
             if (isset(self::BLOCKING_FUNCTIONS[$name])) {
-                if ($name === 'fopen' && 
+                if ($name === 'fopen' &&
                     isset($call->args[0]) &&
+                    $call->args[0] instanceof Arg &&
                     $call->args[0]->value instanceof String_ &&
-                    str_starts_with($call->args[0]->value->value, 'php://memory')
+                    \str_starts_with($call->args[0]->value->value, 'php://memory')
                 ) {
                     continue;
                 }

@@ -154,7 +154,7 @@ final class Wrapper extends ClientAbstract
                 EventLoop::queue($this->clientRequest(...), $id++, $payload);
             }
         } finally {
-            $this->server->disconnect();
+            EventLoop::queue($this->server->disconnect(...));
         }
     }
 

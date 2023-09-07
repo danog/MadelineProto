@@ -248,7 +248,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 * [FAQ](https://docs.madelineproto.xyz/docs/FAQ.html) - Here's a list of common MadelineProto questions and answers.
 * [Upgrading from MadelineProto v7 to v8](https://docs.madelineproto.xyz/docs/UPGRADING.html) - MadelineProto v8 is a major MadelineProto update, that removes a large number of long-deprecated APIs: I've created this upgrade checklist, to simplify the upgrade process.  
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html) - There are simplifications for many, if not all of, these methods.
-  * [Named arguments (PHP 8+)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
+  * [Named arguments](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
   * [Files](https://docs.madelineproto.xyz/docs/FILES.html)
   * [Secret chats](https://docs.madelineproto.xyz/docs/USING_METHODS.html#secret-chats)

@@ -132,7 +132,7 @@ final class CheckLoop extends Loop
                             }
                         }
                         $this->connection->flush();
-                    //} catch (CancelledException) {
+                        //} catch (CancelledException) {
                         //$this->logger->logger("We did not receive a response for {$this->timeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
                         //EventLoop::queue($this->connection->reconnect(...));
                     } catch (\Throwable $e) {

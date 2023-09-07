@@ -41,6 +41,7 @@ use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
+use Revolt\EventLoop;
 
 /**
  * @psalm-type TDcOption=array{
@@ -387,7 +388,7 @@ final class DataCenter
                 $this->sockets[$dc]->setExtra($this->API, $dc, $ctxs);
                 $this->sockets[$dc]->connect();
             } finally {
-                $lock->release();
+                EventLoop::queue($lock->release(...));
             }
         }
         return $this->sockets[$dc];

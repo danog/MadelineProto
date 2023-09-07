@@ -37,6 +37,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\TL\Exception as TLException;
+use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
 /**
@@ -106,6 +107,10 @@ final class Connection
      */
     private bool $reading = false;
     /**
+     * Whether we're currently writing an MTProto packet.
+     */
+    private bool $writing = false;
+    /**
      * Logger instance.
      *
      */
@@ -160,6 +165,7 @@ final class Connection
      */
     public function writing(bool $writing): void
     {
+        $this->writing = $writing;
         $this->shared->writing($writing, $this->id);
     }
     /**
@@ -176,6 +182,13 @@ final class Connection
     public function isReading(): bool
     {
         return $this->reading;
+    }
+    /**
+     * Whether we're currently writing an MTProto packet.
+     */
+    public function isWriting(): bool
+    {
+        return $this->writing;
     }
     /**
      * Indicate a received HTTP response.
@@ -310,7 +323,7 @@ final class Connection
             }
             throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     /**

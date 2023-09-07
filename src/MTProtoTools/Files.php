@@ -859,16 +859,14 @@ trait Files
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = Tools::flock("$file.lock", LOCK_EX);
         $this->logger->logger('Got lock of file to download');
-        try {
-            $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
-        } finally {
+        async($this->downloadToStream(...), $messageMedia, $stream, $cb, $size, -1)->finally(function () use ($stream, $unlock, $file): void {
+            $stream->close();
             $unlock();
             try {
                 deleteFile("$file.lock");
-            } catch (Throwable) {
+            } catch (\Throwable) {
             }
-            $stream->close();
-        }
+        })->await();
         return $file;
     }
     /**

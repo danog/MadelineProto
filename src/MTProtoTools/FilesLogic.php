@@ -139,13 +139,7 @@ trait FilesLogic
     {
         $pipe = new Pipe(1024*1024);
         $sink = $pipe->getSink();
-        EventLoop::queue(function () use ($messageMedia, $sink, $cb, $offset, $end): void {
-            try {
-                $this->downloadToStream($messageMedia, $sink, $cb, $offset, $end);
-            } finally {
-                $sink->close();
-            }
-        });
+        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end)->finally($sink->close(...));
         return $pipe->getSource();
     }
     /**
@@ -191,7 +185,7 @@ trait FilesLogic
                 }
                 $stream->write($payload);
             } finally {
-                $l->release();
+                EventLoop::queue($l->release(...));
             }
             return \strlen($payload);
         };
@@ -316,11 +310,7 @@ trait FilesLogic
         }
         $stream = openFile($file, 'rb');
         $mime = Extension::getMimeFromFile($file);
-        try {
-            return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
-        } finally {
-            $stream->close();
-        }
+        return async($this->uploadFromStream(...), $stream, $size, $mime, $fileName, $cb, $encrypted)->finally($stream->close(...))->await();
     }
 
     /**
@@ -369,7 +359,7 @@ trait FilesLogic
                     }
                     return $stream->read(null, $size);
                 } finally {
-                    $l->release();
+                    EventLoop::queue($l->release(...));
                 }
             };
         } else {

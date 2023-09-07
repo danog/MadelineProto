@@ -256,7 +256,7 @@ final class Client extends ClientAbstract
             $params = [$method, &$args, $aargs];
             $wrapper = Wrapper::create($params, $this->session, $this->logger);
             foreach ($args['multi_media'] as &$media) {
-                if (isset($media['media']['file']) && 
+                if (isset($media['media']['file']) &&
                     (
                         $media['media']['file'] instanceof FileCallbackInterface
                         || $media['media']['file'] instanceof ReadableStream

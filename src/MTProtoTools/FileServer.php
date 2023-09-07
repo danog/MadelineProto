@@ -35,6 +35,7 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\AppInfo;
 use danog\MadelineProto\Tools;
 use Exception;
+use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\File\exists;
@@ -216,7 +217,7 @@ trait FileServer
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
 
@@ -249,7 +250,7 @@ trait FileServer
 
             self::$checkedScripts[$scriptUrl] = true;
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
 }

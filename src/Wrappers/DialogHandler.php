@@ -25,6 +25,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -93,7 +94,7 @@ trait DialogHandler
             }
             $this->cachedAllBotUsers = true;
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     private function searchRightPts(): void
@@ -188,7 +189,7 @@ trait DialogHandler
             try {
                 $this->getFullDialogsInternal(false);
             } finally {
-                $lock->release();
+                EventLoop::queue($lock->release(...));
             }
             return true;
         }

@@ -21,6 +21,7 @@ use Amp\Postgres\PostgresConnectionPool;
 use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+use Revolt\EventLoop;
 use Throwable;
 
 /**
@@ -51,7 +52,7 @@ final class Postgres
                 self::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
 
         return self::$connections[$dbKey];
