@@ -754,6 +754,13 @@ abstract class Tools extends AsyncTools
 
             $name = $call->name->toLowerString();
             if (isset(self::BLOCKING_FUNCTIONS[$name])) {
+                if ($name === 'fopen' && 
+                    isset($call->args[0]) &&
+                    $call->args[0]->value instanceof String_ &&
+                    str_starts_with($call->args[0]->value->value, 'php://memory')
+                ) {
+                    continue;
+                }
                 $explanation = self::BLOCKING_FUNCTIONS[$name];
                 $issues []= new EventHandlerIssue(
                     message: \sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),

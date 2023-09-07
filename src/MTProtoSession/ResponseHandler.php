@@ -312,6 +312,16 @@ trait ResponseHandler
                 }
                 EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId(), datacenter: $datacenter);
                 return null;
+            case 400:
+                if ($request->hasQueue() &&
+                    ($response['error_message'] === 'MSG_WAIT_FAILED'
+                        || $response['error_message'] === 'MSG_WAIT_TIMEOUT'
+                    )
+                ) {
+                    EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId());
+                    return null;
+                }
+                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 401:
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':

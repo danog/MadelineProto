@@ -15,7 +15,9 @@ If not, see <http://www.gnu.org/licenses/>.
  * Various ways to load MadelineProto.
  */
 
+use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\API;
+use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\VoIP;
@@ -260,7 +262,7 @@ $media = [];
 $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => __DIR__.'/faust.jpg'];
 
 // Image by URL
-$media['photo'] = ['_' => 'inputMediaPhotoExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg'];
+$media['photo_url'] = ['_' => 'inputMediaPhotoExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg'];
 
 // Sticker
 $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
@@ -278,7 +280,21 @@ $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/mosc
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
 // Document by URL
-$media['document'] = ['_' => 'inputMediaDocumentExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
+$media['document_url'] = ['_' => 'inputMediaDocumentExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
+
+foreach ($media as $key => $value) {
+    if (isset($value['file'])) {
+        $value['file'] = new ReadableBuffer(read($value['file']));
+        $media["stream_$key"] = $value;
+    }
+}
+
+foreach ($media as $key => $value) {
+    if (isset($value['file'])) {
+        $value['file'] = new FileCallback($value['file'], function () {});
+        $media["callback_$key"] = $value;
+    }
+}
 
 $message = 'yay '.PHP_VERSION_ID;
 $mention = $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
@@ -311,8 +327,8 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Downloading $type");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
+        if ($type !== 'photo' && $type !== 'photo_url') {
+            Assert::eq(read($file), $fileOrig, "Not equal $type!");
         }
 
         $MadelineProto->logger("Uploading $type");
@@ -320,8 +336,8 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Downloading $type");
         $file = $MadelineProto->downloadToDir($media, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
+        if ($type !== 'photo' && $type !== 'photo_url') {
+            Assert::eq(read($file), $fileOrig, "Not equal $type!");
         }
 
         $MadelineProto->logger("Re-sending $type");
@@ -331,8 +347,8 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Re-downloading $type");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
+        if ($type !== 'photo' && $type !== 'photo_url') {
+            Assert::eq(read($file), $fileOrig, "Not equal $type!");
         }
     }
 }

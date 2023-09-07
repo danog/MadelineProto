@@ -34,6 +34,7 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Wrappers\Start;
 use Revolt\EventLoop;
+use Symfony\Component\Process\InputStream;
 use Throwable;
 
 use function Amp\async;
@@ -242,7 +243,10 @@ final class Client extends ClientAbstract
             $method === 'messages.sendMedia' ||
             $method === 'messages.editMessage') &&
             isset($args['media']['file']) &&
-            $args['media']['file'] instanceof FileCallbackInterface
+            (
+                $args['media']['file'] instanceof FileCallbackInterface
+                || $args['media']['file'] instanceof InputStream
+            )
         ) {
             $params = [$method, &$args, $aargs];
             $wrapper = Wrapper::create($params, $this->session, $this->logger);
@@ -252,7 +256,12 @@ final class Client extends ClientAbstract
             $params = [$method, &$args, $aargs];
             $wrapper = Wrapper::create($params, $this->session, $this->logger);
             foreach ($args['multi_media'] as &$media) {
-                if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
+                if (isset($media['media']['file']) && 
+                    (
+                        $media['media']['file'] instanceof FileCallbackInterface
+                        || $media['media']['file'] instanceof ReadableStream
+                    )
+                ) {
                     $wrapper->wrap($media['media']['file'], true);
                 }
             }

@@ -115,9 +115,9 @@ final class Wrapper extends ClientAbstract
             }
             $class = null;
             if ($callback instanceof ByteStreamReadableStream) {
-                $class = \method_exists($callback, 'seek') ? ReadableStream::class : SeekableReadableStream::class;
+                $class = \method_exists($callback, 'seek') ? SeekableReadableStream::class : ReadableStream::class;
             } elseif ($callback instanceof ByteStreamWritableStream) {
-                $class = \method_exists($callback, 'seek') ? WritableStream::class : SeekableWritableStream::class;
+                $class = \method_exists($callback, 'seek') ? SeekableWritableStream::class : WritableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
             } elseif ($callback instanceof Cancellation) {
