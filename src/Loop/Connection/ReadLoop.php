@@ -65,6 +65,7 @@ final class ReadLoop extends Loop
                     && !$this->connection->hasPendingCalls()
                     && $this->connection->isMedia()
                     && !$this->connection->isWriting()
+                    && $this->shared->hasTempAuthKey()
                 ) {
                     $this->logger->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
                     $this->connection->disconnect(true);
