@@ -518,6 +518,7 @@ final class Connection
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
+        $this->connect();
         $promise->await();
     }
     /**
