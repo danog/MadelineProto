@@ -211,7 +211,7 @@ final class DjLoop extends VoIPLoop
                     Ogg::convert($f, $pipe->getSink(), $cancellation);
                 } catch (CancelledException) {
                 } finally {
-                    $pipe->getSink()->close();
+                    EventLoop::queue($pipe->getSink()->close(...));
                 }
             });
             $it = new Ogg($pipe->getSource());

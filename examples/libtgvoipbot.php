@@ -47,7 +47,7 @@ class MyEventHandler extends SimpleEventHandler
     public function convertCmd((Incoming&Message&HasAudio)|(Incoming&Message&HasDocument) $message): void
     {
         $reply = $message->reply("Conversion in progress...");
-        try {
+        async(function () use ($message, $reply): void {
             $pipe = self::getStreamPipe();
             $sink = $pipe->getSink();
             async(
@@ -62,9 +62,7 @@ class MyEventHandler extends SimpleEventHandler
                 fileName: $message->media->fileName.".ogg",
                 replyToMsgId: $message->id
             );
-        } finally {
-            $reply->delete();
-        }
+        })->finally($reply->delete(...));
     }
 }
 

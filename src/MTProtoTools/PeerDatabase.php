@@ -289,7 +289,7 @@ final class PeerDatabase implements TLCallback
                 $this->usernames[$username] = $id;
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
 
@@ -450,7 +450,7 @@ final class PeerDatabase implements TLCallback
             if (isset($o) && $this->pendingDb[$id] === $o) {
                 unset($this->pendingDb[$id]);
             }
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     public function addChatBlocking(int $chat): void
@@ -584,7 +584,7 @@ final class PeerDatabase implements TLCallback
             if (isset($o) && $this->pendingDb[$id] === $o) {
                 unset($this->pendingDb[$id]);
             }
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     /**

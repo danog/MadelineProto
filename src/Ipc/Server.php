@@ -214,14 +214,17 @@ class Server extends Loop
         } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
-            try {
-                $socket->disconnect();
-            } catch (Throwable $e) {
-            }
-            if ($payload === self::SHUTDOWN) {
-                Shutdown::removeCallback('restarter');
-                $this->stop();
-            }
+            EventLoop::queue(function () use ($socket, $payload): void {
+                try {
+                    $socket->disconnect();
+                } catch (Throwable $e) {
+                    Logger::log("Exception during shutdown in IPC connection: $e");
+                }
+                if ($payload === self::SHUTDOWN) {
+                    Shutdown::removeCallback('restarter');
+                    $this->stop();
+                }
+            });
         }
     }
     /**
@@ -243,10 +246,13 @@ class Server extends Loop
             $result = new ExitFailure($e);
         } finally {
             if (isset($wrapper)) {
-                try {
-                    $wrapper->disconnect();
-                } catch (Throwable $e) {
-                }
+                EventLoop::queue(function () use ($wrapper): void {
+                    try {
+                        $wrapper->disconnect();
+                    } catch (Throwable $e) {
+                        Logger::log("Exception during shutdown in IPC connection: $e");
+                    }
+                });
             }
         }
         try {

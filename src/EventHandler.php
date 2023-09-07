@@ -263,7 +263,7 @@ abstract class EventHandler extends AbstractAPI
         } finally {
             $this->startDeferred = null;
             $startDeferred->complete();
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     /**

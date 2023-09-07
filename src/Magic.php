@@ -308,6 +308,9 @@ final class Magic
                 throw Exception::extension($extension);
             }
         }
+        if (\extension_loaded('psr')) {
+            throw new Exception("Please uninstall the psr extension to use MadelineProto!");
+        }
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
         self::$hasOpenssl = \extension_loaded('openssl');
         self::$emojis = \json_decode(self::JSON_EMOJIS);

@@ -24,6 +24,7 @@ use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -109,7 +110,7 @@ final class InternalState
     }
     private function notifyProgress(): void
     {
-        $this->API->saveUpdate(['_' => 'updateBroadcastProgress', 'progress' => $this->getProgress()]);
+        EventLoop::queue($this->API->saveUpdate(...), ['_' => 'updateBroadcastProgress', 'progress' => $this->getProgress()]);
     }
     private function gatherPeers(): void
     {

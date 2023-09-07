@@ -197,7 +197,7 @@ final class DataCenterConnection implements JsonSerializable
                 $this->syncAuthorization();
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
         if ($this->hasTempAuthKey()) {
             $connection->pingHttpWaiter();

@@ -908,6 +908,10 @@
       <code>copy</code>
       <code>unwrap</code>
     </MissingReturnType>
+    <PossiblyUndefinedArrayOffset>
+      <code>$payload[0]</code>
+      <code>$payload[0]</code>
+    </PossiblyUndefinedArrayOffset>
     <PropertyNotSetInConstructor>
       <code>$data</code>
       <code>Wrapper</code>
@@ -1508,6 +1512,9 @@
       <code>seek</code>
       <code>seek</code>
     </PossiblyUndefinedMethod>
+    <PossiblyUndefinedVariable>
+      <code>$l</code>
+    </PossiblyUndefinedVariable>
   </file>
   <file src="src/MTProtoTools/MinDatabase.php">
     <MissingReturnType>

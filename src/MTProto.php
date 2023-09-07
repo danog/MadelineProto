@@ -1670,7 +1670,7 @@ final class MTProto implements TLCallback, LoggerGetter
                 $this->logger->logger('Reported!');
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     /**

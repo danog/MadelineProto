@@ -15,7 +15,9 @@ If not, see <http://www.gnu.org/licenses/>.
  * Various ways to load MadelineProto.
  */
 
+use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\API;
+use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\VoIP;
@@ -83,16 +85,6 @@ $MadelineProto = new API(__DIR__.'/../testing.madeline', $settings);
 
 $MadelineProto->start();
 $MadelineProto->fileGetContents('https://google.com');
-
-try {
-    $MadelineProto->getSelf();
-} catch (\danog\MadelineProto\Exception $e) {
-    if ($e->getMessage() === 'TOS action required, check the logs') {
-        $MadelineProto->acceptTos();
-    }
-}
-
-//var_dump(count($MadelineProto->getPwrChat('@madelineproto')['participants']));
 
 /*
  * Test logging
@@ -260,7 +252,7 @@ $media = [];
 $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => __DIR__.'/faust.jpg'];
 
 // Image by URL
-$media['photo'] = ['_' => 'inputMediaPhotoExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg'];
+$media['photo_url'] = ['_' => 'inputMediaPhotoExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg'];
 
 // Sticker
 $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
@@ -278,7 +270,7 @@ $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/mosc
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
 // Document by URL
-$media['document'] = ['_' => 'inputMediaDocumentExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
+$media['document_url'] = ['_' => 'inputMediaDocumentExternal', 'url' => 'https://github.com/danog/MadelineProto/raw/v8/tests/60'];
 
 $message = 'yay '.PHP_VERSION_ID;
 $mention = $MadelineProto->getInfo(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
@@ -288,6 +280,60 @@ $peers = json_decode(getenv('TEST_DESTINATION_GROUPS'), true);
 if (!$peers) {
     die("No TEST_DESTINATION_GROUPS array was provided!");
 }
+
+foreach ($media as &$inputMedia) {
+    $inputMedia['content'] = isset($inputMedia['file'])
+        ? read($inputMedia['file'])
+        : $MadelineProto->fileGetContents($inputMedia['url']);
+}
+
+function eq(string $file, string $contents, string $type): void
+{
+    if ($type !== 'photo' && $type !== 'photo_url') {
+        Assert::eq(read($file), $contents, "Not equal $type!");
+    }
+}
+
+function sendMedia(API $MadelineProto, array $media, string $message, string $mention, mixed $peer, string $type): void
+{
+    $medias = [
+        'base' => $media
+    ];
+    /*if (isset($media['file']) && is_string($media['file'])) {
+        $MadelineProto->sendDocument(
+            peer: $peer,
+            file: new ReadableBuffer(read($media['file'])),
+            callback: fn ($v) => $MadelineProto->logger($v),
+            fileName: basename($media['file'])
+        );
+        $medias['callback'] = array_merge(
+            $media,
+            ['file' => new FileCallback($media['file'], fn ($v) => $MadelineProto->logger(...))]
+        );
+        $medias['stream'] = array_merge(
+            $media,
+            ['file' => new ReadableBuffer(read($media['file']))]
+        );
+        $medias['callback stream'] = array_merge(
+            $media,
+            ['file' => new FileCallback(new ReadableBuffer(read($media['file'])), fn ($v) => $MadelineProto->logger(...))]
+        );
+    } elseif (isset($media['url'])) {
+        $medias['callback'] = array_merge(
+            $media,
+            ['url' => new FileCallback($media['url'], fn ($v) => $MadelineProto->logger(...))]
+        );
+    }*/
+    foreach ($medias as $subtype => $m) {
+        $MadelineProto->logger("Sending $type $subtype");
+        $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $m, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
+
+        $MadelineProto->logger("Downloading $type $subtype");
+        $file = $MadelineProto->downloadToDir($dl, '/tmp');
+        eq($file, $m['content'], $type);
+    }
+}
+
 foreach ($peers as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     $MadelineProto->logger($sentMessage, Logger::NOTICE);
@@ -303,26 +349,15 @@ foreach ($peers as $peer) {
                 ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
             ]]);
         }
-        $fileOrig = isset($inputMedia['file'])
-            ? read($inputMedia['file'])
-            : $MadelineProto->fileGetContents($inputMedia['url']);
-        $MadelineProto->logger("Sending $type");
-        $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
 
-        $MadelineProto->logger("Downloading $type");
-        $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
-        }
+        sendMedia($MadelineProto, $inputMedia, $message, $mention, $peer, $type);
 
         $MadelineProto->logger("Uploading $type");
         $media = $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
 
         $MadelineProto->logger("Downloading $type");
         $file = $MadelineProto->downloadToDir($media, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
-        }
+        eq($file, $inputMedia['content'], $type);
 
         $MadelineProto->logger("Re-sending $type");
         $inputMedia['file'] = $media;
@@ -331,9 +366,7 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Re-downloading $type");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        if ($type !== 'photo') {
-            Assert::eq(read($file), $fileOrig, "Not equal!");
-        }
+        eq($file, $inputMedia['content'], $type);
     }
 }
 

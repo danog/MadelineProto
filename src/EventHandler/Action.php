@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Action\Cancel;
 use danog\MadelineProto\EventHandler\Action\ChooseContact;
 use danog\MadelineProto\EventHandler\Action\ChooseSticker;
 use danog\MadelineProto\EventHandler\Action\EmojiSeen;
@@ -56,7 +57,8 @@ abstract class Action implements JsonSerializable
         }
         return match ($type) {
             'sendMessageTypingAction' => new Typing,
-            'sendMessageCancelAction' => new GamePlay,
+            'sendMessageCancelAction' => new Cancel,
+            'sendMessageGamePlayAction' => new GamePlay,
             'sendMessageGeoLocationAction' => new GeoLocation,
             'sendMessageChooseContactAction' => new ChooseContact,
             'sendMessageChooseStickerAction' => new ChooseSticker,
@@ -79,7 +81,8 @@ abstract class Action implements JsonSerializable
     {
         return match (true) {
             $this instanceof Typing =>  [ '_' => 'sendMessageTypingAction' ],
-            $this instanceof GamePlay => [ '_' => 'sendMessageCancelAction' ],
+            $this instanceof Cancel =>  [ '_' => 'sendMessageCancelAction' ],
+            $this instanceof GamePlay => [ '_' => 'sendMessageGamePlayAction' ],
             $this instanceof GeoLocation => [ '_' => 'sendMessageGeoLocationAction' ],
             $this instanceof ChooseContact => [ '_' => 'sendMessageChooseContactAction' ],
             $this instanceof ChooseSticker => [ '_' => 'sendMessageChooseStickerAction' ],

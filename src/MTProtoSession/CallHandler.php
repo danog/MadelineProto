@@ -130,7 +130,7 @@ trait CallHandler
             if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
-                $aargs['queue'] = $method;
+                $aargs['queue'] = $method.' '.\time();
                 $aargs['multiple'] = true;
             }
             if (isset($aargs['multiple'])) {

@@ -148,7 +148,7 @@ final class ReferenceDatabase implements TLCallback
             $this->db[$location] = $locationValue;
         } finally {
             unset($this->pendingDb[$location]);
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array

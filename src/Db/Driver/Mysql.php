@@ -24,6 +24,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 use PDO;
 use PDOException;
+use Revolt\EventLoop;
 use Throwable;
 
 /**
@@ -79,7 +80,7 @@ final class Mysql
                 ];
             }
         } finally {
-            $lock->release();
+            EventLoop::queue($lock->release(...));
         }
 
         return self::$connections[$dbKey];

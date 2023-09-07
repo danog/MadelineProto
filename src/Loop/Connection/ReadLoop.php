@@ -64,6 +64,7 @@ final class ReadLoop extends Loop
                 if ($e instanceof NothingInTheSocketException
                     && !$this->connection->hasPendingCalls()
                     && $this->connection->isMedia()
+                    && !$this->connection->isWriting()
                 ) {
                     $this->logger->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
                     $this->connection->disconnect(true);
