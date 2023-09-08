@@ -299,7 +299,7 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
     $medias = [
         'base' => $media
     ];
-    /*if (isset($media['file']) && is_string($media['file'])) {
+    if (isset($media['file']) && is_string($media['file'])) {
         $MadelineProto->sendDocument(
             peer: $peer,
             file: new ReadableBuffer(read($media['file'])),
@@ -323,7 +323,7 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
             $media,
             ['url' => new FileCallback($media['url'], fn ($v) => $MadelineProto->logger(...))]
         );
-    }*/
+    }
     foreach ($medias as $subtype => $m) {
         $MadelineProto->logger("Sending $type $subtype");
         $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $m, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
