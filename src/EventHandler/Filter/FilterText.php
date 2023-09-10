@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
@@ -34,6 +35,7 @@ final class FilterText extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->message === $this->content;
+        return ($update instanceof Message && $update->message === $this->content) ||
+            ($update instanceof Story && $update->caption === $this->content);
     }
 }

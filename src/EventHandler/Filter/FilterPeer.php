@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
 
@@ -39,6 +40,7 @@ final class FilterPeer extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->chatId === $this->peerResolved;
+        return ($update instanceof Message && $update->chatId === $this->peerResolved) ||
+            ($update instanceof AbstractStory && $update->senderId === $this->peerResolved);
     }
 }

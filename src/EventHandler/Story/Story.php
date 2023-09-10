@@ -89,6 +89,13 @@ final class Story extends AbstractStory
     /** @var list<int> List of users who recently viewed the story */
     public readonly array $recentViewers;
 
+    /**
+     * @readonly
+     *
+     * @var list<string> Regex matches, if a filter regex is present
+     */
+    public ?array $matches = null;
+
     /** @internal */
     public function __construct(MTProto|Client $API, array $rawStory)
     {
