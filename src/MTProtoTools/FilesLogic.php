@@ -290,7 +290,7 @@ trait FilesLogic
                 'application/octet-stream'
             );
         }
-        if ($upload && !\is_array($media['file'])) {
+        if ($upload && isset($media['file']) && !\is_array($media['file'])) {
             $media['file'] = $this->upload($media['file']);
         }
     }

@@ -139,7 +139,7 @@ trait Files
         }
         if ($has_animated) {
             if ($has_video === null) {
-                throw new AssertionError("has_video === null: ".\json_encode($media['document']));
+                return new Document($this, $media, $protected);
             }
             return new Gif($this, $media, $has_video, $protected);
         }

@@ -73,4 +73,9 @@ interface TLInterface
      * @param array           $type   Type identifier
      */
     public function deserialize($stream, array $type);
+
+    /**
+     * Get secret chat layer version.
+     */
+    public function getSecretLayer(): int;
 }
