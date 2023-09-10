@@ -418,6 +418,33 @@ abstract class Message extends AbstractMessage
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
+    /**
+     * If message is outgoing, will edit message text. otherwise will reply to the message.
+     *
+     * @param string     $message      New message
+     * @param ParseMode  $parseMode    Whether to parse HTML or Markdown markup in the message
+     * @param array|null $replyMarkup  Reply markup for inline keyboards
+     * @param int|null   $scheduleDate Scheduled message date for scheduled messages
+     * @param bool       $noWebpage    Disable webpage preview
+     *
+     */
+    public function replyOrEdit(
+        string    $message,
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?array    $replyMarkup = null,
+        ?int      $scheduleDate = null,
+        bool      $noWebpage = false,
+    ): Message {
+        $method = $this->out ? 'editText' : 'reply';
+        return $this->$method(
+            $message,
+            $parseMode,
+            $replyMarkup,
+            $scheduleDate,
+            $noWebpage,
+        );
+    }
+
     protected readonly string $html;
     protected readonly string $htmlTelegram;
 
