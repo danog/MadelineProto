@@ -30,6 +30,8 @@ final class FilterFromAdmin extends Filter
 {
     public function initialize(EventHandler $API): Filter
     {
+        if ($API->isSelfBot())
+            return new FilterFromAdmin;
         return new FiltersOr(new FilterFromAdmin, new FilterOutgoing);
     }
 
