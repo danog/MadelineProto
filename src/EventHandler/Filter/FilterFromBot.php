@@ -19,27 +19,21 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\InlineQuery;
-use danog\MadelineProto\EventHandler\Query\ButtonQuery;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow only messages coming from bots.
+ * Allows messages from the bot admin or outgoing messages
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterFromBot extends Filter
 {
     private readonly EventHandler $API;
-    /** Run some initialization logic, optionally returning a new filter to replace the current one. */
     public function initialize(EventHandler $API): Filter
     {
-        $this->API = $API;
         return $this;
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof AbstractMessage && $this->API->isBot($update->senderId)) ||
-            ($update instanceof ButtonQuery && $this->API->isBot($update->userId)) ||
-            ($update instanceof InlineQuery && $this->API->isBot($update->userId));
+        return $update instanceof AbstractMessage && $this->API->isBot($update->senderId);
     }
 }
