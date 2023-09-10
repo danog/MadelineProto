@@ -38,6 +38,7 @@ use danog\MadelineProto\EventHandler\Media\StaticSticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\VideoSticker;
 use danog\MadelineProto\EventHandler\Media\Voice;
+use danog\MadelineProto\EventHandler\Media\Wallpaper;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -77,6 +78,10 @@ trait Files
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
+        if ($media['_'] === 'photo') 
+            $media = [ '_' => 'messageMediaPhoto', 'photo' => $media ];
+        if ($media['_'] === 'document') 
+            $media = [ '_' => 'messageMediaDocument', 'document' => $media];
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
                 return null;
@@ -149,6 +154,8 @@ trait Files
                 : new Video($this, $media, $has_video, $protected);
         }
         if ($has_document_photo) {
+            if ($media['document']['mime_type'] === 'application/x-tgwallpattern')
+                return new Wallpaper($this, $media, $has_document_photo, $protected);
             return new DocumentPhoto($this, $media, $has_document_photo, $protected);
         }
         return new Document($this, $media, $protected);
