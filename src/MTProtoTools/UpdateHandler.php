@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Service\DialogBotAllowed;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
@@ -54,6 +55,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatWallPaper;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
@@ -436,10 +438,7 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    $this->wrapMedia([
-                        '_' => 'messageMediaPhoto',
-                        'photo' => $message['action']['photo']
-                    ])
+                    $this->wrapMedia($message['action']['photo'])
                 ),
                 'messageActionChatDeletePhoto' => new DialogPhotoChanged(
                     $this,
@@ -610,10 +609,7 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    $this->wrapMedia([
-                        '_' => 'messageMediaPhoto',
-                        'photo' => $message['action']['photo']
-                    ])
+                    $this->wrapMedia($message['action']['photo'])
                 ),
                 'messageActionRequestedPeer' => new DialogPeerRequested(
                     $this,
@@ -621,6 +617,22 @@ trait UpdateHandler
                     $info,
                     $message['action']['button_id'],
                     $this->getIdInternal($message['action']['peer']),
+                ),
+                'messageActionBotAllowed' => new DialogBotAllowed(
+                    $this,
+                    $message,
+                    $info, 
+                ),
+                'messageActionSetChatWallPaper' => new DialogSetChatWallPaper(
+                    $this,
+                    $message,
+                    $info['action']['wallpaper'],
+                ),
+                'messageActionSetSameChatWallPaper' => new DialogSetChatWallPaper(
+                    $this,
+                    $message,
+                    $info['action']['wallpaper'],
+                    true
                 ),
                 default => null
             };
