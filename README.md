@@ -78,7 +78,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Manual (bot)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-bot)
   * [QR code login (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#qr-code-user)
 * [Features](https://docs.madelineproto.xyz/docs/FEATURES.html) - MadelineProto can do everything official clients can do, and more!
-* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, ffi, openssl extensions to function properly.
+* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, openssl, iconv extensions to function properly.
 * [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html) - MadelineProto offers an official MadelineProto docker image for the linux/amd64, linux/arm64 and linux/riscv64 platforms @ hub.madelineproto.xyz/danog/madelineproto.  
   * [Getting started](https://docs.madelineproto.xyz/docs/DOCKER.html#getting-started)
     * [CLI bot (recommended)](https://docs.madelineproto.xyz/docs/DOCKER.html#cli-bot-recommended)
@@ -933,6 +933,9 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.invalidateSignInCodes.html" name="account.invalidateSignInCodes">account.invalidateSignInCodes</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urldecode" name="base64urlDecode">base64URL decode: base64urlDecode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.allowSendMessage.html" name="bots.allowSendMessage">bots.allowSendMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.canSendMessage.html" name="bots.canSendMessage">bots.canSendMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.invokeWebViewCustomMethod.html" name="bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.clickSponsoredMessage.html" name="channels.clickSponsoredMessage">channels.clickSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.editCloseFriends.html" name="contacts.editCloseFriends">contacts.editCloseFriends</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.setBlocked.html" name="contacts.setBlocked">contacts.setBlocked</a>
@@ -940,6 +943,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rledecode" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleencode" name="rleEncode">null-byte RLE encode: rleEncode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.activateStealthMode.html" name="stories.activateStealthMode">stories.activateStealthMode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canSendStory.html" name="stories.canSendStory">stories.canSendStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.deleteStories.html" name="stories.deleteStories">stories.deleteStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.editStory.html" name="stories.editStory">stories.editStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.exportStoryLink.html" name="stories.exportStoryLink">stories.exportStoryLink</a>
