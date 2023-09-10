@@ -666,10 +666,6 @@ final class TL implements TLInterface
                     $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt(modulus: 3)), 'random_bytes');
                     continue;
                 }
-                if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true) && isset($arguments['message'])) {
-                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $arguments['queuePromise']), 'data');
-                    continue;
-                }
                 if ($current_argument['name'] === 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':

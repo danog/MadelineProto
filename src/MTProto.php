@@ -37,7 +37,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
-use danog\MadelineProto\Loop\Update\SecretFeedLoop;
+use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\AuthKeyHandler;
@@ -97,9 +97,6 @@ final class MTProto implements TLCallback, LoggerGetter
     use UpdateHandler;
     use Files;
     use \danog\MadelineProto\SecretChats\AuthKeyHandler;
-    use MessageHandler;
-    use ResponseHandler;
-    use SeqNoHandler;
     use BotAPI;
     use BotAPIFiles;
     use TD;
@@ -123,7 +120,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 172;
+    const V = 173;
     /**
      * Bad message error codes.
      *
@@ -303,12 +300,6 @@ final class MTProto implements TLCallback, LoggerGetter
      * @var array<FeedLoop>
      */
     public array $feeders = [];
-    /**
-     * Secret chat feeder loops.
-     *
-     * @var array<SecretFeedLoop>
-     */
-    public array $secretFeeders = [];
     /**
      * Updater loops.
      *
@@ -881,7 +872,8 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
         $this->initialize($this->settings);
-        foreach ($this->secret_chats as $chat => $data) {
+        foreach ($this->secret_chats as $chat => &$data) {
+            $data['chat_id'] = $chat;
             try {
                 if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
                     $this->notifyLayer($chat);
@@ -1237,15 +1229,6 @@ final class MTProto implements TLCallback, LoggerGetter
             return;
         }
         $this->logger('Starting update system');
-        foreach ($this->secret_chats as $id => $chat) {
-            if (!isset($this->secretFeeders[$id])) {
-                $this->secretFeeders[$id] = new SecretFeedLoop($this, $id);
-            }
-            $this->secretFeeders[$id]->start();
-            if (isset($this->secretFeeders[$id])) {
-                $this->secretFeeders[$id]->resume();
-            }
-        }
         $this->channels_state->get(FeedLoop::GENERIC);
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {

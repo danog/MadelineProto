@@ -18,11 +18,13 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Loop\Update;
+namespace danog\MadelineProto\Loop\Secret;
 
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\SecretChats\SecretChat;
+use danog\MadelineProto\SecretChats\SecretChatController;
 use danog\MadelineProto\SecurityException;
 
 /**
@@ -42,42 +44,31 @@ final class SecretFeedLoop extends Loop
      */
     private array $incomingUpdates = [];
     /**
-     * Secret chat ID.
-     */
-    private int $secretId;
-    /**
      * Constructor.
      *
      * @param MTProto $API      API instance
-     * @param integer $secretId Secret chat ID
      */
-    public function __construct(MTProto $API, int $secretId)
+    public function __construct(MTProto $API, private readonly SecretChatController $secretChat)
     {
         $this->init($API);
-        $this->secretId = $secretId;
     }
     /**
      * Main loop.
      */
     public function loop(): ?float
     {
-        if (!$this->isLoggedIn()) {
-            return self::PAUSE;
-        }
         $this->logger->logger("Resumed {$this}");
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;
             $this->incomingUpdates = [];
             foreach ($updates as $update) {
                 try {
-                    if (!$this->API->handleEncryptedUpdate($update)) {
+                    if (!$this->secretChat->handleEncryptedUpdate($update)) {
                         $this->logger->logger("Secret chat deleted, exiting $this...");
-                        unset($this->API->secretFeeders[$this->secretId]);
                         return self::STOP;
                     }
                 } catch (SecurityException $e) {
                     $this->logger->logger("Secret chat deleted, exiting $this...");
-                    unset($this->API->secretFeeders[$this->secretId]);
                     throw $e;
                 }
             }
@@ -94,6 +85,6 @@ final class SecretFeedLoop extends Loop
     }
     public function __toString(): string
     {
-        return "secret chat feed loop {$this->secretId}";
+        return "secret chat feed loop {$this->secretChat->public->chatId}";
     }
 }

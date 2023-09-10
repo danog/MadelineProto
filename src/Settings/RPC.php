@@ -38,11 +38,6 @@ final class RPC extends SettingsAbstract
     protected int $floodTimeout = 30;
 
     /**
-     * Maximum number of message IDs to consider when using call queues.
-     */
-    protected int $limitCallQueue = 100;
-
-    /**
      * Encode payload with GZIP if bigger than.
      */
     protected int $gzipEncodeIfGt = 1024 * 1024;
@@ -105,26 +100,6 @@ final class RPC extends SettingsAbstract
     public function setFloodTimeout(int $floodTimeout): self
     {
         $this->floodTimeout = $floodTimeout;
-
-        return $this;
-    }
-
-    /**
-     * Get maximum number of messages to consider when using call queues.
-     */
-    public function getLimitCallQueue(): int
-    {
-        return $this->limitCallQueue;
-    }
-
-    /**
-     * Set maximum number of messages to consider when using call queues.
-     *
-     * @param int $limitCallQueue Maximum number of messages to consider when using call queues
-     */
-    public function setLimitCallQueue(int $limitCallQueue): self
-    {
-        $this->limitCallQueue = $limitCallQueue;
 
         return $this;
     }
