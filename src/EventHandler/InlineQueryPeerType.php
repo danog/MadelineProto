@@ -20,20 +20,20 @@ use AssertionError;
 use JsonSerializable;
 
 /** @internal */
-enum InlineQueryPeerType implements JsonSerializable
+enum InlineQueryPeerType: string implements JsonSerializable
 {
     /** private chat */
-    case PM;
+    case PM = 'inlineQueryPeerTypePM';
     /** [chat](https://core.telegram.org/api/channel) */
-    case Chat;
+    case Chat = 'inlineQueryPeerTypeChat';
     /** private chat with a bot. */
-    case BotPM;
+    case BotPM = 'inlineQueryPeerTypeBotPM';
     /** [channel](https://core.telegram.org/api/channel) */
-    case Broadcast;
+    case Broadcast = 'inlineQueryPeerTypeBroadcast';
     /** [supergroup](https://core.telegram.org/api/channel) */
-    case Megagroup;
+    case Megagroup = 'inlineQueryPeerTypeMegagroup';
     /** private chat with the bot itself */
-    case SameBotPM;
+    case SameBotPM = 'inlineQueryPeerTypeSameBotPM';
 
     /**
      * Get InlineQueryPeerType from update.
@@ -43,9 +43,8 @@ enum InlineQueryPeerType implements JsonSerializable
      */
     public static function fromRawInlineQuery(string $rawInlineQuery): InlineQueryPeerType
     {
-        $newName = \substr($rawInlineQuery, 19);
         foreach (InlineQueryPeerType::cases() as $case) {
-            if ($case->name === $newName) {
+            if ($case->value === $rawInlineQuery) {
                 return $case;
             }
         }
