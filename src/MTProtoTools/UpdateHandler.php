@@ -68,6 +68,7 @@ use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Typing\ChatUserTyping;
 use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
 use danog\MadelineProto\EventHandler\Typing\UserTyping;
 use danog\MadelineProto\EventHandler\Update;
@@ -396,6 +397,7 @@ trait UpdateHandler
                 'updatePrivacy' => new Privacy($this, $update),
                 'updateUserTyping' => new UserTyping($this, $update),
                 'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
+                'updateChatUserTyping' => new ChatUserTyping($this, $update),
                 default => null
             };
         } catch (\Throwable $e) {
