@@ -26,7 +26,7 @@ use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
  * Allow only messages coming from the admin (defined as the peers returned by getReportPeers).
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterFromAdmin extends Filter
+final class FilterFromAdminOrOutgoing extends Filter
 {
     public function initialize(EventHandler $API): Filter
     {
