@@ -18,9 +18,18 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\User\Username;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\Query\ButtonQuery;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
 
 /**
  * Allow messages coming from or sent to a certain peer.
@@ -41,6 +50,15 @@ final class FilterPeer extends Filter
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->chatId === $this->peerResolved) ||
-            ($update instanceof AbstractStory && $update->senderId === $this->peerResolved);
+            ($update instanceof AbstractStory && $update->senderId === $this->peerResolved) ||
+            ($update instanceof StoryReaction && $update->senderId === $this->peerResolved) ||
+            ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) ||
+            ($update instanceof InlineQuery && $update->userId === $this->peerResolved) ||
+            ($update instanceof Typing && $update->userId === $this->peerResolved) ||
+            ($update instanceof Blocked && $update->userId === $this->peerResolved) ||
+            ($update instanceof BotStopped && $update->userId === $this->peerResolved) ||
+            ($update instanceof Phone && $update->userId === $this->peerResolved) ||
+            ($update instanceof Status && $update->userId === $this->peerResolved) ||
+            ($update instanceof Username && $update->userId === $this->peerResolved);
     }
 }

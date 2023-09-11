@@ -22,7 +22,7 @@ use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allows messages from the bot admin or outgoing messages
+ * Allow only messages coming from bots.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterFromBot extends Filter
@@ -30,6 +30,7 @@ final class FilterFromBot extends Filter
     private readonly EventHandler $API;
     public function initialize(EventHandler $API): Filter
     {
+        $this->API = $API;
         return $this;
     }
     public function apply(Update $update): bool

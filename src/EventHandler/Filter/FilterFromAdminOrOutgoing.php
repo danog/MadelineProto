@@ -23,7 +23,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
 
 /**
- * Allow only messages coming from the admin (defined as the peers returned by getReportPeers).
+ * Allow only messages coming from the admin (defined as the peers returned by getReportPeers) or outgoing.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterFromAdminOrOutgoing extends Filter
