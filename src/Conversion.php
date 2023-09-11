@@ -35,7 +35,7 @@ final class Conversion
      *
      * @param array<int, string> $authorization Authorization info
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, ?SettingsAbstract $settings = null): API
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, ?Settings $settings = null): API
     {
         $settingsFull = new Settings;
         if ($settings) {
@@ -50,7 +50,7 @@ final class Conversion
         $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;
     }
-    public static function telethon(string $session, string $new_session, ?SettingsAbstract $settings = null)
+    public static function telethon(string $session, string $new_session, ?Settings $settings = null)
     {
         if (!\extension_loaded('sqlite3')) {
             throw Exception::extension('sqlite3');
@@ -73,7 +73,7 @@ final class Conversion
         return self::importAuthorization($dcs, $dc['dc_id'], $new_session, $settings);
     }
 
-    public static function pyrogram(string $session, string $new_session, ?SettingsAbstract $settings = null)
+    public static function pyrogram(string $session, string $new_session, ?Settings $settings = null)
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!isset(\pathinfo($session)['extension'])) {
@@ -85,7 +85,8 @@ final class Conversion
         Assert::notFalse($session['auth_key']);
         Assert::integer($session['dc_id']);
 
-        $settings['connection_settings']['all']['test_mode'] = $session['test_mode'];
+        $settings ??= new Settings;
+        $settings->getConnection()->setTestMode($session['test_mode']);
 
         return self::importAuthorization([$session['dc_id'] => $session['auth_key']], $session['dc_id'], $new_session, $settings);
     }
