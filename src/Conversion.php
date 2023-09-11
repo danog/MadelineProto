@@ -35,7 +35,7 @@ final class Conversion
      *
      * @param array<int, string> $authorization Authorization info
      */
-    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, ?SettingsAbstract $settings = null): API
+    public static function importAuthorization(array $authorization, int $main_dc_id, string $session, ?Settings $settings = null): API
     {
         $settingsFull = new Settings;
         if ($settings) {
@@ -50,11 +50,12 @@ final class Conversion
         $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;
     }
-    public static function telethon(string $session, string $new_session, $settings = [])
+    public static function telethon(string $session, string $new_session, ?Settings $settings = null)
     {
         if (!\extension_loaded('sqlite3')) {
-            throw new Exception(['extension', 'sqlite3']);
+            throw Exception::extension('sqlite3');
         }
+        Magic::start(light: false);
         if (!isset(\pathinfo($session)['extension'])) {
             $session .= '.session';
         }
@@ -72,7 +73,7 @@ final class Conversion
         return self::importAuthorization($dcs, $dc['dc_id'], $new_session, $settings);
     }
 
-    public static function pyrogram(string $session, string $new_session, $settings = [])
+    public static function pyrogram(string $session, string $new_session, ?Settings $settings = null)
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!isset(\pathinfo($session)['extension'])) {
@@ -84,7 +85,8 @@ final class Conversion
         Assert::notFalse($session['auth_key']);
         Assert::integer($session['dc_id']);
 
-        $settings['connection_settings']['all']['test_mode'] = $session['test_mode'];
+        $settings ??= new Settings;
+        $settings->getConnection()->setTestMode($session['test_mode']);
 
         return self::importAuthorization([$session['dc_id'] => $session['auth_key']], $session['dc_id'], $new_session, $settings);
     }
@@ -103,7 +105,7 @@ final class Conversion
         return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 
-    public static function tdesktop_md5($data)
+    private static function tdesktop_md5($data)
     {
         $result = '';
         foreach (\str_split(\md5($data), 2) as $byte) {
@@ -119,7 +121,7 @@ final class Conversion
     public static $tdesktop_user_base_path;
     public static $tdesktop_key;
 
-    public static function tdesktop_fopen($fileName, $options = self::FILEOPTION_SAFE|self::FILEOPTION_USER)
+    private static function tdesktop_fopen($fileName, $options = self::FILEOPTION_SAFE|self::FILEOPTION_USER)
     {
         $name = ($options & self::FILEOPTION_USER ? self::$tdesktop_user_base_path : self::$tdesktop_base_path).$fileName;
         $totry = [];
@@ -157,7 +159,7 @@ final class Conversion
         throw new Exception("Could not open $fileName");
     }
 
-    public static function tdesktop_fopen_encrypted($fileName, $options = 3)
+    private static function tdesktop_fopen_encrypted($fileName, $options = 3)
     {
         $f = self::tdesktop_fopen($fileName, $options);
         $data = self::tdesktop_read_bytearray($f);
@@ -171,7 +173,7 @@ final class Conversion
         return $res;
     }
 
-    public static function tdesktop_read_bytearray($fp, bool $asString = false)
+    private static function tdesktop_read_bytearray($fp, bool $asString = false)
     {
         $length = Tools::unpackSignedInt(\strrev(\stream_get_contents($fp, 4)));
         $data = $length > 0 ? \stream_get_contents($fp, $length) : '';
@@ -185,7 +187,7 @@ final class Conversion
         return $res;
     }
 
-    public static function tdesktop_decrypt($data, $auth_key)
+    private static function tdesktop_decrypt($data, $auth_key)
     {
         $message_key = \stream_get_contents($data, 16);
         $encrypted_data = \stream_get_contents($data);
@@ -284,7 +286,7 @@ final class Conversion
 
     const dbiVersion = 666;
 
-    public static function tdesktop(string $session, string $new_session, $settings = [])
+    private static function tdesktop(string $session, string $new_session, $settings = [])
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $settings['old_session_key'] ??= 'data';
