@@ -168,6 +168,7 @@ trait PeerHandler
      */
     public function getId(mixed $id): int
     {
+        if (is_integer($id)) return $id;
         return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_ID);
     }
 
