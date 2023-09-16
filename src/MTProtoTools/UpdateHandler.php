@@ -601,8 +601,8 @@ trait UpdateHandler
                     $info,
                     $message['action']['title'] ?? null,
                     $message['action']['icon_emoji_id'] ?? null,
-                    $message['action']['closed'],
-                    $message['action']['hidden'],
+                    $message['action']['closed'] ?? null,
+                    $message['action']['hidden'] ?? null,
                 ),
                 'messageActionSuggestProfilePhoto' => new DialogSuggestProfilePhoto(
                     $this,
