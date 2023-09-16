@@ -29,27 +29,27 @@ final class DialogTopicEdited extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** 
-         * If not null, indicates that the topic name has changed, contains the new topic name. 
-         * 
+        /**
+         * If not null, indicates that the topic name has changed, contains the new topic name.
+         *
          * Ignore this field if null.
          */
         public readonly ?string $title,
         /**
          * If not null, indicates that the topic icon has changed, and contains the ID of the new [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon (0 if it was removed).
-         * 
+         *
          * Ignore this field if null.
          */
         public readonly ?int $iconEmojiId,
         /**
-         * If not null, indicates whether the topic was opened or closed. 
-         * 
+         * If not null, indicates whether the topic was opened or closed.
+         *
          * Ignore this field if null.
          */
         public readonly ?bool $closed,
-        /** 
-         * If not null, indicates whether the topic was hidden or unhidden (only valid for the “General” topic, id=1). 
-         * 
+        /**
+         * If not null, indicates whether the topic was hidden or unhidden (only valid for the “General” topic, id=1).
+         *
          * Ignore this field if null.
          */
         public readonly ?bool $hidden
