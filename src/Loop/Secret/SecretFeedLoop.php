@@ -23,7 +23,6 @@ namespace danog\MadelineProto\Loop\Secret;
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\SecretChats\SecretChat;
 use danog\MadelineProto\SecretChats\SecretChatController;
 use danog\MadelineProto\SecurityException;
 

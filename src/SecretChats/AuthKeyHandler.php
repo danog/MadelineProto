@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\SecretChats;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\DialogId;
@@ -101,36 +100,12 @@ trait AuthKeyHandler
         $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
         $this->secret_chats[$params['id']] = new SecretChatController(
             $this,
-            new SecretChat(
-                DialogId::fromSecretChatId($params['id']),
-                false,
-                $params['admin_id'],
-                time(),
-                0
-            )
-        ) [
-            'chat_id' => $params['id'],
-            'key' => $key,
-            'admin' => false,
-            'user_id' => $params['admin_id'],
-            'InputEncryptedChat' => [
-                '_' => 'inputEncryptedChat',
-                'chat_id' => $params['id'],
-                'access_hash' => $params['access_hash'],
-            ],
-            'in_seq_no_x' => 1,
-            'out_seq_no_x' => 0,
-            'in_seq_no' => 0,
-            'out_seq_no' => 0,
-            'layer' => 8,
-            'ttl' => 0,
-            'ttr' => 100,
-            'updated' => \time(),
-            'incoming' => [],
-            'outgoing' => [],
-            'created' => \time(),
-            'mtproto' => 1,
-        ];
+            $key,
+            $params['id'],
+            $params['access_hash'],
+            false,
+            $params['admin_id'],
+        );
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
         $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
@@ -164,15 +139,12 @@ trait AuthKeyHandler
         $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
         $this->secret_chats[$params['id']] = $chat = new SecretChatController(
             $this,
-            new SecretChat(
-                DialogId::fromSecretChatId($params['id']),
-                true,
-                $params['participant_id'],
-                time(),
-                0
-            ),
-            1,
-            0
+            $key,
+            $params['id'],
+            $params['access_hash'],
+            true,
+            $params['participant_id'],
+            \time(),
         );
         $chat->notifyLayer();
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
@@ -184,7 +156,7 @@ trait AuthKeyHandler
      */
     public function getSecretChat(array|int $chat): SecretChat
     {
-        if (is_array($chat)) {
+        if (\is_array($chat)) {
             return $this->getInfo($chat);
         } elseif (DialogId::isSecretChat($chat)) {
             $chat = DialogId::toSecretChatId($chat);

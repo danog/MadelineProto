@@ -20,29 +20,18 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
-use AssertionError;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\SecurityException;
-use danog\MadelineProto\Tools;
-use phpseclib3\Math\BigInteger;
-
 /**
  * Represents a secret chat.
  */
-final class SecretChat {
+final class SecretChat
+{
+    /** Creation date */
+    public readonly int $created;
     public function __construct(
         public readonly int $chatId,
         public readonly bool $creator,
         public readonly int $otherID,
-        /** Creation date */
-        public readonly int $created,
-        public int $ttl = 0
-    )
-    {
-        
+    ) {
+        $this->created = \time();
     }
-    
 }

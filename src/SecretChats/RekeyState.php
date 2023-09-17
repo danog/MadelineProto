@@ -23,7 +23,8 @@ namespace danog\MadelineProto\SecretChats;
 /**
  * @internal
  */
-enum RekeyState {
+enum RekeyState
+{
     case IDLE;
     case REQUESTED;
     case ACCEPTED;

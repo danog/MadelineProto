@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
-use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\MadelineProto\Loop\Connection\CheckLoop;

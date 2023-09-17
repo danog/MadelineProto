@@ -21,15 +21,14 @@ declare(strict_types=1);
 namespace danog\MadelineProto\SecretChats;
 
 use Amp\Sync\LocalMutex;
-use AssertionError;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ResponseException;
-use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
@@ -40,11 +39,11 @@ use Stringable;
 /**
  * Represents a secret chat.
  * @internal
- * 
+ *
  * @psalm-type TKey=array{auth_key: string, fingerprint: string, visualization_orig: string, visualization_46: string}
  */
-final class SecretChatController implements Stringable {
-
+final class SecretChatController implements Stringable
+{
     /**
      * @var array<int, array>
      */
@@ -69,31 +68,46 @@ final class SecretChatController implements Stringable {
     private ?BigInteger $rekeyParam = null;
     private ?array $rekeyKey;
 
-    /** @var TKey */
-    private array $key;
     /** @var ?TKey */
-    private ?array $oldKey; 
+    private ?array $oldKey;
 
     private int $ttr = 100;
-    
+
     private int $mtproto = 1;
 
-    private readonly int $id;
+    private int $in_seq_no_x;
+    private int $out_seq_no_x;
+
+    public readonly int $ttl = 0;
+
     private SecretFeedLoop $feedLoop;
+    public readonly SecretChat $public;
     public function __construct(
         private readonly MTProto $API,
-        public readonly SecretChat $public,
-        private int $in_seq_no_x,
-        private int $out_seq_no_x
-    )
-    {
-        $this->updated = $public->created;
-        $this->id = DialogId::toSecretChatId($public->chatId);
+        /** @var TKey */
+        private array $key,
+        public readonly int $id,
+        public readonly int $accessHash,
+        bool $creator,
+        int $otherID,
+    ) {
+        if ($creator) {
+            $this->in_seq_no_x = 1;
+            $this->out_seq_no_x = 0;
+        } else {
+            $this->in_seq_no_x = 0;
+            $this->out_seq_no_x = 1;
+        }
+        $this->public = new SecretChat(
+            DialogId::fromSecretChatId($id),
+            $creator,
+            $otherID,
+        );
+        $this->updated = $this->public->created;
         $this->feedLoop = new SecretFeedLoop($API, $this);
         $this->feedLoop->start();
         $this->secretQueue = new SplQueue;
     }
-
 
     /**
      * Discard secret chat.
@@ -110,7 +124,7 @@ final class SecretChatController implements Stringable {
     /**
      * Rekey secret chat.
      */
-    public function rekey(): void
+    private function rekey(): void
     {
         if ($this->rekeyState !== RekeyState::IDLE) {
             return;
@@ -164,7 +178,7 @@ final class SecretChatController implements Stringable {
             $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
             $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-            
+
             $this->rekeyState = RekeyState::ACCEPTED;
             $this->rekeyExchangeId = $params['exchange_id'];
             $this->rekeyKey = $key;
@@ -184,39 +198,46 @@ final class SecretChatController implements Stringable {
      */
     private function commitRekey(array $params): void
     {
-        if ($this->rekeyState !== RekeyState::REQUESTED || $this->rekeyExchangeId !== $params['exchange_id']) {
+        $lock = $this->rekeyMutex->acquire();
+        try {
+            if ($this->rekeyState !== RekeyState::REQUESTED || $this->rekeyExchangeId !== $params['exchange_id']) {
+                $this->rekeyState = RekeyState::IDLE;
+                return;
+            }
+            $this->API->logger->logger('Committing rekeying of '.$this.'...', Logger::VERBOSE);
+            $dh_config = ($this->API->getDhConfig());
+            $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
+            Crypt::checkG($params['g_b'], $dh_config['p']);
+            $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            $key['visualization_orig'] = $this->key['visualization_orig'];
+            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            if ($key['fingerprint'] !== $params['key_fingerprint']) {
+                $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
+                throw new SecurityException('Invalid key fingerprint!');
+            }
+            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
             $this->rekeyState = RekeyState::IDLE;
-            return;
+            $this->oldKey = $this->key;
+            $this->key = $key;
+            $this->ttr = 100;
+            $this->updated = \time();
+            $this->API->updaters[UpdateLoop::GENERIC]->resume();
+        } finally {
+            EventLoop::queue($lock->release(...));
         }
-        $this->API->logger->logger('Committing rekeying of '.$this.'...', Logger::VERBOSE);
-        $dh_config = ($this->API->getDhConfig());
-        $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
-        Crypt::checkG($params['g_b'], $dh_config['p']);
-        $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
-        $key['visualization_orig'] = $this->key['visualization_orig'];
-        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-        if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
-            throw new SecurityException('Invalid key fingerprint!');
-        }
-        $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
-        $this->rekeyState = RekeyState::IDLE;
-        $this->oldKey = $this->key;
-        $this->key = $key;
-        $this->ttr = 100;
-        $this->updated = time();
-        $this->API->updaters[UpdateLoop::GENERIC]->resume();
     }
     /**
      * Complete rekeying.
      *
      * @param array $params Parameters
      */
-    private function completeRekey(array $params): bool
+    private function completeRekey(array $params): void
     {
+        $lock = $this->rekeyMutex->acquire();
+        try {
         if ($this->rekeyState !== RekeyState::ACCEPTED || $this->rekeyExchangeId !== $params['exchange_id']) {
-            return false;
+            return;
         }
         if ($this->rekeyKey['fingerprint'] !== $params['key_fingerprint']) {
             $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
@@ -227,10 +248,12 @@ final class SecretChatController implements Stringable {
         $this->oldKey = $this->key;
         $this->key = $this->rekeyKey;
         $this->ttr = 100;
-        $this->updated = time();
+        $this->updated = \time();
         $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
         $this->API->logger->logger('Secret chat '.$this.' rekeyed successfully!', Logger::VERBOSE);
-        return true;
+    } finally {
+        EventLoop::queue($lock->release(...));
+    }
     }
     /**
      * Encrypt secret chat message.
@@ -249,14 +272,15 @@ final class SecretChatController implements Stringable {
                 $this->rekey();
             }
         }
-        
+
         $body['data'] = $this->encryptSecretMessageInner($body['message']);
         unset($body['message']);
         $this->secretQueue->enqueue([$msg->getConstructor(), $body]);
 
         return $body;
     }
-    private function encryptSecretMessageInner(array $message): void {
+    private function encryptSecretMessageInner(array $message): void
+    {
         $message['random_id'] = Tools::random(8);
         if ($this->layer > 8) {
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->layer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
@@ -311,7 +335,7 @@ final class SecretChatController implements Stringable {
                     }
                     return;
                 case 'decryptedMessageActionSetMessageTTL':
-                    $this->public->ttl = $action['ttl_seconds'];
+                    $this->ttl = $action['ttl_seconds'];
                     $this->API->saveUpdate($update);
                     return;
                 case 'decryptedMessageActionNoop':
