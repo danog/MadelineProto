@@ -51,7 +51,7 @@
         "danog/ipc": "^1",
         "amphp/log": "^2",
         "danog/loop": "^1",
-        "phpseclib/phpseclib": "^3",
+        "phpseclib/phpseclib": "^3.0.22",
         "amphp/redis": "^2",
         "psr/http-factory": "^1.0",
         "psr/log": "^3",
@@ -79,7 +79,8 @@
         "ext-pdo": "Install the pdo extension to store session data on MySQL",
         "ext-openssl": "Install the openssl extension for faster crypto",
         "ext-uv": "Install the uv extension to greatly speed up MadelineProto!",
-        "ext-gmp": "Install the gmp extension to speed up authorization"
+        "ext-gmp": "Install the gmp extension to speed up authorization",
+        "ext-bcmath": "Install the bcmath extension to speed up authorization"
     },
     "authors": [
         {
