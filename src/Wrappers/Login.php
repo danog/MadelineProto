@@ -26,10 +26,12 @@ use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use AssertionError;
 use danog\MadelineProto\API;
+use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -252,22 +254,23 @@ trait Login
             throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
         $this->logger->logger(Lang::$current_lang['login_auth_key'], Logger::NOTICE);
-        foreach ($this->datacenter->getDataCenterConnections() as $connection) {
-            $connection->resetSession();
-            $connection->setPermAuthKey(null);
-            $connection->setTempAuthKey(null);
-            $connection->authorized(false);
+
+        $this->datacenter = new DataCenter($this);
+        $auth_key = $authorization[$mainDcID];
+        if (!\is_array($auth_key)) {
+            $auth_key = ['auth_key' => $auth_key];
         }
-        foreach ($authorization as $dc_id => $auth_key) {
-            $this->logger->logger("Setting auth key in DC $dc_id", Logger::NOTICE);
-            if (!\is_array($auth_key)) {
-                $auth_key = ['auth_key' => $auth_key];
-            }
-            $auth_key = new PermAuthKey($auth_key);
-            $auth_key->authorized(true);
-            $dataCenterConnection = $this->datacenter->getDataCenterConnection($dc_id);
-            $dataCenterConnection->setPermAuthKey($auth_key);
-        }
+        $dataCenterConnection = $this->datacenter->getDataCenterConnection($mainDcID);
+
+        $this->logger->logger("Setting auth key in DC $mainDcID", Logger::NOTICE);
+        $auth_key = new PermAuthKey($auth_key);
+        $auth_key->authorized(true);
+        $auth_key->setServerSalt(\random_bytes(8));
+        $dataCenterConnection->setPermAuthKey($auth_key);
+        $dataCenterConnection->setTempAuthKey(new TempAuthKey());
+        $dataCenterConnection->bind($this->settings->getAuth()->getPfs());
+
+        $this->datacenter->currentDatacenter = $mainDcID;
         $this->authorized_dc = $mainDcID;
         $this->authorized = \danog\MadelineProto\API::LOGGED_IN;
         $this->getPhoneConfig();
