@@ -35,5 +35,5 @@ steps:
       - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - php tests/handshake.php
       - tests/test.sh
+      - php tests/handshake.php
