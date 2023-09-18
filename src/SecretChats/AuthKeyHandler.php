@@ -156,6 +156,17 @@ trait AuthKeyHandler
      */
     public function getSecretChat(array|int $chat): SecretChat
     {
+        return $this->getSecretChatController($chat)->public;
+    }
+    /**
+     * Get secret chat controller.
+     *
+     * @internal
+     * 
+     * @param array|int $chat Secret chat ID
+     */
+    public function getSecretChatController(array|int $chat): SecretChatController
+    {
         if (\is_array($chat)) {
             return $this->getInfo($chat);
         } elseif (DialogId::isSecretChat($chat)) {

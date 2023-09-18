@@ -56,20 +56,15 @@ final class SecretChatController implements Stringable
     private int $out_seq_no = 0;
     private int $layer = 8;
     private int $updated;
-    /**
-     * Secret queue.
-     *
-     * @var SplQueue<list{message, array}>
-     */
-    private SplQueue $secretQueue;
 
     private RekeyState $rekeyState = RekeyState::IDLE;
     private ?int $rekeyExchangeId = null;
     private ?BigInteger $rekeyParam = null;
-    private ?array $rekeyKey;
+    /** @var ?TKey */
+    private ?array $rekeyKey = null;
 
     /** @var ?TKey */
-    private ?array $oldKey;
+    private ?array $oldKey = null;
 
     private int $ttr = 100;
 
@@ -78,7 +73,7 @@ final class SecretChatController implements Stringable
     private int $in_seq_no_x;
     private int $out_seq_no_x;
 
-    public readonly int $ttl = 0;
+    private int $ttl = 0;
 
     private SecretFeedLoop $feedLoop;
     public readonly SecretChat $public;
@@ -106,7 +101,6 @@ final class SecretChatController implements Stringable
         $this->updated = $this->public->created;
         $this->feedLoop = new SecretFeedLoop($API, $this);
         $this->feedLoop->start();
-        $this->secretQueue = new SplQueue;
     }
 
     /**
@@ -267,15 +261,15 @@ final class SecretChatController implements Stringable
         }
 
         $this->ttr--;
-        if ($this->layer > 8) {
-            if (($this->ttr <= 0 || \time() - $this->updated > 7 * 24 * 60 * 60) && $this->rekeyState === RekeyState::IDLE) {
-                $this->rekey();
-            }
+        if ($this->layer > 8
+            && ($this->ttr <= 0 || \time() - $this->updated > 7 * 24 * 60 * 60) 
+            && $this->rekeyState === RekeyState::IDLE
+        ) {
+            EventLoop::queue($this->rekey(...));
         }
 
         $body['data'] = $this->encryptSecretMessageInner($body['message']);
         unset($body['message']);
-        $this->secretQueue->enqueue([$msg->getConstructor(), $body]);
 
         return $body;
     }

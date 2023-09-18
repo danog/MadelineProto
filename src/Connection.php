@@ -494,8 +494,7 @@ final class Connection
                 $method = $message->getConstructor();
                 $this->methodAbstractions($method, $body);
                 if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
-                    $id = $this->API->getSecretChat($body['peer'])['chat_id'];
-                    $body = $this->API->secret_chats[$id]->encryptSecretMessage($message);
+                    $body = $this->API->getSecretChatController($body['peer'])->encryptSecretMessage($message);
                 }
                 $body = $this->API->getTL()->serializeMethod($method, $body);
             } else {
