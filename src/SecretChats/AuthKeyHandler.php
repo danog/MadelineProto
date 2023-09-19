@@ -162,7 +162,7 @@ trait AuthKeyHandler
      * Get secret chat controller.
      *
      * @internal
-     * 
+     *
      * @param array|int $chat Secret chat ID
      */
     public function getSecretChatController(array|int $chat): SecretChatController

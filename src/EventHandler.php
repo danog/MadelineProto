@@ -53,6 +53,12 @@ abstract class EventHandler extends AbstractAPI
     use DbPropertiesTrait {
         DbPropertiesTrait::initDb as private internalInitDb;
     }
+
+    protected function getDbPrefix(): string
+    {
+        return $this->wrapper->getAPI()->getDbPrefix();
+    }
+
     private static bool $includingPlugins = false;
     /**
      * Start MadelineProto and the event handler.

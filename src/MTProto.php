@@ -554,7 +554,7 @@ final class MTProto implements TLCallback, LoggerGetter
     private ?string $tmpDbPrefix = null;
 
     /** @internal */
-    public function getDbPrefix(): string
+    protected function getDbPrefix(): string
     {
         $prefix = $this->getSelf()['id'] ?? null;
         if (!$prefix) {
@@ -803,6 +803,9 @@ final class MTProto implements TLCallback, LoggerGetter
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
         $db []= async($this->initDb(...), $this);
+        foreach ($this->secret_chats as $chat) {
+            $db []= async($chat->init(...));
+        }
         await($db);
 
         if (isset($this->chats) && $this->chats instanceof MemoryArray) {

@@ -41,6 +41,10 @@ final class ReferenceDatabase implements TLCallback
 {
     use DbPropertiesTrait;
 
+    protected function getDbPrefix(): string
+    {
+        return $this->API->getDbPrefix();
+    }
     // Reference from a document
     const DOCUMENT_LOCATION = 0;
     // Reference from a photo
