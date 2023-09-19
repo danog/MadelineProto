@@ -308,10 +308,10 @@ trait PeerHandler
                     return DialogId::fromSupergroupOrChannel((int) $matches[1]);
                 }
                 if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
-                    $id = '-'.$matches[1];
+                    return -((int) $matches[1]);
                 }
                 if (\preg_match('/^user#(\\d*)/', $id, $matches)) {
-                    return $matches[1];
+                    return (int) $matches[1];
                 }
             }
         }
