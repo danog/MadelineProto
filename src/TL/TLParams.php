@@ -59,7 +59,7 @@ trait TLParams
             }
 
             $this->by_id[$key]['params'][$kkey] = $param;
-            if (isset($cur_flag['pow'])) {
+            if (isset($param['pow'])) {
                 $this->by_id[$key]['flags'][$kkey] = $param;
             }
         }
