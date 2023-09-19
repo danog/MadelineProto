@@ -649,14 +649,14 @@ final class TL implements TLInterface
             'pow' => $pow
         ]) {
             $arguments[$flag] ??= 0;
-            switch ($type) {
-                case 'true':
-                    $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] ? $arguments[$flag] | $pow : $arguments[$flag] & ~$pow;
-                    unset($arguments[$name]);
-                    break;
-                default:
-                    $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] !== null ? $arguments[$flag] | $pow : $arguments[$flag] & ~$pow;
-                    break;
+            if ($type === 'true') {
+                $arguments[$flag] = isset($arguments[$name]) && $arguments[$name]
+                    ? $arguments[$flag] | $pow
+                    : $arguments[$flag] & ~$pow;
+            } else {
+                $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] !== null
+                    ? $arguments[$flag] | $pow
+                    : $arguments[$flag] & ~$pow;
             }
         }
         foreach ($tl['params'] as $current_argument) {
