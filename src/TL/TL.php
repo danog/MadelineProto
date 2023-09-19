@@ -642,15 +642,20 @@ final class TL implements TLInterface
     {
         $serialized = '';
         $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
-        foreach ($tl['flags'] as $cur_flag) {
-            $arguments[$cur_flag['flag']] ??= 0;
-            switch ($cur_flag['type']) {
+        foreach ($tl['flags'] as [
+            'flag' => $flag,
+            'name' => $name,
+            'type' => $type,
+            'pow' => $pow
+        ]) {
+            $arguments[$flag] ??= 0;
+            switch ($type) {
                 case 'true':
-                    $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
-                    unset($arguments[$cur_flag['name']]);
+                    $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] ? $arguments[$flag] | $pow : $arguments[$flag] & ~$pow;
+                    unset($arguments[$name]);
                     break;
                 default:
-                    $arguments[$cur_flag['flag']] = isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null ? $arguments[$cur_flag['flag']] | $cur_flag['pow'] : $arguments[$cur_flag['flag']] & ~$cur_flag['pow'];
+                    $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] !== null ? $arguments[$flag] | $pow : $arguments[$flag] & ~$pow;
                     break;
             }
         }
