@@ -51,7 +51,7 @@ trait AuthKeyHandler
      *
      * @var array<int, SecretChatController>
      */
-    public array $secret_chats = [];
+    public array $secretChats = [];
     /**
      * Request secret chat.
      *
@@ -84,7 +84,7 @@ trait AuthKeyHandler
      */
     public function acceptSecretChat(array $params): void
     {
-        if ($this->secretChatStatus($params['id']) !== 0) {
+        if (isset($this->secretChats[$params['id']])) {
             $this->logger->logger("I've already accepted secret chat ".$params['id']);
             return;
         }
@@ -98,7 +98,7 @@ trait AuthKeyHandler
         $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = new SecretChatController(
+        $this->secretChats[$params['id']] = $chat = new SecretChatController(
             $this,
             $key,
             $params['id'],
@@ -109,7 +109,7 @@ trait AuthKeyHandler
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
         $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
-        $this->notifyLayer($params['id']);
+        $chat->notifyLayer();
         $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', Logger::NOTICE);
     }
     /**
@@ -119,7 +119,7 @@ trait AuthKeyHandler
      */
     private function completeSecretChat(array $params)
     {
-        if ($this->secretChatStatus($params['id']) !== 1) {
+        if (!isset($this->temp_requested_secret_chats[$params['id']])) {
             //$this->logger->logger($this->secretChatStatus($params['id']));
             $this->logger->logger('Could not find and complete secret chat '.$params['id']);
             return false;
@@ -137,14 +137,13 @@ trait AuthKeyHandler
         }
         $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = $chat = new SecretChatController(
+        $this->secretChats[$params['id']] = $chat = new SecretChatController(
             $this,
             $key,
             $params['id'],
             $params['access_hash'],
             true,
             $params['participant_id'],
-            \time(),
         );
         $chat->notifyLayer();
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
@@ -186,7 +185,7 @@ trait AuthKeyHandler
         } elseif (DialogId::isSecretChat($chat)) {
             $chat = DialogId::toSecretChatId($chat);
         }
-        return $this->secret_chats[$chat];
+        return $this->secretChats[$chat];
     }
     /**
      * Check whether secret chat exists.
@@ -195,7 +194,7 @@ trait AuthKeyHandler
      */
     public function hasSecretChat(array|int $chat): bool
     {
-        return isset($this->secret_chats[\is_array($chat) ? $chat['chat_id'] : $chat]);
+        return isset($this->secretChats[\is_array($chat) ? $chat['chat_id'] : $chat]);
     }
     /**
      * Discard secret chat.
@@ -205,8 +204,8 @@ trait AuthKeyHandler
     public function discardSecretChat(int $chat): void
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', Logger::VERBOSE);
-        if (isset($this->secret_chats[$chat])) {
-            unset($this->secret_chats[$chat]);
+        if (isset($this->secretChats[$chat])) {
+            unset($this->secretChats[$chat]);
         }
         if (isset($this->temp_requested_secret_chats[$chat])) {
             unset($this->temp_requested_secret_chats[$chat]);

@@ -130,6 +130,11 @@ final class SecretChatController implements Stringable
         $this->init();
     }
 
+    public function feed(array $update): void
+    {
+        $this->feedLoop->feed($update);
+        $this->feedLoop->resume();
+    }
     public function init(): void
     {
         $this->initDb($this->API);
@@ -187,7 +192,7 @@ final class SecretChatController implements Stringable
             $this->rekeyState = RekeyState::REQUESTED;
             $this->rekeyExchangeId = Tools::randomInt();
             $this->rekeyParam = $a;
-            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]]);
+            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $this->rekeyExchangeId]]]);
             $this->API->updaters[UpdateLoop::GENERIC]->resume();
         } finally {
             EventLoop::queue($lock->release(...));
@@ -251,6 +256,7 @@ final class SecretChatController implements Stringable
             $dh_config = ($this->API->getDhConfig());
             $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
             Crypt::checkG($params['g_b'], $dh_config['p']);
+            assert($this->rekeyParam !== null);
             $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
             $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
@@ -282,6 +288,7 @@ final class SecretChatController implements Stringable
             if ($this->rekeyState !== RekeyState::ACCEPTED || $this->rekeyExchangeId !== $params['exchange_id']) {
                 return;
             }
+            assert($this->rekeyKey !== null);
             if ($this->rekeyKey['fingerprint'] !== $params['key_fingerprint']) {
                 $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
                 throw new SecurityException('Invalid key fingerprint!');
@@ -488,7 +495,9 @@ final class SecretChatController implements Stringable
 
     private function tryMTProtoV1Decrypt(string $message_key, bool $old, string $encrypted_data): string
     {
-        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, ($old ? $this->oldKey : $this->key)['auth_key'], true);
+        $key = $old ? $this->oldKey : $this->key;
+        assert($key !== null);
+        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $key['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
         $message_data = \substr($decrypted_data, 4, $message_data_length);
@@ -509,7 +518,9 @@ final class SecretChatController implements Stringable
 
     private function tryMTProtoV2Decrypt(string $message_key, bool $old, string $encrypted_data): string
     {
-        $key = ($old ? $this->oldKey : $this->key)['auth_key'];
+        $key = $old ? $this->oldKey : $this->key;
+        assert($key !== null);
+        $key = $key['auth_key'];
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $key, !$this->public->creator);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
         if ($message_key != \substr(\hash('sha256', \substr($key, 88 + ($this->public->creator ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {

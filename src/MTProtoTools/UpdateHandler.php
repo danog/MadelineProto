@@ -1035,12 +1035,11 @@ trait UpdateHandler
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
                 $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
             }
-            if (!isset($this->secret_chats[$update['message']['chat_id']])) {
+            if (!isset($this->secretChats[$update['message']['chat_id']])) {
                 $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
                 return;
             }
-            $this->secretFeeders[$update['message']['chat_id']]->feed($update);
-            $this->secretFeeders[$update['message']['chat_id']]->resume();
+            $this->secretChats[$update['message']['chat_id']]->feed($update);
             return;
         }
         if ($update['_'] === 'updateEncryption') {
@@ -1058,15 +1057,7 @@ trait UpdateHandler
                     break;
                 case 'encryptedChatDiscarded':
                     $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
-                    if (isset($this->secret_chats[$update['chat']['id']])) {
-                        unset($this->secret_chats[$update['chat']['id']]);
-                    }
-                    if (isset($this->temp_requested_secret_chats[$update['chat']['id']])) {
-                        unset($this->temp_requested_secret_chats[$update['chat']['id']]);
-                    }
-                    if (isset($this->temp_rekeyed_secret_chats[$update['chat']['id']])) {
-                        unset($this->temp_rekeyed_secret_chats[$update['chat']['id']]);
-                    }
+                    $this->discardSecretChat($update['chat']['id']);
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);

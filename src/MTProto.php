@@ -554,7 +554,7 @@ final class MTProto implements TLCallback, LoggerGetter
     private ?string $tmpDbPrefix = null;
 
     /** @internal */
-    protected function getDbPrefix(): string
+    public function getDbPrefix(): string
     {
         $prefix = $this->getSelf()['id'] ?? null;
         if (!$prefix) {
@@ -636,9 +636,8 @@ final class MTProto implements TLCallback, LoggerGetter
             'TL',
 
             // Secret chats
-            'secret_chats',
+            'secretChats',
             'temp_requested_secret_chats',
-            'temp_rekeyed_secret_chats',
 
             // Report URI
             'reportDest',
@@ -803,7 +802,7 @@ final class MTProto implements TLCallback, LoggerGetter
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
         $db []= async($this->initDb(...), $this);
-        foreach ($this->secret_chats as $chat) {
+        foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }
         await($db);
@@ -857,12 +856,9 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
         $this->initialize($this->settings);
-        foreach ($this->secret_chats as $chat => &$data) {
-            $data['chat_id'] = $chat;
+        foreach ($this->secretChats as $chat) {
             try {
-                if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                    $this->notifyLayer($chat);
-                }
+                $chat->notifyLayer();
             } catch (RPCErrorException $e) {
             }
         }
