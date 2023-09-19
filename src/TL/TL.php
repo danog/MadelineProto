@@ -655,21 +655,23 @@ final class TL implements TLInterface
             }
         }
         foreach ($tl['params'] as $current_argument) {
-            if (!isset($arguments[$current_argument['name']])) {
-                if (isset($current_argument['pow']) && ($current_argument['type'] === 'true' || ($arguments[$current_argument['flag']] & $current_argument['pow']) === 0)) {
-                    //$this->API->logger->logger('Skipping '.$current_argument['name'].' of type '.$current_argument['type');
+            $name = $current_argument['name'];
+            $type = $current_argument['type'];
+            if (!isset($arguments[$name])) {
+                if (isset($current_argument['pow']) && ($type === 'true' || ($arguments[$current_argument['flag']] & $current_argument['pow']) === 0)) {
+                    //$this->API->logger->logger('Skipping '.$name.' of type '.$current_argument['type');
                     continue;
                 }
-                if ($current_argument['name'] === 'random_bytes') {
+                if ($name === 'random_bytes') {
                     $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt(modulus: 3)), 'random_bytes');
                     continue;
                 }
-                if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true) && isset($arguments['message'])) {
+                if ($name === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true) && isset($arguments['message'])) {
                     $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $arguments['queuePromise']), 'data');
                     continue;
                 }
-                if ($current_argument['name'] === 'random_id') {
-                    switch ($current_argument['type']) {
+                if ($name === 'random_id') {
+                    switch ($type) {
                         case 'long':
                             $serialized .= Tools::random(8);
                             continue 2;
@@ -685,66 +687,68 @@ final class TL implements TLInterface
                             }
                     }
                 }
-                if ($current_argument['type'] === 'long') {
+                if ($type === 'long') {
                     $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
-                if ($current_argument['type'] === 'double') {
+                if ($type === 'double') {
                     $serialized .= "\0\0\0\0\0\0\0\0";
                     continue;
                 }
-                if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
-                    $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer));
+                if ($tl['type'] === 'InputMedia' && $name === 'mime_type') {
+                    $serialized .= ($this->serializeObject($current_argument, $arguments['file']['mime_type'], $name, $layer));
                     continue;
                 }
-                if (\in_array($current_argument['type'], ['bytes', 'string', 'int'], true)) {
+                if (\in_array($type, ['bytes', 'string', 'int'], true)) {
                     $serialized .= "\0\0\0\0";
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate(\lcfirst($type).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $type) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate('input'.$current_argument['type'].'Empty', $tl['layer'] ?? -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate('input'.$type.'Empty', $tl['layer'] ?? -1)) && $id['type'] === $type) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                switch ($current_argument['type']) {
+                switch ($type) {
                     case 'Vector t':
                     case 'vector':
-                        $arguments[$current_argument['name']] = [];
+                        $value = [];
                         break;
                     case 'DataJSON':
                     case '%DataJSON':
-                        $arguments[$current_argument['name']] = null;
+                        $value = null;
                         break;
                     default:
-                        throw new Exception(Lang::$current_lang['params_missing'].' '.$current_argument['name']);
+                        throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
                 }
+            } else {
+                $value = $arguments[$name];
             }
-            if (\in_array($current_argument['type'], ['DataJSON', '%DataJSON'], true)) {
-                $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => \json_encode($arguments[$current_argument['name']])];
+            if (\in_array($type, ['DataJSON', '%DataJSON'], true)) {
+                $value = ['_' => 'dataJSON', 'data' => \json_encode($value)];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'], true)) {
-                \array_walk($arguments[$current_argument['name']], function (&$arg): void {
+                \array_walk($value, function (&$arg): void {
                     $arg = ['_' => 'dataJSON', 'data' => \json_encode($arg)];
                 });
             }
-            if ($current_argument['type'] === 'InputFile' && (!\is_array($arguments[$current_argument['name']]) || !(isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'))) {
-                $arguments[$current_argument['name']] = ($this->API->upload($arguments[$current_argument['name']]));
+            if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
+                $value = ($this->API->upload($value));
             }
-            if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
-                if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = ($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
+            if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
+                if (\is_array($value)) {
+                    $value = ($this->API->getInfo($value))['InputEncryptedChat'];
                 } else {
-                    if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
+                    if (!$this->API->hasSecretChat($value)) {
                         throw new SecretPeerNotInDbException;
                     }
-                    $arguments[$current_argument['name']] = $this->API->getSecretChat($arguments[$current_argument['name']])['InputEncryptedChat'];
+                    $value = $this->API->getSecretChat($value)['InputEncryptedChat'];
                 }
             }
-            //$this->API->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
-            $serialized .= ($this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));
+            //$this->API->logger->logger('Serializing '.$name.' of type '.$current_argument['type');
+            $serialized .= ($this->serializeObject($current_argument, $value, $name, $layer));
         }
         return $serialized;
     }
