@@ -168,7 +168,21 @@ trait AuthKeyHandler
     public function getSecretChatController(array|int $chat): SecretChatController
     {
         if (\is_array($chat)) {
-            return $this->getInfo($chat);
+            switch ($chat['_']) {
+                case 'updateEncryption':
+                    $chat = $chat['chat']['id'];
+                    break;
+                case 'updateNewEncryptedMessage':
+                    $chat = $chat['message'];
+                    // no break
+                case 'inputEncryptedChat':
+                case 'updateEncryptedChatTyping':
+                case 'updateEncryptedMessagesRead':
+                case 'encryptedMessage':
+                case 'encryptedMessageService':
+                    $chat = $chat['chat_id'];
+                    break;
+            }
         } elseif (DialogId::isSecretChat($chat)) {
             $chat = DialogId::toSecretChatId($chat);
         }

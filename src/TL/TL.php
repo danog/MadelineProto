@@ -732,14 +732,7 @@ final class TL implements TLInterface
                 $arguments[$current_argument['name']] = ($this->API->upload($arguments[$current_argument['name']]));
             }
             if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
-                if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = ($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
-                } else {
-                    if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
-                        throw new SecretPeerNotInDbException;
-                    }
-                    $arguments[$current_argument['name']] = $this->API->getSecretChat($arguments[$current_argument['name']])['InputEncryptedChat'];
-                }
+                $arguments[$current_argument['name']] = $this->API->getSecretChatController($arguments[$current_argument['name']])->inputChat;
             }
             //$this->API->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
             $serialized .= ($this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer));

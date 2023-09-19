@@ -91,6 +91,7 @@ final class SecretChatController implements Stringable
     private int $in_seq_no_x;
     private int $out_seq_no_x;
 
+    public readonly array $inputChat;
     private int $ttl = 0;
 
     private SecretFeedLoop $feedLoop;
@@ -100,10 +101,15 @@ final class SecretChatController implements Stringable
         /** @var TKey */
         private array $key,
         public readonly int $id,
-        public readonly int $accessHash,
+        int $accessHash,
         bool $creator,
         int $otherID,
     ) {
+        $this->inputChat = [
+            '_' => 'inputEncryptedChat',
+            'id' => $id,
+            'access_hash' => $accessHash
+        ];
         if ($creator) {
             $this->in_seq_no_x = 1;
             $this->out_seq_no_x = 0;
@@ -128,7 +134,7 @@ final class SecretChatController implements Stringable
     {
         $this->initDb($this->API);
     }
-    
+
     public function __serialize(): array
     {
         $vars = \get_object_vars($this);
