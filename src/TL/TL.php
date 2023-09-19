@@ -24,7 +24,6 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
-use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;

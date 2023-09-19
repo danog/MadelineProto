@@ -28,7 +28,6 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Throwable;
@@ -360,7 +359,7 @@ trait PeerHandler
 
     /**
      * Get info about peer, returns an Info object.
-     * 
+     *
      * If passed a secret chat ID, returns information about the user, not about the secret chat.
      * Use getSecretChat to return information about the secret chat.
      *

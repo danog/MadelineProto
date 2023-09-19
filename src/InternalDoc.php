@@ -879,6 +879,9 @@ abstract class InternalDoc
     /**
      * Get info about peer, returns an Info object.
      *
+     * If passed a secret chat ID, returns information about the user, not about the secret chat.
+     * Use getSecretChat to return information about the secret chat.
+     *
      * @param mixed                                 $id   Peer
      * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html

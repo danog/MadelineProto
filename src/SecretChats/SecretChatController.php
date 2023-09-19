@@ -256,7 +256,7 @@ final class SecretChatController implements Stringable
             $dh_config = ($this->API->getDhConfig());
             $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
             Crypt::checkG($params['g_b'], $dh_config['p']);
-            assert($this->rekeyParam !== null);
+            \assert($this->rekeyParam !== null);
             $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
             $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
@@ -288,7 +288,7 @@ final class SecretChatController implements Stringable
             if ($this->rekeyState !== RekeyState::ACCEPTED || $this->rekeyExchangeId !== $params['exchange_id']) {
                 return;
             }
-            assert($this->rekeyKey !== null);
+            \assert($this->rekeyKey !== null);
             if ($this->rekeyKey['fingerprint'] !== $params['key_fingerprint']) {
                 $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
                 throw new SecurityException('Invalid key fingerprint!');
@@ -496,7 +496,7 @@ final class SecretChatController implements Stringable
     private function tryMTProtoV1Decrypt(string $message_key, bool $old, string $encrypted_data): string
     {
         $key = $old ? $this->oldKey : $this->key;
-        assert($key !== null);
+        \assert($key !== null);
         [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $key['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
@@ -519,7 +519,7 @@ final class SecretChatController implements Stringable
     private function tryMTProtoV2Decrypt(string $message_key, bool $old, string $encrypted_data): string
     {
         $key = $old ? $this->oldKey : $this->key;
-        assert($key !== null);
+        \assert($key !== null);
         $key = $key['auth_key'];
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $key, !$this->public->creator);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);

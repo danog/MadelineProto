@@ -20,12 +20,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
+use AssertionError;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
@@ -181,9 +183,14 @@ trait AuthKeyHandler
                 case 'encryptedMessageService':
                     $chat = $chat['chat_id'];
                     break;
+                default:
+                    throw new AssertionError("Unknown update type {$chat['_']} provided!");
             }
         } elseif (DialogId::isSecretChat($chat)) {
             $chat = DialogId::toSecretChatId($chat);
+        }
+        if (!isset($this->secretChats[$chat])) {
+            throw new SecretPeerNotInDbException;
         }
         return $this->secretChats[$chat];
     }

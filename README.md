@@ -583,8 +583,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getSavedInfo.html" name="payments.getSavedInfo">Get saved payment information: payments.getSavedInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getScheduledHistory.html" name="messages.getScheduledHistory">Get scheduled messages: messages.getScheduledHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getScheduledMessages.html" name="messages.getScheduledMessages">Get scheduled messages: messages.getScheduledMessages</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#secretchatstatus-int-chat-int-one-of-danog-madelineproto-api-secret_empty-danog-madelineproto-api-secret_requested-danog-madelineproto-api-secret_ready" name="secretChatStatus">Get secret chat status: secretChatStatus</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsecretchat-array-int-chat-array" name="getSecretChat">Get secret chat: getSecretChat</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsecretchat-array-int-chat-danog-madelineproto-secretchats-secretchat" name="getSecretChat">Get secret chat: getSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#random-int-length-string" name="random">Get secure random string of specified length: random</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContentSettings.html" name="account.getContentSettings">Get sensitive content settings: account.getContentSettings</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getsponsoredmessages-int-string-array-peer-array" name="getSponsoredMessages">Get sponsored messages for channel: getSponsoredMessages</a>
@@ -731,7 +730,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshfullpeercache-mixed-id-void" name="refreshFullPeerCache">Refresh full peer cache for a certain peer: refreshFullPeerCache</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshpeercache-mixed-ids-void" name="refreshPeerCache">Refresh peer cache for a certain peer: refreshPeerCache</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.registerDevice.html" name="account.registerDevice">Register device to receive PUSH notifications: account.registerDevice</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rekey-int-chat-string" name="rekey">Rekey secret chat: rekey</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.removeStickerFromSet.html" name="stickers.removeStickerFromSet">Remove a sticker from the set where it belongs, bots only. The sticker set must have been created by the bot: stickers.removeStickerFromSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.renameStickerSet.html" name="stickers.renameStickerSet">Renames a stickerset, bots only: stickers.renameStickerSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reorderUsernames.html" name="channels.reorderUsernames">Reorder active usernames: channels.reorderUsernames</a>
