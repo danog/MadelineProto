@@ -42,6 +42,7 @@ final class TLConstructors
         $this->by_id[$json_dict['id']] = [
             'predicate' => $predicate,
             'params' => $json_dict['params'],
+            'flags' => [],
             'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type'],
             'encrypted' => $scheme_type !== 'mtproto'
         ];
