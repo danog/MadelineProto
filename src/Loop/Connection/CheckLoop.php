@@ -106,7 +106,13 @@ final class CheckLoop extends Loop
                                     $this->connection->methodRecall(message_id: $message_id, postpone: true);
                                     break;
                                 case 4:
-                                    if ($chr & 32) {
+                                    if ($chr & 128) {
+                                        $this->logger->logger("Message $message received by server and was already sent, requesting reply...", Logger::ERROR);
+                                        $reply[] = $message_id;
+                                    } elseif ($chr & 64) {
+                                        $this->logger->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
+                                        $reply[] = $message_id;
+                                    } elseif ($chr & 32) {
                                         if ($message->getSent() + $this->resendTimeout < \time()) {
                                             if ($message->isCancellationRequested()) {
                                                 unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
@@ -119,12 +125,6 @@ final class CheckLoop extends Loop
                                         } else {
                                             $this->logger->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         }
-                                    } elseif ($chr & 64) {
-                                        $this->logger->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
-                                        $reply[] = $message_id;
-                                    } elseif ($chr & 128) {
-                                        $this->logger->logger("Message $message received by server and was already sent, requesting reply...", Logger::ERROR);
-                                        $reply[] = $message_id;
                                     } else {
                                         $this->logger->logger("Message $message received by server, waiting...", Logger::ERROR);
                                         $reply[] = $message_id;
