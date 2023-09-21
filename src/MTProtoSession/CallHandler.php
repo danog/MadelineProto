@@ -115,7 +115,8 @@ trait CallHandler
             $aargs['datacenter'] = $args['id']['dc_id'];
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
-        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
+        $file = \in_array($method, ['upload.saveFilePart', 'upload.saveBigFilePart', 'upload.getFile', 'upload.getCdnFile'], true);
+        if ($file && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
             $this->logger->logger('Using media DC');
             $aargs['datacenter'] = -$this->datacenter;
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
@@ -181,7 +182,7 @@ trait CallHandler
         if (isset($aargs['msg_id'])) {
             $message->setMsgId($aargs['msg_id']);
         }
-        if ($aargs['file'] ?? false) {
+        if ($file) {
             $message->setFileRelated(true);
         }
         if ($aargs['botAPI'] ?? false) {

@@ -36,3 +36,4 @@ steps:
     commands:
       - apk add bash
       - tests/test.sh
+      - php tests/handshake.php

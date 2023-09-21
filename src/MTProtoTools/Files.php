@@ -298,7 +298,7 @@ trait Files
                 $this->methodCallAsyncWrite(...),
                 $method,
                 fn () => $callable($part_num),
-                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
+                ['heavy' => true, 'datacenter' => &$datacenter]
             );
             if (!$seekable) {
                 try {
@@ -1140,7 +1140,7 @@ trait Files
                     $res = $this->methodCallAsyncRead(
                         $cdn ? 'upload.getCdnFile' : 'upload.getFile',
                         $basic_param + $offset,
-                        ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
+                        ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
                     );
                     break;
                 } catch (FloodWaitError $e) {
@@ -1193,7 +1193,7 @@ trait Files
                 $datacenter = 0;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
-                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
+                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
             }
             $res['bytes'] = (string) $res['bytes'];
             if ($res['bytes'] === '') {

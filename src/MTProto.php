@@ -123,7 +123,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 172;
+    const V = 173;
     /**
      * Bad message error codes.
      *
@@ -541,20 +541,6 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->TL->init($this->settings->getSchema(), $callbacks);
         $this->startLoops();
         $this->datacenter->currentDatacenter = $this->settings->getConnection()->getTestMode() ? 10002 : 2;
-        $this->getConfig();
-        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->hasTempAuthKey()) {
-            try {
-                $nearest_dc = $this->methodCallAsyncRead('help.getNearestDc', []);
-                $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
-                if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                    $this->authorized_dc = $this->datacenter->currentDatacenter = (int) $nearest_dc['nearest_dc'];
-                }
-            } catch (RPCErrorException $e) {
-                if ($e->rpc !== 'BOT_METHOD_INVALID') {
-                    throw $e;
-                }
-            }
-        }
         $this->getConfig();
         $this->startUpdateSystem(true);
         $this->v = self::V;
