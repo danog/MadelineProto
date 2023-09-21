@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use AssertionError;
 use JsonSerializable;
 
 /** @internal */
@@ -34,22 +33,6 @@ enum InlineQueryPeerType: string implements JsonSerializable
     case Megagroup = 'inlineQueryPeerTypeMegagroup';
     /** private chat with the bot itself */
     case SameBotPM = 'inlineQueryPeerTypeSameBotPM';
-
-    /**
-     * Get InlineQueryPeerType from update.
-     *
-     * @param string Type of the chat from which the inline query was sent.
-     * @throws AssertionError
-     */
-    public static function fromRawInlineQuery(string $rawInlineQuery): InlineQueryPeerType
-    {
-        foreach (InlineQueryPeerType::cases() as $case) {
-            if ($case->value === $rawInlineQuery) {
-                return $case;
-            }
-        }
-        throw new AssertionError("Undefined case InlineQueryPeerType::".$rawInlineQuery);
-    }
 
     /** @internal */
     public function jsonSerialize(): string

@@ -43,21 +43,6 @@ enum Rule: string implements JsonSerializable
     /** Whether the user can see our bio. */
     case ABOUT = 'privacyKeyAbout';
 
-    /**
-     * @internal
-     *
-     * @throws AssertionError
-     */
-    public static function fromRawKey(string $key): Rule
-    {
-        foreach (Rule::cases() as $case) {
-            if ($case->value === $key) {
-                return $case;
-            }
-        }
-        throw new AssertionError("Undefined case Privacy::".$key);
-    }
-
     /** @internal */
     public function jsonSerialize(): string
     {

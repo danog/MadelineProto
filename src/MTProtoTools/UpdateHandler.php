@@ -511,7 +511,7 @@ trait UpdateHandler
                     $info,
                     $message['action']['video'],
                     $message['action']['call_id'],
-                    DiscardReason::fromString($message['action']['reason']['_'] ?? null),
+                    DiscardReason::tryfrom($message['action']['reason']['_'] ?? ''),
                     $message['action']['duration'] ?? null,
                 ),
                 'messageActionContactSignUp' => new DialogContactSignUp(
