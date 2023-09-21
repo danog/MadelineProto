@@ -287,10 +287,10 @@ foreach ($media as &$inputMedia) {
         : $MadelineProto->fileGetContents($inputMedia['url']);
 }
 
-function eq(string $file, string $contents, string $type): void
+function eq(string $file, string $contents, string $type, string $subtype): void
 {
     if ($type !== 'photo' && $type !== 'photo_url') {
-        Assert::eq(read($file), $contents, "Not equal $type!");
+        Assert::eq(read($file), $contents, "Not equal $type $subtype!");
     }
 }
 
@@ -330,7 +330,7 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
 
         $MadelineProto->logger("Downloading $type $subtype");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        eq($file, $m['content'], $type);
+        eq($file, $m['content'], $type, $subtype);
     }
 }
 
@@ -357,7 +357,7 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Downloading $type");
         $file = $MadelineProto->downloadToDir($media, '/tmp');
-        eq($file, $inputMedia['content'], $type);
+        eq($file, $inputMedia['content'], $type, "upload");
 
         $MadelineProto->logger("Re-sending $type");
         $inputMedia['file'] = $media;
@@ -366,7 +366,7 @@ foreach ($peers as $peer) {
 
         $MadelineProto->logger("Re-downloading $type");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
-        eq($file, $inputMedia['content'], $type);
+        eq($file, $inputMedia['content'], $type, "re-upload");
     }
 }
 

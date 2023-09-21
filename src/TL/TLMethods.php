@@ -39,6 +39,7 @@ final class TLMethods
             'method' => $json_dict['method'],
             'type' => $json_dict['type'],
             'params' => $json_dict['params'],
+            'flags' => [],
             'encrypted' => $scheme_type !== 'mtproto'
         ];
         $this->by_method[$json_dict['method']] = $json_dict['id'];

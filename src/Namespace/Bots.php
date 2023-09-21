@@ -118,4 +118,28 @@ interface Bots
      * @param string $username Username
      */
     public function toggleUsername(bool $active, array|int|string|null $bot = null, string|null $username = ''): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     */
+    public function canSendMessage(array|int|string|null $bot = null): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     */
+    public function allowSendMessage(array|int|string|null $bot = null): array;
+
+    /**
+     *
+     *
+     * @param mixed $params Any JSON-encodable data
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @return mixed Any JSON-encodable data
+     */
+    public function invokeWebViewCustomMethod(mixed $params, array|int|string|null $bot = null, string|null $custom_method = ''): mixed;
 }

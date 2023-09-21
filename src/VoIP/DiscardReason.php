@@ -47,6 +47,9 @@ enum DiscardReason implements JsonSerializable
             return null;
         }
         $newName = \strtoupper(\substr($name, 22));
+        if ($newName === 'DISCONNECT') {
+            return self::DISCONNECTED;
+        }
         foreach (DiscardReason::cases() as $case) {
             if ($case->name === $newName) {
                 return $case;
