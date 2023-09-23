@@ -51,6 +51,14 @@ final class SecretFeedLoop extends Loop
     {
         $this->init($API);
     }
+    public function __sleep()
+    {
+        return ['API', 'secretChat', 'incomingUpdates'];
+    }
+    public function __wakeup()
+    {
+        $this->init($this->API);
+    }
     /**
      * Main loop.
      */

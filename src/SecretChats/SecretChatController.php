@@ -72,7 +72,7 @@ final class SecretChatController implements Stringable
     private DbArray $outgoing;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
-    private int $remote_in_seq_no = -1;
+    private int $remote_in_seq_no = 0;
     private int $layer = 8;
     private int $updated;
 
