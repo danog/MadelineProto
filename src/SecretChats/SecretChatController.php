@@ -317,6 +317,7 @@ final class SecretChatController implements Stringable
     public function encryptSecretMessage(MTProtoOutgoingMessage $msg): array
     {
         $body = $msg->getBody();
+        $body['peer'] = $this->inputChat;
         if (isset($body['data'])) {
             return $body;
         }
@@ -341,7 +342,7 @@ final class SecretChatController implements Stringable
             throw $e;
         }
     }
-    private function encryptSecretMessageInner(array $message): void
+    private function encryptSecretMessageInner(array $message): string
     {
         $message['random_id'] = Tools::random(8);
         if ($this->layer > 8) {
@@ -365,7 +366,7 @@ final class SecretChatController implements Stringable
             [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->key['auth_key'], true);
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
-        $message = $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
+        return $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
     }
 
     private function handleDecryptedUpdate(array $update): void
