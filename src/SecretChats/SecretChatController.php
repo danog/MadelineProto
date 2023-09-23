@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
+use Amp\Future;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
@@ -73,7 +74,7 @@ final class SecretChatController implements Stringable
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
     private int $remote_in_seq_no = 0;
-    private int $layer = 8;
+    private int $remoteLayer = 46;
     private int $updated;
 
     private RekeyState $rekeyState = RekeyState::IDLE;
@@ -136,11 +137,15 @@ final class SecretChatController implements Stringable
     public function feed(array $update): void
     {
         $this->feedLoop->feed($update);
-        $this->feedLoop->resume();
     }
     public function init(): void
     {
         $this->initDb($this->API);
+    }
+
+    public function startFeedLoop(): void
+    {
+        $this->feedLoop->start();
     }
 
     public function __serialize(): array
@@ -314,9 +319,8 @@ final class SecretChatController implements Stringable
      * Encrypt secret chat message.
      * @internal
      */
-    public function encryptSecretMessage(MTProtoOutgoingMessage $msg): array
+    public function encryptSecretMessage(array $body, Future $promise): array
     {
-        $body = $msg->getBody();
         $body['peer'] = $this->inputChat;
         if (isset($body['data'])) {
             return $body;
@@ -325,7 +329,7 @@ final class SecretChatController implements Stringable
         $lock = $this->encryptMutex->acquire();
         try {
             $this->ttr--;
-            if ($this->layer > 8
+            if ($this->remoteLayer > 8
                 && ($this->ttr <= 0 || \time() - $this->updated > 7 * 24 * 60 * 60)
                 && $this->rekeyState === RekeyState::IDLE
             ) {
@@ -335,7 +339,7 @@ final class SecretChatController implements Stringable
             $body['data'] = $this->encryptSecretMessageInner($body['message']);
             unset($body['message']);
 
-            $msg->getResultPromise()->finally($lock->release(...));
+            $promise->finally($lock->release(...));
             return $body;
         } catch (\Throwable $e) {
             $lock->release();
@@ -345,13 +349,13 @@ final class SecretChatController implements Stringable
     private function encryptSecretMessageInner(array $message): string
     {
         $message['random_id'] = Tools::random(8);
-        if ($this->layer > 8) {
-            $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->layer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
+        if ($this->remoteLayer > 8) {
+            $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
             $this->out_seq_no++;
         }
         $this->outgoing[$this->out_seq_no] = $message;
-        $constructor = $this->layer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
-        $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->layer);
+        $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
+        $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->mtproto === 2) {
             $padding = Tools::posmod(-\strlen($message), 16);
@@ -389,12 +393,17 @@ final class SecretChatController implements Stringable
                     $this->completeRekey($action);
                     return;
                 case 'decryptedMessageActionNotifyLayer':
-                    $this->layer = $action['layer'];
-                    if ($action['layer'] >= 17 && \time() - $this->public->created > 15) {
-                        $this->notifyLayer();
-                    }
-                    if ($action['layer'] >= 73) {
-                        $this->mtproto = 2;
+                    if ($action['layer'] > $this->remoteLayer) {
+                        $this->API->logger->logger("Applying layer {$action['layer']} notification in $this");
+                        $this->remoteLayer = $action['layer'];
+                        if ($action['layer'] >= 46 && \time() - $this->public->created > 15) {
+                            $this->notifyLayer();
+                        }
+                        if ($action['layer'] >= 73) {
+                            $this->mtproto = 2;
+                        }
+                    } else {
+                        $this->API->logger->logger("Ignoring layer {$action['layer']} notification in $this");
                     }
                     return;
                 case 'decryptedMessageActionSetMessageTTL':
@@ -453,6 +462,10 @@ final class SecretChatController implements Stringable
                 $message_data = $this->tryMTProtoV2Decrypt($message_key, $old, $encrypted_data);
                 $this->API->logger->logger('MTProto v2 decryption OK for '.$this.'...', Logger::NOTICE);
             } catch (SecurityException $e) {
+                if ($this->remoteLayer >= 73) {
+                    // && !$this->waitingGaps
+                    throw $e;
+                }
                 $this->API->logger->logger('MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for '.$this.'...', Logger::NOTICE);
                 $message_data = $this->tryMTProtoV1Decrypt($message_key, $old, $encrypted_data);
                 $this->API->logger->logger('MTProto v1 decryption OK for '.$this.'...', Logger::NOTICE);
@@ -482,9 +495,9 @@ final class SecretChatController implements Stringable
             if (($this->checkSecretOutSeqNo($deserialized['out_seq_no']))
                 && ($this->checkSecretInSeqNo($deserialized['in_seq_no']))) {
                 $this->incoming[$this->in_seq_no++] = $message['message'];
-                if ($deserialized['layer'] >= 17 && $deserialized['layer'] !== $this->layer) {
-                    $this->layer = $deserialized['layer'];
-                    if ($deserialized['layer'] >= 17 && \time() - $this->public->created > 15) {
+                if ($deserialized['layer'] >= 46 && $deserialized['layer'] > $this->remoteLayer) {
+                    $this->remoteLayer = $deserialized['layer'];
+                    if (\time() - $this->public->created > 15) {
                         $this->notifyLayer();
                     }
                 }
@@ -584,11 +597,11 @@ final class SecretChatController implements Stringable
     }
     private function generateSecretInSeqNo(): int
     {
-        return $this->layer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_base : -1;
+        return $this->remoteLayer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_base : -1;
     }
     private function generateSecretOutSeqNo(): int
     {
-        return $this->layer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
+        return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
     }
 
     public function __toString(): string

@@ -93,6 +93,7 @@ final class SecretFeedLoop extends Loop
     public function feed(array $update): void
     {
         $this->incomingUpdates []= $update;
+        $this->resume();
     }
     public function __toString(): string
     {

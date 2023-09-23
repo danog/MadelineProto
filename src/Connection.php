@@ -33,6 +33,7 @@ use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -358,7 +359,12 @@ final class Connection
             } else {
                 $arguments['channel'] = $content;
             }
-        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'], true)) {
+        } elseif ($method === 'messages.sendMessage' && 
+            (
+                (isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'], true))
+                || (is_int($arguments['peer']) && DialogId::isSecretChat($arguments['peer']))
+            )
+        ) {
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             if (!isset($arguments['message']['_'])) {
@@ -505,12 +511,7 @@ final class Connection
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod()) {
-                $method = $message->getConstructor();
-                $this->methodAbstractions($method, $body);
-                if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
-                    $body = $this->API->getSecretChatController($body['peer'])->encryptSecretMessage($message);
-                }
-                $body = $this->API->getTL()->serializeMethod($method, $body);
+                $body = $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
             } else {
                 $body['_'] = $message->getConstructor();
                 $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());

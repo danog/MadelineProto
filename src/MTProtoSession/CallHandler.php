@@ -161,6 +161,10 @@ trait CallHandler
             $encrypted = true;
         }
         $response = new DeferredFuture;
+        $this->methodAbstractions($method, $args);
+        if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
+            $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
+        }
         $message = new MTProtoOutgoingMessage(
             $args,
             $method,

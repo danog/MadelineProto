@@ -738,6 +738,10 @@ final class TL implements TLInterface
                 $value = $this->API->upload($value);
                 $arguments[$name] = $value;
             }
+            if ($type === 'InputEncryptedFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputEncryptedFile'))) {
+                $value = $this->API->uploadEncrypted($value);
+                $arguments[$name] = $value;
+            }
             if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
                 $value = $this->API->getSecretChatController($value)->inputChat;
                 $arguments[$name] = $value;

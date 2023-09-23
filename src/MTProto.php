@@ -1234,6 +1234,9 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->seqUpdater->start();
         $this->seqUpdater->resume();
+        foreach ($this->secretChats as $chat) {
+            $chat->startFeedLoop();
+        }
     }
     /**
      * Store shared phone config.
