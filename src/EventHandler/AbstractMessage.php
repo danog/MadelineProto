@@ -287,7 +287,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'id' => \array_column($result, 'id'),
             ]
         )['stories'];
