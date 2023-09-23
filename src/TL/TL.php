@@ -735,10 +735,12 @@ final class TL implements TLInterface
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
-                $value = ($this->API->upload($value));
+                $value = $this->API->upload($value);
+                $arguments[$name] = $value;
             }
             if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
                 $value = $this->API->getSecretChatController($value)->inputChat;
+                $arguments[$name] = $value;
             }
             $serialized .= ($this->serializeObject($current_argument, $value, $name, $layer));
         }

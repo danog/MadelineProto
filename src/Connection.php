@@ -460,6 +460,20 @@ final class Connection
                     throw new TLException(Lang::$current_lang['params_missing'].' offset_user');
                 }
             }
+        } elseif ($method === 'stories.getAllReadUserStories') {
+            $method = 'stories.getAllReadPeerStories';
+        } elseif ($method === 'stories.getUserStories') {
+            $method = 'stories.getPeerStories';
+            if (isset($arguments['user_id'])) {
+                $arguments['peer'] = $arguments['user_id'];
+            }
+        } elseif ($method === 'users.getStoriesMaxIDs') {
+            $method = 'stories.getPeerMaxIDs';
+        } elseif ($method === 'contacts.toggleStoriesHidden') {
+            $method = 'stories.togglePeerStoriesHidden';
+            if (isset($arguments['id'])) {
+                $arguments['peer'] = $arguments['id'];
+            }
         }
         if (isset($arguments['reply_to_msg_id'])) {
             if (isset($arguments['reply_to'])) {
