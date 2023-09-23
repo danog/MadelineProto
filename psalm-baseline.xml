@@ -2203,7 +2203,7 @@
       <code>\is_resource($stream)</code>
     </DocblockTypeContradiction>
     <InvalidArrayOffset>
-      <code><![CDATA[($this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat']]]></code>
+      <code><![CDATA[($this->API->getInfo($value))['InputEncryptedChat']]]></code>
     </InvalidArrayOffset>
     <MissingClosureParamType>
       <code>$arg</code>
@@ -2215,30 +2215,20 @@
       <code>serializeParams</code>
     </MissingReturnType>
     <PossiblyInvalidArgument>
-      <code><![CDATA[$arguments[$current_argument['name']]]]></code>
-      <code><![CDATA[$arguments[$current_argument['name']]]]></code>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['message']]]></code>
       <code><![CDATA[$arguments['queuePromise']]]></code>
+      <code>$value</code>
+      <code>$value</code>
       <code><![CDATA[$x['result']]]></code>
     </PossiblyInvalidArgument>
     <PossiblyInvalidIterator>
       <code><![CDATA[$x['value']]]></code>
     </PossiblyInvalidIterator>
     <PossiblyNullArgument>
-      <code><![CDATA[$arguments[$current_argument['name']]]]></code>
-      <code><![CDATA[$arguments[$current_argument['name']]]]></code>
-      <code><![CDATA[$arguments[$current_argument['name']]['_']]]></code>
-      <code><![CDATA[$arguments[$current_argument['name']]['_']]]></code>
-      <code><![CDATA[$arguments['peer']['chat_id']]]></code>
+      <code>$value</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess>
-      <code><![CDATA[$arguments[$current_argument['name']]['_']]]></code>
-      <code><![CDATA[$arguments[$current_argument['name']]['_']]]></code>
-      <code><![CDATA[$arguments['file']['mime_type']]]></code>
-      <code><![CDATA[$arguments['peer']['chat_id']]]></code>
-    </PossiblyNullArrayAccess>
     <PossiblyNullPropertyFetch>
       <code><![CDATA[$this->API->logger]]></code>
     </PossiblyNullPropertyFetch>

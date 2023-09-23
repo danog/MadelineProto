@@ -211,13 +211,6 @@ interface Contacts
     /**
      *
      *
-     * @param array|int|string $id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
-     */
-    public function toggleStoriesHidden(bool $hidden, array|int|string|null $id = null): bool;
-
-    /**
-     *
-     *
      * @param list<array|int|string>|array<never, never> $id Array of  @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      */
     public function setBlocked(bool|null $my_stories_from = false, array $id = [], int|null $limit = 0): bool;

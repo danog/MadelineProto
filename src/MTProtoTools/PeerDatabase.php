@@ -29,6 +29,7 @@ use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings\Database\SerializerType;
@@ -251,6 +252,9 @@ final class PeerDatabase implements TLCallback
                 $id = $this->API->methodCallAsyncRead('help.getSupport', [])['user'];
             } else {
                 $id = $this->resolveUsername($id);
+                if ($id === null) {
+                    throw new PeerNotInDbException;
+                }
             }
         }
         unset($this->fullDb[$this->API->getIdInternal($id)]);
