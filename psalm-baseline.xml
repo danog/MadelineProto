@@ -154,6 +154,9 @@
     </TooManyArguments>
   </file>
   <file src="src/DataCenter.php">
+    <DocblockTypeContradiction>
+      <code>\is_string($dc)</code>
+    </DocblockTypeContradiction>
     <PossiblyUndefinedArrayOffset>
       <code>$default[2]</code>
       <code>$default[2]</code>
@@ -1486,8 +1489,6 @@
   </file>
   <file src="src/MTProtoTools/FilesLogic.php">
     <MissingClosureReturnType>
-      <code>static function (int $offset, int $size) use ($stream) {</code>
-      <code>static function (int $offset, int $size) use ($stream, $seekable, $lock) {</code>
       <code>static function (string $payload, int $offset) use ($stream, $seekable, $lock) {</code>
     </MissingClosureReturnType>
     <PossiblyInvalidArgument>

@@ -22,6 +22,10 @@ namespace danog\MadelineProto;
 
 /**
  * File callback interface.
+ *
+ * @template TT
+ *
+ * @implements FileCallbackInterface<TT>
  */
 final class FileCallback implements FileCallbackInterface
 {
@@ -34,7 +38,7 @@ final class FileCallback implements FileCallbackInterface
     /**
      * Construct file callback.
      *
-     * @param mixed                         $file     File to download/upload
+     * @param TT                            $file     File to download/upload
      * @param callable(float, float, float) $callback Callback
      */
     public function __construct(public readonly mixed $file, callable $callback)
@@ -43,6 +47,8 @@ final class FileCallback implements FileCallbackInterface
     }
     /**
      * Get file.
+     *
+     * @return TT
      */
     public function getFile(): mixed
     {
