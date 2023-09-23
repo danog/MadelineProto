@@ -114,11 +114,11 @@ final class SecretChatController implements Stringable
             'access_hash' => $accessHash
         ];
         if ($creator) {
-            $this->in_seq_no_base = 1;
-            $this->out_seq_no_base = 0;
-        } else {
             $this->in_seq_no_base = 0;
             $this->out_seq_no_base = 1;
+        } else {
+            $this->in_seq_no_base = 1;
+            $this->out_seq_no_base = 0;
         }
         $this->public = new SecretChat(
             DialogId::fromSecretChatId($id),
