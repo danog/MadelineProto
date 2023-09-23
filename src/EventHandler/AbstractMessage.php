@@ -272,12 +272,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function getStories(): array
     {
+        // TODO : support seen channel story
         Assert::true($this->senderId > 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'stories.getUserStories',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
             ]
         )['stories']['stories'];
         $result = \array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
@@ -293,8 +294,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         return \array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
-                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
-                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+                    ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])
+                    : new Story($client, ['peer' => $this->senderId, 'story' => $arr]),
             $result
         );
     }
