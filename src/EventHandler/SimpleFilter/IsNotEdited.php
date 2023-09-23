@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
-/** Allows messages that not edited */
+/** Allows messages that weren't edited. */
 interface IsNotEdited
 {
 }

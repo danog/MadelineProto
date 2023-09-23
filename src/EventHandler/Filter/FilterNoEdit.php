@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
 
 /**
- * Allows messages that not edited.
+ * Allows messages that weren't edited.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterNoEdit extends Filter
