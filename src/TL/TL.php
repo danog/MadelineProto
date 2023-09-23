@@ -740,7 +740,8 @@ final class TL implements TLInterface
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
-                $value = ($this->API->upload($value));
+                $value = $this->API->upload($value);
+                $arguments[$name] = $value;
             }
             if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
                 if (\is_array($value)) {
@@ -751,6 +752,7 @@ final class TL implements TLInterface
                     }
                     $value = $this->API->getSecretChat($value)['InputEncryptedChat'];
                 }
+                $arguments[$name] = $value;
             }
             //$this->API->logger->logger('Serializing '.$name.' of type '.$current_argument['type');
             $serialized .= ($this->serializeObject($current_argument, $value, $name, $layer));
