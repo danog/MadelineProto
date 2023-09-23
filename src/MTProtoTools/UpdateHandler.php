@@ -1020,7 +1020,7 @@ trait UpdateHandler
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
-            EventLoop::queue(function () use ($update) {
+            EventLoop::queue(function () use ($update): void {
                 if (isset($update['qts'])) {
                     $cur_state = ($this->loadUpdateState());
                     if ($cur_state->qts() === -1) {
@@ -1047,7 +1047,7 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updateEncryption') {
-            EventLoop::queue(function () use ($update) {
+            EventLoop::queue(function () use ($update): void {
                 switch ($update['chat']['_']) {
                     case 'encryptedChatRequested':
                         if (!$this->settings->getSecretChats()->canAccept($update['chat']['admin_id'])) {

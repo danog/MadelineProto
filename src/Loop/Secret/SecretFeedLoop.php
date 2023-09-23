@@ -25,7 +25,6 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SecretChats\SecretChatController;
 use danog\MadelineProto\SecurityException;
-use Revolt\EventLoop;
 
 /**
  * Secret feed loop.
@@ -56,7 +55,7 @@ final class SecretFeedLoop extends Loop
     {
         return ['API', 'secretChat', 'incomingUpdates'];
     }
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (!isset($this->API->logger)) {
             $this->API->setupLogger();

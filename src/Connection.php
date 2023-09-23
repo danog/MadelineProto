@@ -359,10 +359,10 @@ final class Connection
             } else {
                 $arguments['channel'] = $content;
             }
-        } elseif ($method === 'messages.sendMessage' && 
+        } elseif ($method === 'messages.sendMessage' &&
             (
                 (isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'], true))
-                || (is_int($arguments['peer']) && DialogId::isSecretChat($arguments['peer']))
+                || (\is_int($arguments['peer']) && DialogId::isSecretChat($arguments['peer']))
             )
         ) {
             $method = 'messages.sendEncrypted';

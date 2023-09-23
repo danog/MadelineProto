@@ -28,7 +28,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ResponseException;
