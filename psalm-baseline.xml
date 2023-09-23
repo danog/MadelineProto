@@ -385,6 +385,9 @@
     <PossiblyNullArgument>
       <code><![CDATA[$methodRefl->getParameters()[0]->getType()]]></code>
     </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code>getDbPrefix</code>
+    </PossiblyNullReference>
     <PropertyTypeCoercion>
       <code>self::$pluginCache</code>
     </PropertyTypeCoercion>
@@ -1063,8 +1066,7 @@
       <code><![CDATA[$message->getSerializedBody()]]></code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->connection->call_queue]]></code>
-      <code><![CDATA[$this->connection->call_queue]]></code>
+      <code><![CDATA[$this->connection->callQueue]]></code>
     </PossiblyNullArrayOffset>
     <PossiblyNullReference>
       <code>getWriteBuffer</code>
@@ -1101,11 +1103,6 @@
       <code>$state</code>
       <code>$updater</code>
       <code>FeedLoop</code>
-    </PropertyNotSetInConstructor>
-  </file>
-  <file src="src/Loop/Update/SecretFeedLoop.php">
-    <PropertyNotSetInConstructor>
-      <code>SecretFeedLoop</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/Loop/Update/SeqLoop.php">
@@ -1355,6 +1352,7 @@
     <PossiblyNullArgument>
       <code>$msgId</code>
       <code>$msgId</code>
+      <code><![CDATA[$request->getMsgId()]]></code>
       <code><![CDATA[$request->getMsgId()]]></code>
       <code><![CDATA[$request->getMsgId()]]></code>
       <code><![CDATA[$request->getMsgId()]]></code>
@@ -1815,9 +1813,6 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/SecretChats/AuthKeyHandler.php">
-    <MissingParamType>
-      <code>$chat</code>
-    </MissingParamType>
     <MissingReturnType>
       <code>completeSecretChat</code>
     </MissingReturnType>
@@ -1825,33 +1820,11 @@
       <code><![CDATA[$user['user_id']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
-  <file src="src/SecretChats/MessageHandler.php">
-    <MissingParamType>
-      <code>$chat_id</code>
-      <code>$chat_id</code>
-      <code>$encrypted_data</code>
-      <code>$encrypted_data</code>
-      <code>$message_key</code>
-      <code>$message_key</code>
-      <code>$old</code>
-      <code>$old</code>
-    </MissingParamType>
-  </file>
-  <file src="src/SecretChats/SeqNoHandler.php">
-    <MissingParamType>
-      <code>$chat</code>
-      <code>$chat</code>
-      <code>$chat_id</code>
-      <code>$chat_id</code>
-      <code>$seqno</code>
-      <code>$seqno</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>checkSecretInSeqNo</code>
-      <code>checkSecretOutSeqNo</code>
-      <code>generateSecretInSeqNo</code>
-      <code>generateSecretOutSeqNo</code>
-    </MissingReturnType>
+  <file src="src/SecretChats/SecretChatController.php">
+    <PropertyNotSetInConstructor>
+      <code>$incoming</code>
+      <code>$outgoing</code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Serialization.php">
     <LessSpecificReturnStatement>
@@ -2203,9 +2176,6 @@
       <code>\is_resource($stream)</code>
       <code>\is_resource($stream)</code>
     </DocblockTypeContradiction>
-    <InvalidArrayOffset>
-      <code><![CDATA[($this->API->getInfo($value))['InputEncryptedChat']]]></code>
-    </InvalidArrayOffset>
     <MissingClosureParamType>
       <code>$arg</code>
     </MissingClosureParamType>
@@ -2218,8 +2188,6 @@
     <PossiblyInvalidArgument>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>
-      <code><![CDATA[$arguments['message']]]></code>
-      <code><![CDATA[$arguments['queuePromise']]]></code>
       <code>$value</code>
       <code>$value</code>
       <code><![CDATA[$x['result']]]></code>

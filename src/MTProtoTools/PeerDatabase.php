@@ -48,6 +48,11 @@ final class PeerDatabase implements TLCallback
 {
     use DbPropertiesTrait;
 
+    protected function getDbPrefix(): string
+    {
+        return $this->API->getDbPrefix();
+    }
+
     private const V = 0;
 
     /**

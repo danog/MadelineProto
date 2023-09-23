@@ -879,6 +879,9 @@ abstract class InternalDoc
     /**
      * Get info about peer, returns an Info object.
      *
+     * If passed a secret chat ID, returns information about the user, not about the secret chat.
+     * Use getSecretChat to return information about the secret chat.
+     *
      * @param mixed                                 $id   Peer
      * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
@@ -1014,7 +1017,7 @@ abstract class InternalDoc
      *
      * @param array|int $chat Secret chat ID
      */
-    public function getSecretChat(array|int $chat): array
+    public function getSecretChat(array|int $chat): \danog\MadelineProto\SecretChats\SecretChat
     {
         return $this->wrapper->getAPI()->getSecretChat($chat);
     }
@@ -1516,15 +1519,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->refreshPeerCache(...$ids);
     }
     /**
-     * Rekey secret chat.
-     *
-     * @param int $chat Secret chat to rekey
-     */
-    public function rekey(int $chat): ?string
-    {
-        return $this->wrapper->getAPI()->rekey($chat);
-    }
-    /**
      * Report an error to the previously set peer.
      *
      * @param string $message   Error to report
@@ -1604,16 +1598,6 @@ abstract class InternalDoc
     public static function rleEncode(string $string): string
     {
         return \danog\MadelineProto\Tools::rleEncode($string);
-    }
-    /**
-     * Get secret chat status.
-     *
-     * @param  int $chat Chat ID
-     * @return int One of \danog\MadelineProto\API::SECRET_EMPTY, \danog\MadelineProto\API::SECRET_REQUESTED, \danog\MadelineProto\API::SECRET_READY
-     */
-    public function secretChatStatus(int $chat): int
-    {
-        return $this->wrapper->getAPI()->secretChatStatus($chat);
     }
     /**
      * Sends an updateCustomEvent update to the event handler.

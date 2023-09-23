@@ -1002,6 +1002,8 @@ trait Files
             $datacenter = -$datacenter;
         }
         if (isset($messageMedia['key'])) {
+            $messageMedia['key'] = (string) $messageMedia['key'];
+            $messageMedia['iv'] = (string) $messageMedia['iv'];
             $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
             $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {

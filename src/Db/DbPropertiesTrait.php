@@ -44,7 +44,7 @@ trait DbPropertiesTrait
         }
         $dbSettings = $API->settings->getDb();
 
-        $prefix = $API->getDbPrefix();
+        $prefix = $this->getDbPrefix();
 
         $className = \explode('\\', static::class);
         $className = \end($className);
@@ -64,4 +64,6 @@ trait DbPropertiesTrait
             $this->{$key} = $data;
         }
     }
+
+    abstract protected function getDbPrefix(): string;
 }

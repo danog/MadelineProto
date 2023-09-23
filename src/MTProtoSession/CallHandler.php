@@ -121,9 +121,6 @@ trait CallHandler
             $aargs['datacenter'] = -$this->datacenter;
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
-        if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'], true)) {
-            $aargs['queue'] = 'secret';
-        }
         if (\is_array($args)) {
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
@@ -131,7 +128,7 @@ trait CallHandler
             if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
-                $aargs['queue'] = $method.' '.\time();
+                $aargs['queue'] = $method.' '.$this->API->getId($args['peer']);
                 $aargs['multiple'] = true;
             }
             if (isset($aargs['multiple'])) {
@@ -164,6 +161,13 @@ trait CallHandler
             $encrypted = true;
         }
         $response = new DeferredFuture;
+        // Closures only used for upload.saveFilePart
+        if (is_array($args)) {
+            $this->methodAbstractions($method, $args);
+            if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
+                $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
+            }
+        }
         $message = new MTProtoOutgoingMessage(
             $args,
             $method,

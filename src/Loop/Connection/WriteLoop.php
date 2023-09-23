@@ -217,14 +217,19 @@ final class WriteLoop extends Loop
                         }
                     } elseif ($message->hasQueue()) {
                         $queueId = $message->getQueueId();
-                        $this->connection->call_queue[$queueId] ??= [];
-                        $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $this->connection->call_queue[$queueId], 'query' => $MTmessage['body']]));
-                        $this->connection->call_queue[$queueId][$message_id] = $message_id;
-                        if (\count($this->connection->call_queue[$queueId]) > $this->API->settings->getRpc()->getLimitCallQueue()) {
-                            \reset($this->connection->call_queue[$queueId]);
-                            $key = \key($this->connection->call_queue[$queueId]);
-                            unset($this->connection->call_queue[$queueId][$key]);
+                        if (isset($this->connection->callQueue[$queueId])) {
+                            $this->logger->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
+                            $MTmessage['body'] = $this->API->getTL()->serializeMethod(
+                                'invokeAfterMsg',
+                                [
+                                    'msg_id' => $this->connection->callQueue[$queueId],
+                                    'query' => $MTmessage['body']
+                                ]
+                            );
+                        } else {
+                            $this->logger->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
                         }
+                        $this->connection->callQueue[$queueId] = $message_id;
                     }
                     // TODO
                     /*
