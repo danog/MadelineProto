@@ -30,7 +30,7 @@ final class DialogBotAllowed extends ServiceMessage
     public readonly bool $attachMenu;
 
     /** @var string We have authorized the bot to send us messages by logging into a website via [Telegram Login »](https://core.telegram.org/widgets/login); this field contains the domain name of the website on which the user has logged in. */
-    public readonly string $domain;
+    public readonly ?string $domain;
   
     /** @var ?BotApp We have authorized the bot to send us messages by opening the specified [bot web app](https://core.telegram.org/api/bots/webapps). */
     public readonly ?BotApp $app;
@@ -43,7 +43,7 @@ final class DialogBotAllowed extends ServiceMessage
     ) {
         parent::__construct($API, $rawMessage, $info);
         $this->attachMenu = $rawMessage['action']['attach_menu'];
-        $this->domain = $rawMessage['action']['domain'];
+        $this->domain = $rawMessage['action']['domain'] ?? null;
         $this->app = isset($rawMessage['action']['app']) ? new BotApp($API, $rawMessage['action']['app']) : null;
     }
 }
