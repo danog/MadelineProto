@@ -471,9 +471,9 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Toggle supergroup slow mode: Users will only be able to send one message every `n` seconds
+     * Toggle supergroup slow mode: Users will only be able to send one message every `$seconds` seconds
      * 
-     * @param integer $seconds Users will only be able to send one message every `n` seconds
+     * @param integer $seconds Users will only be able to send one message every `$seconds` seconds
      * @throws InvalidArgumentException
      */
     public function enableSlowMode(int $seconds): void

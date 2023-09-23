@@ -419,7 +419,7 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * If message is outgoing, will edit message text. otherwise will reply to the message.
+     * If the message is outgoing, will edit the message's text, otherwise will reply to the message..
      *
      * @param string     $message      New message
      * @param ParseMode  $parseMode    Whether to parse HTML or Markdown markup in the message
@@ -437,11 +437,11 @@ abstract class Message extends AbstractMessage
     ): Message {
         $method = $this->out ? 'editText' : 'reply';
         return $this->$method(
-            $message,
-            $parseMode,
-            $replyMarkup,
-            $scheduleDate,
-            $noWebpage,
+            message: $message,
+            parseMode: $parseMode,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            noWebpage: $noWebpage,
         );
     }
 
