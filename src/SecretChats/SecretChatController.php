@@ -111,7 +111,7 @@ final class SecretChatController implements Stringable
     ) {
         $this->inputChat = [
             '_' => 'inputEncryptedChat',
-            'id' => $id,
+            'chat_id' => $id,
             'access_hash' => $accessHash
         ];
         if ($creator) {
