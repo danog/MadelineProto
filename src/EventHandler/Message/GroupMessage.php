@@ -480,7 +480,7 @@ final class GroupMessage extends Message
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
         Assert::false($seconds === 0);
-        $this->getClient()->methodCallAsyncWrite(
+        $this->getClient()->methodCallAsyncRead(
             'channels.toggleSlowMode',
             [
                 'channel' => $this->chatId,
@@ -498,7 +498,7 @@ final class GroupMessage extends Message
     public function disableSlowMode(): void
     {
         Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
-        $this->getClient()->methodCallAsyncWrite(
+        $this->getClient()->methodCallAsyncRead(
             'channels.toggleSlowMode',
             [
                 'channel' => $this->chatId,
