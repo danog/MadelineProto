@@ -97,6 +97,9 @@ final class DataCenter
         $this->dohWrapper ??= new DoHWrapper($API);
         if ($this->getSettings()->hasChanged()) {
             foreach ($this->sockets as $dc => $socket) {
+                if (\is_string($dc)) {
+                    continue;
+                }
                 $socket->setExtra($this->API, $dc, $this->generateContexts($dc));
                 $socket->reconnect();
             }

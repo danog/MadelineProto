@@ -662,6 +662,9 @@ trait PeerHandler
                     continue;
                 } else {
                     $id = $this->peerDatabase->resolveUsername($id);
+                    if ($id === null) {
+                        throw new PeerNotInDbException;
+                    }
                 }
             }
             $id = $this->getIdInternal($id);

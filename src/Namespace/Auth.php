@@ -88,7 +88,7 @@ interface Auth
      * For more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
      * @param string $token Login token embedded in QR code, for more info, see [login via QR code](https://core.telegram.org/api/qr-login).
-     * @return array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, hash: list<int>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string} @see https://docs.madelineproto.xyz/API_docs/types/Authorization.html
+     * @return array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, unconfirmed: bool, hash: list<int>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string} @see https://docs.madelineproto.xyz/API_docs/types/Authorization.html
      */
     public function acceptLoginToken(string|null $token = ''): array;
 

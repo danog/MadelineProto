@@ -939,30 +939,35 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.clickSponsoredMessage.html" name="channels.clickSponsoredMessage">channels.clickSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.editCloseFriends.html" name="contacts.editCloseFriends">contacts.editCloseFriends</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.setBlocked.html" name="contacts.setBlocked">contacts.setBlocked</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleStoriesHidden.html" name="contacts.toggleStoriesHidden">contacts.toggleStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rledecode-string-string-string" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleencode-string-string-string" name="rleEncode">null-byte RLE encode: rleEncode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.activateStealthMode.html" name="stories.activateStealthMode">stories.activateStealthMode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.applyBoost.html" name="stories.applyBoost">stories.applyBoost</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canApplyBoost.html" name="stories.canApplyBoost">stories.canApplyBoost</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canSendStory.html" name="stories.canSendStory">stories.canSendStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.deleteStories.html" name="stories.deleteStories">stories.deleteStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.editStory.html" name="stories.editStory">stories.editStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.exportStoryLink.html" name="stories.exportStoryLink">stories.exportStoryLink</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllReadUserStories.html" name="stories.getAllReadUserStories">stories.getAllReadUserStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllReadPeerStories.html" name="stories.getAllReadPeerStories">stories.getAllReadPeerStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllStories.html" name="stories.getAllStories">stories.getAllStories</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getBoostersList.html" name="stories.getBoostersList">stories.getBoostersList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getBoostsStatus.html" name="stories.getBoostsStatus">stories.getBoostsStatus</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getChatsToSend.html" name="stories.getChatsToSend">stories.getChatsToSend</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPeerMaxIDs.html" name="stories.getPeerMaxIDs">stories.getPeerMaxIDs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPeerStories.html" name="stories.getPeerStories">stories.getPeerStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPinnedStories.html" name="stories.getPinnedStories">stories.getPinnedStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesArchive.html" name="stories.getStoriesArchive">stories.getStoriesArchive</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesByID.html" name="stories.getStoriesByID">stories.getStoriesByID</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesViews.html" name="stories.getStoriesViews">stories.getStoriesViews</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryViewsList.html" name="stories.getStoryViewsList">stories.getStoryViewsList</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getUserStories.html" name="stories.getUserStories">stories.getUserStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.incrementStoryViews.html" name="stories.incrementStoryViews">stories.incrementStoryViews</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.readStories.html" name="stories.readStories">stories.readStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.report.html" name="stories.report">stories.report</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.sendReaction.html" name="stories.sendReaction">stories.sendReaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.sendStory.html" name="stories.sendStory">stories.sendStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.toggleAllStoriesHidden.html" name="stories.toggleAllStoriesHidden">stories.toggleAllStoriesHidden</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePeerStoriesHidden.html" name="stories.togglePeerStoriesHidden">stories.togglePeerStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePinned.html" name="stories.togglePinned">stories.togglePinned</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getStoriesMaxIDs.html" name="users.getStoriesMaxIDs">users.getStoriesMaxIDs</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.  
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)

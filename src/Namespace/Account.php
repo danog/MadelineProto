@@ -171,7 +171,7 @@ interface Account
     /**
      * Get logged-in sessions.
      *
-     * @return array{_: 'account.authorizations', authorization_ttl_days: int, authorizations: list<array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, hash: list<int>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Authorizations.html
+     * @return array{_: 'account.authorizations', authorization_ttl_days: int, authorizations: list<array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, unconfirmed: bool, hash: list<int>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Authorizations.html
      */
     public function getAuthorizations(): array;
 
@@ -596,7 +596,7 @@ interface Account
      * @param bool $encrypted_requests_disabled Whether to enable or disable receiving encrypted chats: if the flag is not set, the previous setting is not changed
      * @param bool $call_requests_disabled Whether to enable or disable receiving calls: if the flag is not set, the previous setting is not changed
      */
-    public function changeAuthorizationSettings(array $hash = [], bool|null $encrypted_requests_disabled = false, bool|null $call_requests_disabled = false): bool;
+    public function changeAuthorizationSettings(bool|null $confirmed = false, array $hash = [], bool|null $encrypted_requests_disabled = false, bool|null $call_requests_disabled = false): bool;
 
     /**
      * Fetch saved notification sounds.
