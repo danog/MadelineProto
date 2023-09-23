@@ -17,13 +17,13 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Action\Typing;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -276,7 +276,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         Assert::true($this->senderId > 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'stories.getUserStories',
+            'stories.getPeerStories',
             [
                 'peer' => $this->senderId,
             ]
