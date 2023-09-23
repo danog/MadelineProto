@@ -1084,6 +1084,16 @@
       <code><![CDATA[fn () => $callable()]]></code>
     </MissingClosureReturnType>
   </file>
+  <file src="src/Loop/Secret/SecretFeedLoop.php">
+    <TypeDoesNotContainType>
+      <code><![CDATA[isset($this->API->logger)]]></code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="src/Loop/Secret/SecretSeqLoop.php">
+    <TypeDoesNotContainType>
+      <code><![CDATA[isset($this->API->logger)]]></code>
+    </TypeDoesNotContainType>
+  </file>
   <file src="src/Loop/Update/FeedLoop.php">
     <MissingClosureParamType>
       <code>$msg</code>
@@ -1471,6 +1481,10 @@
       <code>$res</code>
       <code>$res</code>
     </PossiblyUndefinedVariable>
+    <RedundantCastGivenDocblockType>
+      <code><![CDATA[(string) $messageMedia['iv']]]></code>
+      <code><![CDATA[(string) $messageMedia['key']]]></code>
+    </RedundantCastGivenDocblockType>
     <RedundantCondition>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </RedundantCondition>
@@ -2176,6 +2190,9 @@
       <code>\is_resource($stream)</code>
       <code>\is_resource($stream)</code>
     </DocblockTypeContradiction>
+    <InvalidScalarArgument>
+      <code>$value</code>
+    </InvalidScalarArgument>
     <MissingClosureParamType>
       <code>$arg</code>
     </MissingClosureParamType>
