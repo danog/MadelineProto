@@ -97,6 +97,6 @@ final class SecretFeedLoop extends Loop
     }
     public function __toString(): string
     {
-        return "secret chat feed loop {$this->secretChat->public->chatId}";
+        return "secret chat feed loop {$this->secretChat->id}";
     }
 }
