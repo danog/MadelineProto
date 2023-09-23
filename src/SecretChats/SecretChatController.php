@@ -72,6 +72,7 @@ final class SecretChatController implements Stringable
     private DbArray $outgoing;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
+    private int $remote_in_seq_no = -1;
     private int $layer = 8;
     private int $updated;
 
@@ -547,51 +548,36 @@ final class SecretChatController implements Stringable
 
     private function checkSecretInSeqNo(int $seqno): bool
     {
-        $last = 0;
-        foreach ($this->incoming as $message) {
-            if (isset($message['decrypted_message']['in_seq_no'])) {
-                if (($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) >> 1 < $last) {
-                    $this->API->logger->logger("Discarding $this, in_seq_no is not increasing", Logger::LEVEL_FATAL);
-                    $this->discard();
-                    throw new SecurityException('in_seq_no is not increasing');
-                }
-                $last = ($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) >> 1;
-            }
-        }
         $seqno = ($seqno - $this->out_seq_no_base) >> 1;
+        if ($seqno < $this->remote_in_seq_no) {
+            $this->API->logger->logger("Discarding $this, in_seq_no is decreasing", Logger::LEVEL_FATAL);
+            $this->discard();
+            throw new SecurityException('in_seq_no is decreasing');
+        }
         if ($seqno > $this->out_seq_no + 1) {
             $this->API->logger->logger("Discarding $this, in_seq_no is too big", Logger::LEVEL_FATAL);
             $this->discard();
             throw new SecurityException('in_seq_no is too big');
         }
+        $this->remote_in_seq_no = $seqno;
         return true;
     }
     private function checkSecretOutSeqNo(int $seqno): bool
     {
-        $C = 0;
-        foreach ($this->incoming as $message) {
-            if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->in_seq_no) {
-                $temp = ($message['decrypted_message']['out_seq_no'] - $this->in_seq_no_base) >> 1;
-                if ($temp !== $C) {
-                    $this->API->logger->logger("Discarding $this, out_seq_no hole: should be $C, is $temp", Logger::LEVEL_FATAL);
-                    $this->discard();
-                    throw new SecurityException("out_seq_no hole: should be $C, is $temp");
-                }
-                $C++;
-            }
-        }
         $seqno = ($seqno - $this->in_seq_no_base) >> 1;
+        $C_plus_one = $this->in_seq_no;
         //$this->API->logger->logger($C, $seqno);
-        if ($seqno < $C) {
+        if ($seqno < $C_plus_one) {
             // <= C
             $this->API->logger->logger('WARNING: dropping repeated message with seqno '.$seqno);
             return false;
         }
-        if ($seqno > $C) {
+        if ($seqno > $C_plus_one) {
             // > C+1
-            $this->API->logger->logger("Discarding $this, out_seq_no gap detected: ($seqno > $C)", Logger::LEVEL_FATAL);
+            $this->API->logger->logger("Discarding $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
             $this->discard();
-            throw new SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C.')!');
+            // TODO request resending
+            throw new SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C_plus_one.')!');
         }
         return true;
     }
