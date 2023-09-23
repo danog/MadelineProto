@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Represents a photo uploaded as a document.
  */
-class DocumentPhoto extends Media
+final class DocumentPhoto extends Media
 {
     /** If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
