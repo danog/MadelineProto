@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.0.0-beta151';
+    public const RELEASE = '8.0.0-beta152';
     /**
      * Secret chat was not found.
      *
