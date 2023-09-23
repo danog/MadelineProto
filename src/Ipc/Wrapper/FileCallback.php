@@ -20,12 +20,11 @@ use danog\MadelineProto\FileCallbackInterface;
 
 /**
  * @internal
+ *
+ * @implements FileCallbackInterface<mixed>
  */
 final class FileCallback extends Obj implements FileCallbackInterface
 {
-    /**
-     * Get file.
-     */
     public function getFile(): mixed
     {
         return $this->__call('getFile');

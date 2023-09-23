@@ -22,11 +22,15 @@ namespace danog\MadelineProto;
 
 /**
  * File callback interface.
+ *
+ * @template T
  */
 interface FileCallbackInterface
 {
     /**
      * Get file.
+     *
+     * @return T
      */
     public function getFile(): mixed;
     /**

@@ -1956,13 +1956,13 @@ abstract class InternalDoc
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param mixed    $callable  Callable
-     * @param integer  $size      File size
-     * @param string   $mime      Mime type
-     * @param string   $fileName  File name
-     * @param callable $cb        Callback
-     * @param boolean  $seekable  Whether chunks can be fetched out of order
-     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     * @param callable(int, int): string $callable  Callable (offset, length) => data
+     * @param integer                    $size      File size
+     * @param string                     $mime      Mime type
+     * @param string                     $fileName  File name
+     * @param callable(float, float, float): void $cb        Status callback
+     * @param boolean                    $seekable  Whether chunks can be fetched out of order
+     * @param boolean                    $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */
