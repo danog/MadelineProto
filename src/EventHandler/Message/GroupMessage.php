@@ -469,4 +469,41 @@ final class GroupMessage extends Message
             ]
         );
     }
+
+    /**
+     * Toggle supergroup slow mode: Users will only be able to send one message every `n` seconds
+     * 
+     * @param integer $seconds Users will only be able to send one message every `n` seconds
+     * @throws InvalidArgumentException
+     */
+    public function enableSlowMode(int $seconds): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::false($seconds === 0);
+        $this->getClient()->methodCallAsyncWrite(
+            'channels.toggleSlowMode',
+            [
+                'channel' => $this->chatId,
+                'seconds' => $seconds,
+            ]
+        );
+    }
+
+    /**
+     * Disable supergroup slow mode
+     * 
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function disableSlowMode(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncWrite(
+            'channels.toggleSlowMode',
+            [
+                'channel' => $this->chatId,
+                'seconds' => 0,
+            ]
+        );
+    }
 }
