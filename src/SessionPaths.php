@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use AssertionError;
 use danog\MadelineProto\Ipc\IpcState;
 
 use const LOCK_EX;
@@ -98,7 +97,16 @@ final class SessionPaths
             return;
         }
         if (!isDirectory($session) && isFile("$session.safe.php")) {
-            throw new AssertionError("MadelineProto v7 sessions are not supported, please recreate the session to use MadelineProto v8!");
+            deleteFile($session);
+            createDirectory($session);
+            foreach (['safe.php', 'lightState.php', 'lock', 'ipc', 'callback.ipc', 'ipcState.php'] as $part) {
+                if (exists("$session.$part")) {
+                    move("$session.$part", $session.DIRECTORY_SEPARATOR."$part");
+                }
+                if (exists("$session.$part.lock")) {
+                    move("$session.$part.lock", $session.DIRECTORY_SEPARATOR."$part.lock");
+                }
+            }
         }
     }
     /**

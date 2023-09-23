@@ -404,8 +404,8 @@ final class SecretChatController implements Stringable
                 case 'decryptedMessageActionResend':
                     $action['start_seq_no'] -= $this->out_seq_no_base;
                     $action['end_seq_no'] -= $this->out_seq_no_base;
-                    $action['start_seq_no'] /= 2;
-                    $action['end_seq_no'] /= 2;
+                    $action['start_seq_no'] >>= 1;
+                    $action['end_seq_no'] >>= 1;
                     $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
                     for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
                         $this->API->methodCallAsyncRead('messages.sendEncrypted', [
@@ -416,21 +416,6 @@ final class SecretChatController implements Stringable
                     return;
                 default:
                     $this->API->saveUpdate($update);
-            }
-            return;
-        }
-        if ($decryptedMessage['_'] === 'decryptedMessageLayer') {
-            if (($this->checkSecretOutSeqNo($decryptedMessage['out_seq_no']))
-                && ($this->checkSecretInSeqNo($decryptedMessage['in_seq_no']))) {
-                $this->in_seq_no++;
-                if ($decryptedMessage['layer'] >= 17 && $decryptedMessage['layer'] !== $this->layer) {
-                    $this->layer = $decryptedMessage['layer'];
-                    if ($decryptedMessage['layer'] >= 17 && \time() - $this->public->created > 15) {
-                        $this->notifyLayer();
-                    }
-                }
-                $update['message']['decrypted_message'] = $decryptedMessage['message'];
-                $this->handleDecryptedUpdate($update);
             }
             return;
         }
@@ -490,8 +475,23 @@ final class SecretChatController implements Stringable
         }
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
-        $this->incoming[$this->in_seq_no] = $message['message'];
-        $this->handleDecryptedUpdate($message);
+
+        if ($deserialized['_'] === 'decryptedMessageLayer') {
+            if (($this->checkSecretOutSeqNo($deserialized['out_seq_no']))
+                && ($this->checkSecretInSeqNo($deserialized['in_seq_no']))) {
+                $this->incoming[$this->in_seq_no++] = $message['message'];
+                if ($deserialized['layer'] >= 17 && $deserialized['layer'] !== $this->layer) {
+                    $this->layer = $deserialized['layer'];
+                    if ($deserialized['layer'] >= 17 && \time() - $this->public->created > 15) {
+                        $this->notifyLayer();
+                    }
+                }
+                $message['message']['decrypted_message'] = $deserialized['message'];
+                $this->handleDecryptedUpdate($message);
+            }
+        } else {
+            $this->handleDecryptedUpdate($message);
+        }
         return true;
     }
 
@@ -550,15 +550,15 @@ final class SecretChatController implements Stringable
         $last = 0;
         foreach ($this->incoming as $message) {
             if (isset($message['decrypted_message']['in_seq_no'])) {
-                if (($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) / 2 < $last) {
+                if (($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) >> 1 < $last) {
                     $this->API->logger->logger("Discarding $this, in_seq_no is not increasing", Logger::LEVEL_FATAL);
                     $this->discard();
                     throw new SecurityException('in_seq_no is not increasing');
                 }
-                $last = ($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) / 2;
+                $last = ($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) >> 1;
             }
         }
-        $seqno = ($seqno - $this->out_seq_no_base) / 2;
+        $seqno = ($seqno - $this->out_seq_no_base) >> 1;
         if ($seqno > $this->out_seq_no + 1) {
             $this->API->logger->logger("Discarding $this, in_seq_no is too big", Logger::LEVEL_FATAL);
             $this->discard();
@@ -571,7 +571,7 @@ final class SecretChatController implements Stringable
         $C = 0;
         foreach ($this->incoming as $message) {
             if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->in_seq_no) {
-                $temp = ($message['decrypted_message']['out_seq_no'] - $this->in_seq_no_base) / 2;
+                $temp = ($message['decrypted_message']['out_seq_no'] - $this->in_seq_no_base) >> 1;
                 if ($temp !== $C) {
                     $this->API->logger->logger("Discarding $this, out_seq_no hole: should be $C, is $temp", Logger::LEVEL_FATAL);
                     $this->discard();
@@ -580,7 +580,7 @@ final class SecretChatController implements Stringable
                 $C++;
             }
         }
-        $seqno = ($seqno - $this->in_seq_no_base) / 2;
+        $seqno = ($seqno - $this->in_seq_no_base) >> 1;
         //$this->API->logger->logger($C, $seqno);
         if ($seqno < $C) {
             // <= C
