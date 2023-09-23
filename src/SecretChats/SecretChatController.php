@@ -88,8 +88,10 @@ final class SecretChatController implements Stringable
 
     private int $mtproto = 1;
 
-    private int $in_seq_no_x;
-    private int $out_seq_no_x;
+    /** @var 0|1 */
+    private int $in_seq_no_base;
+    /** @var 0|1 */
+    private int $out_seq_no_base;
 
     public readonly array $inputChat;
     private int $ttl = 0;
@@ -111,11 +113,11 @@ final class SecretChatController implements Stringable
             'access_hash' => $accessHash
         ];
         if ($creator) {
-            $this->in_seq_no_x = 1;
-            $this->out_seq_no_x = 0;
+            $this->in_seq_no_base = 1;
+            $this->out_seq_no_base = 0;
         } else {
-            $this->in_seq_no_x = 0;
-            $this->out_seq_no_x = 1;
+            $this->in_seq_no_base = 0;
+            $this->out_seq_no_base = 1;
         }
         $this->public = new SecretChat(
             DialogId::fromSecretChatId($id),
@@ -400,8 +402,8 @@ final class SecretChatController implements Stringable
                 case 'decryptedMessageActionNoop':
                     return;
                 case 'decryptedMessageActionResend':
-                    $action['start_seq_no'] -= $this->out_seq_no_x;
-                    $action['end_seq_no'] -= $this->out_seq_no_x;
+                    $action['start_seq_no'] -= $this->out_seq_no_base;
+                    $action['end_seq_no'] -= $this->out_seq_no_base;
                     $action['start_seq_no'] /= 2;
                     $action['end_seq_no'] /= 2;
                     $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
@@ -545,18 +547,18 @@ final class SecretChatController implements Stringable
 
     private function checkSecretInSeqNo(int $seqno): bool
     {
-        $seqno = ($seqno - $this->out_seq_no_x) / 2;
         $last = 0;
         foreach ($this->incoming as $message) {
             if (isset($message['decrypted_message']['in_seq_no'])) {
-                if (($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_x) / 2 < $last) {
+                if (($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) / 2 < $last) {
                     $this->API->logger->logger("Discarding $this, in_seq_no is not increasing", Logger::LEVEL_FATAL);
                     $this->discard();
                     throw new SecurityException('in_seq_no is not increasing');
                 }
-                $last = ($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_x) / 2;
+                $last = ($message['decrypted_message']['in_seq_no'] - $this->out_seq_no_base) / 2;
             }
         }
+        $seqno = ($seqno - $this->out_seq_no_base) / 2;
         if ($seqno > $this->out_seq_no + 1) {
             $this->API->logger->logger("Discarding $this, in_seq_no is too big", Logger::LEVEL_FATAL);
             $this->discard();
@@ -566,11 +568,10 @@ final class SecretChatController implements Stringable
     }
     private function checkSecretOutSeqNo(int $seqno): bool
     {
-        $seqno = ($seqno - $this->in_seq_no_x) / 2;
         $C = 0;
         foreach ($this->incoming as $message) {
             if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->in_seq_no) {
-                $temp = ($message['decrypted_message']['out_seq_no'] - $this->in_seq_no_x) / 2;
+                $temp = ($message['decrypted_message']['out_seq_no'] - $this->in_seq_no_base) / 2;
                 if ($temp !== $C) {
                     $this->API->logger->logger("Discarding $this, out_seq_no hole: should be $C, is $temp", Logger::LEVEL_FATAL);
                     $this->discard();
@@ -579,6 +580,7 @@ final class SecretChatController implements Stringable
                 $C++;
             }
         }
+        $seqno = ($seqno - $this->in_seq_no_base) / 2;
         //$this->API->logger->logger($C, $seqno);
         if ($seqno < $C) {
             // <= C
@@ -595,11 +597,11 @@ final class SecretChatController implements Stringable
     }
     private function generateSecretInSeqNo(): int
     {
-        return $this->layer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_x : -1;
+        return $this->layer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_base : -1;
     }
     private function generateSecretOutSeqNo(): int
     {
-        return $this->layer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_x : -1;
+        return $this->layer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
     }
 
     public function __toString(): string
