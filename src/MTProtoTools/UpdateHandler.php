@@ -965,7 +965,9 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCallSignalingData') {
-            ($this->calls[$update['phone_call_id']] ?? null)?->onSignaling((string) $update['data']);
+            if (isset($this->calls[$update['phone_call_id']])) {
+                EventLoop::queue($this->calls[$update['phone_call_id']]->onSignaling(...), (string) $update['data']);
+            }
         }
         if ($update['_'] === 'updatePhoneCall') {
             switch ($update['phone_call']['_']) {
@@ -1018,52 +1020,56 @@ trait UpdateHandler
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
-            if (isset($update['qts'])) {
-                $cur_state = ($this->loadUpdateState());
-                if ($cur_state->qts() === -1) {
-                    $cur_state->qts($update['qts']);
+            EventLoop::queue(function () use ($update) {
+                if (isset($update['qts'])) {
+                    $cur_state = ($this->loadUpdateState());
+                    if ($cur_state->qts() === -1) {
+                        $cur_state->qts($update['qts']);
+                    }
+                    if ($update['qts'] < $cur_state->qts()) {
+                        $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                        return;
+                    }
+                    if ($update['qts'] > $cur_state->qts() + 1) {
+                        $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                        $this->updaters[UpdateLoop::GENERIC]->resume();
+                        return;
+                    }
+                    $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
+                    $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
                 }
-                if ($update['qts'] < $cur_state->qts()) {
-                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                if (!isset($this->secretChats[$update['message']['chat_id']])) {
+                    $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
                     return;
                 }
-                if ($update['qts'] > $cur_state->qts() + 1) {
-                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
-                    $this->updaters[UpdateLoop::GENERIC]->resume();
-                    return;
-                }
-                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
-                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
-            }
-            if (!isset($this->secretChats[$update['message']['chat_id']])) {
-                $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
-                return;
-            }
-            $this->secretChats[$update['message']['chat_id']]->feed($update);
+                $this->secretChats[$update['message']['chat_id']]->feed($update);
+            });
             return;
         }
         if ($update['_'] === 'updateEncryption') {
-            switch ($update['chat']['_']) {
-                case 'encryptedChatRequested':
-                    if (!$this->settings->getSecretChats()->canAccept($update['chat']['admin_id'])) {
-                        return;
-                    }
-                    $this->logger->logger('Accepting secret chat '.$update['chat']['id'], Logger::NOTICE);
-                    try {
-                        $this->acceptSecretChat($update['chat']);
-                    } catch (RPCErrorException $e) {
-                        $this->logger->logger("Error while accepting secret chat: {$e}", Logger::FATAL_ERROR);
-                    }
-                    break;
-                case 'encryptedChatDiscarded':
-                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
-                    $this->discardSecretChat($update['chat']['id']);
-                    break;
-                case 'encryptedChat':
-                    $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);
-                    $this->completeSecretChat($update['chat']);
-                    break;
-            }
+            EventLoop::queue(function () use ($update) {
+                switch ($update['chat']['_']) {
+                    case 'encryptedChatRequested':
+                        if (!$this->settings->getSecretChats()->canAccept($update['chat']['admin_id'])) {
+                            return;
+                        }
+                        $this->logger->logger('Accepting secret chat '.$update['chat']['id'], Logger::NOTICE);
+                        try {
+                            $this->acceptSecretChat($update['chat']);
+                        } catch (RPCErrorException $e) {
+                            $this->logger->logger("Error while accepting secret chat: {$e}", Logger::FATAL_ERROR);
+                        }
+                        break;
+                    case 'encryptedChatDiscarded':
+                        $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
+                        $this->discardSecretChat($update['chat']['id']);
+                        break;
+                    case 'encryptedChat':
+                        $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);
+                        $this->completeSecretChat($update['chat']);
+                        break;
+                }
+            });
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
         }
         if ($this->updateHandlerType === UpdateHandlerType::NOOP) {
