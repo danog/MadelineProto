@@ -24,9 +24,9 @@ use ReflectionIntersectionType;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Filter\FilterEdit;
+use danog\MadelineProto\EventHandler\Filter\FilterEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\Ended;
-use danog\MadelineProto\EventHandler\Filter\FilterNoEdit;
+use danog\MadelineProto\EventHandler\Filter\FilterNoEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasGif;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
@@ -95,8 +95,8 @@ abstract class Filter
                 GroupMessage::class => new FilterGroup,
                 ChannelMessage::class => new FilterChannel,
                 ServiceMessage::class => new FilterService,
-                IsEdited::class => new FilterEdit,
-                IsNotEdited::class => new FilterNoEdit,
+                IsEdited::class => new FilterEdited,
+                IsNotEdited::class => new FilterNoEdited,
                 IsForwarded::class => new FilterForwarded,
                 IsReply::class => new FilterReply,
                 IsReplyToSelf::class => new FilterReplyToSelf,

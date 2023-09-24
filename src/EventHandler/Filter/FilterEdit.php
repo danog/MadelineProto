@@ -24,7 +24,7 @@ use danog\MadelineProto\EventHandler\Message;
  * Allows messages that were edited.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterEdit extends Filter
+final class FilterEdited extends Filter
 {
     public function apply(Update $update): bool
     {
