@@ -33,7 +33,8 @@ class SecretMessage extends AbstractPrivateMessage
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info)
     {
-        parent::__construct($API, $decryptedMessage = $rawMessage['decrypted_message'], $info);
+        parent::__construct($API, $rawMessage['decrypted_message'], $info);
+        $decryptedMessage = $rawMessage['decrypted_message'];
         $this->noWebpage = $decryptedMessage['no_webpage'] ?? null;
         $this->replyToRandomId = $decryptedMessage['reply_to_random_id'] ?? null;
     }

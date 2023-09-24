@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
@@ -36,10 +37,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     public readonly int $id;
     /** Whether the message is outgoing */
     public readonly bool $out;
-    //TODO add support for secret chats
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
-    //TODO add support for secret chats
     /** ID of the sender of the message */
     public readonly int $senderId;
     /** ID of the message to which this message is replying */
@@ -70,17 +69,17 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         array $info
     ) {
         parent::__construct($API);
-
-        $this->out = $rawMessage['out'];
-        $this->id = $rawMessage['id'];
-        $this->chatId = $info['bot_api_id'];
-        $this->senderId = isset($rawMessage['from_id'])
+        $decryptedMessage = $this instanceof SecretMessage ? $rawMessage['decrypted_message'] : null;
+        $this->out = $rawMessage['out'] ?? false;
+        $this->id = $this instanceof SecretMessage ? $rawMessage['random_id'] : $rawMessage['id'];
+        $this->chatId = $this instanceof SecretMessage ? $this->getClient()->getSecretChat($rawMessage['chat_id'])->chatId :$info['bot_api_id'];
+        $this->senderId = $this instanceof SecretMessage ? $this->getClient()->getSecretChat($rawMessage['chat_id'])->otherID : (isset($rawMessage['from_id'])
             ? $this->getClient()->getIdInternal($rawMessage['from_id'])
-            : $this->chatId;
+            : $this->chatId);
         $this->date = $rawMessage['date'];
-        $this->mentioned = $rawMessage['mentioned'];
-        $this->silent = $rawMessage['silent'];
-        $this->ttlPeriod = $rawMessage['ttl_period'] ?? $rawMessage['ttl'] ?? null;
+        $this->mentioned = $rawMessage['mentioned'] ?? false;
+        $this->silent = $rawMessage['silent'] ?? $decryptedMessage['silent'];
+        $this->ttlPeriod = $rawMessage['ttl_period'] ?? $decryptedMessage['ttl'] ?? null;
 
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];

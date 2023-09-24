@@ -32,8 +32,6 @@ final class Document extends Media
     public readonly ?int $thumbHeight;
     /** Thumbnail width only for secret chats. */
     public readonly ?int $thumbWidth;
-    /** Caption. */
-    public readonly ?string $caption;
 
     /** @internal */
     public function __construct(
@@ -45,7 +43,6 @@ final class Document extends Media
         $this->thumb = new Bytes($rawMedia['thumb']) ?? null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
-        $this->caption = $rawMedia['caption'] ?? null;
     }
 
     /** @internal */
