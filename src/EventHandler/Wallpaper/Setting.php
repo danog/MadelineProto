@@ -23,7 +23,7 @@ use ReflectionProperty;
 /**
  * Info on how to generate a wallpaper, according to [these instructions »](https://core.telegram.org/api/wallpapers).
  */
-final class Setting implements JsonSerializable
+final class WallpaperSettings implements JsonSerializable
 {
     /** @var bool For [image wallpapers](https://core.telegram.org/api/wallpapers#image-wallpapers): if set, the JPEG must be downscaled to fit in 450x450 square and then box-blurred with radius 12. */
     public readonly bool $blur;
