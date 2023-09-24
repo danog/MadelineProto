@@ -17,21 +17,21 @@
 namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\AbstractMedia;
-use danog\MadelineProto\EventHandler\Story\Story as UpdateStory;
+use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 
 /**
- * Represents a class for non-downloadable media.
+ * Represents a class for a forwarded story.
  */
-abstract class Story extends AbstractMedia
+abstract class MediaStory extends AbstractMedia
 {
     /** @var bool */
     public readonly bool $viaMention;
 
     /** @var bool */
-    public readonly int $userId;
+    public readonly int $senderId;
 
     /** @var int */
     public readonly int $storyId;
@@ -46,41 +46,46 @@ abstract class Story extends AbstractMedia
     ) {
         parent::__construct($API);
         $this->viaMention = $rawMedia['via_mention'];
-        $this->userId = $API->getIdInternal($rawMedia['peer']);
+        $this->senderId = $API->getIdInternal($rawMedia['peer']);
         $this->storyId = $rawMedia['id'];
         $this->story = match($rawMedia['story']['_'] ?? null)
         {
-            'storyItem' => new UpdateStory($API, [
-                'peer' => $this->userId,
+            'storyItem' => new Story($API, [
+                'peer' => $this->senderId,
                 'story' => $rawMedia['story']
             ]),
             'storyItemDeleted' => new StoryDeleted($API, [
-                'peer' => $this->userId,
+                'peer' => $this->senderId,
                 'story' => $rawMedia['story']
             ]),
-            'storyItemSkipped' => null,
+            'storyItemSkipped' => null, // Will it happen?
             default => null
         };
-
     }
 
     /**
      * Get story.
      * 
      * @psalm-suppress InaccessibleProperty
+     * @return ?AbstractStory
      */
-    public function getStory(): AbstractStory
+    public function getStory(): ?AbstractStory
     {
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
-                'peer' => $this->userId,
+                'peer' => $this->senderId,
                 'id' => [ $this->storyId ],
             ]
-        )['stories'][0];
-        return $this->story ??= $result['_'] === 'storyItemDeleted'
-            ? new StoryDeleted($client, [ 'peer' => $this->userId, 'story' => $result ])
-            : new Story($client, [ 'peer' => $this->userId, 'story' => $result ]);
+        )['stories'][0] ?? false;
+        if ($result)
+        {
+            $arr = [ 'peer' => $this->senderId, 'story' => $result ];
+            return $this->story ??= $result['_'] === 'storyItem' // I hope storyItemSkipped never happen
+                ? new StoryDeleted($client, $arr)
+                : new Story($client, $arr);
+        }
+        return null;
     }
 }
