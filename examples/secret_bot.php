@@ -302,7 +302,7 @@ class SecretHandler extends EventHandler
         foreach ($secret_media as $type => $smessage) {
             $promises []= async($this->messages->sendEncryptedFile(...), $smessage);
         }
-        await($promises);
+        var_dump(await($promises));
 
         $i = 0;
         while ($i < 10) {
