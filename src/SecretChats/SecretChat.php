@@ -43,4 +43,15 @@ final class SecretChat extends IpcCapable
         parent::__construct($API);
         $this->created = \time();
     }
+
+    /**
+     * Gets a secret chat message.
+     *
+     * @param integer $randomId Secret chat message ID.
+     * @return array|null
+     */
+    public function getMessage(int $randomId): array
+    {
+        return $this->getClient()->getSecretMessage($this->chatId, $randomId);
+    }
 }

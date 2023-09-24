@@ -1022,6 +1022,16 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getSecretChat($chat);
     }
     /**
+     * Gets a secret chat message.
+     *
+     * @param integer $chatId Secret chat ID.
+     * @param integer $randomId Secret chat message ID.
+     */
+    public function getSecretMessage(int $chatId, int $randomId): array
+    {
+        return $this->wrapper->getAPI()->getSecretMessage($chatId, $randomId);
+    }
+    /**
      * Get info about the logged-in user, cached.
      *
      * Use fullGetSelf to bypass the cache.

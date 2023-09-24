@@ -23,6 +23,7 @@ namespace danog\MadelineProto\SecretChats;
 use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Logger;
@@ -691,11 +692,11 @@ final class SecretChatController implements Stringable
         return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
     }
 
-    public function getMessage(int $random_id): ?array
+    public function getMessage(int $random_id): array
     {
         $result = $this->randomIdMap[$random_id];
         if ($result === null) {
-            return null;
+            throw new AssertionError("The secret message with ID $random_id does not exist!");
         }
         [$seq, $outgoing] = $result;
         return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
