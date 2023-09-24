@@ -48,7 +48,6 @@ final class SecretChat extends IpcCapable
      * Gets a secret chat message.
      *
      * @param integer $randomId Secret chat message ID.
-     * @return array|null
      */
     public function getMessage(int $randomId): array
     {
