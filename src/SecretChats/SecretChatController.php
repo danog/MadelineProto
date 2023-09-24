@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\SecretChats;
 
 use Amp\Future;
+use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
-use Webmozart\Assert\Assert;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Logger;
@@ -37,6 +37,7 @@ use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Stringable;
+use Webmozart\Assert\Assert;
 
 /**
  * Represents a secret chat.
@@ -105,6 +106,7 @@ final class SecretChatController implements Stringable
 
     private SecretFeedLoop $feedLoop;
     public readonly SecretChat $public;
+    private LocalKeyedMutex $sentMutex;
     public function __construct(
         private readonly MTProto $API,
         /** @var TKey */
@@ -137,6 +139,7 @@ final class SecretChatController implements Stringable
         $this->feedLoop->start();
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
+        $this->sentMutex = new LocalKeyedMutex;
         $this->init();
     }
 
@@ -157,7 +160,7 @@ final class SecretChatController implements Stringable
     public function __serialize(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['rekeyMutex'], $vars['encryptMutex']);
+        unset($vars['rekeyMutex'], $vars['encryptMutex'], $vars['sentMutex']);
 
         return $vars;
     }
@@ -169,6 +172,7 @@ final class SecretChatController implements Stringable
         }
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
+        $this->sentMutex = new LocalKeyedMutex;
     }
 
     /**
@@ -356,11 +360,17 @@ final class SecretChatController implements Stringable
         $message = $body['message'];
         $randomId = $message['random_id'] = Tools::randomInt();
         Assert::true($this->remoteLayer > 8);
+        $body['_'] = 'updateNewOutgoingEncryptedMessage';
+        $body['message'] = [
+            '_' => $body['method'] === 'messages.sendEncryptedService'
+                ? 'encryptedMessageService'
+                : 'encryptedMessage',
+            'message' => $message,
+            'chat_id' => $this->id,
+        ]; // Not sent
         $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-        $seq = $this->out_seq_no++;
+        $body['seq'] = $seq = $this->out_seq_no++; // Not sent
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
-        $body['seq'] = $seq; // Not sent
-        $body['message'] = $message; // Not sent
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->mtproto === 2) {
@@ -381,6 +391,23 @@ final class SecretChatController implements Stringable
         $this->randomIdMap[$randomId] = [$seq, true];
     }
 
+    public function handleSent(array $request, array $response): void
+    {
+        $lock = $this->sentMutex->acquire((string) $request['seq']);
+        try {
+            $msg = $this->outgoing[$request['seq']];
+            if (!isset($msg['message']['date'])) {
+                $msg['message']['date'] = $response['date'];
+                if (isset($response['file'])) {
+                    $msg['message']['file'] = $response['file'];
+                }
+                $this->outgoing[$request['seq']] = $msg;
+                EventLoop::queue($this->API->saveUpdate(...), $msg);
+            }
+        } finally {
+            EventLoop::queue($lock->release(...));
+        }
+    }
     private function handleDecryptedUpdate(array $update): void
     {
         $decryptedMessage = $update['message']['decrypted_message'];
@@ -443,7 +470,7 @@ final class SecretChatController implements Stringable
         $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
             $msg = $this->outgoing[$seq];
-            $this->API->methodCallAsyncRead($msg['_'], $msg[$seq]);
+            $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);
         }
     }
     /**

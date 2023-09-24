@@ -1089,11 +1089,6 @@
       <code><![CDATA[isset($this->API->logger)]]></code>
     </TypeDoesNotContainType>
   </file>
-  <file src="src/Loop/Secret/SecretSeqLoop.php">
-    <TypeDoesNotContainType>
-      <code><![CDATA[isset($this->API->logger)]]></code>
-    </TypeDoesNotContainType>
-  </file>
   <file src="src/Loop/Update/FeedLoop.php">
     <MissingClosureParamType>
       <code>$msg</code>
@@ -1357,6 +1352,7 @@
       <code><![CDATA[fn () => $e]]></code>
     </MissingClosureReturnType>
     <PossiblyInvalidArgument>
+      <code>$response</code>
       <code>\time() + $seconds</code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
@@ -1835,9 +1831,13 @@
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/SecretChats/SecretChatController.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->remoteLayer === 8]]></code>
+    </DocblockTypeContradiction>
     <PropertyNotSetInConstructor>
       <code>$incoming</code>
       <code>$outgoing</code>
+      <code>$randomIdMap</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/Serialization.php">
