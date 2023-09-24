@@ -60,6 +60,7 @@ final class SecretChatController implements Stringable
     protected static array $dbProperties = [
         'incoming' => ['innerMadelineProto' => true],
         'outgoing' => ['innerMadelineProto' => true],
+        'randomIdMap' => ['innerMadelineProto' => true],
     ];
 
     /**
@@ -70,6 +71,10 @@ final class SecretChatController implements Stringable
      * @var DbArray<int, array>
      */
     private DbArray $outgoing;
+    /**
+     * @var DbArray<int, list{int, bool}> Seq, outgoing
+     */
+    private DbArray $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
     private int $remote_in_seq_no = 0;
@@ -121,6 +126,7 @@ final class SecretChatController implements Stringable
             $this->out_seq_no_base = 0;
         }
         $this->public = new SecretChat(
+            $API,
             DialogId::fromSecretChatId($id),
             $creator,
             $otherID,
@@ -347,10 +353,10 @@ final class SecretChatController implements Stringable
     private function encryptSecretMessageInner(array &$body): void
     {
         $message = $body['message'];
-        $message['random_id'] = Tools::random(8);
+        $message['random_id'] = Tools::randomInt();
         if ($this->remoteLayer > 8) {
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-            $this->out_seq_no++;
+            $seq = $this->out_seq_no++;
         }
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
@@ -369,8 +375,8 @@ final class SecretChatController implements Stringable
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
         $body['data'] = $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
-        $this->outgoing[$this->out_seq_no] = $body;
-
+        $this->outgoing[$seq] = $body;
+        $this->randomIdMap[$message['random_id']] = [$seq, true];
     }
 
     private function handleDecryptedUpdate(array $update): void
@@ -512,7 +518,8 @@ final class SecretChatController implements Stringable
                     }
                 }
                 $message['message']['decrypted_message'] = $message['message']['decrypted_message']['message'];
-                $this->incoming[$this->in_seq_no++] = $message;
+                $this->incoming[$seq = $this->in_seq_no++] = $message;
+                $this->randomIdMap[$message['random_id']] = [$seq, false];
                 $this->handleDecryptedUpdate($message);
             }
         } else {
@@ -657,6 +664,15 @@ final class SecretChatController implements Stringable
         return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
     }
 
+    public function getMessage(int $random_id): ?array
+    {
+        $result = $this->randomIdMap[$random_id];
+        if ($result === null) {
+            return null;
+        }
+        [$seq, $outgoing] = $result;
+        return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
+    }
     public function __toString(): string
     {
         return "secret chat {$this->id}";
