@@ -113,7 +113,7 @@ abstract class Media extends AbstractMedia
      * Download the media to working directory or passed path.
      * 
      * @param string $dir Directory where to download the file
-     * @param callable|null $cb Progress callback as callback(float, float, float): void
+     * @param (callable(float, float, float): void)|null $cb Progress callback
      * @return string
      */
     public function downloadToDir(?string $dir = null, ?callable $cb = null): string
@@ -125,7 +125,7 @@ abstract class Media extends AbstractMedia
      * Download the media to file.
      * 
      * @param string $file Downloaded file path
-     * @param callable|null $cb Progress callback as callback(float, float, float): void
+     * @param (callable(float, float, float): void)|null $cb Progress callback
      * @return string
      */
     public function downloadToFile(string $file, ?callable $cb = null): string
