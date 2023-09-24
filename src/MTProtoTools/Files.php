@@ -86,10 +86,10 @@ trait Files
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] !== 'messageMediaDocument' && $media['_'] == 'decryptedMessageMediaDocument') {
+        if ($media['_'] !== 'messageMediaDocument' && $media['_'] !== 'decryptedMessageMediaDocument' && $media['_'] !== 'decryptedMessageMediaExternalDocument') {
             return null;
         }
-        if ($media['_'] = 'decryptedMessageMediaDocument') {
+        if ($media['_'] == 'decryptedMessageMediaDocument' || $media['_'] == 'decryptedMessageMediaExternalDocument') {
             $media['document'] = $media;
         }
         if (!isset($media['document'])) {
