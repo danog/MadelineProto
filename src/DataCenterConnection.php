@@ -564,7 +564,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     private function getAuthConnection(): Connection
     {
-        return $this->connections[0]->connect();
+        return $this->connections[0];
     }
     /**
      * Check if any connection is available.
@@ -583,7 +583,7 @@ final class DataCenterConnection implements JsonSerializable
         if (empty($this->availableConnections)) {
             $this->connectionsPromise->await();
         }
-        return $this->getConnection()->connect();
+        return $this->getConnection();
     }
     /**
      * Get best socket in round robin.

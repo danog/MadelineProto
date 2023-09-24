@@ -37,7 +37,6 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
-use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\AuthKeyHandler;
@@ -51,9 +50,6 @@ use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
-use danog\MadelineProto\SecretChats\MessageHandler;
-use danog\MadelineProto\SecretChats\ResponseHandler;
-use danog\MadelineProto\SecretChats\SeqNoHandler;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -97,9 +93,6 @@ final class MTProto implements TLCallback, LoggerGetter
     use UpdateHandler;
     use Files;
     use \danog\MadelineProto\SecretChats\AuthKeyHandler;
-    use MessageHandler;
-    use ResponseHandler;
-    use SeqNoHandler;
     use BotAPI;
     use BotAPIFiles;
     use TD;
@@ -123,7 +116,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 173;
+    const V = 174;
     /**
      * Bad message error codes.
      *
@@ -303,12 +296,6 @@ final class MTProto implements TLCallback, LoggerGetter
      * @var array<FeedLoop>
      */
     public array $feeders = [];
-    /**
-     * Secret chat feeder loops.
-     *
-     * @var array<SecretFeedLoop>
-     */
-    public array $secretFeeders = [];
     /**
      * Updater loops.
      *
@@ -649,9 +636,8 @@ final class MTProto implements TLCallback, LoggerGetter
             'TL',
 
             // Secret chats
-            'secret_chats',
+            'secretChats',
             'temp_requested_secret_chats',
-            'temp_rekeyed_secret_chats',
 
             // Report URI
             'reportDest',
@@ -816,6 +802,9 @@ final class MTProto implements TLCallback, LoggerGetter
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
         $db []= async($this->initDb(...), $this);
+        foreach ($this->secretChats as $chat) {
+            $db []= async($chat->init(...));
+        }
         await($db);
 
         if (isset($this->chats) && $this->chats instanceof MemoryArray) {
@@ -867,11 +856,9 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
         $this->initialize($this->settings);
-        foreach ($this->secret_chats as $chat => $data) {
+        foreach ($this->secretChats as $chat) {
             try {
-                if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                    $this->notifyLayer($chat);
-                }
+                $chat->notifyLayer();
             } catch (RPCErrorException $e) {
             }
         }
@@ -1223,15 +1210,6 @@ final class MTProto implements TLCallback, LoggerGetter
             return;
         }
         $this->logger('Starting update system');
-        foreach ($this->secret_chats as $id => $chat) {
-            if (!isset($this->secretFeeders[$id])) {
-                $this->secretFeeders[$id] = new SecretFeedLoop($this, $id);
-            }
-            $this->secretFeeders[$id]->start();
-            if (isset($this->secretFeeders[$id])) {
-                $this->secretFeeders[$id]->resume();
-            }
-        }
         $this->channels_state->get(FeedLoop::GENERIC);
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
@@ -1256,6 +1234,9 @@ final class MTProto implements TLCallback, LoggerGetter
         }
         $this->seqUpdater->start();
         $this->seqUpdater->resume();
+        foreach ($this->secretChats as $chat) {
+            $chat->startFeedLoop();
+        }
     }
     /**
      * Store shared phone config.

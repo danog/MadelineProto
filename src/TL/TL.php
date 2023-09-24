@@ -24,7 +24,6 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
-use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
@@ -671,10 +670,6 @@ final class TL implements TLInterface
                     $serialized .= $this->serializeObject(['type' => 'bytes'], Tools::random(15 + 4 * Tools::randomInt(modulus: 3)), 'random_bytes');
                     continue;
                 }
-                if ($name === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true) && isset($arguments['message'])) {
-                    $serialized .= $this->serializeObject($current_argument, $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $arguments['queuePromise']), 'data');
-                    continue;
-                }
                 if ($name === 'random_id') {
                     switch ($type) {
                         case 'long':
@@ -743,18 +738,14 @@ final class TL implements TLInterface
                 $value = $this->API->upload($value);
                 $arguments[$name] = $value;
             }
-            if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
-                if (\is_array($value)) {
-                    $value = ($this->API->getInfo($value))['InputEncryptedChat'];
-                } else {
-                    if (!$this->API->hasSecretChat($value)) {
-                        throw new SecretPeerNotInDbException;
-                    }
-                    $value = $this->API->getSecretChat($value)['InputEncryptedChat'];
-                }
+            if ($type === 'InputEncryptedFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputEncryptedFile'))) {
+                $value = $this->API->uploadEncrypted($value);
                 $arguments[$name] = $value;
             }
-            //$this->API->logger->logger('Serializing '.$name.' of type '.$current_argument['type');
+            if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {
+                $value = $this->API->getSecretChatController($value)->inputChat;
+                $arguments[$name] = $value;
+            }
             $serialized .= ($this->serializeObject($current_argument, $value, $name, $layer));
         }
         return $serialized;

@@ -32,7 +32,6 @@ use Amp\Http\Client\Request;
 use ArrayAccess;
 use Closure;
 use Countable;
-use Exception;
 use Fiber;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
@@ -55,7 +54,6 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use phpseclib3\Crypt\Random;
 use ReflectionClass;
-use Throwable;
 use Traversable;
 use Webmozart\Assert\Assert;
 
@@ -183,18 +181,9 @@ abstract class Tools extends AsyncTools
     public static function randomInt(int $modulus = 0): int
     {
         if ($modulus === 0) {
-            $modulus = PHP_INT_MAX;
+            return \random_int(PHP_INT_MIN, PHP_INT_MAX);
         }
-        try {
-            return \random_int(0, PHP_INT_MAX) % $modulus;
-        } catch (Throwable $e) {
-            // If a sufficient source of randomness is unavailable, random_bytes() will throw an
-            // object that implements the Throwable interface (Exception, TypeError, Error).
-            // We don't actually need to do anything here. The string() method should just continue
-            // as normal.
-        }
-        $number = self::unpackSignedLong(self::random(8));
-        return ($number & PHP_INT_MAX) % $modulus;
+        return \random_int(0, PHP_INT_MAX) % $modulus;
     }
     /**
      * Get secure random string of specified length.

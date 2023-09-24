@@ -23,7 +23,6 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
-use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
@@ -34,6 +33,7 @@ use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -267,7 +267,7 @@ final class Connection
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      */
-    public function connect(): self
+    private function connect(): self
     {
         if ($this->stream) {
             return $this;
@@ -335,7 +335,7 @@ final class Connection
      * @param string $method    Method name
      * @param array  $arguments Arguments
      */
-    private function methodAbstractions(string &$method, array &$arguments): ?DeferredFuture
+    private function methodAbstractions(string &$method, array &$arguments): void
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && $r = Tools::parseLink($arguments['hash'])) {
             [$invite, $content] = $r;
@@ -359,7 +359,12 @@ final class Connection
             } else {
                 $arguments['channel'] = $content;
             }
-        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'], true)) {
+        } elseif ($method === 'messages.sendMessage' &&
+            (
+                (isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'], true))
+                || (\is_int($arguments['peer']) && DialogId::isSecretChat($arguments['peer']))
+            )
+        ) {
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             if (!isset($arguments['message']['_'])) {
@@ -425,8 +430,7 @@ final class Connection
                     $arguments['message']['media']['size'] = $arguments['file']['size'];
                 }
             }
-            $arguments['queuePromise'] = new DeferredFuture;
-            return $arguments['queuePromise'];
+            return;
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat'], true) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
             $res = $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
@@ -477,10 +481,6 @@ final class Connection
                 $arguments['peer'] = $arguments['id'];
             }
         }
-        if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
-            $arguments['queuePromise'] = new DeferredFuture;
-            return $arguments['queuePromise'];
-        }
         if (isset($arguments['reply_to_msg_id'])) {
             if (isset($arguments['reply_to'])) {
                 throw new Exception("You can't provide a reply_to together with reply_to_msg_id and top_msg_id!");
@@ -491,7 +491,6 @@ final class Connection
                 'top_msg_id' => $arguments['top_msg_id'] ?? null
             ];
         }
-        return null;
     }
     /**
      * Send an MTProto message.
@@ -512,9 +511,7 @@ final class Connection
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod()) {
-                $method = $message->getConstructor();
-                $queuePromise = $this->methodAbstractions($method, $body);
-                $body = $this->API->getTL()->serializeMethod($method, $body);
+                $body = $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
             } else {
                 $body['_'] = $message->getConstructor();
                 $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
@@ -526,9 +523,6 @@ final class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
-        if (isset($queuePromise)) {
-            $queuePromise->complete();
-        }
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }

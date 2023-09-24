@@ -84,6 +84,10 @@ final class MinDatabase implements TLCallback
     {
         return ['db', 'pendingDb', 'API', 'v'];
     }
+    protected function getDbPrefix(): string
+    {
+        return $this->API->getDbPrefix();
+    }
     public function __wakeup(): void
     {
         $this->localMutex = new LocalKeyedMutex;

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * FileCallback module.
+ * Secret chat module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,45 +18,20 @@ declare(strict_types=1);
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\SecretChats;
 
 /**
- * File callback interface.
- *
- * @template TT
- *
- * @implements FileCallbackInterface<TT>
+ * Represents a secret chat.
  */
-final class FileCallback implements FileCallbackInterface
+final class SecretChat
 {
-    /**
-     * Callback.
-     *
-     * @var callable(float, float, float)
-     */
-    public readonly mixed $callback;
-    /**
-     * Construct file callback.
-     *
-     * @param TT                            $file     File to download/upload
-     * @param callable(float, float, float) $callback Callback
-     */
-    public function __construct(public readonly mixed $file, callable $callback)
-    {
-        $this->callback = $callback;
-    }
-    /**
-     * Get file.
-     *
-     * @return TT
-     */
-    public function getFile(): mixed
-    {
-        return $this->file;
-    }
-    public function __invoke(float $percent, float $speed, float $time): void
-    {
-        $callback = $this->callback;
-        $callback($percent, $speed, $time);
+    /** Creation date */
+    public readonly int $created;
+    public function __construct(
+        public readonly int $chatId,
+        public readonly bool $creator,
+        public readonly int $otherID,
+    ) {
+        $this->created = \time();
     }
 }
