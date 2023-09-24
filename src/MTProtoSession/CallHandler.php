@@ -165,6 +165,7 @@ trait CallHandler
         if (\is_array($args)) {
             $this->methodAbstractions($method, $args);
             if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
+                $args['_'] = $method;
                 $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
             }
         }

@@ -22,6 +22,7 @@ namespace danog\MadelineProto\SecretChats;
 
 use Amp\Future;
 use Amp\Sync\LocalMutex;
+use Webmozart\Assert\Assert;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Logger;
@@ -354,11 +355,12 @@ final class SecretChatController implements Stringable
     {
         $message = $body['message'];
         $message['random_id'] = Tools::randomInt();
-        if ($this->remoteLayer > 8) {
-            $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-            $seq = $this->out_seq_no++;
-        }
+        Assert::true($this->remoteLayer > 8);
+        $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
+        $seq = $this->out_seq_no++;
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
+        $body['seq'] = $seq; // Not sent
+        $body['message'] = $message; // Not sent
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->mtproto === 2) {
@@ -440,10 +442,8 @@ final class SecretChatController implements Stringable
         $action['handled'] = true;
         $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
-            $this->API->methodCallAsyncRead('messages.sendEncrypted', [
-                'peer' => $this->id,
-                'message' => $this->outgoing[$seq]
-            ]);
+            $msg = $this->outgoing[$seq];
+            $this->API->methodCallAsyncRead($msg['_'], $msg[$seq]);
         }
     }
     /**
