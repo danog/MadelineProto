@@ -370,7 +370,7 @@ final class SecretChatController implements Stringable
         }
         $body['data'] = $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
         $this->outgoing[$this->out_seq_no] = $body;
-        return;
+
     }
 
     private function handleDecryptedUpdate(array $update): void
