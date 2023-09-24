@@ -130,7 +130,7 @@ abstract class Media extends AbstractMedia
      */
     public function downloadToFile(string $file, ?callable $cb = null): string
     {
-        return $this->getClient()->downloadToFile($this, $file);
+        return $this->getClient()->downloadToFile($this, $file, $cb);
     }
 
     /** @internal */
