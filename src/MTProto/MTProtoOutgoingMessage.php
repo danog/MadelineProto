@@ -476,6 +476,15 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
+     * Get the promise.
+     */
+    public function getResultPromise(): Future
+    {
+        \assert($this->resultDeferred !== null);
+        return $this->resultDeferred->getFuture();
+    }
+
+    /**
      * Reset sent time to trigger resending.
      */
     public function resetSent(): self

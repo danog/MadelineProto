@@ -28,7 +28,6 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Throwable;
@@ -361,6 +360,9 @@ trait PeerHandler
     /**
      * Get info about peer, returns an Info object.
      *
+     * If passed a secret chat ID, returns information about the user, not about the secret chat.
+     * Use getSecretChat to return information about the secret chat.
+     *
      * @param mixed                                 $id   Peer
      * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
@@ -385,21 +387,18 @@ trait PeerHandler
         if (\is_array($id)) {
             switch ($id['_']) {
                 case 'updateEncryption':
-                    return $this->getSecretChat($id['chat']['id']);
-                case 'inputEncryptedChat':
-                case 'updateEncryptedChatTyping':
-                case 'updateEncryptedMessagesRead':
-                    return $this->getSecretChat($id['chat_id']);
+                    $id = $this->getSecretChat($id['chat']['id'])->otherID;
+                    break;
                 case 'updateNewEncryptedMessage':
                     $id = $id['message'];
                     // no break
+                case 'inputEncryptedChat':
+                case 'updateEncryptedChatTyping':
+                case 'updateEncryptedMessagesRead':
                 case 'encryptedMessage':
                 case 'encryptedMessageService':
-                    $id = $id['chat_id'];
-                    if (!isset($this->secret_chats[$id])) {
-                        throw new SecretPeerNotInDbException;
-                    }
-                    return $this->secret_chats[$id];
+                    $id = $this->getSecretChat($id['chat_id'])->otherID;
+                    break;
             }
         }
         $folder_id = $this->getFolderId($id);
@@ -411,7 +410,7 @@ trait PeerHandler
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
             if (DialogId::getType($id) === DialogId::SECRET_CHAT) {
-                return $this->getSecretChat(DialogId::toSecretChatId($id));
+                $id = $this->getSecretChat($id)->otherID;
             }
             if (!$this->peerDatabase->isset($id)) {
                 try {
@@ -662,6 +661,9 @@ trait PeerHandler
                     continue;
                 } else {
                     $id = $this->peerDatabase->resolveUsername($id);
+                    if ($id === null) {
+                        throw new PeerNotInDbException;
+                    }
                 }
             }
             $id = $this->getIdInternal($id);

@@ -81,8 +81,9 @@ trait Session
     /**
      * Call queue.
      *
+     * @var array<string, int>
      */
-    public array $call_queue = [];
+    public array $callQueue = [];
     /**
      * Ack queue.
      *

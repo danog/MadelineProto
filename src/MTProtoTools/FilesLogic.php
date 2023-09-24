@@ -399,7 +399,8 @@ trait FilesLogic
         }
         if ($stream instanceof File) {
             $lock = new LocalMutex;
-            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock) {
+            $nextOffset = 0;
+            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock, &$nextOffset): string {
                 /** @var Lock */
                 $l = $lock->acquire();
                 try {
@@ -407,8 +408,13 @@ trait FilesLogic
                         while ($stream->tell() !== $offset) {
                             $stream->seek($offset);
                         }
+                    } else {
+                        Assert::eq($offset, $nextOffset);
+                        $nextOffset += $size;
                     }
-                    return $stream->read(null, $size);
+                    $result = $stream->read(null, $size);
+                    \assert($result !== null);
+                    return $result;
                 } finally {
                     EventLoop::queue($l->release(...));
                 }
@@ -419,17 +425,22 @@ trait FilesLogic
                 $stream = ($ctx->getStream());
                 $created = true;
             }
-            $callable = static function (int $offset, int $size) use ($stream) {
+            $nextOffset = 0;
+            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset): string {
                 if (!$stream instanceof BufferedRawStream) {
                     throw new \InvalidArgumentException('Invalid stream type');
                 }
+                Assert::eq($offset, $nextOffset);
+                $nextOffset += $size;
                 $reader = $stream->getReadBuffer($l);
                 try {
-                    return $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size);
                 } catch (NothingInTheSocketException $e) {
                     $reader = $stream->getReadBuffer($size);
-                    return $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size);
                 }
+                \assert($result !== null);
+                return $result;
             };
             $seekable = false;
         }

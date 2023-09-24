@@ -187,25 +187,18 @@ trait Files
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param mixed    $callable  Callable
-     * @param integer  $size      File size
-     * @param string   $mime      Mime type
-     * @param string   $fileName  File name
-     * @param callable $cb        Callback
-     * @param boolean  $seekable  Whether chunks can be fetched out of order
-     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     * @param callable(int, int): string $callable  Callable (offset, length) => data
+     * @param integer                    $size      File size
+     * @param string                     $mime      Mime type
+     * @param string                     $fileName  File name
+     * @param callable(float, float, float): void $cb        Status callback
+     * @param boolean                    $seekable  Whether chunks can be fetched out of order
+     * @param boolean                    $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */
     public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false): array
     {
-        if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
-            $cb = $callable;
-            $callable = $callable->getFile();
-        }
-        if (!\is_callable($callable)) {
-            throw new Exception('Invalid callable provided');
-        }
         if ($cb === null) {
             $cb = function (float $percent, float $speed, float $time): void {
                 $this->logger->logger('Upload status: '.$percent.'%', Logger::NOTICE);
@@ -256,13 +249,17 @@ trait Files
             };
         }
         $totalSize = 0;
+        if (!$seekable) {
+            $nextOffset = 0;
+            $callable = static function (int $offset, int $size) use ($callable, &$nextOffset): string {
+                Assert::eq($offset, $nextOffset);
+                $nextOffset += $size;
+                return $callable($offset, $size);
+            };
+        }
         $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige): array {
-            static $offset = 0;
-            $oldOffset = $offset;
-            $offset += $part_size;
-
             $bytes = $callable(
-                $oldOffset,
+                $part_num * $part_size,
                 $part_size
             );
             $totalSize += $bytesLen = \strlen($bytes);
@@ -275,9 +272,6 @@ trait Files
                 }
             }
 
-            if ($bytes instanceof Future) {
-                $bytes = $bytes->await();
-            }
             if ($ige) {
                 $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
             }
@@ -287,18 +281,15 @@ trait Files
         $resPromises = [];
         $start = \microtime(true);
         while ($part_num < $part_total_num || !$size) {
-            $writePromise = async(
-                $this->methodCallAsyncWrite(...),
-                $method,
-                fn () => $callable($part_num),
-                ['heavy' => true, 'datacenter' => &$datacenter]
-            );
-            if (!$seekable) {
-                try {
-                    $writePromise->await();
-                } catch (StreamEof) {
-                    break;
-                }
+            try {
+                $writePromise = async(
+                    $this->methodCallAsyncWrite(...),
+                    $method,
+                    $seekable ? fn () => $callable($part_num) : $callable($part_num),
+                    ['heavy' => true, 'datacenter' => &$datacenter]
+                );
+            } catch (StreamEof) {
+                break;
             }
             EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises): void {
                 $readFuture = $writePromise->await();
@@ -1011,6 +1002,8 @@ trait Files
             $datacenter = -$datacenter;
         }
         if (isset($messageMedia['key'])) {
+            $messageMedia['key'] = (string) $messageMedia['key'];
+            $messageMedia['iv'] = (string) $messageMedia['iv'];
             $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
             $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {

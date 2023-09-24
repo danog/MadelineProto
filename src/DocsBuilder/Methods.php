@@ -45,7 +45,7 @@ trait Methods
     {
         static $bots;
         if (!$bots) {
-            $bots = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/bot.json'), true)['result'];
+            $bots = \json_decode(\file_get_contents('https://raw.githubusercontent.com/danog/rpc-db/master/bot.json'), true)['result'];
         }
         static $errors;
         if (!$errors) {
