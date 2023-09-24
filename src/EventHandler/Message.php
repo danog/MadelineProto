@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -419,7 +418,7 @@ abstract class Message extends AbstractMessage
     }
 
     /**
-     * If the message is outgoing, will edit the message's text, otherwise will reply to the message..
+     * If the message is outgoing, will edit the message's text, otherwise will reply to the message.
      *
      * @param string     $message      New message
      * @param ParseMode  $parseMode    Whether to parse HTML or Markdown markup in the message
