@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 abstract class AbstractSticker extends Media
 {
-    /** Emoji representation of sticker */
+    /** @var string Emoji representation of sticker */
     public readonly string $emoji;
 
-    /** Associated stickerset */
+    /** @var array Associated stickerset */
     public readonly array $stickerset;
 
     /** @internal */

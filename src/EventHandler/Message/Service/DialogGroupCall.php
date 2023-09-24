@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 abstract class DialogGroupCall extends ServiceMessage
 {
-    /** Group call ID */
+    /**  @var int Group call ID */
     public readonly int $callId;
 
-    /** Group call access hash */
+    /** @var int Group call access hash */
     public readonly int $accessHash;
 
     /** @internal */

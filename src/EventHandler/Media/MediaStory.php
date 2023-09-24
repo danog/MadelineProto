@@ -23,7 +23,7 @@ use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 
 /**
- * Represents a class for a forwarded story.
+ * Represents a forwarded story.
  */
 abstract class MediaStory extends AbstractMedia
 {

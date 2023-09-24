@@ -29,9 +29,10 @@ final class DialogGameScore extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** Game ID */
+        /** @var int Game ID */
         public readonly int $gameId,
-        /** Score */
+
+        /** @var int Score */
         public readonly int $score
     ) {
         parent::__construct($API, $rawMessage, $info);

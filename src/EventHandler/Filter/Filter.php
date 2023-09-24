@@ -43,7 +43,6 @@ use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\NotEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasNoMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterAudio;

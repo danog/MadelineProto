@@ -30,7 +30,7 @@ final class DialogPhotoChanged extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** New photo (or no photo if it was deleted) */
+        /** @var ?Photo New photo (or no photo if it was deleted) */
         public readonly ?Photo $photo
     ) {
         parent::__construct($API, $rawMessage, $info);

@@ -23,7 +23,7 @@ use danog\MadelineProto\MTProto;
  */
 final class Gif extends AbstractVideo
 {
-    /** If true; the current media has attached mask stickers. */
+    /** @var bool If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
 
     /** @internal */
@@ -47,6 +47,7 @@ final class Gif extends AbstractVideo
     /**
      * Add GIF to saved gifs list.
      *
+     * @return bool
      */
     public function save(): bool
     {
@@ -62,6 +63,7 @@ final class Gif extends AbstractVideo
     /**
      * Remove GIF from saved gifs list.
      *
+     * @return bool
      */
     public function unsave(): bool
     {

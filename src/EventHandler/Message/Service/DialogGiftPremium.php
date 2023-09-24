@@ -29,15 +29,19 @@ final class DialogGiftPremium extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** Three-letter ISO 4217 [currency](https://core.telegram.org/bots/payments#supported-currencies) code */
+        /** @var string Three-letter ISO 4217 [currency](https://core.telegram.org/bots/payments#supported-currencies) code */
         public readonly string $currency,
-        /** Price of the gift in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json), it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). */
+    
+        /** @var int Price of the gift in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json), it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). */
         public readonly int $amount,
-        /** Duration of the gifted Telegram Premium subscription */
+
+        /** @var int Duration of the gifted Telegram Premium subscription */
         public readonly int $months,
-        /** If the gift was bought using a cryptocurrency, the cryptocurrency name. */
+
+        /** @var ?int If the gift was bought using a cryptocurrency, the cryptocurrency name. */
         public readonly ?int $cryptoCurrency,
-        /** If the gift was bought using a cryptocurrency, price of the gift in the smallest units of a cryptocurrency. */
+
+        /** @var ?int If the gift was bought using a cryptocurrency, price of the gift in the smallest units of a cryptocurrency. */
         public readonly ?int $cryptoAmount
     ) {
         parent::__construct($API, $rawMessage, $info);

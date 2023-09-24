@@ -30,7 +30,7 @@ final class DialogSuggestProfilePhoto extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** The photo that the user suggested we set as profile picture. */
+        /** @var ?Photo The photo that the user suggested we set as profile picture. */
         public readonly ?Photo $photo
     ) {
         parent::__construct($API, $rawMessage, $info);

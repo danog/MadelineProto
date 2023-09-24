@@ -24,13 +24,16 @@ use danog\MadelineProto\MTProto;
  */
 abstract class AbstractVideo extends Media
 {
-    /** Video duration in seconds */
+    /** @var float Video duration in seconds */
     public readonly float $duration;
-    /** Whether the video supports streaming */
+
+    /** @var bool Whether the video supports streaming */
     public readonly bool $supportsStreaming;
-    /** Video width */
+
+    /** @var int Video width */
     public readonly int $width;
-    /** Video height */
+
+    /** @var int Video height */
     public readonly int $height;
 
     /** @internal */

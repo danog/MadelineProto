@@ -29,9 +29,9 @@ final class DialogChannelMigrateFrom extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** The old chat title */
+        /** @var string The old chat title */
         public readonly string $oldTitle,
-        /** The old chat title */
+        /** @var int The old chat title */
         public readonly int $oldChatId,
     ) {
         parent::__construct($API, $rawMessage, $info);

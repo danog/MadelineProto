@@ -29,7 +29,7 @@ final class DialogMemberLeft extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** ID of the user that left the channel */
+        /**  @var int ID of the user that left the channel */
         public readonly int $left,
     ) {
         parent::__construct($API, $rawMessage, $info);

@@ -29,7 +29,7 @@ final class DialogChatMigrateTo extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** The supergroup it was migrated to */
+        /** @var int The supergroup it was migrated to */
         public readonly int $channelId
     ) {
         parent::__construct($API, $rawMessage, $info);
