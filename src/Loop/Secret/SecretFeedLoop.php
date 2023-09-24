@@ -73,10 +73,7 @@ final class SecretFeedLoop extends Loop
             $this->incomingUpdates = [];
             foreach ($updates as $update) {
                 try {
-                    if (!$this->secretChat->handleEncryptedUpdate($update)) {
-                        $this->logger->logger("Secret chat deleted, exiting $this...");
-                        return self::STOP;
-                    }
+                    $this->secretChat->handleEncryptedUpdate($update);
                 } catch (SecurityException $e) {
                     $this->logger->logger("Secret chat deleted, exiting $this...");
                     throw $e;

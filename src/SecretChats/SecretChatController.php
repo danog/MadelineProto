@@ -490,17 +490,20 @@ final class SecretChatController implements Stringable
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
 
-        if ($deserialized['_'] === 'decryptedMessageLayer') {
-            if (($this->checkSecretOutSeqNo($deserialized['out_seq_no']))
-                && ($this->checkSecretInSeqNo($deserialized['in_seq_no']))) {
-                $this->incoming[$this->in_seq_no++] = $message['message'];
-                if ($deserialized['layer'] >= 46 && $deserialized['layer'] > $this->remoteLayer) {
-                    $this->remoteLayer = $deserialized['layer'];
+        if ($message['message']['decrypted_message']['_'] === 'decryptedMessageLayer') {
+            foreach ($this->checkSecretOutSeqNo($message) as $message) {
+                $this->checkSecretInSeqNo(
+                    $message['message']['decrypted_message']['in_seq_no']
+                );
+                $layer = $message['message']['decrypted_message']['layer'];
+                if ($layer >= 46 && $layer > $this->remoteLayer) {
+                    $this->remoteLayer = $layer;
                     if (\time() - $this->public->created > 15) {
                         $this->notifyLayer();
                     }
                 }
-                $message['message']['decrypted_message'] = $deserialized['message'];
+                $message['message']['decrypted_message'] = $message['message']['decrypted_message']['message'];
+                $this->incoming[$this->in_seq_no++] = $message;
                 $this->handleDecryptedUpdate($message);
             }
         } else {
@@ -559,7 +562,7 @@ final class SecretChatController implements Stringable
         return $message_data;
     }
 
-    private function checkSecretInSeqNo(int $seqno): bool
+    private function checkSecretInSeqNo(int $seqno): void
     {
         $seqno = ($seqno - $this->out_seq_no_base) >> 1;
         if ($seqno < $this->remote_in_seq_no) {
@@ -573,26 +576,63 @@ final class SecretChatController implements Stringable
             throw new SecurityException('in_seq_no is too big');
         }
         $this->remote_in_seq_no = $seqno;
-        return true;
     }
-    private function checkSecretOutSeqNo(int $seqno): bool
+
+
+    private ?int $gapEnd = null;
+    private ?int $gapQueueSeq = null;
+    private array $gapQueue = [];
+
+    private function checkSecretOutSeqNo(array $message): \Generator
     {
+        $seqno = $message['message']['decrypted_message']['out_seq_no'];
         $seqno = ($seqno - $this->in_seq_no_base) >> 1;
         $C_plus_one = $this->in_seq_no;
         //$this->API->logger->logger($C, $seqno);
         if ($seqno < $C_plus_one) {
             // <= C
-            $this->API->logger->logger('WARNING: dropping repeated message with seqno '.$seqno);
-            return false;
+            $this->API->logger->logger("WARNING: dropping repeated message in $this with seqno $seqno");
+            return;
         }
         if ($seqno > $C_plus_one) {
             // > C+1
-            $this->API->logger->logger("Discarding $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
-            $this->discard();
-            // TODO request resending
-            throw new SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C_plus_one.')!');
+            if ($this->gapEnd !== null) {
+                // Already recovering gap...
+                $C_plus_one = $this->gapQueueSeq;
+                if ($seqno < $C_plus_one) {
+                    // <= C
+                    $this->API->logger->logger("WARNING: dropping repeated message in $this with seqno $seqno while recovering gaps");
+                    return;
+                }
+                if ($seqno > $C_plus_one) {
+                    // > C+1
+                    $this->API->logger->logger("Discarding $this because out_seq_no gap detected: ($seqno > $C_plus_one), but already recovering gap!", Logger::LEVEL_FATAL);
+                    $this->discard();
+                    throw new SecurityException("Additional out_seq_no gap detected!");
+                }
+                $this->gapQueue []= $message;
+                $this->gapQueueSeq = $seqno+1;
+                return;
+            }
+            $this->API->logger->logger("Requesting resending in $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
+            $this->gapEnd = $seqno-1;
+            $this->gapQueue = [$message];
+            $this->gapQueueSeq = $seqno+1;
+            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
+                '_' => 'decryptedMessageActionResend',
+                'start_seq_no' => $this->in_seq_no,
+                'end_seq_no' => $this->gapEnd
+            ]]]);
+            return;
         }
-        return true;
+        yield $message;
+        if ($seqno === $this->gapEnd) {
+            $queue = $this->gapQueue;
+            $this->gapQueue = [];
+            $this->gapQueueSeq = null;
+            $this->gapEnd = null;
+            yield from $queue;
+        }
     }
     private function generateSecretInSeqNo(): int
     {
