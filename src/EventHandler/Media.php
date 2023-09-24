@@ -16,14 +16,15 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use Amp\ByteStream\ReadableStream;
+use JsonSerializable;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\AbstractMedia;
+use Amp\ByteStream\ReadableStream;
+use danog\MadelineProto\Ipc\IpcCapable;
 
 /**
  * Represents a generic media.
  */
-abstract class Media extends AbstractMedia
+abstract class Media extends IpcCapable implements JsonSerializable
 {
     /** Media filesize */
     public readonly int $size;
@@ -136,7 +137,7 @@ abstract class Media extends AbstractMedia
     /** @internal */
     public function jsonSerialize(): mixed
     {
-        $v = parent::jsonSerialize();
+        $v = \get_object_vars($this);
         unset($v['API'], $v['session'], $v['location']);
         return $v;
     }

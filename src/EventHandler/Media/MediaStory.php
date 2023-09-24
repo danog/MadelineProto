@@ -16,16 +16,19 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\AbstractMedia;
-use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 
 /**
  * Represents a forwarded story.
  */
-abstract class MediaStory extends AbstractMedia
+abstract class MediaStory extends IpcCapable implements JsonSerializable // for now. I should think a way
 {
     /** @var bool */
     public readonly bool $viaMention;
@@ -87,5 +90,16 @@ abstract class MediaStory extends AbstractMedia
                 : new Story($client, $arr);
         }
         return null;
+    }
+
+    /** @internal */
+    public function jsonSerialize(): mixed
+    {
+        $res = ['_' => static::class];
+        $refl = new ReflectionClass($this);
+        foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+            $res[$prop->getName()] = $prop->getValue($this);
+        }
+        return $res;
     }
 }
