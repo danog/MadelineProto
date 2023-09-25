@@ -50,14 +50,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /** When was the message sent */
     public readonly int $date;
 
-
     /** ID of the forum topic where the message was sent */
     public readonly ?int $topicId;
 
-
     /** ID of the message thread where the message was sent */
     public readonly ?int $threadId;
-
 
     /** Whether this is a reply to a scheduled message */
     public readonly bool $replyToScheduled;
