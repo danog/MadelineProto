@@ -38,8 +38,7 @@ class SecretMessage extends AbstractPrivateMessage
         $this->noWebpage = $decryptedMessage['no_webpage'] ?? null;
         $this->replyToRandomId = $decryptedMessage['reply_to_random_id'] ?? null;
     }
-    //TODO implement it using getSecretChat
-    /*public function getReply(string $class = AbstractMessage::class) : ?AbstractMessage
+    public function getReply(string $class = AbstractMessage::class): ?AbstractMessage
     {
         if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
             throw new AssertionError("A class that extends AbstractMessage was expected.");
@@ -53,5 +52,16 @@ class SecretMessage extends AbstractPrivateMessage
             }
             return $this->replyCache;
         }
-    }*/
+        $message = $this->getClient()->getSecretMessage(
+            chatId: $this->chatId,
+            randomId: $this->id
+        );
+        /** @psalm-suppress InaccessibleProperty */
+        $this->replyCache = $message;
+        $this->replyCached = true;
+        if (!$this->replyCache instanceof $class) {
+            return null;
+        }
+        return $this->replyCache;
+    }
 }

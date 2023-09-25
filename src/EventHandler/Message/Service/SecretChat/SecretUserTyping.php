@@ -25,6 +25,7 @@ use danog\MadelineProto\MTProto;
  */
 class SecretUserTyping extends Typing
 {
+    /** @internal */
     public function __construct(
         MTProto $API,
         array   $rawMessage,

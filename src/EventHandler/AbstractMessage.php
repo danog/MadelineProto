@@ -80,7 +80,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $this->mentioned = $rawMessage['mentioned'] ?? false;
         $this->silent = $rawMessage['silent'] ?? $decryptedMessage['silent'];
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? $decryptedMessage['ttl'] ?? null;
-
+        if ($this instanceof SecretMessage && isset($decryptedMessage['reply_to_random_id'])) {
+            $this->replyToMsgId = $decryptedMessage['reply_to_random_id'];
+        }
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];
             $this->replyToScheduled = $replyTo['reply_to_scheduled'];

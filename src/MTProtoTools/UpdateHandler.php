@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
@@ -669,6 +670,7 @@ trait UpdateHandler
             return null;
         }
         return match ($info['type']) {
+            API::PEER_TYPE_USER && $message['_'] === 'encryptedMessage' => new SecretMessage($this, $message, $info),
             API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
             API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info),
             API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info),

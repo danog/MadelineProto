@@ -24,6 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 class ActionFlushHistory extends ServiceMessage
 {
+    /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info)
     {
         parent::__construct($API, $rawMessage, $info);

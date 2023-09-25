@@ -116,7 +116,7 @@ abstract class Message extends AbstractMessage
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
 
-        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
+        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? $decryptedMessage['entities']?? []);
         $this->message = $rawMessage['message'] ?? $decryptedMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
         $this->viaBotId = $rawMessage['via_bot_id'] ?? $this->getClient()->getIdInternal($rawMessage['via_bot_name']) ?? null;
@@ -150,6 +150,7 @@ abstract class Message extends AbstractMessage
 
         $this->protected = $this instanceof SecretMessage ? true : $rawMessage['noforwards'];
         $media = $rawMessage['media'] ?? $decryptedMessage['media'] ?? null;
+        $media['file'] = $rawMessage['file'] ?? null;
         $this->media = isset($media)
             ? $API->wrapMedia($media, $this->protected)
             : null;

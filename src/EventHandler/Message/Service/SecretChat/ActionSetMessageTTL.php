@@ -27,6 +27,7 @@ use danog\MadelineProto\MTProto;
  */
 class ActionSetMessageTTL extends ServiceMessage
 {
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage,

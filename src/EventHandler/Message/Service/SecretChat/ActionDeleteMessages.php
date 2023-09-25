@@ -24,6 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 class ActionDeleteMessages extends ServiceMessage
 {
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage,
