@@ -401,6 +401,7 @@ final class SecretChatController implements Stringable
                 $msg['message']['date'] = $response['date'];
                 if (isset($response['file'])) {
                     $msg['message']['file'] = $response['file'];
+                    $update['message']['decrypted_message']['media']['file'] = $response['file'];
                 }
                 $this->outgoing[$request['seq']] = $msg;
                 EventLoop::queue($this->API->saveUpdate(...), $msg);
@@ -413,6 +414,9 @@ final class SecretChatController implements Stringable
     {
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
+            if (isset($update['message']['file'])) {
+                $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
+            }
             $this->API->saveUpdate($update);
             return;
         }
