@@ -46,16 +46,7 @@ abstract class Action implements JsonSerializable
     /** @internal */
     public static function fromRawAction(array $rawAction): Action
     {
-        $type = $rawAction['_'];
-        if ($type === 'sendMessageEmojiInteraction') {
-            return new EmojiTap(
-                $rawAction['emoticon'],
-                $rawAction['interaction']['a']['t'],
-                $rawAction['interaction']['a']['i'],
-                $rawAction['msg_id'],
-            );
-        }
-        return match ($type) {
+        return match ($rawAction['_']) {
             'sendMessageTypingAction' => new Typing,
             'sendMessageCancelAction' => new Cancel,
             'sendMessageGamePlayAction' => new GamePlay,
@@ -73,6 +64,11 @@ abstract class Action implements JsonSerializable
             'sendMessageUploadDocumentAction' => new UploadDocument($rawAction['progress']),
             'sendMessageHistoryImportAction' => new HistoryImport($rawAction['progress']),
             'sendMessageEmojiInteractionSeen' => new EmojiSeen($rawAction['emoticon']),
+            'sendMessageEmojiInteraction' => new EmojiTap(
+                $rawAction['emoticon'],
+                $rawAction['msg_id'],
+                $rawAction['interaction']['a']
+            ),
         };
     }
 
