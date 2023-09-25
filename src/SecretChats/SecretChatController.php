@@ -392,7 +392,7 @@ final class SecretChatController implements Stringable
         $this->randomIdMap[$randomId] = [$seq, true];
     }
 
-    public function handleSent(array $request, array $response): void
+    public function handleSent(array $request, array $response): array
     {
         $lock = $this->sentMutex->acquire((string) $request['seq']);
         try {
@@ -401,11 +401,12 @@ final class SecretChatController implements Stringable
                 $msg['message']['date'] = $response['date'];
                 if (isset($response['file'])) {
                     $msg['message']['file'] = $response['file'];
-                    $update['message']['decrypted_message']['media']['file'] = $response['file'];
+                    $msg['message']['decrypted_message']['media']['file'] = $response['file'];
                 }
                 $this->outgoing[$request['seq']] = $msg;
                 EventLoop::queue($this->API->saveUpdate(...), $msg);
             }
+            return $msg;
         } finally {
             EventLoop::queue($lock->release(...));
         }

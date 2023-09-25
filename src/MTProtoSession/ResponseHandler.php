@@ -257,7 +257,7 @@ trait ResponseHandler
             } elseif ($responseType === 'messages.SentEncryptedMessage') {
                 $body = $request->getBodyOrEmpty();
                 try {
-                    $this->API->getSecretChatController($body['peer'])->handleSent($body, $response);
+                    $response = $this->API->getSecretChatController($body['peer'])->handleSent($body, $response);
                 } catch (SecretPeerNotInDbException) {
                 }
             }
