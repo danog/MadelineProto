@@ -532,7 +532,7 @@ final class GroupMessage extends Message
      *
      * @return void
      */
-    public function enableProtecion(): void
+    public function enableProtection(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'messages.toggleNoForwards',
@@ -548,7 +548,7 @@ final class GroupMessage extends Message
      *
      * @return void
      */
-    public function disableProtecion(): void
+    public function disableProtection(): void
     {
         $this->getClient()->methodCallAsyncRead(
             'messages.toggleNoForwards',
