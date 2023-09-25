@@ -150,7 +150,6 @@ abstract class Message extends AbstractMessage
 
         $this->protected = $this instanceof SecretMessage ? true : $rawMessage['noforwards'];
         $media = $rawMessage['media'] ?? $decryptedMessage['media'] ?? null;
-        $media['file'] = $rawMessage['file'] ?? null;
         $this->media = isset($media)
             ? $API->wrapMedia($media, $this->protected)
             : null;
