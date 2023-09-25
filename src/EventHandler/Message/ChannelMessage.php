@@ -120,7 +120,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Hide message history for new channel/supergroup users.
+     * Hide message history for new channel users.
      *
      * @return void
      */
@@ -136,7 +136,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Unhide message history for new channel/supergroup users.
+     * Unhide message history for new channel users.
      *
      * @return void
      */
@@ -146,6 +146,38 @@ final class ChannelMessage extends Message
             'channels.toggleParticipantsHidden',
             [
                 'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     *
+     * @return void
+     */
+    public function enableProtecion(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
+                'enabled' => true,
+            ]
+        );  
+    }
+
+    /**
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     *
+     * @return void
+     */
+    public function disableProtecion(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
                 'enabled' => false,
             ]
         );

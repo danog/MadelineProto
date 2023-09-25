@@ -34,27 +34,37 @@ abstract class AbstractMessage extends Update implements SimpleFilters
 {
     /** Message ID */
     public readonly int $id;
+
     /** Whether the message is outgoing */
     public readonly bool $out;
+
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
+
     /** ID of the sender of the message */
     public readonly int $senderId;
+
     /** ID of the message to which this message is replying */
     public readonly ?int $replyToMsgId;
+
     /** When was the message sent */
     public readonly int $date;
+
 
     /** ID of the forum topic where the message was sent */
     public readonly ?int $topicId;
 
+
     /** ID of the message thread where the message was sent */
     public readonly ?int $threadId;
 
+
     /** Whether this is a reply to a scheduled message */
     public readonly bool $replyToScheduled;
+
     /** Whether we were mentioned in this message */
     public readonly bool $mentioned;
+
     /** Whether this message was sent without any notification (silently) */
     public readonly bool $silent;
 
@@ -341,9 +351,11 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Set maximum Time-To-Live of all messages in the specified chat.
      *
      * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @return DialogSetTTL
      */
     public function enableTTL(int $seconds = 86400): DialogSetTTL
     {
+        Assert::false($seconds === 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'messages.setHistoryTTL',
@@ -358,6 +370,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Disable Time-To-Live of all messages in the specified chat.
      *
+     * @return DialogSetTTL
      */
     public function disableTTL(): DialogSetTTL
     {
@@ -370,5 +383,37 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         );
         return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Show the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     *
+     * @return boolean
+     */
+    public function enableAutoTranslate(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.togglePeerTranslations',
+            [
+                'peer' => $this->chatId,
+                'disabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Hide the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     *
+     * @return boolean
+     */
+    public function disableAutoTranslate(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.togglePeerTranslations',
+            [
+                'peer' => $this->chatId,
+                'disabled' => true,
+            ]
+        );
     }
 }

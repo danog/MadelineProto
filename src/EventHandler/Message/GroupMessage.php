@@ -526,4 +526,70 @@ final class GroupMessage extends Message
             ]
         );
     }
+
+    /**
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat
+     *
+     * @return void
+     */
+    public function enableProtecion(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
+                'enabled' => true,
+            ]
+        );  
+    }
+
+    /**
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat
+     *
+     * @return void
+     */
+    public function disableProtecion(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
+                'enabled' => false,
+            ]
+        ); 
+    }
+
+    /**
+     * Enable to all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
+     *
+     * @return void
+     */
+    public function enableJoinToComment(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleJoinToSend',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Disable to all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
+     *
+     * @return void
+     */
+    public function disableJoinToComment(): void
+    {
+        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        $this->getClient()->methodCallAsyncRead(
+            'channels.toggleJoinToSend',
+            [
+                'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
 }
