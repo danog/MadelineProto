@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\SecretPeerNotInDbException;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -233,24 +234,33 @@ trait ResponseHandler
             $this->shared->getTempAuthKey()->init(true);
         }
         $botAPI = $request->getBotAPI();
-        if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
-            $body = $request->getBodyOrEmpty();
-            $trimmed = $body;
-            if (isset($trimmed['peer']) && (
-                !\is_array($trimmed['peer'])
-                || (($trimmed['peer']['_'] ?? null) !== 'inputPhoneCall')
-            )) {
+        if (isset($response['_']) && !$this->isCdn()) {
+            $responseType = $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'];
+            if ($responseType === 'Updates') {
+                $body = $request->getBodyOrEmpty();
+                $trimmed = $body;
+                if (isset($trimmed['peer']) && (
+                    !\is_array($trimmed['peer'])
+                    || (($trimmed['peer']['_'] ?? null) !== 'inputPhoneCall')
+                )) {
+                    try {
+                        $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getIdInternal($body['peer']);
+                    } catch (Throwable $e) {
+                    }
+                }
+                if (isset($trimmed['message'])) {
+                    $trimmed['message'] = (string) $body['message'];
+                }
+                $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
+                unset($body);
+                EventLoop::queue($this->API->handleUpdates(...), $response);
+            } elseif ($responseType === 'messages.SentEncryptedMessage') {
+                $body = $request->getBodyOrEmpty();
                 try {
-                    $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getIdInternal($body['peer']);
-                } catch (Throwable $e) {
+                    $response = $this->API->getSecretChatController($body['peer'])->handleSent($body, $response);
+                } catch (SecretPeerNotInDbException) {
                 }
             }
-            if (isset($trimmed['message'])) {
-                $trimmed['message'] = (string) $body['message'];
-            }
-            $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
-            unset($body);
-            EventLoop::queue($this->API->handleUpdates(...), $response);
         }
         $this->gotResponseForOutgoingMessage($request);
 

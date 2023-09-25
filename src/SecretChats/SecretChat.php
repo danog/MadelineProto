@@ -20,18 +20,37 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
+use danog\MadelineProto\Ipc\IpcCapable;
+use danog\MadelineProto\MTProto;
+
 /**
  * Represents a secret chat.
  */
-final class SecretChat
+final class SecretChat extends IpcCapable
 {
     /** Creation date */
     public readonly int $created;
+    /** @internal */
     public function __construct(
+        MTProto $API,
+        /** Secret chat ID */
         public readonly int $chatId,
+        /** Whether we created this chat */
         public readonly bool $creator,
+        /** User ID of the other peer in the chat */
         public readonly int $otherID,
     ) {
+        parent::__construct($API);
         $this->created = \time();
+    }
+
+    /**
+     * Gets a secret chat message.
+     *
+     * @param integer $randomId Secret chat message ID.
+     */
+    public function getMessage(int $randomId): array
+    {
+        return $this->getClient()->getSecretMessage($this->chatId, $randomId);
     }
 }

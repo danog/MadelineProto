@@ -150,6 +150,18 @@ trait AuthKeyHandler
         $chat->notifyLayer();
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
     }
+
+    /**
+     * Gets a secret chat message.
+     *
+     * @param integer $chatId Secret chat ID.
+     * @param integer $randomId Secret chat message ID.
+     */
+    public function getSecretMessage(int $chatId, int $randomId): array
+    {
+        return $this->getSecretChatController($chatId)->getMessage($randomId);
+    }
+
     /**
      * Get secret chat.
      *

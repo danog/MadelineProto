@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\SecretChats;
 
 use Amp\Future;
+use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Logger;
@@ -36,6 +38,7 @@ use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
 use Revolt\EventLoop;
 use Stringable;
+use Webmozart\Assert\Assert;
 
 /**
  * Represents a secret chat.
@@ -60,6 +63,7 @@ final class SecretChatController implements Stringable
     protected static array $dbProperties = [
         'incoming' => ['innerMadelineProto' => true],
         'outgoing' => ['innerMadelineProto' => true],
+        'randomIdMap' => ['innerMadelineProto' => true],
     ];
 
     /**
@@ -70,6 +74,10 @@ final class SecretChatController implements Stringable
      * @var DbArray<int, array>
      */
     private DbArray $outgoing;
+    /**
+     * @var DbArray<int, list{int, bool}> Seq, outgoing
+     */
+    private DbArray $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
     private int $remote_in_seq_no = 0;
@@ -99,6 +107,7 @@ final class SecretChatController implements Stringable
 
     private SecretFeedLoop $feedLoop;
     public readonly SecretChat $public;
+    private LocalKeyedMutex $sentMutex;
     public function __construct(
         private readonly MTProto $API,
         /** @var TKey */
@@ -121,6 +130,7 @@ final class SecretChatController implements Stringable
             $this->out_seq_no_base = 0;
         }
         $this->public = new SecretChat(
+            $API,
             DialogId::fromSecretChatId($id),
             $creator,
             $otherID,
@@ -130,6 +140,7 @@ final class SecretChatController implements Stringable
         $this->feedLoop->start();
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
+        $this->sentMutex = new LocalKeyedMutex;
         $this->init();
     }
 
@@ -150,7 +161,7 @@ final class SecretChatController implements Stringable
     public function __serialize(): array
     {
         $vars = \get_object_vars($this);
-        unset($vars['rekeyMutex'], $vars['encryptMutex']);
+        unset($vars['rekeyMutex'], $vars['encryptMutex'], $vars['sentMutex']);
 
         return $vars;
     }
@@ -162,6 +173,7 @@ final class SecretChatController implements Stringable
         }
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
+        $this->sentMutex = new LocalKeyedMutex;
     }
 
     /**
@@ -335,8 +347,7 @@ final class SecretChatController implements Stringable
                 EventLoop::queue($this->rekey(...));
             }
 
-            $body['data'] = $this->encryptSecretMessageInner($body['message']);
-            unset($body['message']);
+            $this->encryptSecretMessageInner($body);
 
             $promise->finally($lock->release(...));
             return $body;
@@ -345,14 +356,21 @@ final class SecretChatController implements Stringable
             throw $e;
         }
     }
-    private function encryptSecretMessageInner(array $message): string
+    private function encryptSecretMessageInner(array &$body): void
     {
-        $message['random_id'] = Tools::random(8);
-        if ($this->remoteLayer > 8) {
-            $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-            $this->out_seq_no++;
-        }
-        $this->outgoing[$this->out_seq_no] = $message;
+        $message = $body['message'];
+        $randomId = $message['random_id'] = Tools::randomInt();
+        Assert::true($this->remoteLayer > 8);
+        $body['_'] = 'updateNewOutgoingEncryptedMessage';
+        $body['message'] = [
+            '_' => $body['method'] === 'messages.sendEncryptedService'
+                ? 'encryptedMessageService'
+                : 'encryptedMessage',
+            'message' => $message,
+            'chat_id' => $this->id,
+        ]; // Not sent
+        $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
+        $body['seq'] = $seq = $this->out_seq_no++; // Not sent
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
@@ -369,13 +387,37 @@ final class SecretChatController implements Stringable
             [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->key['auth_key'], true);
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
-        return $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
+        $body['data'] = $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
+        $this->outgoing[$seq] = $body;
+        $this->randomIdMap[$randomId] = [$seq, true];
     }
 
+    public function handleSent(array $request, array $response): array
+    {
+        $lock = $this->sentMutex->acquire((string) $request['seq']);
+        try {
+            $msg = $this->outgoing[$request['seq']];
+            if (!isset($msg['message']['date'])) {
+                $msg['message']['date'] = $response['date'];
+                if (isset($response['file'])) {
+                    $msg['message']['file'] = $response['file'];
+                    $msg['message']['decrypted_message']['media']['file'] = $response['file'];
+                }
+                $this->outgoing[$request['seq']] = $msg;
+                EventLoop::queue($this->API->saveUpdate(...), $msg);
+            }
+            return $msg;
+        } finally {
+            EventLoop::queue($lock->release(...));
+        }
+    }
     private function handleDecryptedUpdate(array $update): void
     {
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
+            if (isset($update['message']['file'])) {
+                $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
+            }
             $this->API->saveUpdate($update);
             return;
         }
@@ -412,17 +454,7 @@ final class SecretChatController implements Stringable
                 case 'decryptedMessageActionNoop':
                     return;
                 case 'decryptedMessageActionResend':
-                    $action['start_seq_no'] -= $this->out_seq_no_base;
-                    $action['end_seq_no'] -= $this->out_seq_no_base;
-                    $action['start_seq_no'] >>= 1;
-                    $action['end_seq_no'] >>= 1;
-                    $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
-                    for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
-                        $this->API->methodCallAsyncRead('messages.sendEncrypted', [
-                            'peer' => $this->id,
-                            'message' => $this->outgoing[$seq]
-                        ]);
-                    }
+                    $this->handleResend($action);
                     return;
                 default:
                     $this->API->saveUpdate($update);
@@ -430,6 +462,22 @@ final class SecretChatController implements Stringable
             return;
         }
         throw new ResponseException('Unrecognized decrypted message received: '.\var_export($update, true));
+    }
+    private function handleResend(array &$action): void
+    {
+        if (isset($action['handled'])) {
+            return;
+        }
+        $action['start_seq_no'] -= $this->out_seq_no_base;
+        $action['end_seq_no'] -= $this->out_seq_no_base;
+        $action['start_seq_no'] >>= 1;
+        $action['end_seq_no'] >>= 1;
+        $action['handled'] = true;
+        $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
+        for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
+            $msg = $this->outgoing[$seq];
+            $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);
+        }
     }
     /**
      * Handle encrypted update.
@@ -503,7 +551,8 @@ final class SecretChatController implements Stringable
                     }
                 }
                 $message['message']['decrypted_message'] = $message['message']['decrypted_message']['message'];
-                $this->incoming[$this->in_seq_no++] = $message;
+                $this->incoming[$seq = $this->in_seq_no++] = $message;
+                $this->randomIdMap[$message['message']['decrypted_message']['random_id']] = [$seq, false];
                 $this->handleDecryptedUpdate($message);
             }
         } else {
@@ -578,7 +627,6 @@ final class SecretChatController implements Stringable
         $this->remote_in_seq_no = $seqno;
     }
 
-
     private ?int $gapEnd = null;
     private ?int $gapQueueSeq = null;
     private array $gapQueue = [];
@@ -596,20 +644,26 @@ final class SecretChatController implements Stringable
         }
         if ($seqno > $C_plus_one) {
             // > C+1
+            if ($message['message']['decrypted_message']['message']['_'] === 'decryptedMessageService'
+                && $message['message']['decrypted_message']['message']['action']['_'] === 'decryptedMessageActionResend'
+            ) {
+                $this->handleResend($message['message']['decrypted_message']['message']['action']);
+            }
             if ($this->gapEnd !== null) {
                 // Already recovering gap...
-                $C_plus_one = $this->gapQueueSeq;
-                if ($seqno < $C_plus_one) {
+                $C_plus_one_gap = $this->gapQueueSeq;
+                if ($seqno < $C_plus_one_gap) {
                     // <= C
                     $this->API->logger->logger("WARNING: dropping repeated message in $this with seqno $seqno while recovering gaps");
                     return;
                 }
-                if ($seqno > $C_plus_one) {
+                if ($seqno > $C_plus_one_gap) {
                     // > C+1
-                    $this->API->logger->logger("Discarding $this because out_seq_no gap detected: ($seqno > $C_plus_one), but already recovering gap!", Logger::LEVEL_FATAL);
+                    $this->API->logger->logger("Discarding $this because out_seq_no gap detected: ($seqno > $C_plus_one_gap), but already recovering gap!", Logger::LEVEL_FATAL);
                     $this->discard();
                     throw new SecurityException("Additional out_seq_no gap detected!");
                 }
+                $this->API->logger->logger("WARNING: queueing message $seqno in $this while recovering gaps");
                 $this->gapQueue []= $message;
                 $this->gapQueueSeq = $seqno+1;
                 return;
@@ -620,8 +674,8 @@ final class SecretChatController implements Stringable
             $this->gapQueueSeq = $seqno+1;
             $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
                 '_' => 'decryptedMessageActionResend',
-                'start_seq_no' => $this->in_seq_no,
-                'end_seq_no' => $this->gapEnd
+                'start_seq_no' => $C_plus_one * 2 + $this->in_seq_no_base,
+                'end_seq_no' => $this->gapEnd * 2 + $this->in_seq_no_base
             ]]]);
             return;
         }
@@ -643,6 +697,15 @@ final class SecretChatController implements Stringable
         return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
     }
 
+    public function getMessage(int $random_id): array
+    {
+        $result = $this->randomIdMap[$random_id];
+        if ($result === null) {
+            throw new AssertionError("The secret message with ID $random_id does not exist!");
+        }
+        [$seq, $outgoing] = $result;
+        return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
+    }
     public function __toString(): string
     {
         return "secret chat {$this->id}";

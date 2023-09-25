@@ -171,7 +171,12 @@ abstract class EventHandler extends AbstractAPI
                 }
                 $closure = $this->$method(...);
                 $method_name = \lcfirst(\substr($method, 2));
-                if (($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
+                if ((
+                    ($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update'
+                )
+                    || $method_name === 'updateBroadcastProgress'
+                    || $method_name === 'updateNewOutgoingEncryptedMessage'
+                ) {
                     $methods[$method_name] = [
                         static function (array $update) use ($basic_handler, $closure): void {
                             EventLoop::queue($basic_handler, $update, $closure);

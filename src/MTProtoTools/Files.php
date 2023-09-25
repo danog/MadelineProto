@@ -720,28 +720,33 @@ trait Files
                 // Secret media
                 // no break
             case 'encryptedMessage':
-                if ($messageMedia['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
-                    return $this->getDownloadInfo($messageMedia['decrypted_message']['media']);
+                if ($messageMedia['decrypted_message']['media']['_'] !== 'decryptedMessageMediaExternalDocument') {
+                    $messageMedia['decrypted_message']['media']['file'] = $messageMedia['file'];
                 }
+                return $this->getDownloadInfo($messageMedia['decrypted_message']['media']);
+            case 'decryptedMessageMediaPhoto':
+            case 'decryptedMessageMediaVideo':
+            case 'decryptedMessageMediaDocument':
+            case 'decryptedMessageMediaAudio':
                 $res['InputFileLocation'] = ['_' => 'inputEncryptedFileLocation', 'id' => $messageMedia['file']['id'], 'access_hash' => $messageMedia['file']['access_hash'], 'dc_id' => $messageMedia['file']['dc_id']];
-                $res['size'] = $messageMedia['decrypted_message']['media']['size'];
+                $res['size'] = $messageMedia['size'];
                 $res['key_fingerprint'] = $messageMedia['file']['key_fingerprint'];
-                $res['key'] = $messageMedia['decrypted_message']['media']['key'];
-                $res['iv'] = $messageMedia['decrypted_message']['media']['iv'];
-                if (isset($messageMedia['decrypted_message']['media']['file_name'])) {
-                    $pathinfo = \pathinfo($messageMedia['decrypted_message']['media']['file_name']);
+                $res['key'] = $messageMedia['key'];
+                $res['iv'] = $messageMedia['iv'];
+                if (isset($messageMedia['file_name'])) {
+                    $pathinfo = \pathinfo($messageMedia['file_name']);
                     if (isset($pathinfo['extension'])) {
                         $res['ext'] = '.'.$pathinfo['extension'];
                     }
                     $res['name'] = $pathinfo['filename'];
                 }
-                if (isset($messageMedia['decrypted_message']['media']['mime_type'])) {
-                    $res['mime'] = $messageMedia['decrypted_message']['media']['mime_type'];
-                } elseif ($messageMedia['decrypted_message']['media']['_'] === 'decryptedMessageMediaPhoto') {
+                if (isset($messageMedia['mime_type'])) {
+                    $res['mime'] = $messageMedia['mime_type'];
+                } elseif ($messageMedia['_'] === 'decryptedMessageMediaPhoto') {
                     $res['mime'] = 'image/jpeg';
                 }
-                if (isset($messageMedia['decrypted_message']['media']['attributes'])) {
-                    foreach ($messageMedia['decrypted_message']['media']['attributes'] as $attribute) {
+                if (isset($messageMedia['attributes'])) {
+                    foreach ($messageMedia['attributes'] as $attribute) {
                         switch ($attribute['_']) {
                             case 'documentAttributeFilename':
                                 $pathinfo = \pathinfo($attribute['file_name']);

@@ -53,25 +53,6 @@ final class API extends AbstractAPI
      */
     public const RELEASE = '8.0.0-beta152';
     /**
-     * Secret chat was not found.
-     *
-     * @var int
-     */
-    public const SECRET_EMPTY = 0;
-    /**
-     * Secret chat was requested.
-     *
-     * @var int
-     */
-    public const SECRET_REQUESTED = 1;
-    /**
-     * Secret chat was found.
-     *
-     * @var int
-     */
-    public const SECRET_READY = 2;
-
-    /**
      * We're not logged in.
      *
      * @var int
