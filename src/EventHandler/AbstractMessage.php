@@ -347,12 +347,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Set maximum Time-To-Live of all messages in the specified chat.
      *
-     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @param positive-integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @throws InvalidArgumentException
      * @return DialogSetTTL
      */
     public function enableTTL(int $seconds = 86400): DialogSetTTL
     {
-        Assert::false($seconds === 0);
+        Assert::false($seconds <= 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'messages.setHistoryTTL',
