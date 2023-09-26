@@ -1064,24 +1064,24 @@ trait UpdateHandler
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
-            EventLoop::queue(function () use ($update): void {
-                if (isset($update['qts'])) {
-                    $cur_state = ($this->loadUpdateState());
-                    if ($cur_state->qts() === -1) {
-                        $cur_state->qts($update['qts']);
-                    }
-                    if ($update['qts'] < $cur_state->qts()) {
-                        $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
-                        return;
-                    }
-                    if ($update['qts'] > $cur_state->qts() + 1) {
-                        $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
-                        $this->updaters[UpdateLoop::GENERIC]->resume();
-                        return;
-                    }
-                    $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
-                    $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
+            if (isset($update['qts'])) {
+                $cur_state = ($this->loadUpdateState());
+                if ($cur_state->qts() === -1) {
+                    $cur_state->qts($update['qts']);
                 }
+                if ($update['qts'] < $cur_state->qts()) {
+                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                    return;
+                }
+                if ($update['qts'] > $cur_state->qts() + 1) {
+                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], Logger::ERROR);
+                    $this->updaters[UpdateLoop::GENERIC]->resume();
+                    return;
+                }
+                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
+                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
+            }
+            EventLoop::queue(function () use ($update): void {
                 if (!isset($this->secretChats[$update['message']['chat_id']])) {
                     $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
                     return;

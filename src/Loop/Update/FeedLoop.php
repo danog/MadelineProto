@@ -78,7 +78,7 @@ final class FeedLoop extends Loop
         $this->updater = $this->API->updaters[$this->channelId];
         $this->state = $this->channelId === self::GENERIC ? $this->API->loadUpdateState() : $this->API->loadChannelState($this->channelId);
 
-        $this->API->logger->logger("Resumed {$this}");
+        $this->API->logger("Resumed {$this}");
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;
             $this->incomingUpdates = [];
@@ -107,7 +107,7 @@ final class FeedLoop extends Loop
             $update = $updates[$key];
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
-                $this->API->logger->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
+                $this->API->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
                 $this->updater->resume();
                 continue;
             }
@@ -117,7 +117,7 @@ final class FeedLoop extends Loop
                     $mid = $update['message']['id'] ?? '-';
                     $mypts = $this->state->pts();
                     $computed = $mypts + $pts_count;
-                    $this->API->logger->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", Logger::ULTRA_VERBOSE);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
@@ -225,7 +225,7 @@ final class FeedLoop extends Loop
                     if ($entities) {
                         $log .= 'entities '.\json_encode($update['message']['entities']).', ';
                     }
-                    $this->API->logger->logger("Not enough data: for message update {$log}, getting difference...", Logger::VERBOSE);
+                    $this->API->logger("Not enough data: for message update {$log}, getting difference...", Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
                     if ($channelId && $to) {
                         $channelId = self::GENERIC;
@@ -234,7 +234,7 @@ final class FeedLoop extends Loop
                 break;
             default:
                 if ($channelId && !($this->API->peerIsset(DialogId::fromSupergroupOrChannel($channelId)))) {
-                    $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
+                    $this->API->logger('Skipping update, I do not have the channel id '.$channelId, Logger::ERROR);
                     return false;
                 }
                 break;
@@ -246,7 +246,7 @@ final class FeedLoop extends Loop
                 return $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
-        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);
+        $this->API->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);
         if ($update['_'] === 'updateLoginToken') {
             $this->API->saveUpdate($update);
             return $this->channelId;
@@ -262,11 +262,11 @@ final class FeedLoop extends Loop
     {
         foreach ($messages as $message) {
             if (!$this->API->checkMsgId($message)) {
-                $this->API->logger->logger("MSGID duplicate ({$message['id']}) in {$this}");
+                $this->API->logger("MSGID duplicate ({$message['id']}) in {$this}");
                 continue;
             }
             if ($message['_'] !== 'messageEmpty') {
-                $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", Logger::VERBOSE);
+                $this->API->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", Logger::VERBOSE);
             }
             $this->parsedUpdates[] = ['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }

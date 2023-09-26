@@ -63,7 +63,7 @@ final class SeqLoop extends Loop
         }
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
         $this->state = $this->API->loadUpdateState();
-        $this->logger->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
+        $this->API->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;
             $this->incomingUpdates = [];
@@ -93,7 +93,7 @@ final class SeqLoop extends Loop
             $seq_end = $options['seq_end'];
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
+                $this->API->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
                 delay(1);
                 if (!$this->incomingUpdates) {
                     $this->API->updaters[UpdateLoop::GENERIC]->resume();
@@ -102,7 +102,7 @@ final class SeqLoop extends Loop
                 continue;
             }
             if ($result < 0) {
-                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
+                $this->API->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
                 continue;
             }
             $this->state->seq($seq_end);
@@ -117,7 +117,7 @@ final class SeqLoop extends Loop
      */
     public function feed(array $updates): void
     {
-        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', Logger::VERBOSE);
+        $this->API->logger('Was fed updates of type '.$updates['_'].'...', Logger::VERBOSE);
         $this->incomingUpdates[] = $updates;
     }
     /**

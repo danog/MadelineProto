@@ -179,7 +179,7 @@ final class DataCenterConnection implements JsonSerializable
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+                        $logger->logger(\sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 } else {
@@ -188,7 +188,7 @@ final class DataCenterConnection implements JsonSerializable
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+                        $logger->logger(\sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 }
@@ -304,6 +304,16 @@ final class DataCenterConnection implements JsonSerializable
         return $this->permAuthKey;
     }
     /**
+     * Check if needs auth.
+     */
+    public function needsAuth(): bool
+    {
+        if ($this->API->isCdn($this->datacenter)) {
+            return !$this->hasTempAuthKey();
+        }
+        return !$this->hasTempAuthKey() || !$this->isBound();
+    }
+    /**
      * Check if has temporary authorization key.
      */
     public function hasTempAuthKey(): bool
@@ -410,7 +420,7 @@ final class DataCenterConnection implements JsonSerializable
         if (!isset($this->datacenter)) {
             return;
         }
-        $this->API->logger->logger("Flushing pending messages, DC {$this->datacenter}", Logger::NOTICE);
+        $this->API->logger("Flushing pending messages, DC {$this->datacenter}", Logger::NOTICE);
         foreach ($this->connections as $socket) {
             $socket->flush();
         }
@@ -445,7 +455,7 @@ final class DataCenterConnection implements JsonSerializable
         $this->decWrite = self::WRITE_WEIGHT;
         if ($id === -1 || !isset($this->connections[$id])) {
             if ($this->connections) {
-                $this->API->logger->logger('Already connected!', Logger::WARNING);
+                $this->API->logger('Already connected!', Logger::WARNING);
                 return;
             }
             $f = new DeferredFuture;
@@ -497,7 +507,7 @@ final class DataCenterConnection implements JsonSerializable
             $list .= $message->getConstructor();
             $list .= ', ';
         }
-        $this->API->logger->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
+        $this->API->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
         $this->backup = \array_merge($this->backup, $backup);
         unset($this->connections[$id], $this->availableConnections[$id]);
     }
@@ -511,7 +521,7 @@ final class DataCenterConnection implements JsonSerializable
         if (!isset($this->ctx)) {
             return;
         }
-        $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");
+        $this->API->logger("Disconnecting from shared DC {$this->datacenter}");
         if ($this->robinLoop) {
             $this->robinLoop->stop();
             $this->robinLoop = null;
@@ -521,7 +531,7 @@ final class DataCenterConnection implements JsonSerializable
             $connection->disconnect();
         }
         $count = \count($this->backup) - $before;
-        $this->API->logger->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->datacenter}");
+        $this->API->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->datacenter}");
         $this->connections = [];
         $this->availableConnections = [];
     }
@@ -530,7 +540,7 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function reconnect(): void
     {
-        $this->API->logger->logger("Reconnecting shared DC {$this->datacenter}");
+        $this->API->logger("Reconnecting shared DC {$this->datacenter}");
         $this->disconnect();
         $this->connect();
     }
@@ -542,7 +552,7 @@ final class DataCenterConnection implements JsonSerializable
         $backup = $this->backup;
         $this->backup = [];
         $count = \count($backup);
-        $this->API->logger->logger("Restoring {$count} messages to DC {$this->datacenter}");
+        $this->API->logger("Restoring {$count} messages to DC {$this->datacenter}");
         /** @var MTProtoOutgoingMessage */
         foreach ($backup as $message) {
             if ($message->hasSeqno()) {
@@ -552,10 +562,10 @@ final class DataCenterConnection implements JsonSerializable
                 $message->setMsgId(null);
             }
             if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                $this->API->logger->logger("Resending $message to DC {$this->datacenter}");
+                $this->API->logger("Resending $message to DC {$this->datacenter}");
                 EventLoop::queue($this->getConnection()->sendMessage(...), $message);
             } else {
-                $this->API->logger->logger("Dropping $message to DC {$this->datacenter}");
+                $this->API->logger("Dropping $message to DC {$this->datacenter}");
             }
         }
     }

@@ -30,15 +30,6 @@ trait LoggerLoop
     private bool $logPauses = true;
 
     /**
-     * Constructor.
-     *
-     * @param Logger $logger Logger instance
-     */
-    public function __construct(private Logger $logger)
-    {
-    }
-
-    /**
      * Report pause, can be overriden for logging.
      *
      * @param float $timeout Pause duration, 0 = forever
@@ -46,7 +37,7 @@ trait LoggerLoop
     protected function reportPause(float $timeout): void
     {
         $timeout = $timeout ? "for $timeout" : "until resume";
-        $this->logger->logger("Pausing $this $timeout...", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Pausing $this $timeout...", Logger::ULTRA_VERBOSE);
     }
 
     /**
@@ -54,14 +45,14 @@ trait LoggerLoop
      */
     protected function startedLoop(): void
     {
-        $this->logger->logger("Started $this!", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Started $this!", Logger::ULTRA_VERBOSE);
     }
     /**
      * Signal that loop has exited.
      */
     protected function exitedLoop(): void
     {
-        $this->logger->logger("Exited $this!", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Exited $this!", Logger::ULTRA_VERBOSE);
     }
     /**
      * Get loop name.

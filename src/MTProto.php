@@ -27,6 +27,7 @@ use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
+use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
@@ -657,6 +658,9 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
+        if (empty($file)) {
+            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        }
         ($this->logger ?? Logger::$default)->logger($param, $level, $file);
     }
     /**
@@ -787,6 +791,8 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function cleanupProperties(): void
     {
+        $this->acceptChatMutex ??= new LocalKeyedMutex;
+        $this->confirmChatMutex ??= new LocalKeyedMutex;
         $this->channels_state ??= new CombinedUpdatesState;
         $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;

@@ -44,7 +44,7 @@ final class HttpWaitLoop extends Loop
         if (!$this->shared->hasTempAuthKey()) {
             return self::PAUSE;
         }
-        $this->logger->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
+        $this->API->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
         if ($this->connection->countHttpSent() === $this->connection->countHttpReceived() && (!empty($this->connection->pendingOutgoing) || !empty($this->connection->new_outgoing) && !$this->connection->hasPendingCalls())) {
             $this->connection->sendMessage(
                 new MTProtoOutgoingMessage(
@@ -56,7 +56,7 @@ final class HttpWaitLoop extends Loop
                 ),
             );
         }
-        $this->logger->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
+        $this->API->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
         return self::PAUSE;
     }
     /**

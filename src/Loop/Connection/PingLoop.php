@@ -54,17 +54,17 @@ final class PingLoop extends Loop
     public function loop(): ?float
     {
         if (!$this->shared->hasTempAuthKey()) {
-            $this->logger->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
+            $this->API->logger("Waiting for temp key in {$this}", Logger::LEVEL_ULTRA_VERBOSE);
             return self::PAUSE;
         }
 
         EventLoop::queue(function (): void {
-            $this->logger->logger("Ping DC {$this->datacenter}");
+            $this->API->logger("Ping DC {$this->datacenter}");
             try {
                 $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => \random_bytes(8), 'disconnect_delay' => $this->timeoutDisconnect]);
             } catch (Throwable $e) {
-                $this->logger->logger("Error while pinging DC {$this->datacenter}");
-                $this->logger->logger((string) $e);
+                $this->API->logger("Error while pinging DC {$this->datacenter}");
+                $this->API->logger((string) $e);
             }
         });
         return $this->timeout;

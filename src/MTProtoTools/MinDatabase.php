@@ -141,7 +141,7 @@ final class MinDatabase implements TLCallback
     public function reset(): void
     {
         if ($this->cache) {
-            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
+            $this->API->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
             $this->cache = [];
         }
     }
@@ -172,7 +172,7 @@ final class MinDatabase implements TLCallback
             default:
                 $peers[$this->API->getIdInternal($location)] = true;
         }
-        $this->API->logger->logger("Caching peer location info from location from {$location['_']}", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Caching peer location info from location from {$location['_']}", Logger::ULTRA_VERBOSE);
         $key = \count($this->cache) - 1;
         foreach ($peers as $id => $true) {
             $this->cache[$key][$id] = $id;
@@ -181,7 +181,7 @@ final class MinDatabase implements TLCallback
     }
     public function addOriginContext(string $type): void
     {
-        $this->API->logger->logger("Adding peer origin context for {$type}!", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Adding peer origin context for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cache[] = [];
     }
     public function addOrigin(array $data = []): void
@@ -207,7 +207,7 @@ final class MinDatabase implements TLCallback
             $this->pendingDb[$id] = $origin;
             EventLoop::queue($this->flush(...), $id);
         }
-        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
+        $this->API->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', Logger::ULTRA_VERBOSE);
     }
     private function flush(int $id): void
     {
@@ -239,12 +239,12 @@ final class MinDatabase implements TLCallback
             $new['_'] .= 'FromMessage';
             $new['peer'] = $this->API->getInputPeer($new['peer']);
             if (($new['peer']['min'] ?? false)) {
-                $this->API->logger->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
+                $this->API->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
                 return $object;
             }
             return $new;
         }
-        $this->API->logger->logger("Don't have origin info with min peer {$id}, this may fail");
+        $this->API->logger("Don't have origin info with min peer {$id}, this may fail");
         return $object;
     }
 

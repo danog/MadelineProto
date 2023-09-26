@@ -67,7 +67,7 @@ final class SecretFeedLoop extends Loop
      */
     public function loop(): ?float
     {
-        $this->logger->logger("Resumed {$this}");
+        $this->API->logger("Resumed {$this}");
         while ($this->incomingUpdates) {
             $updates = $this->incomingUpdates;
             $this->incomingUpdates = [];
@@ -75,7 +75,7 @@ final class SecretFeedLoop extends Loop
                 try {
                     $this->secretChat->handleEncryptedUpdate($update);
                 } catch (SecurityException $e) {
-                    $this->logger->logger("Secret chat deleted, exiting $this...");
+                    $this->API->logger("Secret chat deleted, exiting $this...");
                     throw $e;
                 }
             }

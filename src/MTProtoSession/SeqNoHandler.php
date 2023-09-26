@@ -38,7 +38,7 @@ trait SeqNoHandler
         $in = $contentRelated ? 1 : 0;
         $value = $this->session_out_seq_no;
         $this->session_out_seq_no += $in;
-        //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
+        //$this->API->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
     public function checkInSeqNo(MTProtoIncomingMessage $message): void
@@ -49,7 +49,7 @@ trait SeqNoHandler
                 if ($message->isContentRelated()) {
                     $this->session_in_seq_no -= 1;
                 }
-                $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$message->getSeqNo().", $message)", Logger::ULTRA_VERBOSE);
+                $this->API->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$message->getSeqNo().", $message)", Logger::ULTRA_VERBOSE);
             }
         }
     }
@@ -58,7 +58,7 @@ trait SeqNoHandler
         $in = $contentRelated ? 1 : 0;
         $value = $this->session_in_seq_no;
         $this->session_in_seq_no += $in;
-        //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
+        //$this->API->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
 }

@@ -53,15 +53,15 @@ final class WriteLoop extends Loop
         $please_wait = false;
         while (true) {
             if ($this->connection->shouldReconnect()) {
-                $this->logger->logger("Exiting $this because connection is old");
+                $this->API->logger("Exiting $this because connection is old");
                 return self::STOP;
             }
             if (!$this->connection->pendingOutgoing) {
-                $this->logger->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
+                $this->API->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
                 return self::PAUSE;
             }
             if ($please_wait) {
-                $this->logger->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
                 return self::PAUSE;
             }
             $this->connection->writing(true);
@@ -71,15 +71,15 @@ final class WriteLoop extends Loop
                     : $this->unencryptedWriteLoop();
             } catch (StreamException $e) {
                 if ($this->connection->shouldReconnect()) {
-                    $this->logger->logger("Stopping $this because we have to reconnect");
+                    $this->API->logger("Stopping $this because we have to reconnect");
                     return self::STOP;
                 }
                 EventLoop::queue(function () use ($e): void {
-                    $this->logger->logger($e);
-                    $this->logger->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+                    $this->API->logger($e);
+                    $this->API->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
                 });
-                $this->logger->logger("Stopping $this");
+                $this->API->logger("Stopping $this");
                 return self::STOP;
             } finally {
                 $this->connection->writing(false);
@@ -102,7 +102,7 @@ final class WriteLoop extends Loop
                     continue;
                 }
                 $skipped_all = false;
-                $this->logger->logger("Sending $message as unencrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Sending $message as unencrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
                 $message_id = $message->getMsgId() ?? $this->connection->msgIdHandler->generateMessageId();
                 $length = \strlen($message->getSerializedBody());
                 $pad_length = -$length & 15;
@@ -112,7 +112,7 @@ final class WriteLoop extends Loop
                 $buffer->bufferWrite("\0\0\0\0\0\0\0\0".Tools::packSignedLong($message_id).Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
                 $this->connection->httpSent();
 
-                $this->logger->logger("Sent $message as unencrypted message to DC $this->datacenter!", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Sent $message as unencrypted message to DC $this->datacenter!", Logger::ULTRA_VERBOSE);
 
                 unset($this->connection->pendingOutgoing[$k]);
                 $message->setMsgId($message_id);
@@ -157,7 +157,7 @@ final class WriteLoop extends Loop
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
-                    $this->logger->logger("Skipping resending of $message, we already got a reply in DC $this->datacenter");
+                    $this->API->logger("Skipping resending of $message, we already got a reply in DC $this->datacenter");
                     continue;
                 }
                 if ($message instanceof Container) {
@@ -166,7 +166,7 @@ final class WriteLoop extends Loop
                 }
                 $constructor = $message->getConstructor();
                 if ($this->shared->getGenericSettings()->getAuth()->getPfs() && !$this->shared->isBound() && !$this->connection->isCDN() && $message->isMethod() && !\in_array($constructor, ['http_wait', 'auth.bindTempAuthKey'], true)) {
-                    $this->logger->logger("Skipping $message due to unbound keys in DC $this->datacenter");
+                    $this->API->logger("Skipping $message due to unbound keys in DC $this->datacenter");
                     $skipped = true;
                     continue;
                 }
@@ -175,7 +175,7 @@ final class WriteLoop extends Loop
                 }
                 if ($constructor === 'msgs_state_req') {
                     if ($has_state) {
-                        $this->logger->logger("Already have a state request queued for the current container in DC {$this->datacenter}");
+                        $this->API->logger("Already have a state request queued for the current container in DC {$this->datacenter}");
                         continue;
                     }
                     $has_state = true;
@@ -190,7 +190,7 @@ final class WriteLoop extends Loop
                 $body_length = \strlen($message->getSerializedBody());
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760 || $count >= 1020) {
-                    $this->logger->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
+                    $this->API->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
                     break;
                 }
                 if ($message->hasSeqNo()) {
@@ -198,7 +198,7 @@ final class WriteLoop extends Loop
                 }
 
                 $message_id = $message->getMsgId() ?? $this->connection->msgIdHandler->generateMessageId();
-                $this->logger->logger("Sending $message as encrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Sending $message as encrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
                 $MTmessage = [
                     '_' => 'MTmessage',
                     'msg_id' => $message_id,
@@ -208,17 +208,17 @@ final class WriteLoop extends Loop
                 if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
-                            $this->logger->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
+                            $this->API->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
                             $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                         } else {
-                            $this->logger->logger("Skipping $message due to uninited connection in DC $this->datacenter");
+                            $this->API->logger("Skipping $message due to uninited connection in DC $this->datacenter");
                             $skipped = true;
                             continue;
                         }
                     } elseif ($message->hasQueue()) {
                         $queueId = $message->getQueueId();
                         if (isset($this->connection->callQueue[$queueId])) {
-                            $this->logger->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
+                            $this->API->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
                             $MTmessage['body'] = $this->API->getTL()->serializeMethod(
                                 'invokeAfterMsg',
                                 [
@@ -227,7 +227,7 @@ final class WriteLoop extends Loop
                                 ]
                             );
                         } else {
-                            $this->logger->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
+                            $this->API->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
                         }
                         $this->connection->callQueue[$queueId] = $message_id;
                     }
@@ -236,7 +236,7 @@ final class WriteLoop extends Loop
                     if ($this->API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->API->settings['requests']['gzip_encode_if_gt']) {
                         if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
                             $MTmessage['body'] = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'gzip_packed', 'packed_data' => $gzipped], 'gzipped data');
-                            $this->logger->logger('Using GZIP compression for ' . $constructor . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                            $this->API->logger('Using GZIP compression for ' . $constructor . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                         }
                         unset($gzipped);
                     }*/
@@ -244,7 +244,7 @@ final class WriteLoop extends Loop
                 $body_length = \strlen($MTmessage['body']);
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760) {
-                    $this->logger->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
+                    $this->API->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
                     break;
                 }
                 $count++;
@@ -260,7 +260,7 @@ final class WriteLoop extends Loop
 
             $acks = \array_slice($this->connection->ack_queue, 0, self::MAX_COUNT);
             if ($ackCount = \count($acks)) {
-                $this->logger->logger('Adding msgs_ack', Logger::ULTRA_VERBOSE);
+                $this->API->logger('Adding msgs_ack', Logger::ULTRA_VERBOSE);
 
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack', 'msg_ids' => $acks], 'msgs_ack');
                 $messages []= [
@@ -274,7 +274,7 @@ final class WriteLoop extends Loop
                 unset($acks, $body);
             }
             if ($this->connection->isHttp() && !$has_http_wait) {
-                $this->logger->logger('Adding http_wait', Logger::ULTRA_VERBOSE);
+                $this->API->logger('Adding http_wait', Logger::ULTRA_VERBOSE);
                 $body = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait');
                 $messages []= [
                     '_' => 'MTmessage',
@@ -288,7 +288,7 @@ final class WriteLoop extends Loop
             }
 
             if ($count > 1 || $has_seq) {
-                $this->logger->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
                 $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(\array_values($keys));
                 $keys[$this->connection->pendingOutgoingKey++] = $message_id;
@@ -302,7 +302,7 @@ final class WriteLoop extends Loop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $this->logger->logger("NO MESSAGE SENT in $this, pending ".\implode(', ', \array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
+                $this->API->logger("NO MESSAGE SENT in $this, pending ".\implode(', ', \array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
                 return true;
             }
             unset($messages);
@@ -318,7 +318,7 @@ final class WriteLoop extends Loop
             $buffer = $this->connection->stream->getWriteBuffer(\strlen($message));
             $buffer->bufferWrite($message);
             $this->connection->httpSent();
-            $this->logger->logger("Sent encrypted payload to DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
+            $this->API->logger("Sent encrypted payload to DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
 
             if ($ackCount) {
                 $this->connection->ack_queue = \array_slice($this->connection->ack_queue, $ackCount);

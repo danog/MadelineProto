@@ -378,7 +378,7 @@ final class DataCenter
     public function getDataCenterConnection(int $dc): DataCenterConnection
     {
         if (!isset($this->sockets[$dc]) || !$this->sockets[$dc]->hasCtx()) {
-            $this->API->logger->logger("Acquiring connect lock for $dc!", Logger::VERBOSE);
+            $this->API->logger("Acquiring connect lock for $dc!", Logger::VERBOSE);
             $lock = $this->connectMutex->acquire((string) $dc);
             try {
                 if (isset($this->sockets[$dc]) && $this->sockets[$dc]->hasCtx()) {
@@ -386,7 +386,7 @@ final class DataCenter
                 }
                 $ctxs = $this->generateContexts($dc);
 
-                $this->API->logger->logger("Connecting to DC {$dc}", Logger::WARNING);
+                $this->API->logger("Connecting to DC {$dc}", Logger::WARNING);
                 $this->sockets[$dc] ??= new DataCenterConnection();
                 $this->sockets[$dc]->setExtra($this->API, $dc, $ctxs);
                 $this->sockets[$dc]->connect();

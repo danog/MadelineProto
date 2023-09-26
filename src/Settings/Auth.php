@@ -90,11 +90,11 @@ final class Auth extends SettingsAbstract
     /**
      * Set max tries for generating auth key.
      *
-     * @param int $maxAuthTries Max tries for generating auth key
+     * @param int<1, max> $maxAuthTries Max tries for generating auth key
      */
     public function setMaxAuthTries(int $maxAuthTries): self
     {
-        $this->maxAuthTries = $maxAuthTries;
+        $this->maxAuthTries = \max(1, $maxAuthTries);
 
         return $this;
     }

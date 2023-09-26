@@ -74,7 +74,7 @@ trait CallHandler
                     EventLoop::queue($this->sendMessage(...), $message, false);
                 }
             } else {
-                $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
+                $this->API->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
             }
         }
         if (!$postpone) {
@@ -117,7 +117,7 @@ trait CallHandler
         }
         $file = \in_array($method, ['upload.saveFilePart', 'upload.saveBigFilePart', 'upload.getFile', 'upload.getCdnFile'], true);
         if ($file && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
-            $this->logger->logger('Using media DC');
+            $this->API->logger('Using media DC');
             $aargs['datacenter'] = -$this->datacenter;
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
@@ -126,9 +126,10 @@ trait CallHandler
                 $aargs['multiple'] = true;
             }
             if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+                $peer = $args['peer'];
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
-                $aargs['queue'] = $method.' '.$this->API->getId($args['peer']);
+                $aargs['queue'] = $method.' '.$this->API->getId($peer);
                 $aargs['multiple'] = true;
             }
             if (isset($aargs['multiple'])) {

@@ -127,7 +127,7 @@ final class InternalState
                     try {
                         $this->API->getInfo($id);
                     } catch (Throwable $e) {
-                        $this->API->logger->logger("An error occurred while getting info about whitelisted peer $id: $e", Logger::ERROR);
+                        $this->API->logger("An error occurred while getting info about whitelisted peer $id: $e", Logger::ERROR);
                     }
                 }
             }
@@ -189,7 +189,7 @@ final class InternalState
                         // The finally block will still be executed
                         return;
                     }
-                    $this->API->logger->logger("An error occurred while broadcasting: $e", Logger::ERROR);
+                    $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
                 } finally {
                     if ($this->cancellation->isCancelled()) {
                         $this->setStatus(StatusInternal::CANCELLED);

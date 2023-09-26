@@ -99,7 +99,7 @@ trait Session
      */
     public function resetSession(): void
     {
-        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", Logger::WARNING);
+        $this->API->logger("Resetting session in DC {$this->datacenterId}...", Logger::WARNING);
         $this->session_id = Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
@@ -124,14 +124,14 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", Logger::VERBOSE);
+                $this->API->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", Logger::VERBOSE);
                 $incoming[$key] = $message;
             }
         }
         $this->incoming_messages = $incoming;
         $total = \count($this->incoming_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
+            $this->API->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
 
         $count = 0;
@@ -142,7 +142,7 @@ trait Session
             } else {
                 $ago = \time() - $message->getSent();
                 if ($ago > 2) {
-                    $this->API->logger->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
+                    $this->API->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }
                 $outgoing[$key] = $message;
             }
@@ -150,7 +150,7 @@ trait Session
         $this->outgoing_messages = $outgoing;
         $total = \count($this->outgoing_messages);
         if ($count+$total) {
-            $this->API->logger->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
+            $this->API->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
     }
     /**

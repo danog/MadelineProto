@@ -70,7 +70,7 @@ final class CheckLoop extends Loop
                     }
                     $list .= $this->connection->outgoing_messages[$message_id]->getConstructor().', ';
                 }
-                $this->logger->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
+                $this->API->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
                 $this->connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                 EventLoop::queue(function () use ($deferred, $message_ids): void {
                     try {
@@ -82,18 +82,18 @@ final class CheckLoop extends Loop
                         foreach (\str_split($result['info']) as $key => $chr) {
                             $message_id = $message_ids[$key];
                             if (!isset($this->connection->outgoing_messages[$message_id])) {
-                                $this->logger->logger("Already got response for and forgot about message ID $message_id");
+                                $this->API->logger("Already got response for and forgot about message ID $message_id");
                                 continue;
                             }
                             if (!isset($this->connection->new_outgoing[$message_id])) {
-                                $this->logger->logger('Already got response for '.$this->connection->outgoing_messages[$message_id]);
+                                $this->API->logger('Already got response for '.$this->connection->outgoing_messages[$message_id]);
                                 continue;
                             }
                             $message = $this->connection->new_outgoing[$message_id];
                             $chr = \ord($chr);
                             switch ($chr & 7) {
                                 case 0:
-                                    $this->logger->logger("Wrong message status 0 for $message", Logger::FATAL_ERROR);
+                                    $this->API->logger("Wrong message status 0 for $message", Logger::FATAL_ERROR);
                                     break;
                                 case 1:
                                 case 2:
@@ -102,42 +102,42 @@ final class CheckLoop extends Loop
                                         $this->connection->gotResponseForOutgoingMessage($message);
                                         break;
                                     }
-                                    $this->logger->logger("Message $message not received by server, resending...", Logger::ERROR);
+                                    $this->API->logger("Message $message not received by server, resending...", Logger::ERROR);
                                     $this->connection->methodRecall(message_id: $message_id, postpone: true);
                                     break;
                                 case 4:
                                     if ($chr & 128) {
-                                        $this->logger->logger("Message $message received by server and was already sent, requesting reply...", Logger::ERROR);
+                                        $this->API->logger("Message $message received by server and was already sent, requesting reply...", Logger::ERROR);
                                         $reply[] = $message_id;
                                     } elseif ($chr & 64) {
-                                        $this->logger->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
+                                        $this->API->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
                                         $reply[] = $message_id;
                                     } elseif ($chr & 32) {
                                         if ($message->getSent() + $this->resendTimeout < \time()) {
                                             if ($message->isCancellationRequested()) {
                                                 unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
 
-                                                $this->logger->logger("Cancelling $message...", Logger::ERROR);
+                                                $this->API->logger("Cancelling $message...", Logger::ERROR);
                                             } else {
-                                                $this->logger->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
+                                                $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
                                                 $this->connection->methodRecall(message_id: $message_id, postpone: true);
                                             }
                                         } else {
-                                            $this->logger->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
+                                            $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         }
                                     } else {
-                                        $this->logger->logger("Message $message received by server, waiting...", Logger::ERROR);
+                                        $this->API->logger("Message $message received by server, waiting...", Logger::ERROR);
                                         $reply[] = $message_id;
                                     }
                             }
                         }
                         $this->connection->flush();
                         //} catch (CancelledException) {
-                        //$this->logger->logger("We did not receive a response for {$this->timeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
+                        //$this->API->logger("We did not receive a response for {$this->timeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
                         //EventLoop::queue($this->connection->reconnect(...));
                     } catch (\Throwable $e) {
-                        $this->logger->logger("Got exception in check loop for DC {$this->datacenter}");
-                        $this->logger->logger((string) $e);
+                        $this->API->logger("Got exception in check loop for DC {$this->datacenter}");
+                        $this->API->logger((string) $e);
                     }
                 });
             }
@@ -147,7 +147,7 @@ final class CheckLoop extends Loop
                     && $message->getSent() + $this->timeout < \time()
                     && $message->isUnencrypted()
                 ) {
-                    $this->logger->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);
+                    $this->API->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);
                     $this->connection->methodRecall(message_id: $message->getMsgId(), postpone: true);
                 }
             }

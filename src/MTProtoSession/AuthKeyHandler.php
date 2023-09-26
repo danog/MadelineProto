@@ -68,7 +68,7 @@ trait AuthKeyHandler
 
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
-                $this->logger->logger('Requesting pq...', Logger::VERBOSE);
+                $this->API->logger('Requesting pq...', Logger::VERBOSE);
                 /**
                  * ***********************************************************************
                  * Make pq request, DH exchange initiation.
@@ -104,7 +104,7 @@ trait AuthKeyHandler
                 }
                 if (!isset($key)) {
                     if ($cdn) {
-                        $this->logger->logger('Could not find required CDN public key, postponing CDN handshake...');
+                        $this->API->logger('Could not find required CDN public key, postponing CDN handshake...');
                         return null;
                     }
                     throw new SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
@@ -123,9 +123,9 @@ trait AuthKeyHandler
                     'python_single',
                     'native_single',
                 ] as $method) {
-                    $this->logger->logger("Factorizing with $method (please wait, might take a while)");
+                    $this->API->logger("Factorizing with $method (please wait, might take a while)");
                     if ($method !== 'native_single_cpp') {
-                        $this->logger->logger('Install https://prime.madelineproto.xyz and the FFI extension to speed this up!');
+                        $this->API->logger('Install https://prime.madelineproto.xyz and the FFI extension to speed this up!');
                     }
 
                     $p = 0;
@@ -133,7 +133,7 @@ trait AuthKeyHandler
                     try {
                         $p = PrimeModule::$method($pq);
                     } catch (Throwable $e) {
-                        $this->logger->logger("While factorizing with $method: $e");
+                        $this->API->logger("While factorizing with $method: $e");
                     }
 
                     if ($p) {
@@ -150,7 +150,7 @@ trait AuthKeyHandler
                 if (!$ok) {
                     throw new SecurityException("Couldn't compute p and q, install prime.madelineproto.xyz to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p*$q);
                 }
-                $this->logger->logger('Factorization '.$pq.' = '.$p.' * '.$q, Logger::VERBOSE);
+                $this->API->logger('Factorization '.$pq.' = '.$p.' * '.$q, Logger::VERBOSE);
                 /*
                  * ***********************************************************************
                  * Serialize object for req_DH_params
@@ -177,7 +177,7 @@ trait AuthKeyHandler
                     $key_aes_encrypted_bigint = new BigInteger($temp_key_xor.$aes_encrypted, 256);
                 } while ($key_aes_encrypted_bigint->compare($key->n) >= 0);
                 $encrypted_data = $key->encrypt($key_aes_encrypted_bigint);
-                $this->logger->logger('Starting Diffie Hellman key exchange', Logger::VERBOSE);
+                $this->API->logger('Starting Diffie Hellman key exchange', Logger::VERBOSE);
                 /*
                  * ***********************************************************************
                  * Starting Diffie Hellman key exchange, Server authentication
@@ -271,13 +271,13 @@ trait AuthKeyHandler
                  */
                 $server_time = $server_DH_inner_data['server_time'];
                 $this->time_delta = $server_time - \time();
-                $this->logger->logger(\sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
+                $this->API->logger(\sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
                 Crypt::checkPG($dh_prime, $g);
                 Crypt::checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id++) {
-                    $this->logger->logger('Generating b...', Logger::VERBOSE);
+                    $this->API->logger('Generating b...', Logger::VERBOSE);
                     $b = new BigInteger(Tools::random(256), 256);
-                    $this->logger->logger('Generating g_b...', Logger::VERBOSE);
+                    $this->API->logger('Generating g_b...', Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
                     Crypt::checkG($g_b, $dh_prime);
                     /*
@@ -285,11 +285,11 @@ trait AuthKeyHandler
                      * Check validity of g_b
                      * 1 < g_b < dh_prime - 1
                      */
-                    $this->logger->logger('Executing g_b check...', Logger::VERBOSE);
+                    $this->API->logger('Executing g_b check...', Logger::VERBOSE);
                     if ($g_b->compare(Magic::$one) <= 0 || $g_b->compare($dh_prime->subtract(Magic::$one)) >= 0) {
                         throw new SecurityException('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
-                    $this->logger->logger('Preparing client_DH_inner_data...', Logger::VERBOSE);
+                    $this->API->logger('Preparing client_DH_inner_data...', Logger::VERBOSE);
                     $g_b_str = $g_b->toBytes();
                     /*
                      * ***********************************************************************
@@ -310,7 +310,7 @@ trait AuthKeyHandler
                     $data_with_sha = \sha1($data, true).$data;
                     $data_with_sha_padded = $data_with_sha.Tools::random(Tools::posmod(-\strlen($data_with_sha), 16));
                     $encrypted_data = Crypt::igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
-                    $this->logger->logger('Executing set_client_DH_params...', Logger::VERBOSE);
+                    $this->API->logger('Executing set_client_DH_params...', Logger::VERBOSE);
                     /*
                      * ***********************************************************************
                      * Send set_client_DH_params query
@@ -333,7 +333,7 @@ trait AuthKeyHandler
                      * ***********************************************************************
                      * Generate auth_key
                      */
-                    $this->logger->logger(
+                    $this->API->logger(
                         \extension_loaded('gmp') ? 'Generating authorization key...' : 'Generating authorization key (install gmp to speed up this process)...',
                         Logger::VERBOSE
                     );
@@ -367,27 +367,27 @@ trait AuthKeyHandler
                             if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
                                 throw new SecurityException('wrong new_nonce_hash1');
                             }
-                            $this->logger->logger('Diffie Hellman key exchange processed successfully!', Logger::VERBOSE);
+                            $this->API->logger('Diffie Hellman key exchange processed successfully!', Logger::VERBOSE);
                             $key = $expires_in < 0 ? new PermAuthKey() : new TempAuthKey();
                             if ($expires_in >= 0) {
                                 $key->expires(\time() + $expires_in);
                             }
                             $key->setServerSalt(\substr($new_nonce, 0, 8) ^ \substr($server_nonce, 0, 8));
                             $key->setAuthKey($auth_key_str);
-                            $this->logger->logger('Auth key generated', Logger::NOTICE);
+                            $this->API->logger('Auth key generated', Logger::NOTICE);
                             return $key;
                         case 'dh_gen_retry':
                             if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                                 throw new SecurityException('wrong new_nonce_hash_2');
                             }
                             //repeat foreach
-                            $this->logger->logger('Retrying Auth', Logger::VERBOSE);
+                            $this->API->logger('Retrying Auth', Logger::VERBOSE);
                             break;
                         case 'dh_gen_fail':
                             if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                                 throw new SecurityException('wrong new_nonce_hash_3');
                             }
-                            $this->logger->logger('Auth Failed', Logger::WARNING);
+                            $this->API->logger('Auth Failed', Logger::WARNING);
                             break 2;
                         default:
                             throw new SecurityException('Response Error');
@@ -395,10 +395,10 @@ trait AuthKeyHandler
                     }
                 }
             } catch (SecurityException|Exception|RPCErrorException $e) {
-                $this->logger->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
+                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
                 $this->reconnect();
             } catch (Throwable $e) {
-                $this->logger->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', Logger::WARNING);
+                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', Logger::WARNING);
                 $this->reconnect();
             }
         }

@@ -19,7 +19,7 @@ use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\FileCallback;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\AppInfo;
 use danog\MadelineProto\VoIP;
 use Webmozart\Assert\Assert;
 
@@ -72,8 +72,7 @@ if ($loader) {
 }
 
 echo 'Loading settings...'.PHP_EOL;
-$settings = new Settings;
-$settings->getAppInfo()
+$settings = (new AppInfo)
     ->setApiId((int) getenv('API_ID'))
     ->setApiHash(getenv('API_HASH'));
 

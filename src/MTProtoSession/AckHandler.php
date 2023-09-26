@@ -42,7 +42,7 @@ trait AckHandler
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', Logger::WARNING);
+            $this->API->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', Logger::WARNING);
             return false;
         }
         return true;
@@ -126,7 +126,7 @@ trait AckHandler
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
-                    $this->logger->logger("Already replied to message $message, but still in new_outgoing");
+                    $this->API->logger("Already replied to message $message, but still in new_outgoing");
                     unset($this->new_outgoing[$message_id]);
                     continue;
                 }
