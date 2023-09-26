@@ -27,6 +27,7 @@ use Amp\Dns\DnsResolver;
 use Amp\Future;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
+use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
@@ -787,8 +788,8 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     private function cleanupProperties(): void
     {
-        $this->acceptChatMutex ??= new LocalMutex;
-        $this->confirmChatMutex ??= new LocalMutex;
+        $this->acceptChatMutex ??= new LocalKeyedMutex;
+        $this->confirmChatMutex ??= new LocalKeyedMutex;
         $this->channels_state ??= new CombinedUpdatesState;
         $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;
