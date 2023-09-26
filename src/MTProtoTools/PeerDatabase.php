@@ -355,7 +355,7 @@ final class PeerDatabase implements TLCallback
         } catch (FloodWaitError $e) {
             throw $e;
         } catch (RPCErrorException $e) {
-            $this->API->logger->logger('Username resolution failed with error '.$e->getMessage(), Logger::ERROR);
+            $this->API->logger('Username resolution failed with error '.$e->getMessage(), Logger::ERROR);
             if ($e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
                 throw $e;
             }
@@ -409,7 +409,7 @@ final class PeerDatabase implements TLCallback
             $existingChat = $this->db[$user['id']];
             if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {
-                    $this->API->logger->logger("No access hash with user {$user['id']}, using backup");
+                    $this->API->logger("No access hash with user {$user['id']}, using backup");
                     $user['access_hash'] = $existingChat['access_hash'];
                     $user['min'] = false;
                 } else {
@@ -422,7 +422,7 @@ final class PeerDatabase implements TLCallback
                         ]]]);
                         return;
                     } catch (RPCErrorException $e) {
-                        $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
+                        $this->API->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
                     }
                     foreach (self::getUsernames($user) as $username) {
                         if (($this->resolveUsername($username)) === $user['id']) {
@@ -433,9 +433,9 @@ final class PeerDatabase implements TLCallback
                 }
             }
             if ($existingChat !== $user) {
-                $this->API->logger->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
                 if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
-                    $this->API->logger->logger("{$user['id']} is min, filling missing fields", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("{$user['id']} is min, filling missing fields", Logger::ULTRA_VERBOSE);
                     if (isset($existingChat['access_hash'])) {
                         $user['min'] = false;
                         $user['access_hash'] = $existingChat['access_hash'];
@@ -518,7 +518,7 @@ final class PeerDatabase implements TLCallback
             ) {
                 $existingChat = $this->db[-$chat['id']];
                 if (!$existingChat || $existingChat !== $chat) {
-                    $this->API->logger->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
                     if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                         $chat = [
                             '_' => $chat['_'],
@@ -541,7 +541,7 @@ final class PeerDatabase implements TLCallback
             $existingChat = $this->db[$bot_api_id];
             if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {
-                    $this->API->logger->logger("No access hash with channel {$bot_api_id}, using backup");
+                    $this->API->logger("No access hash with channel {$bot_api_id}, using backup");
                     $chat['access_hash'] = $existingChat['access_hash'];
                 } else {
                     Assert::null($existingChat);
@@ -553,7 +553,7 @@ final class PeerDatabase implements TLCallback
                         ]]]);
                         return;
                     } catch (RPCErrorException $e) {
-                        $this->API->logger->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
+                        $this->API->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
                     }
                     foreach (self::getUsernames($chat) as $username) {
                         if (($this->resolveUsername($username)) === $bot_api_id) {
@@ -565,9 +565,9 @@ final class PeerDatabase implements TLCallback
             }
             if ($existingChat !== $chat) {
                 $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
-                $this->API->logger->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
                 if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
-                    $this->API->logger->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
                     $newchat = $existingChat;
                     foreach (['title', 'username', 'usernames', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
                         if (isset($chat[$field])) {

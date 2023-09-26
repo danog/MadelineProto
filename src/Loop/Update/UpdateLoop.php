@@ -84,7 +84,7 @@ final class UpdateLoop extends Loop
         $this->toPts = null;
         while (true) {
             if ($this->channelId) {
-                $this->logger->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::ULTRA_VERBOSE);
+                $this->API->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::ULTRA_VERBOSE);
                 if ($state->pts() <= 1) {
                     $limit = 10;
                 } elseif ($this->API->authorization['user']['bot']) {
@@ -104,7 +104,7 @@ final class UpdateLoop extends Loop
                         $this->feeder->stop();
                         unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
                         $this->API->getChannelStates()->remove($this->channelId);
-                        $this->logger->logger("Channel private, exiting {$this}");
+                        $this->API->logger("Channel private, exiting {$this}");
                         return self::STOP;
                     }
                     throw $e;
@@ -112,17 +112,17 @@ final class UpdateLoop extends Loop
                     $this->feeder->stop();
                     $this->API->getChannelStates()->remove($this->channelId);
                     unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
-                    $this->logger->logger("Channel private, exiting {$this}");
+                    $this->API->logger("Channel private, exiting {$this}");
                     return self::STOP;
                 } catch (PTSException $e) {
                     $this->feeder->stop();
                     $this->API->getChannelStates()->remove($this->channelId);
                     unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
-                    $this->logger->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
+                    $this->API->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
                     return self::STOP;
                 }
                 $timeout = \min(self::DEFAULT_TIMEOUT, $difference['timeout'] ?? self::DEFAULT_TIMEOUT);
-                $this->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
+                $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                 switch ($difference['_']) {
                     case 'updates.channelDifferenceEmpty':
                         $state->update($difference);
@@ -130,7 +130,7 @@ final class UpdateLoop extends Loop
                         break 2;
                     case 'updates.channelDifference':
                         if ($request_pts >= $difference['pts'] && $request_pts > 1) {
-                            $this->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), Logger::VERBOSE);
+                            $this->API->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), Logger::VERBOSE);
                             $difference['pts'] = $request_pts + 1;
                         }
                         $result += ($this->feeder->feed($difference['other_updates']));
@@ -158,7 +158,7 @@ final class UpdateLoop extends Loop
                         throw new Exception('Unrecognized update difference received: '.\var_export($difference, true));
                 }
             } else {
-                $this->logger->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
+                $this->API->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
                 do {
                     try {
                         $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->authorized_dc]);
@@ -169,7 +169,7 @@ final class UpdateLoop extends Loop
                         }
                     }
                 } while (true);
-                $this->logger->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
+                $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                 $timeout = self::DEFAULT_TIMEOUT;
                 switch ($difference['_']) {
                     case 'updates.differenceEmpty':
@@ -211,11 +211,11 @@ final class UpdateLoop extends Loop
                 }
             }
         }
-        $this->logger->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
         foreach ($result as $channelId => $_) {
             $this->API->feeders[$channelId]?->resume();
         }
-        $this->logger->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
 
         return $timeout;
     }

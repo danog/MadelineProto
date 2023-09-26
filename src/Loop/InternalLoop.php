@@ -28,9 +28,7 @@ use danog\MadelineProto\MTProto;
  */
 trait InternalLoop
 {
-    use LoggerLoop {
-        __construct as private setLogger;
-    }
+    use LoggerLoop;
 
     /**
      * API instance.
@@ -44,7 +42,6 @@ trait InternalLoop
     public function __construct(MTProto $API)
     {
         $this->API = $API;
-        $this->setLogger($API->getLogger());
     }
 
     public function isLoggedIn(): bool

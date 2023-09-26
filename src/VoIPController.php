@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\BufferedReader;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
+use Amp\Sync\LocalMutex;
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -141,6 +142,8 @@ final class VoIPController
     /** @var ?list{string, string, string, string} */
     private ?array $visualization = null;
 
+    private LocalMutex $authMutex;
+
     /**
      * Constructor.
      *
@@ -160,17 +163,21 @@ final class VoIPController
         } else {
             $this->callState = CallState::INCOMING;
         }
+        $this->authMutex = new LocalMutex;
     }
 
     public function __serialize(): array
     {
-        return \get_object_vars($this);
+        $result = \get_object_vars($this);
+        unset($result['authMutex']);
+        return $result;
     }
     /**
      * Wakeup function.
      */
     public function __unserialize(array $data): void
     {
+        $this->authMutex = new LocalMutex;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -206,93 +213,103 @@ final class VoIPController
      */
     public function confirm(array $params): bool
     {
-        if ($this->callState !== CallState::REQUESTED) {
-            $this->log(\sprintf(Lang::$current_lang['call_error_2'], $this->public->callID));
-            return false;
-        }
-        $this->log(\sprintf(Lang::$current_lang['call_confirming'], $this->public->otherID), Logger::VERBOSE);
-        $dh_config = $this->API->getDhConfig();
-        $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
-        Crypt::checkG($params['g_b'], $dh_config['p']);
-        $key = \str_pad($params['g_b']->powMod($this->call['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+        $lock = $this->authMutex->acquire();
         try {
-            $res = ($this->API->methodCallAsyncRead('phone.confirmCall', [
-                'key_fingerprint' => \substr(\sha1($key, true), -8),
-                'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
-                'g_a' => $this->call['g_a'],
-                'protocol' => self::CALL_PROTOCOL
-            ]))['phone_call'];
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
-                return true;
-            }
-            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                $this->log(Lang::$current_lang['call_already_declined']);
-                $this->discard(DiscardReason::HANGUP);
+            if ($this->callState !== CallState::REQUESTED) {
+                $this->log(\sprintf(Lang::$current_lang['call_error_2'], $this->public->callID));
                 return false;
             }
-            throw $e;
+            $this->log(\sprintf(Lang::$current_lang['call_confirming'], $this->public->otherID), Logger::VERBOSE);
+            $dh_config = $this->API->getDhConfig();
+            $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
+            Crypt::checkG($params['g_b'], $dh_config['p']);
+            $key = \str_pad($params['g_b']->powMod($this->call['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            try {
+                $res = ($this->API->methodCallAsyncRead('phone.confirmCall', [
+                    'key_fingerprint' => \substr(\sha1($key, true), -8),
+                    'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
+                    'g_a' => $this->call['g_a'],
+                    'protocol' => self::CALL_PROTOCOL
+                ]))['phone_call'];
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                    $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
+                    return true;
+                }
+                if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                    $this->log(Lang::$current_lang['call_already_declined']);
+                    $this->discard(DiscardReason::HANGUP);
+                    return false;
+                }
+                throw $e;
+            }
+            $visualization = [];
+            $length = new BigInteger(\count(Magic::$emojis));
+            foreach (\str_split(\hash('sha256', $key.\str_pad($this->call['g_a'], 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
+                $number[0] = \chr(\ord($number[0]) & 0x7f);
+                $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
+            }
+            $this->visualization = $visualization;
+            $this->authKey = $key;
+            $this->callState = CallState::RUNNING;
+            $this->messageHandler = new MessageHandler(
+                $this,
+                \substr(\hash('sha256', $key, true), -16)
+            );
+            $this->initialize($res['connections']);
+            return true;
+        } finally {
+            EventLoop::queue($lock->release(...));
         }
-        $visualization = [];
-        $length = new BigInteger(\count(Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($this->call['g_a'], 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
-            $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
-        }
-        $this->visualization = $visualization;
-        $this->authKey = $key;
-        $this->callState = CallState::RUNNING;
-        $this->messageHandler = new MessageHandler(
-            $this,
-            \substr(\hash('sha256', $key, true), -16)
-        );
-        $this->initialize($res['connections']);
-        return true;
     }
     /**
      * Accept incoming call.
      */
     public function accept(): self
     {
-        if ($this->callState === CallState::RUNNING || $this->callState === CallState::ENDED) {
-            return $this;
-        }
-        Assert::eq($this->callState->name, CallState::INCOMING->name);
-
-        $this->log(\sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
-        $dh_config = $this->API->getDhConfig();
-        $this->log('Generating b...', Logger::VERBOSE);
-        $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
-        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
-        Crypt::checkG($g_b, $dh_config['p']);
-
-        $this->callState = CallState::ACCEPTED;
+        $lock = $this->authMutex->acquire();
         try {
-            $this->API->methodCallAsyncRead('phone.acceptCall', [
-                'peer' => [
-                    'id' => $this->call['id'],
-                    'access_hash' => $this->call['access_hash'],
-                    '_' => 'inputPhoneCall'
-                ],
-                'g_b' => $g_b->toBytes(),
-                'protocol' => self::CALL_PROTOCOL
-            ]);
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
+            if ($this->callState === CallState::RUNNING || $this->callState === CallState::ENDED) {
                 return $this;
             }
-            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                $this->log(Lang::$current_lang['call_already_declined']);
-                $this->discard(DiscardReason::HANGUP);
-                return $this;
-            }
-            throw $e;
-        }
-        $this->call['b'] = $b;
+            Assert::eq($this->callState->name, CallState::INCOMING->name);
 
-        return $this;
+            $this->log(\sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
+            $dh_config = $this->API->getDhConfig();
+            $this->log('Generating b...', Logger::VERBOSE);
+            $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
+            $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
+            Crypt::checkG($g_b, $dh_config['p']);
+
+            $this->callState = CallState::ACCEPTED;
+            try {
+                $this->API->methodCallAsyncRead('phone.acceptCall', [
+                    'peer' => [
+                        'id' => $this->call['id'],
+                        'access_hash' => $this->call['access_hash'],
+                        '_' => 'inputPhoneCall'
+                    ],
+                    'g_b' => $g_b->toBytes(),
+                    'protocol' => self::CALL_PROTOCOL
+                ]);
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                    $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
+                    return $this;
+                }
+                if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                    $this->log(Lang::$current_lang['call_already_declined']);
+                    $this->discard(DiscardReason::HANGUP);
+                    return $this;
+                }
+                throw $e;
+            }
+            $this->call['b'] = $b;
+
+            return $this;
+        } finally {
+            EventLoop::queue($lock->release(...));
+        }
     }
 
     /**
@@ -302,35 +319,40 @@ final class VoIPController
      */
     public function complete(array $params): bool
     {
-        if ($this->callState !== CallState::ACCEPTED) {
-            return false;
+        $lock = $this->authMutex->acquire();
+        try {
+            if ($this->callState !== CallState::ACCEPTED) {
+                return false;
+            }
+            $this->log(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
+            $dh_config = $this->API->getDhConfig();
+            if (\hash('sha256', (string) $params['g_a_or_b'], true) !== (string) $this->call['g_a_hash']) {
+                throw new SecurityException('Invalid g_a!');
+            }
+            $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
+            Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
+            $key = \str_pad($params['g_a_or_b']->powMod($this->call['b'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            if (\substr(\sha1($key, true), -8) != $params['key_fingerprint']) {
+                throw new SecurityException(Lang::$current_lang['fingerprint_invalid']);
+            }
+            $visualization = [];
+            $length = new BigInteger(\count(Magic::$emojis));
+            foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
+                $number[0] = \chr(\ord($number[0]) & 0x7f);
+                $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
+            }
+            $this->visualization = $visualization;
+            $this->authKey = $key;
+            $this->callState = CallState::RUNNING;
+            $this->messageHandler = new MessageHandler(
+                $this,
+                \substr(\hash('sha256', $key, true), -16)
+            );
+            $this->initialize($params['connections']);
+            return true;
+        } finally {
+            EventLoop::queue($lock->release(...));
         }
-        $this->log(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
-        $dh_config = $this->API->getDhConfig();
-        if (\hash('sha256', (string) $params['g_a_or_b'], true) !== (string) $this->call['g_a_hash']) {
-            throw new SecurityException('Invalid g_a!');
-        }
-        $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
-        Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
-        $key = \str_pad($params['g_a_or_b']->powMod($this->call['b'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-        if (\substr(\sha1($key, true), -8) != $params['key_fingerprint']) {
-            throw new SecurityException(Lang::$current_lang['fingerprint_invalid']);
-        }
-        $visualization = [];
-        $length = new BigInteger(\count(Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
-            $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
-        }
-        $this->visualization = $visualization;
-        $this->authKey = $key;
-        $this->callState = CallState::RUNNING;
-        $this->messageHandler = new MessageHandler(
-            $this,
-            \substr(\hash('sha256', $key, true), -16)
-        );
-        $this->initialize($params['connections']);
-        return true;
     }
     /**
      * Get call emojis (will return null if the call is not inited yet).

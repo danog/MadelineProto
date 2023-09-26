@@ -658,6 +658,9 @@ final class MTProto implements TLCallback, LoggerGetter
      */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
+        if (empty($file)) {
+            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        }
         ($this->logger ?? Logger::$default)->logger($param, $level, $file);
     }
     /**

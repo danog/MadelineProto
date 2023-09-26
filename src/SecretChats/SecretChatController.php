@@ -202,10 +202,10 @@ final class SecretChatController implements Stringable
                 return;
             }
             $dh_config = $this->API->getDhConfig();
-            $this->API->logger->logger('Rekeying secret chat '.$this.'...', Logger::VERBOSE);
-            $this->API->logger->logger('Generating a...', Logger::VERBOSE);
+            $this->API->logger('Rekeying secret chat '.$this.'...', Logger::VERBOSE);
+            $this->API->logger('Generating a...', Logger::VERBOSE);
             $a = new BigInteger(Tools::random(256), 256);
-            $this->API->logger->logger('Generating g_a...', Logger::VERBOSE);
+            $this->API->logger('Generating g_a...', Logger::VERBOSE);
             $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
             Crypt::checkG($g_a, $dh_config['p']);
             $this->rekeyState = RekeyState::REQUESTED;
@@ -235,9 +235,9 @@ final class SecretChatController implements Stringable
                     return;
                 }
             }
-            $this->API->logger->logger('Accepting rekeying of '.$this.'...', Logger::VERBOSE);
+            $this->API->logger('Accepting rekeying of '.$this.'...', Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig();
-            $this->API->logger->logger('Generating b...', Logger::VERBOSE);
+            $this->API->logger('Generating b...', Logger::VERBOSE);
             $b = new BigInteger(Tools::random(256), 256);
             $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
             Crypt::checkG($params['g_a'], $dh_config['p']);
@@ -271,7 +271,7 @@ final class SecretChatController implements Stringable
                 $this->rekeyState = RekeyState::IDLE;
                 return;
             }
-            $this->API->logger->logger('Committing rekeying of '.$this.'...', Logger::VERBOSE);
+            $this->API->logger('Committing rekeying of '.$this.'...', Logger::VERBOSE);
             $dh_config = ($this->API->getDhConfig());
             $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
             Crypt::checkG($params['g_b'], $dh_config['p']);
@@ -312,14 +312,14 @@ final class SecretChatController implements Stringable
                 $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
                 throw new SecurityException('Invalid key fingerprint!');
             }
-            $this->API->logger->logger('Completing rekeying of secret chat '.$this.'...', Logger::VERBOSE);
+            $this->API->logger('Completing rekeying of secret chat '.$this.'...', Logger::VERBOSE);
             $this->rekeyState = RekeyState::IDLE;
             $this->oldKey = $this->key;
             $this->key = $this->rekeyKey;
             $this->ttr = 100;
             $this->updated = \time();
             $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
-            $this->API->logger->logger('Secret chat '.$this.' rekeyed successfully!', Logger::VERBOSE);
+            $this->API->logger('Secret chat '.$this.' rekeyed successfully!', Logger::VERBOSE);
         } finally {
             EventLoop::queue($lock->release(...));
         }
@@ -399,7 +399,7 @@ final class SecretChatController implements Stringable
             $msg = $this->outgoing[$request['seq']];
             if (!isset($msg['message']['date'])) {
                 $msg['message']['date'] = $response['date'];
-                if (isset($response['file'])) {
+                if (isset($response['file']) && $response['file']['_'] !== 'encryptedFileEmpty') {
                     $msg['message']['file'] = $response['file'];
                     $msg['message']['decrypted_message']['media']['file'] = $response['file'];
                 }
@@ -415,7 +415,7 @@ final class SecretChatController implements Stringable
     {
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
-            if (isset($update['message']['file'])) {
+            if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {
                 $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
             }
             $this->API->saveUpdate($update);
@@ -435,7 +435,7 @@ final class SecretChatController implements Stringable
                     return;
                 case 'decryptedMessageActionNotifyLayer':
                     if ($action['layer'] > $this->remoteLayer) {
-                        $this->API->logger->logger("Applying layer {$action['layer']} notification in $this");
+                        $this->API->logger("Applying layer {$action['layer']} notification in $this");
                         $this->remoteLayer = $action['layer'];
                         if ($action['layer'] >= 46 && \time() - $this->public->created > 15) {
                             $this->notifyLayer();
@@ -444,7 +444,7 @@ final class SecretChatController implements Stringable
                             $this->mtproto = 2;
                         }
                     } else {
-                        $this->API->logger->logger("Ignoring layer {$action['layer']} notification in $this");
+                        $this->API->logger("Ignoring layer {$action['layer']} notification in $this");
                     }
                     return;
                 case 'decryptedMessageActionSetMessageTTL':
@@ -473,7 +473,7 @@ final class SecretChatController implements Stringable
         $action['start_seq_no'] >>= 1;
         $action['end_seq_no'] >>= 1;
         $action['handled'] = true;
-        $this->API->logger->logger('Resending messages for '.$this, Logger::WARNING);
+        $this->API->logger('Resending messages for '.$this, Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
             $msg = $this->outgoing[$seq];
             $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);
@@ -504,29 +504,29 @@ final class SecretChatController implements Stringable
         $message_key = \substr($message['message']['bytes'], 8, 16);
         $encrypted_data = \substr($message['message']['bytes'], 24);
         if ($this->mtproto === 2) {
-            $this->API->logger->logger('Trying MTProto v2 decryption for '.$this.'...', Logger::NOTICE);
+            $this->API->logger('Trying MTProto v2 decryption for '.$this.'...', Logger::NOTICE);
             try {
                 $message_data = $this->tryMTProtoV2Decrypt($message_key, $old, $encrypted_data);
-                $this->API->logger->logger('MTProto v2 decryption OK for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v2 decryption OK for '.$this.'...', Logger::NOTICE);
             } catch (SecurityException $e) {
                 if ($this->remoteLayer >= 73) {
                     // && !$this->waitingGaps
                     throw $e;
                 }
-                $this->API->logger->logger('MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for '.$this.'...', Logger::NOTICE);
                 $message_data = $this->tryMTProtoV1Decrypt($message_key, $old, $encrypted_data);
-                $this->API->logger->logger('MTProto v1 decryption OK for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v1 decryption OK for '.$this.'...', Logger::NOTICE);
                 $this->mtproto = 1;
             }
         } else {
-            $this->API->logger->logger('Trying MTProto v1 decryption for '.$this.'...', Logger::NOTICE);
+            $this->API->logger('Trying MTProto v1 decryption for '.$this.'...', Logger::NOTICE);
             try {
                 $message_data = $this->tryMTProtoV1Decrypt($message_key, $old, $encrypted_data);
-                $this->API->logger->logger('MTProto v1 decryption OK for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v1 decryption OK for '.$this.'...', Logger::NOTICE);
             } catch (SecurityException $e) {
-                $this->API->logger->logger('MTProto v1 decryption failed with message '.$e->getMessage().', trying MTProto v2 decryption for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v1 decryption failed with message '.$e->getMessage().', trying MTProto v2 decryption for '.$this.'...', Logger::NOTICE);
                 $message_data = $this->tryMTProtoV2Decrypt($message_key, $old, $encrypted_data);
-                $this->API->logger->logger('MTProto v2 decryption OK for '.$this.'...', Logger::NOTICE);
+                $this->API->logger('MTProto v2 decryption OK for '.$this.'...', Logger::NOTICE);
                 $this->mtproto = 2;
             }
         }
@@ -615,12 +615,12 @@ final class SecretChatController implements Stringable
     {
         $seqno = ($seqno - $this->out_seq_no_base) >> 1;
         if ($seqno < $this->remote_in_seq_no) {
-            $this->API->logger->logger("Discarding $this, in_seq_no is decreasing", Logger::LEVEL_FATAL);
+            $this->API->logger("Discarding $this, in_seq_no is decreasing", Logger::LEVEL_FATAL);
             $this->discard();
             throw new SecurityException('in_seq_no is decreasing');
         }
         if ($seqno > $this->out_seq_no + 1) {
-            $this->API->logger->logger("Discarding $this, in_seq_no is too big", Logger::LEVEL_FATAL);
+            $this->API->logger("Discarding $this, in_seq_no is too big", Logger::LEVEL_FATAL);
             $this->discard();
             throw new SecurityException('in_seq_no is too big');
         }
@@ -636,10 +636,10 @@ final class SecretChatController implements Stringable
         $seqno = $message['message']['decrypted_message']['out_seq_no'];
         $seqno = ($seqno - $this->in_seq_no_base) >> 1;
         $C_plus_one = $this->in_seq_no;
-        //$this->API->logger->logger($C, $seqno);
+        //$this->API->logger($C, $seqno);
         if ($seqno < $C_plus_one) {
             // <= C
-            $this->API->logger->logger("WARNING: dropping repeated message in $this with seqno $seqno");
+            $this->API->logger("WARNING: dropping repeated message in $this with seqno $seqno");
             return;
         }
         if ($seqno > $C_plus_one) {
@@ -654,21 +654,21 @@ final class SecretChatController implements Stringable
                 $C_plus_one_gap = $this->gapQueueSeq;
                 if ($seqno < $C_plus_one_gap) {
                     // <= C
-                    $this->API->logger->logger("WARNING: dropping repeated message in $this with seqno $seqno while recovering gaps");
+                    $this->API->logger("WARNING: dropping repeated message in $this with seqno $seqno while recovering gaps");
                     return;
                 }
                 if ($seqno > $C_plus_one_gap) {
                     // > C+1
-                    $this->API->logger->logger("Discarding $this because out_seq_no gap detected: ($seqno > $C_plus_one_gap), but already recovering gap!", Logger::LEVEL_FATAL);
+                    $this->API->logger("Discarding $this because out_seq_no gap detected: ($seqno > $C_plus_one_gap), but already recovering gap!", Logger::LEVEL_FATAL);
                     $this->discard();
                     throw new SecurityException("Additional out_seq_no gap detected!");
                 }
-                $this->API->logger->logger("WARNING: queueing message $seqno in $this while recovering gaps");
+                $this->API->logger("WARNING: queueing message $seqno in $this while recovering gaps");
                 $this->gapQueue []= $message;
                 $this->gapQueueSeq = $seqno+1;
                 return;
             }
-            $this->API->logger->logger("Requesting resending in $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
+            $this->API->logger("Requesting resending in $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
             $this->gapEnd = $seqno-1;
             $this->gapQueue = [$message];
             $this->gapQueueSeq = $seqno+1;

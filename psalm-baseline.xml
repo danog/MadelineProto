@@ -94,7 +94,6 @@
     <MissingConstructor>
       <code>$API</code>
       <code>$datacenter</code>
-      <code>$logger</code>
       <code>$shared</code>
     </MissingConstructor>
     <PossiblyNullReference>
@@ -1272,6 +1271,9 @@
       <code>start</code>
       <code>start</code>
     </PossiblyNullReference>
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
+    </PossiblyUndefinedArrayOffset>
     <PropertyTypeCoercion>
       <code><![CDATA[$this->sanitizeReportPeers($userOrId)]]></code>
     </PropertyTypeCoercion>
@@ -1823,9 +1825,6 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/SecretChats/AuthKeyHandler.php">
-    <MissingReturnType>
-      <code>completeSecretChat</code>
-    </MissingReturnType>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$user['user_id']]]></code>
     </PossiblyUndefinedArrayOffset>
@@ -2215,9 +2214,6 @@
     <PossiblyNullArgument>
       <code>$value</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch>
-      <code><![CDATA[$this->API->logger]]></code>
-    </PossiblyNullPropertyFetch>
     <PossiblyNullReference>
       <code>botAPIToMTProto</code>
       <code>logger</code>

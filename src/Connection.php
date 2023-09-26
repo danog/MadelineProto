@@ -114,11 +114,6 @@ final class Connection
      */
     private bool $writing = false;
     /**
-     * Logger instance.
-     *
-     */
-    protected Logger $logger;
-    /**
      * Main instance.
      *
      */
@@ -280,14 +275,14 @@ final class Connection
             }
             $this->createSession();
             foreach ($this->shared->getCtxs() as $ctx) {
-                $this->API->logger->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
+                $this->API->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
                 try {
                     $this->stream = $ctx->getStream();
                 } catch (\Throwable $e) {
-                    $this->API->logger->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::WARNING);
+                    $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::WARNING);
                     continue;
                 }
-                $this->API->logger->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
+                $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
                 $this->chosenCtx = $ctx;
 
                 if ($ctx->getIpv6()) {
@@ -414,7 +409,7 @@ final class Connection
                     $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
                 }
             }
-            $this->logger->logger($arguments);
+            $this->API->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
@@ -499,8 +494,8 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {
-        if (!$message->isUnencrypted() && !$this->shared->hasTempAuthKey()) {
-            $this->logger->logger("Initing auth in DC {$this->datacenter} due to call to $message!");
+        if (!$message->isUnencrypted() && !$this->shared->needsAuth()) {
+            $this->API->logger("Initing auth in DC {$this->datacenter} due to call to $message!");
             $this->shared->initAuthorization();
         }
         $message->trySend();
@@ -561,7 +556,7 @@ final class Connection
         $this->shared = $extra;
         $this->id = $id;
         $this->API = $extra->getExtra();
-        $this->logger = $this->API->logger;
+        $this->API->logger = $this->API->logger;
         $this->datacenter = $datacenter;
         $this->datacenterId = $this->datacenter . '.' . $this->id;
     }
@@ -586,7 +581,7 @@ final class Connection
      */
     public function disconnect(bool $temporary = false): void
     {
-        $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
+        $this->API->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
         if ($this->stream) {
             try {
@@ -594,7 +589,7 @@ final class Connection
                 $this->stream = null;
                 $stream->disconnect();
             } catch (ClosedException $e) {
-                $this->API->logger->logger($e);
+                $this->API->logger($e);
             }
         }
 
@@ -607,14 +602,14 @@ final class Connection
         if (!$temporary) {
             $this->shared->signalDisconnect($this->id);
         }
-        $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
+        $this->API->logger("Disconnected from DC {$this->datacenterId}");
     }
     /**
      * Reconnect to DC.
      */
     public function reconnect(): void
     {
-        $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
+        $this->API->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
         $this->shared->connect($this->id);
         $this->connect();

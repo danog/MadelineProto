@@ -187,7 +187,7 @@ final class ReferenceDatabase implements TLCallback
     public function addReference(array $location): bool
     {
         if (!$this->cacheContexts) {
-            $this->API->logger->logger('Trying to add reference out of context, report the following message to @danogentili!', Logger::ERROR);
+            $this->API->logger('Trying to add reference out of context, report the following message to @danogentili!', Logger::ERROR);
             $frames = [];
             $previous = '';
             foreach (\debug_backtrace(0) as $k => $frame) {
@@ -215,11 +215,11 @@ final class ReferenceDatabase implements TLCallback
             foreach ($frames as $frame) {
                 $tlTrace .= "['".$frame."']";
             }
-            $this->API->logger->logger($tlTrace, Logger::ERROR);
+            $this->API->logger($tlTrace, Logger::ERROR);
             return false;
         }
         if (!isset($location['file_reference'])) {
-            $this->API->logger->logger("Object {$location['_']} does not have reference", Logger::ERROR);
+            $this->API->logger("Object {$location['_']} does not have reference", Logger::ERROR);
             return false;
         }
         $key = \count($this->cacheContexts) - 1;
@@ -236,7 +236,7 @@ final class ReferenceDatabase implements TLCallback
             default:
                 throw new Exception('Unknown location type provided: '.$location['_']);
         }
-        $this->API->logger->logger("Caching reference from location of type {$locationType} from {$location['_']}", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Caching reference from location of type {$locationType} from {$location['_']}", Logger::ULTRA_VERBOSE);
         if (!isset($this->cache[$key])) {
             $this->cache[$key] = [];
         }
@@ -249,7 +249,7 @@ final class ReferenceDatabase implements TLCallback
             throw new Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::CONSTRUCTOR_CONTEXT[$type];
-        //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        //$this->API->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
     public function addOrigin(array $data = []): void
@@ -260,7 +260,7 @@ final class ReferenceDatabase implements TLCallback
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            //$this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            //$this->API->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
@@ -298,7 +298,7 @@ final class ReferenceDatabase implements TLCallback
                     foreach ($cache as $location => $reference) {
                         $this->cache[$key][$location] = $reference;
                     }
-                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
+                    $this->API->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
                     return;
                 }
                 $origin['max_id'] = $data['profile_photo']['id'];
@@ -328,7 +328,7 @@ final class ReferenceDatabase implements TLCallback
                     foreach ($cache as $location => $reference) {
                         $this->cache[$key][$location] = $reference;
                     }
-                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
+                    $this->API->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
                     return;
                 }
                 break;
@@ -341,7 +341,7 @@ final class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
+        $this->API->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
     public function addOriginMethodContext(string $type): void
     {
@@ -349,7 +349,7 @@ final class ReferenceDatabase implements TLCallback
             throw new Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::METHOD_CONTEXT[$type];
-        //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
+        //$this->API->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
     public function addOriginMethod(MTProtoOutgoingMessage $data, array $res): void
@@ -361,7 +361,7 @@ final class ReferenceDatabase implements TLCallback
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            //$this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
+            //$this->API->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
@@ -410,7 +410,7 @@ final class ReferenceDatabase implements TLCallback
                         }
                     }
                 }
-                $this->API->logger->logger("Added origin {$originType} ($constructor) to {$count} references", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Added origin {$originType} ($constructor) to {$count} references", Logger::ULTRA_VERBOSE);
                 return;
             case 'messages.getStickers':
                 $origin['emoticon'] = $data->getBodyOrEmpty()['emoticon'];
@@ -421,7 +421,7 @@ final class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
+        $this->API->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
     private function storeReference(string $location, string $reference, int $originType, array $origin): void
     {
@@ -476,7 +476,7 @@ final class ReferenceDatabase implements TLCallback
         $res = $this->getDb($locationString);
         if (!isset($res['reference'])) {
             if (isset($location['file_reference'])) {
-                $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 if (\is_array($location['file_reference'])) {
                     Assert::eq($location['file_reference']['_'], 'bytes');
                     return \base64_decode($location['file_reference']['bytes'], true);
@@ -484,21 +484,21 @@ final class ReferenceDatabase implements TLCallback
                 return (string) $location['file_reference'];
             }
             if (!$this->refresh) {
-                $this->API->logger->logger("Using null file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Using null file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 return '';
             }
             throw new Exception("Could not find file reference for location of type {$locationType} object {$location['_']}");
         }
-        $this->API->logger->logger("Getting file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
+        $this->API->logger("Getting file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
         if ($this->refresh) {
             if (isset($this->refreshed[$locationString])) {
-                $this->API->logger->logger('Reference already refreshed!', Logger::VERBOSE);
+                $this->API->logger('Reference already refreshed!', Logger::VERBOSE);
                 return (string) $this->getDb($locationString)['reference'];
             }
             $count = 0;
             foreach ($this->getDb($locationString)['origins'] as $originType => $origin) {
                 $count++;
-                $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
+                $this->API->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
                 switch ($originType) {
                     // Peer + msg ID
                     case self::MESSAGE_ORIGIN:

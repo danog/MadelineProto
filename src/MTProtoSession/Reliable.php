@@ -95,7 +95,7 @@ trait Reliable
                     $status .= $description;
                 }
             }
-            $this->logger->logger($status, Logger::NOTICE);
+            $this->API->logger($status, Logger::NOTICE);
         }
     }
     /**
@@ -106,24 +106,24 @@ trait Reliable
      */
     public function sendMsgsStateInfo(array $msg_ids, int $req_msg_id): void
     {
-        $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
+        $this->API->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!isset($this->incoming_messages[$msg_id])) {
                 $shifted = $msg_id >> 32;
                 if ($shifted > (\time() + $this->time_delta + 30)) {
-                    $this->logger->logger("Do not know anything about {$msg_id} and it is too big");
+                    $this->API->logger("Do not know anything about {$msg_id} and it is too big");
                     $cur_info |= 3;
                 } elseif ($shifted < (\time() + $this->time_delta - 300)) {
-                    $this->logger->logger("Do not know anything about {$msg_id} and it is too small");
+                    $this->API->logger("Do not know anything about {$msg_id} and it is too small");
                     $cur_info |= 1;
                 } else {
-                    $this->logger->logger("Do not know anything about {$msg_id}");
+                    $this->API->logger("Do not know anything about {$msg_id}");
                     $cur_info |= 2;
                 }
             } else {
-                $this->logger->logger("Know about {$msg_id}");
+                $this->API->logger("Know about {$msg_id}");
                 $cur_info = $this->incoming_messages[$msg_id]->getState();
             }
             $info .= \chr($cur_info);
