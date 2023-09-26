@@ -494,7 +494,7 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {
-        if (!$message->isUnencrypted() && !$this->shared->needsAuth()) {
+        if (!$message->isUnencrypted() && $this->shared->needsAuth()) {
             $this->API->logger("Initing auth in DC {$this->datacenter} due to call to $message!");
             $this->shared->initAuthorization();
         }
