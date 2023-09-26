@@ -209,7 +209,23 @@ final class WriteLoop extends Loop
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
                             $this->API->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
-                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $this->API->settings->getSchema()->getLayer(), 'query' => $this->API->getTL()->serializeMethod('initConnection', ['api_id' => $this->API->settings->getAppInfo()->getApiId(), 'api_hash' => $this->API->settings->getAppInfo()->getApiHash(), 'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $this->API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_code' => $this->API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(), 'proxy' => $this->connection->getInputClientProxy(), 'query' => $MTmessage['body']])]));
+                            $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', [
+                                'layer' => $this->API->settings->getSchema()->getLayer(),
+                                'query' => $this->API->getTL()->serializeMethod(
+                                    'initConnection', [
+                                        'api_id' => $this->API->settings->getAppInfo()->getApiId(),
+                                        'api_hash' => $this->API->settings->getAppInfo()->getApiHash(),
+                                        'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a',
+                                        'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a',
+                                        'app_version' => $this->API->settings->getAppInfo()->getAppVersion(),
+                                        'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(),
+                                        'lang_code' => $this->API->settings->getAppInfo()->getLangCode(),
+                                        'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(),
+                                        'proxy' => $this->connection->getInputClientProxy(),
+                                        'query' => $MTmessage['body']
+                                    ]
+                                )
+                            ]));
                         } else {
                             $this->API->logger("Skipping $message due to uninited connection in DC $this->datacenter");
                             $skipped = true;
