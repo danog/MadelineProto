@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\SecretChats;
 
+use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -31,6 +32,7 @@ use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use phpseclib3\Math\BigInteger;
+use Revolt\EventLoop;
 
 use const STR_PAD_LEFT;
 
@@ -79,6 +81,7 @@ trait AuthKeyHandler
         $this->logger->logger('Secret chat '.$res['id'].' requested successfully!', Logger::NOTICE);
         return $res['id'];
     }
+    private LocalKeyedMutex $acceptChatMutex;
     /**
      * Accept secret chat.
      *
@@ -86,51 +89,56 @@ trait AuthKeyHandler
      */
     public function acceptSecretChat(array $params): void
     {
-        if (isset($this->secretChats[$params['id']])) {
-            $this->logger->logger("I've already accepted secret chat ".$params['id']);
-            return;
+        $lock = $this->acceptChatMutex->acquire((string) $params['id']);
+        try {
+            if (isset($this->secretChats[$params['id']])) {
+                $this->logger->logger("I've already accepted secret chat ".$params['id']);
+                return;
+            }
+            $dh_config = $this->getDhConfig();
+            $this->logger->logger('Generating b...', Logger::VERBOSE);
+            $b = new BigInteger(Tools::random(256), 256);
+            $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
+            Crypt::checkG($params['g_a'], $dh_config['p']);
+            $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            //$this->logger->logger($key);
+            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
+            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $this->secretChats[$params['id']] = $chat = new SecretChatController(
+                $this,
+                $key,
+                $params['id'],
+                $params['access_hash'],
+                false,
+                $params['admin_id'],
+            );
+            $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
+            Crypt::checkG($g_b, $dh_config['p']);
+            $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
+            $chat->notifyLayer();
+            $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', Logger::NOTICE);
+        } finally {
+            EventLoop::queue($lock->release(...));
         }
-        $dh_config = $this->getDhConfig();
-        $this->logger->logger('Generating b...', Logger::VERBOSE);
-        $b = new BigInteger(Tools::random(256), 256);
-        $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
-        Crypt::checkG($params['g_a'], $dh_config['p']);
-        $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        //$this->logger->logger($key);
-        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
-        $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
-        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-        $this->secretChats[$params['id']] = $chat = new SecretChatController(
-            $this,
-            $key,
-            $params['id'],
-            $params['access_hash'],
-            false,
-            $params['admin_id'],
-        );
-        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
-        Crypt::checkG($g_b, $dh_config['p']);
-        $this->methodCallAsyncRead('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']]);
-        $chat->notifyLayer();
-        $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', Logger::NOTICE);
     }
     /**
      * Complete secret chat.
      *
      * @param array $params Secret chat
      */
-    private function completeSecretChat(array $params)
+    private function completeSecretChat(array $params): void
     {
         if (!isset($this->temp_requested_secret_chats[$params['id']])) {
             //$this->logger->logger($this->secretChatStatus($params['id']));
             $this->logger->logger('Could not find and complete secret chat '.$params['id']);
-            return false;
+            return;
         }
+        unset($this->temp_requested_secret_chats[$params['id']]);
         $dh_config = ($this->getDhConfig());
         $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
         Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        unset($this->temp_requested_secret_chats[$params['id']]);
         $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         //$this->logger->logger($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
