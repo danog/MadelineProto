@@ -304,16 +304,6 @@ final class DataCenterConnection implements JsonSerializable
         return $this->permAuthKey;
     }
     /**
-     * Check if needs auth.
-     */
-    public function needsAuth(): bool
-    {
-        if ($this->API->isCdn($this->datacenter)) {
-            return !$this->hasTempAuthKey();
-        }
-        return !$this->hasTempAuthKey() || !$this->isBound();
-    }
-    /**
      * Check if has temporary authorization key.
      */
     public function hasTempAuthKey(): bool
