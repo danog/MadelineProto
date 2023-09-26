@@ -788,6 +788,7 @@ final class MTProto implements TLCallback, LoggerGetter
     private function cleanupProperties(): void
     {
         $this->acceptChatMutex ??= new LocalMutex;
+        $this->confirmChatMutex ??= new LocalMutex;
         $this->channels_state ??= new CombinedUpdatesState;
         $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;

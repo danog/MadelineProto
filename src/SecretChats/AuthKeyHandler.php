@@ -82,6 +82,7 @@ trait AuthKeyHandler
         return $res['id'];
     }
     private LocalKeyedMutex $acceptChatMutex;
+    private LocalKeyedMutex $confirmChatMutex;
     /**
      * Accept secret chat.
      *
@@ -129,34 +130,39 @@ trait AuthKeyHandler
      */
     private function completeSecretChat(array $params): void
     {
-        if (!isset($this->temp_requested_secret_chats[$params['id']])) {
-            //$this->logger->logger($this->secretChatStatus($params['id']));
-            $this->logger->logger('Could not find and complete secret chat '.$params['id']);
-            return;
+        $lock = $this->confirmChatMutex->acquire((string) $params['id']);
+        try {
+            if (!isset($this->temp_requested_secret_chats[$params['id']])) {
+                //$this->logger->logger($this->secretChatStatus($params['id']));
+                $this->logger->logger('Could not find and complete secret chat '.$params['id']);
+                return;
+            }
+            $dh_config = ($this->getDhConfig());
+            $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
+            Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
+            $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            unset($this->temp_requested_secret_chats[$params['id']]);
+            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            //$this->logger->logger($key);
+            if ($key['fingerprint'] !== $params['key_fingerprint']) {
+                $this->discardSecretChat($params['id']);
+                throw new SecurityException('Invalid key fingerprint!');
+            }
+            $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
+            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $this->secretChats[$params['id']] = $chat = new SecretChatController(
+                $this,
+                $key,
+                $params['id'],
+                $params['access_hash'],
+                true,
+                $params['participant_id'],
+            );
+            $chat->notifyLayer();
+            $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
+        } finally {
+            EventLoop::queue($lock->release(...));
         }
-        unset($this->temp_requested_secret_chats[$params['id']]);
-        $dh_config = ($this->getDhConfig());
-        $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
-        Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
-        $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
-        //$this->logger->logger($key);
-        if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            $this->discardSecretChat($params['id']);
-            throw new SecurityException('Invalid key fingerprint!');
-        }
-        $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
-        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
-        $this->secretChats[$params['id']] = $chat = new SecretChatController(
-            $this,
-            $key,
-            $params['id'],
-            $params['access_hash'],
-            true,
-            $params['participant_id'],
-        );
-        $chat->notifyLayer();
-        $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', Logger::NOTICE);
     }
 
     /**
