@@ -218,7 +218,7 @@ final class WriteLoop extends Loop
                                         'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a',
                                         'system_version' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getSystemVersion() : 'n/a',
                                         'app_version' => $this->API->settings->getAppInfo()->getAppVersion(),
-                                        'system_lang_code' => $this->API->settings->getAppInfo()->getLangCode(),
+                                        'system_lang_code' => $this->API->settings->getAppInfo()->getSystemLangCode(),
                                         'lang_code' => $this->API->settings->getAppInfo()->getLangCode(),
                                         'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(),
                                         'proxy' => $this->connection->getInputClientProxy(),
