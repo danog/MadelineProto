@@ -31,7 +31,6 @@ use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
@@ -111,7 +110,7 @@ abstract class Message extends AbstractMessage
         array $info,
     ) {
         parent::__construct($API, $rawMessage, $info);
-        $decryptedMessage = $this instanceof SecretMessage ? $rawMessage['decrypted_message'] : null;
+        $decryptedMessage = $rawMessage['decrypted_message'] ?? null;
         $this->views = $rawMessage['views'] ?? null;
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
@@ -148,8 +147,11 @@ abstract class Message extends AbstractMessage
             $this->imported = false;
         }
 
-        $this->protected = $this instanceof SecretMessage ? true : $rawMessage['noforwards'];
-        $media = $rawMessage['media'] ?? $decryptedMessage['media'] ?? null;
+        $this->protected = isset($decryptedMessage) ? true : $rawMessage['noforwards'];
+        $media = $rawMessage['media'] ??
+            //Todo Add support from secret medias
+           //$decryptedMessage['media'] ??
+            null;
         $this->media = isset($media)
             ? $API->wrapMedia($media, $this->protected)
             : null;

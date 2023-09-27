@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler\Message;
 use AssertionError;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -26,18 +27,12 @@ use danog\MadelineProto\MTProto;
  */
 class SecretMessage extends AbstractPrivateMessage
 {
-    /** Whether the webpage preview is disabled */
-    public readonly ?bool $noWebpage;
-    /** Random message ID of the message this message replies to (parameter added in layer 45) */
-    public readonly ?int $replyToRandomId;
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info)
     {
-        parent::__construct($API, $rawMessage['decrypted_message'], $info);
-        $decryptedMessage = $rawMessage['decrypted_message'];
-        $this->noWebpage = $decryptedMessage['no_webpage'] ?? null;
-        $this->replyToRandomId = $decryptedMessage['reply_to_random_id'] ?? null;
+        parent::__construct($API, $rawMessage, $info);
     }
+
     public function getReply(string $class = AbstractMessage::class): ?AbstractMessage
     {
         if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
@@ -63,5 +58,20 @@ class SecretMessage extends AbstractPrivateMessage
             return null;
         }
         return $this->replyCache;
+    }
+
+    public function screenShot(): DialogScreenshotTaken
+    {
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.sendEncryptedService',
+            [
+                'peer' => $this->chatId,
+                'message' => [
+                    '_' => 'decryptedMessageService',
+                    'action' => ['_' => 'decryptedMessageActionScreenshotMessages', 'random_ids' => [$this->id]]
+                ]
+            ]
+        );
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 }

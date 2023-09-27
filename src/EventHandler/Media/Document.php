@@ -40,18 +40,8 @@ final class Document extends Media
         bool $protected
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->thumb = new Bytes($rawMedia['thumb']) ?? null;
+        $this->thumb = isset($rawMedia['thumb']) ? new Bytes($rawMedia['thumb']) : null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
-    }
-
-    /** @internal */
-    public function jsonSerialize(): mixed
-    {
-        $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location']);
-        $v['_'] = static::class;
-        $v['thumb'] = new Bytes($v['thumb']);
-        return $v;
     }
 }

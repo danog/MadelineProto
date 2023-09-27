@@ -14,19 +14,26 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service\SecretChat;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
+use danog\MadelineProto\EventHandler\Action;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
 /**
- * The entire message history has been deleted.
+ * User is preparing a message: typing, recording, uploading, etc.
  */
-class ActionFlushHistory extends ServiceMessage
+class DialogUserTyping extends ServiceMessage
 {
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessage, array $info)
-    {
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+
+        /** Type of action. */
+        public readonly Action $action,
+    ) {
         parent::__construct($API, $rawMessage, $info);
     }
 }

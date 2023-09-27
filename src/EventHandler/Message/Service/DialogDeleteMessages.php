@@ -14,15 +14,12 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service\SecretChat;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
-/**
- * A screenshot was taken.
- */
-class ActionScreenshotMessages extends ServiceMessage
+class DialogDeleteMessages extends ServiceMessage
 {
     /** @internal */
     public function __construct(
@@ -30,8 +27,8 @@ class ActionScreenshotMessages extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** @var $randomIds list<int> List of affected message ids (that appeared on the screenshot) */
-        public readonly array $randomIds
+        /** @var list<int> $ids List of deleted message IDs. */
+        public readonly array $ids
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

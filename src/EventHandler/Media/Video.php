@@ -49,7 +49,7 @@ final class Video extends AbstractVideo
             }
         }
         $this->hasStickers = $hasStickers;
-        $this->thumb = new Bytes($rawMedia['thumb']) ?? null;
+        $this->thumb = isset($rawMedia['thumb']) ? new Bytes($rawMedia['thumb']) : null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }

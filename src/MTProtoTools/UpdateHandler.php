@@ -40,6 +40,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
 use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogDeleteMessages;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
@@ -54,6 +55,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogReadMessages;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
@@ -61,13 +63,8 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogUserTyping;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionDeleteMessages;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionFlushHistory;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionReadMessages;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionScreenshotMessages;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\ActionSetMessageTTL;
-use danog\MadelineProto\EventHandler\Message\Service\SecretChat\SecretUserTyping;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -381,7 +378,7 @@ trait UpdateHandler
     {
         try {
             return match ($update['_']) {
-                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage' => $this->wrapMessage($update['message']),
+                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage','updateNewOutgoingEncryptedMessage' => $this->wrapMessage($update['message']),
                 'updateBotCallbackQuery' => isset($update['game_short_name'])
                     ? new ChatGameQuery($this, $update)
                     : new ChatButtonQuery($this, $update),
@@ -628,40 +625,47 @@ trait UpdateHandler
                     $message['action']['button_id'],
                     $this->getIdInternal($message['action']['peer']),
                 ),
-                'decryptedMessageActionSetMessageTTL' => new ActionSetMessageTTL(
+                default => null
+            };
+        }
+        if ($message['_'] === 'encryptedMessageService') {
+            $action = $message['decrypted_message']['action'];
+            return match ($action['_']) {
+                'decryptedMessageActionSetMessageTTL' => new DialogSetTTL(
                     $this,
                     $message,
                     $info,
-                    $message['action']['ttl_seconds']
+                    $action['ttl_seconds'],
+                    null,
                 ),
-                'decryptedMessageActionReadMessages' => new ActionReadMessages(
+                'decryptedMessageActionReadMessages' => new DialogReadMessages(
                     $this,
                     $message,
                     $info,
-                    $message['action']['random_ids']
+                    $action['random_ids'],
                 ),
-                'decryptedMessageActionDeleteMessages' => new ActionDeleteMessages(
+                'decryptedMessageActionDeleteMessages' => new DialogDeleteMessages(
                     $this,
                     $message,
                     $info,
-                    $message['action']['random_ids']
+                    $action['random_ids'],
                 ),
-                'decryptedMessageActionScreenshotMessages' => new ActionScreenshotMessages(
+                'decryptedMessageActionScreenshotMessages' => new DialogScreenshotTaken(
                     $this,
                     $message,
                     $info,
-                    $message['action']['random_ids']
+                    $action['random_ids'],
                 ),
-                'decryptedMessageActionFlushHistory' => new ActionFlushHistory(
-                    $this,
-                    $message,
-                    $info
-                ),
-                'decryptedMessageActionTyping' => new SecretUserTyping(
+                'decryptedMessageActionFlushHistory' => new DialogHistoryCleared(
                     $this,
                     $message,
                     $info,
-                    Action::fromRawAction($message['action']['action'])
+                ),
+                'decryptedMessageActionTyping' => new DialogUserTyping(
+                    $this,
+                    $message,
+                    $info,
+                    Action::fromRawAction($action['action'])
                 ),
                 default => null
             };
@@ -669,8 +673,10 @@ trait UpdateHandler
         if (($info['User']['username'] ?? '') === 'replies') {
             return null;
         }
+        if ($message['_'] === 'encryptedMessage') {
+            return new SecretMessage($this, $message, $info);
+        }
         return match ($info['type']) {
-            API::PEER_TYPE_USER && $message['_'] === 'encryptedMessage' => new SecretMessage($this, $message, $info),
             API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
             API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info),
             API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info),

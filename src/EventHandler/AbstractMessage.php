@@ -18,7 +18,6 @@ namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
-use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
@@ -69,20 +68,18 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         array $info
     ) {
         parent::__construct($API);
-        $decryptedMessage = $this instanceof SecretMessage ? $rawMessage['decrypted_message'] : null;
+        $decryptedMessage = $rawMessage['decrypted_message'] ?? null;
+        $secretChat = isset($decryptedMessage) ? $this->getClient()->getSecretChat($rawMessage['chat_id']) : null;
         $this->out = $rawMessage['out'] ?? false;
-        $this->id = $this instanceof SecretMessage ? $rawMessage['random_id'] : $rawMessage['id'];
-        $this->chatId = $this instanceof SecretMessage ? $this->getClient()->getSecretChat($rawMessage['chat_id'])->chatId :$info['bot_api_id'];
-        $this->senderId = $this instanceof SecretMessage ? $this->getClient()->getSecretChat($rawMessage['chat_id'])->otherID : (isset($rawMessage['from_id'])
+        $this->id = isset($secretChat) ? $rawMessage['random_id'] : $rawMessage['id'];
+        $this->chatId = isset($secretChat) ? $secretChat->chatId :$info['bot_api_id'];
+        $this->senderId = isset($secretChat)  ? $secretChat->otherID : (isset($rawMessage['from_id'])
             ? $this->getClient()->getIdInternal($rawMessage['from_id'])
             : $this->chatId);
         $this->date = $rawMessage['date'];
         $this->mentioned = $rawMessage['mentioned'] ?? false;
         $this->silent = $rawMessage['silent'] ?? $decryptedMessage['silent'];
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? $decryptedMessage['ttl'] ?? null;
-        if ($this instanceof SecretMessage && isset($decryptedMessage['reply_to_random_id'])) {
-            $this->replyToMsgId = $decryptedMessage['reply_to_random_id'];
-        }
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];
             $this->replyToScheduled = $replyTo['reply_to_scheduled'];
@@ -111,7 +108,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             $this->replyToScheduled = false;
         } else {
             $this->topicId = null;
-            $this->replyToMsgId = null;
+            if (isset($secretChat) && isset($decryptedMessage['reply_to_random_id'])) {
+                $this->replyToMsgId = $decryptedMessage['reply_to_random_id'];
+            }
             $this->threadId = null;
             $this->replyToScheduled = false;
         }

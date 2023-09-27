@@ -14,7 +14,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service\SecretChat;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Messages marked as read.
  */
-class ActionReadMessages extends ServiceMessage
+final class DialogReadMessages extends ServiceMessage
 {
     /** @internal */
     public function __construct(
@@ -30,8 +30,8 @@ class ActionReadMessages extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** @var $randomIds list<int> List of message IDs */
-        public readonly array $randomIds
+        /** @var list<int> $ids List of message IDs. */
+        public readonly array $ids
     ) {
         parent::__construct($API, $rawMessage, $info);
     }
