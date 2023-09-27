@@ -122,6 +122,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly string $type,
         public readonly bool $isMethod,
         public readonly bool $unencrypted,
+        public readonly ?string $subtype = null,
         /**
          * Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
          */

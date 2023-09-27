@@ -993,8 +993,8 @@ final class TL implements TLInterface
                 foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
                     $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
                 }
-                if ($message->type && \str_contains($message->type, '<')) {
-                    $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->type);
+                if ($message->subtype) {
+                    $arg['subtype'] = $message->subtype;
                 }
             }
             if (isset($type['connection'])) {

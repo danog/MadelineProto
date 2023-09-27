@@ -81,6 +81,9 @@ final class WriteLoop extends Loop
                 });
                 $this->API->logger("Stopping $this");
                 return self::STOP;
+            } catch (\Throwable $e) {
+                $this->API->logger("Exiting $this due to $e", Logger::FATAL_ERROR);
+                return self::STOP;
             } finally {
                 $this->connection->writing(false);
             }

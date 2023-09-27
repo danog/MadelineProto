@@ -178,6 +178,7 @@ trait CallHandler
             body: $args,
             constructor: $method,
             type: $methodInfo['type'],
+            subtype: $methodInfo['subtype'] ?? null,
             isMethod: true,
             unencrypted: !$encrypted,
             fileRelated: $file,
