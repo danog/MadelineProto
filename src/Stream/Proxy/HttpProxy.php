@@ -108,7 +108,12 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
         if ($code !== 200) {
             $read = '';
             if (isset($headers['content-length'])) {
-                $read = $buffer->bufferRead((int) $headers['content-length']);
+                $length = (int) $headers['content-length'];
+                if ($length < 0) {
+                    Logger::log("Trying to read negative amount {$headers['content-length']}");
+                } else {
+                    $read = $buffer->bufferRead($length);
+                }
             }
             Logger::log(\trim($read));
             throw new Exception($description, $code);

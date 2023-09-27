@@ -94,7 +94,7 @@ final class WriteLoop extends Loop
                 if ($this->shared->hasTempAuthKey()) {
                     return false;
                 }
-                if ($message->isEncrypted()) {
+                if (!$message->unencrypted) {
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
@@ -152,7 +152,7 @@ final class WriteLoop extends Loop
             $has_resend = false;
             $has_http_wait = false;
             foreach ($this->connection->pendingOutgoing as $k => $message) {
-                if ($message->isUnencrypted()) {
+                if ($message->unencrypted) {
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
@@ -165,7 +165,7 @@ final class WriteLoop extends Loop
                     continue;
                 }
                 $constructor = $message->getConstructor();
-                if ($this->shared->getGenericSettings()->getAuth()->getPfs() && !$this->shared->isBound() && !$this->connection->isCDN() && $message->isMethod() && !\in_array($constructor, ['http_wait', 'auth.bindTempAuthKey'], true)) {
+                if ($this->shared->getGenericSettings()->getAuth()->getPfs() && !$this->shared->isBound() && !$this->connection->isCDN() && $message->isMethod && !\in_array($constructor, ['http_wait', 'auth.bindTempAuthKey'], true)) {
                     $this->API->logger("Skipping $message due to unbound keys in DC $this->datacenter");
                     $skipped = true;
                     continue;
@@ -203,16 +203,17 @@ final class WriteLoop extends Loop
                     '_' => 'MTmessage',
                     'msg_id' => $message_id,
                     'body' => $message->getSerializedBody(),
-                    'seqno' => $message->getSeqNo() ?? $this->connection->generateOutSeqNo($message->isContentRelated()),
+                    'seqno' => $message->getSeqNo() ?? $this->connection->generateOutSeqNo($message->contentRelated),
                 ];
-                if ($message->isMethod() && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
+                if ($message->isMethod && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
                             $this->API->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
                             $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', [
                                 'layer' => $this->API->settings->getSchema()->getLayer(),
                                 'query' => $this->API->getTL()->serializeMethod(
-                                    'initConnection', [
+                                    'initConnection',
+                                    [
                                         'api_id' => $this->API->settings->getAppInfo()->getApiId(),
                                         'api_hash' => $this->API->settings->getAppInfo()->getApiHash(),
                                         'device_model' => !$this->connection->isCDN() ? $this->API->settings->getAppInfo()->getDeviceModel() : 'n/a',
@@ -231,9 +232,10 @@ final class WriteLoop extends Loop
                             $skipped = true;
                             continue;
                         }
-                    } elseif ($message->hasQueue()) {
-                        $queueId = $message->getQueueId();
+                    } elseif ($message->queueId !== null) {
+                        $queueId = $message->queueId;
                         if (isset($this->connection->callQueue[$queueId])) {
+                            $message->setPreviousQueuedMsgId($this->connection->callQueue[$queueId]);
                             $this->API->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
                             $MTmessage['body'] = $this->API->getTL()->serializeMethod(
                                 'invokeAfterMsg',
@@ -243,6 +245,7 @@ final class WriteLoop extends Loop
                                 ]
                             );
                         } else {
+                            $message->setPreviousQueuedMsgId(null);
                             $this->API->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
                         }
                         $this->connection->callQueue[$queueId] = $message_id;

@@ -71,7 +71,7 @@ final class CheckLoop extends Loop
                     $list .= $this->connection->outgoing_messages[$message_id]->getConstructor().', ';
                 }
                 $this->API->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
-                $this->connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
+                $this->connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], true, $deferred);
                 EventLoop::queue(function () use ($deferred, $message_ids): void {
                     try {
                         $result = $deferred->getFuture()->await(new TimeoutCancellation($this->timeout));
@@ -145,7 +145,7 @@ final class CheckLoop extends Loop
             foreach ($this->connection->new_outgoing as $message_id => $message) {
                 if ($message->wasSent()
                     && $message->getSent() + $this->timeout < \time()
-                    && $message->isUnencrypted()
+                    && $message->unencrypted
                 ) {
                     $this->API->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);
                     $this->connection->methodRecall(message_id: $message->getMsgId(), postpone: true);

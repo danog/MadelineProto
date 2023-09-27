@@ -58,15 +58,11 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * Receive date.
      */
-    private int $received;
+    public readonly int $received;
     /**
      * Deserialized response content.
      */
     private array $content;
-    /**
-     * Was present in container.
-     */
-    private bool $fromContainer;
 
     /**
      * Constructor.
@@ -74,15 +70,14 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      * @param array   $content       Content
      * @param boolean $fromContainer Whether this message was in a container
      */
-    public function __construct(array $content, int $msgId, public readonly bool $unencrypted, bool $fromContainer = false)
+    public function __construct(array $content, int $msgId, public readonly bool $unencrypted, public readonly bool $fromContainer = false)
     {
         $this->content = $content;
-        $this->fromContainer = $fromContainer;
         $this->msgId = $msgId;
 
         $this->received = \time();
 
-        $this->contentRelated = !isset(MTProtoMessage::NOT_CONTENT_RELATED[$content['_']]);
+        parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$content['_']]));
         if (!$this->contentRelated) {
             $this->state |= 16; // message not requiring acknowledgment
         }
@@ -93,14 +88,6 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     public function getContent(): array
     {
         return $this->content;
-    }
-
-    /**
-     * Get was present in container.
-     */
-    public function isFromContainer(): bool
-    {
-        return $this->fromContainer;
     }
 
     /**
@@ -119,7 +106,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * Get message type.
      */
-    public function getType(): string
+    public function getPredicate(): string
     {
         return $this->content['_'];
     }
@@ -171,13 +158,5 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     public function getState(): int
     {
         return $this->state;
-    }
-
-    /**
-     * Get receive date.
-     */
-    public function getReceived(): int
-    {
-        return $this->received;
     }
 }

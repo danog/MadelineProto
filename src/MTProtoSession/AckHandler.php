@@ -81,7 +81,7 @@ trait AckHandler
         foreach ($this->new_outgoing as $message) {
             if ($message->wasSent()
                 && $message->getSent() + $timeout < \time()
-                && $message->isUnencrypted() === $unencrypted
+                && $message->unencrypted === $unencrypted
                 && $message->getConstructor() !== 'msgs_state_req') {
                 if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
@@ -112,7 +112,7 @@ trait AckHandler
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->wasSent()
                 && $message->getSent() + $timeout < \time()
-                && $message->isUnencrypted() === $unencrypted
+                && $message->unencrypted === $unencrypted
             ) {
                 if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;

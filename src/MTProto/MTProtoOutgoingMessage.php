@@ -60,34 +60,13 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * @var self::STATE_*
      */
     private int $state = self::STATE_PENDING;
-    /**
-     * Constructor name.
-     */
-    private string $constructor;
-    /**
-     * Constructor type.
-     */
-    private string $type;
 
-    /**
-     * Whether this is a method.
-     */
-    private bool $method;
-    /**
-     * Resolution deferred.
-     */
-    private ?DeferredFuture $resultDeferred = null;
     /**
      * Send deferred.
      *
      * @var ?DeferredFuture<null>
      */
     private ?DeferredFuture $sendDeferred = null;
-
-    /**
-     * Whether this is an unencrypted message.
-     */
-    private bool $unencrypted;
 
     /**
      * Message body.
@@ -102,33 +81,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     private ?string $serializedBody = null;
 
     /**
-     * Whether this message is related to a user, as in getting a successful reply means we have auth.
-     */
-    private bool $userRelated = false;
-    /**
-     * Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     */
-    private bool $fileRelated = false;
-
-    /**
-     * Custom flood wait limit for this bot.
-     */
-    private ?int $floodWaitLimit = null;
-
-    /**
-     * Whether we should try converting the result to a bot API object.
-     */
-    private bool $botAPI = false;
-
-    /**
      * Whether we should refresh references upon serialization of this message.
      */
     private bool $refreshReferences = false;
-
-    /**
-     * Queue ID.
-     */
-    private ?string $queueId = null;
 
     /**
      * When was this message sent.
@@ -143,27 +98,49 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     private ?Cancellation $cancellation = null;
 
     /**
+     * Whether this message is related to a user, as in getting a successful reply means we have auth.
+     */
+    public readonly bool $userRelated;
+
+    /**
+     * Previous queued message ID.
+     */
+    private ?int $previousQueuedMsgId = null;
+
+    /**
      * Create outgoing message.
      *
      * @param array|callable(): array $body        Body
      * @param string                  $constructor Constructor name
      * @param string                  $type        Constructor type
-     * @param boolean                 $method      Is this a method?
+     * @param boolean                 $isMethod    Is this a method?
      * @param boolean                 $unencrypted Is this an unencrypted message?
-     * @param null|DeferredFuture     $deferred    Response deferred
      */
-    public function __construct(array|callable $body, string $constructor, string $type, bool $method, bool $unencrypted, ?DeferredFuture $deferred = null, ?Cancellation $cancellation = null)
-    {
+    public function __construct(
+        array|callable $body,
+        public readonly string $constructor,
+        public readonly string $type,
+        public readonly bool $isMethod,
+        public readonly bool $unencrypted,
+        /**
+         * Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
+         */
+        public readonly bool $fileRelated = false,
+        /**
+         * Queue ID.
+         */
+        public readonly ?string $queueId = null,
+        /**
+         * Custom flood wait limit for this message.
+         */
+        public readonly ?int $floodWaitLimit = null,
+        private ?DeferredFuture $resultDeferred = null,
+        ?Cancellation $cancellation = null
+    ) {
         $this->body = $body;
-        $this->constructor = $constructor;
-        $this->type = $type;
-        $this->method = $method;
-        $this->unencrypted = $unencrypted;
-        if ($deferred) {
-            $this->resultDeferred = $deferred;
-        }
+        $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
-        $this->contentRelated = !isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]);
+        parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
         $this->cancellation = $cancellation;
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(fn () => throw $e));
     }
@@ -297,65 +274,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Get constructor type.
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * Get whether this is a method.
-     */
-    public function isMethod(): bool
-    {
-        return $this->method;
-    }
-
-    /**
-     * Get whether this is an unencrypted message.
-     */
-    public function isUnencrypted(): bool
-    {
-        return $this->unencrypted;
-    }
-    /**
-     * Get whether this is an encrypted message.
-     */
-    public function isEncrypted(): bool
-    {
-        return !$this->unencrypted;
-    }
-
-    /**
-     * Get whether this message is related to a user, as in getting a successful reply means we have auth.
-     */
-    public function isUserRelated(): bool
-    {
-        return $this->userRelated;
-    }
-
-    /**
      * Get whether we should refresh references upon serialization of this message.
      */
     public function shouldRefreshReferences(): bool
     {
         return $this->refreshReferences;
-    }
-
-    /**
-     * Get queue ID.
-     */
-    public function getQueueId(): ?string
-    {
-        return $this->queueId;
-    }
-    /**
-     * Get whether we have a queue ID.
-     */
-    public function hasQueue(): bool
-    {
-        return $this->queueId !== null;
     }
 
     /**
@@ -371,18 +294,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Set whether this message is related to a user, as in getting a successful reply means we have auth.
-     *
-     * @param bool $userRelated Whether this message is related to a user, as in getting a successful reply means we have auth.
-     */
-    public function setUserRelated(bool $userRelated): self
-    {
-        $this->userRelated = $userRelated;
-
-        return $this;
-    }
-
-    /**
      * Set whether we should refresh references upon serialization of this message.
      *
      * @param bool $refreshReferences Whether we should refresh references upon serialization of this message.
@@ -390,18 +301,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function setRefreshReferences(bool $refreshReferences): self
     {
         $this->refreshReferences = $refreshReferences;
-
-        return $this;
-    }
-
-    /**
-     * Set queue ID.
-     *
-     * @param null|string $queueId Queue ID.
-     */
-    public function setQueueId(?string $queueId): self
-    {
-        $this->queueId = $queueId;
 
         return $this;
     }
@@ -495,66 +394,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Get whether we should try converting the result to a bot API object.
-     */
-    public function getBotAPI(): bool
-    {
-        return $this->botAPI;
-    }
-
-    /**
-     * Set whether we should try converting the result to a bot API object.
-     *
-     * @param bool $botAPI Whether we should try converting the result to a bot API object
-     */
-    public function setBotAPI(bool $botAPI): self
-    {
-        $this->botAPI = $botAPI;
-
-        return $this;
-    }
-
-    /**
-     * Get whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     */
-    public function isFileRelated(): bool
-    {
-        return $this->fileRelated;
-    }
-
-    /**
-     * Set whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     *
-     * @param bool $fileRelated Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-     */
-    public function setFileRelated(bool $fileRelated): self
-    {
-        $this->fileRelated = $fileRelated;
-
-        return $this;
-    }
-
-    /**
-     * Get custom flood wait limit for this bot.
-     */
-    public function getFloodWaitLimit(): ?int
-    {
-        return $this->floodWaitLimit;
-    }
-
-    /**
-     * Set custom flood wait limit for this bot.
-     *
-     * @param null|int $floodWaitLimit Custom flood wait limit for this bot
-     */
-    public function setFloodWaitLimit(?int $floodWaitLimit): self
-    {
-        $this->floodWaitLimit = $floodWaitLimit;
-
-        return $this;
-    }
-
-    /**
      * Set when was this message sent.
      *
      * @param int $sent When was this message sent.
@@ -562,6 +401,29 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function setSent(int $sent): self
     {
         $this->sent = $sent;
+
+        return $this;
+    }
+
+    /**
+     * Get previous queued message ID.
+     *
+     * @return ?int
+     */
+    public function getPreviousQueuedMsgId(): ?int
+    {
+        return $this->previousQueuedMsgId;
+    }
+
+    /**
+     * Set previous queued message ID.
+     *
+     * @param ?int $previousQueuedMsgId Previous queued message ID.
+     *
+     */
+    public function setPreviousQueuedMsgId(?int $previousQueuedMsgId): self
+    {
+        $this->previousQueuedMsgId = $previousQueuedMsgId;
 
         return $this;
     }
