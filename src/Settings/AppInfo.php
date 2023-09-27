@@ -56,6 +56,10 @@ final class AppInfo extends SettingsAbstract
      */
     protected string $langCode = 'en';
     /**
+     * System language code.
+     */
+    protected string $systemLangCode = 'en';
+    /**
      * Language pack.
      */
     protected string $langPack = '';
@@ -233,6 +237,26 @@ final class AppInfo extends SettingsAbstract
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];
         }
+
+        return $this;
+    }
+
+    /**
+     * Get system language code.
+     */
+    public function getSystemLangCode(): string
+    {
+        return $this->systemLangCode;
+    }
+
+    /**
+     * Set system language code.
+     *
+     * @param string $langCode Language code.
+     */
+    public function setSystemLangCode(string $langCode): self
+    {
+        $this->systemLangCode = $langCode;
 
         return $this;
     }

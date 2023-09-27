@@ -317,6 +317,8 @@ final class Connection
                 if ($this->pinger) {
                     Assert::true($this->pinger->start(), "Could not start pinger stream");
                 }
+
+                EventLoop::queue($this->shared->initAuthorization(...));
                 return $this;
             }
             throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
@@ -494,10 +496,6 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
     {
-        if (!$message->isUnencrypted() && $this->shared->needsAuth()) {
-            $this->API->logger("Initing auth in DC {$this->datacenter} due to call to $message!");
-            $this->shared->initAuthorization();
-        }
         $message->trySend();
         $promise = $message->getSendPromise();
         if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
