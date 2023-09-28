@@ -827,6 +827,8 @@ trait UpdateHandler
                 $message['peer_id'] = $this->getInfo($to_id, API::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
+            case 'updateNewOutgoingEncryptedMessage':
+                return [$updates];
             default:
                 throw new ResponseException('Unrecognized update received: '.$updates['_']);
         }

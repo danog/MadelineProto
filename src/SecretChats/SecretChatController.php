@@ -399,6 +399,8 @@ final class SecretChatController implements Stringable
             $msg = $this->outgoing[$request['seq']];
             if (!isset($msg['message']['date'])) {
                 $msg['message']['date'] = $response['date'];
+                $msg['message']['decrypted_message'] = $msg['message']['message'];
+                unset($msg['message']['message']);
                 if (isset($response['file']) && $response['file']['_'] !== 'encryptedFileEmpty') {
                     $msg['message']['file'] = $response['file'];
                     $msg['message']['decrypted_message']['media']['file'] = $response['file'];

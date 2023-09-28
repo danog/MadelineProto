@@ -94,7 +94,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
         $this->key = $rawMedia['key'] ?? null;
-        $this->key = $rawMedia['iv'] ?? null;
+        $this->iv = $rawMedia['iv'] ?? null;
     }
 
     /**
