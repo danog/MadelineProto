@@ -60,14 +60,14 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly string $botApiFileUniqueId;
 
     /** @internal Media location */
-    private readonly array $location;
+    protected readonly array $location;
 
     /** @internal Encryption key for secret chat files */
-    private readonly ?string $key;
+    protected readonly ?string $key;
     /** @internal Encryption IV for secret chat files */
-    private readonly ?string $iv;
+    protected readonly ?string $iv;
     /** @internal Encryption key fingerprint for secret chat files */
-    private readonly ?int $keyFingerprint;
+    protected readonly ?int $keyFingerprint;
 
     /** @internal */
     public function __construct(
@@ -177,7 +177,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv']);
+        unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv'], $v['keyFingerprint']);
         return $v;
     }
 }
