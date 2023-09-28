@@ -236,6 +236,13 @@ final class WriteLoop extends Loop
                             $skipped = true;
                             continue;
                         }
+                    } elseif ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
+                        && !$this->shared->isAuthorized()
+                        && $constructor !== 'auth.importAuthorization'
+                    ) {
+                        $this->API->logger("Skipping $message due to unimported auth in connection in DC $this->datacenter");
+                        $skipped = true;
+                        continue;
                     } elseif ($message->queueId !== null) {
                         $queueId = $message->queueId;
                         if (isset($this->connection->callQueue[$queueId])

@@ -263,6 +263,7 @@ final class DataCenterConnection implements JsonSerializable
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                     && !$this->isAuthorized()
                     && !$this->API->isCDN($authorized_dc_id)
+                    && $authorized_dc_id !== $this->datacenter
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
