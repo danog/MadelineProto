@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@7428e49b115a2a837aa29cf0fafd0ca902fe2457">
+<files psalm-version="dev-master@1f979f4c33897fc8b42c68a063828381c6d60716">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -430,6 +430,12 @@
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
     </NullableReturnStatement>
   </file>
+  <file src="src/EventHandler/AbstractPrivateMessage.php">
+    <PropertyNotSetInConstructor>
+      <code>AbstractPrivateMessage</code>
+      <code>AbstractPrivateMessage</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="src/EventHandler/AbstractStory.php">
     <PossiblyNullPropertyAssignmentValue>
       <code><![CDATA[$API->getIdInternal($rawStory['peer'])]]></code>
@@ -478,6 +484,21 @@
     </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/Media.php">
+    <LessSpecificReturnStatement>
+      <code>$result</code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>array{
+     *      ext: string,
+     *      name: string,
+     *      mime: string,
+     *      size: int,
+     *      InputFileLocation: array,
+     *      key_fingerprint?: string,
+     *      key?: string,
+     *      iv?: string,
+     * }</code>
+    </MoreSpecificReturnType>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->botApiFileId]]></code>
       <code><![CDATA[$this->botApiFileUniqueId]]></code>
@@ -660,6 +681,25 @@
     <PropertyNotSetInConstructor>
       <code>PrivateMessage</code>
       <code>PrivateMessage</code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/EventHandler/Message/SecretMessage.php">
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->replyCache]]></code>
+      <code><![CDATA[$this->replyCache]]></code>
+    </InvalidReturnStatement>
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code>DialogScreenshotTaken</code>
+    </MoreSpecificReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+    </NullableReturnStatement>
+    <PropertyNotSetInConstructor>
+      <code>SecretMessage</code>
+      <code>SecretMessage</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Participant/Banned.php">
@@ -1380,7 +1420,7 @@
       <code>$msgId</code>
       <code>$msgId</code>
       <code>$msgId</code>
-      <code><![CDATA[$request->getMsgId()]]></code>
+      <code>$msgId</code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>hasReply</code>
@@ -1828,6 +1868,9 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/SecretChats/AuthKeyHandler.php">
+    <MoreSpecificReturnType>
+      <code>SecretMessage</code>
+    </MoreSpecificReturnType>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$user['user_id']]]></code>
     </PossiblyUndefinedArrayOffset>
@@ -2111,6 +2154,11 @@
     </UndefinedClass>
     <UndefinedDocblockClass>
       <code>WsStream</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Stream/Transport/WssStream.php">
+    <UndefinedDocblockClass>
+      <code>WssStream</code>
     </UndefinedDocblockClass>
   </file>
   <file src="src/TL/Conversion/BotAPI.php">
