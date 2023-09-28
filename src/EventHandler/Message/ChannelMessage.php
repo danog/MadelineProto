@@ -152,7 +152,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     * Enable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
      *
      * @return void
      */
@@ -168,7 +168,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     * Disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
      *
      * @return void
      */
