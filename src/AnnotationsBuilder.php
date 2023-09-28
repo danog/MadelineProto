@@ -374,6 +374,9 @@ final class Blacklist {
             if (!\strpos($data['method'], '.')) {
                 continue;
             }
+            if ($data['type'] === 'Vector t') {
+                $data['type'] = "Vector<{$data['subtype']}>";
+            }
             [$namespace, $method] = \explode('.', $data['method']);
             if (!\in_array($namespace, $this->TL->getMethodNamespaces(), true)) {
                 continue;

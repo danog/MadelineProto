@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\Loop;
-use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 
 /**
  * HttpWait loop.

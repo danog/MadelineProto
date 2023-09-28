@@ -199,7 +199,6 @@ trait CallHandler
      *
      * @param string $object Object name
      * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
      */
     public function objectCall(string $object, array $args, bool $flush = true, ?DeferredFuture $promise = null): void
     {

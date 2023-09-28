@@ -176,9 +176,9 @@
                     && $authorized_socket->isAuthorized()
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
-    <UnsupportedReferenceUsage>
-      <code><![CDATA[$this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey]]></code>
-    </UnsupportedReferenceUsage>
+    <UnsupportedPropertyReferenceUsage>
+      <code><![CDATA[$this->permAuthKey =& $connection->permAuthKey]]></code>
+    </UnsupportedPropertyReferenceUsage>
   </file>
   <file src="src/Db/CacheContainer.php">
     <ParadoxicalCondition>
@@ -1064,9 +1064,6 @@
       <code><![CDATA[$message->getSerializedBody()]]></code>
       <code><![CDATA[$message->getSerializedBody()]]></code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->connection->callQueue]]></code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullReference>
       <code>getWriteBuffer</code>
       <code>getWriteBuffer</code>
@@ -1361,9 +1358,6 @@
       <code>$msgId</code>
       <code>$msgId</code>
       <code><![CDATA[$request->getMsgId()]]></code>
-      <code><![CDATA[$request->getMsgId()]]></code>
-      <code><![CDATA[$request->getMsgId()]]></code>
-      <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>resume</code>
@@ -1374,16 +1368,6 @@
     <RiskyCast>
       <code><![CDATA[\preg_replace('/[^0-9]+/', '', $response['error_message'])]]></code>
     </RiskyCast>
-  </file>
-  <file src="src/MTProtoSession/SeqNoHandler.php">
-    <MissingParamType>
-      <code>$contentRelated</code>
-      <code>$contentRelated</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>generateInSeqNo</code>
-      <code>generateOutSeqNo</code>
-    </MissingReturnType>
   </file>
   <file src="src/MTProtoSession/Session.php">
     <MissingConstructor>

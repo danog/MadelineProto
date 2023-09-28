@@ -224,9 +224,8 @@ trait ResponseHandler
                     $this->API->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
-                    EventLoop::queue(function () use ($requestId): void {
-                        $this->methodRecall(message_id: $requestId);
-                    });
+                    EventLoop::queue($this->shared->initAuthorization(...));
+                    EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
             $this->handleReject($request, fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
@@ -378,9 +377,11 @@ trait ResponseHandler
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
                             $this->gotResponseForOutgoingMessage($request);
-                            EventLoop::queue(function () use ($request, $response): void {
-                                $this->handleReject($request, fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
-                            });
+                            EventLoop::queue(
+                                $this->handleReject(...),
+                                $request,
+                                fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor())
+                            );
                             return null;
                         }
                         $this->session_id = null;
@@ -396,16 +397,14 @@ trait ResponseHandler
                             $this->API->logout();
                             throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
-                        EventLoop::queue(function () use ($request): void {
-                            $this->methodRecall($request->getMsgId());
-                        });
+                        EventLoop::queue($this->shared->initAuthorization(...));
+                        EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                     case 'AUTH_KEY_PERM_EMPTY':
                         $this->API->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
                         $this->shared->setTempAuthKey(null);
-                        EventLoop::queue(function () use ($request): void {
-                            $this->methodRecall($request->getMsgId());
-                        });
+                        EventLoop::queue($this->shared->initAuthorization(...));
+                        EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                 }
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
