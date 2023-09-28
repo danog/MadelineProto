@@ -1357,9 +1357,12 @@
     <PossiblyNullArgument>
       <code>$msgId</code>
       <code>$msgId</code>
+      <code>$msgId</code>
       <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
+      <code>hasReply</code>
+      <code>hasReply</code>
       <code>resume</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
