@@ -36,6 +36,6 @@ abstract class Sticker extends AbstractSticker
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $stickerAttribute, $width, $height, $protected);
-        $this->premiumSticker = !$rawMedia['nopremium'];
+        $this->premiumSticker = !($rawMedia['nopremium'] ?? true);
     }
 }

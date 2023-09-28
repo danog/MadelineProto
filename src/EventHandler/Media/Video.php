@@ -42,7 +42,7 @@ final class Video extends AbstractVideo
     ) {
         parent::__construct($API, $rawMedia, $attribute, $protected);
         $hasStickers = false;
-        foreach ($rawMedia['document']['attributes'] as ['_' => $t]) {
+        foreach ($rawMedia['document']['attributes'] ?? [] as ['_' => $t]) {
             if ($t === 'documentAttributeHasStickers') {
                 $hasStickers = true;
                 break;

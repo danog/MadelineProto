@@ -43,7 +43,7 @@ final class Photo extends Media
     ) {
         parent::__construct($API, $rawMedia, $protected);
         $this->hasStickers = $rawMedia['photo']['has_stickers'] ?? false;
-        $this->thumb = isset($rawMedia['thumb']) ? new Bytes($rawMedia['thumb']) : null;
+        $this->thumb = $rawMedia['thumb'] ?? null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }

@@ -401,10 +401,13 @@ final class SecretChatController implements Stringable
                 $msg['message']['date'] = $response['date'];
                 $msg['message']['decrypted_message'] = $msg['message']['message'];
                 unset($msg['message']['message']);
-                if (isset($response['file']) && $response['file']['_'] !== 'encryptedFileEmpty') {
+                if (isset($msg['message']['decrypted_message']['media']) 
+                    && $msg['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
+                ) {
                     $msg['message']['file'] = $response['file'];
-                    $msg['message']['decrypted_message']['media']['file'] = $response['file'];
-                    $msg['message']['decrypted_message']['media']['date'] = $response['date'];
+                    $msg['message']['decrypted_message']['media']['file'] = $msg['message']['file'];
+                    $msg['message']['decrypted_message']['media']['date'] = $msg['message']['date'];
+                    $msg['message']['decrypted_message']['media']['ttl_seconds'] = $msg['message']['decrypted_message']['ttl'];
                 }
                 $msg['message']['decrypted_message']['out'] = true;
                 $msg['message']['decrypted_message']['date'] = $msg['message']['date'];
@@ -425,9 +428,12 @@ final class SecretChatController implements Stringable
 
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
-            if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {
+            if (isset($update['message']['decrypted_message']['media']) 
+                && $update['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
+            ) {
                 $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
                 $update['message']['decrypted_message']['media']['date'] = $update['message']['date'];
+                $update['message']['decrypted_message']['media']['ttl_seconds'] = $update['message']['decrypted_message']['ttl'];
             }
             $this->API->saveUpdate($update);
             return;

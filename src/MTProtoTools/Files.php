@@ -98,10 +98,18 @@ trait Files
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] !== 'messageMediaDocument'
-            && $media['_'] === 'decryptedMessageMediaDocument' 
-            && $media['_'] === 'decryptedMessageMediaExternalDocument'
+        if ($media['_'] === 'decryptedMessageMediaDocument' 
+            || $media['_'] === 'decryptedMessageMediaExternalDocument'
         ) {
+            // TODO caption?
+            $media = [
+                '_' => 'messageMediaDocument',
+                'document' => $media,
+                'ttl_seconds' => $media['ttl_seconds'],
+                'secret' => true
+            ];
+        }
+        if ($media['_'] !== 'messageMediaDocument') {
             return null;
         }
         if (!isset($media['document'])) {
@@ -684,13 +692,7 @@ trait Files
             $messageMedia = $messageMedia->media;
         }
         if ($messageMedia instanceof Media) {
-            return [
-                'name' => \basename($messageMedia->fileName, $messageMedia->fileExt),
-                'ext' => $messageMedia->fileExt,
-                'mime' => $messageMedia->mimeType,
-                'size' => $messageMedia->size,
-                'InputFileLocation' => $messageMedia->location
-            ];
+            return $messageMedia->getDownloadInfo();
         }
         if (\is_string($messageMedia)) {
             $messageMedia = $this->unpackFileId($messageMedia);
