@@ -63,9 +63,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly array $location;
 
     /** Encryption key for secret chat files */
-    private readonly ?array $key;
+    private readonly ?string $key;
     /** Encryption key for secret chat files */
-    private readonly ?array $iv;
+    private readonly ?string $iv;
 
     /** @internal */
     public function __construct(
