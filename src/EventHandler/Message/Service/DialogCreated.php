@@ -29,8 +29,9 @@ final class DialogCreated extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** Title of the created chat or channel */
+        /** @var string Title of the created chat or channel */
         public readonly string $title,
+
         /** @var list<int> List of group members */
         public readonly array $users,
     ) {

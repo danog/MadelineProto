@@ -29,7 +29,7 @@ final class DialogSetChatTheme extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** The emoji that identifies a chat theme */
+        /** @var string The emoji that identifies a chat theme */
         public readonly string $emoticon
     ) {
         parent::__construct($API, $rawMessage, $info);

@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
@@ -25,7 +26,6 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\MTProto;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -43,6 +43,8 @@ final class ChannelMessage extends Message
 
     /**
      * Disable message signatures in channels.
+     * 
+     * @return void
      */
     public function disableSignatures(): void
     {
@@ -57,6 +59,8 @@ final class ChannelMessage extends Message
 
     /**
      * Enable message signatures in channels.
+     * 
+     * @return void
      */
     public function enableSignatures(): void
     {
@@ -73,6 +77,7 @@ final class ChannelMessage extends Message
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
      * @param  string|integer $member Participant to get info about.
+     * @return Participant
      * @throws AssertionError
      */
     public function getMember(string|int $member): Participant
@@ -99,6 +104,8 @@ final class ChannelMessage extends Message
 
     /**
      * Increase the view counter of a current message in the channel.
+     * 
+     * @return void
      */
     public function view(): void
     {
@@ -113,8 +120,9 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Hide message history for new channel/supergroup users.
+     * Hide message history for new channel users.
      *
+     * @return void
      */
     public function hideHistory(): void
     {
@@ -128,8 +136,9 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Unhide message history for new channel/supergroup users.
+     * Unhide message history for new channel users.
      *
+     * @return void
      */
     public function unhideHistory(): void
     {
@@ -137,6 +146,38 @@ final class ChannelMessage extends Message
             'channels.toggleParticipantsHidden',
             [
                 'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Enable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     *
+     * @return void
+     */
+    public function enableProtection(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
+                'enabled' => true,
+            ]
+        );  
+    }
+
+    /**
+     * Disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel
+     *
+     * @return void
+     */
+    public function disableProtection(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
                 'enabled' => false,
             ]
         );

@@ -29,7 +29,7 @@ final class DialogChannelCreated extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** Original channel/supergroup title */
+        /** @var string Original channel/supergroup title */
         public readonly string $title
     ) {
         parent::__construct($API, $rawMessage, $info);

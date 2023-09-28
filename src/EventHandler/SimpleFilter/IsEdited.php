@@ -8,31 +8,15 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service;
+namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
-use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
-use danog\MadelineProto\MTProto;
-
-/**
- * A new profile picture was suggested using [photos.uploadContactProfilePhoto](https://docs.madelineproto.xyz/API_docs/methods/photos.uploadContactProfilePhoto.html).
- */
-final class DialogSuggestProfilePhoto extends ServiceMessage
+/** Allows messages that were edited. */
+interface IsEdited
 {
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
-
-        /** @var ?Photo The photo that the user suggested we set as profile picture. */
-        public readonly ?Photo $photo
-    ) {
-        parent::__construct($API, $rawMessage, $info);
-    }
 }

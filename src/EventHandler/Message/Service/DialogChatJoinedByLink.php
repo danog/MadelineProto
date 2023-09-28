@@ -29,7 +29,7 @@ final class DialogChatJoinedByLink extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** ID of the user that created the invite link */
+        /** @var int ID of the user that created the invite link */
         public readonly int $inviterId
     ) {
         parent::__construct($API, $rawMessage, $info);

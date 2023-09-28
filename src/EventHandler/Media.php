@@ -16,10 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use JsonSerializable;
+use danog\MadelineProto\MTProto;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
-use danog\MadelineProto\MTProto;
-use JsonSerializable;
 
 /**
  * Represents a generic media.
@@ -100,15 +100,6 @@ abstract class Media extends IpcCapable implements JsonSerializable
         return $this->getClient()->getDownloadLink($this, $scriptUrl);
     }
 
-    /** @internal */
-    public function jsonSerialize(): mixed
-    {
-        $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location']);
-        $v['_'] = static::class;
-        return $v;
-    }
-
     /**
      * Get a readable amp stream with the file contents.
      *
@@ -121,17 +112,33 @@ abstract class Media extends IpcCapable implements JsonSerializable
 
     /**
      * Download the media to working directory or passed path.
+     * 
+     * @param string $dir Directory where to download the file
+     * @param (callable(float, float, float): void)|null $cb Progress callback
+     * @return string
      */
-    public function downloadToDir(?string $path = null): string
+    public function downloadToDir(?string $dir = null, ?callable $cb = null): string
     {
-        $path ??= \getcwd();
-        return $this->getClient()->downloadToDir($this, $path);
+        $dir ??= \getcwd();
+        return $this->getClient()->downloadToDir($this, $dir, $cb);
     }
     /**
      * Download the media to file.
+     * 
+     * @param string $file Downloaded file path
+     * @param (callable(float, float, float): void)|null $cb Progress callback
+     * @return string
      */
-    public function downloadToFile(string $path): string
+    public function downloadToFile(string $file, ?callable $cb = null): string
     {
-        return $this->getClient()->downloadToFile($this, $path);
+        return $this->getClient()->downloadToFile($this, $file, $cb);
+    }
+
+    /** @internal */
+    public function jsonSerialize(): mixed
+    {
+        $v = \get_object_vars($this);
+        unset($v['API'], $v['session'], $v['location']);
+        return $v;
     }
 }

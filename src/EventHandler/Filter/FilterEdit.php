@@ -14,39 +14,20 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\MTProto;
+use Attribute;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message;
 
 /**
- * Represents a generic video.
+ * Allows messages that were edited.
  */
-abstract class AbstractVideo extends Media
+#[Attribute(Attribute::TARGET_METHOD)]
+final class FilterEdited extends Filter
 {
-    /** Video duration in seconds */
-    public readonly float $duration;
-
-    /** Whether the video supports streaming */
-    public readonly bool $supportsStreaming;
-
-    /** Video width */
-    public readonly int $width;
-
-    /** Video height */
-    public readonly int $height;
-
-    /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMedia,
-        array $attribute,
-        bool $protected,
-    ) {
-        parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $attribute['duration'];
-        $this->supportsStreaming = $attribute['supports_streaming'];
-        $this->width = $attribute['w'];
-        $this->height = $attribute['h'];
+    public function apply(Update $update): bool
+    {
+        return $update instanceof Message && $update->editDate !== null;
     }
 }

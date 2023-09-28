@@ -20,43 +20,21 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\VoIP;
 
-use AssertionError;
 use JsonSerializable;
 
 /**
  * Why was the call discarded?
  */
-enum DiscardReason implements JsonSerializable
+enum DiscardReason: string implements JsonSerializable
 {
     /** We missed the call */
-    case MISSED;
+    case MISSED = 'phoneCallDiscardReasonMissed';
     /** The phone call was disconnected */
-    case DISCONNECTED;
+    case DISCONNECTED = 'phoneCallDiscardReasonDisconnect';
     /** The phone call ended normally */
-    case HANGUP;
+    case HANGUP = 'phoneCallDiscardReasonHangup';
     /** The phone call was discarded because the user is busy in another call */
-    case BUSY;
-
-    /**
-     * @internal
-     * @throws AssertionError
-     */
-    public static function fromString(?string $name): ?DiscardReason
-    {
-        if ($name === null) {
-            return null;
-        }
-        $newName = \strtoupper(\substr($name, 22));
-        if ($newName === 'DISCONNECT') {
-            return self::DISCONNECTED;
-        }
-        foreach (DiscardReason::cases() as $case) {
-            if ($case->name === $newName) {
-                return $case;
-            }
-        }
-        throw new AssertionError("Undefined case PhoneCallDiscardReason::".$name);
-    }
+    case BUSY = 'phoneCallDiscardReasonBusy';
 
     /** @internal */
     public function jsonSerialize(): string

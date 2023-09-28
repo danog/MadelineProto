@@ -19,8 +19,6 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\InlineQuery;
-use danog\MadelineProto\EventHandler\Query\ButtonQuery;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
@@ -30,7 +28,6 @@ use danog\MadelineProto\EventHandler\Update;
 final class FilterFromBot extends Filter
 {
     private readonly EventHandler $API;
-    /** Run some initialization logic, optionally returning a new filter to replace the current one. */
     public function initialize(EventHandler $API): Filter
     {
         $this->API = $API;
@@ -38,8 +35,6 @@ final class FilterFromBot extends Filter
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof AbstractMessage && $this->API->isBot($update->senderId)) ||
-            ($update instanceof ButtonQuery && $this->API->isBot($update->userId)) ||
-            ($update instanceof InlineQuery && $this->API->isBot($update->userId));
+        return $update instanceof AbstractMessage && $this->API->isBot($update->senderId);
     }
 }

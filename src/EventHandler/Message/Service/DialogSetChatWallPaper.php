@@ -14,39 +14,28 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Wallpaper;
 
 /**
- * Represents a generic video.
+ * The [wallpaper](https://core.telegram.org/api/wallpapers) of the current chat was changed.
  */
-abstract class AbstractVideo extends Media
+final class DialogSetChatWallPaper extends ServiceMessage
 {
-    /** Video duration in seconds */
-    public readonly float $duration;
-
-    /** Whether the video supports streaming */
-    public readonly bool $supportsStreaming;
-
-    /** Video width */
-    public readonly int $width;
-
-    /** Video height */
-    public readonly int $height;
-
-    /** @internal */
     public function __construct(
         MTProto $API,
-        array $rawMedia,
-        array $attribute,
-        bool $protected,
+        array $rawMessage,
+        array $info,
+
+        /** @var Wallpaper New [wallpaper](https://core.telegram.org/api/wallpapers) */
+        public readonly Wallpaper $wallpaper,
+
+        /** @var bool Whether the user applied a wallpaper previously sent by the other user in a DialogSetChatWallPaper message. */
+        public readonly bool $same = false
     ) {
-        parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $attribute['duration'];
-        $this->supportsStreaming = $attribute['supports_streaming'];
-        $this->width = $attribute['w'];
-        $this->height = $attribute['h'];
+        parent::__construct($API, $rawMessage, $info);
     }
 }

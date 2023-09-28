@@ -17,13 +17,13 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Action\Typing;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -34,14 +34,19 @@ abstract class AbstractMessage extends Update implements SimpleFilters
 {
     /** Message ID */
     public readonly int $id;
+
     /** Whether the message is outgoing */
     public readonly bool $out;
+
     /** ID of the chat where the message was sent */
     public readonly int $chatId;
+
     /** ID of the sender of the message */
     public readonly int $senderId;
+
     /** ID of the message to which this message is replying */
     public readonly ?int $replyToMsgId;
+
     /** When was the message sent */
     public readonly int $date;
 
@@ -53,8 +58,10 @@ abstract class AbstractMessage extends Update implements SimpleFilters
 
     /** Whether this is a reply to a scheduled message */
     public readonly bool $replyToScheduled;
+
     /** Whether we were mentioned in this message */
     public readonly bool $mentioned;
+
     /** Whether this message was sent without any notification (silently) */
     public readonly bool $silent;
 
@@ -272,12 +279,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function getStories(): array
     {
+        // TODO : support seen channel story
         Assert::true($this->senderId > 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'stories.getUserStories',
+            'stories.getPeerStories',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
             ]
         )['stories']['stories'];
         $result = \array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
@@ -286,15 +294,15 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'id' => \array_column($result, 'id'),
             ]
         )['stories'];
         return \array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
-                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
-                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+                    ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])
+                    : new Story($client, ['peer' => $this->senderId, 'story' => $arr]),
             $result
         );
     }
@@ -339,10 +347,13 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Set maximum Time-To-Live of all messages in the specified chat.
      *
-     * @param integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @param positive-integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @throws InvalidArgumentException
+     * @return DialogSetTTL
      */
     public function enableTTL(int $seconds = 86400): DialogSetTTL
     {
+        Assert::false($seconds <= 0);
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
             'messages.setHistoryTTL',
@@ -357,6 +368,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Disable Time-To-Live of all messages in the specified chat.
      *
+     * @return DialogSetTTL
      */
     public function disableTTL(): DialogSetTTL
     {
@@ -369,5 +381,37 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             ]
         );
         return $client->wrapMessage($client->extractMessage($result));
+    }
+
+    /**
+     * Show the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     *
+     * @return boolean
+     */
+    public function enableAutoTranslate(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.togglePeerTranslations',
+            [
+                'peer' => $this->chatId,
+                'disabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Hide the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     *
+     * @return boolean
+     */
+    public function disableAutoTranslate(): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.togglePeerTranslations',
+            [
+                'peer' => $this->chatId,
+                'disabled' => true,
+            ]
+        );
     }
 }

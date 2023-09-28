@@ -8,31 +8,30 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service;
+namespace danog\MadelineProto\EventHandler\Typing;
 
-use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * A new profile picture was suggested using [photos.uploadContactProfilePhoto](https://docs.madelineproto.xyz/API_docs/methods/photos.uploadContactProfilePhoto.html).
+ * The user is preparing a message in a group; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing
  */
-final class DialogSuggestProfilePhoto extends ServiceMessage
+final class ChatUserTyping extends Typing
 {
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
+    /** @var int Group ID. */
+    public readonly int $chatId;
 
-        /** @var ?Photo The photo that the user suggested we set as profile picture. */
-        public readonly ?Photo $photo
-    ) {
-        parent::__construct($API, $rawMessage, $info);
+    /** @internal */
+    public function __construct(MTProto $API, array $rawTyping)
+    {
+        parent::__construct($API, $rawTyping);
+        $this->chatId = $rawTyping['chat_id'];
     }
 }

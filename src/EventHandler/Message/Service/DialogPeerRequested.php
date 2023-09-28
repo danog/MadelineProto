@@ -29,9 +29,10 @@ final class DialogPeerRequested extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** buttonId contained in the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) */
+        /** @var int buttonId contained in the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) */
         public readonly int $buttonId,
-        /** The shared peer */
+
+        /** @var int The shared peer */
         public readonly int $peer
     ) {
         parent::__construct($API, $rawMessage, $info);
