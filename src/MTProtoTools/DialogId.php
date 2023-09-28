@@ -82,7 +82,7 @@ enum DialogId
      */
     public static function toSupergroupOrChannel(int $id): int
     {
-        Assert::eq(self::getType($id), self::CHANNEL_OR_SUPERGROUP);
+        Assert::eq(self::getType($id), self::CHANNEL_OR_SUPERGROUP, "The provided ID is not a bot API channel ID");
         return (-$id) + Magic::ZERO_CHANNEL_ID;
     }
 

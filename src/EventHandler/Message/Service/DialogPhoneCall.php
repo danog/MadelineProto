@@ -30,13 +30,16 @@ final class DialogPhoneCall extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** Is this a video call? */
+        /** @var bool Is this a video call? */
         public readonly bool $video,
-        /** Call ID */
+
+        /** @var int Call ID */
         public readonly int $callId,
-        /** If the call has ended, the reason why it ended */
+
+        /** @var ?DiscardReason If the call has ended, the reason why it ended */
         public readonly ?DiscardReason $reason,
-        /** Duration of the call in seconds */
+
+        /** @var ?int Duration of the call in seconds */
         public readonly ?int $duration,
     ) {
         parent::__construct($API, $rawMessage, $info);

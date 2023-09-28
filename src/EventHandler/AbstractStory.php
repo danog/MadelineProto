@@ -34,7 +34,7 @@ abstract class AbstractStory extends Update
     public function __construct(MTProto|Client $API, array $rawStory)
     {
         parent::__construct($API);
-        $this->senderId = $rawStory['user_id'];
+        $this->senderId = $API->getIdInternal($rawStory['peer']);
         $this->id = $rawStory['story']['id'];
     }
 }

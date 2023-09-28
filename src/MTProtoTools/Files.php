@@ -77,6 +77,12 @@ trait Files
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
+        if ($media['_'] === 'photo') {
+            $media = [ '_' => 'messageMediaPhoto', 'photo' => $media ];
+        }
+        if ($media['_'] === 'document') {
+            $media = [ '_' => 'messageMediaDocument', 'document' => $media];
+        }
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
                 return null;

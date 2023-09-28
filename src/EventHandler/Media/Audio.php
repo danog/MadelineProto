@@ -23,9 +23,10 @@ use danog\MadelineProto\MTProto;
  */
 final class Audio extends AbstractAudio
 {
-    /** Song name */
+    /** @var ?string Song name */
     public readonly ?string $title;
-    /** Performer */
+
+    /** @var ?string Performer */
     public readonly ?string $performer;
 
     /** @internal */

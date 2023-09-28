@@ -9,6 +9,7 @@ final class TextUrl extends MessageEntity
 {
     /** The actual URL */
     public readonly string $url;
+
     /** @internal  */
     protected function __construct(array $rawEntities)
     {

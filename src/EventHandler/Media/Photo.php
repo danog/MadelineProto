@@ -26,7 +26,7 @@ use danog\MadelineProto\TL\Types\Bytes;
  */
 final class Photo extends Media
 {
-    /** If true; the current media has attached mask stickers. */
+    /** @var bool If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
     /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
     public readonly ?Bytes $thumb;

@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class DocumentPhoto extends Media
 {
-    /** If true; the current media has attached mask stickers. */
+    /** @var bool If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
 
     public readonly int $width;

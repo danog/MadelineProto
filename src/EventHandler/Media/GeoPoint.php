@@ -8,10 +8,13 @@ final class GeoPoint implements JsonSerializable
 {
     /** @var int Longitude */
     public readonly int $long;
+
     /** @var int Latitude */
     public readonly int $lat;
+
     /** @var int 	Access hash */
     public readonly int $accessHash;
+
     /** @var int The estimated horizontal accuracy of the location, in meters; as defined by the sender. */
     public readonly ?int $accuracyRadius;
 

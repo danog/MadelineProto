@@ -403,6 +403,7 @@ final class SecretChatController implements Stringable
                     $msg['message']['file'] = $response['file'];
                     $msg['message']['decrypted_message']['media']['file'] = $response['file'];
                 }
+                $msg['message']['decrypted_message']['out'] = true;
                 $this->outgoing[$request['seq']] = $msg;
                 EventLoop::queue($this->API->saveUpdate(...), $msg);
             }
@@ -413,6 +414,7 @@ final class SecretChatController implements Stringable
     }
     private function handleDecryptedUpdate(array $update): void
     {
+        $update['message']['decrypted_message']['out'] = false;
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
             if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {

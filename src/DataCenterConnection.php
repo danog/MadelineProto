@@ -263,6 +263,7 @@ final class DataCenterConnection implements JsonSerializable
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                     && !$this->isAuthorized()
                     && !$this->API->isCDN($authorized_dc_id)
+                    && $authorized_dc_id !== $this->datacenter
                 ) {
                     try {
                         $logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$this->datacenter);
@@ -381,8 +382,10 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function link(int $dc): void
     {
+        $connection = $this->API->datacenter->getDataCenterConnection($dc);
+        $connection->initAuthorization();
         $this->linkedDc = $dc;
-        $this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey;
+        $this->permAuthKey =& $connection->permAuthKey;
     }
     /**
      * Reset MTProto sessions.
@@ -490,7 +493,7 @@ final class DataCenterConnection implements JsonSerializable
         foreach ($backup as $k => $message) {
             if ($message->getConstructor() === 'msgs_state_req'
                 || $message->getConstructor() === 'ping_delay_disconnect'
-                || $message->isUnencrypted()) {
+                || $message->unencrypted) {
                 unset($backup[$k]);
                 continue;
             }

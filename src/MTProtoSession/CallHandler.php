@@ -100,7 +100,11 @@ trait CallHandler
         if ($aargs['noResponse'] ?? false) {
             return null;
         }
-        return $readFuture->await();
+        $result = $readFuture->await();
+        if ($aargs['botAPI'] ?? false) {
+            return $this->API->MTProtoToBotAPI($result);
+        }
+        return $result;
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
@@ -171,34 +175,22 @@ trait CallHandler
             }
         }
         $message = new MTProtoOutgoingMessage(
-            $args,
-            $method,
-            $methodInfo['type'],
-            true,
-            !$encrypted,
-            $response,
-            $aargs['cancellation'] ?? null
+            body: $args,
+            constructor: $method,
+            type: $methodInfo['type'],
+            subtype: $methodInfo['subtype'] ?? null,
+            isMethod: true,
+            unencrypted: !$encrypted,
+            fileRelated: $file,
+            queueId: $aargs['queue'] ?? null,
+            floodWaitLimit: $aargs['FloodWaitLimit'] ?? null,
+            resultDeferred: $response,
+            cancellation: $aargs['cancellation'] ?? null,
         );
-        if (isset($aargs['queue'])) {
-            $message->setQueueId($aargs['queue']);
-        }
-        if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
-            $message->setUserRelated(true);
-        }
         if (isset($aargs['msg_id'])) {
             $message->setMsgId($aargs['msg_id']);
         }
-        if ($file) {
-            $message->setFileRelated(true);
-        }
-        if ($aargs['botAPI'] ?? false) {
-            $message->setBotAPI(true);
-        }
-        if (isset($aargs['FloodWaitLimit'])) {
-            $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
-        }
-        $aargs['postpone'] ??= false;
-        $this->sendMessage($message, !$aargs['postpone']);
+        $this->sendMessage($message, !($aargs['postpone'] ?? false));
         $this->checker->resume();
         return new WrappedFuture($response->getFuture());
     }
@@ -207,19 +199,19 @@ trait CallHandler
      *
      * @param string $object Object name
      * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
      */
-    public function objectCall(string $object, array $args = [], array $aargs = ['msg_id' => null]): void
+    public function objectCall(string $object, array $args, bool $flush = true, ?DeferredFuture $promise = null): void
     {
-        $message = new MTProtoOutgoingMessage(
-            $args,
-            $object,
-            '',
-            false,
-            !$this->shared->hasTempAuthKey(),
-            $aargs['promise'] ?? null
+        $this->sendMessage(
+            new MTProtoOutgoingMessage(
+                body: $args,
+                constructor: $object,
+                type: '',
+                isMethod: false,
+                unencrypted: false,
+                resultDeferred: $promise
+            ),
+            $flush
         );
-        $aargs['postpone'] ??= false;
-        $this->sendMessage($message, !$aargs['postpone']);
     }
 }

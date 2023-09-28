@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\Loop;
-use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 
 /**
  * HttpWait loop.
@@ -46,14 +45,9 @@ final class HttpWaitLoop extends Loop
         }
         $this->API->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
         if ($this->connection->countHttpSent() === $this->connection->countHttpReceived() && (!empty($this->connection->pendingOutgoing) || !empty($this->connection->new_outgoing) && !$this->connection->hasPendingCalls())) {
-            $this->connection->sendMessage(
-                new MTProtoOutgoingMessage(
-                    ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
-                    'http_wait',
-                    '',
-                    false,
-                    false,
-                ),
+            $this->connection->objectCall(
+                'http_wait',
+                ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
             );
         }
         $this->API->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");

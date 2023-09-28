@@ -81,7 +81,7 @@ trait Session
     /**
      * Call queue.
      *
-     * @var array<string, int>
+     * @var array<string, MTProtoOutgoingMessage>
      */
     public array $callQueue = [];
     /**

@@ -20,6 +20,7 @@ use Attribute;
 use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
@@ -48,6 +49,11 @@ final class FilterRegex extends Filter
             return true;
         }
         if ($update instanceof InlineQuery && \preg_match($this->regex, $update->query, $matches)) {
+            /** @psalm-suppress InaccessibleProperty */
+            $update->matches = $matches;
+            return true;
+        }
+        if ($update instanceof Story && \preg_match($this->regex, $update->caption, $matches)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;

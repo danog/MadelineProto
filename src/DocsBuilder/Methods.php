@@ -73,6 +73,9 @@ trait Methods
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', Logger::NOTICE);
         foreach ($this->TL->getMethods()->by_id as $id => $data) {
+            if ($data['type'] === 'Vector t') {
+                $data['type'] = "Vector<{$data['subtype']}>";
+            }
             $method = $data['method'];
             $phpMethod = StrTools::methodEscape($method);
             $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);

@@ -7,8 +7,9 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class MentionName extends MessageEntity
 {
-    /** Identifier of the user that was mentioned */
+    /**  @var int Identifier of the user that was mentioned */
     public readonly int $userId;
+
     /** @internal  */
     protected function __construct(array $rawEntities)
     {

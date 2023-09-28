@@ -279,7 +279,7 @@ final class Connection
                 try {
                     $this->stream = $ctx->getStream();
                 } catch (\Throwable $e) {
-                    $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::WARNING);
+                    $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::ERROR);
                     continue;
                 }
                 $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
@@ -302,7 +302,7 @@ final class Connection
                     $this->pinger = new PingLoop($this);
                 }
                 foreach ($this->new_outgoing as $message_id => $message) {
-                    if ($message->isUnencrypted()) {
+                    if ($message->unencrypted) {
                         if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
                             $message->reply(fn () => new Exception('Restart because we were reconnected'));
                         }
@@ -503,7 +503,7 @@ final class Connection
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
-            if ($message->isMethod()) {
+            if ($message->isMethod) {
                 $body = $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
             } else {
                 $body['_'] = $message->getConstructor();

@@ -28,8 +28,6 @@ namespace danog\MadelineProto\MTProto;
 abstract class MTProtoMessage
 {
     public const NOT_CONTENT_RELATED = [
-        //'rpc_result' => true,
-        //'rpc_error' => true,
         'rpc_drop_answer' => true,
         'rpc_answer_unknown' => true,
         'rpc_answer_dropped_running' => true,
@@ -69,17 +67,12 @@ abstract class MTProtoMessage
      */
     protected ?int $seqNo = null;
 
-    /**
-     * Whether constructor is content related.
-     */
-    protected bool $contentRelated;
-
-    /**
-     * Get whether constructor is content related.
-     */
-    public function isContentRelated(): bool
-    {
-        return $this->contentRelated;
+    public function __construct(
+        /**
+         * Whether constructor is content related.
+         */
+        public readonly bool $contentRelated
+    ) {
     }
 
     /**

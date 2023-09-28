@@ -11,9 +11,10 @@ use ReflectionProperty;
  */
 abstract class MessageEntity implements JsonSerializable
 {
-    /** Offset of message entity within message (in UTF-16 code units) */
+    /** @var int Offset of message entity within message (in UTF-16 code units) */
     public readonly int $offset;
-    /** Length of message entity within message (in UTF-16 code units) */
+
+    /** @var int Length of message entity within message (in UTF-16 code units) */
     public readonly int $length;
 
     /** @internal  */
@@ -52,6 +53,7 @@ abstract class MessageEntity implements JsonSerializable
             default => new Unknown($entity)
         }, $entities);
     }
+
     /** @internal */
     public function jsonSerialize(): mixed
     {

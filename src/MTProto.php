@@ -117,7 +117,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 174;
+    const V = 175;
     /**
      * Bad message error codes.
      *

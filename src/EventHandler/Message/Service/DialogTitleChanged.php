@@ -29,7 +29,7 @@ final class DialogTitleChanged extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** New title */
+        /** @var string New title */
         public readonly string $title
     ) {
         parent::__construct($API, $rawMessage, $info);

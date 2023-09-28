@@ -89,13 +89,20 @@ final class Story extends AbstractStory
     /** @var list<int> List of users who recently viewed the story */
     public readonly array $recentViewers;
 
+    /**
+     * @readonly
+     *
+     * @var list<string> Regex matches, if a filter regex is present
+     */
+    public ?array $matches = null;
+
     /** @internal */
     public function __construct(MTProto|Client $API, array $rawStory)
     {
         parent::__construct($API, $rawStory);
         if ($rawStory['story']['min']) {
             // TODO: cache
-            $rawStory = $API->methodCallAsyncRead('stories.getStoriesByID', ['user_id' => $rawStory['user_id'], 'id' => [$rawStory['story']['id']]])['stories'][0];
+            $rawStory = $API->methodCallAsyncRead('stories.getStoriesByID', ['peer' => $rawStory['peer'], 'id' => [$rawStory['story']['id']]])['stories'][0];
         } else {
             $rawStory = $rawStory['story'];
         }
@@ -193,6 +200,7 @@ final class Story extends AbstractStory
         $this->getClient()->methodCallAsyncRead(
             'stories.deleteStories',
             [
+                'peer' => $this->senderId,
                 'id' => [$this->id],
             ]
         );
@@ -207,7 +215,7 @@ final class Story extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.exportStoryLink',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'id' => $this->id,
             ]
         )['link'];
@@ -225,7 +233,7 @@ final class Story extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.report',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'id' => [$this->id],
                 'reason' => ['_' => $reason->value],
                 'message' => $message,
@@ -242,6 +250,7 @@ final class Story extends AbstractStory
         $this->getClient()->methodCallAsyncRead(
             'stories.togglePinned',
             [
+                'peer' => $this->senderId,
                 'id' => [$this->id],
                 'pinned' => true,
             ]
@@ -273,7 +282,7 @@ final class Story extends AbstractStory
         return $this->getClient()->methodCallAsyncRead(
             'stories.incrementStoryViews',
             [
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'id' => [$this->id],
             ]
         );
@@ -292,7 +301,7 @@ final class Story extends AbstractStory
             'stories.sendReaction',
             [
                 'add_to_recent' => $recent,
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'story_id' => $this->id,
                 'reaction' => \is_int($reaction)
                 ? ['_' => 'reactionCustomEmoji', 'document_id' => $reaction]
@@ -319,7 +328,7 @@ final class Story extends AbstractStory
             'stories.sendReaction',
             [
                 'add_to_recent' => $recent,
-                'user_id' => $this->senderId,
+                'peer' => $this->senderId,
                 'story_id' => $this->id,
             ]
         )['updates'];

@@ -176,9 +176,9 @@
                     && $authorized_socket->isAuthorized()
                     && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
-    <UnsupportedReferenceUsage>
-      <code><![CDATA[$this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey]]></code>
-    </UnsupportedReferenceUsage>
+    <UnsupportedPropertyReferenceUsage>
+      <code><![CDATA[$this->permAuthKey =& $connection->permAuthKey]]></code>
+    </UnsupportedPropertyReferenceUsage>
   </file>
   <file src="src/Db/CacheContainer.php">
     <ParadoxicalCondition>
@@ -415,8 +415,8 @@
       <code><![CDATA[\array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
-                    ? new StoryDeleted($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr])
-                    : new Story($this->getClient(), ['user_id' => $this->senderId, 'story' => $arr]),
+                    ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])
+                    : new Story($client, ['peer' => $this->senderId, 'story' => $arr]),
             $result
         )]]></code>
     </LessSpecificReturnStatement>
@@ -430,10 +430,16 @@
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
     </NullableReturnStatement>
   </file>
-  <file src="src/EventHandler/Action.php">
-    <UnhandledMatchCondition>
-      <code>$type</code>
-    </UnhandledMatchCondition>
+  <file src="src/EventHandler/AbstractStory.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawStory['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/BotApp.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[isset($rawBotApp['document']) ? $API->wrapMedia($rawBotApp['document']) : null]]></code>
+      <code><![CDATA[isset($rawBotApp['photo']) ? $API->wrapMedia($rawBotApp['photo']) : null]]></code>
+    </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -465,6 +471,7 @@
   </file>
   <file src="src/EventHandler/Filter/FilterRegex.php">
     <PropertyTypeCoercion>
+      <code>$matches</code>
       <code>$matches</code>
       <code>$matches</code>
       <code>$matches</code>
@@ -539,6 +546,11 @@
       <code>MaskSticker</code>
       <code>MaskSticker</code>
     </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/EventHandler/Media/MediaStory.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawMedia['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/Media/Photo.php">
     <PropertyNotSetInConstructor>
@@ -703,6 +715,11 @@
       <code><![CDATA[\array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
     </PropertyTypeCoercion>
   </file>
+  <file src="src/EventHandler/Story/StoryReaction.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawStory['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
   <file src="src/EventHandler/User/Blocked.php">
     <PossiblyNullPropertyAssignmentValue>
       <code><![CDATA[$API->getIdInternal($rawPeerBlocked['peer_id'])]]></code>
@@ -714,6 +731,11 @@
             fn (array $username) => new UsernameInfo($username),
             $rawUserName['usernames']
         )]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/EventHandler/Wallpaper.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[$API->wrapMedia($rawWallpaper['document'])]]></code>
     </PropertyTypeCoercion>
   </file>
   <file src="src/Exception.php">
@@ -1064,9 +1086,6 @@
       <code><![CDATA[$message->getSerializedBody()]]></code>
       <code><![CDATA[$message->getSerializedBody()]]></code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->connection->callQueue]]></code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullReference>
       <code>getWriteBuffer</code>
       <code>getWriteBuffer</code>
@@ -1360,12 +1379,12 @@
     <PossiblyNullArgument>
       <code>$msgId</code>
       <code>$msgId</code>
-      <code><![CDATA[$request->getMsgId()]]></code>
-      <code><![CDATA[$request->getMsgId()]]></code>
-      <code><![CDATA[$request->getMsgId()]]></code>
+      <code>$msgId</code>
       <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
+      <code>hasReply</code>
+      <code>hasReply</code>
       <code>resume</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
@@ -1374,16 +1393,6 @@
     <RiskyCast>
       <code><![CDATA[\preg_replace('/[^0-9]+/', '', $response['error_message'])]]></code>
     </RiskyCast>
-  </file>
-  <file src="src/MTProtoSession/SeqNoHandler.php">
-    <MissingParamType>
-      <code>$contentRelated</code>
-      <code>$contentRelated</code>
-    </MissingParamType>
-    <MissingReturnType>
-      <code>generateInSeqNo</code>
-      <code>generateOutSeqNo</code>
-    </MissingReturnType>
   </file>
   <file src="src/MTProtoSession/Session.php">
     <MissingConstructor>
@@ -1671,14 +1680,8 @@
   </file>
   <file src="src/MTProtoTools/UpdateHandler.php">
     <ArgumentTypeCoercion>
-      <code><![CDATA[$this->wrapMedia([
-                        '_' => 'messageMediaPhoto',
-                        'photo' => $message['action']['photo']
-                    ])]]></code>
-      <code><![CDATA[$this->wrapMedia([
-                        '_' => 'messageMediaPhoto',
-                        'photo' => $message['action']['photo']
-                    ])]]></code>
+      <code><![CDATA[$this->wrapMedia($message['action']['photo'])]]></code>
+      <code><![CDATA[$this->wrapMedia($message['action']['photo'])]]></code>
     </ArgumentTypeCoercion>
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
@@ -2108,11 +2111,6 @@
     </UndefinedClass>
     <UndefinedDocblockClass>
       <code>WsStream</code>
-    </UndefinedDocblockClass>
-  </file>
-  <file src="src/Stream/Transport/WssStream.php">
-    <UndefinedDocblockClass>
-      <code>WssStream</code>
     </UndefinedDocblockClass>
   </file>
   <file src="src/TL/Conversion/BotAPI.php">

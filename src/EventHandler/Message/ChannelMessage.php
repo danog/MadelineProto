@@ -43,6 +43,7 @@ final class ChannelMessage extends Message
 
     /**
      * Disable message signatures in channels.
+     *
      */
     public function disableSignatures(): void
     {
@@ -57,6 +58,7 @@ final class ChannelMessage extends Message
 
     /**
      * Enable message signatures in channels.
+     *
      */
     public function enableSignatures(): void
     {
@@ -99,6 +101,7 @@ final class ChannelMessage extends Message
 
     /**
      * Increase the view counter of a current message in the channel.
+     *
      */
     public function view(): void
     {
@@ -113,7 +116,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Hide message history for new channel/supergroup users.
+     * Hide message history for new channel users.
      *
      */
     public function hideHistory(): void
@@ -128,7 +131,7 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Unhide message history for new channel/supergroup users.
+     * Unhide message history for new channel users.
      *
      */
     public function unhideHistory(): void
@@ -137,6 +140,36 @@ final class ChannelMessage extends Message
             'channels.toggleParticipantsHidden',
             [
                 'channel' => $this->chatId,
+                'enabled' => false,
+            ]
+        );
+    }
+
+    /**
+     * Enable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel.
+     *
+     */
+    public function enableProtection(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
+                'enabled' => true,
+            ]
+        );
+    }
+
+    /**
+     * Disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel.
+     *
+     */
+    public function disableProtection(): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.toggleNoForwards',
+            [
+                'peer' => $this->chatId,
                 'enabled' => false,
             ]
         );

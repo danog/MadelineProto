@@ -49,7 +49,9 @@ use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVoice;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReplyToSelf;
 use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
@@ -93,6 +95,8 @@ abstract class Filter
                 GroupMessage::class => new FilterGroup,
                 ChannelMessage::class => new FilterChannel,
                 ServiceMessage::class => new FilterService,
+                IsEdited::class => new FilterEdited,
+                IsNotEdited::class => new FilterNotEdited,
                 IsForwarded::class => new FilterForwarded,
                 IsReply::class => new FilterReply,
                 IsReplyToSelf::class => new FilterReplyToSelf,

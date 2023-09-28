@@ -35,7 +35,7 @@ final class Privacy extends Update
     public function __construct(MTProto $API, array $rawPrivacy)
     {
         parent::__construct($API);
-        $this->rule = Rule::fromRawKey($rawPrivacy['key']['_']);
+        $this->rule = Rule::from($rawPrivacy['key']['_']);
         $this->appliesTo = \array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules']);
     }
 }
