@@ -77,14 +77,17 @@ trait Files
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
-        if ($media['_'] === 'photo' || $media['_'] === 'decryptedMessageMediaPhoto') {
+        if ($media['_'] === 'photo') {
             $media = [ '_' => 'messageMediaPhoto', 'photo' => $media ];
         }
-        if ($media['_'] === 'document' || $media['_'] === 'decryptedMessageMediaDocument' || $media['_'] === 'decryptedMessageMediaExternalDocument') {
+        if ($media['_'] === 'document') {
             $media = [ '_' => 'messageMediaDocument', 'document' => $media];
         }
         if ($media['_'] === 'decryptedMessageMediaAudio') {
             return new Audio($this, $media, $media, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaPhoto') {
+            return new Photo($this, $media, $protected);
         }
         if ($media['_'] === 'decryptedMessageMediaVideo') {
             return new Video($this, $media, $media, $protected);
@@ -95,7 +98,10 @@ trait Files
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] !== 'messageMediaDocument') {
+        if ($media['_'] !== 'messageMediaDocument'
+            && $media['_'] === 'decryptedMessageMediaDocument' 
+            && $media['_'] === 'decryptedMessageMediaExternalDocument'
+        ) {
             return null;
         }
         if (!isset($media['document'])) {

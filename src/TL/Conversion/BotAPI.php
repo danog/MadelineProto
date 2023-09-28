@@ -388,6 +388,12 @@ trait BotAPI
                 $res['file_id'] = (string) $fileId;
                 $res['file_unique_id'] = $fileId->getUniqueBotAPI();
                 return [$type_name => $res, 'caption' => $data['caption'] ?? ''];
+            case 'decryptedMessageMediaAudio':
+            case 'decryptedMessageMediaPhoto':
+            case 'decryptedMessageMediaVideo':
+            case 'decryptedMessageMediaDocument':
+            case 'decryptedMessageMediaDocument':
+                $data = $data['file'];
             case 'encryptedFile':
                 $fileId = new FileId;
                 $fileId->setId($data['id']);
@@ -402,7 +408,7 @@ trait BotAPI
                     'file_size' => $data['size'],
                     'mime_type' => 'application/octet-stream'
                 ];
-                return ['encrypted' => $res, 'caption' => $data['caption'] ?? ''];
+                return ['encrypted' => $res];
             default:
                 throw new Exception(\sprintf(Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }

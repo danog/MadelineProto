@@ -404,6 +404,7 @@ final class SecretChatController implements Stringable
                 if (isset($response['file']) && $response['file']['_'] !== 'encryptedFileEmpty') {
                     $msg['message']['file'] = $response['file'];
                     $msg['message']['decrypted_message']['media']['file'] = $response['file'];
+                    $msg['message']['decrypted_message']['media']['date'] = $response['date'];
                 }
                 $msg['message']['decrypted_message']['out'] = true;
                 $msg['message']['decrypted_message']['date'] = $msg['message']['date'];
@@ -426,6 +427,7 @@ final class SecretChatController implements Stringable
         if ($decryptedMessage['_'] === 'decryptedMessage') {
             if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {
                 $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
+                $update['message']['decrypted_message']['media']['date'] = $update['message']['date'];
             }
             $this->API->saveUpdate($update);
             return;

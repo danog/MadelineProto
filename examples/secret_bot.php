@@ -79,7 +79,7 @@ class SecretHandler extends SimpleEventHandler
         if ($update->media) {
             $this->logger($update->media->downloadToDir('/tmp'));
         }
-        if (isset($this->sent[$update->chatId])) {
+        /*if (isset($this->sent[$update->chatId])) {
             return;
         }
         $secret_media = [];
@@ -312,7 +312,7 @@ class SecretHandler extends SimpleEventHandler
             // You can also use the sendEncrypted parameter for more options in secret chats
             $this->sendMessage(peer: $update->chatId, message: (string) ($i++));
         }
-        $this->sent[$update->chatId] = true;
+        $this->sent[$update->chatId] = true;*/
     }
 }
 

@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
 /**
@@ -62,10 +63,10 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** @internal Media location */
     public readonly array $location;
 
-    /** Encryption key for secret chat files */
-    private readonly ?string $key;
-    /** Encryption key for secret chat files */
-    private readonly ?string $iv;
+    /** @internal Encryption key for secret chat files */
+    public readonly ?Bytes $key;
+    /** @internal Encryption key for secret chat files */
+    public readonly ?Bytes $iv;
 
     /** @internal */
     public function __construct(
@@ -143,7 +144,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location']);
+        unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv']);
         return $v;
     }
 }
