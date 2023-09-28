@@ -786,7 +786,7 @@ trait UpdateHandler
     {
         $result = null;
         foreach (($this->extractUpdates($updates)) as $update) {
-            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage', 'updateNewScheduledMessage'], true)) {
+            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage', 'updateNewScheduledMessage', 'updateNewEncryptedMessage', 'updateNewOutgoingEncryptedMessage'], true)) {
                 if ($result !== null) {
                     throw new Exception('Found more than one update of type message, use extractUpdates to extract all updates');
                 }

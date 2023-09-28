@@ -89,7 +89,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             : $this->chatId);
         $this->date = $rawMessage['date'];
         $this->mentioned = $rawMessage['mentioned'] ?? false;
-        $this->silent = $rawMessage['silent'];
+        $this->silent = $rawMessage['silent'] ?? false;
         $this->ttlPeriod = $rawMessage['ttl_period'] ?? $rawMessage['ttl'] ?? null;
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];

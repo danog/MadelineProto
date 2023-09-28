@@ -640,6 +640,7 @@ final class SecretChatController implements Stringable
     private ?int $gapEnd = null;
     private ?int $gapQueueSeq = null;
     private array $gapQueue = [];
+    private array $gapQuery = [];
 
     private function checkSecretOutSeqNo(array $message): \Generator
     {
@@ -676,17 +677,19 @@ final class SecretChatController implements Stringable
                 $this->API->logger("WARNING: queueing message $seqno in $this while recovering gaps");
                 $this->gapQueue []= $message;
                 $this->gapQueueSeq = $seqno+1;
+                $this->API->methodCallAsyncRead('messages.sendEncryptedService', $this->gapQuery);
                 return;
             }
             $this->API->logger("Requesting resending in $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
             $this->gapEnd = $seqno-1;
             $this->gapQueue = [$message];
             $this->gapQueueSeq = $seqno+1;
-            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
+            $this->gapQuery = ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
                 '_' => 'decryptedMessageActionResend',
                 'start_seq_no' => $C_plus_one * 2 + $this->in_seq_no_base,
                 'end_seq_no' => $this->gapEnd * 2 + $this->in_seq_no_base
-            ]]]);
+            ]]];
+            $this->API->methodCallAsyncRead('messages.sendEncryptedService', $this->gapQuery);
             return;
         }
         yield $message;
