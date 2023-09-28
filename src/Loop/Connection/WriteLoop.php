@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
+use Webmozart\Assert\Assert;
 
 use function strlen;
 
@@ -237,21 +238,25 @@ final class WriteLoop extends Loop
                         }
                     } elseif ($message->queueId !== null) {
                         $queueId = $message->queueId;
-                        if (isset($this->connection->callQueue[$queueId])) {
-                            $message->setPreviousQueuedMsgId($this->connection->callQueue[$queueId]);
+                        if (isset($this->connection->callQueue[$queueId])
+                            && !($prev = $this->connection->callQueue[$queueId])->hasReply()
+                        ) {
+                            $this->connection->callQueue[$queueId] = $message;
+                            $message->setPreviousQueuedMessage($prev);
                             $this->API->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
+                            $prev = $prev->getMsgId();
+                            Assert::notNull($prev);
                             $MTmessage['body'] = $this->API->getTL()->serializeMethod(
                                 'invokeAfterMsg',
                                 [
-                                    'msg_id' => $this->connection->callQueue[$queueId],
+                                    'msg_id' => $prev,
                                     'query' => $MTmessage['body']
                                 ]
                             );
                         } else {
-                            $message->setPreviousQueuedMsgId(null);
+                            $this->connection->callQueue[$queueId] = $message;
                             $this->API->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
                         }
-                        $this->connection->callQueue[$queueId] = $message_id;
                     }
                     // TODO
                     /*

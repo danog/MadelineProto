@@ -103,9 +103,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public readonly bool $userRelated;
 
     /**
-     * Previous queued message ID.
+     * Previous queued message.
      */
-    private ?int $previousQueuedMsgId = null;
+    private ?self $previousQueuedMessage = null;
 
     /**
      * Create outgoing message.
@@ -322,6 +322,13 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         return (bool) ($this->state & self::STATE_SENT);
     }
     /**
+     * Check if the message has a reply.
+     */
+    public function hasReply(): bool
+    {
+        return (bool) ($this->state & self::STATE_REPLIED);
+    }
+    /**
      * Check if can garbage collect this message.
      */
     public function canGarbageCollect(): bool
@@ -407,24 +414,24 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Get previous queued message ID.
+     * Get previous queued message.
      *
-     * @return ?int
+     * @return ?self
      */
-    public function getPreviousQueuedMsgId(): ?int
+    public function getPreviousQueuedMessage(): ?self
     {
-        return $this->previousQueuedMsgId;
+        return $this->previousQueuedMessage;
     }
 
     /**
-     * Set previous queued message ID.
+     * Set previous queued message.
      *
-     * @param ?int $previousQueuedMsgId Previous queued message ID.
+     * @param ?self $previousQueuedMessage Previous queued message.
      *
      */
-    public function setPreviousQueuedMsgId(?int $previousQueuedMsgId): self
+    public function setPreviousQueuedMessage(?self $previousQueuedMessage): self
     {
-        $this->previousQueuedMsgId = $previousQueuedMsgId;
+        $this->previousQueuedMessage = $previousQueuedMessage;
 
         return $this;
     }

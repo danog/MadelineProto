@@ -232,7 +232,10 @@ trait ResponseHandler
             return;
         }
 
-        if ($request->isMethod && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+        if ($request->isMethod && $request->getConstructor() !== 'auth.bindTempAuthKey'
+            && $this->shared->hasTempAuthKey()
+            && !$this->shared->getTempAuthKey()->isInited()
+        ) {
             $this->shared->getTempAuthKey()->init(true);
         }
         if (isset($response['_']) && !$this->isCdn()) {
@@ -272,7 +275,11 @@ trait ResponseHandler
      */
     private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
-        if ($request->isMethod && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+        if ($request->isMethod
+            && $request->getConstructor() !== 'auth.bindTempAuthKey'
+            && $this->shared->hasTempAuthKey()
+            && !$this->shared->getTempAuthKey()->isInited()
+        ) {
             $this->shared->getTempAuthKey()->init(true);
         }
         if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'], true)) {
@@ -305,14 +312,16 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    unset($this->callQueue[$request->queueId]);
-                    $request->setSent(\time() + 1);
+                    $request->setSent(\time() + 5*60);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    if ($response['error_message'] === 'MSG_WAIT_TIMEOUT') {
-                        EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
+                    $prev = $request->getPreviousQueuedMessage();
+                    if ($prev->hasReply()) {
+                        $this->methodRecall($msgId);
                     } else {
-                        EventLoop::queue($this->methodRecall(...), $msgId);
+                        $prev->getResultPromise()->finally(
+                            fn () => $this->methodRecall($msgId)
+                        );
                     }
                     return null;
                 }
@@ -347,15 +356,17 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    unset($this->callQueue[$request->queueId]);
-                    $request->setSent(\time() + 1);
+                    $request->setSent(\time() + 5*60);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
-                    if ($response['error_message'] === 'MSG_WAIT_TIMEOUT') {
-                        EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
+                    $prev = $request->getPreviousQueuedMessage();
+                    if ($prev->hasReply()) {
+                        $this->methodRecall($msgId);
                     } else {
-                        EventLoop::queue($this->methodRecall(...), $msgId);
+                        $prev->getResultPromise()->finally(
+                            fn () => $this->methodRecall($msgId)
+                        );
                     }
                     return null;
                 }
