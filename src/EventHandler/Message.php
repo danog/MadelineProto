@@ -109,15 +109,21 @@ abstract class Message extends AbstractMessage
         array $info,
     ) {
         parent::__construct($API, $rawMessage, $info);
-
+        if (isset($rawMessage['decrypted_message'])) {
+            $this->protected = true;
+            $rawMessage = $rawMessage['decrypted_message'];
+        } else {
+            $this->protected = $rawMessage['noforwards'];
+        }
         $this->views = $rawMessage['views'] ?? null;
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
 
         $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->message = $rawMessage['message'];
-        $this->fromScheduled = $rawMessage['from_scheduled'];
-        $this->viaBotId = $rawMessage['via_bot_id'] ?? null;
+        $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
+        $this->viaBotId = $rawMessage['via_bot_id'] ??
+            (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
         $this->editDate = $rawMessage['edit_date'] ?? null;
 
         $this->keyboard = isset($rawMessage['reply_markup'])
@@ -145,8 +151,6 @@ abstract class Message extends AbstractMessage
             $this->psaType = null;
             $this->imported = false;
         }
-
-        $this->protected = $rawMessage['noforwards'];
 
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'], $this->protected)

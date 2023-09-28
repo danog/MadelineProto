@@ -75,18 +75,22 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         array $info
     ) {
         parent::__construct($API);
-
-        $this->out = $rawMessage['out'];
-        $this->id = $rawMessage['id'];
-        $this->chatId = $info['bot_api_id'];
-        $this->senderId = isset($rawMessage['from_id'])
+        if (isset($rawMessage['decrypted_message'])) {
+            $rawMessage = $rawMessage['decrypted_message'];
+            $secretChat = $this->getClient()->getSecretChat($rawMessage['chat_id']);
+        } else {
+            $secretChat = null;
+        }
+        $this->out = $rawMessage['out'] ?? false;
+        $this->id = $rawMessage['id'] ?? $rawMessage['random_id'];
+        $this->chatId = isset($secretChat) ? $secretChat->chatId : $info['bot_api_id'];
+        $this->senderId = isset($secretChat)  ? $secretChat->otherID : (isset($rawMessage['from_id'])
             ? $this->getClient()->getIdInternal($rawMessage['from_id'])
-            : $this->chatId;
+            : $this->chatId);
         $this->date = $rawMessage['date'];
-        $this->mentioned = $rawMessage['mentioned'];
-        $this->silent = $rawMessage['silent'];
-        $this->ttlPeriod = $rawMessage['ttl_period'] ?? null;
-
+        $this->mentioned = $rawMessage['mentioned'] ?? false;
+        $this->silent = $rawMessage['silent'] ?? false;
+        $this->ttlPeriod = $rawMessage['ttl_period'] ?? $rawMessage['ttl'] ?? null;
         if (isset($rawMessage['reply_to']) && $rawMessage['reply_to']['_'] === 'messageReplyHeader') {
             $replyTo = $rawMessage['reply_to'];
             $this->replyToScheduled = $replyTo['reply_to_scheduled'];
@@ -115,7 +119,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             $this->replyToScheduled = false;
         } else {
             $this->topicId = null;
-            $this->replyToMsgId = null;
+            $this->replyToMsgId = $rawMessage['reply_to_random_id'] ?? null;
             $this->threadId = null;
             $this->replyToScheduled = false;
         }

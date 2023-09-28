@@ -19,12 +19,20 @@ namespace danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 
 /**
  * Represents a document.
  */
 final class Document extends Media
 {
+    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
+    public readonly ?Bytes $thumb;
+    /** Thumbnail height only for secret chats. */
+    public readonly ?int $thumbHeight;
+    /** Thumbnail width only for secret chats. */
+    public readonly ?int $thumbWidth;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -32,5 +40,8 @@ final class Document extends Media
         bool $protected
     ) {
         parent::__construct($API, $rawMedia, $protected);
+        $this->thumb = isset($rawMedia['thumb']) ? new Bytes($rawMedia['thumb']) : null;
+        $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
+        $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }
 }

@@ -23,7 +23,7 @@ use danog\MadelineProto\MTProto;
  */
 abstract class Typing extends Update
 {
-    /** @var int The user id that is typing. */
+    /** @var int The peer that is typing. */
     public readonly int $userId;
 
     /** @var Action Whether the user is typing, sending a media or doing something else. */

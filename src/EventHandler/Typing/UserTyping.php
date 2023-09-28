@@ -17,16 +17,10 @@
 namespace danog\MadelineProto\EventHandler\Typing;
 
 use danog\MadelineProto\EventHandler\Typing;
-use danog\MadelineProto\MTProto;
 
 /**
  * The user is preparing a message; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing.
  */
 final class UserTyping extends Typing
 {
-    /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
-    {
-        parent::__construct($API, $rawTyping);
-    }
 }

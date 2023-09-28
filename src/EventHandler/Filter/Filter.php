@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\Ended;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
@@ -92,6 +93,7 @@ abstract class Filter
                 Update::class => new FilterAllowAll,
                 Message::class => new FilterMessage,
                 PrivateMessage::class => new FilterPrivate,
+                SecretMessage::class => new FilterSecret,
                 GroupMessage::class => new FilterGroup,
                 ChannelMessage::class => new FilterChannel,
                 ServiceMessage::class => new FilterService,

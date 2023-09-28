@@ -8,45 +8,31 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler\Message\Service;
 
-use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents a generic video.
+ * Deleted messages.
  */
-abstract class AbstractVideo extends Media
+class DialogDeleteMessages extends ServiceMessage
 {
-    /** Video duration in seconds */
-    public readonly float $duration;
-
-    /** Whether the video supports streaming */
-    public readonly bool $supportsStreaming;
-
-    /** Video width */
-    public readonly int $width;
-
-    /** Video height */
-    public readonly int $height;
-
     /** @internal */
     public function __construct(
         MTProto $API,
-        array $rawMedia,
-        array $attribute,
-        bool $protected,
+        array $rawMessage,
+        array $info,
+
+        /** @var list<int> $ids List of deleted message IDs. */
+        public readonly array $ids
     ) {
-        parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $attribute['duration'];
-        $this->supportsStreaming = $attribute['supports_streaming'] ?? false;
-        $this->width = $attribute['w'];
-        $this->height = $attribute['h'];
+        parent::__construct($API, $rawMessage, $info);
     }
 }

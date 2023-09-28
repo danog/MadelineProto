@@ -1,5 +1,4 @@
-#!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 /**
  * Secret chat bot.
  *
@@ -18,11 +17,15 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
+use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\SimpleEventHandler;
 
 use function Amp\async;
+use function Amp\File\read;
 use function Amp\Future\await;
 
 /*
@@ -37,7 +40,7 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-class SecretHandler extends EventHandler
+class SecretHandler extends SimpleEventHandler
 {
     private array $sent = [];
     /**
@@ -69,22 +72,21 @@ class SecretHandler extends EventHandler
     }
     /**
      * Handle secret chat messages.
-     *
-     * @param array $update Update
      */
-    public function onUpdateNewEncryptedMessage(array $update): void
+    #[Handler]
+    public function handle(Incoming&SecretMessage $update): void
     {
-        if (isset($update['message']['decrypted_message']['media'])) {
-            $this->logger($this->downloadToDir($update, '.'));
+        if ($update->media) {
+            $this->logger($update->media->downloadToDir('/tmp'));
         }
-        if (isset($this->sent[$update['message']['chat_id']])) {
+        /*if (isset($this->sent[$update->chatId])) {
             return;
         }
         $secret_media = [];
 
         // Photo uploaded as document, secret chat
         $secret_media['document_photo'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/faust.jpg',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -92,7 +94,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => read('tests/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/faust.jpg'),
@@ -112,7 +114,7 @@ class SecretHandler extends EventHandler
 
         // Photo, secret chat
         $secret_media['photo'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/faust.jpg',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -120,7 +122,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaPhoto',
-                    'thumb' => file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => read('tests/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'caption' => 'This file was uploaded using MadelineProto',
@@ -133,7 +135,7 @@ class SecretHandler extends EventHandler
 
         // GIF, secret chat
         $secret_media['gif'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/pony.mp4',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -141,7 +143,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/pony.preview.jpg'),
+                    'thumb' => read('tests/pony.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/pony.mp4'),
@@ -157,7 +159,7 @@ class SecretHandler extends EventHandler
 
         // Sticker, secret chat
         $secret_media['sticker'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/lel.webp',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -165,7 +167,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/lel.preview.jpg'),
+                    'thumb' => read('tests/lel.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/lel.webp'),
@@ -185,7 +187,7 @@ class SecretHandler extends EventHandler
 
         // Document, secrey chat
         $secret_media['document'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/60',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -193,7 +195,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => read('tests/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => 'magic/magic',
@@ -212,7 +214,7 @@ class SecretHandler extends EventHandler
 
         // Video, secret chat
         $secret_media['video'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/swing.mp4',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -220,7 +222,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/swing.preview.jpg'),
+                    'thumb' => read('tests/swing.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/swing.mp4'),
@@ -241,7 +243,7 @@ class SecretHandler extends EventHandler
 
         // audio, secret chat
         $secret_media['audio'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/mosconi.mp3',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -249,7 +251,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => read('tests/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/mosconi.mp3'),
@@ -270,7 +272,7 @@ class SecretHandler extends EventHandler
         ];
 
         $secret_media['voice'] = [
-            'peer' => $update,
+            'peer' => $update->chatId,
             'file' => 'tests/mosconi.mp3',
             'message' => [
                 '_' => 'decryptedMessage',
@@ -278,7 +280,7 @@ class SecretHandler extends EventHandler
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => read('tests/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'mime_type' => mime_content_type('tests/mosconi.mp3'),
@@ -306,11 +308,11 @@ class SecretHandler extends EventHandler
 
         $i = 0;
         while ($i < 10) {
-            $this->logger("SENDING MESSAGE $i TO ".$update['message']['chat_id']);
+            $this->logger("SENDING MESSAGE $i TO ".$update->chatId);
             // You can also use the sendEncrypted parameter for more options in secret chats
-            $this->messages->sendMessage(peer: $update, message: (string) ($i++));
+            $this->sendMessage(peer: $update->chatId, message: (string) ($i++));
         }
-        $this->sent[$update['message']['chat_id']] = true;
+        $this->sent[$update->chatId] = true;*/
     }
 }
 

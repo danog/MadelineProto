@@ -1027,7 +1027,7 @@ abstract class InternalDoc
      * @param integer $chatId Secret chat ID.
      * @param integer $randomId Secret chat message ID.
      */
-    public function getSecretMessage(int $chatId, int $randomId): array
+    public function getSecretMessage(int $chatId, int $randomId): \danog\MadelineProto\EventHandler\Message\SecretMessage
     {
         return $this->wrapper->getAPI()->getSecretMessage($chatId, $randomId);
     }

@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
 /**
@@ -60,7 +61,14 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly string $botApiFileUniqueId;
 
     /** @internal Media location */
-    public readonly array $location;
+    private readonly array $location;
+
+    /** @internal Encryption key for secret chat files */
+    private readonly ?string $key;
+    /** @internal Encryption IV for secret chat files */
+    private readonly ?string $iv;
+    /** @internal Encryption key fingerprint for secret chat files */
+    private readonly ?int $keyFingerprint;
 
     /** @internal */
     public function __construct(
@@ -71,6 +79,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
         public readonly bool $protected
     ) {
         parent::__construct($API);
+        if ($rawMedia['secret'] ?? false) {
+            $rawMedia = $rawMedia['document'];
+        }
         [
             'name' => $name,
             'ext' => $this->fileExt,
@@ -85,9 +96,12 @@ abstract class Media extends IpcCapable implements JsonSerializable
             'file_unique_id' => $this->botApiFileUniqueId
         ] = $API->extractBotAPIFile($API->MTProtoToBotAPI($rawMedia));
 
-        $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'])['date'];
+        $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'] ?? $rawMedia)['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
+        $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
+        $this->key = isset($rawMedia['key']) ? (string)$rawMedia['key'] : null;
+        $this->iv = isset($rawMedia['iv']) ? (string)$rawMedia['iv'] : null;
     }
 
     /**
@@ -132,11 +146,39 @@ abstract class Media extends IpcCapable implements JsonSerializable
         return $this->getClient()->downloadToFile($this, $file, $cb);
     }
 
+    /**
+     * @return array{
+     *      ext: string,
+     *      name: string,
+     *      mime: string,
+     *      size: int,
+     *      InputFileLocation: array,
+     *      key_fingerprint?: string,
+     *      key?: string,
+     *      iv?: string,
+     * }
+     */
+    public function getDownloadInfo(): array
+    {
+        $result = [
+            'name' => \basename($this->fileName, $this->fileExt),
+            'ext' => $this->fileExt,
+            'mime' => $this->mimeType,
+            'size' => $this->size,
+            'InputFileLocation' => $this->location,
+        ];
+        if ($this->key !== null) {
+            $result['key_fingerprint'] = $this->keyFingerprint;
+            $result['key'] = $this->key;
+            $result['iv'] = $this->iv;
+        }
+        return $result;
+    }
     /** @internal */
     public function jsonSerialize(): mixed
     {
         $v = \get_object_vars($this);
-        unset($v['API'], $v['session'], $v['location']);
+        unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv']);
         return $v;
     }
 }

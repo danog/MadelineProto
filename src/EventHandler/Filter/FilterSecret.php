@@ -14,39 +14,20 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\MTProto;
+use Attribute;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Represents a generic video.
+ * Allow only updates coming from secret chats.
  */
-abstract class AbstractVideo extends Media
+#[Attribute(Attribute::TARGET_METHOD)]
+final class FilterSecret extends Filter
 {
-    /** Video duration in seconds */
-    public readonly float $duration;
-
-    /** Whether the video supports streaming */
-    public readonly bool $supportsStreaming;
-
-    /** Video width */
-    public readonly int $width;
-
-    /** Video height */
-    public readonly int $height;
-
-    /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMedia,
-        array $attribute,
-        bool $protected,
-    ) {
-        parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $attribute['duration'];
-        $this->supportsStreaming = $attribute['supports_streaming'] ?? false;
-        $this->width = $attribute['w'];
-        $this->height = $attribute['h'];
+    public function apply(Update $update): bool
+    {
+        return $update instanceof SecretMessage;
     }
 }

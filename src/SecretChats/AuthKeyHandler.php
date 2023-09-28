@@ -22,6 +22,7 @@ namespace danog\MadelineProto\SecretChats;
 
 use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -171,9 +172,9 @@ trait AuthKeyHandler
      * @param integer $chatId Secret chat ID.
      * @param integer $randomId Secret chat message ID.
      */
-    public function getSecretMessage(int $chatId, int $randomId): array
+    public function getSecretMessage(int $chatId, int $randomId): SecretMessage
     {
-        return $this->getSecretChatController($chatId)->getMessage($randomId);
+        return $this->wrapMessage($this->getSecretChatController($chatId)->getMessage($randomId)['message']);
     }
 
     /**

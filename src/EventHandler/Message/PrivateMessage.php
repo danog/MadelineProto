@@ -16,18 +16,14 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
-use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 
 /**
  * Represents an incoming or outgoing private message.
  */
-final class PrivateMessage extends Message
+final class PrivateMessage extends AbstractPrivateMessage
 {
-    /**
-     * Notify the other user in a private chat that a screenshot of the chat was taken.
-     *
-     */
     public function screenShot(): DialogScreenshotTaken
     {
         $result = $this->getClient()->methodCallAsyncRead(

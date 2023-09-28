@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogBotAllowed;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
@@ -39,6 +40,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
 use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogDeleteMessages;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
 use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
@@ -53,6 +55,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogReadMessages;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatWallPaper;
@@ -62,6 +65,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Typing\SecretUserTyping;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -376,7 +380,7 @@ trait UpdateHandler
     {
         try {
             return match ($update['_']) {
-                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage' => $this->wrapMessage($update['message']),
+                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage','updateNewOutgoingEncryptedMessage' => $this->wrapMessage($update['message']),
                 'updateBotCallbackQuery' => isset($update['game_short_name'])
                     ? new ChatGameQuery($this, $update)
                     : new ChatButtonQuery($this, $update),
@@ -639,8 +643,52 @@ trait UpdateHandler
                 default => null
             };
         }
+        if ($message['_'] === 'encryptedMessageService') {
+            $action = $message['decrypted_message']['action'];
+            return match ($action['_']) {
+                'decryptedMessageActionSetMessageTTL' => new DialogSetTTL(
+                    $this,
+                    $message,
+                    $info,
+                    $action['ttl_seconds'],
+                    null,
+                ),
+                'decryptedMessageActionReadMessages' => new DialogReadMessages(
+                    $this,
+                    $message,
+                    $info,
+                    $action['random_ids'],
+                ),
+                'decryptedMessageActionDeleteMessages' => new DialogDeleteMessages(
+                    $this,
+                    $message,
+                    $info,
+                    $action['random_ids'],
+                ),
+                'decryptedMessageActionScreenshotMessages' => new DialogScreenshotTaken(
+                    $this,
+                    $message,
+                    $info,
+                    $action['random_ids'],
+                ),
+                'decryptedMessageActionFlushHistory' => new DialogHistoryCleared(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                'decryptedMessageActionTyping' => new SecretUserTyping(
+                    $this,
+                    $message,
+                    $info,
+                ),
+                default => null
+            };
+        }
         if (($info['User']['username'] ?? '') === 'replies') {
             return null;
+        }
+        if ($message['_'] === 'encryptedMessage') {
+            return new SecretMessage($this, $message, $info);
         }
         return match ($info['type']) {
             API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
@@ -738,7 +786,7 @@ trait UpdateHandler
     {
         $result = null;
         foreach (($this->extractUpdates($updates)) as $update) {
-            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage', 'updateNewScheduledMessage'], true)) {
+            if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage', 'updateNewScheduledMessage', 'updateNewEncryptedMessage', 'updateNewOutgoingEncryptedMessage'], true)) {
                 if ($result !== null) {
                     throw new Exception('Found more than one update of type message, use extractUpdates to extract all updates');
                 }
@@ -779,6 +827,8 @@ trait UpdateHandler
                 $message['peer_id'] = $this->getInfo($to_id, API::INFO_TYPE_PEER);
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
+            case 'updateNewOutgoingEncryptedMessage':
+                return [$updates];
             default:
                 throw new ResponseException('Unrecognized update received: '.$updates['_']);
         }

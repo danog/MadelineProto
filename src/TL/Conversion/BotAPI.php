@@ -29,6 +29,7 @@ use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 use Throwable;
 
+use const danog\Decoder\ENCRYPTED;
 use const danog\Decoder\TYPES_IDS;
 
 /**
@@ -387,6 +388,27 @@ trait BotAPI
                 $res['file_id'] = (string) $fileId;
                 $res['file_unique_id'] = $fileId->getUniqueBotAPI();
                 return [$type_name => $res, 'caption' => $data['caption'] ?? ''];
+            case 'decryptedMessageMediaAudio':
+            case 'decryptedMessageMediaPhoto':
+            case 'decryptedMessageMediaVideo':
+            case 'decryptedMessageMediaDocument':
+            case 'decryptedMessageMediaDocument':
+                $data = $data['file'];
+            case 'encryptedFile':
+                $fileId = new FileId;
+                $fileId->setId($data['id']);
+                $fileId->setAccessHash($data['access_hash']);
+                $fileId->setFileReference('');
+                $fileId->setDcId($data['dc_id']);
+                $fileId->setType(ENCRYPTED);
+
+                $res = [
+                    'file_id' => (string) $fileId,
+                    'file_unique_id' => $fileId->getUniqueBotAPI(),
+                    'file_size' => $data['size'],
+                    'mime_type' => 'application/octet-stream'
+                ];
+                return ['encrypted' => $res];
             default:
                 throw new Exception(\sprintf(Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }

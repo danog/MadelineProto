@@ -83,11 +83,31 @@ trait Files
         if ($media['_'] === 'document') {
             $media = [ '_' => 'messageMediaDocument', 'document' => $media];
         }
+        if ($media['_'] === 'decryptedMessageMediaAudio') {
+            return new Audio($this, $media, $media, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaPhoto') {
+            return new Photo($this, $media, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaVideo') {
+            return new Video($this, $media, $media, $protected);
+        }
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
                 return null;
             }
             return new Photo($this, $media, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaDocument' 
+            || $media['_'] === 'decryptedMessageMediaExternalDocument'
+        ) {
+            // TODO caption?
+            $media = [
+                '_' => 'messageMediaDocument',
+                'document' => $media,
+                'ttl_seconds' => $media['ttl_seconds'],
+                'secret' => true
+            ];
         }
         if ($media['_'] !== 'messageMediaDocument') {
             return null;
@@ -672,13 +692,7 @@ trait Files
             $messageMedia = $messageMedia->media;
         }
         if ($messageMedia instanceof Media) {
-            return [
-                'name' => \basename($messageMedia->fileName, $messageMedia->fileExt),
-                'ext' => $messageMedia->fileExt,
-                'mime' => $messageMedia->mimeType,
-                'size' => $messageMedia->size,
-                'InputFileLocation' => $messageMedia->location
-            ];
+            return $messageMedia->getDownloadInfo();
         }
         if (\is_string($messageMedia)) {
             $messageMedia = $this->unpackFileId($messageMedia);

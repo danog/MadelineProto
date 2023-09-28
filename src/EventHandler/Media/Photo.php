@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 
 /**
  * Represents a photo.
@@ -27,14 +28,23 @@ final class Photo extends Media
 {
     /** @var bool If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
+    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
+    public readonly ?Bytes $thumb;
+    /** Thumbnail height only for secret chats. */
+    public readonly ?int $thumbHeight;
+    /** Thumbnail width only for secret chats. */
+    public readonly ?int $thumbWidth;
 
     /** @internal */
     public function __construct(
         MTProto $API,
-        array $rawMedia,
-        bool $protected,
+        array   $rawMedia,
+        bool    $protected,
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->hasStickers = $rawMedia['photo']['has_stickers'];
+        $this->hasStickers = $rawMedia['photo']['has_stickers'] ?? false;
+        $this->thumb = $rawMedia['thumb'] ?? null;
+        $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
+        $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }
 }

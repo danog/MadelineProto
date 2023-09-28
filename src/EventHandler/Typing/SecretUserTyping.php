@@ -8,34 +8,32 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler\Typing;
 
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents a sticker.
+ * The user is preparing a message in a secret chat; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing.
  */
-abstract class Sticker extends AbstractSticker
+final class SecretUserTyping extends Typing
 {
-    /** Whether this is a premium sticker and a premium sticker animation must be played. */
-    public readonly bool $premiumSticker;
+    /** @var int Secret chat ID. */
+    public readonly int $chatId;
 
     /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMedia,
-        array $stickerAttribute,
-        int $width,
-        int $height,
-        bool $protected,
-    ) {
-        parent::__construct($API, $rawMedia, $stickerAttribute, $width, $height, $protected);
-        $this->premiumSticker = !($rawMedia['nopremium'] ?? true);
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
+        $this->chatId = $rawMessage['chat_id'];
+        parent::__construct($API, [
+            'user_id' => $info['user_id'],
+            'action' => $rawMessage['decrypted_message']['action']
+        ]);
     }
 }

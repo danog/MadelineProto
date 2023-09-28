@@ -8,34 +8,28 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Mahdi <mahdi.talaee1379@gmail.com>
+ * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Media;
+namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
 
-/**
- * Represents a sticker.
- */
-abstract class Sticker extends AbstractSticker
+/** Represents a private or secret chat message. */
+abstract class AbstractPrivateMessage extends Message
 {
-    /** Whether this is a premium sticker and a premium sticker animation must be played. */
-    public readonly bool $premiumSticker;
-
     /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMedia,
-        array $stickerAttribute,
-        int $width,
-        int $height,
-        bool $protected,
-    ) {
-        parent::__construct($API, $rawMedia, $stickerAttribute, $width, $height, $protected);
-        $this->premiumSticker = !($rawMedia['nopremium'] ?? true);
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
+        parent::__construct($API, $rawMessage, $info);
     }
+    /**
+     * Notify the other user in a private chat that a screenshot of the chat was taken.
+     *
+     */
+    abstract public function screenShot(): DialogScreenshotTaken;
 }

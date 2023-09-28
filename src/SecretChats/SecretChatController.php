@@ -399,11 +399,19 @@ final class SecretChatController implements Stringable
             $msg = $this->outgoing[$request['seq']];
             if (!isset($msg['message']['date'])) {
                 $msg['message']['date'] = $response['date'];
-                if (isset($response['file']) && $response['file']['_'] !== 'encryptedFileEmpty') {
+                $msg['message']['decrypted_message'] = $msg['message']['message'];
+                unset($msg['message']['message']);
+                if (isset($msg['message']['decrypted_message']['media']) 
+                    && $msg['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
+                ) {
                     $msg['message']['file'] = $response['file'];
-                    $msg['message']['decrypted_message']['media']['file'] = $response['file'];
+                    $msg['message']['decrypted_message']['media']['file'] = $msg['message']['file'];
+                    $msg['message']['decrypted_message']['media']['date'] = $msg['message']['date'];
+                    $msg['message']['decrypted_message']['media']['ttl_seconds'] = $msg['message']['decrypted_message']['ttl'];
                 }
                 $msg['message']['decrypted_message']['out'] = true;
+                $msg['message']['decrypted_message']['date'] = $msg['message']['date'];
+                $msg['message']['decrypted_message']['chat_id'] = $msg['message']['chat_id'];
                 $this->outgoing[$request['seq']] = $msg;
                 EventLoop::queue($this->API->saveUpdate(...), $msg);
             }
@@ -415,10 +423,17 @@ final class SecretChatController implements Stringable
     private function handleDecryptedUpdate(array $update): void
     {
         $update['message']['decrypted_message']['out'] = false;
+        $update['message']['decrypted_message']['date'] = $update['message']['date'];
+        $update['message']['decrypted_message']['chat_id'] = $update['message']['chat_id'];
+
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
-            if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {
+            if (isset($update['message']['decrypted_message']['media']) 
+                && $update['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
+            ) {
                 $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
+                $update['message']['decrypted_message']['media']['date'] = $update['message']['date'];
+                $update['message']['decrypted_message']['media']['ttl_seconds'] = $update['message']['decrypted_message']['ttl'];
             }
             $this->API->saveUpdate($update);
             return;
@@ -470,12 +485,13 @@ final class SecretChatController implements Stringable
         if (isset($action['handled'])) {
             return;
         }
+        $this->API->logger("Resending messages for $this: ".\json_encode($action), Logger::WARNING);
         $action['start_seq_no'] -= $this->out_seq_no_base;
         $action['end_seq_no'] -= $this->out_seq_no_base;
         $action['start_seq_no'] >>= 1;
         $action['end_seq_no'] >>= 1;
         $action['handled'] = true;
-        $this->API->logger('Resending messages for '.$this, Logger::WARNING);
+        $this->API->logger("Resending messages for $this (after): ".\json_encode($action), Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
             $msg = $this->outgoing[$seq];
             $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);
@@ -632,6 +648,7 @@ final class SecretChatController implements Stringable
     private ?int $gapEnd = null;
     private ?int $gapQueueSeq = null;
     private array $gapQueue = [];
+    private array $gapQuery = [];
 
     private function checkSecretOutSeqNo(array $message): \Generator
     {
@@ -668,17 +685,19 @@ final class SecretChatController implements Stringable
                 $this->API->logger("WARNING: queueing message $seqno in $this while recovering gaps");
                 $this->gapQueue []= $message;
                 $this->gapQueueSeq = $seqno+1;
+                $this->API->methodCallAsyncRead('messages.sendEncryptedService', $this->gapQuery);
                 return;
             }
             $this->API->logger("Requesting resending in $this, out_seq_no gap detected: ($seqno > $C_plus_one)", Logger::LEVEL_FATAL);
             $this->gapEnd = $seqno-1;
             $this->gapQueue = [$message];
             $this->gapQueueSeq = $seqno+1;
-            $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
+            $this->gapQuery = ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
                 '_' => 'decryptedMessageActionResend',
                 'start_seq_no' => $C_plus_one * 2 + $this->in_seq_no_base,
                 'end_seq_no' => $this->gapEnd * 2 + $this->in_seq_no_base
-            ]]]);
+            ]]];
+            $this->API->methodCallAsyncRead('messages.sendEncryptedService', $this->gapQuery);
             return;
         }
         yield $message;
