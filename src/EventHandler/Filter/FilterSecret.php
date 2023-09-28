@@ -8,19 +8,26 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
- * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Typing;
+namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\EventHandler\Typing;
+use Attribute;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
- * The user is preparing a message; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing.
+ * Allow only updates coming from secret chats.
  */
-final class UserTyping extends Typing
+#[Attribute(Attribute::TARGET_METHOD)]
+final class FilterSecret extends Filter
 {
+    public function apply(Update $update): bool
+    {
+        return $update instanceof SecretMessage;
+    }
 }

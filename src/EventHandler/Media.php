@@ -61,8 +61,11 @@ abstract class Media extends IpcCapable implements JsonSerializable
 
     /** @internal Media location */
     public readonly array $location;
-    /** Encrypted file (only for secret chats). */
-    private readonly ?array $file;
+
+    /** Encryption key for secret chat files */
+    private readonly ?array $key;
+    /** Encryption key for secret chat files */
+    private readonly ?array $iv;
 
     /** @internal */
     public function __construct(
@@ -90,7 +93,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'])['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
-        $this->file = $rawMedia['file'];
+        $this->key = $rawMedia['key'] ?? null;
+        $this->key = $rawMedia['iv'] ?? null;
     }
 
     /**

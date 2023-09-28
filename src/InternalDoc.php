@@ -35,7 +35,6 @@ use danog\MadelineProto\EventHandler\Message\Entities\Phone;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
-use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Update;
@@ -1028,7 +1027,7 @@ abstract class InternalDoc
      * @param integer $chatId Secret chat ID.
      * @param integer $randomId Secret chat message ID.
      */
-    public function getSecretMessage(int $chatId, int $randomId): SecretMessage
+    public function getSecretMessage(int $chatId, int $randomId): \danog\MadelineProto\EventHandler\Message\SecretMessage
     {
         return $this->wrapper->getAPI()->getSecretMessage($chatId, $randomId);
     }

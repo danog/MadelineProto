@@ -17,11 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
-use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
-use Webmozart\Assert\Assert;
 
 /**
  * Represents New encrypted message.

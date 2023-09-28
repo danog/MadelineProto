@@ -26,7 +26,7 @@ final class SecretUserTyping extends Typing
 {
     /** @var int Secret chat ID. */
     public readonly int $chatId;
-    
+
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info)
     {

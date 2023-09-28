@@ -82,7 +82,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             $secretChat = null;
         }
         $this->out = $rawMessage['out'] ?? false;
-        $this->id = isset($secretChat) ? $rawMessage['random_id'] : $rawMessage['id'];
+        $this->id = $rawMessage['id'] ?? $rawMessage['random_id'];
         $this->chatId = isset($secretChat) ? $secretChat->chatId : $info['bot_api_id'];
         $this->senderId = isset($secretChat)  ? $secretChat->otherID : (isset($rawMessage['from_id'])
             ? $this->getClient()->getIdInternal($rawMessage['from_id'])

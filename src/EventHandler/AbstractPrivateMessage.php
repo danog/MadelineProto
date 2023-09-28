@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
 
+/** Represents a private or secret chat message. */
 abstract class AbstractPrivateMessage extends Message
 {
     /** @internal */

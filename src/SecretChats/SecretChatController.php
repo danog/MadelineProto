@@ -419,7 +419,7 @@ final class SecretChatController implements Stringable
         $update['message']['decrypted_message']['out'] = false;
         $update['message']['decrypted_message']['date'] = $update['message']['date'];
         $update['message']['decrypted_message']['chat_id'] = $update['message']['chat_id'];
-        
+
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
             if (isset($update['message']['file']) && $update['message']['file']['_'] !== 'encryptedFileEmpty') {
@@ -475,12 +475,13 @@ final class SecretChatController implements Stringable
         if (isset($action['handled'])) {
             return;
         }
+        $this->API->logger("Resending messages for $this: ".\json_encode($action), Logger::WARNING);
         $action['start_seq_no'] -= $this->out_seq_no_base;
         $action['end_seq_no'] -= $this->out_seq_no_base;
         $action['start_seq_no'] >>= 1;
         $action['end_seq_no'] >>= 1;
         $action['handled'] = true;
-        $this->API->logger('Resending messages for '.$this, Logger::WARNING);
+        $this->API->logger("Resending messages for $this (after): ".\json_encode($action), Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
             $msg = $this->outgoing[$seq];
             $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);

@@ -110,17 +110,20 @@ abstract class Message extends AbstractMessage
     ) {
         parent::__construct($API, $rawMessage, $info);
         if (isset($rawMessage['decrypted_message'])) {
+            $this->protected = true;
             $rawMessage = $rawMessage['decrypted_message'];
+        } else {
+            $this->protected = $rawMessage['noforwards'];
         }
-        $decryptedMessage = $rawMessage['decrypted_message'] ?? null;
         $this->views = $rawMessage['views'] ?? null;
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
 
-        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? $decryptedMessage['entities']?? []);
-        $this->message = $rawMessage['message'] ?? $decryptedMessage['message'];
+        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
+        $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
-        $this->viaBotId = $rawMessage['via_bot_id'] ?? $this->getClient()->getIdInternal($rawMessage['via_bot_name']) ?? null;
+        $this->viaBotId = $rawMessage['via_bot_id'] ??
+            (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
         $this->editDate = $rawMessage['edit_date'] ?? null;
 
         $this->keyboard = isset($rawMessage['reply_markup'])
@@ -149,11 +152,6 @@ abstract class Message extends AbstractMessage
             $this->imported = false;
         }
 
-        $this->protected = isset($decryptedMessage) ? true : $rawMessage['noforwards'];
-        $media = $rawMessage['media'] ??
-            //Todo Add support from secret medias
-           //$decryptedMessage['media'] ??
-            null;
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'], $this->protected)
             : null;
