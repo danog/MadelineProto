@@ -327,6 +327,7 @@ trait ResponseHandler
                 }
                 if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->getConstructor(), ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
                     || (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'], true))) {
+                    $this->API->logger("Resending $request in 1 second due to {$response['error_message']}");
                     EventLoop::delay(1.0, fn () => $this->methodRecall(message_id: $request->getMsgId()));
                     return null;
                 }
@@ -344,6 +345,7 @@ trait ResponseHandler
                 if ($request->userRelated) {
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
+                $this->API->logger("Resending $request to new DC $datacenter...");
                 EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId(), datacenter: $datacenter);
                 return null;
             case 400:
