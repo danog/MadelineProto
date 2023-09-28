@@ -19,7 +19,6 @@ namespace danog\MadelineProto\EventHandler;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
 /**
@@ -100,8 +99,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
         $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
-        $this->key = isset($rawMedia['key']) ? (string)$rawMedia['key'] : null;
-        $this->iv = isset($rawMedia['iv']) ? (string)$rawMedia['iv'] : null;
+        $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
+        $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
     }
 
     /**

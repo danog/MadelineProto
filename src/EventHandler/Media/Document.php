@@ -40,7 +40,7 @@ final class Document extends Media
         bool $protected
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->thumb = isset($rawMedia['thumb']) ? new Bytes($rawMedia['thumb']) : null;
+        $this->thumb = $rawMedia['thumb'] ?? null;
         $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
         $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
     }

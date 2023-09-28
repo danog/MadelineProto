@@ -394,6 +394,7 @@ trait BotAPI
             case 'decryptedMessageMediaDocument':
             case 'decryptedMessageMediaDocument':
                 $data = $data['file'];
+                // no break
             case 'encryptedFile':
                 $fileId = new FileId;
                 $fileId->setId($data['id']);

@@ -98,7 +98,7 @@ trait Files
             }
             return new Photo($this, $media, $protected);
         }
-        if ($media['_'] === 'decryptedMessageMediaDocument' 
+        if ($media['_'] === 'decryptedMessageMediaDocument'
             || $media['_'] === 'decryptedMessageMediaExternalDocument'
         ) {
             // TODO caption?

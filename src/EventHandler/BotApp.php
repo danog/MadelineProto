@@ -60,7 +60,6 @@ final class BotApp implements JsonSerializable
 
         /** The bot is asking permission to send messages to the user: if the user agrees, set the write_allowed flag when invoking [messages.requestAppWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html). */
         public readonly ?bool $requestWriteAccess = null,
-
         public readonly ?bool $hasSettings = null,
     ) {
         $this->id = $rawBotApp['id'];

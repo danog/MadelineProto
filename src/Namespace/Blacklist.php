@@ -4,7 +4,7 @@ namespace danog\MadelineProto\Namespace;
 
 final class Blacklist
 {
-    public const BLACKLIST = [
+    public const BLACKLIST =  [
         'account.updatePasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)',
         'account.getPasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)',
         'messages.receivedQueue' => 'You cannot use this method directly',

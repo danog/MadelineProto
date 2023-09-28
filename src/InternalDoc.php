@@ -711,7 +711,7 @@ abstract class InternalDoc
      *
      * @param array $config Current config
      */
-    public function getConfig(array $config = [
+    public function getConfig(array $config =  [
     ]): array
     {
         return $this->wrapper->getAPI()->getConfig($config);
@@ -1102,7 +1102,7 @@ abstract class InternalDoc
      * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
      * @return list<array{update_id: mixed, update: mixed}>
      */
-    public function getUpdates(array $params = [
+    public function getUpdates(array $params =  [
     ]): array
     {
         return $this->wrapper->getAPI()->getUpdates($params);

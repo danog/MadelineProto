@@ -401,7 +401,7 @@ final class SecretChatController implements Stringable
                 $msg['message']['date'] = $response['date'];
                 $msg['message']['decrypted_message'] = $msg['message']['message'];
                 unset($msg['message']['message']);
-                if (isset($msg['message']['decrypted_message']['media']) 
+                if (isset($msg['message']['decrypted_message']['media'])
                     && $msg['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
                 ) {
                     $msg['message']['file'] = $response['file'];
@@ -428,7 +428,7 @@ final class SecretChatController implements Stringable
 
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
-            if (isset($update['message']['decrypted_message']['media']) 
+            if (isset($update['message']['decrypted_message']['media'])
                 && $update['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
             ) {
                 $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
