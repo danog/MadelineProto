@@ -381,8 +381,10 @@ final class DataCenterConnection implements JsonSerializable
      */
     public function link(int $dc): void
     {
+        $connection = $this->API->datacenter->getDataCenterConnection($dc);
+        $connection->initAuthorization();
         $this->linkedDc = $dc;
-        $this->permAuthKey =& $this->API->datacenter->getDataCenterConnection($dc)->permAuthKey;
+        $this->permAuthKey =& $connection->permAuthKey;
     }
     /**
      * Reset MTProto sessions.
