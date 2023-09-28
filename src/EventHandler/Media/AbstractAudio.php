@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 abstract class AbstractAudio extends Media
 {
-    /** @var int Audio duration in seconds */
+    /** Audio duration in seconds */
     public readonly int $duration;
 
     /** @internal */
