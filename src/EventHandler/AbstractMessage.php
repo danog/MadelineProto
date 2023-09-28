@@ -17,13 +17,13 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\ParseMode;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -347,9 +347,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Set maximum Time-To-Live of all messages in the specified chat.
      *
-     * @param positive-integer $seconds Automatically delete all messages sent in the chat after this many seconds
+     * @param int<1, max> $seconds Automatically delete all messages sent in the chat after this many seconds
      * @throws InvalidArgumentException
-     * @return DialogSetTTL
      */
     public function enableTTL(int $seconds = 86400): DialogSetTTL
     {
@@ -368,7 +367,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     /**
      * Disable Time-To-Live of all messages in the specified chat.
      *
-     * @return DialogSetTTL
      */
     public function disableTTL(): DialogSetTTL
     {
@@ -384,7 +382,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
-     * Show the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     * Show the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat.
      *
      * @return boolean
      */
@@ -400,7 +398,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     }
 
     /**
-     * Hide the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat
+     * Hide the [real-time chat translation popup](https://core.telegram.org/api/translation) for a certain chat.
      *
      * @return boolean
      */

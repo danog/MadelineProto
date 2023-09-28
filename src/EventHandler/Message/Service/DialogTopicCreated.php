@@ -31,10 +31,10 @@ final class DialogTopicCreated extends ServiceMessage
 
         /** @var string Topic name. */
         public readonly string $title,
-    
+
         /** @var int If no custom emoji icon is specified, specifies the color of the fallback topic icon (RGB), one of 0x6FB9F0, 0xFFD67E, 0xCB86DB, 0x8EEE98, 0xFF93B2, or 0xFB6F5F. */
         public readonly int $iconColor,
-    
+
         /** @var ?int ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. */
         public readonly ?int $iconEmojiId,
     ) {

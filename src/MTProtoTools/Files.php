@@ -20,37 +20,37 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Throwable;
-use AssertionError;
-use Revolt\EventLoop;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Http\Client\Request;
-use danog\MadelineProto\Tools;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Settings;
-use danog\MadelineProto\StreamEof;
-use danog\MadelineProto\SecurityException;
-use danog\MadelineProto\FileCallbackInterface;
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\RPCError\FloodWaitError;
-use danog\MadelineProto\EventHandler\Message;
+use AssertionError;
 use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\EventHandler\Media\Gif;
-use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
-use danog\MadelineProto\EventHandler\Media\Video;
-use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Media\CustomEmoji;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
-use danog\MadelineProto\EventHandler\Media\VideoSticker;
 use danog\MadelineProto\EventHandler\Media\StaticSticker;
-use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\VideoSticker;
+use danog\MadelineProto\EventHandler\Media\Voice;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\SecurityException;
+use danog\MadelineProto\Settings;
+use danog\MadelineProto\StreamEof;
+use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 use const LOCK_EX;
@@ -77,10 +77,12 @@ trait Files
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
-        if ($media['_'] === 'photo') 
+        if ($media['_'] === 'photo') {
             $media = [ '_' => 'messageMediaPhoto', 'photo' => $media ];
-        if ($media['_'] === 'document') 
+        }
+        if ($media['_'] === 'document') {
             $media = [ '_' => 'messageMediaDocument', 'document' => $media];
+        }
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
                 return null;
@@ -152,8 +154,9 @@ trait Files
                 ? new RoundVideo($this, $media, $has_video, $protected)
                 : new Video($this, $media, $has_video, $protected);
         }
-        if ($has_document_photo)
+        if ($has_document_photo) {
             return new DocumentPhoto($this, $media, $has_document_photo, $protected);
+        }
         return new Document($this, $media, $protected);
     }
     /**

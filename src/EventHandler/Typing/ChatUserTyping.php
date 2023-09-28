@@ -18,10 +18,9 @@ namespace danog\MadelineProto\EventHandler\Typing;
 
 use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * The user is preparing a message in a group; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing
+ * The user is preparing a message in a group; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing.
  */
 final class ChatUserTyping extends Typing
 {

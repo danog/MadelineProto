@@ -16,30 +16,26 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
+use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use danog\MadelineProto\Ipc\IpcCapable;
+use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Ipc\IpcCapable;
-use danog\MadelineProto\EventHandler\Story\Story;
-use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 
 /**
  * Represents a forwarded story.
  */
 abstract class MediaStory extends IpcCapable implements JsonSerializable // for now. I should think a way
 {
-    /** @var bool */
     public readonly bool $viaMention;
 
-    /** @var bool */
     public readonly int $senderId;
 
-    /** @var int */
     public readonly int $storyId;
 
-    /** @var AbstractStory */
     protected readonly ?AbstractStory $story;
 
     /** @internal */
@@ -51,8 +47,7 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
         $this->viaMention = $rawMedia['via_mention'];
         $this->senderId = $API->getIdInternal($rawMedia['peer']);
         $this->storyId = $rawMedia['id'];
-        $this->story = match($rawMedia['story']['_'] ?? null)
-        {
+        $this->story = match ($rawMedia['story']['_'] ?? null) {
             'storyItem' => new Story($API, [
                 'peer' => $this->senderId,
                 'story' => $rawMedia['story']
@@ -68,7 +63,7 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
 
     /**
      * Get story.
-     * 
+     *
      * @psalm-suppress InaccessibleProperty
      * @return ?AbstractStory
      */
@@ -82,8 +77,7 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
                 'id' => [ $this->storyId ],
             ]
         )['stories'][0] ?? false;
-        if ($result)
-        {
+        if ($result) {
             $arr = [ 'peer' => $this->senderId, 'story' => $result ];
             return $this->story ??= $result['_'] === 'storyItem' // I hope storyItemSkipped never happen
                 ? new StoryDeleted($client, $arr)

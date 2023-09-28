@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy;
 
-use AssertionError;
 use JsonSerializable;
 
 /** Represents a privacy rule. */

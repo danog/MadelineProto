@@ -32,13 +32,13 @@ final class DialogPhoneCall extends ServiceMessage
 
         /** @var bool Is this a video call? */
         public readonly bool $video,
-    
+
         /** @var int Call ID */
         public readonly int $callId,
-    
+
         /** @var ?DiscardReason If the call has ended, the reason why it ended */
         public readonly ?DiscardReason $reason,
-    
+
         /** @var ?int Duration of the call in seconds */
         public readonly ?int $duration,
     ) {

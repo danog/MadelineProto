@@ -16,10 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use JsonSerializable;
-use danog\MadelineProto\MTProto;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
+use danog\MadelineProto\MTProto;
+use JsonSerializable;
 
 /**
  * Represents a generic media.
@@ -112,10 +112,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
 
     /**
      * Download the media to working directory or passed path.
-     * 
+     *
      * @param string $dir Directory where to download the file
      * @param (callable(float, float, float): void)|null $cb Progress callback
-     * @return string
      */
     public function downloadToDir(?string $dir = null, ?callable $cb = null): string
     {
@@ -124,10 +123,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
     }
     /**
      * Download the media to file.
-     * 
+     *
      * @param string $file Downloaded file path
      * @param (callable(float, float, float): void)|null $cb Progress callback
-     * @return string
      */
     public function downloadToFile(string $file, ?callable $cb = null): string
     {

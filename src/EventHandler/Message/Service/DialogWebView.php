@@ -32,7 +32,7 @@ final class DialogWebView extends ServiceMessage
 
         /** @var string Text of the [keyboardButtonSimpleWebView](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonSimpleWebView.html) that was pressed to open the web app. */
         public readonly string $text,
-    
+
         /** @var ?string Relayed data. (bot side service message) */
         public readonly ?string $data,
     ) {

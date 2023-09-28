@@ -17,9 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Banned;
@@ -27,8 +27,8 @@ use danog\MadelineProto\EventHandler\Participant\Creator;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
+use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -70,7 +70,6 @@ final class GroupMessage extends Message
      * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function hideMembers(): void
@@ -89,7 +88,6 @@ final class GroupMessage extends Message
      * Display the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function unhideMembers(): void
@@ -107,7 +105,6 @@ final class GroupMessage extends Message
     /**
      * Hide message history for new supergroup users.
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function hideHistory(): void
@@ -125,7 +122,6 @@ final class GroupMessage extends Message
     /**
      * Unhide message history for new supergroup users.
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function unhideHistory(): void
@@ -144,7 +140,6 @@ final class GroupMessage extends Message
      * Ban message sender from current supergroup.
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
-     * @return void
      */
     public function ban(int $untilDate = 0): void
     {
@@ -186,7 +181,6 @@ final class GroupMessage extends Message
      * Unban message sender from current supergroup.
      *
      * @param int $untilDate Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days).
-     * @return void
      */
     public function unban(int $untilDate = 0): void
     {
@@ -226,7 +220,6 @@ final class GroupMessage extends Message
 
     /**
      * Kick message sender from current supergroup.
-     * @return void
      */
     public function kick(): void
     {
@@ -236,7 +229,6 @@ final class GroupMessage extends Message
 
     /**
      * Delete all supergroup message.
-     * @return void
      */
     public function deleteAll(bool $forEveryone = true, int $maxId = 0): void
     {
@@ -254,7 +246,6 @@ final class GroupMessage extends Message
      * Delete all messages sent by a specific participant of a given supergroup.
      *
      * @param  string|integer|null      $member The participant whose messages should be deleted, if null or absent defaults to the sender of the message.
-     * @return void
      * @throws InvalidArgumentException
      */
     public function deleteUserMessages(string|int|null $member = null): void
@@ -274,7 +265,6 @@ final class GroupMessage extends Message
      * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration).
      *
      * @return integer                  the channel id that migrate to
-     * @return int
      * @throws InvalidArgumentException
      */
     public function toSuperGroup(): int
@@ -293,7 +283,6 @@ final class GroupMessage extends Message
     /**
      * Enable the [native antispam system](https://core.telegram.org/api/antispam).
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function enableAntiSpam(): void
@@ -311,7 +300,6 @@ final class GroupMessage extends Message
     /**
      * Disable the [native antispam system](https://core.telegram.org/api/antispam).
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function disableAntiSpam(): void
@@ -329,7 +317,6 @@ final class GroupMessage extends Message
     /**
      * Enable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
      *
-     * @return void
      */
     public function enableTopics(): void
     {
@@ -347,7 +334,6 @@ final class GroupMessage extends Message
     /**
      * Disable [forum functionality](https://core.telegram.org/api/forum) in a supergroup.
      *
-     * @return void
      */
     public function disableTopics(): void
     {
@@ -370,7 +356,6 @@ final class GroupMessage extends Message
      *                             [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack.
      *                             If no custom emoji icon is specified, specifies the color of the fallback topic icon
      *
-     * @return DialogTopicCreated
      * @throws InvalidArgumentException
      */
     public function createTopic(string $title, IconColor|int $icon = IconColor::NONE): DialogTopicCreated
@@ -399,7 +384,6 @@ final class GroupMessage extends Message
      * @param  string                   $title   Topic title (maximum UTF-8 length: 128)
      * @param  integer                  $icon    ID of the [custom emoji](https://core.telegram.org/api/custom-emoji) used as topic icon. [Telegram Premium](https://core.telegram.org/api/premium) users can use any custom emoji, other users can only use the custom emojis contained in the [inputStickerSetEmojiDefaultTopicIcons](https://docs.madelineproto.xyz/API_docs/constructors/inputStickerSetEmojiDefaultTopicIcons.html) emoji pack. Pass 0 to switch to the fallback topic icon.
      * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
-     * @return DialogTopicEdited
      * @throws InvalidArgumentException
      */
     public function editTopic(string $title, int $icon = 0, ?int $topicId = null): DialogTopicEdited
@@ -424,7 +408,6 @@ final class GroupMessage extends Message
      * Open a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
      * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
-     * @return DialogTopicEdited
      * @throws InvalidArgumentException
      */
     public function openTopic(?int $topicId = null): DialogTopicEdited
@@ -448,7 +431,6 @@ final class GroupMessage extends Message
      * Close a [forum topic](https://core.telegram.org/api/forum); requires [`manage_topics` rights](https://core.telegram.org/api/rights).
      *
      * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
-     * @return DialogTopicEdited
      * @throws InvalidArgumentException
      */
     public function closeTopic(?int $topicId = null): DialogTopicEdited
@@ -472,7 +454,6 @@ final class GroupMessage extends Message
      * Delete message history of a [forum topic](https://core.telegram.org/api/forum).
      *
      * @param  integer|null             $topicId Topic ID, if absent defaults to the topic where this message was sent.
-     * @return void
      * @throws InvalidArgumentException
      */
     public function deleteTopic(?int $topicId = null): void
@@ -490,10 +471,9 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Toggle supergroup slow mode: Users will only be able to send one message every `$seconds` seconds
-     * 
+     * Toggle supergroup slow mode: Users will only be able to send one message every `$seconds` seconds.
+     *
      * @param integer $seconds Users will only be able to send one message every `$seconds` seconds
-     * @return void
      * @throws InvalidArgumentException
      */
     public function enableSlowMode(int $seconds): void
@@ -510,9 +490,8 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Disable supergroup slow mode
-     * 
-     * @return void
+     * Disable supergroup slow mode.
+     *
      * @throws InvalidArgumentException
      */
     public function disableSlowMode(): void
@@ -528,9 +507,8 @@ final class GroupMessage extends Message
     }
 
     /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
      *
-     * @return void
      */
     public function enableProtection(): void
     {
@@ -540,13 +518,12 @@ final class GroupMessage extends Message
                 'peer' => $this->chatId,
                 'enabled' => true,
             ]
-        );  
+        );
     }
 
     /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat
+     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
      *
-     * @return void
      */
     public function disableProtection(): void
     {
@@ -556,13 +533,12 @@ final class GroupMessage extends Message
                 'peer' => $this->chatId,
                 'enabled' => false,
             ]
-        ); 
+        );
     }
 
     /**
      * Enable to all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
      *
-     * @return void
      */
     public function enableJoinToComment(): void
     {
@@ -579,7 +555,6 @@ final class GroupMessage extends Message
     /**
      * Disable to all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
      *
-     * @return void
      */
     public function disableJoinToComment(): void
     {

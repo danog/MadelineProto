@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Message\Service;
 
 use danog\MadelineProto\EventHandler\Message\ServiceMessage;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Wallpaper;
+use danog\MadelineProto\MTProto;
 
 /**
  * The [wallpaper](https://core.telegram.org/api/wallpapers) of the current chat was changed.

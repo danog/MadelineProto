@@ -17,17 +17,17 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allows messages that were edited.
+ * Allows messages that weren't edited.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterEdited extends Filter
+final class FilterNotEdited extends Filter
 {
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->editDate !== null;
+        return $update instanceof Message && $update->editDate === null;
     }
 }

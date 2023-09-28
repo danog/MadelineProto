@@ -31,7 +31,7 @@ final class DialogGeoProximityReached extends ServiceMessage
 
         /** @var int The user or chat that is now in proximity of to_id */
         public readonly int $fromId,
-    
+
         /** @var int The user or chat that subscribed to [live geolocation proximity alerts](https://core.telegram.org/api/live-location#proximity-alert) */
         public readonly int $toId,
 

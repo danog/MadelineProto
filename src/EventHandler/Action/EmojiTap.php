@@ -30,7 +30,7 @@ final class EmojiTap extends Action
         /** @var int Message ID of the animated emoji that was clicked */
         public readonly ?int $id,
 
-        /** 
+        /**
          * t: number of seconds that passed since the previous tap in the array, the first tap uses a value of `0.0`.
          * i: 1-based index of the randomly chosen animation for the tap (equivalent to the index of a specific emoji-related animation in [stickerPack](https://core.telegram.org/constructor/stickerPack) + 1).
          * @var list<array{t:float,i:int}>

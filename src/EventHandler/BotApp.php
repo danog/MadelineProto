@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\Media\Document;
-use danog\MadelineProto\EventHandler\Media\Photo;
 
 /**
  * Represents information about a [named bot web app](https://core.telegram.org/api/bots/webapps#named-bot-web-apps).
@@ -54,17 +54,15 @@ final class BotApp implements JsonSerializable
     public function __construct(
         MTProto $API,
         array $rawBotApp,
-        
-        /** @var bool Whether the web app was never used by the user, and confirmation must be asked from the user before opening it. */
+
+        /** Whether the web app was never used by the user, and confirmation must be asked from the user before opening it. */
         public readonly ?bool $inactive = null,
 
-        /** @var bool The bot is asking permission to send messages to the user: if the user agrees, set the write_allowed flag when invoking [messages.requestAppWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html). */
+        /** The bot is asking permission to send messages to the user: if the user agrees, set the write_allowed flag when invoking [messages.requestAppWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html). */
         public readonly ?bool $requestWriteAccess = null,
 
-        /** @var bool */
         public readonly ?bool $hasSettings = null,
-    )
-    {
+    ) {
         $this->id = $rawBotApp['id'];
         $this->accessHash = $rawBotApp['access_hash'];
         $this->name = $rawBotApp['short_name'];
