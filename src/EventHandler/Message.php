@@ -154,8 +154,8 @@ abstract class Message extends AbstractMessage
             //Todo Add support from secret medias
            //$decryptedMessage['media'] ??
             null;
-        $this->media = isset($media)
-            ? $API->wrapMedia($media, $this->protected)
+        $this->media = isset($rawMessage['media'])
+            ? $API->wrapMedia($rawMessage['media'], $this->protected)
             : null;
 
         if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {

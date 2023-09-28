@@ -77,11 +77,17 @@ trait Files
      */
     public function wrapMedia(array $media, bool $protected = false): ?Media
     {
-        if ($media['_'] === 'photo') {
+        if ($media['_'] === 'photo' || $media['_'] === 'decryptedMessageMediaPhoto') {
             $media = [ '_' => 'messageMediaPhoto', 'photo' => $media ];
         }
-        if ($media['_'] === 'document') {
+        if ($media['_'] === 'document' || $media['_'] === 'decryptedMessageMediaDocument' || $media['_'] === 'decryptedMessageMediaExternalDocument') {
             $media = [ '_' => 'messageMediaDocument', 'document' => $media];
+        }
+        if ($media['_'] === 'decryptedMessageMediaAudio') {
+            return new Audio($this, $media, $media, $protected);
+        }
+        if ($media['_'] === 'decryptedMessageMediaVideo') {
+            return new Video($this, $media, $media, $protected);
         }
         if ($media['_'] === 'messageMediaPhoto') {
             if (!isset($media['photo'])) {
