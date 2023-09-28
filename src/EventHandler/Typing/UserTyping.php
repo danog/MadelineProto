@@ -24,9 +24,4 @@ use danog\MadelineProto\MTProto;
  */
 final class UserTyping extends Typing
 {
-    /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
-    {
-        parent::__construct($API, $rawTyping);
-    }
 }

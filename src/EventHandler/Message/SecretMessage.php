@@ -21,6 +21,7 @@ use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\AbstractPrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
+use Webmozart\Assert\Assert;
 
 /**
  * Represents New encrypted message.
@@ -33,9 +34,9 @@ class SecretMessage extends AbstractPrivateMessage
         parent::__construct($API, $rawMessage, $info);
     }
 
-    public function getReply(string $class = AbstractMessage::class): ?AbstractMessage
+    public function getReply(string $class = SecretMessage::class): ?SecretMessage
     {
-        if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
+        if ($class !== SecretMessage::class) {
             throw new AssertionError("A class that extends AbstractMessage was expected.");
         }
         if ($this->replyToMsgId === null) {
@@ -51,12 +52,8 @@ class SecretMessage extends AbstractPrivateMessage
             chatId: $this->chatId,
             randomId: $this->id
         );
-        /** @psalm-suppress InaccessibleProperty */
         $this->replyCache = $message;
         $this->replyCached = true;
-        if (!$this->replyCache instanceof $class) {
-            return null;
-        }
         return $this->replyCache;
     }
 

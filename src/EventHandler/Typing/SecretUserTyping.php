@@ -8,32 +8,32 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Mahdi <mahdi.talaee1379@gmail.com>
- * @copyright 2016-2023 Mahdi <mahdi.talaee1379@gmail.com>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Message\Service;
+namespace danog\MadelineProto\EventHandler\Typing;
 
-use danog\MadelineProto\EventHandler\Action;
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 
 /**
- * User is preparing a message: typing, recording, uploading, etc.
+ * The user is preparing a message in a secret chat; typing, recording, uploading, etc. This update is valid for 6 seconds. If no further updates of this kind are received after 6 seconds, it should be considered that the user stopped doing whatever they were doing.
  */
-class DialogUserTyping extends ServiceMessage
+final class SecretUserTyping extends Typing
 {
+    /** @var int Secret chat ID. */
+    public readonly int $chatId;
+    
     /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
-
-        /** Type of action. */
-        public readonly Action $action,
-    ) {
-        parent::__construct($API, $rawMessage, $info);
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
+        $this->chatId = $rawMessage['chat_id'];
+        parent::__construct($API, [
+            'user_id' => $info['user_id'],
+            'action' => $rawMessage['decrypted_message']['action']
+        ]);
     }
 }

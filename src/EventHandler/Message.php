@@ -109,6 +109,9 @@ abstract class Message extends AbstractMessage
         array $info,
     ) {
         parent::__construct($API, $rawMessage, $info);
+        if (isset($rawMessage['decrypted_message'])) {
+            $rawMessage = $rawMessage['decrypted_message'];
+        }
         $decryptedMessage = $rawMessage['decrypted_message'] ?? null;
         $this->views = $rawMessage['views'] ?? null;
         $this->forwards = $rawMessage['forwards'] ?? null;
