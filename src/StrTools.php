@@ -96,7 +96,7 @@ abstract class StrTools extends Extension
         $pos = strrpos($haystack, $needle);
         if ($pos === false) return false;
 
-        return mbStrlen(substr($haystack, $offset, $pos));
+        return self::mbStrlen(substr($haystack, $offset, $pos));
     }
 
     /**
@@ -110,10 +110,10 @@ abstract class StrTools extends Extension
     public function mbSubstrReplace(string $string, string $replacement,int $start, ?int $length = null): array|false|string|null
     {
 
-        if ($length === null) $length = mbStrlen($string);
+        if ($length === null) $length = self::mbStrlen($string);
         
-        $firstPart = mbSubstr($string, 0, $start);
-        $secondPart = mbSubstr($string, $start + $length);
+        $firstPart = self::mbSubstr($string, 0, $start);
+        $secondPart = self::mbSubstr($string, $start + $length);
 
         return $firstPart . $replacement . $secondPart;
     }
