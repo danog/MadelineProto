@@ -352,7 +352,7 @@ trait BotAPI
                             break;
                         case 'documentAttributeSticker':
                             $type_name = 'sticker';
-                            $res['mask'] = $attribute['mask'];
+                            $res['mask'] = $attribute['mask'] ?? false;
                             $res['emoji'] = $attribute['alt'];
                             $res['sticker_set'] = $attribute['stickerset'];
                             if (isset($attribute['mask_coords'])) {
