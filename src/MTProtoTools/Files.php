@@ -137,7 +137,7 @@ trait Files
                     throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
                 }
 
-                if ($attr['mask']) {
+                if ($attr['mask'] ?? false) {
                     return new MaskSticker($this, $media, $attr, $has_document_photo, $protected);
                 }
 

@@ -304,6 +304,8 @@ trait BotAPI
                 return $res;
             case 'messageMediaEmpty':
                 return [];
+            case 'decryptedMessageMediaExternalDocument':
+                $data = ['document' => $document];
             case 'messageMediaDocument':
                 $type_name = 'document';
                 $res = [];
@@ -391,7 +393,6 @@ trait BotAPI
             case 'decryptedMessageMediaAudio':
             case 'decryptedMessageMediaPhoto':
             case 'decryptedMessageMediaVideo':
-            case 'decryptedMessageMediaDocument':
             case 'decryptedMessageMediaDocument':
                 $data = $data['file'];
                 // no break
