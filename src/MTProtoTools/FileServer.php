@@ -90,7 +90,7 @@ trait FileServer
     /**
      * Internal endpoint used by the download server.
      */
-    public function processDownloadServerPing(string $path, string $payload): void
+    public static function processDownloadServerPing(string $path, string $payload): void
     {
         self::$checkedScripts[$path] = $payload;
     }

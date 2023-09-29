@@ -1469,9 +1469,9 @@ abstract class InternalDoc
     /**
      * Internal endpoint used by the download server.
      */
-    public function processDownloadServerPing(string $path, string $payload): void
+    public static function processDownloadServerPing(string $path, string $payload): void
     {
-        $this->wrapper->getAPI()->processDownloadServerPing($path, $payload);
+        \danog\MadelineProto\MTProto::processDownloadServerPing($path, $payload);
     }
     /**
      * Initiates QR code login.
