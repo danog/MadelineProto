@@ -90,10 +90,38 @@ abstract class StrTools extends Extension
      * @param string   $haystack haystack
      * @param string   $needle   needle
      * @param integer  $offset   Offset
+     * 
+     * @return int<0, max>|false
      */
-    public static function mbStrrpos(string $haystack, string $needle,int $offset = 0): false|int
+    public static function mbStrrpos(string $haystack, string $needle, int $offset = 0): false|int
     {
-        $pos = strrpos($haystack, $needle);
+        if ($offset > 0) {
+            $offset = strlen(self::mbSubstr($haystack, 0, $offset)); 
+        } elseif ($offset < 0) {
+            $offset = -strlen(self::mbSubstr($haystack, $offset)); 
+        }
+        $pos = strrpos($haystack, $needle, $offset);
+        if ($pos === false) return false;
+
+        return self::mbStrlen(substr($haystack, 0, $pos));
+    }
+    /**
+     * Telegram UTF-8 multibyte strpos.
+     *
+     * @param string   $haystack haystack
+     * @param string   $needle   needle
+     * @param integer  $offset   Offset
+     * 
+     * @return int<0, max>|false
+     */
+    public static function mbStrpos(string $haystack, string $needle, int $offset = 0): false|int
+    {
+        if ($offset > 0) {
+            $offset = strlen(self::mbSubstr($haystack, 0, $offset)); 
+        } elseif ($offset < 0) {
+            $offset = -strlen(self::mbSubstr($haystack, $offset)); 
+        }
+        $pos = strpos($haystack, $needle, $offset);
         if ($pos === false) return false;
 
         return self::mbStrlen(substr($haystack, $offset, $pos));
@@ -104,18 +132,25 @@ abstract class StrTools extends Extension
      *
      * @param string   $string        String
      * @param string   $replacement   Replacement
-     * @param integer  $start         Start
+     * @param integer  $offset        Offset
      * @param integer  $length        Length
      */
-    public static function mbSubstrReplace(string $string, string $replacement,int $start, ?int $length = null): array|false|string|null
+    public static function mbSubstrReplace(string $string, string $replacement, int $offset, ?int $length = null): string
     {
+        if ($length) {
+            if ($length > 0) {
+                $length = strlen(self::mbSubstr($string, $offset, $length));
+            } else { // < 0
+                $length = -strlen(self::mbSubstr($string, $offset, $length));
+            }
+        }
+        if ($offset > 0) {
+            $offset = strlen(self::mbSubstr($string, 0, $offset)); 
+        } elseif ($offset < 0) {
+            $offset = -strlen(self::mbSubstr($string, $offset)); 
+        }
 
-        if ($length === null) $length = self::mbStrlen($string);
-        
-        $firstPart = self::mbSubstr($string, 0, $start);
-        $secondPart = self::mbSubstr($string, $start + $length);
-
-        return $firstPart . $replacement . $secondPart;
+        return substr_replace($string, $replacement, $offset, $length);
     }
     
     /**
