@@ -217,6 +217,9 @@ final class API extends AbstractAPI
             $appInfo->setApiHash($app['api_hash']);
         }
         $this->wrapper->setAPI(new MTProto($settings, $this->wrapper));
+        $this->wrapper->logger('Prompting initial serialization...');
+        $this->wrapper->serialize();
+        $this->wrapper->logger('Done initial serialization!');
         $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
