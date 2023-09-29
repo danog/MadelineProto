@@ -91,7 +91,7 @@ abstract class StrTools extends Extension
      * @param string   $needle   needle
      * @param integer  $offset   Offset
      */
-    public function mbStrrpos(string $haystack, string $needle,int $offset = 0): false|int
+    public static function mbStrrpos(string $haystack, string $needle,int $offset = 0): false|int
     {
         $pos = strrpos($haystack, $needle);
         if ($pos === false) return false;
@@ -107,7 +107,7 @@ abstract class StrTools extends Extension
      * @param integer  $start         Start
      * @param integer  $length        Length
      */
-    public function mbSubstrReplace(string $string, string $replacement,int $start, ?int $length = null): array|false|string|null
+    public static function mbSubstrReplace(string $string, string $replacement,int $start, ?int $length = null): array|false|string|null
     {
 
         if ($length === null) $length = self::mbStrlen($string);
