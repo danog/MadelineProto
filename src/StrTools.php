@@ -83,6 +83,41 @@ abstract class StrTools extends Extension
             'UTF-16',
         );
     }
+
+    /**
+     * Telegram UTF-8 multibyte strrpos.
+     *
+     * @param string   $haystack haystack
+     * @param string   $needle   needle
+     * @param integer  $offset   Offset
+     */
+    public function mbStrrpos(string $haystack, string $needle,int $offset = 0): false|int
+    {
+        $pos = strrpos($haystack, $needle);
+        if ($pos === false) return false;
+
+        return mbStrlen(substr($haystack, $offset, $pos));
+    }
+
+    /**
+     * Telegram UTF-8 multibyte substr replace.
+     *
+     * @param string   $string        String
+     * @param string   $replacement   Replacement
+     * @param integer  $start         Start
+     * @param integer  $length        Length
+     */
+    public function mbSubstrReplace(string $string, string $replacement,int $start, ?int $length = null): array|false|string|null
+    {
+
+        if ($length === null) $length = mbStrlen($string);
+        
+        $firstPart = mbSubstr($string, 0, $start);
+        $secondPart = mbSubstr($string, $start + $length);
+
+        return $firstPart . $replacement . $secondPart;
+    }
+    
     /**
      * Telegram UTF-8 multibyte split.
      *
