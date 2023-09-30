@@ -239,6 +239,7 @@ final class WriteLoop extends Loop
                     } elseif ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                         && !$this->shared->isAuthorized()
                         && $constructor !== 'auth.importAuthorization'
+                        && !$this->connection->isCDN()
                     ) {
                         $this->API->logger("Skipping $message due to unimported auth in connection in DC $this->datacenter");
                         $skipped = true;
