@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Http\Client\Request;
@@ -933,14 +934,14 @@ trait Files
      *
      * @return non-empty-string Downloaded file name
      */
-    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null): string
+    public function downloadToDir(mixed $messageMedia, string|FileCallbackInterface $dir, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
             $dir = $dir->getFile();
         }
         $messageMedia = ($this->getDownloadInfo($messageMedia));
-        return $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb);
+        return $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb, $cancellation);
     }
     /**
      * Download file.
@@ -951,7 +952,7 @@ trait Files
      *
      * @return non-empty-string Downloaded file name
      */
-    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null): string
+    public function downloadToFile(mixed $messageMedia, string|FileCallbackInterface $file, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -969,7 +970,7 @@ trait Files
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = Tools::flock("$file.lock", LOCK_EX);
         $this->logger->logger('Got lock of file to download');
-        async($this->downloadToStream(...), $messageMedia, $stream, $cb, $size, -1)->finally(function () use ($stream, $unlock, $file): void {
+        async($this->downloadToStream(...), $messageMedia, $stream, $cb, $size, -1, $cancellation)->finally(function () use ($stream, $unlock, $file): void {
             $stream->close();
             $unlock();
             try {
@@ -992,7 +993,7 @@ trait Files
      * @param int                            $end          Offset where to stop downloading (inclusive)
      * @param int                            $part_size    Size of each chunk
      */
-    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null): void
+    public function downloadToCallable(mixed $messageMedia, callable $callable, ?callable $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, ?Cancellation $cancellation = null): void
     {
         $messageMedia = ($this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
@@ -1074,7 +1075,7 @@ trait Files
         $params[0]['previous_promise'] = true;
         $start = \microtime(true);
         $old_dc = null;
-        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
+        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable, $cancellation);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
             $origCb(100, 0, 0);
@@ -1086,7 +1087,7 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable);
+                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable, $cancellation);
                 $previous_promise->map(static function (int $res) use (&$size): void {
                     $size += $res;
                 });
@@ -1137,7 +1138,7 @@ trait Files
      * @param boolean  $seekable     Whether the download file is seekable
      * @param boolean  $postpone     Whether to postpone method call
      */
-    private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, bool $postpone = false): int
+    private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, ?Cancellation $cancellation): int
     {
         do {
             if (!$cdn) {
@@ -1151,7 +1152,7 @@ trait Files
                     $res = $this->methodCallAsyncRead(
                         $cdn ? 'upload.getCdnFile' : 'upload.getFile',
                         $basic_param + $offset,
-                        ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'postpone' => $postpone]
+                        ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'cancellation' => $cancellation]
                     );
                     break;
                 } catch (FloodWaitError $e) {
@@ -1186,7 +1187,7 @@ trait Files
                 $this->config['expires'] = 0;
                 $this->getConfig();
                 try {
-                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc, 'cancellation' => $cancellation]));
                 } catch (RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
@@ -1213,7 +1214,7 @@ trait Files
             if (isset($messageMedia['cdn_key'])) {
                 $ivec = \substr($messageMedia['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
-                $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc);
+                $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc, $cancellation);
             }
             if (isset($messageMedia['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
@@ -1244,11 +1245,11 @@ trait Files
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
-    private function checkCdnHash(string $file, int $offset, string $data, int &$datacenter): void
+    private function checkCdnHash(string $file, int $offset, string $data, int &$datacenter, ?Cancellation $cancellation): void
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter, 'cancellation' => $cancellation]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);

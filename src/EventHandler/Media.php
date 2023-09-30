@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\Cancellation;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\Types\Bytes;
@@ -138,9 +139,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
      *
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
     {
-        return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end);
+        return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end, $cancellation);
     }
 
     /**
@@ -149,10 +150,10 @@ abstract class Media extends IpcCapable implements JsonSerializable
      * @param string $dir Directory where to download the file
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function downloadToDir(?string $dir = null, ?callable $cb = null): string
+    public function downloadToDir(?string $dir = null, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
         $dir ??= \getcwd();
-        return $this->getClient()->downloadToDir($this, $dir, $cb);
+        return $this->getClient()->downloadToDir($this, $dir, $cb, $cancellation);
     }
     /**
      * Download the media to file.
@@ -160,9 +161,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
      * @param string $file Downloaded file path
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function downloadToFile(string $file, ?callable $cb = null): string
+    public function downloadToFile(string $file, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
-        return $this->getClient()->downloadToFile($this, $file, $cb);
+        return $this->getClient()->downloadToFile($this, $file, $cb, $cancellation);
     }
 
     /**

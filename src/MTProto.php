@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cache\Cache;
 use Amp\Cache\LocalCache;
+use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
@@ -713,7 +714,7 @@ final class MTProto implements TLCallback, LoggerGetter
     /**
      * Provide a stream for a file, URL or amp stream.
      */
-    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream): ReadableStream
+    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null): ReadableStream
     {
         if ($stream instanceof LocalFile) {
             return openFile($stream->file, 'r');
@@ -723,6 +724,7 @@ final class MTProto implements TLCallback, LoggerGetter
             $request->setTransferTimeout(INF);
             return $this->getHTTPClient()->request(
                 $request,
+                $cancellation
             )->getBody();
         }
         if ($stream instanceof Message) {
@@ -732,10 +734,10 @@ final class MTProto implements TLCallback, LoggerGetter
             }
         }
         if ($stream instanceof Media) {
-            return $stream->getStream();
+            return $stream->getStream(cancellation: $cancellation);
         }
         if ($stream instanceof BotApiFileId) {
-            return $this->downloadToReturnedStream($stream);
+            return $this->downloadToReturnedStream($stream, cancellation: $cancellation);
         }
         return $stream;
     }

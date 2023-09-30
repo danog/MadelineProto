@@ -23,6 +23,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Cancellation;
 use Amp\File\File;
 use Amp\File\Whence;
 use Amp\Http\HttpStatus;
@@ -82,7 +83,7 @@ trait FilesLogic
      * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, ?Cancellation $cancellation = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -128,7 +129,8 @@ trait FilesLogic
                 \ob_end_flush();
                 \ob_implicit_flush();
             }
-            $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, ...$result->getServeRange());
+            [$start, $end] = $result->getServeRange();
+            $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, $start, $end, $cancellation);
         }
     }
     /**
@@ -139,11 +141,11 @@ trait FilesLogic
      * @param int      $offset       Offset where to start downloading
      * @param int      $end          Offset where to end download
      */
-    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
     {
         $pipe = new Pipe(1024*1024);
         $sink = $pipe->getSink();
-        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end)->finally($sink->close(...));
+        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end, $cancellation)->finally($sink->close(...));
         return $pipe->getSource();
     }
     /**
@@ -155,7 +157,7 @@ trait FilesLogic
      * @param int                                                 $offset       Offset where to start downloading
      * @param int                                                 $end          Offset where to end download
      */
-    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): void
     {
         $messageMedia = $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
@@ -193,7 +195,7 @@ trait FilesLogic
             }
             return \strlen($payload);
         };
-        $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
+        $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end, null, $cancellation);
     }
 
     /**
@@ -208,7 +210,7 @@ trait FilesLogic
      * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
+    public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, ?Cancellation $cancellation = null): Response
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -235,7 +237,8 @@ trait FilesLogic
         $body = null;
         if ($result->shouldServe()) {
             $pipe = new Pipe(1024 * 1024);
-            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
+            [$start, $end] = $result->getServeRange();
+            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
             $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();

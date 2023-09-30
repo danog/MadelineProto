@@ -69,6 +69,8 @@ trait FilesAbstraction
      * @param boolean                                                            $background             Send this message as background message
      * @param boolean                                                            $clearDraft             Clears the draft field
      * @param boolean                                                            $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                            $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                       $cancellation           Cancellation.
      *
      */
     public function sendDocument(
@@ -92,6 +94,7 @@ trait FilesAbstraction
         bool $background = false,
         bool $clearDraft = false,
         bool $updateStickersetsOrder = false,
+        bool $forceResend,
         ?Cancellation $cancellation = null,
     ): Message {
         if ($file instanceof Message) {
@@ -123,6 +126,7 @@ trait FilesAbstraction
             replyMarkup: $replyMarkup,
             scheduleDate: $scheduleDate,
             sendAs: $sendAs,
+            forceResend: $forceResend,
             cancellation: $cancellation
         );
     }
@@ -146,6 +150,8 @@ trait FilesAbstraction
      * @param boolean                                                       $background             Send this message as background message
      * @param boolean                                                       $clearDraft             Clears the draft field
      * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation           Cancellation.
      *
      */
     public function sendPhoto(
@@ -167,6 +173,7 @@ trait FilesAbstraction
         bool $background = false,
         bool $clearDraft = false,
         bool $updateStickersetsOrder = false,
+        bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
         if ($file instanceof Message) {
@@ -198,6 +205,7 @@ trait FilesAbstraction
             replyMarkup: $replyMarkup,
             scheduleDate: $scheduleDate,
             sendAs: $sendAs,
+            forceResend: $forceResend,
             cancellation: $cancellation
         );
     }
@@ -230,7 +238,8 @@ trait FilesAbstraction
         bool $background,
         bool $clearDraft,
         bool $updateStickersetsOrder,
-        ?Cancellation $cancellation = null,
+        bool $forceResend,
+        ?Cancellation $cancellation,
     ): Message {
         $peer = $this->getId($peer);
         if ($file instanceof Media) {
@@ -253,6 +262,7 @@ trait FilesAbstraction
         if ($file instanceof $type
             && ($fileName ?? $file->fileName) === $file->fileName
             && !$file->protected
+            && !$forceResend
         ) {
             // Re-use
             $reuseId = $file->botApiFileId;
@@ -261,6 +271,7 @@ trait FilesAbstraction
             && $file->getTypeClass() === $type
             && ($fileName ?? $file->fileName) === $file->fileName
             && !$file->protected
+            && !$forceResend
         ) {
             // Re-use
             $reuseId = $file->fileId;
@@ -299,7 +310,7 @@ trait FilesAbstraction
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
-                $file = buffer($this->getStream($file), $cancellation);
+                $file = buffer($this->getStream($file, $cancellation), $cancellation);
                 $img = \imagecreatefromstring($file);
                 $width = \imagesx($img);
                 $height = \imagesy($img);
@@ -326,7 +337,7 @@ trait FilesAbstraction
                 unset($stream);
                 $file = new ReadableBuffer($file);
             } elseif ($thumb !== null) {
-                $thumb = buffer($this->getStream($thumb), $cancellation);
+                $thumb = buffer($this->getStream($thumb, $cancellation), $cancellation);
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
@@ -368,6 +379,7 @@ trait FilesAbstraction
             if ($file instanceof $type
                 && ($fileName ?? $file->fileName) === $file->fileName
                 && $file->encrypted
+                && !$forceResend
             ) {
                 // Reuse
                 $file = $file->location;
