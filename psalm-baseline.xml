@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@1f979f4c33897fc8b42c68a063828381c6d60716">
+<files psalm-version="dev-master@1b12255fb19da5c25413fb0071ab3d1f006bb67b">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -504,6 +504,9 @@
       <code><![CDATA[$this->botApiFileUniqueId]]></code>
     </PossiblyNullArrayAccess>
     <PropertyNotSetInConstructor>
+      <code>$thumb</code>
+      <code>$thumbHeight</code>
+      <code>$thumbWidth</code>
       <code>$thumbs</code>
       <code>$videoThumbs</code>
     </PropertyNotSetInConstructor>
@@ -512,10 +515,16 @@
     <PropertyNotSetInConstructor>
       <code>AbstractAudio</code>
       <code>AbstractAudio</code>
+      <code>AbstractAudio</code>
+      <code>AbstractAudio</code>
+      <code>AbstractAudio</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/AbstractSticker.php">
     <PropertyNotSetInConstructor>
+      <code>AbstractSticker</code>
+      <code>AbstractSticker</code>
+      <code>AbstractSticker</code>
       <code>AbstractSticker</code>
       <code>AbstractSticker</code>
     </PropertyNotSetInConstructor>
@@ -524,10 +533,16 @@
     <PropertyNotSetInConstructor>
       <code>AbstractVideo</code>
       <code>AbstractVideo</code>
+      <code>AbstractVideo</code>
+      <code>AbstractVideo</code>
+      <code>AbstractVideo</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/AnimatedSticker.php">
     <PropertyNotSetInConstructor>
+      <code>AnimatedSticker</code>
+      <code>AnimatedSticker</code>
+      <code>AnimatedSticker</code>
       <code>AnimatedSticker</code>
       <code>AnimatedSticker</code>
     </PropertyNotSetInConstructor>
@@ -536,10 +551,16 @@
     <PropertyNotSetInConstructor>
       <code>Audio</code>
       <code>Audio</code>
+      <code>Audio</code>
+      <code>Audio</code>
+      <code>Audio</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/CustomEmoji.php">
     <PropertyNotSetInConstructor>
+      <code>CustomEmoji</code>
+      <code>CustomEmoji</code>
+      <code>CustomEmoji</code>
       <code>CustomEmoji</code>
       <code>CustomEmoji</code>
     </PropertyNotSetInConstructor>
@@ -548,10 +569,16 @@
     <PropertyNotSetInConstructor>
       <code>Document</code>
       <code>Document</code>
+      <code>Document</code>
+      <code>Document</code>
+      <code>Document</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/DocumentPhoto.php">
     <PropertyNotSetInConstructor>
+      <code>DocumentPhoto</code>
+      <code>DocumentPhoto</code>
+      <code>DocumentPhoto</code>
       <code>DocumentPhoto</code>
       <code>DocumentPhoto</code>
     </PropertyNotSetInConstructor>
@@ -560,10 +587,16 @@
     <PropertyNotSetInConstructor>
       <code>Gif</code>
       <code>Gif</code>
+      <code>Gif</code>
+      <code>Gif</code>
+      <code>Gif</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/MaskSticker.php">
     <PropertyNotSetInConstructor>
+      <code>MaskSticker</code>
+      <code>MaskSticker</code>
+      <code>MaskSticker</code>
       <code>MaskSticker</code>
       <code>MaskSticker</code>
     </PropertyNotSetInConstructor>
@@ -577,10 +610,16 @@
     <PropertyNotSetInConstructor>
       <code>Photo</code>
       <code>Photo</code>
+      <code>Photo</code>
+      <code>Photo</code>
+      <code>Photo</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/RoundVideo.php">
     <PropertyNotSetInConstructor>
+      <code>RoundVideo</code>
+      <code>RoundVideo</code>
+      <code>RoundVideo</code>
       <code>RoundVideo</code>
       <code>RoundVideo</code>
     </PropertyNotSetInConstructor>
@@ -589,10 +628,16 @@
     <PropertyNotSetInConstructor>
       <code>StaticSticker</code>
       <code>StaticSticker</code>
+      <code>StaticSticker</code>
+      <code>StaticSticker</code>
+      <code>StaticSticker</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/Sticker.php">
     <PropertyNotSetInConstructor>
+      <code>Sticker</code>
+      <code>Sticker</code>
+      <code>Sticker</code>
       <code>Sticker</code>
       <code>Sticker</code>
     </PropertyNotSetInConstructor>
@@ -601,16 +646,25 @@
     <PropertyNotSetInConstructor>
       <code>Video</code>
       <code>Video</code>
+      <code>Video</code>
+      <code>Video</code>
+      <code>Video</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/VideoSticker.php">
     <PropertyNotSetInConstructor>
       <code>VideoSticker</code>
       <code>VideoSticker</code>
+      <code>VideoSticker</code>
+      <code>VideoSticker</code>
+      <code>VideoSticker</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/Voice.php">
     <PropertyNotSetInConstructor>
+      <code>Voice</code>
+      <code>Voice</code>
+      <code>Voice</code>
       <code>Voice</code>
       <code>Voice</code>
     </PropertyNotSetInConstructor>
@@ -1400,7 +1454,6 @@
     </MissingReturnType>
     <PossiblyNullReference>
       <code>resume</code>
-      <code>resume</code>
     </PossiblyNullReference>
   </file>
   <file src="src/MTProtoSession/MsgIdHandler.php">
@@ -1425,7 +1478,6 @@
     <PossiblyNullReference>
       <code>hasReply</code>
       <code>hasReply</code>
-      <code>resume</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
@@ -1547,6 +1599,12 @@
     <MoreSpecificReturnType>
       <code>Message</code>
     </MoreSpecificReturnType>
+    <PossiblyInvalidArgument>
+      <code>$file</code>
+      <code>$file</code>
+      <code><![CDATA[$media['file']]]></code>
+      <code><![CDATA[$media['file']]]></code>
+    </PossiblyInvalidArgument>
   </file>
   <file src="src/MTProtoTools/FilesLogic.php">
     <MissingClosureReturnType>
@@ -2235,9 +2293,6 @@
       <code>\is_resource($stream)</code>
       <code>\is_resource($stream)</code>
     </DocblockTypeContradiction>
-    <InvalidScalarArgument>
-      <code>$value</code>
-    </InvalidScalarArgument>
     <MissingClosureParamType>
       <code>$arg</code>
     </MissingClosureParamType>
@@ -2250,6 +2305,7 @@
     <PossiblyInvalidArgument>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>
+      <code>$value</code>
       <code>$value</code>
       <code>$value</code>
       <code><![CDATA[$x['result']]]></code>

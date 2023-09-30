@@ -372,6 +372,8 @@ final class Connection
             }
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
+            } elseif (isset($arguments['message']['reply_to']['reply_to_msg_id'])) {
+                $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to']['reply_to_msg_id'];
             }
         } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
             if ($method === 'messages.uploadMedia') {
@@ -414,7 +416,16 @@ final class Connection
             $this->API->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
-                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
+                if (
+                    (
+                        !\is_array($arguments['file'])
+                        || !(
+                            isset($arguments['file']['_'])
+                            && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_'])['type'] === 'InputEncryptedFile'
+                        )
+                    )
+                    && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()
+                ) {
                     $arguments['file'] = ($this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {

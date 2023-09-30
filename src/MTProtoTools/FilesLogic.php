@@ -247,13 +247,13 @@ trait FilesLogic
     /**
      * Upload file to secret chat.
      *
-     * @param FileCallbackInterface|string|array $file     File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                             $fileName File name
      * @param callable                           $cb       Callback
      *
      * @return array InputFile constructor
      */
-    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null): array
+    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null): array
     {
         return $this->upload($file, $fileName, $cb, true);
     }

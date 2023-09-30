@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
 /**
@@ -60,14 +61,24 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly string $botApiFileUniqueId;
 
     /** @internal Media location */
-    protected readonly array $location;
+    public readonly array $location;
 
     /** @internal Encryption key for secret chat files */
-    protected readonly ?string $key;
+    public readonly ?string $key;
     /** @internal Encryption IV for secret chat files */
-    protected readonly ?string $iv;
+    public readonly ?string $iv;
     /** @internal Encryption key fingerprint for secret chat files */
     protected readonly ?int $keyFingerprint;
+
+    /** Whether this media originates from a secret chat. */
+    public readonly bool $encrypted;
+
+    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
+    public readonly ?Bytes $thumb;
+    /** Thumbnail height only for secret chats. */
+    public readonly ?int $thumbHeight;
+    /** Thumbnail width only for secret chats. */
+    public readonly ?int $thumbWidth;
 
     /** @internal */
     public function __construct(
@@ -101,6 +112,15 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
         $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
         $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
+        if ($this->encrypted = isset($rawMedia['iv'])) {
+            $this->thumb = $rawMedia['thumb'] ?? null;
+            $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
+            $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
+        } else {
+            $this->thumb = null;
+            $this->thumbHeight = null;
+            $this->thumbWidth = null;
+        }
     }
 
     /**

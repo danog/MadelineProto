@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\Cache\Cache;
 use Amp\Cache\LocalCache;
 use Amp\DeferredFuture;
@@ -29,11 +30,13 @@ use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
+use AssertionError;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\MemoryArray;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -75,6 +78,7 @@ use Webmozart\Assert\Assert;
 use function Amp\async;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
+use function Amp\File\openFile;
 use function Amp\Future\await;
 
 use function time;
@@ -705,6 +709,37 @@ final class MTProto implements TLCallback, LoggerGetter
     {
         return $this->datacenter->getHTTPClient();
     }
+
+    /**
+     * Provide a stream for a file, URL or amp stream.
+     */
+    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream): ReadableStream
+    {
+        if ($stream instanceof LocalFile) {
+            return openFile($stream->file, 'r');
+        }
+        if ($stream instanceof RemoteUrl) {
+            $request = new Request($stream->url);
+            $request->setTransferTimeout(INF);
+            return $this->getHTTPClient()->request(
+                $request,
+            )->getBody();
+        }
+        if ($stream instanceof Message) {
+            $stream = $stream->media;
+            if ($stream === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
+        if ($stream instanceof Media) {
+            return $stream->getStream();
+        }
+        if ($stream instanceof BotApiFileId) {
+            return $this->downloadToReturnedStream($stream);
+        }
+        return $stream;
+    }
+
     /**
      * Get async DNS client.
      */
