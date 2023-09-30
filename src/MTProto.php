@@ -1206,6 +1206,7 @@ final class MTProto implements TLCallback, LoggerGetter
             }
             if ($auth_key) {
                 $socket->setTempAuthKey(null);
+                EventLoop::queue($socket->initAuthorization(...));
             }
         }
     }
