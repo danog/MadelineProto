@@ -1136,7 +1136,6 @@ trait Files
      * @param array    $offset       Offset
      * @param callable $callable     Chunk callback
      * @param boolean  $seekable     Whether the download file is seekable
-     * @param boolean  $postpone     Whether to postpone method call
      */
     private function downloadPart(array &$messageMedia, bool &$cdn, int &$datacenter, ?int &$old_dc, ?IGE &$ige, callable $cb, array $offset, callable $callable, bool $seekable, ?Cancellation $cancellation): int
     {
