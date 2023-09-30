@@ -76,8 +76,7 @@ class SecretHandler extends SimpleEventHandler
     #[Handler]
     public function handle(Incoming&SecretMessage $message): void
     {
-        if ($message->media)
-        {
+        if ($message->media) {
             $path = $message->media->downloadToDir('/tmp');
             $message->reply($path);
         }
