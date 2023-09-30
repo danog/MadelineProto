@@ -94,7 +94,7 @@ trait FilesAbstraction
         bool $background = false,
         bool $clearDraft = false,
         bool $updateStickersetsOrder = false,
-        bool $forceResend,
+        bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
         if ($file instanceof Message) {
