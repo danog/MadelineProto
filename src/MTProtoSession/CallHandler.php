@@ -148,7 +148,7 @@ trait CallHandler
                     $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
-                    $this->writer->resume();
+                    $this->flush();
                 }
                 return new WrappedFuture(async(fn () => \array_map(
                     fn (WrappedFuture $f) => $f->await(),

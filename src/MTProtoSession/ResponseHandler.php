@@ -162,7 +162,7 @@ trait ResponseHandler
         }
         $this->new_incoming = [];
         if ($this->pendingOutgoing) {
-            $this->writer->resume();
+            $this->flush();
         }
     }
     /**

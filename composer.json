@@ -50,7 +50,7 @@
         "league/uri": "^7",
         "danog/ipc": "^1",
         "amphp/log": "^2",
-        "danog/loop": "^1",
+        "danog/loop": "^1.1.0",
         "phpseclib/phpseclib": "^3.0.22",
         "amphp/redis": "^2",
         "psr/http-factory": "^1.0",

@@ -516,8 +516,8 @@ final class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
-        if ($flush && isset($this->writer)) {
-            $this->writer->resume();
+        if ($flush) {
+            $this->flush();
         }
         $this->connect();
         $promise->await();
