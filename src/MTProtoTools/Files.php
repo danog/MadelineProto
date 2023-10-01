@@ -1086,6 +1086,7 @@ trait Files
             $previous_promise = true;
             $promises = [];
             foreach ($params as $key => $param) {
+                $cancellation?->throwIfRequested();
                 $param['previous_promise'] = $previous_promise;
                 $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable, $cancellation);
                 $previous_promise->map(static function (int $res) use (&$size): void {
@@ -1147,6 +1148,7 @@ trait Files
             }
             //$x = 0;
             while (true) {
+                $cancellation?->throwIfRequested();
                 try {
                     $res = $this->methodCallAsyncRead(
                         $cdn ? 'upload.getCdnFile' : 'upload.getFile',
@@ -1167,6 +1169,7 @@ trait Files
                     }
                 }
             }
+            $cancellation?->throwIfRequested();
 
             if ($res['_'] === 'upload.fileCdnRedirect') {
                 $cdn = true;
@@ -1204,8 +1207,9 @@ trait Files
                 $datacenter = 0;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
-                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
+                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter, 'cancellation' => $cancellation]);
             }
+            $cancellation?->throwIfRequested();
             $res['bytes'] = (string) $res['bytes'];
             if ($res['bytes'] === '') {
                 return 0;
