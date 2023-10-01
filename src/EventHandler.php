@@ -149,9 +149,6 @@ abstract class EventHandler extends AbstractAPI
                     $r = $r->await();
                 }
             }
-            if (\method_exists($this, 'onStop')) {
-                Shutdown::addCallback([$this, 'onStop']);
-            }
             if ($main) {
                 $this->setReportPeers($this->getReportPeers());
             }
@@ -479,5 +476,11 @@ abstract class EventHandler extends AbstractAPI
         }
 
         return $plugins;
+    }
+    public function __destruct()
+    {
+        if (\method_exists($this, 'onStop')) {
+            $this->onStop();
+        }
     }
 }
