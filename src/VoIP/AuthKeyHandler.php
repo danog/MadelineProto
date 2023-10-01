@@ -72,7 +72,7 @@ trait AuthKeyHandler
         $this->pendingCalls[$user] = $deferred->getFuture();
 
         try {
-            $this->logger->logger(\sprintf('Calling %s...', $user), Logger::VERBOSE);
+            $this->logger->logger(sprintf('Calling %s...', $user), Logger::VERBOSE);
             $dh_config = ($this->getDhConfig());
             $this->logger->logger('Generating a...', Logger::VERBOSE);
             $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
@@ -81,11 +81,11 @@ trait AuthKeyHandler
             Crypt::checkG($g_a, $dh_config['p']);
             $res = $this->methodCallAsyncRead('phone.requestCall', [
                 'user_id' => $user,
-                'g_a_hash' => \hash('sha256', $g_a->toBytes(), true),
+                'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
                 'protocol' => VoIPController::CALL_PROTOCOL
             ])['phone_call'];
             $res['a'] = $a;
-            $res['g_a'] = \str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            $res['g_a'] = str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
             $this->callsByPeer[$controller->public->otherID] = $controller;
             unset($this->pendingCalls[$user]);
@@ -152,7 +152,7 @@ trait AuthKeyHandler
      */
     public function getAllCalls(): array
     {
-        return \array_map(fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+        return array_map(fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
     }
 
     /**

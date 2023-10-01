@@ -6,7 +6,7 @@ if (\defined('MADELINE_PHP')) {
     throw new \Exception('Please do not include madeline.php twice, use require_once \'madeline.php\';!');
 }
 
-if (!\defined('MADELINE_ALLOW_COMPOSER') && \class_exists(\Composer\Autoload\ClassLoader::class)) {
+if (!\defined('MADELINE_ALLOW_COMPOSER') && class_exists(\Composer\Autoload\ClassLoader::class)) {
     throw new \Exception('Composer autoloader detected: madeline.php is incompatible with Composer, please install MadelineProto using composer: https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project');
 }
 
@@ -46,7 +46,7 @@ class Installer
         if (PHP_INT_SIZE < 8) {
             die('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.'.PHP_EOL);
         }
-        $backtrace = \debug_backtrace(0);
+        $backtrace = debug_backtrace(0);
         if (\count($backtrace) === 1) {
             if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
                 $arguments = \array_slice($GLOBALS['argv'], 1);
@@ -56,17 +56,17 @@ class Installer
                 $arguments = [];
             }
             if (\count($arguments) >= 2) {
-                \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
+                \define(\MADELINE_WORKER_TYPE::class, array_shift($arguments));
                 \define(\MADELINE_WORKER_ARGS::class, $arguments);
             } else {
                 die('MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.'.PHP_EOL);
             }
             \define('MADELINE_REAL_ROOT', \dirname($backtrace[0]["file"]));
         }
-        $this->version = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-        \define('MADELINE_PHAR_GLOB', \getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
-        \define('MADELINE_PHAR_VERSION', \getcwd().DIRECTORY_SEPARATOR."madeline.version");
-        \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
+        $this->version = (string) min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+        \define('MADELINE_PHAR_GLOB', getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
+        \define('MADELINE_PHAR_VERSION', getcwd().DIRECTORY_SEPARATOR."madeline.version");
+        \define('MADELINE_RELEASE_URL', sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
     /**
@@ -75,8 +75,8 @@ class Installer
     public function __destruct()
     {
         if ($this->lockInstaller) {
-            \flock($this->lockInstaller, LOCK_UN);
-            \fclose($this->lockInstaller);
+            flock($this->lockInstaller, LOCK_UN);
+            fclose($this->lockInstaller);
             $this->lockInstaller = null;
         }
     }
@@ -91,21 +91,21 @@ class Installer
         $release ??= '';
         $phar = "madeline-$release.phar";
         $packages = ['danog/madelineproto' => 'old'];
-        if (!\file_exists("phar://$phar/vendor/composer/installed.json")) {
+        if (!file_exists("phar://$phar/vendor/composer/installed.json")) {
             return $packages;
         }
-        $composer = \json_decode(\file_get_contents("phar://$phar/vendor/composer/installed.json"), true) ?: [];
+        $composer = json_decode(file_get_contents("phar://$phar/vendor/composer/installed.json"), true) ?: [];
         if (!isset($composer['packages'])) {
             return $packages;
         }
         foreach ($composer['packages'] as $dep) {
             $name = $dep['name'];
-            if (\strpos($name, 'phabel/transpiler') === 0) {
-                $name = \explode('/', $name, 3)[2];
+            if (strpos($name, 'phabel/transpiler') === 0) {
+                $name = explode('/', $name, 3)[2];
             }
             $version = $dep['version_normalized'];
-            if ($name === 'danog/madelineproto' && \substr($version, 0, 2) === '90') {
-                $version = \substr($version, 2);
+            if ($name === 'danog/madelineproto' && substr($version, 0, 2) === '90') {
+                $version = substr($version, 2);
             }
             $packages[$name] = $version;
         }
@@ -136,21 +136,21 @@ class Installer
                 'method' => 'POST',
                 'header' => [
                     'Content-Type: application/json',
-                    \sprintf(
+                    sprintf(
                         'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
                         'MProto v7',
-                        \function_exists('php_uname') ? @\php_uname('s') : 'Unknown',
-                        \function_exists('php_uname') ? @\php_uname('r') : 'Unknown',
+                        \function_exists('php_uname') ? @php_uname('s') : 'Unknown',
+                        \function_exists('php_uname') ? @php_uname('r') : 'Unknown',
                         $phpVersion,
                         'streams',
-                        \getenv('CI') ? '; CI' : ''
+                        getenv('CI') ? '; CI' : ''
                     )
                 ],
-                'content' => \json_encode($postData),
+                'content' => json_encode($postData),
                 'timeout' => 6,
             ],
         ];
-        @\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
+        @file_get_contents("https://packagist.org/downloads/", false, stream_context_create($opts));
     }
 
     /**
@@ -166,9 +166,9 @@ class Installer
         }
         $phar = "madeline-$release.phar";
         if (!self::$lock) {
-            self::$lock = \fopen("$phar.lock", 'c');
+            self::$lock = fopen("$phar.lock", 'c');
         }
-        \flock(self::$lock, LOCK_SH);
+        flock(self::$lock, LOCK_SH);
         return require_once $phar;
     }
 
@@ -178,7 +178,7 @@ class Installer
      */
     public static function unlock(): void
     {
-        \flock(self::$lock, LOCK_UN);
+        flock(self::$lock, LOCK_UN);
     }
 
     /**
@@ -189,8 +189,8 @@ class Installer
         if ($this->lockInstaller) {
             return true;
         }
-        $this->lockInstaller = \fopen($version, 'w');
-        return \flock($this->lockInstaller, LOCK_EX|LOCK_NB);
+        $this->lockInstaller = fopen($version, 'w');
+        return flock($this->lockInstaller, LOCK_EX|LOCK_NB);
     }
 
     /**
@@ -198,49 +198,49 @@ class Installer
      */
     public function install()
     {
-        if (\file_exists(MADELINE_PHAR_VERSION)) {
-            $local_release = \file_get_contents(MADELINE_PHAR_VERSION) ?: null;
+        if (file_exists(MADELINE_PHAR_VERSION)) {
+            $local_release = file_get_contents(MADELINE_PHAR_VERSION) ?: null;
         } else {
-            \touch(MADELINE_PHAR_VERSION);
+            touch(MADELINE_PHAR_VERSION);
             $local_release = null;
         }
         \define('HAD_MADELINE_PHAR', !!$local_release);
 
-        if ($local_release !== null && \file_exists("madeline-$local_release.phar")) {
+        if ($local_release !== null && file_exists("madeline-$local_release.phar")) {
             return self::load($local_release);
         }
 
-        $remote_release = \file_get_contents(MADELINE_RELEASE_URL) ?: null;
+        $remote_release = file_get_contents(MADELINE_RELEASE_URL) ?: null;
         $madeline_phar = "madeline-$remote_release.phar";
 
         if (!$this->lock(MADELINE_PHAR_VERSION)) {
-            \flock($this->lockInstaller, LOCK_EX);
+            flock($this->lockInstaller, LOCK_EX);
             return $this->install();
         }
 
-        if (!\file_exists($madeline_phar)) {
+        if (!file_exists($madeline_phar)) {
             for ($x = 0; $x < 10; $x++) {
-                $pharTest = \file_get_contents(\sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
-                if ($pharTest && \strpos($pharTest, $remote_release) !== false) {
+                $pharTest = file_get_contents(sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
+                if ($pharTest && strpos($pharTest, $remote_release) !== false) {
                     $phar = $pharTest;
                     unset($pharTest);
                     break;
                 }
-                \sleep(1);
+                sleep(1);
             }
             if (!isset($phar)) {
                 return self::load($local_release);
             }
 
-            self::$lock = \fopen("$madeline_phar.lock", 'w');
-            \flock(self::$lock, LOCK_EX);
-            \file_put_contents($madeline_phar, $phar);
+            self::$lock = fopen("$madeline_phar.lock", 'w');
+            flock(self::$lock, LOCK_EX);
+            file_put_contents($madeline_phar, $phar);
             unset($phar);
 
             self::reportComposer($local_release, $remote_release);
         }
-        \fwrite($this->lockInstaller, $remote_release);
-        \fflush($this->lockInstaller);
+        fwrite($this->lockInstaller, $remote_release);
+        fflush($this->lockInstaller);
         return self::load($remote_release);
     }
 }

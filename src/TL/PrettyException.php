@@ -85,7 +85,7 @@ trait PrettyException
             $eol = '<br>'.PHP_EOL;
         }
         $tl = false;
-        foreach (\array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
+        foreach (array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'], true)) {
                 if (($frame['args'][2] ?? '') !== '') {
                     $this->tlTrace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
@@ -98,16 +98,16 @@ trait PrettyException
                 if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === \count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
-                $this->tlTrace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
+                $this->tlTrace .= isset($frame['file']) ? str_pad(basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
                 $this->tlTrace .= isset($frame['function']) ? $frame['function'].'(' : '';
-                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']) ?: '', 1, -1) : '';
+                $this->tlTrace .= isset($frame['args']) ? substr(json_encode($frame['args']) ?: '', 1, -1) : '';
                 $this->tlTrace .= ')';
                 $this->tlTrace .= $eol;
                 $tl = false;
             }
         }
         $this->tlTrace .= $init !== '' ? "['".$init."']" : '';
-        $this->tlTrace = \implode($eol, \array_reverse(\explode($eol, $this->tlTrace)));
+        $this->tlTrace = implode($eol, array_reverse(explode($eol, $this->tlTrace)));
         if ($previous_trace) {
             $this->tlTrace .= $eol.$eol;
             $this->tlTrace .= "Previous TL trace:{$eol}";

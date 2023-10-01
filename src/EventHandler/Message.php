@@ -157,11 +157,11 @@ abstract class Message extends AbstractMessage
             : null;
 
         if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {
-            $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
-            $this->command = \substr($this->message, 1, $space-1);
-            $args = \explode(
+            $space = strpos($this->message, ' ', 1) ?: \strlen($this->message);
+            $this->command = substr($this->message, 1, $space-1);
+            $args = explode(
                 ' ',
-                \substr($this->message, $space+1)
+                substr($this->message, $space+1)
             );
             $this->commandArgs = $args === [''] ? [] : $args;
             $this->commandType = match ($this->message[0]) {
@@ -347,13 +347,13 @@ abstract class Message extends AbstractMessage
      */
     public function delReaction(int|string $reaction): array
     {
-        $key = \array_search($reaction, $this->reactions, true);
+        $key = array_search($reaction, $this->reactions, true);
         if ($key === false) {
             return $this->reactions;
         }
         unset($this->reactions[$key]);
-        $this->reactions = \array_values($this->reactions);
-        $r = \array_map(fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
+        $this->reactions = array_values($this->reactions);
+        $r = array_map(fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
         $r[]= ['_' => 'reactionEmpty'];
         $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
@@ -461,7 +461,7 @@ abstract class Message extends AbstractMessage
     public function getHTML(bool $allowTelegramTags = false): string
     {
         if (!$this->entities) {
-            return \htmlentities($this->message);
+            return htmlentities($this->message);
         }
         if ($allowTelegramTags) {
             return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);

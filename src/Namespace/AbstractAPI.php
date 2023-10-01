@@ -51,7 +51,7 @@ class AbstractAPI
             // Legacy arguments
             $args = $arguments[0] ?? [];
             $aargs = $arguments[1] ?? [];
-            if (!\array_is_list($arguments)
+            if (!array_is_list($arguments)
                 || \count($arguments) > 2
                 || !\is_array($args)
                 || !\is_array($aargs)

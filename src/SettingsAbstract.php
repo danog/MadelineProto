@@ -49,7 +49,7 @@ abstract class SettingsAbstract
             if ($name === 'changed') {
                 continue;
             }
-            $uc = \ucfirst($name);
+            $uc = ucfirst($name);
             if (isset($other->{$name})
                 && (
                     !isset($defaults[$name])
@@ -80,7 +80,7 @@ abstract class SettingsAbstract
     {
         $result = [];
         foreach ($properties as $prop) {
-            $result['set'.\ucfirst(Tools::toCamelCase($prop))] = $prop;
+            $result['set'.ucfirst(Tools::toCamelCase($prop))] = $prop;
         }
         return $result;
     }

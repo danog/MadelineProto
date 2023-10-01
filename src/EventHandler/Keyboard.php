@@ -36,8 +36,8 @@ abstract class Keyboard
     public static function fromRawReplyMarkup(array $rawReplyMarkup): ?self
     {
         return match ($rawReplyMarkup['_']) {
-            'replyKeyboardMarkup' => new ReplyKeyboard(\array_column($rawReplyMarkup['rows'], 'buttons')),
-            'replyInlineMarkup' => new InlineKeyboard(\array_column($rawReplyMarkup['rows'], 'buttons')),
+            'replyKeyboardMarkup' => new ReplyKeyboard(array_column($rawReplyMarkup['rows'], 'buttons')),
+            'replyInlineMarkup' => new InlineKeyboard(array_column($rawReplyMarkup['rows'], 'buttons')),
             default => null
         };
     }

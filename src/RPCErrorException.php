@@ -54,16 +54,16 @@ class RPCErrorException extends \Exception
             'CONNECTION_LANG_PACK_INVALID', 'MSGID_DECREASE_RETRY', 'API_CALL_ERROR', 'STORAGE_CHECK_FAILED', 'INPUT_LAYER_INVALID', 'NEED_MEMBER_INVALID', 'NEED_CHAT_INVALID', 'HISTORY_GET_FAILED', 'CHP_CALL_FAIL', 'IMAGE_ENGINE_DOWN', 'MSG_RANGE_UNSYNC', 'PTS_CHANGE_EMPTY',
             'CONNECTION_SYSTEM_LANG_CODE_EMPTY', 'WORKER_BUSY_TOO_LONG_RETRY', 'WP_ID_GENERATE_FAILED', 'ARR_CAS_FAILED', 'CHANNEL_ADD_INVALID', 'CHANNEL_ADMINS_INVALID', 'CHAT_OCCUPY_LOC_FAILED', 'GROUPED_ID_OCCUPY_FAILED', 'GROUPED_ID_OCCUPY_FAULED', 'LOG_WRAP_FAIL', 'MEMBER_FETCH_FAILED', 'MEMBER_OCCUPY_PRIMARY_LOC_FAILED', 'MEMBER_FETCH_FAILED', 'MEMBER_NO_LOCATION', 'MEMBER_OCCUPY_USERNAME_FAILED', 'MT_SEND_QUEUE_TOO_LONG', 'POSTPONED_TIMEOUT', 'RPC_CONNECT_FAILED', 'SHORTNAME_OCCUPY_FAILED', 'STORE_INVALID_OBJECT_TYPE', 'STORE_INVALID_SCALAR_TYPE', 'TMSG_ADD_FAILED', 'UNKNOWN_ERROR', 'UPLOAD_NO_VOLUME', 'USER_NOT_AVAILABLE', 'VOLUME_LOC_NOT_FOUND',
         ], true)
-                || \str_contains($error, 'Received bad_msg_notification')
-                || \str_contains($error, 'FLOOD_WAIT_')
-                || \str_contains($error, '_MIGRATE_')
-                || \str_contains($error, 'INPUT_METHOD_INVALID')
-                || \str_contains($error, 'INPUT_CONSTRUCTOR_INVALID')
-                || \str_contains($error, 'https://telegram.org/dl')
-                || \str_starts_with($error, 'Received bad_msg_notification')
-                || \str_starts_with($error, 'No workers running')
-                || \str_starts_with($error, 'All workers are busy. Active_queries ')
-                || \preg_match('/FILE_PART_\d*_MISSING/', $error);
+                || str_contains($error, 'Received bad_msg_notification')
+                || str_contains($error, 'FLOOD_WAIT_')
+                || str_contains($error, '_MIGRATE_')
+                || str_contains($error, 'INPUT_METHOD_INVALID')
+                || str_contains($error, 'INPUT_CONSTRUCTOR_INVALID')
+                || str_contains($error, 'https://telegram.org/dl')
+                || str_starts_with($error, 'Received bad_msg_notification')
+                || str_starts_with($error, 'No workers running')
+                || str_starts_with($error, 'All workers are busy. Active_queries ')
+                || preg_match('/FILE_PART_\d*_MISSING/', $error);
     }
 
     public static function localizeMessage($method, int $code, string $error): string
@@ -71,17 +71,17 @@ class RPCErrorException extends \Exception
         if (!$method || !$code || !$error) {
             return $error;
         }
-        $error = \preg_replace('/\\d+$/', 'X', $error);
+        $error = preg_replace('/\\d+$/', 'X', $error);
         $description = self::$descriptions[$error] ?? '';
         if (
             !isset(self::$fetchedError[$error])
             && (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]))
             && !self::isBad($error, $code)
-            && !($error === 'Timeout' && !\in_array(\strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
+            && !($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
         ) {
             EventLoop::queue(function () use ($method, $code, $error): void {
                 try {
-                    $res = \json_decode(
+                    $res = json_decode(
                         (
                             HttpClientBuilder::buildDefault()
                             ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
@@ -107,9 +107,9 @@ class RPCErrorException extends \Exception
     {
         Magic::start(light: true);
         $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
-        $result = \sprintf(Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = sprintf(Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+            $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
         return $result;
     }

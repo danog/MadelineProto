@@ -38,25 +38,25 @@ abstract class RunnerAbstract
         if (\defined('MADELINE_PHP')) {
             return \MADELINE_PHP;
         }
-        if (!\str_starts_with(self::SCRIPT_PATH, 'phar://')) {
+        if (!str_starts_with(self::SCRIPT_PATH, 'phar://')) {
             return self::SCRIPT_PATH;
         }
-        $alternateTmpDir = $alternateTmpDir ?: \sys_get_temp_dir();
+        $alternateTmpDir = $alternateTmpDir ?: sys_get_temp_dir();
 
         if (isset(self::$pharScriptPath[$alternateTmpDir])) {
             return self::$pharScriptPath[$alternateTmpDir];
         }
         $path = \dirname(self::SCRIPT_PATH);
 
-        $contents = \file_get_contents(self::SCRIPT_PATH);
-        $contents = \str_replace('__DIR__', \var_export($path, true), $contents);
-        $suffix = API::RELEASE.'___'.\bin2hex(\random_bytes(10));
+        $contents = file_get_contents(self::SCRIPT_PATH);
+        $contents = str_replace('__DIR__', var_export($path, true), $contents);
+        $suffix = API::RELEASE.'___'.bin2hex(random_bytes(10));
         self::$pharScriptPath[$alternateTmpDir] = $scriptPath = $alternateTmpDir.'/madeline-ipc-'.$suffix.'.php';
-        \file_put_contents($scriptPath, $contents, LOCK_EX);
+        file_put_contents($scriptPath, $contents, LOCK_EX);
         Logger::log("Copied IPC bootstrap file to $scriptPath");
 
-        \register_shutdown_function(static function () use ($alternateTmpDir): void {
-            @\unlink(self::$pharScriptPath[$alternateTmpDir]);
+        register_shutdown_function(static function () use ($alternateTmpDir): void {
+            @unlink(self::$pharScriptPath[$alternateTmpDir]);
         });
 
         return $scriptPath;

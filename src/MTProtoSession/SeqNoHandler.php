@@ -51,7 +51,7 @@ trait SeqNoHandler
             //$this->API->logger("IN $message ({$message->getMsgId()}): $value + $in = {$message->getSeqNo()}");
             $seq_no = $value + $in;
             if ($seq_no !== $message->getSeqNo()) {
-                $this->API->logger("SECURITY WARNING: Seqno mismatch (should be $seq_no, is {$message->getSeqNo()}, $message)", Logger::FATAL_ERROR);
+                $this->API->logger("SECURITY WARNING: Seqno mismatch (should be $seq_no, is {$message->getSeqNo()}, $message)", Logger::ULTRA_VERBOSE);
             }
         }
     }

@@ -42,12 +42,12 @@ final class TLMethods
             'flags' => [],
             'encrypted' => $scheme_type !== 'mtproto'
         ];
-        if (\preg_match('/^(v|V)ector\\<(.*)\\>$/', $json_dict['type'], $matches)) {
+        if (preg_match('/^(v|V)ector\\<(.*)\\>$/', $json_dict['type'], $matches)) {
             $this->by_id[$json_dict['id']]['type'] = $matches[1] === 'v' ? 'vector' : 'Vector t';
             $this->by_id[$json_dict['id']]['subtype'] = $matches[2];
         }
         $this->by_method[$json_dict['method']] = $json_dict['id'];
-        $namespace = \explode('.', $json_dict['method']);
+        $namespace = explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
             $this->method_namespace[] = [$namespace[0] => $namespace[1]];
         }

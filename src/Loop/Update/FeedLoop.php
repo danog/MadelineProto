@@ -101,9 +101,9 @@ final class FeedLoop extends Loop
     }
     public function parse(array $updates): void
     {
-        \reset($updates);
+        reset($updates);
         while ($updates) {
-            $key = \key($updates);
+            $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
@@ -128,7 +128,7 @@ final class FeedLoop extends Loop
                     $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
                     $this->updater->resume();
-                    $updates = \array_merge($this->incomingUpdates, $updates);
+                    $updates = array_merge($this->incomingUpdates, $updates);
                     $this->incomingUpdates = [];
                     continue;
                 }
@@ -217,13 +217,13 @@ final class FeedLoop extends Loop
                         $log .= "from_id {$from_id}, ";
                     }
                     if ($to) {
-                        $log .= 'peer_id '.\json_encode($update['message']['peer_id']).', ';
+                        $log .= 'peer_id '.json_encode($update['message']['peer_id']).', ';
                     }
                     if ($via_bot) {
                         $log .= "via_bot {$update['message']['via_bot_id']}, ";
                     }
                     if ($entities) {
-                        $log .= 'entities '.\json_encode($update['message']['entities']).', ';
+                        $log .= 'entities '.json_encode($update['message']['entities']).', ';
                     }
                     $this->API->logger("Not enough data: for message update {$log}, getting difference...", Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];

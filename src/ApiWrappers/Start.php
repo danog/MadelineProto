@@ -54,7 +54,7 @@ trait Start
         $app = [];
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
-            $stdout->write(\sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
+            $stdout->write(sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
             $stdout->write('1) '.Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
             $stdout->write('2) '.Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
             $stdout->write('3) ');
@@ -84,28 +84,28 @@ trait Start
      */
     private function webAPIEcho(Settings $settings, string $message = ''): void
     {
-        $message = \htmlentities($message);
+        $message = htmlentities($message);
         $title = MTProto::getWebWarnings();
-        $title .= \htmlentities(Lang::$current_lang['apiManualWeb']);
+        $title .= htmlentities(Lang::$current_lang['apiManualWeb']);
         $title .= "<br>";
-        $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
+        $title .= sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
         $title .= "<br><b>$message</b>";
         $title .= '<ol>';
-        $title .= '<li>'.\str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', \htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
-        $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions1']).'</li>';
+        $title .= '<li>'.str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
+        $title .= '<li>'.htmlentities(Lang::$current_lang['apiManualInstructions1']).'</li>';
         $title .= '<li><ul>';
         foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
             $title .= "<li>$key: ";
-            $title .= \htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
+            $title .= htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
             $title .= '</li>';
         }
         $title .= '</li></ul>';
-        $title .= '<li>'.\htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
+        $title .= '<li>'.htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
         $title .= '</ol>';
         $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
         $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
         getOutputBufferStream()->write(
-            \sprintf(
+            sprintf(
                 $settings->getTemplates()->getHtmlTemplate(),
                 $title,
                 $form,

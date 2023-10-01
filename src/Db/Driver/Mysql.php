@@ -47,7 +47,7 @@ final class Mysql
 
         try {
             if (!isset(self::$connections[$dbKey])) {
-                $config = MysqlConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
+                $config = MysqlConfig::fromString('host='.str_replace('tcp://', '', $settings->getUri()))
                     ->withUser($settings->getUsername())
                     ->withPassword($settings->getPassword())
                     ->withDatabase($settings->getDatabase());

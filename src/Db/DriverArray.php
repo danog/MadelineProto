@@ -121,7 +121,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
             // Otherwise rename table of old database.
             if ($previous instanceof SqlArray && $previous->getTable()) {
                 if ($previous->getTable() !== $instance->getTable() &&
-                    !\str_starts_with($instance->getTable(), 'tmp')
+                    !str_starts_with($instance->getTable(), 'tmp')
                 ) {
                     $instance->moveDataFromTableToTable($previous->getTable(), $instance->getTable());
                 } else {
@@ -140,13 +140,13 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $this->serializer = match ($serializer) {
             SerializerType::SERIALIZE => \serialize(...),
             SerializerType::IGBINARY => \igbinary_serialize(...),
-            SerializerType::JSON => fn ($value) => \json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::JSON => fn ($value) => json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
             SerializerType::STRING => strval(...),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),
             SerializerType::IGBINARY => \igbinary_unserialize(...),
-            SerializerType::JSON => fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::JSON => fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
             SerializerType::STRING => fn ($v) => $v,
         };
     }
@@ -202,7 +202,7 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         } elseif (\is_array($instance)) {
             return 'Array';
         }
-        $base = \str_replace('NullCache\\', '', $instance::class);
+        $base = str_replace('NullCache\\', '', $instance::class);
         if ($include_serialization_type && $instance instanceof DriverArray) {
             $base .= ' ('.($instance->dbSettings->getSerializer()?->value ?? 'default').')';
         }

@@ -89,7 +89,7 @@ trait DialogHandler
                         $this->searchRightPts();
                         break;
                     default:
-                        throw new Exception('Unrecognized update difference received: '.\var_export($result, true));
+                        throw new Exception('Unrecognized update difference received: '.var_export($result, true));
                 }
             }
             $this->cachedAllBotUsers = true;
@@ -141,7 +141,7 @@ trait DialogHandler
             $this->cacheAllBotUsers();
             return $this->peerDatabase->getDialogIds();
         }
-        return \array_keys($this->getFullDialogs());
+        return array_keys($this->getFullDialogs());
     }
     /**
      * Get dialog peers.
@@ -221,8 +221,8 @@ trait DialogHandler
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;
-            $res['messages'] = \array_reverse($res['messages'] ?? []);
-            foreach (\array_reverse($res['dialogs'] ?? []) as $dialog) {
+            $res['messages'] = array_reverse($res['messages'] ?? []);
+            foreach (array_reverse($res['dialogs'] ?? []) as $dialog) {
                 $id = $this->getIdInternal($dialog['peer']);
                 if (!isset($dialogs[$id])) {
                     $dialogs[$id] = $dialog;

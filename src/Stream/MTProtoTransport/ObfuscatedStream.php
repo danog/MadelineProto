@@ -51,24 +51,24 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
         }
         do {
             $random = Tools::random(64);
-        } while (\in_array(\substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', \str_repeat(\chr(238), 4), \str_repeat(\chr(221), 4)], true) || $random[0] === \chr(0xef) || \substr($random, 4, 4) === "\0\0\0\0");
+        } while (\in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(\chr(238), 4), str_repeat(\chr(221), 4)], true) || $random[0] === \chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         if (\strlen($header) === 1) {
-            $header = \str_repeat($header, 4);
+            $header = str_repeat($header, 4);
         }
-        $random = \substr_replace($random, $header.\substr($random, 56 + \strlen($header)), 56);
-        $random = \substr_replace($random, \pack('s', $ctx->getDc()).\substr($random, 60 + 2), 60);
-        $reversed = \strrev($random);
-        $key = \substr($random, 8, 32);
-        $keyRev = \substr($reversed, 8, 32);
+        $random = substr_replace($random, $header.substr($random, 56 + \strlen($header)), 56);
+        $random = substr_replace($random, pack('s', $ctx->getDc()).substr($random, 60 + 2), 60);
+        $reversed = strrev($random);
+        $key = substr($random, 8, 32);
+        $keyRev = substr($reversed, 8, 32);
         if (isset($this->extra['secret'])) {
-            $key = \hash('sha256', $key.$this->extra['secret'], true);
-            $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
+            $key = hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
         }
-        $iv = \substr($random, 40, 16);
-        $ivRev = \substr($reversed, 40, 16);
+        $iv = substr($random, 40, 16);
+        $ivRev = substr($reversed, 40, 16);
         parent::setExtra(['encrypt' => ['key' => $key, 'iv' => $iv], 'decrypt' => ['key' => $keyRev, 'iv' => $ivRev]]);
         parent::connect($ctx);
-        $random = \substr_replace($random, \substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
+        $random = substr_replace($random, substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
         $this->getStream()->write($random);
     }
     /**
@@ -78,10 +78,10 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     {
         if (isset($extra['secret'])) {
             if (\strlen($extra['secret']) > 17) {
-                $extra['secret'] = \hex2bin($extra['secret']);
+                $extra['secret'] = hex2bin($extra['secret']);
             }
             if (\strlen($extra['secret']) == 17) {
-                $extra['secret'] = \substr($extra['secret'], 1, 16);
+                $extra['secret'] = substr($extra['secret'], 1, 16);
             }
         }
         $this->extra = $extra;

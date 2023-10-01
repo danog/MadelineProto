@@ -116,16 +116,16 @@ final class Wrapper extends ClientAbstract
                 }
             }
             $ids = [];
-            foreach (\get_class_methods($callback) as $method) {
+            foreach (get_class_methods($callback) as $method) {
                 $id = $this->id++;
                 $this->callbacks[$id] = [$callback, $method];
                 $ids[$method] = $id;
             }
             $class = null;
             if ($callback instanceof ByteStreamReadableStream) {
-                $class = \method_exists($callback, 'seek') ? SeekableReadableStream::class : ReadableStream::class;
+                $class = method_exists($callback, 'seek') ? SeekableReadableStream::class : ReadableStream::class;
             } elseif ($callback instanceof ByteStreamWritableStream) {
-                $class = \method_exists($callback, 'seek') ? SeekableWritableStream::class : WritableStream::class;
+                $class = method_exists($callback, 'seek') ? SeekableWritableStream::class : WritableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
             } elseif ($callback instanceof Cancellation) {

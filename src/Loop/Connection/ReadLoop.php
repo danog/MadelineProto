@@ -131,8 +131,8 @@ final class ReadLoop extends Loop
             $buffer = $this->connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
             $this->API->logger($e->getReason());
-            if (\str_starts_with($e->getReason(), '       ')) {
-                $payload = -((int) \substr($e->getReason(), 7));
+            if (str_starts_with($e->getReason(), '       ')) {
+                $payload = -((int) substr($e->getReason(), 7));
                 $this->API->logger("Received {$payload} from DC ".$this->datacenter, Logger::ERROR);
                 return $payload;
             }
@@ -153,7 +153,7 @@ final class ReadLoop extends Loop
                 }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
                 $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
-                $message_length = \unpack('V', $buffer->bufferRead(4))[1];
+                $message_length = unpack('V', $buffer->bufferRead(4))[1];
                 $message_data = $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
                 if ($left) {
@@ -173,7 +173,7 @@ final class ReadLoop extends Loop
                 if ($left) {
                     $buffer->bufferRead($left);
                 }
-                if ($message_key != \substr(\hash('sha256', \substr($this->shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
+                if ($message_key != substr(hash('sha256', substr($this->shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new SecurityException('msg_key mismatch');
                 }
                 /*
@@ -182,16 +182,16 @@ final class ReadLoop extends Loop
                                 $this->API->logger('WARNING: Server salt mismatch (my server salt '.$this->shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
                                 }
                 */
-                $session_id = \substr($decrypted_data, 8, 8);
+                $session_id = substr($decrypted_data, 8, 8);
                 if ($session_id !== $this->connection->session_id) {
                     $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
                     $this->connection->resetSession();
                     throw new NothingInTheSocketException();
                 }
-                $message_id = Tools::unpackSignedLong(\substr($decrypted_data, 16, 8));
+                $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
                 $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
-                $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
-                $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
+                $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
+                $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {
                     throw new SecurityException('message_data_length is too big');
                 }
@@ -207,7 +207,7 @@ final class ReadLoop extends Loop
                 if ($message_data_length % 4 != 0) {
                     throw new SecurityException('message_data_length not divisible by 4');
                 }
-                $message_data = \substr($decrypted_data, 32, $message_data_length);
+                $message_data = substr($decrypted_data, 32, $message_data_length);
             } else {
                 $this->API->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
@@ -217,7 +217,7 @@ final class ReadLoop extends Loop
             try {
                 $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection]);
             } catch (\Throwable $e) {
-                Logger::log('Error during deserializing message (base64): ' .  \base64_encode($message_data), Logger::ERROR);
+                Logger::log('Error during deserializing message (base64): ' .  base64_encode($message_data), Logger::ERROR);
                 throw $e;
             }
 

@@ -45,11 +45,11 @@ trait Methods
     {
         static $bots;
         if (!$bots) {
-            $bots = \json_decode(\file_get_contents('https://raw.githubusercontent.com/danog/rpc-db/master/bot.json'), true)['result'];
+            $bots = json_decode(file_get_contents('https://raw.githubusercontent.com/danog/rpc-db/master/bot.json'), true)['result'];
         }
         static $errors;
         if (!$errors) {
-            $errors = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
+            $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
         }
         $new = ['result' => []];
         foreach ($errors['result'] as $code => $suberrors) {
@@ -62,13 +62,13 @@ trait Methods
                 }
             }
         }
-        foreach (\glob('methods/'.$this->any) as $unlink) {
-            \unlink($unlink);
+        foreach (glob('methods/'.$this->any) as $unlink) {
+            unlink($unlink);
         }
-        if (\file_exists('methods')) {
-            \rmdir('methods');
+        if (file_exists('methods')) {
+            rmdir('methods');
         }
-        \mkdir('methods');
+        mkdir('methods');
         $this->docs_methods = [];
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', Logger::NOTICE);
@@ -78,8 +78,8 @@ trait Methods
             }
             $method = $data['method'];
             $phpMethod = StrTools::methodEscape($method);
-            $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
-            $php_type = \preg_replace('/.*_of_/', '', $type);
+            $type = str_replace(['<', '>'], ['_of_', ''], $data['type']);
+            $php_type = preg_replace('/.*_of_/', '', $type);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['methods' => [], 'constructors' => []];
             }
@@ -99,8 +99,8 @@ trait Methods
                     $param['type'] = 'InputPeer';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
+                $type_or_bare_type = ctype_upper(Tools::end(explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
+                $param[$type_or_subtype] = str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.self::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $param[$type_or_subtype] = '$'.$param[$type_or_subtype];
                 $params .= $param['name'].': '.(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
@@ -115,7 +115,7 @@ trait Methods
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.self::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            $desc = StrTools::toString(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'] ?? '')[0], '.'));
+            $desc = StrTools::toString(trim(explode("\n", $this->tdDescriptions['methods'][$method]['description'] ?? '')[0], '.'));
             if ($desc !== '') {
                 $desc .= ': ';
             }
@@ -187,11 +187,11 @@ trait Methods
                 if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
+                $type_or_bare_type = ctype_upper(Tools::end(explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
                 if (isset($this->tdDescriptions['methods'][$method])) {
-                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || $param['type'] === 'double' || ($id = $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || $param['type'] === 'double' || ($id = $this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($param['type'] === 'long' && $param['name'] === 'hash')|| ($id = $this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes'], true) ? "'".$ptype."'" : '$'.$ptype;
@@ -220,9 +220,9 @@ trait Methods
                 }
             }
             $description = isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'] : $method.' parameters, return type and example';
-            $symFile = \str_replace('.', '_', $method);
+            $symFile = str_replace('.', '_', $method);
             $redir = $symFile !== $method ? "\nredirect_from: /API_docs/methods/{$symFile}.html" : '';
-            $description = \str_replace('"', "'", \rtrim(\explode("\n", $description)[0], ':'));
+            $description = str_replace('"', "'", rtrim(explode("\n", $description)[0], ':'));
             $header = $this->template('Method', $method, $description, $redir, self::markdownEscape($method));
             if ($this->td) {
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
@@ -246,7 +246,7 @@ trait Methods
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
-                $example .= \str_replace('[]', '', $this->template('method-example', \str_replace('.', '_', $type), $phpMethod, $params, $method, $lua_params));
+                $example .= str_replace('[]', '', $this->template('method-example', str_replace('.', '_', $type), $phpMethod, $params, $method, $lua_params));
                 if ($hasreplymarkup) {
                     $example .= $this->template('reply_markup');
                 }
@@ -269,7 +269,7 @@ trait Methods
                     $example .= "\n\n";
                 }
             }
-            \file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
+            file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
         $this->logger->logger('Generating methods index...', Logger::NOTICE);
         $reflection = new ReflectionClass(API::class);
@@ -279,21 +279,21 @@ trait Methods
         $builder = DocBlockFactory::createInstance();
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $name = $method->getName();
-            if (\in_array(\strtolower($name), ['update2fa', 'getdialogids', 'getdialogs', 'getfulldialogs', 'getpwrchat', 'getfullinfo', 'getinfo', 'getid', 'getself', '__magic_construct', '__construct', '__destruct', '__sleep', '__wakeup'], true)) {
+            if (\in_array(strtolower($name), ['update2fa', 'getdialogids', 'getdialogs', 'getfulldialogs', 'getpwrchat', 'getfullinfo', 'getinfo', 'getid', 'getself', '__magic_construct', '__construct', '__destruct', '__sleep', '__wakeup'], true)) {
                 continue;
             }
             $doc = $method->getDocComment();
-            if (\str_contains($doc, '@internal') || \str_contains($doc, '@deprecated')) {
+            if (str_contains($doc, '@internal') || str_contains($doc, '@deprecated')) {
                 continue;
             }
             if ($doc) {
                 $doc = $builder->create($doc);
-                $doc = \explode("\n", $doc->getSummary())[0];
+                $doc = explode("\n", $doc->getSummary())[0];
             }
             if (!$doc) {
                 throw new AssertionError($name);
             }
-            $doc = \trim($doc, '.');
+            $doc = trim($doc, '.');
             $method = new MethodDoc($phpdoc, $method);
             $anchor = $method->getSignatureAnchor();
             $this->human_docs_methods["$doc: $name"] = '* <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#'.$anchor.'" name="'.$name.'">'.$doc.': '.$name.'</a>
@@ -301,18 +301,18 @@ trait Methods
 ';
         }
 
-        \ksort($this->docs_methods);
-        \ksort($this->human_docs_methods);
+        ksort($this->docs_methods);
+        ksort($this->human_docs_methods);
         $last_namespace = '';
         foreach ($this->docs_methods as $method => &$value) {
-            $new_namespace = \preg_replace('/_.*/', '', $method);
+            $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>
 ' : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        \file_put_contents('methods/api_'.$this->index, $this->template('methods-api-index', $this->index, \implode('', $this->docs_methods)));
-        \file_put_contents('methods/'.$this->index, $this->template('methods-index', $this->index, \implode('', $this->human_docs_methods)));
+        file_put_contents('methods/api_'.$this->index, $this->template('methods-api-index', $this->index, implode('', $this->docs_methods)));
+        file_put_contents('methods/'.$this->index, $this->template('methods-index', $this->index, implode('', $this->human_docs_methods)));
     }
 }

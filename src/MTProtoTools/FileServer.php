@@ -58,7 +58,7 @@ trait FileServer
             $API = new API($session);
             $API->start();
             $id = (string) $API->getSelf()['id'];
-            \header("Content-length: ".\strlen($id));
+            header("Content-length: ".\strlen($id));
             echo $id;
             die;
         }
@@ -105,8 +105,8 @@ trait FileServer
             try {
                 $scriptUrl = $this->getDefaultDownloadScript();
             } catch (Throwable $e) {
-                $sessionPath = \var_export($this->getSessionName(), true);
-                throw new Exception(\sprintf(
+                $sessionPath = var_export($this->getSessionName(), true);
+                throw new Exception(sprintf(
                     Lang::$current_lang['need_dl.php'],
                     $e->getMessage(),
                     "<?php require 'vendor/autoload.php'; \\danog\\MadelineProto\\API::downloadServer($sessionPath); ?>",
@@ -143,7 +143,7 @@ trait FileServer
             $name = $name.$ext;
         }
 
-        return $scriptUrl."?".\http_build_query([
+        return $scriptUrl."?".http_build_query([
             'f' => $f,
             's' => $size,
             'n' => $name,
@@ -180,7 +180,7 @@ trait FileServer
             }
 
             if (!isset($autoloadPath)) {
-                throw new AssertionError('Could not locate autoload.php in any of the following files: '.\implode(', ', $paths));
+                throw new AssertionError('Could not locate autoload.php in any of the following files: '.implode(', ', $paths));
             }
         }
 
@@ -190,7 +190,7 @@ trait FileServer
         $this->scriptMutex ??= new LocalMutex;
         $lock = $this->scriptMutex->acquire();
         try {
-            $downloadScript = \sprintf('<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);', \var_export($autoloadPath, true));
+            $downloadScript = sprintf('<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);', var_export($autoloadPath, true));
             $f = $s.DIRECTORY_SEPARATOR.'dl.php';
             $recreate = true;
             if (exists($f)) {
@@ -199,20 +199,20 @@ trait FileServer
             if ($recreate) {
                 $temp = "$f.temp.php";
                 write($temp, $downloadScript);
-                \rename($temp, $f);
+                rename($temp, $f);
             }
 
-            $f = \realpath($f);
+            $f = realpath($f);
             $absoluteRootDir = $isCli
                 ? $_ENV['absoluteRootDir']
                 : WebRunner::getAbsoluteRootDir();
 
-            if (\substr($f, 0, \strlen($absoluteRootDir)) !== $absoluteRootDir) {
+            if (substr($f, 0, \strlen($absoluteRootDir)) !== $absoluteRootDir) {
                 throw new AssertionError("Process runner $f is not within readable document root $absoluteRootDir!");
             }
-            $f = \substr($f, \strlen($absoluteRootDir)-1);
-            $f = \str_replace(DIRECTORY_SEPARATOR, '/', $f);
-            $f = \str_replace('//', '/', $f);
+            $f = substr($f, \strlen($absoluteRootDir)-1);
+            $f = str_replace(DIRECTORY_SEPARATOR, '/', $f);
+            $f = str_replace('//', '/', $f);
             $f = 'https://'.($isCli ? $_ENV['serverName'] : $_SERVER['SERVER_NAME']).$f;
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
@@ -235,12 +235,12 @@ trait FileServer
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }
-            $scriptUrlNew = $scriptUrl.'?'.\http_build_query(['login' => 1]);
+            $scriptUrlNew = $scriptUrl.'?'.http_build_query(['login' => 1]);
             $this->logger->logger("Checking $scriptUrlNew...");
             $result = $this->fileGetContents($scriptUrlNew);
             $expected = (string) $this->getSelf()['id'];
             if ($result !== $expected) {
-                throw new AssertionError(\sprintf(
+                throw new AssertionError(sprintf(
                     Lang::$current_lang['invalid_dl.php_session'],
                     $scriptUrl,
                     $expected,

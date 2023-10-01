@@ -135,7 +135,7 @@ trait Files
                 }
 
                 if ($has_document_photo === null) {
-                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                    throw new AssertionError("has_document_photo === null: ".json_encode($media['document']));
                 }
 
                 if ($attr['mask'] ?? false) {
@@ -159,7 +159,7 @@ trait Files
             }
             if ($t === 'documentAttributeCustomEmoji') {
                 if ($has_document_photo === null) {
-                    throw new AssertionError("has_document_photo === null: ".\json_encode($media['document']));
+                    throw new AssertionError("has_document_photo === null: ".json_encode($media['document']));
                 }
                 return new CustomEmoji($this, $media, $attr, $has_document_photo, $protected);
             }
@@ -203,7 +203,7 @@ trait Files
         if (($status = $response->getStatus()) !== 200) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
-        $mime = \trim(\explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
+        $mime = trim(explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
         return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
@@ -246,7 +246,7 @@ trait Files
             $datacenter = -$datacenter;
         }
         $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
-        $part_total_num = $size ? ((int) \ceil($size / $part_size)) : -1;
+        $part_total_num = $size ? ((int) ceil($size / $part_size)) : -1;
         Assert::notEq($part_total_num, 0);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 || !$size ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
@@ -259,8 +259,8 @@ trait Files
         if ($encrypted === true) {
             $key = Tools::random(32);
             $iv = Tools::random(32);
-            $digest = \hash('md5', $key.$iv, true);
-            $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $digest = hash('md5', $key.$iv, true);
+            $fingerprint = Tools::unpackSignedInt(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             $ige = IGE::getInstance($key, $iv);
             $seekable = false;
         }
@@ -295,18 +295,18 @@ trait Files
                     throw new StreamEof();
                 }
                 if ($bytesLen < $part_size) {
-                    $part_total_num = (int) \ceil($totalSize / $part_size);
+                    $part_total_num = (int) ceil($totalSize / $part_size);
                 }
             }
 
             if ($ige) {
-                $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
+                $bytes = $ige->encrypt(str_pad($bytes, $part_size, \chr(0)));
             }
 
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
         $resPromises = [];
-        $start = \microtime(true);
+        $start = microtime(true);
         while ($part_num < $part_total_num || !$size) {
             try {
                 $writePromise = async(
@@ -353,7 +353,7 @@ trait Files
         }
         await($promises);
         await($resPromises);
-        $time = \microtime(true) - $start;
+        $time = microtime(true) - $start;
         $speed = (int) ($totalSize * 8 / $time) / 1000000;
         if (!$size) {
             $cb(100, $speed, $time);
@@ -651,7 +651,7 @@ trait Files
         }
         $info = $info[$method];
         if ($method === 'photo') {
-            $info = \array_values($info);
+            $info = array_values($info);
             $cur = $info[0];
             foreach ($info as $n) {
                 /** @psalm-suppress InvalidArrayAccess */
@@ -708,7 +708,7 @@ trait Files
             }
             if (isset($messageMedia['file_id'])) {
                 $res = $this->getDownloadInfo($messageMedia['file_id']);
-                $pathinfo = \pathinfo($messageMedia['file_name']);
+                $pathinfo = pathinfo($messageMedia['file_name']);
                 if (isset($pathinfo['extension'])) {
                     $res['ext'] = '.'.$pathinfo['extension'];
                 }
@@ -749,7 +749,7 @@ trait Files
                 $res['key'] = $messageMedia['key'];
                 $res['iv'] = $messageMedia['iv'];
                 if (isset($messageMedia['file_name'])) {
-                    $pathinfo = \pathinfo($messageMedia['file_name']);
+                    $pathinfo = pathinfo($messageMedia['file_name']);
                     if (isset($pathinfo['extension'])) {
                         $res['ext'] = '.'.$pathinfo['extension'];
                     }
@@ -764,7 +764,7 @@ trait Files
                     foreach ($messageMedia['attributes'] as $attribute) {
                         switch ($attribute['_']) {
                             case 'documentAttributeFilename':
-                                $pathinfo = \pathinfo($attribute['file_name']);
+                                $pathinfo = pathinfo($attribute['file_name']);
                                 if (isset($pathinfo['extension'])) {
                                     $res['ext'] = '.'.$pathinfo['extension'];
                                 }
@@ -815,7 +815,7 @@ trait Files
                         'secret' => $size['secret'],
                     ];
                 } else {
-                    $res = \array_merge($res, $this->getDownloadInfo($size));
+                    $res = array_merge($res, $this->getDownloadInfo($size));
                     $res['InputFileLocation'] = [
                         '_' => 'inputPhotoFileLocation',
                         'id' => $messageMedia['id'],
@@ -878,7 +878,7 @@ trait Files
             case 'photoSizeProgressive':
                 $res['thumb_size'] = $messageMedia['type'];
                 if (isset($messageMedia['sizes'])) {
-                    $res['size'] = \end($messageMedia['sizes']);
+                    $res['size'] = end($messageMedia['sizes']);
                 }
                 return $res;
                 // Documents
@@ -891,7 +891,7 @@ trait Files
                 foreach ($messageMedia['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
                         case 'documentAttributeFilename':
-                            $pathinfo = \pathinfo($attribute['file_name']);
+                            $pathinfo = pathinfo($attribute['file_name']);
                             if (isset($pathinfo['extension'])) {
                                 $res['ext'] = '.'.$pathinfo['extension'];
                             }
@@ -958,11 +958,11 @@ trait Files
             $cb = $file;
             $file = $file->getFile();
         }
-        $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
-        if (!\file_exists($file)) {
-            \touch($file);
+        $file = Tools::absolute(preg_replace('|/+|', '/', $file));
+        if (!file_exists($file)) {
+            touch($file);
         }
-        $file = \realpath($file);
+        $file = realpath($file);
         Assert::notEmpty($file);
         $messageMedia = ($this->getDownloadInfo($messageMedia));
         $size = getSize($file);
@@ -1030,8 +1030,8 @@ trait Files
         if (isset($messageMedia['key'])) {
             $messageMedia['key'] = (string) $messageMedia['key'];
             $messageMedia['iv'] = (string) $messageMedia['iv'];
-            $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
-            $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $digest = hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
+            $fingerprint = Tools::unpackSignedInt(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
                 throw new Exception('Fingerprint mismatch!');
             }
@@ -1073,9 +1073,9 @@ trait Files
         };
         $cdn = false;
         $params[0]['previous_promise'] = true;
-        $start = \microtime(true);
+        $start = microtime(true);
         $old_dc = null;
-        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable, $cancellation);
+        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = array_shift($params), $callable, $seekable, $cancellation);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
             $origCb(100, 0, 0);
@@ -1103,7 +1103,7 @@ trait Files
                     }
                 }
                 if (!($key % $parallel_chunks)) {
-                    $time = \microtime(true) - $start;
+                    $time = microtime(true) - $start;
                     $speed = (int) ($size * 8 / $time) / 1000000;
                     $this->logger->logger("Partial download time: {$time}");
                     $this->logger->logger("Partial download speed: {$speed} mbps");
@@ -1113,7 +1113,7 @@ trait Files
                 await($promises);
             }
         }
-        $time = \microtime(true) - $start;
+        $time = microtime(true) - $start;
         $speed = (int) ($size * 8 / $time) / 1000000;
         $this->logger->logger("Total download time: {$time}");
         $this->logger->logger("Total download speed: {$speed} mbps");
@@ -1211,7 +1211,7 @@ trait Files
                 return 0;
             }
             if (isset($messageMedia['cdn_key'])) {
-                $ivec = \substr($messageMedia['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
+                $ivec = substr($messageMedia['cdn_iv'], 0, 12).pack('N', $offset['offset'] >> 4);
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
                 $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc, $cancellation);
             }
@@ -1219,7 +1219,7 @@ trait Files
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
             if ($offset['part_start_at'] || $offset['part_end_at'] !== $offset['limit']) {
-                $res['bytes'] = \substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
+                $res['bytes'] = substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
             if (!$seekable && $offset['previous_promise'] instanceof Future) {
                 $offset['previous_promise']->await();
@@ -1253,10 +1253,10 @@ trait Files
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);
             }
-            if (\hash('sha256', \substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
+            if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
                 throw new SecurityException('CDN hash mismatch for offset '.$offset);
             }
-            $data = \substr($data, $this->cdn_hashes[$file][$offset]['limit']);
+            $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
     }

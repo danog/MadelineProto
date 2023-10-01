@@ -140,7 +140,7 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $ago = \time() - $message->getSent();
+                $ago = time() - $message->getSent();
                 if ($ago > 2) {
                     $this->API->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }
@@ -169,7 +169,7 @@ trait Session
      */
     public function backupSession(): array
     {
-        $pending = \array_values($this->pendingOutgoing);
-        return \array_merge($pending, $this->new_outgoing);
+        $pending = array_values($this->pendingOutgoing);
+        return array_merge($pending, $this->new_outgoing);
     }
 }

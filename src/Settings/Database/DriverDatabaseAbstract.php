@@ -44,7 +44,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      */
     public function getKey(): string
     {
-        $uri = \parse_url($this->getUri());
+        $uri = parse_url($this->getUri());
         $host = $uri['host'] ?? '';
         $port = $uri['port'] ?? '';
         return "$host:$port:".$this->getDatabase();
@@ -71,7 +71,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      */
     public function setCacheTtl(int|string $cacheTtl): static
     {
-        $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : \strtotime($cacheTtl) - \time();
+        $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : strtotime($cacheTtl) - time();
 
         return $this;
     }

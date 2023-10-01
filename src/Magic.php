@@ -227,24 +227,24 @@ final class Magic
         if (!self::$initedLight) {
             // Setup error reporting
             Shutdown::init();
-            \set_error_handler(Exception::exceptionErrorHandler(...));
-            \set_exception_handler(Exception::exceptionHandler(...));
+            set_error_handler(Exception::exceptionErrorHandler(...));
+            set_exception_handler(Exception::exceptionHandler(...));
             self::$can_use_igbinary = \function_exists('igbinary_serialize');
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             // Important, obtain root relative to caller script
-            $backtrace = \debug_backtrace(0);
-            self::$script_cwd = self::$cwd = \dirname(\end($backtrace)['file']);
+            $backtrace = debug_backtrace(0);
+            self::$script_cwd = self::$cwd = \dirname(end($backtrace)['file']);
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
-                    \error_reporting(E_ALL);
-                    \ini_set('log_errors', 1);
-                    \ini_set('error_log', self::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
+                    error_reporting(E_ALL);
+                    ini_set('log_errors', 1);
+                    ini_set('error_log', self::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
                 } catch (Throwable $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
             try {
-                \ini_set('memory_limit', -1);
+                ini_set('memory_limit', -1);
             } catch (Throwable $e) {
             }
             // Check if we're in a console, for colorful log output
@@ -253,13 +253,13 @@ final class Magic
             } catch (Throwable $e) {
             }
             try {
-                self::$cwd = \getcwd();
+                self::$cwd = getcwd();
                 self::$can_getcwd = true;
             } catch (Throwable $e) {
             }
             try {
                 if (\function_exists('set_time_limit')) {
-                    \set_time_limit(-1);
+                    set_time_limit(-1);
                 }
             } catch (Throwable $e) {
             }
@@ -267,8 +267,8 @@ final class Magic
             if (\defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 try {
-                    \pcntl_signal(SIGINT, fn () => null);
-                    \pcntl_signal(SIGINT, SIG_DFL);
+                    pcntl_signal(SIGINT, fn () => null);
+                    pcntl_signal(SIGINT, SIG_DFL);
                     EventLoop::unreference(EventLoop::onSignal(SIGINT, static function (): void {
                         if (self::$suspendPeriodicLogging) {
                             self::togglePeriodicLogging();
@@ -284,8 +284,8 @@ final class Magic
                 } catch (Throwable $e) {
                 }
             }
-            self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
-            self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
+            self::$altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
+            self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
             self::$revision = 'Revision: '.API::RELEASE;
             self::$initedLight = true;
@@ -311,9 +311,9 @@ final class Magic
         if (\extension_loaded('psr')) {
             throw new Exception("Please uninstall the psr extension to use MadelineProto!");
         }
-        self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
+        self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
         self::$hasOpenssl = \extension_loaded('openssl');
-        self::$emojis = \json_decode(self::JSON_EMOJIS);
+        self::$emojis = json_decode(self::JSON_EMOJIS);
         self::$zero = new BigInteger(0);
         self::$one = new BigInteger(1);
         self::$two = new BigInteger(2);
@@ -323,15 +323,15 @@ final class Magic
         if (!isset(self::$latest_release)) {
             self::$latest_release = null;
             try {
-                $php = (string) \min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
-                self::$latest_release = \trim(@\file_get_contents("https://phar.madelineproto.xyz/release$php"));
+                $php = (string) min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+                self::$latest_release = trim(@file_get_contents("https://phar.madelineproto.xyz/release$php"));
             } catch (Throwable $e) {
             }
             if (self::$latest_release !== API::RELEASE) {
                 self::$revision .= ' (AN UPDATE IS REQUIRED)';
             }
         }
-        $res = \json_decode(\file_get_contents(__DIR__.'/v3.json'), true);
+        $res = json_decode(file_get_contents(__DIR__.'/v3.json'), true);
         RPCErrorException::$errorMethodMap = $res['result'];
         RPCErrorException::$descriptions += $res['human_result'];
         foreach (Extension::ALL_MIMES as $ext => $mimes) {
@@ -358,9 +358,9 @@ final class Magic
         }
         try {
             if (self::$pid === null) {
-                self::$pid = \getmypid();
+                self::$pid = getmypid();
             }
-            return self::$isFork = self::$pid !== \getmypid();
+            return self::$isFork = self::$pid !== getmypid();
         } catch (Throwable $e) {
             return self::$can_getmypid = false;
         }
@@ -370,7 +370,7 @@ final class Magic
      */
     public static function getcwd(): string
     {
-        return self::$can_getcwd ? \getcwd() : self::$cwd;
+        return self::$can_getcwd ? getcwd() : self::$cwd;
     }
     /**
      * Toggle periodic logging.

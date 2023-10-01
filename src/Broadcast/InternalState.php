@@ -56,7 +56,7 @@ final class InternalState
     }
     public function __serialize(): array
     {
-        $vars = \get_object_vars($this);
+        $vars = get_object_vars($this);
         $vars['status'] = match ($vars['status']) {
             StatusInternal::GATHERING_PEERS => StatusInternal::IDLING_BEFORE_GATHERING_PEERS,
             StatusInternal::BROADCASTING => StatusInternal::IDLING_BEFORE_BROADCASTING,
@@ -131,7 +131,7 @@ final class InternalState
                     }
                 }
             }
-            $peers = \array_filter($peers, function (int $peer): bool {
+            $peers = array_filter($peers, function (int $peer): bool {
                 if (\in_array($peer, $this->filter->blacklist, true)) {
                     return false;
                 }

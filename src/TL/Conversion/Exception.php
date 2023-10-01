@@ -36,7 +36,7 @@ final class Exception extends \Exception
     {
         $result = static::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+            $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
         return $result;
     }

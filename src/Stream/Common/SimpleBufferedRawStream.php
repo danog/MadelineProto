@@ -38,22 +38,22 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
      */
     public function bufferRead(int $length): string
     {
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length < $length && $buffer_length) {
-            \fseek($this->memory_stream, $offset + $buffer_length);
+            fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
             $chunk = $this->read();
             if ($chunk === null) {
                 break;
             }
-            \fwrite($this->memory_stream, $chunk);
+            fwrite($this->memory_stream, $chunk);
             $buffer_length += \strlen($chunk);
         }
-        \fseek($this->memory_stream, $offset);
-        return \fread($this->memory_stream, $length);
+        fseek($this->memory_stream, $offset);
+        return fread($this->memory_stream, $length);
     }
     /**
      * {@inheritDoc}

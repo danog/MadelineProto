@@ -50,7 +50,7 @@ final class MemoryArray extends ArrayIterator implements DbArray
             if ($previous instanceof DriverArray) {
                 $previous->initStartup();
             }
-            $temp = \iterator_to_array($previous->getIterator());
+            $temp = iterator_to_array($previous->getIterator());
             $previous->clear();
             $previous = $temp;
         }

@@ -43,7 +43,7 @@ final class Postgres
 
         try {
             if (empty(self::$connections[$dbKey])) {
-                $config = PostgresConfig::fromString('host='.\str_replace('tcp://', '', $settings->getUri()))
+                $config = PostgresConfig::fromString('host='.str_replace('tcp://', '', $settings->getUri()))
                     ->withUser($settings->getUsername())
                     ->withPassword($settings->getPassword())
                     ->withDatabase($settings->getDatabase());
@@ -68,7 +68,7 @@ final class Postgres
             $result = $connection->query("SELECT * FROM pg_database WHERE datname = '{$db}'");
 
             // Replace with getRowCount once it gets fixed
-            if (!\iterator_to_array($result)) {
+            if (!iterator_to_array($result)) {
                 $connection->query("
                     CREATE DATABASE {$db}
                     OWNER {$user}

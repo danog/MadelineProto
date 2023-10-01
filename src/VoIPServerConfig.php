@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-if (\class_exists(VoIPServerConfig::class)) {
+if (class_exists(VoIPServerConfig::class)) {
     return;
 }
 /**
@@ -79,6 +79,6 @@ final class VoIPServerConfig
      */
     public static function getFinal(): array
     {
-        return \array_merge(self::$_configDefault, self::$_config);
+        return array_merge(self::$_configDefault, self::$_config);
     }
 }

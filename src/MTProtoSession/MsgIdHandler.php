@@ -63,11 +63,11 @@ final class MsgIdHandler
      */
     public function checkMessageId(int $newMessageId, bool $outgoing, bool $container = false): void
     {
-        $minMessageId = (\time() + $this->session->time_delta - 300) << 32;
+        $minMessageId = (time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
             $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', Logger::WARNING);
         }
-        $maxMessageId = (\time() + $this->session->time_delta + 30) << 32;
+        $maxMessageId = (time() + $this->session->time_delta + 30) << 32;
         if ($newMessageId > $maxMessageId) {
             throw new Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
         }
@@ -101,8 +101,8 @@ final class MsgIdHandler
      */
     public function generateMessageId(): int
     {
-        $messageId = (\time() + $this->session->time_delta) << 32;
-        $messageId += \hrtime(true) % 1000_000;
+        $messageId = (time() + $this->session->time_delta) << 32;
+        $messageId += hrtime(true) % 1000_000;
         $messageId += 4 - ($messageId % 4);
         if ($messageId <= $this->maxOutgoingId) {
             $messageId = $this->maxOutgoingId + 4;
@@ -125,9 +125,9 @@ final class MsgIdHandler
      */
     public function cleanup(): void
     {
-        $usage = \memory_get_usage();
+        $usage = memory_get_usage();
         $this->session->cleanupSession();
-        $cleaned = \round(($usage - \memory_get_usage())/1024/1024, 1);
+        $cleaned = round(($usage - memory_get_usage())/1024/1024, 1);
         if ($cleaned && !Magic::$suspendPeriodicLogging) {
             $this->session->API->logger->logger("Zend hashmap reallocation done. Cleaned memory: $cleaned Mb", Logger::VERBOSE);
         }

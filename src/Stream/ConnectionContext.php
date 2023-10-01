@@ -330,13 +330,13 @@ final class ConnectionContext
         $string .= ', via ';
         $string .= $this->getIpv6() ? 'ipv6' : 'ipv4';
         $string .= ' using ';
-        foreach (\array_reverse($this->nextStreams) as $k => $stream) {
+        foreach (array_reverse($this->nextStreams) as $k => $stream) {
             if ($k) {
                 $string .= ' => ';
             }
-            $string .= \preg_replace('/.*\\\\/', '', $stream[0]);
+            $string .= preg_replace('/.*\\\\/', '', $stream[0]);
             if ($stream[1] && $stream[0] !== DefaultStream::class) {
-                $string .= ' ('.\json_encode($stream[1]).')';
+                $string .= ' ('.json_encode($stream[1]).')';
             }
         }
         return $string;

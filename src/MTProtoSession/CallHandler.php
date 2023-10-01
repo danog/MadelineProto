@@ -129,7 +129,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+            if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
                 $peer = $args['peer'];
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
@@ -150,7 +150,7 @@ trait CallHandler
                 if (!isset($aargs['postpone'])) {
                     $this->flush();
                 }
-                return new WrappedFuture(async(fn () => \array_map(
+                return new WrappedFuture(async(fn () => array_map(
                     fn (WrappedFuture $f) => $f->await(),
                     await($promises)
                 )));

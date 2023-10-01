@@ -90,7 +90,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         try {
             if ($this->stream) {
-                if (\method_exists($this->stream, 'close')) {
+                if (method_exists($this->stream, 'close')) {
                     $this->stream->close();
                 }
                 $this->stream = null;

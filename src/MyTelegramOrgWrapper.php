@@ -112,11 +112,11 @@ final class MyTelegramOrgWrapper
     {
         $this->number = $number;
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
-        $request->setBody(\http_build_query(['phone' => $number]));
+        $request->setBody(http_build_query(['phone' => $number]));
         $request->setHeaders($this->getHeaders('origin'));
         $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
-        $resulta = \json_decode($result, true);
+        $resulta = json_decode($result, true);
         if (!isset($resulta['random_hash'])) {
             throw new Exception($result);
         }
@@ -133,7 +133,7 @@ final class MyTelegramOrgWrapper
             throw new Exception('Already logged in!');
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/login', 'POST');
-        $request->setBody(\http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
+        $request->setBody(http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
         $request->setHeaders($this->getHeaders('origin'));
         $request->setHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
         $response = $this->datacenter->HTTPClient->request($request);
@@ -166,12 +166,12 @@ final class MyTelegramOrgWrapper
         $request->setHeaders($this->getHeaders('refer'));
         $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
-        $title = \explode('</title>', \explode('<title>', $result)[1])[0];
+        $title = explode('</title>', explode('<title>', $result)[1])[0];
         switch ($title) {
             case 'App configuration':
                 return true;
             case 'Create new application':
-                $this->creation_hash = \explode('"/>', \explode('<input type="hidden" name="hash" value="', $result)[1])[0];
+                $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
                 return false;
         }
         $this->logged = false;
@@ -189,15 +189,15 @@ final class MyTelegramOrgWrapper
         $request->setHeaders($this->getHeaders('refer'));
         $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
-        $cose = \explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
+        $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();"><strong>', $result);
-        $asd = \explode('</strong></span>', $cose[1]);
+        $asd = explode('</strong></span>', $cose[1]);
         $api_id = $asd[0];
-        $cose = \explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
+        $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = \explode('</span>', $cose[1]);
+        $asd = explode('</span>', $cose[1]);
         $api_hash = $asd[0];
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
@@ -216,30 +216,30 @@ final class MyTelegramOrgWrapper
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
         $request->setHeaders($this->getHeaders('app'));
-        $request->setBody(\http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
+        $request->setBody(http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
         $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
         if ($result) {
-            throw new Exception(\html_entity_decode($result));
+            throw new Exception(html_entity_decode($result));
         }
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
         $response = $this->datacenter->HTTPClient->request($request);
         $result = $response->getBody()->buffer();
-        $title = \explode('</title>', \explode('<title>', $result)[1])[0];
+        $title = explode('</title>', explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {
-            $this->creation_hash = \explode('"/>', \explode('<input type="hidden" name="hash" value="', $result)[1])[0];
+            $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
             throw new Exception('App creation failed');
         }
-        $cose = \explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
+        $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();"><strong>', $result);
-        $asd = \explode('</strong></span>', $cose['1']);
+        $asd = explode('</strong></span>', $cose['1']);
         $api_id = $asd['0'];
-        $cose = \explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
+        $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = \explode('</span>', $cose['1']);
+        $asd = explode('</span>', $cose['1']);
         $api_hash = $asd['0'];
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
@@ -284,8 +284,8 @@ final class MyTelegramOrgWrapper
         }
         $final_headers = [];
         foreach ($headers as $header) {
-            [$key, $value] = \explode(':', $header, 2);
-            $final_headers[\trim($key)] = \trim($value);
+            [$key, $value] = explode(':', $header, 2);
+            $final_headers[trim($key)] = trim($value);
         }
         return $final_headers;
     }

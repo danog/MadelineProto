@@ -56,18 +56,18 @@ final class AnnotationsBuilder
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL();
         $this->TL->init($settings['TL']);
-        $this->blacklist = \json_decode(\file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
+        $this->blacklist = json_decode(file_get_contents(__DIR__.'/../docs/template/disallow.json'), true);
         $this->blacklist['updates.getDifference'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
         $this->blacklist['updates.getChannelDifference'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
         $this->blacklist['updates.getState'] = 'You cannot use this method directly, please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html), instead.';
         $this->blacklistHard = $this->blacklist;
         unset($this->blacklistHard['messages.getHistory'], $this->blacklistHard['channels.getMessages'], $this->blacklistHard['messages.getMessages'], $this->blacklistHard['updates.getDifference'], $this->blacklistHard['updates.getChannelDifference'], $this->blacklistHard['updates.getState']);
 
-        \file_put_contents(__DIR__.'/Namespace/Blacklist.php', '<?php
+        file_put_contents(__DIR__.'/Namespace/Blacklist.php', '<?php
 namespace danog\MadelineProto\Namespace;
 
 final class Blacklist {
-    public const BLACKLIST = '.\var_export($this->blacklistHard, true).';
+    public const BLACKLIST = '.var_export($this->blacklistHard, true).';
 }
         ');
         $special = [];
@@ -91,8 +91,8 @@ final class Blacklist {
     }
     private static function isVector(string $type): array
     {
-        if (\str_contains($type, '<')) {
-            return [true, \str_replace(['Vector<', '>'], '', $type)];
+        if (str_contains($type, '<')) {
+            return [true, str_replace(['Vector<', '>'], '', $type)];
         }
         return [false, $type];
     }
@@ -189,14 +189,14 @@ final class Blacklist {
                         $params []= "$name$optional: ".$this->prepareTLPsalmType($param['type'], $input, $depth+1, $stack);
                         unset($stack[$param['type']]);
                     }
-                    $params = \implode(', ', $params);
+                    $params = implode(', ', $params);
                     $constructors []= 'array{'.$params.'}';
                 }
             }
             if ($constructors === []) {
                 throw new AssertionError("No constructors for $type!");
             }
-            $base = \implode('|', $constructors);
+            $base = implode('|', $constructors);
         }
         if ($type === 'InputMessage') {
             $base = "int|$base";
@@ -286,9 +286,9 @@ final class Blacklist {
                 continue;
             }
             if ($method) {
-                $param['description'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$method}_param_{$param['name']}_type_{$param['type']}"] ?? '');
+                $param['description'] = str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$method}_param_{$param['name']}_type_{$param['type']}"] ?? '');
             }
-            $param['type'] = \ltrim($param['type'], '%');
+            $param['type'] = ltrim($param['type'], '%');
             if ($param['name'] === 'data' && $type === 'messages.SentEncryptedMessage') {
                 $param['name'] = 'message';
                 $param['type'] = 'DecryptedMessage';
@@ -313,16 +313,16 @@ final class Blacklist {
             }
             $param['array'] = isset($param['subtype']);
             if ($param['array']) {
-                $param['subtype'] = \ltrim($param['subtype'], '%');
+                $param['subtype'] = ltrim($param['subtype'], '%');
                 $param['type'] = 'Vector<'.$param['subtype'].'>';
                 $param['pow'] = 'optional';
             }
-            if ($this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty')) {
+            if ($this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty')) {
                 $param['pow'] = 'optional';
             }
             $newParams[$param['name']] = $param;
         }
-        \uasort($newParams, fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
+        uasort($newParams, fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
         return $newParams;
     }
     private function prepareTLParams(array $data): array
@@ -371,13 +371,13 @@ final class Blacklist {
         Logger::log('Creating internal classes...', Logger::NOTICE);
         $internalDoc = [];
         foreach ($this->TL->getMethods()->by_id as $data) {
-            if (!\strpos($data['method'], '.')) {
+            if (!strpos($data['method'], '.')) {
                 continue;
             }
             if ($data['type'] === 'Vector t') {
                 $data['type'] = "Vector<{$data['subtype']}>";
             }
-            [$namespace, $method] = \explode('.', $data['method']);
+            [$namespace, $method] = explode('.', $data['method']);
             if (!\in_array($namespace, $this->TL->getMethodNamespaces(), true)) {
                 continue;
             }
@@ -385,8 +385,8 @@ final class Blacklist {
                 continue;
             }
 
-            $title = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}"] ?? '');
-            $title = \implode("\n     * ", \explode("\n", $title));
+            $title = str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}"] ?? '');
+            $title = implode("\n     * ", explode("\n", $title));
             $contents = "\n    /**\n";
             $contents .= "     * {$title}\n";
             $contents .= "     *\n";
@@ -398,7 +398,7 @@ final class Blacklist {
             $contents .= "     * @return {$psalmType} {$description}\n";
             $contents .= "     */\n";
             $contents .= "    public function {$method}(";
-            $contents .= \implode(', ', $signature);
+            $contents .= implode(', ', $signature);
             $contents .= "): {$returnType};\n";
 
             $internalDoc[$namespace][$method] = $contents;
@@ -406,18 +406,18 @@ final class Blacklist {
         $class = new ReflectionClass($this->reflectionClasses['MTProto']);
         $methods = $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC);
         $class = new ReflectionClass(Tools::class);
-        $methods = \array_merge($methods, $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC));
+        $methods = array_merge($methods, $class->getMethods((ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC) | ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($name == 'methodCallAsyncRead') {
-                unset($methods[\array_search('methodCall', $methods)]);
-            } elseif (\strpos($name, '__') === 0) {
+                unset($methods[array_search('methodCall', $methods)]);
+            } elseif (strpos($name, '__') === 0) {
                 unset($methods[$key]);
-            } elseif (\stripos($name, 'async') !== false) {
-                if (\strpos($name, '_async') !== false) {
-                    unset($methods[\array_search(\str_ireplace('_async', '', $name), $methods)]);
+            } elseif (stripos($name, 'async') !== false) {
+                if (strpos($name, '_async') !== false) {
+                    unset($methods[array_search(str_ireplace('_async', '', $name), $methods)]);
                 } else {
-                    unset($methods[\array_search(\str_ireplace('async', '', $name), $methods)]);
+                    unset($methods[array_search(str_ireplace('async', '', $name), $methods)]);
                 }
             }
         }
@@ -426,33 +426,33 @@ final class Blacklist {
         foreach ($methods as $method) {
             $sortedMethods[$method->getName()] = $method;
         }
-        \ksort($sortedMethods);
-        $methods = \array_values($sortedMethods);
+        ksort($sortedMethods);
+        $methods = array_values($sortedMethods);
 
         foreach ($methods as $method) {
             $name = $method->getName();
-            if (\strpos($method->getDocComment() ?: '', '@internal') !== false) {
+            if (strpos($method->getDocComment() ?: '', '@internal') !== false) {
                 continue;
             }
             $static = $method->isStatic();
             if (!$static) {
-                $code = \file_get_contents($method->getFileName());
-                $code = \implode("\n", \array_slice(\explode("\n", $code), $method->getStartLine(), $method->getEndLine() - $method->getStartLine()));
-                if (\strpos($code, '$this') === false) {
+                $code = file_get_contents($method->getFileName());
+                $code = implode("\n", \array_slice(explode("\n", $code), $method->getStartLine(), $method->getEndLine() - $method->getStartLine()));
+                if (strpos($code, '$this') === false) {
                     Logger::log("{$name} should be STATIC!", Logger::FATAL_ERROR);
                 }
             }
             if ($name == 'methodCallAsyncRead') {
                 $name = 'methodCall';
-            } elseif (\stripos($name, 'async') !== false) {
-                if (\strpos($name, '_async') !== false) {
-                    $name = \str_ireplace('_async', '', $name);
+            } elseif (stripos($name, 'async') !== false) {
+                if (strpos($name, '_async') !== false) {
+                    $name = str_ireplace('_async', '', $name);
                 } else {
-                    $name = \str_ireplace('async', '', $name);
+                    $name = str_ireplace('async', '', $name);
                 }
             }
             $name = StrTools::toCamelCase($name);
-            $name = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
+            $name = str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
             $doc = 'public ';
             if ($static) {
                 $doc .= 'static ';
@@ -478,9 +478,9 @@ final class Blacklist {
                 if ($param->isOptional() && !$param->isVariadic()) {
                     $doc .= ' = ';
                     if ($param->isDefaultValueConstant()) {
-                        $doc .= '\\'.\str_replace(['NULL', 'self'], ['null', 'danog\\MadelineProto\\MTProto'], $param->getDefaultValueConstantName());
+                        $doc .= '\\'.str_replace(['NULL', 'self'], ['null', 'danog\\MadelineProto\\MTProto'], $param->getDefaultValueConstantName());
                     } else {
-                        $doc .= \str_replace('NULL', 'null', \var_export($param->getDefaultValue(), true));
+                        $doc .= str_replace('NULL', 'null', var_export($param->getDefaultValue(), true));
                     }
                 }
                 $doc .= ', ';
@@ -491,8 +491,8 @@ final class Blacklist {
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;
-            $doc = \rtrim($doc, ', ');
-            $paramList = \rtrim($paramList, ', ');
+            $doc = rtrim($doc, ', ');
+            $paramList = rtrim($paramList, ', ');
             $doc .= ')';
             $async = true;
             if ($hasReturnValue) {
@@ -527,57 +527,57 @@ final class Blacklist {
             }
             $phpdoc = $method->getDocComment() ?: '';
             $internalDoc['InternalDoc'][$name] = $phpdoc;
-            $internalDoc['InternalDoc'][$name] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
+            $internalDoc['InternalDoc'][$name] .= "\n    ".implode("\n    ", explode("\n", $doc));
         }
         foreach ($internalDoc as $namespace => $methods) {
             if ($namespace === 'InternalDoc') {
-                $handle = \fopen(__DIR__.'/InternalDoc.php', 'w');
-                \fwrite($handle, "<?php\n");
-                \fwrite($handle, "/**\n");
-                \fwrite($handle, " * This file is automatically generated by the build_docs.php file\n");
-                \fwrite($handle, " * and is used only for autocompletion in multiple IDEs\n");
-                \fwrite($handle, " * don't modify it manually.\n");
-                \fwrite($handle, " */\n\n");
-                \fwrite($handle, "namespace {$this->namespace};\n");
-                \fwrite($handle, "use Generator;\n");
-                \fwrite($handle, "use Amp\\Future;\n");
-                \fwrite($handle, "use Closure;\n");
-                \fwrite($handle, "use __PHP_Incomplete_Class;\n");
-                \fwrite($handle, "use Amp\\ByteStream\\WritableStream;\n");
-                \fwrite($handle, "use Amp\\ByteStream\\ReadableStream;\n");
-                \fwrite($handle, "use Amp\\ByteStream\\Pipe;\n");
-                \fwrite($handle, "use Amp\\Cancellation;\n");
-                \fwrite($handle, "use Amp\\Http\\Server\\Request as ServerRequest;\n");
-                \fwrite($handle, "use danog\\MadelineProto\\Broadcast\\Action;\n");
-                \fwrite($handle, "use danog\\MadelineProto\\MTProtoTools\\DialogId;\n");
+                $handle = fopen(__DIR__.'/InternalDoc.php', 'w');
+                fwrite($handle, "<?php\n");
+                fwrite($handle, "/**\n");
+                fwrite($handle, " * This file is automatically generated by the build_docs.php file\n");
+                fwrite($handle, " * and is used only for autocompletion in multiple IDEs\n");
+                fwrite($handle, " * don't modify it manually.\n");
+                fwrite($handle, " */\n\n");
+                fwrite($handle, "namespace {$this->namespace};\n");
+                fwrite($handle, "use Generator;\n");
+                fwrite($handle, "use Amp\\Future;\n");
+                fwrite($handle, "use Closure;\n");
+                fwrite($handle, "use __PHP_Incomplete_Class;\n");
+                fwrite($handle, "use Amp\\ByteStream\\WritableStream;\n");
+                fwrite($handle, "use Amp\\ByteStream\\ReadableStream;\n");
+                fwrite($handle, "use Amp\\ByteStream\\Pipe;\n");
+                fwrite($handle, "use Amp\\Cancellation;\n");
+                fwrite($handle, "use Amp\\Http\\Server\\Request as ServerRequest;\n");
+                fwrite($handle, "use danog\\MadelineProto\\Broadcast\\Action;\n");
+                fwrite($handle, "use danog\\MadelineProto\\MTProtoTools\\DialogId;\n");
                 $had = [];
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler::class, ClassFinder::RECURSIVE_MODE) as $class) {
-                    $name = \basename(\str_replace('\\', '//', $class));
+                    $name = basename(str_replace('\\', '//', $class));
                     if (isset($had[$name]) || $name === 'Status' || $name === 'Action') {
                         continue;
                     }
                     $had[$name] = true;
-                    \fwrite($handle, "use $class;\n");
+                    fwrite($handle, "use $class;\n");
                 }
                 /** @psalm-suppress UndefinedClass */
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Ipc::class, ClassFinder::RECURSIVE_MODE) as $class) {
-                    if (\str_contains($class, 'Wrapper')) {
+                    if (str_contains($class, 'Wrapper')) {
                         continue;
                     }
-                    \fwrite($handle, "use $class;\n");
+                    fwrite($handle, "use $class;\n");
                 }
                 /** @psalm-suppress UndefinedClass */
                 foreach (ClassFinder::getClassesInNamespace(\danog\MadelineProto\Broadcast::class, ClassFinder::RECURSIVE_MODE) as $class) {
-                    \fwrite($handle, "use $class;\n");
+                    fwrite($handle, "use $class;\n");
                 }
 
-                \fwrite($handle, "\n/** @psalm-suppress PossiblyNullReference */\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
+                fwrite($handle, "\n/** @psalm-suppress PossiblyNullReference */\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {
-                    $namespaceInterface = '\\danog\\MadelineProto\\Namespace\\'.\ucfirst($namespace);
-                    \fwrite($handle, '/** @var '.$namespaceInterface.' $'.$namespace." */\n");
-                    \fwrite($handle, 'public $'.$namespace.";\n");
+                    $namespaceInterface = '\\danog\\MadelineProto\\Namespace\\'.ucfirst($namespace);
+                    fwrite($handle, '/** @var '.$namespaceInterface.' $'.$namespace." */\n");
+                    fwrite($handle, 'public $'.$namespace.";\n");
                 }
-                \fwrite($handle, '
+                fwrite($handle, '
                     /**
                      * Export APIFactory instance with the specified namespace.
                      * @psalm-suppress InaccessibleProperty
@@ -586,43 +586,43 @@ final class Blacklist {
                     {
                 ');
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {
-                    \fwrite($handle, "\$this->$namespace ??= new \\danog\\MadelineProto\\Namespace\\AbstractAPI('$namespace');\n");
-                    \fwrite($handle, "\$this->{$namespace}->setWrapper(\$this->wrapper);\n");
+                    fwrite($handle, "\$this->$namespace ??= new \\danog\\MadelineProto\\Namespace\\AbstractAPI('$namespace');\n");
+                    fwrite($handle, "\$this->{$namespace}->setWrapper(\$this->wrapper);\n");
                 }
-                \fwrite($handle, "}\n");
+                fwrite($handle, "}\n");
             } else {
-                $namespace = \ucfirst($namespace);
-                $handle = \fopen(__DIR__."/Namespace/$namespace.php", 'w');
-                \fwrite($handle, "<?php\n");
-                \fwrite($handle, "/**\n");
-                \fwrite($handle, " * This file is automatic generated by build_docs.php file\n");
-                \fwrite($handle, " * and is used only for autocomplete in multiple IDE\n");
-                \fwrite($handle, " * don't modify manually.\n");
-                \fwrite($handle, " */\n\n");
-                \fwrite($handle, "namespace {$this->namespace}\\Namespace;\n");
+                $namespace = ucfirst($namespace);
+                $handle = fopen(__DIR__."/Namespace/$namespace.php", 'w');
+                fwrite($handle, "<?php\n");
+                fwrite($handle, "/**\n");
+                fwrite($handle, " * This file is automatic generated by build_docs.php file\n");
+                fwrite($handle, " * and is used only for autocomplete in multiple IDE\n");
+                fwrite($handle, " * don't modify manually.\n");
+                fwrite($handle, " */\n\n");
+                fwrite($handle, "namespace {$this->namespace}\\Namespace;\n");
 
-                \fwrite($handle, "\ninterface {$namespace}\n{");
+                fwrite($handle, "\ninterface {$namespace}\n{");
             }
             foreach ($methods as $contents) {
-                \fwrite($handle, $contents);
+                fwrite($handle, $contents);
             }
-            \fwrite($handle, "}\n");
+            fwrite($handle, "}\n");
         }
-        \fclose($handle);
+        fclose($handle);
 
-        $handle = \fopen(__DIR__.'/EventHandler/SimpleFilters.php', 'w');
-        \fwrite($handle, "<?php\n");
-        \fwrite($handle, "/**\n");
-        \fwrite($handle, " * This file is automatically generated by the build_docs.php file\n");
-        \fwrite($handle, " * and is used only for autocompletion in multiple IDEs\n");
-        \fwrite($handle, " * don't modify it manually.\n");
-        \fwrite($handle, " */\n\n");
-        \fwrite($handle, "namespace {$this->namespace}\\EventHandler;\n");
-        \fwrite($handle, "/** @internal An internal interface used to avoid type errors when using simple filters. */\n");
-        \fwrite($handle, "interface SimpleFilters extends ");
+        $handle = fopen(__DIR__.'/EventHandler/SimpleFilters.php', 'w');
+        fwrite($handle, "<?php\n");
+        fwrite($handle, "/**\n");
+        fwrite($handle, " * This file is automatically generated by the build_docs.php file\n");
+        fwrite($handle, " * and is used only for autocompletion in multiple IDEs\n");
+        fwrite($handle, " * don't modify it manually.\n");
+        fwrite($handle, " */\n\n");
+        fwrite($handle, "namespace {$this->namespace}\\EventHandler;\n");
+        fwrite($handle, "/** @internal An internal interface used to avoid type errors when using simple filters. */\n");
+        fwrite($handle, "interface SimpleFilters extends ");
         /** @psalm-suppress UndefinedClass */
-        \fwrite($handle, \implode(", ", \array_map(fn ($s) => "\\$s", ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler\SimpleFilter::class, ClassFinder::RECURSIVE_MODE|ClassFinder::ALLOW_INTERFACES))));
-        \fwrite($handle, "{}\n");
+        fwrite($handle, implode(", ", array_map(fn ($s) => "\\$s", ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler\SimpleFilter::class, ClassFinder::RECURSIVE_MODE|ClassFinder::ALLOW_INTERFACES))));
+        fwrite($handle, "{}\n");
     }
 
     private function typeToStr(ReflectionType $type): string
@@ -637,7 +637,7 @@ final class Blacklist {
             };
             $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
         } elseif ($type instanceof ReflectionUnionType) {
-            return \implode('|', \array_map($this->typeToStr(...), $type->getTypes()));
+            return implode('|', array_map($this->typeToStr(...), $type->getTypes()));
         }
         return $new;
     }

@@ -47,7 +47,7 @@ class FileIdTest extends MadelineTestCase
         $fileIdAstr = self::stripFileReference($fileIdAstr);
         $fileIdBstr = self::stripFileReference($fileIdBstr);
         if ($fileIdAstr !== $fileIdBstr) {
-            \var_dump(FileId::fromBotAPI($fileIdAstr), FileId::fromBotAPI($fileIdBstr));
+            var_dump(FileId::fromBotAPI($fileIdAstr), FileId::fromBotAPI($fileIdBstr));
         }
         self::assertEquals($fileIdAstr, $fileIdBstr, $message);
     }
@@ -61,7 +61,7 @@ class FileIdTest extends MadelineTestCase
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
-        \unlink("/tmp/$fileIdStr");
+        unlink("/tmp/$fileIdStr");
         $this->assertTrue(true);
     }
     /**
@@ -88,7 +88,7 @@ class FileIdTest extends MadelineTestCase
         }
         $res = self::$MadelineProto->messages->sendMedia(
             [
-                'peer' => \getenv('DEST'),
+                'peer' => getenv('DEST'),
                 'media' => $fileIdStr,
             ],
             [
@@ -129,10 +129,10 @@ class FileIdTest extends MadelineTestCase
 
     public function provideFileIdsAndType(): Generator
     {
-        $dest = \getenv('DEST');
-        $token = \getenv('BOT_TOKEN');
+        $dest = getenv('DEST');
+        $token = getenv('BOT_TOKEN');
         foreach ($this->provideChats() as $chat) {
-            $result = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'] ?? [];
+            $result = json_decode(file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'] ?? [];
             if (!$result) {
                 continue;
             }
@@ -151,20 +151,20 @@ class FileIdTest extends MadelineTestCase
         }
         foreach ($this->provideUrls() as $type => $url) {
             if ($type === 'video_note') {
-                \copy($url, \basename($url));
+                copy($url, basename($url));
 
-                $handle = \curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
-                \curl_setopt($handle, CURLOPT_POST, true);
-                \curl_setopt($handle, CURLOPT_POSTFIELDS, [
-                    $type => new CURLFile(\basename($url)),
+                $handle = curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
+                curl_setopt($handle, CURLOPT_POST, true);
+                curl_setopt($handle, CURLOPT_POSTFIELDS, [
+                    $type => new CURLFile(basename($url)),
                 ]);
-                \curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-                $botResult = \json_decode(\curl_exec($handle), true);
-                \curl_close($handle);
+                curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+                $botResult = json_decode(curl_exec($handle), true);
+                curl_close($handle);
 
-                \unlink(\basename($url));
+                unlink(basename($url));
             } else {
-                $botResult = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true);
+                $botResult = json_decode(file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true);
             }
             $botResult = $botResult['result'][$type];
             if ($type !== 'photo') {
@@ -191,7 +191,7 @@ class FileIdTest extends MadelineTestCase
     }
     public function provideChats(): array
     {
-        return [\getenv('DEST'), '@MadelineProto'];
+        return [getenv('DEST'), '@MadelineProto'];
     }
     public function provideUrls(): array
     {
@@ -204,7 +204,7 @@ class FileIdTest extends MadelineTestCase
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
             'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
         ];
-        if (\getenv('GITHUB_SHA')) {
+        if (getenv('GITHUB_SHA')) {
             $res['video_note'] = 'https://daniil.it/round.mp4';
         }
         return $res;

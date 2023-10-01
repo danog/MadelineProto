@@ -40,8 +40,8 @@ final class DOMEntities extends Entities
     {
         try {
             $dom = new DOMDocument();
-            $html = \preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
-            $dom->loadxml('<body>' . \trim($html) . '</body>');
+            $html = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $html);
+            $dom->loadxml('<body>' . trim($html) . '</body>');
             $message = '';
             $entities = [];
             self::parseNode($dom->getElementsByTagName('body')->item(0), 0, $message, $entities);

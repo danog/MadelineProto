@@ -50,7 +50,7 @@ final class TLSchema extends SettingsAbstract
     private bool $wasUpgraded = true;
     public function __sleep()
     {
-        return \array_merge(['wasUpgraded'], parent::__sleep());
+        return array_merge(['wasUpgraded'], parent::__sleep());
     }
 
     /**
@@ -60,7 +60,7 @@ final class TLSchema extends SettingsAbstract
     {
         $exists = false;
         try {
-            $exists = \file_exists($this->APISchema);
+            $exists = file_exists($this->APISchema);
         } catch (Throwable) {
         }
         // Scheme was upgraded or path has changed

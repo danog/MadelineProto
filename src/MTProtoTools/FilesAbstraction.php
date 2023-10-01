@@ -245,9 +245,9 @@ trait FilesAbstraction
         if ($file instanceof Media) {
             $fileName ??= $file->fileName;
         } elseif ($file instanceof LocalFile) {
-            $fileName ??= \basename($file->file);
+            $fileName ??= basename($file->file);
         } elseif ($file instanceof RemoteUrl) {
-            $fileName ??= \basename($file->url);
+            $fileName ??= basename($file->url);
         } elseif ($file instanceof BotApiFileId) {
             if ($fileName === null) {
                 throw new AssertionError("A file name must be provided when uploading a bot API file ID!");
@@ -311,9 +311,9 @@ trait FilesAbstraction
                     throw Exception::extension('gd');
                 }
                 $file = buffer($this->getStream($file, $cancellation), $cancellation);
-                $img = \imagecreatefromstring($file);
-                $width = \imagesx($img);
-                $height = \imagesy($img);
+                $img = imagecreatefromstring($file);
+                $width = imagesx($img);
+                $height = imagesy($img);
                 if ($width > $height) {
                     $thumb_width = 90;
                     $thumb_height = (int) (90*$height/$width);
@@ -326,14 +326,14 @@ trait FilesAbstraction
                 }
                 Assert::lessThanEq($thumb_height, 90);
                 Assert::lessThanEq($thumb_width, 90);
-                $thumb = \imagecreatetruecolor($thumb_width, $thumb_height);
-                \imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+                $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
+                imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
 
-                $stream = \fopen('php://memory', 'r+');
-                \imagepng($thumb, $stream);
-                \rewind($stream);
-                $thumb = \stream_get_contents($stream);
-                \fclose($stream);
+                $stream = fopen('php://memory', 'r+');
+                imagepng($thumb, $stream);
+                rewind($stream);
+                $thumb = stream_get_contents($stream);
+                fclose($stream);
                 unset($stream);
                 $file = new ReadableBuffer($file);
             } elseif ($thumb !== null) {
@@ -341,7 +341,7 @@ trait FilesAbstraction
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
-                [$thumb_width, $thumb_height] = \getimagesizefromstring($thumb);
+                [$thumb_width, $thumb_height] = getimagesizefromstring($thumb);
             } elseif ($file instanceof Media) {
                 $thumb = $file->thumb;
                 $thumb_width = $file->thumbWidth;

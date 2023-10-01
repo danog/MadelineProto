@@ -76,13 +76,13 @@ abstract class Filter
     {
         return match (true) {
             $type instanceof ReflectionUnionType => new FiltersOr(
-                ...\array_map(
+                ...array_map(
                     self::fromReflectionType(...),
                     $type->getTypes()
                 )
             ),
             $type instanceof ReflectionIntersectionType => new FiltersAnd(
-                ...\array_map(
+                ...array_map(
                     self::fromReflectionType(...),
                     $type->getTypes()
                 )
@@ -117,7 +117,7 @@ abstract class Filter
                 Ended::class => new FilterEnded,
                 Running::class => new FilterRunning,
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
-                default => \is_subclass_of($type->getName(), Update::class)
+                default => is_subclass_of($type->getName(), Update::class)
                     ? new class($type->getName()) extends Filter {
                         public function __construct(private readonly string $class)
                         {

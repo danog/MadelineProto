@@ -50,7 +50,7 @@ final class ActionForward implements Action
                 $id = 0;
                 foreach ($updates as $update) {
                     if (\in_array($update['_'], ['updateNewMessage', 'updateNewChannelMessage'], true)) {
-                        $id = \max($id, $update['message']['id']);
+                        $id = max($id, $update['message']['id']);
                     }
                 }
                 try {

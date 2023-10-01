@@ -52,7 +52,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function startReadHash(): void
     {
-        $this->read_hash = \hash_init($this->hash_name);
+        $this->read_hash = hash_init($this->hash_name);
     }
     /**
      * Check the read hash after N bytes are read.
@@ -68,9 +68,9 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function getReadHash(): string
     {
-        $hash = \hash_final($this->read_hash, true);
+        $hash = hash_final($this->read_hash, true);
         if ($this->rev) {
-            $hash = \strrev($hash);
+            $hash = strrev($hash);
         }
         $this->read_hash = null;
         $this->read_check_after = 0;
@@ -89,7 +89,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function startWriteHash(): void
     {
-        $this->write_hash = \hash_init($this->hash_name);
+        $this->write_hash = hash_init($this->hash_name);
     }
     /**
      * Write the write hash after N bytes are read.
@@ -105,9 +105,9 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function getWriteHash(): string
     {
-        $hash = \hash_final($this->write_hash, true);
+        $hash = hash_final($this->write_hash, true);
         if ($this->rev) {
-            $hash = \strrev($hash);
+            $hash = strrev($hash);
         }
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -128,10 +128,10 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function setExtra($hash): void
     {
-        $rev = \strpos($hash, '_rev');
+        $rev = strpos($hash, '_rev');
         $this->rev = false;
         if ($rev !== false) {
-            $hash = \substr($hash, 0, $rev);
+            $hash = substr($hash, 0, $rev);
             $this->rev = true;
         }
         $this->hash_name = $hash;
@@ -197,7 +197,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
                 throw new Exception('Tried to read too much out of frame data');
             }
             $data = $this->read_buffer->bufferRead($length);
-            \hash_update($this->read_hash, $data);
+            hash_update($this->read_hash, $data);
             $hash = $this->getReadHash();
             if ($hash !== $this->read_buffer->bufferRead(\strlen($hash))) {
                 throw new Exception('Hash mismatch');
@@ -205,7 +205,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             return $data;
         }
         $data = $this->read_buffer->bufferRead($length);
-        \hash_update($this->read_hash, $data);
+        hash_update($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;
         }
@@ -227,7 +227,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             if ($length + $this->write_check_pos > $this->write_check_after) {
                 throw new Exception('Too much out of frame data was sent, cannot check hash');
             }
-            \hash_update($this->write_hash, $data);
+            hash_update($this->write_hash, $data);
             $this->write_buffer->bufferWrite($data.$this->getWriteHash());
             return;
         }
@@ -235,7 +235,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             $this->write_check_pos += $length;
         }
         if ($this->write_hash) {
-            \hash_update($this->write_hash, $data);
+            hash_update($this->write_hash, $data);
         }
         $this->write_buffer->bufferWrite($data);
     }

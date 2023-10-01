@@ -302,19 +302,19 @@ trait PeerHandler
             }
         }
         if (\is_string($id)) {
-            if (\strpos($id, '#') !== false) {
-                if (\preg_match('/^channel#(\\d*)/', $id, $matches)) {
+            if (strpos($id, '#') !== false) {
+                if (preg_match('/^channel#(\\d*)/', $id, $matches)) {
                     return DialogId::fromSupergroupOrChannel((int) $matches[1]);
                 }
-                if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
+                if (preg_match('/^chat#(\\d*)/', $id, $matches)) {
                     return -((int) $matches[1]);
                 }
-                if (\preg_match('/^user#(\\d*)/', $id, $matches)) {
+                if (preg_match('/^user#(\\d*)/', $id, $matches)) {
                     return (int) $matches[1];
                 }
             }
         }
-        if (\is_numeric($id)) {
+        if (is_numeric($id)) {
             if (\is_string($id)) {
                 $id = (int) $id;
             }
@@ -406,7 +406,7 @@ trait PeerHandler
         if ($try_id !== null) {
             $id = $try_id;
         }
-        if (\is_numeric($id)) {
+        if (is_numeric($id)) {
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
             if (DialogId::getType($id) === DialogId::SECRET_CHAT) {
@@ -474,7 +474,7 @@ trait PeerHandler
                 $id = $content;
             }
         }
-        $id = \strtolower(\str_replace('@', '', $id));
+        $id = strtolower(str_replace('@', '', $id));
         if ($id === 'me') {
             return $this->getInfo($this->authorization['user']['id'], $type);
         }
@@ -653,7 +653,7 @@ trait PeerHandler
                         $id = $content;
                     }
                 }
-                $id = \strtolower(\str_replace('@', '', $id));
+                $id = strtolower(str_replace('@', '', $id));
                 if ($id === 'me') {
                     $id = $this->authorization['user']['id'];
                 } elseif ($id === 'support') {
@@ -714,8 +714,8 @@ trait PeerHandler
             return $partial;
         }
         $full = $this->peerDatabase->getFull($partial['bot_api_id']);
-        if (\time() - ($full['last_update'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
-            return \array_merge($partial, $full);
+        if (time() - ($full['last_update'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
+            return array_merge($partial, $full);
         }
         switch ($partial['type']) {
             case 'user':
@@ -730,7 +730,7 @@ trait PeerHandler
                 $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['InputChannel']]);
                 break;
         }
-        return \array_merge($partial, $this->peerDatabase->getFull($partial['bot_api_id']));
+        return array_merge($partial, $this->peerDatabase->getFull($partial['bot_api_id']));
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
@@ -875,7 +875,7 @@ trait PeerHandler
             await($promises);
 
             $this->logger->logger('Fetched '.\count($res['participants'])." out of {$total_count}");
-            $res['participants'] = \array_values($res['participants']);
+            $res['participants'] = array_values($res['participants']);
         }
         if (!$fullfetch) {
             unset($res['participants']);
@@ -923,12 +923,12 @@ trait PeerHandler
             return $promises;
         }
 
-        $yielded = \array_merge(...await($promises));
+        $yielded = array_merge(...await($promises));
         while ($yielded) {
             $newYielded = [];
 
-            foreach (\array_chunk($yielded, 10) as $promises) {
-                $newYielded = \array_merge($newYielded, ...(await($promises)));
+            foreach (array_chunk($yielded, 10) as $promises) {
+                $newYielded = array_merge($newYielded, ...(await($promises)));
             }
 
             $yielded = $newYielded;
@@ -1039,7 +1039,7 @@ trait PeerHandler
                 $ids[] = $participant['user_id'];
             }
         }
-        \sort($ids, SORT_NUMERIC);
+        sort($ids, SORT_NUMERIC);
         $gres['hash'] = Tools::genVectorHash($ids);
         $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)] = $gres;
     }

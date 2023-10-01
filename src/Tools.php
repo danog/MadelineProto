@@ -79,7 +79,7 @@ abstract class Tools extends AsyncTools
      */
     public static function testFibers(int $fiberCount = 100000): array
     {
-        \ini_set('memory_limit', -1);
+        ini_set('memory_limit', -1);
 
         $f = [];
         for ($x = 0; $x < $fiberCount; $x++) {
@@ -94,7 +94,7 @@ abstract class Tools extends AsyncTools
         }
         return [
             'maxFibers' => $x,
-            'realMemoryMb' => (int) (\memory_get_usage(true)/1024/1024),
+            'realMemoryMb' => (int) (memory_get_usage(true)/1024/1024),
             'maps' => self::getMaps(),
             'maxMaps' => self::getMaxMaps(),
         ];
@@ -105,12 +105,12 @@ abstract class Tools extends AsyncTools
     public static function getMaps(): ?int
     {
         try {
-            if (\file_exists('/proc/self/maps')) {
-                return \substr_count(@\file_get_contents('/proc/self/maps'), "\n")-1;
+            if (file_exists('/proc/self/maps')) {
+                return substr_count(@file_get_contents('/proc/self/maps'), "\n")-1;
             }
-            $pid = \getmypid();
-            if (\file_exists("/proc/$pid/maps")) {
-                return \substr_count(@\file_get_contents("/proc/$pid/maps"), "\n")-1;
+            $pid = getmypid();
+            if (file_exists("/proc/$pid/maps")) {
+                return substr_count(@file_get_contents("/proc/$pid/maps"), "\n")-1;
             }
         } catch (\Throwable) {
         }
@@ -123,8 +123,8 @@ abstract class Tools extends AsyncTools
     public static function getMaxMaps(): ?int
     {
         try {
-            if (\file_exists('/proc/sys/vm/max_map_count')) {
-                return ((int) @\file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
+            if (file_exists('/proc/sys/vm/max_map_count')) {
+                return ((int) @file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
             }
         } catch (\Throwable) {
         }
@@ -149,10 +149,10 @@ abstract class Tools extends AsyncTools
             if (isset($val['@type'])) {
                 $val['_'] = $val['@type'];
             } elseif (\is_array($val)) {
-                \array_walk($val, $cb);
+                array_walk($val, $cb);
             }
         };
-        \array_walk($input, $cb);
+        array_walk($input, $cb);
         return $input;
     }
     /**
@@ -181,9 +181,9 @@ abstract class Tools extends AsyncTools
     public static function randomInt(int $modulus = 0): int
     {
         if ($modulus === 0) {
-            return \random_int(PHP_INT_MIN, PHP_INT_MAX);
+            return random_int(PHP_INT_MIN, PHP_INT_MAX);
         }
-        return \random_int(0, PHP_INT_MAX) % $modulus;
+        return random_int(0, PHP_INT_MAX) % $modulus;
     }
     /**
      * Get secure random string of specified length.
@@ -204,7 +204,7 @@ abstract class Tools extends AsyncTools
     public static function posmod(int $a, int $b): int
     {
         $resto = $a % $b;
-        return $resto < 0 ? $resto + \abs($b) : $resto;
+        return $resto < 0 ? $resto + abs($b) : $resto;
     }
     /**
      * Unpack base256 signed int.
@@ -216,7 +216,7 @@ abstract class Tools extends AsyncTools
         if (\strlen($value) !== 4) {
             throw new TL\Exception("Length is not 4");
         }
-        return \unpack('l', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return unpack('l', Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
     /**
      * Unpack base256 signed long.
@@ -228,7 +228,7 @@ abstract class Tools extends AsyncTools
         if (\strlen($value) !== 8) {
             throw new TL\Exception("Length is not 8");
         }
-        return \unpack('q', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return unpack('q', Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
     /**
      * Unpack base256 signed long to string.
@@ -241,7 +241,7 @@ abstract class Tools extends AsyncTools
             return (string) $value;
         }
         if (\is_array($value) && \count($value) === 2) {
-            $value = \pack('l2', $value);
+            $value = pack('l2', $value);
         }
         if (\strlen($value) !== 8) {
             throw new TL\Exception("Length is not 8");
@@ -256,13 +256,13 @@ abstract class Tools extends AsyncTools
     public static function packSignedInt(int $value): string
     {
         if ($value > 2147483647) {
-            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_2147483647'], $value));
+            throw new TL\Exception(sprintf(Lang::$current_lang['value_bigger_than_2147483647'], $value));
         }
         if ($value < -2147483648) {
-            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_2147483648'], $value));
+            throw new TL\Exception(sprintf(Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
-        $res = \pack('l', $value);
-        return Magic::$BIG_ENDIAN ? \strrev($res) : $res;
+        $res = pack('l', $value);
+        return Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
     /**
      * Convert integer to base256 long.
@@ -271,7 +271,7 @@ abstract class Tools extends AsyncTools
      */
     public static function packSignedLong(int $value): string
     {
-        return Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value);
+        return Magic::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value);
     }
     /**
      * Convert value to unsigned base256 int.
@@ -281,12 +281,12 @@ abstract class Tools extends AsyncTools
     public static function packUnsignedInt(int $value): string
     {
         if ($value > 4294967295) {
-            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_4294967296'], $value));
+            throw new TL\Exception(sprintf(Lang::$current_lang['value_bigger_than_4294967296'], $value));
         }
         if ($value < 0) {
-            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_0'], $value));
+            throw new TL\Exception(sprintf(Lang::$current_lang['value_smaller_than_0'], $value));
         }
-        return \pack('V', $value);
+        return pack('V', $value);
     }
     /**
      * Convert double to binary version.
@@ -295,11 +295,11 @@ abstract class Tools extends AsyncTools
      */
     public static function packDouble(float $value): string
     {
-        $res = \pack('d', $value);
+        $res = pack('d', $value);
         if (\strlen($res) !== 8) {
             throw new TL\Exception(Lang::$current_lang['encode_double_error']);
         }
-        return Magic::$BIG_ENDIAN ? \strrev($res) : $res;
+        return Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
     /**
      * Unpack binary double.
@@ -311,7 +311,7 @@ abstract class Tools extends AsyncTools
         if (\strlen($value) !== 8) {
             throw new TL\Exception("Length is not 8");
         }
-        return \unpack('d', Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
+        return unpack('d', Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
     /**
      * Check if is array or similar (traversable && countable && arrayAccess).
@@ -338,7 +338,7 @@ abstract class Tools extends AsyncTools
      */
     public static function base64urlDecode(string $data): string
     {
-        return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
     /**
      * Base64URL encode.
@@ -347,7 +347,7 @@ abstract class Tools extends AsyncTools
      */
     public static function base64urlEncode(string $data): string
     {
-        return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
     /**
      * null-byte RLE decode.
@@ -359,9 +359,9 @@ abstract class Tools extends AsyncTools
         $new = '';
         $last = '';
         $null = \chr(0);
-        foreach (\str_split($string) as $cur) {
+        foreach (str_split($string) as $cur) {
             if ($last === $null) {
-                $new .= \str_repeat($last, \ord($cur));
+                $new .= str_repeat($last, \ord($cur));
                 $last = '';
             } else {
                 $new .= $last;
@@ -381,7 +381,7 @@ abstract class Tools extends AsyncTools
         $new = '';
         $count = 0;
         $null = \chr(0);
-        foreach (\str_split($string) as $cur) {
+        foreach (str_split($string) as $cur) {
             if ($cur === $null) {
                 $count++;
             } else {
@@ -444,7 +444,7 @@ abstract class Tools extends AsyncTools
         $header = self::INFLATE_HEADER;
         $header[164] = $stripped[1];
         $header[166] = $stripped[2];
-        return $header.\substr($stripped, 3).self::INFLATE_FOOTER;
+        return $header.substr($stripped, 3).self::INFLATE_FOOTER;
     }
     /**
      * Close connection with client, connected via web.
@@ -453,16 +453,16 @@ abstract class Tools extends AsyncTools
      */
     public static function closeConnection(string $message): void
     {
-        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
         }
-        $buffer = @\ob_get_clean() ?: '';
+        $buffer = @ob_get_clean() ?: '';
         $buffer .= $message;
-        \ignore_user_abort(true);
-        \header('Connection: close');
-        \header('Content-Type: text/html');
+        ignore_user_abort(true);
+        header('Connection: close');
+        header('Content-Type: text/html');
         echo $buffer;
-        \flush();
+        flush();
         $GLOBALS['exited'] = true;
         if (\function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
@@ -508,7 +508,7 @@ abstract class Tools extends AsyncTools
      */
     public static function end(array $what): mixed
     {
-        return \end($what);
+        return end($what);
     }
     /**
      * Whether this is altervista.
@@ -564,7 +564,7 @@ abstract class Tools extends AsyncTools
      */
     public static function absolute(string $file): string
     {
-        if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(\substr($file, 0, 4), ['phar', 'http'], true)) {
+        if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(substr($file, 0, 4), ['phar', 'http'], true)) {
             $file = Magic::getcwd().DIRECTORY_SEPARATOR.$file;
         }
         return $file;
@@ -577,12 +577,12 @@ abstract class Tools extends AsyncTools
      */
     public static function parseLink(string $link): array|null
     {
-        if (\preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
+        if (preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
             if ($matches[1] !== 'www') {
                 return [false, $matches[1]];
             }
         }
-        if (\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
+        if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
             return [!!$matches[1], $matches[2]];
         }
         return null;
@@ -634,8 +634,8 @@ abstract class Tools extends AsyncTools
             }
             do {
                 if (\strlen($buffer) >= $len) {
-                    $piece = \substr($buffer, 0, $len);
-                    $buffer = \substr($buffer, $len);
+                    $piece = substr($buffer, 0, $len);
+                    $buffer = substr($buffer, $len);
                     return $piece;
                 }
                 $chunk = $stream->read($cancellation);
@@ -697,7 +697,7 @@ abstract class Tools extends AsyncTools
         if (!\extension_loaded('tokenizer')) {
             throw \danog\MadelineProto\Exception::extension('tokenizer');
         }
-        $plugin = \is_subclass_of($class, PluginEventHandler::class);
+        $plugin = is_subclass_of($class, PluginEventHandler::class);
         $file = (new ReflectionClass($class))->getFileName();
         $code = read($file);
         $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
@@ -712,7 +712,7 @@ abstract class Tools extends AsyncTools
 
         if ($plugin) {
             $class = $finder->findInstanceOf($code, ClassLike::class);
-            $class = \array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
+            $class = array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
             if (\count($class) !== 1 || !$class[0] instanceof Class_) {
                 $issues []= new EventHandlerIssue(
                     message: Lang::$current_lang['plugins_must_have_exactly_one_class'],
@@ -750,13 +750,13 @@ abstract class Tools extends AsyncTools
                     isset($call->args[0]) &&
                     $call->args[0] instanceof Arg &&
                     $call->args[0]->value instanceof String_ &&
-                    \str_starts_with($call->args[0]->value->value, 'php://memory')
+                    str_starts_with($call->args[0]->value->value, 'php://memory')
                 ) {
                     continue;
                 }
                 $explanation = self::BLOCKING_FUNCTIONS[$name];
                 $issues []= new EventHandlerIssue(
-                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),
+                    message: sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: true
@@ -767,7 +767,7 @@ abstract class Tools extends AsyncTools
             if (isset(self::DEPRECATED_FUNCTIONS[$name])) {
                 $explanation = self::DEPRECATED_FUNCTIONS[$name];
                 $issues []= new EventHandlerIssue(
-                    message: \sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation),
+                    message: sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: true
@@ -788,7 +788,7 @@ abstract class Tools extends AsyncTools
                         line: $call->getStartLine(),
                         severe: true
                     );
-                } elseif (\str_starts_with($arg, 'madeline') && \str_ends_with($arg, '.phar')) {
+                } elseif (str_starts_with($arg, 'madeline') && str_ends_with($arg, '.phar')) {
                     $issues []= new EventHandlerIssue(
                         message: Lang::$current_lang['do_not_remove_MadelineProto.log_phar'],
                         file: $file,
@@ -801,7 +801,7 @@ abstract class Tools extends AsyncTools
 
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
                 $issues []= new EventHandlerIssue(
-                    message: \sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
+                    message: sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: false
@@ -818,7 +818,7 @@ abstract class Tools extends AsyncTools
             if (isset(self::BLOCKING_CLASSES[$name])) {
                 $explanation = self::BLOCKING_CLASSES[$name];
                 $issues []= new EventHandlerIssue(
-                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation),
+                    message: sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation),
                     file: $file,
                     line: $new->getStartLine(),
                     severe: true

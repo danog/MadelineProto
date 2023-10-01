@@ -250,7 +250,7 @@ final class PeerDatabase implements TLCallback
                     $id = $content;
                 }
             }
-            $id = \strtolower(\str_replace('@', '', $id));
+            $id = strtolower(str_replace('@', '', $id));
             if ($id === 'me') {
                 $id = $this->API->authorization['user']['id'];
             } elseif ($id === 'support') {
@@ -282,8 +282,8 @@ final class PeerDatabase implements TLCallback
         }
         $new = self::getUsernames($new);
         $old = $old ? self::getUsernames($old) : [];
-        $diffToRemove = \array_diff($old, $new);
-        $diffToAdd = \array_diff($new, $old);
+        $diffToRemove = array_diff($old, $new);
+        $diffToAdd = array_diff($new, $old);
         if (!$diffToAdd && !$diffToRemove) {
             return;
         }
@@ -310,10 +310,10 @@ final class PeerDatabase implements TLCallback
         $usernames = [];
         if ($constructor['_'] === 'user' || $constructor['_'] === 'channel') {
             if (isset($constructor['username'])) {
-                $usernames []= \strtolower($constructor['username']);
+                $usernames []= strtolower($constructor['username']);
             }
             foreach ($constructor['usernames'] ?? [] as ['username' => $username]) {
-                $usernames []= \strtolower($username);
+                $usernames []= strtolower($username);
             }
         }
         return $usernames;
@@ -338,7 +338,7 @@ final class PeerDatabase implements TLCallback
      */
     public function resolveUsername(string $username): ?int
     {
-        $username = \strtolower(\str_replace('@', '', $username));
+        $username = strtolower(str_replace('@', '', $username));
         if (!$username) {
             return null;
         }
@@ -603,7 +603,7 @@ final class PeerDatabase implements TLCallback
     {
         $this->fullDb[$this->API->getIdInternal($full)] = [
             'full' => $full,
-            'last_update' => \time(),
+            'last_update' => time(),
         ];
     }
 
@@ -617,10 +617,10 @@ final class PeerDatabase implements TLCallback
     }
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(
-            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
-            \array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
-            \array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
+        return array_merge(
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
+            array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
+            array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
         );
     }
     public function getConstructorBeforeDeserializationCallbacks(): array
@@ -641,6 +641,6 @@ final class PeerDatabase implements TLCallback
 
     public function __debugInfo()
     {
-        return ['PeerDatabase instance '.\spl_object_hash($this)];
+        return ['PeerDatabase instance '.spl_object_hash($this)];
     }
 }

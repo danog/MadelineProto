@@ -114,14 +114,14 @@ final class SessionPaths
      */
     public function delete(): void
     {
-        if (\file_exists($this->sessionDirectoryPath)) {
-            foreach (\scandir($this->sessionDirectoryPath) as $f) {
+        if (file_exists($this->sessionDirectoryPath)) {
+            foreach (scandir($this->sessionDirectoryPath) as $f) {
                 if ($f === '.' || $f === '..') {
                     continue;
                 }
-                \unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
+                unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
             }
-            \rmdir($this->sessionDirectoryPath);
+            rmdir($this->sessionDirectoryPath);
         }
     }
     /**
@@ -140,7 +140,7 @@ final class SessionPaths
                 .\chr(PHP_MAJOR_VERSION)
                 .\chr(PHP_MINOR_VERSION)
                 .\chr(Magic::$can_use_igbinary ? 1 : 0)
-                .(Magic::$can_use_igbinary ? \igbinary_serialize($object) : \serialize($object));
+                .(Magic::$can_use_igbinary ? igbinary_serialize($object) : serialize($object));
 
             write(
                 "$path.temp.php",
@@ -175,8 +175,8 @@ final class SessionPaths
 
             $file = openFile($path, 'rb');
 
-            \clearstatcache(true, $path);
-            $size = \filesize($path);
+            clearstatcache(true, $path);
+            $size = filesize($path);
 
             $file->seek($headerLen++);
             $v = \ord($file->read(null, 1));
@@ -184,7 +184,7 @@ final class SessionPaths
                 $php = $file->read(null, 2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
-                if (\version_compare("$major.$minor", PHP_VERSION) > 0) {
+                if (version_compare("$major.$minor", PHP_VERSION) > 0) {
                     throw new Exception("Cannot deserialize session created on newer PHP $major.$minor, currently using PHP ".PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.', please upgrade to the latest version of PHP!');
                 }
                 $headerLen += 2;
@@ -198,7 +198,7 @@ final class SessionPaths
                 $headerLen++;
             }
             $unserialized = $file->read(null, $size - $headerLen) ?? '';
-            $unserialized = $igbinary ? \igbinary_unserialize($unserialized) : \unserialize($unserialized);
+            $unserialized = $igbinary ? igbinary_unserialize($unserialized) : unserialize($unserialized);
             $file->close();
         } finally {
             $unlock();

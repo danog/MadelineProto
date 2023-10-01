@@ -39,7 +39,7 @@ use Webmozart\Assert\Assert;
     }
     \define('MADELINE_ENTRY', 1);
     if (!\defined('MADELINE_WORKER_TYPE')) {
-        if (\count(\debug_backtrace(0)) !== 1) {
+        if (\count(debug_backtrace(0)) !== 1) {
             // We're not being included directly
             return;
         }
@@ -50,20 +50,20 @@ use Webmozart\Assert\Assert;
             $arguments = $_GET['argv'];
         }
         if (\count($arguments) < 2) {
-            \trigger_error('Not enough arguments!', E_USER_ERROR);
+            trigger_error('Not enough arguments!', E_USER_ERROR);
             exit(1);
         }
-        \define('MADELINE_WORKER_TYPE', \array_shift($arguments));
+        \define('MADELINE_WORKER_TYPE', array_shift($arguments));
         \define('MADELINE_WORKER_ARGS', $arguments);
     }
 
     if (\defined('SIGHUP')) {
         try {
-            \pcntl_signal(SIGHUP, fn () => null);
+            pcntl_signal(SIGHUP, fn () => null);
         } catch (\Throwable $e) {
         }
     }
-    if (!\class_exists(API::class)) {
+    if (!class_exists(API::class)) {
         $paths = [
             \dirname(__DIR__, 5).'/autoload.php',
             \dirname(__DIR__, 3).'/vendor/autoload.php',
@@ -72,14 +72,14 @@ use Webmozart\Assert\Assert;
         ];
 
         foreach ($paths as $path) {
-            if (\file_exists($path)) {
+            if (file_exists($path)) {
                 $autoloadPath = $path;
                 break;
             }
         }
 
         if (!isset($autoloadPath)) {
-            \trigger_error('Could not locate autoload.php in any of the following files: '.\implode(', ', $paths), E_USER_ERROR);
+            trigger_error('Could not locate autoload.php in any of the following files: '.implode(', ', $paths), E_USER_ERROR);
             exit(1);
         }
 
@@ -87,18 +87,18 @@ use Webmozart\Assert\Assert;
     }
     if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
         $session = MADELINE_WORKER_ARGS[0];
-        if (!\file_exists($session)) {
-            \trigger_error("IPC session $session does not exist!", E_USER_ERROR);
+        if (!file_exists($session)) {
+            trigger_error("IPC session $session does not exist!", E_USER_ERROR);
             exit(1);
         }
         if (\function_exists('cli_set_process_title')) {
-            @\cli_set_process_title("MadelineProto worker $session");
+            @cli_set_process_title("MadelineProto worker $session");
         }
         if (\function_exists('posix_setsid')) {
-            @\posix_setsid();
+            @posix_setsid();
         }
         if (isset($_GET['cwd'])) {
-            @\chdir($_GET['cwd']);
+            @chdir($_GET['cwd']);
         }
         \define('MADELINE_WORKER', 1);
 

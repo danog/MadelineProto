@@ -60,7 +60,7 @@ final class CheckLoop extends Loop
         }
         if ($this->shared->hasTempAuthKey()) {
             $full_message_ids = $this->connection->getPendingCalls();
-            foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
+            foreach (array_chunk($full_message_ids, 8192) as $message_ids) {
                 $deferred = new DeferredFuture();
                 $list = '';
                 // Don't edit this here pls
@@ -79,7 +79,7 @@ final class CheckLoop extends Loop
                             throw $result();
                         }
                         $reply = [];
-                        foreach (\str_split($result['info']) as $key => $chr) {
+                        foreach (str_split($result['info']) as $key => $chr) {
                             $message_id = $message_ids[$key];
                             if (!isset($this->connection->outgoing_messages[$message_id])) {
                                 $this->API->logger("Already got response for and forgot about message ID $message_id");
@@ -113,7 +113,7 @@ final class CheckLoop extends Loop
                                         $this->API->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
                                         $reply[] = $message_id;
                                     } elseif ($chr & 32) {
-                                        if ($message->getSent() + $this->resendTimeout < \time()) {
+                                        if ($message->getSent() + $this->resendTimeout < time()) {
                                             if ($message->isCancellationRequested()) {
                                                 unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
 
@@ -144,7 +144,7 @@ final class CheckLoop extends Loop
         } else {
             foreach ($this->connection->new_outgoing as $message_id => $message) {
                 if ($message->wasSent()
-                    && $message->getSent() + $this->timeout < \time()
+                    && $message->getSent() + $this->timeout < time()
                     && $message->unencrypted
                 ) {
                     $this->API->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);

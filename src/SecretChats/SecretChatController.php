@@ -160,7 +160,7 @@ final class SecretChatController implements Stringable
 
     public function __serialize(): array
     {
-        $vars = \get_object_vars($this);
+        $vars = get_object_vars($this);
         unset($vars['rekeyMutex'], $vars['encryptMutex'], $vars['sentMutex']);
 
         return $vars;
@@ -241,10 +241,10 @@ final class SecretChatController implements Stringable
             $b = new BigInteger(Tools::random(256), 256);
             $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
             Crypt::checkG($params['g_a'], $dh_config['p']);
-            $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
-            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
 
             $this->rekeyState = RekeyState::ACCEPTED;
             $this->rekeyExchangeId = $params['exchange_id'];
@@ -276,10 +276,10 @@ final class SecretChatController implements Stringable
             $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
             Crypt::checkG($params['g_b'], $dh_config['p']);
             \assert($this->rekeyParam !== null);
-            $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            $key = ['auth_key' => str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
-            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
             if ($key['fingerprint'] !== $params['key_fingerprint']) {
                 $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
                 throw new SecurityException('Invalid key fingerprint!');
@@ -289,7 +289,7 @@ final class SecretChatController implements Stringable
             $this->oldKey = $this->key;
             $this->key = $key;
             $this->ttr = 100;
-            $this->updated = \time();
+            $this->updated = time();
             $this->API->updaters[UpdateLoop::GENERIC]->resume();
         } finally {
             EventLoop::queue($lock->release(...));
@@ -317,7 +317,7 @@ final class SecretChatController implements Stringable
             $this->oldKey = $this->key;
             $this->key = $this->rekeyKey;
             $this->ttr = 100;
-            $this->updated = \time();
+            $this->updated = time();
             $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
             $this->API->logger('Secret chat '.$this.' rekeyed successfully!', Logger::VERBOSE);
         } finally {
@@ -341,7 +341,7 @@ final class SecretChatController implements Stringable
         try {
             $this->ttr--;
             if ($this->remoteLayer > 8
-                && ($this->ttr <= 0 || \time() - $this->updated > 7 * 24 * 60 * 60)
+                && ($this->ttr <= 0 || time() - $this->updated > 7 * 24 * 60 * 60)
                 && $this->rekeyState === RekeyState::IDLE
             ) {
                 EventLoop::queue($this->rekey(...));
@@ -380,10 +380,10 @@ final class SecretChatController implements Stringable
                 $padding += 16;
             }
             $message .= Tools::random($padding);
-            $message_key = \substr(\hash('sha256', \substr($this->key['auth_key'], 88 + ($this->public->creator ? 0 : 8), 32).$message, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->key['auth_key'], 88 + ($this->public->creator ? 0 : 8), 32).$message, true), 8, 16);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->key['auth_key'], $this->public->creator);
         } else {
-            $message_key = \substr(\sha1($message, true), -16);
+            $message_key = substr(sha1($message, true), -16);
             [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->key['auth_key'], true);
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
@@ -454,7 +454,7 @@ final class SecretChatController implements Stringable
                     if ($action['layer'] > $this->remoteLayer) {
                         $this->API->logger("Applying layer {$action['layer']} notification in $this");
                         $this->remoteLayer = $action['layer'];
-                        if ($action['layer'] >= 46 && \time() - $this->public->created > 15) {
+                        if ($action['layer'] >= 46 && time() - $this->public->created > 15) {
                             $this->notifyLayer();
                         }
                         if ($action['layer'] >= 73) {
@@ -478,20 +478,20 @@ final class SecretChatController implements Stringable
             }
             return;
         }
-        throw new ResponseException('Unrecognized decrypted message received: '.\var_export($update, true));
+        throw new ResponseException('Unrecognized decrypted message received: '.var_export($update, true));
     }
     private function handleResend(array &$action): void
     {
         if (isset($action['handled'])) {
             return;
         }
-        $this->API->logger("Resending messages for $this: ".\json_encode($action), Logger::WARNING);
+        $this->API->logger("Resending messages for $this: ".json_encode($action), Logger::WARNING);
         $action['start_seq_no'] -= $this->out_seq_no_base;
         $action['end_seq_no'] -= $this->out_seq_no_base;
         $action['start_seq_no'] >>= 1;
         $action['end_seq_no'] >>= 1;
         $action['handled'] = true;
-        $this->API->logger("Resending messages for $this (after): ".\json_encode($action), Logger::WARNING);
+        $this->API->logger("Resending messages for $this (after): ".json_encode($action), Logger::WARNING);
         for ($seq = $action['start_seq_no']; $seq <= $action['end_seq_no']; $seq++) {
             $msg = $this->outgoing[$seq];
             $this->API->methodCallAsyncRead($msg['method'], $msg[$seq]);
@@ -505,7 +505,7 @@ final class SecretChatController implements Stringable
     public function handleEncryptedUpdate(array $message): bool
     {
         $message['message']['bytes'] = (string) $message['message']['bytes'];
-        $auth_key_id = \substr($message['message']['bytes'], 0, 8);
+        $auth_key_id = substr($message['message']['bytes'], 0, 8);
         $old = false;
         if ($auth_key_id !== $this->key['fingerprint']) {
             if (isset($this->oldKey['fingerprint'])) {
@@ -519,8 +519,8 @@ final class SecretChatController implements Stringable
                 throw new SecurityException('Key fingerprint mismatch');
             }
         }
-        $message_key = \substr($message['message']['bytes'], 8, 16);
-        $encrypted_data = \substr($message['message']['bytes'], 24);
+        $message_key = substr($message['message']['bytes'], 8, 16);
+        $encrypted_data = substr($message['message']['bytes'], 24);
         if ($this->mtproto === 2) {
             $this->API->logger('Trying MTProto v2 decryption for '.$this.'...', Logger::NOTICE);
             try {
@@ -550,7 +550,7 @@ final class SecretChatController implements Stringable
         }
         $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '']);
         $this->ttr--;
-        if (($this->ttr <= 0 || \time() - $this->updated > 7 * 24 * 60 * 60) && $this->rekeyState === RekeyState::IDLE) {
+        if (($this->ttr <= 0 || time() - $this->updated > 7 * 24 * 60 * 60) && $this->rekeyState === RekeyState::IDLE) {
             $this->rekey();
         }
         unset($message['message']['bytes']);
@@ -564,7 +564,7 @@ final class SecretChatController implements Stringable
                 $layer = $message['message']['decrypted_message']['layer'];
                 if ($layer >= 46 && $layer > $this->remoteLayer) {
                     $this->remoteLayer = $layer;
-                    if (\time() - $this->public->created > 15) {
+                    if (time() - $this->public->created > 15) {
                         $this->notifyLayer();
                     }
                 }
@@ -585,12 +585,12 @@ final class SecretChatController implements Stringable
         \assert($key !== null);
         [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $key['auth_key'], true);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
-        $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
-        $message_data = \substr($decrypted_data, 4, $message_data_length);
+        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
+        $message_data = substr($decrypted_data, 4, $message_data_length);
         if ($message_data_length > \strlen($decrypted_data)) {
             throw new SecurityException('message_data_length is too big');
         }
-        if ($message_key != \substr(\sha1(\substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
+        if ($message_key != substr(sha1(substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
             throw new SecurityException('Msg_key mismatch');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length > 15) {
@@ -609,11 +609,11 @@ final class SecretChatController implements Stringable
         $key = $key['auth_key'];
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $key, !$this->public->creator);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
-        if ($message_key != \substr(\hash('sha256', \substr($key, 88 + ($this->public->creator ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
+        if ($message_key != substr(hash('sha256', substr($key, 88 + ($this->public->creator ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
             throw new SecurityException('Msg_key mismatch');
         }
-        $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
-        $message_data = \substr($decrypted_data, 4, $message_data_length);
+        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
+        $message_data = substr($decrypted_data, 4, $message_data_length);
         if ($message_data_length > \strlen($decrypted_data)) {
             throw new SecurityException('message_data_length is too big');
         }

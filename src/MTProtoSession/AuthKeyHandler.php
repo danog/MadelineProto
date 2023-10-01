@@ -116,7 +116,7 @@ trait AuthKeyHandler
                  * Compute p and q
                  */
                 $ok = false;
-                $pq = Tools::unpackSignedLong(\strrev($pq_bytes));
+                $pq = Tools::unpackSignedLong(strrev($pq_bytes));
                 foreach ([
                     'native_single_cpp',
                     'python_single_alt',
@@ -155,8 +155,8 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Serialize object for req_DH_params
                  */
-                $p_bytes = \strrev(Tools::packUnsignedInt($p));
-                $q_bytes = \strrev(Tools::packUnsignedInt($q));
+                $p_bytes = strrev(Tools::packUnsignedInt($p));
+                $q_bytes = strrev(Tools::packUnsignedInt($q));
                 $new_nonce = Tools::random(32);
                 $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp').'_dc', 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => $this->datacenter];
                 $p_q_inner_data = ($this->API->getTL()->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
@@ -168,12 +168,12 @@ trait AuthKeyHandler
                     throw new SecurityException('p_q_inner_data is too long!');
                 }
                 $data_with_padding = $p_q_inner_data.Tools::random(192 - \strlen($p_q_inner_data));
-                $data_pad_reversed = \strrev($data_with_padding);
+                $data_pad_reversed = strrev($data_with_padding);
                 do {
                     $temp_key = Tools::random(32);
-                    $data_with_hash = $data_pad_reversed.\hash('sha256', $temp_key.$data_with_padding, true);
-                    $aes_encrypted = Crypt::igeEncrypt($data_with_hash, $temp_key, \str_repeat("\0", 32));
-                    $temp_key_xor = $temp_key ^ \hash('sha256', $aes_encrypted, true);
+                    $data_with_hash = $data_pad_reversed.hash('sha256', $temp_key.$data_with_padding, true);
+                    $aes_encrypted = Crypt::igeEncrypt($data_with_hash, $temp_key, str_repeat("\0", 32));
+                    $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
                     $key_aes_encrypted_bigint = new BigInteger($temp_key_xor.$aes_encrypted, 256);
                 } while ($key_aes_encrypted_bigint->compare($key->n) >= 0);
                 $encrypted_data = $key->encrypt($key_aes_encrypted_bigint);
@@ -217,7 +217,7 @@ trait AuthKeyHandler
                  * Check valid new nonce hash if return from server
                  * new nonce hash return in server_DH_params_fail
                  */
-                if (isset($server_dh_params['new_nonce_hash']) && \substr(\sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
+                if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
                     throw new SecurityException('wrong new nonce hash.');
                 }
                 /*
@@ -225,16 +225,16 @@ trait AuthKeyHandler
                  * Get key, iv and decrypt answer
                  */
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
-                $tmp_aes_key = \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
-                $tmp_aes_iv = \substr(\sha1($server_nonce.$new_nonce, true), 12, 8).\sha1($new_nonce.$new_nonce, true).\substr($new_nonce, 0, 4);
+                $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
+                $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
                 $answer_with_hash = Crypt::igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
                  * Separate answer and hash
                  */
-                $answer_hash = \substr($answer_with_hash, 0, 20);
+                $answer_hash = substr($answer_with_hash, 0, 20);
                 /** @var string */
-                $answer = \substr($answer_with_hash, 20);
+                $answer = substr($answer_with_hash, 20);
                 /*
                  * ***********************************************************************
                  * Deserialize answer
@@ -253,7 +253,7 @@ trait AuthKeyHandler
                  * Do some checks
                  */
                 $server_DH_inner_data_length = $this->API->getTL()->getLength($answer);
-                if (\sha1(\substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
+                if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new SecurityException('answer_hash mismatch.');
                 }
                 if ($nonce != $server_DH_inner_data['nonce']) {
@@ -270,8 +270,8 @@ trait AuthKeyHandler
                  * Time delta
                  */
                 $server_time = $server_DH_inner_data['server_time'];
-                $this->time_delta = $server_time - \time();
-                $this->API->logger(\sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
+                $this->time_delta = $server_time - time();
+                $this->API->logger(sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
                 Crypt::checkPG($dh_prime, $g);
                 Crypt::checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id++) {
@@ -307,7 +307,7 @@ trait AuthKeyHandler
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
                      */
-                    $data_with_sha = \sha1($data, true).$data;
+                    $data_with_sha = sha1($data, true).$data;
                     $data_with_sha_padded = $data_with_sha.Tools::random(Tools::posmod(-\strlen($data_with_sha), 16));
                     $encrypted_data = Crypt::igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->API->logger('Executing set_client_DH_params...', Logger::VERBOSE);
@@ -339,11 +339,11 @@ trait AuthKeyHandler
                     );
                     $auth_key = $g_a->powMod($b, $dh_prime);
                     $auth_key_str = $auth_key->toBytes();
-                    $auth_key_sha = \sha1($auth_key_str, true);
-                    $auth_key_aux_hash = \substr($auth_key_sha, 0, 8);
-                    $new_nonce_hash1 = \substr(\sha1($new_nonce.\chr(1).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash2 = \substr(\sha1($new_nonce.\chr(2).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash3 = \substr(\sha1($new_nonce.\chr(3).$auth_key_aux_hash, true), -16);
+                    $auth_key_sha = sha1($auth_key_str, true);
+                    $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
+                    $new_nonce_hash1 = substr(sha1($new_nonce.\chr(1).$auth_key_aux_hash, true), -16);
+                    $new_nonce_hash2 = substr(sha1($new_nonce.\chr(2).$auth_key_aux_hash, true), -16);
+                    $new_nonce_hash3 = substr(sha1($new_nonce.\chr(3).$auth_key_aux_hash, true), -16);
                     /*
                      * ***********************************************************************
                      * Check if the client's nonce and the server's nonce are the same
@@ -370,9 +370,9 @@ trait AuthKeyHandler
                             $this->API->logger('Diffie Hellman key exchange processed successfully!', Logger::VERBOSE);
                             $key = $expires_in < 0 ? new PermAuthKey() : new TempAuthKey();
                             if ($expires_in >= 0) {
-                                $key->expires(\time() + $expires_in);
+                                $key->expires(time() + $expires_in);
                             }
-                            $key->setServerSalt(\substr($new_nonce, 0, 8) ^ \substr($server_nonce, 0, 8));
+                            $key->setServerSalt(substr($new_nonce, 0, 8) ^ substr($server_nonce, 0, 8));
                             $key->setAuthKey($auth_key_str);
                             $this->API->logger('Auth key generated', Logger::NOTICE);
                             return $key;
@@ -395,7 +395,7 @@ trait AuthKeyHandler
                     }
                 }
             } catch (SecurityException|Exception|RPCErrorException $e) {
-                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
+                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
                 $this->reconnect();
             } catch (Throwable $e) {
                 $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', Logger::WARNING);

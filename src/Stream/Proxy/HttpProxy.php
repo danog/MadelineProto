@@ -67,7 +67,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
-            if (\strlen(\inet_pton($address) ?: '') === 16) {
+            if (\strlen(inet_pton($address) ?: '') === 16) {
                 $address = '['.$address.']';
             }
         } catch (Exception) {
@@ -89,21 +89,21 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
             }
             $was_crlf = $piece === "\r\n";
         }
-        $headers = \explode("\r\n", $headers);
-        [$protocol, $code, $description] = \explode(' ', $headers[0], 3);
-        [$protocol, $protocol_version] = \explode('/', $protocol);
+        $headers = explode("\r\n", $headers);
+        [$protocol, $code, $description] = explode(' ', $headers[0], 3);
+        [$protocol, $protocol_version] = explode('/', $protocol);
         if ($protocol !== 'HTTP') {
             throw new Exception('Wrong protocol');
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (\array_pop($headers).\array_pop($headers) !== '') {
+        if (array_pop($headers).array_pop($headers) !== '') {
             throw new Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
             unset($headers[$key]);
-            $current_header = \explode(':', $current_header, 2);
-            $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
+            $current_header = explode(':', $current_header, 2);
+            $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
         if ($code !== 200) {
             $read = '';
@@ -115,7 +115,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
                     $read = $buffer->bufferRead($length);
                 }
             }
-            Logger::log(\trim($read));
+            Logger::log(trim($read));
             throw new Exception($description, $code);
         }
         if (isset($headers['content-length'])) {
@@ -168,7 +168,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
         if (!isset($this->extra['username']) || !isset($this->extra['password'])) {
             return '';
         }
-        return 'Proxy-Authorization: Basic '.\base64_encode($this->extra['username'].':'.$this->extra['password'])."\r\n";
+        return 'Proxy-Authorization: Basic '.base64_encode($this->extra['username'].':'.$this->extra['password'])."\r\n";
     }
     /**
      * Sets proxy data.

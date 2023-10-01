@@ -74,7 +74,7 @@ final class Shutdown
         API::finalize();
         MTProto::serializeAll();
         Logger::finalize();
-        if (\class_exists(Installer::class)) {
+        if (class_exists(Installer::class)) {
             Installer::unlock();
         }
     }
@@ -84,7 +84,7 @@ final class Shutdown
     public static function init(): void
     {
         if (!self::$registered) {
-            \register_shutdown_function(fn () => self::shutdown());
+            register_shutdown_function(fn () => self::shutdown());
             self::$registered = true;
         }
     }

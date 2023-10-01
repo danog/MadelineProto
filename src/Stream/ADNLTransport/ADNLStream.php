@@ -62,7 +62,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     {
         $length += 64;
         $buffer = $this->stream->getWriteBuffer($length + 4, $append);
-        $buffer->bufferWrite(\pack('V', $length));
+        $buffer->bufferWrite(pack('V', $length));
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length - 32);
         $buffer->bufferWrite(Tools::random(32));
@@ -76,7 +76,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
-        $length = \unpack('V', $buffer->bufferRead(4))[1] - 32;
+        $length = unpack('V', $buffer->bufferRead(4))[1] - 32;
         $this->stream->startReadHash();
         $this->stream->checkReadHash($length);
         $buffer->bufferRead(32);

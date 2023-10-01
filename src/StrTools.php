@@ -73,9 +73,9 @@ abstract class StrTools extends Extension
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
-        return \mb_convert_encoding(
-            \substr(
-                \mb_convert_encoding($text, 'UTF-16'),
+        return mb_convert_encoding(
+            substr(
+                mb_convert_encoding($text, 'UTF-16'),
                 $offset<<1,
                 $length === null ? null : ($length<<1),
             ),
@@ -93,8 +93,8 @@ abstract class StrTools extends Extension
     public static function mbStrSplit(string $text, int $length): array
     {
         $result = [];
-        foreach (\str_split(\mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
-            $chunk = \mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
+        foreach (str_split(mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
+            $chunk = mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
             Assert::string($chunk);
             $result []= $chunk;
         }
@@ -154,10 +154,10 @@ abstract class StrTools extends Extension
                 $entity instanceof Strike => '<s>',
                 $entity instanceof Underline => '<u>',
                 $entity instanceof Blockquote => '<blockquote>',
-                $entity instanceof Url => '<a href="'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Email => '<a href="mailto:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Phone => '<a href="phone:'.\htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Mention => '<a href="https://t.me/'.\htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
+                $entity instanceof Url => '<a href="'.htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Email => '<a href="mailto:'.htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Phone => '<a href="phone:'.htmlspecialchars(self::mbSubstr($message, $offset, $length)).'">',
+                $entity instanceof Mention => '<a href="https://t.me/'.htmlspecialchars(self::mbSubstr($message, $offset+1, $length-1)).'">',
                 $entity instanceof Spoiler => $allowTelegramTags ? '<tg-spoiler>' : '',
                 $entity instanceof CustomEmoji => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity->documentId.'">' : '',
                 $entity instanceof MentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
@@ -179,15 +179,15 @@ abstract class StrTools extends Extension
                 default => '',
             } . ($insertions[$offset] ?? '');
         }
-        \ksort($insertions);
+        ksort($insertions);
         $final = '';
         $pos = 0;
         foreach ($insertions as $offset => $insertion) {
-            $final .= \htmlspecialchars(StrTools::mbSubstr($message, $pos, $offset-$pos));
+            $final .= htmlspecialchars(StrTools::mbSubstr($message, $pos, $offset-$pos));
             $final .= $insertion;
             $pos = $offset;
         }
-        return \str_replace("\n", "<br>", $final.\htmlspecialchars(StrTools::mbSubstr($message, $pos)));
+        return str_replace("\n", "<br>", $final.htmlspecialchars(StrTools::mbSubstr($message, $pos)));
     }
     /**
      * Convert to camelCase.
@@ -196,7 +196,7 @@ abstract class StrTools extends Extension
      */
     public static function toCamelCase(string $input): string
     {
-        return \lcfirst(\str_replace('_', '', \ucwords($input, '_')));
+        return lcfirst(str_replace('_', '', ucwords($input, '_')));
     }
     /**
      * Convert to snake_case.
@@ -205,12 +205,12 @@ abstract class StrTools extends Extension
      */
     public static function toSnakeCase(string $input): string
     {
-        \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
         foreach ($ret as &$match) {
-            $match = $match == \strtoupper($match) ? \strtolower($match) : \lcfirst($match);
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
         }
-        return \implode('_', $ret);
+        return implode('_', $ret);
     }
     /**
      * Escape string for markdown.
@@ -219,7 +219,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownEscape(string $what): string
     {
-        return \str_replace(
+        return str_replace(
             [
                 '\\',
                 '_',
@@ -272,7 +272,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownCodeblockEscape(string $what): string
     {
-        return \str_replace('```', '\\```', $what);
+        return str_replace('```', '\\```', $what);
     }
     /**
      * Escape string for URL.
@@ -281,7 +281,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownUrlEscape(string $what): string
     {
-        return \str_replace(')', '\\)', $what);
+        return str_replace(')', '\\)', $what);
     }
     /**
      * Escape type name.
@@ -292,8 +292,8 @@ abstract class StrTools extends Extension
      */
     public static function typeEscape(string $type): string
     {
-        $type = \str_replace(['<', '>'], ['_of_', ''], $type);
-        return \preg_replace('/.*_of_/', '', $type);
+        $type = str_replace(['<', '>'], ['_of_', ''], $type);
+        return preg_replace('/.*_of_/', '', $type);
     }
     /**
      * Escape method name.
@@ -304,7 +304,7 @@ abstract class StrTools extends Extension
      */
     public static function methodEscape(string $method): string
     {
-        return \str_replace('.', '->', $method);
+        return str_replace('.', '->', $method);
     }
     /**
      * Strip markdown tags.
@@ -319,7 +319,7 @@ abstract class StrTools extends Extension
         try {
             return (new MarkdownEntities($markdown))->message;
         } catch (Throwable) {
-            return (new MarkdownEntities(\str_replace('_', '\\_', $markdown)))->message;
+            return (new MarkdownEntities(str_replace('_', '\\_', $markdown)))->message;
         }
     }
 }

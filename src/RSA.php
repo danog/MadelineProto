@@ -59,7 +59,7 @@ final class RSA
         $instance = new self;
         $instance->n = Tools::getVar($key, 'modulus');
         $instance->e = Tools::getVar($key, 'exponent');
-        $instance->fp = \substr(\sha1(($TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).($TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
+        $instance->fp = substr(sha1(($TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).($TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
         return $instance;
     }
     /**
@@ -82,6 +82,6 @@ final class RSA
      */
     public function encrypt(BigInteger $data): string
     {
-        return \str_pad($data->powMod($this->e, $this->n)->toBytes(), 256, "\0", STR_PAD_LEFT);
+        return str_pad($data->powMod($this->e, $this->n)->toBytes(), 256, "\0", STR_PAD_LEFT);
     }
 }

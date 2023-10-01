@@ -127,14 +127,14 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      */
     public function expired(): bool
     {
-        return \time() > $this->expires;
+        return time() > $this->expires;
     }
     /**
      * JSON serialization function.
      */
     public function jsonSerialize(): array
     {
-        return ['auth_key' => 'pony'.\base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'bound' => $this->isBound(), 'expires' => $this->expires, 'connection_inited' => $this->inited];
+        return ['auth_key' => 'pony'.base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'bound' => $this->isBound(), 'expires' => $this->expires, 'connection_inited' => $this->inited];
     }
     /**
      * Sleep function.

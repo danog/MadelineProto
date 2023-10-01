@@ -34,7 +34,7 @@ trait ClosableTrait
     public function close(): void
     {
         if ($this->closeCallbacks) {
-            \array_map(EventLoop::queue(...), $this->closeCallbacks);
+            array_map(EventLoop::queue(...), $this->closeCallbacks);
             $this->closeCallbacks = [];
         }
         $this->__call('close');

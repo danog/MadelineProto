@@ -148,7 +148,7 @@ final class ReferenceDatabase implements TLCallback
             }
             $locationValue['reference'] = $reference;
             $locationValue['origins'][$originType] = $origin;
-            \ksort($locationValue['origins']);
+            ksort($locationValue['origins']);
             $this->db[$location] = $locationValue;
         } finally {
             unset($this->pendingDb[$location]);
@@ -157,27 +157,27 @@ final class ReferenceDatabase implements TLCallback
     }
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
+        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
     }
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
+        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
     }
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(
-            \array_fill_keys(['document', 'photo', 'fileLocation'], [$this->addReference(...)]),
-            \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOrigin(...)]),
+        return array_merge(
+            array_fill_keys(['document', 'photo', 'fileLocation'], [$this->addReference(...)]),
+            array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOrigin(...)]),
             ['document' => [$this->addReference(...), $this->addOrigin(...)]]
         );
     }
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
+        return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
     }
     public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return \array_fill_keys(\array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
+        return array_fill_keys(array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
     }
     public function getTypeMismatchCallbacks(): array
     {
@@ -190,7 +190,7 @@ final class ReferenceDatabase implements TLCallback
             $this->API->logger('Trying to add reference out of context, report the following message to @danogentili!', Logger::ERROR);
             $frames = [];
             $previous = '';
-            foreach (\debug_backtrace(0) as $k => $frame) {
+            foreach (debug_backtrace(0) as $k => $frame) {
                 if (isset($frame['function']) && $frame['function'] === 'deserialize') {
                     if (isset($frame['args'][1]['subtype'])) {
                         if ($frame['args'][1]['subtype'] === $previous) {
@@ -210,8 +210,8 @@ final class ReferenceDatabase implements TLCallback
                     }
                 }
             }
-            $frames = \array_reverse($frames);
-            $tlTrace = \array_shift($frames);
+            $frames = array_reverse($frames);
+            $tlTrace = array_shift($frames);
             foreach ($frames as $frame) {
                 $tlTrace .= "['".$frame."']";
             }
@@ -258,7 +258,7 @@ final class ReferenceDatabase implements TLCallback
         if ($key === -1) {
             throw new Exception("Trying to add origin to constructor {$data['_']} with no origin context set");
         }
-        $originType = \array_pop($this->cacheContexts);
+        $originType = array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             //$this->API->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return;
@@ -359,7 +359,7 @@ final class ReferenceDatabase implements TLCallback
         if ($key === -1) {
             throw new Exception("Trying to add origin to method $constructor with no origin context set");
         }
-        $originType = \array_pop($this->cacheContexts);
+        $originType = array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             //$this->API->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
             return;
@@ -479,7 +479,7 @@ final class ReferenceDatabase implements TLCallback
                 $this->API->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
                 if (\is_array($location['file_reference'])) {
                     Assert::eq($location['file_reference']['_'], 'bytes');
-                    return \base64_decode($location['file_reference']['bytes'], true);
+                    return base64_decode($location['file_reference']['bytes'], true);
                 }
                 return (string) $location['file_reference'];
             }
@@ -554,17 +554,17 @@ final class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.\bin2hex(Tools::packSignedLong($location['id']));
+                return $locationType.bin2hex(Tools::packSignedLong($location['id']));
             case self::PHOTO_LOCATION_LOCATION:
                 $dc_id = Tools::packSignedInt($location['dc_id']);
                 $volume_id = Tools::packSignedLong($location['volume_id']);
                 $local_id = Tools::packSignedInt($location['local_id']);
-                return $locationType.\bin2hex($dc_id.$volume_id.$local_id);
+                return $locationType.bin2hex($dc_id.$volume_id.$local_id);
         }
         throw new Exception('Invalid location type specified!');
     }
     public function __debugInfo()
     {
-        return ['ReferenceDatabase instance '.\spl_object_hash($this)];
+        return ['ReferenceDatabase instance '.spl_object_hash($this)];
     }
 }

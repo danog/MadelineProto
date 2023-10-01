@@ -92,9 +92,9 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              */
             public function __construct(string $buf)
             {
-                $this->buffer = \fopen('php://memory', 'r+');
-                \fwrite($this->buffer, $buf);
-                \fseek($this->buffer, 0);
+                $this->buffer = fopen('php://memory', 'r+');
+                fwrite($this->buffer, $buf);
+                fseek($this->buffer, 0);
             }
             /**
              * Read data from buffer.
@@ -103,14 +103,14 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              */
             public function bufferRead(int $length): string
             {
-                return \fread($this->buffer, $length);
+                return fread($this->buffer, $length);
             }
             /**
              * Destructor function.
              */
             public function __destruct()
             {
-                \fclose($this->buffer);
+                fclose($this->buffer);
             }
         };
     }

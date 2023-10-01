@@ -152,7 +152,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
      */
     public function downloadToDir(?string $dir = null, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
-        $dir ??= \getcwd();
+        $dir ??= getcwd();
         return $this->getClient()->downloadToDir($this, $dir, $cb, $cancellation);
     }
     /**
@@ -181,7 +181,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public function getDownloadInfo(): array
     {
         $result = [
-            'name' => \basename($this->fileName, $this->fileExt),
+            'name' => basename($this->fileName, $this->fileExt),
             'ext' => $this->fileExt,
             'mime' => $this->mimeType,
             'size' => $this->size,
@@ -197,7 +197,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** @internal */
     public function jsonSerialize(): mixed
     {
-        $v = \get_object_vars($this);
+        $v = get_object_vars($this);
         unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv'], $v['keyFingerprint']);
         return $v;
     }

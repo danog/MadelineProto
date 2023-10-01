@@ -71,8 +71,8 @@ final class SeqLoop extends Loop
             $updates = null;
         }
         while ($this->pendingWakeups) {
-            \reset($this->pendingWakeups);
-            $channelId = \key($this->pendingWakeups);
+            reset($this->pendingWakeups);
+            $channelId = key($this->pendingWakeups);
             unset($this->pendingWakeups[$channelId]);
             if (isset($this->API->feeders[$channelId])) {
                 $this->API->feeders[$channelId]->resume();
@@ -82,10 +82,10 @@ final class SeqLoop extends Loop
     }
     public function parse(array $updates): void
     {
-        \reset($updates);
+        reset($updates);
         while ($updates) {
             $options = [];
-            $key = \key($updates);
+            $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
             $options = $update['options'];
@@ -98,7 +98,7 @@ final class SeqLoop extends Loop
                 if (!$this->incomingUpdates) {
                     $this->API->updaters[UpdateLoop::GENERIC]->resume();
                 }
-                $this->incomingUpdates = \array_merge($this->incomingUpdates, [$update], $updates);
+                $this->incomingUpdates = array_merge($this->incomingUpdates, [$update], $updates);
                 continue;
             }
             if ($result < 0) {

@@ -36,6 +36,6 @@ final class Privacy extends Update
     {
         parent::__construct($API);
         $this->rule = Rule::from($rawPrivacy['key']['_']);
-        $this->appliesTo = \array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules']);
+        $this->appliesTo = array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules']);
     }
 }

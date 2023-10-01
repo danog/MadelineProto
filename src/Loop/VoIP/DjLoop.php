@@ -88,11 +88,11 @@ final class DjLoop extends VoIPLoop
         return [
             'pause' => $this->pause,
             'instance' => $this->instance,
-            'holdFiles' => \array_filter(
+            'holdFiles' => array_filter(
                 $this->holdFiles,
                 fn ($v) => !$v instanceof ReadableStream
             ),
-            'inputFiles' => \array_filter(
+            'inputFiles' => array_filter(
                 $this->inputFiles,
                 fn ($v) => !$v instanceof ReadableStream
             ),
@@ -146,19 +146,19 @@ final class DjLoop extends VoIPLoop
             return self::PAUSE;
         }
         $this->instance->log("Resuming DJ loop in $this!");
-        $file = \array_shift($this->inputFiles);
+        $file = array_shift($this->inputFiles);
         try {
             $fileStr = match (true) {
                 $file instanceof LocalFile => $file->file,
                 $file instanceof RemoteUrl => $file->url,
-                $file instanceof ReadableStream => 'stream '.\spl_object_id($file)
+                $file instanceof ReadableStream => 'stream '.spl_object_id($file)
             };
             $p = $this->readingPrimary ? 'primary queue' : 'secondary queue';
             $this->instance->log("DJ loop: playing $fileStr to $p in $this!");
             $desc = match (true) {
                 $file instanceof LocalFile => $file,
                 $file instanceof RemoteUrl => $file,
-                $file instanceof ReadableStream => 'stream '.\spl_object_id($file)
+                $file instanceof ReadableStream => 'stream '.spl_object_id($file)
             };
             if ($this->readingPrimary) {
                 $this->descriptionPrimary = $desc;

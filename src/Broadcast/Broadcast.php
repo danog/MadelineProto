@@ -96,7 +96,7 @@ trait Broadcast
     public function broadcastCustom(Action $action, ?Filter $filter = null): int
     {
         // Ensure it can be serialized
-        Assert::eq(\unserialize(\serialize($action))::class, $action::class);
+        Assert::eq(unserialize(serialize($action))::class, $action::class);
 
         $id = $this->broadcastId--;
         $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default());

@@ -55,7 +55,7 @@ final class RedisArray extends DriverArray
 
         $lenK = \strlen($from);
         foreach ($request as $oldKey) {
-            $newKey = $to.\substr($oldKey, $lenK);
+            $newKey = $to.substr($oldKey, $lenK);
             $value = $this->db->get($oldKey);
             $this->db->set($newKey, $value);
             $this->db->delete($oldKey);
@@ -119,7 +119,7 @@ final class RedisArray extends DriverArray
 
         $len = \strlen($this->rKey(''));
         foreach ($request as $key) {
-            yield \substr($key, $len) => ($this->deserializer)($this->db->get($key));
+            yield substr($key, $len) => ($this->deserializer)($this->db->get($key));
         }
     }
 
@@ -132,7 +132,7 @@ final class RedisArray extends DriverArray
      */
     public function count(): int
     {
-        return \iterator_count($this->db->scan($this->itKey()));
+        return iterator_count($this->db->scan($this->itKey()));
     }
 
     /**

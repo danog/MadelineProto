@@ -35,7 +35,7 @@ final class EventHandlerIssue
 
     public function __toString(): string
     {
-        return \sprintf(
+        return sprintf(
             Lang::$current_lang[$this->severe ? 'static_analysis_severe' : 'static_analysis_minor'],
             "{$this->file}:{$this->line}",
             $this->message
@@ -49,7 +49,7 @@ final class EventHandlerIssue
 
     public function getHTML(): string
     {
-        $issueStr = \htmlentities((string) $this);
+        $issueStr = htmlentities((string) $this);
         $color = $this->severe ? 'red' : 'orange';
         $warning = "<h2 style='color:$color;'>{$issueStr}</h2>";
         return $warning;

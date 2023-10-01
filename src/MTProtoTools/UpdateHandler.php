@@ -151,7 +151,7 @@ trait UpdateHandler
     {
         $this->webhookUrl = $webhookUrl;
         $this->updateHandlerType = UpdateHandlerType::WEBHOOK;
-        \array_map($this->handleUpdate(...), $this->updates);
+        array_map($this->handleUpdate(...), $this->updates);
         $this->updates = [];
         $this->updates_key = 0;
         $this->event_handler = null;
@@ -174,7 +174,7 @@ trait UpdateHandler
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
             $this->updates[$this->updates_key++] = $update;
             $f->map(function (): void {
-                \array_map($this->handleUpdate(...), $this->updates);
+                array_map($this->handleUpdate(...), $this->updates);
                 $this->updates = [];
                 $this->updates_key = 0;
             });
@@ -205,7 +205,7 @@ trait UpdateHandler
      */
     private function pwrWebhook(array $update): void
     {
-        $payload = \json_encode($update);
+        $payload = json_encode($update);
         Assert::notEmpty($payload);
         Assert::notNull($this->webhookUrl);
         $request = new Request($this->webhookUrl, 'POST');
@@ -222,7 +222,7 @@ trait UpdateHandler
             $this->logger->logger("Got {$e->getMessage()} while sending webhook", Logger::FATAL_ERROR);
             $this->updates[$this->updates_key++] = $update;
             delay(1.0);
-            \array_map($this->handleUpdate(...), $this->updates);
+            array_map($this->handleUpdate(...), $this->updates);
             $this->updates = [];
             $this->updates_key = 0;
         }
@@ -267,7 +267,7 @@ trait UpdateHandler
             'offset' => $offset,
             'limit' => $limit,
             'timeout' => $timeout
-        ] = \array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
+        ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
 
         if (!$this->updates) {
             try {
@@ -407,7 +407,7 @@ trait UpdateHandler
                 default => null
             };
         } catch (\Throwable $e) {
-            $update = \json_encode($update);
+            $update = json_encode($update);
             $this->logger->logger("An error occured while wrapping $update: $e", Logger::FATAL_ERROR);
             $this->report("An error occured while wrapping $update: $e");
             return null;
@@ -794,7 +794,7 @@ trait UpdateHandler
             }
         }
         if ($result === null) {
-            $updates = \json_encode($updates);
+            $updates = json_encode($updates);
             throw new Exception("Could not find any message in $updates!");
         }
         return $result;
@@ -817,7 +817,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = \array_merge($updates['request']['body'] ?? [], $updates);
+                $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
@@ -895,7 +895,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = \array_merge($updates['request']['body'] ?? [], $updates);
+                $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
@@ -923,7 +923,7 @@ trait UpdateHandler
                 $this->updaters[UpdateLoop::GENERIC]->resume();
                 break;
             default:
-                throw new ResponseException('Unrecognized update received: '.\var_export($updates, true));
+                throw new ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
         }
     }
@@ -1105,7 +1105,7 @@ trait UpdateHandler
             }
             EventLoop::queue(function () use ($update): void {
                 if (!isset($this->secretChats[$update['message']['chat_id']])) {
-                    $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
+                    $this->logger->logger(sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
                     return;
                 }
                 $this->secretChats[$update['message']['chat_id']]->feed($update);

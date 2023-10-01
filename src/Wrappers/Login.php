@@ -265,7 +265,7 @@ trait Login
         $this->logger->logger("Setting auth key in DC $mainDcID", Logger::NOTICE);
         $auth_key = new PermAuthKey($auth_key);
         $auth_key->authorized(true);
-        $auth_key->setServerSalt(\random_bytes(8));
+        $auth_key->setServerSalt(random_bytes(8));
         $dataCenterConnection->setPermAuthKey($auth_key);
         $dataCenterConnection->setTempAuthKey(new TempAuthKey());
         $dataCenterConnection->bind($this->settings->getAuth()->getPfs());

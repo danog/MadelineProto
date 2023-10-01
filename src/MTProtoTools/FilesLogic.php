@@ -103,7 +103,7 @@ trait FilesLogic
             $messageMedia['size'] = $size ?? $messageMedia['size'];
             $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
             if ($name) {
-                $name = \explode('.', $name, 2);
+                $name = explode('.', $name, 2);
                 $messageMedia['name'] = $name[0];
                 $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
             }
@@ -125,12 +125,12 @@ trait FilesLogic
         if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
-            if (\ob_get_level()) {
-                \ob_end_flush();
-                \ob_implicit_flush();
+            if (ob_get_level()) {
+                ob_end_flush();
+                ob_implicit_flush();
             }
             [$start, $end] = $result->getServeRange();
-            $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, $start, $end, $cancellation);
+            $this->downloadToStream($messageMedia, fopen('php://output', 'w'), $cb, $start, $end, $cancellation);
         }
     }
     /**
@@ -171,7 +171,7 @@ trait FilesLogic
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;
-        if (\method_exists($stream, 'seek')) {
+        if (method_exists($stream, 'seek')) {
             try {
                 $stream->seek($offset);
                 $seekable = true;
@@ -230,7 +230,7 @@ trait FilesLogic
 
         $result = ResponseInfo::parseHeaders(
             $request->getMethod(),
-            \array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
+            array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
         );
 
@@ -289,7 +289,7 @@ trait FilesLogic
             }
             unset($media['url']);
             $media['mime_type'] = Extension::getMimeFromExtension(
-                \pathinfo($url, PATHINFO_EXTENSION),
+                pathinfo($url, PATHINFO_EXTENSION),
                 'application/octet-stream'
             );
         }
@@ -321,8 +321,8 @@ trait FilesLogic
             $info['size'] = $file->size;
             return $this->uploadFromTgfile($info, $cb, $encrypted);
         }
-        if (\is_string($file) || (\is_object($file) && \method_exists($file, '__toString'))) {
-            if (\filter_var($file, FILTER_VALIDATE_URL)) {
+        if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
+            if (filter_var($file, FILTER_VALIDATE_URL)) {
                 return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
             }
         } elseif (\is_array($file) || $file instanceof Media) {
@@ -345,7 +345,7 @@ trait FilesLogic
             throw new Exception(Lang::$current_lang['file_not_exist']);
         }
         if (empty($fileName)) {
-            $fileName = \basename($file);
+            $fileName = basename($file);
         }
         $size = getSize($file);
         if ($size > 512 * 1024 * 8000) {
@@ -381,7 +381,7 @@ trait FilesLogic
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;
-        if (\method_exists($stream, 'seek')) {
+        if (method_exists($stream, 'seek')) {
             try {
                 $stream->seek(0);
                 $seekable = true;
@@ -390,7 +390,7 @@ trait FilesLogic
         }
         $created = false;
         if (!$size) {
-            if ($seekable && \method_exists($stream, 'tell')) {
+            if ($seekable && method_exists($stream, 'tell')) {
                 $stream->seek(0, Whence::End);
                 $size = $stream->tell();
                 $stream->seek(0);

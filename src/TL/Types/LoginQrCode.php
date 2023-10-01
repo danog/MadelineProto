@@ -65,7 +65,7 @@ final class LoginQrCode extends IpcCapable implements JsonSerializable
      */
     public function isExpired(): bool
     {
-        return $this->expiry <= \time();
+        return $this->expiry <= time();
     }
 
     /**
@@ -75,7 +75,7 @@ final class LoginQrCode extends IpcCapable implements JsonSerializable
      */
     public function expiresIn(): int
     {
-        return \max(0, $this->expiry - \time());
+        return max(0, $this->expiry - time());
     }
 
     public function getExpirationCancellation(): Cancellation

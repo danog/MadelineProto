@@ -46,10 +46,10 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-        if (\strpos($message, 'socket_accept') === false
-            && !\in_array(\basename($this->file), ['PKCS8.php', 'PSS.php'], true)
+        if (strpos($message, 'socket_accept') === false
+            && !\in_array(basename($this->file), ['PKCS8.php', 'PSS.php'], true)
         ) {
-            Logger::log($message.' in '.\basename($this->file).':'.$this->line, Logger::FATAL_ERROR);
+            Logger::log($message.' in '.basename($this->file).':'.$this->line, Logger::FATAL_ERROR);
         }
     }
     /**
@@ -60,15 +60,15 @@ class Exception extends \Exception
     public static function extension(string $extensionName): self
     {
         if ($extensionName === 'libtgvoip') {
-            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
+            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
         } elseif ($extensionName === 'prime') {
-            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
+            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
         } else {
-            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
+            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
         }
-        $message = \sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
+        $message = sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            echo \htmlentities($message).'<br>';
+            echo htmlentities($message).'<br>';
         }
         $file = 'MadelineProto';
         $line = 1;
@@ -81,17 +81,17 @@ class Exception extends \Exception
      */
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
-        $errfileReplaced = \preg_replace('/phabel-transpiler\d+\./', '', $errfile ?? '');
+        $errfileReplaced = preg_replace('/phabel-transpiler\d+\./', '', $errfile ?? '');
         // If error is suppressed with @, don't throw an exception
-        if (\error_reporting() === 0
-            || \strpos($errstr, 'headers already sent')
-            || \strpos($errstr, 'Creation of dynamic property') !== false
-            || \strpos($errstr, 'Legacy nullable type detected') !== false
-            || \str_contains($errstr, '$tdMethods is deprecated')
+        if (error_reporting() === 0
+            || strpos($errstr, 'headers already sent')
+            || strpos($errstr, 'Creation of dynamic property') !== false
+            || strpos($errstr, 'Legacy nullable type detected') !== false
+            || str_contains($errstr, '$tdMethods is deprecated')
             || $errfileReplaced && (
-                \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
-                || \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
-                || \strpos($errfileReplaced, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR) !== false
+                strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
+                || strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
+                || strpos($errfileReplaced, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR) !== false
             )
         ) {
             return false;
@@ -107,32 +107,32 @@ class Exception extends \Exception
     {
         $print = function (string $s): void {
             Logger::log($s, Logger::FATAL_ERROR);
-            if (\headers_sent()) {
+            if (headers_sent()) {
                 return;
             }
-            \http_response_code(500);
+            http_response_code(500);
             if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
                 echo($s.PHP_EOL);
             } else {
-                echo(\str_replace("\n", "<br>", \htmlentities($s)).PHP_EOL);
+                echo(str_replace("\n", "<br>", htmlentities($s)).PHP_EOL);
             }
         };
-        if (\str_contains($exception->getMessage(), 'Fiber stack protect failed')
-            || \str_contains($exception->getMessage(), 'Fiber stack allocate failed')
+        if (str_contains($exception->getMessage(), 'Fiber stack protect failed')
+            || str_contains($exception->getMessage(), 'Fiber stack allocate failed')
         ) {
             $maps = "?";
             try {
-                $maps = '~'.\substr_count(\file_get_contents('/proc/self/maps'), "\n");
-                $pid = \getmypid();
-                $maps = '~'.\substr_count(\file_get_contents("/proc/$pid/maps"), "\n");
+                $maps = '~'.substr_count(file_get_contents('/proc/self/maps'), "\n");
+                $pid = getmypid();
+                $maps = '~'.substr_count(file_get_contents("/proc/$pid/maps"), "\n");
             } catch (\Throwable) {
             }
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
-            $print(\sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
-            $print(\sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
-            $print(\sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
+            $print(sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
+            $print(sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
+            $print(sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
             $print(Lang::$current_lang['mmapErrorPart4']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);

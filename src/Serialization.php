@@ -189,14 +189,14 @@ abstract class Serialization
                     }
                 });
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture());
-            } elseif (!\class_exists($class)) {
+            } elseif (!class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
                 Logger::log("Session has event handler (class $class), but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
                 return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), customE: new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process)."));
-            } elseif (\is_subclass_of($class, EventHandler::class)) {
+            } elseif (is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
         } else {
@@ -204,14 +204,14 @@ abstract class Serialization
                 throw new AssertionError("Could not read the lightstate file, check logs!");
             }
             $class = $lightState->getEventHandler();
-            if ($class && !\class_exists($class)) {
+            if ($class && !class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
                 Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
                 Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
                 Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
                 throw new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process).");
-            } elseif ($class && \is_subclass_of($class, EventHandler::class)) {
+            } elseif ($class && is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
         }
@@ -270,7 +270,7 @@ abstract class Serialization
                 Logger::log(Lang::$current_lang['windows_warning']);
             }
             try {
-                \clearstatcache(true, $ipcPath);
+                clearstatcache(true, $ipcPath);
                 $socket = connect($ipcPath);
                 Logger::log('Connected to IPC socket!');
                 if ($cancelFull) {

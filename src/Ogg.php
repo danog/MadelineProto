@@ -240,12 +240,12 @@ final class Ogg
             'number_page_segments'     => 'C',
         ];
 
-        $this->packFormat = \implode(
+        $this->packFormat = implode(
             '/',
-            \array_map(
+            array_map(
                 fn (string $v, string $k): string => $v.$k,
                 $pack_format,
-                \array_keys($pack_format),
+                array_keys($pack_format),
             ),
         );
         $it = $this->read();
@@ -345,16 +345,16 @@ final class Ogg
                     $size = $selfDelimited
                         ? $this->readLen($content, $offset)
                         : ($len - ($offset + $padding)) / $count;
-                    \array_push($sizes, ...\array_fill(0, $count, $size));
+                    array_push($sizes, ...array_fill(0, $count, $size));
                 }
             }
 
             $totalDuration = \count($sizes) * $frameDuration;
             if (!$selfDelimited && $totalDuration + $this->currentDuration <= 60_000) {
                 $this->currentDuration += $totalDuration;
-                $sum = \array_sum($sizes);
+                $sum = array_sum($sizes);
                 /** @psalm-suppress InvalidArgument */
-                $this->opusPayload .= \substr($content, $preOffset, (int) (($offset - $preOffset) + $sum + $paddingLen));
+                $this->opusPayload .= substr($content, $preOffset, (int) (($offset - $preOffset) + $sum + $paddingLen));
                 if ($this->currentDuration === 60_000) {
                     if (($s = \strlen($this->opusPayload)) > 1024) {
                         throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
@@ -370,7 +370,7 @@ final class Ogg
 
             foreach ($sizes as $size) {
                 $this->opusPayload .= \chr($toc & ~3);
-                $this->opusPayload .= \substr($content, $offset, $size);
+                $this->opusPayload .= substr($content, $offset, $size);
                 $offset += $size;
                 $this->currentDuration += $frameDuration;
                 if ($this->currentDuration >= 60_000) {
@@ -418,10 +418,10 @@ final class Ogg
                 if ($capture === null) {
                     return;
                 }
-                throw new Exception('Bad capture pattern: '.\bin2hex($capture));
+                throw new Exception('Bad capture pattern: '.bin2hex($capture));
             }
 
-            $headers = \unpack(
+            $headers = unpack(
                 $this->packFormat,
                 ($this->stream)(23)
             );
@@ -437,7 +437,7 @@ final class Ogg
             $firstPage = (bool) ($headers['header_type_flag'] & self::BOS);
             $lastPage = (bool) ($headers['header_type_flag'] & self::EOS);
 
-            $segments = \unpack(
+            $segments = unpack(
                 'C*',
                 ($this->stream)($headers['number_page_segments']),
             );
@@ -464,16 +464,16 @@ final class Ogg
                         yield from $this->opusStateMachine($content);
                     } elseif ($state === self::STATE_READ_HEADER) {
                         Assert::true($firstPage);
-                        $head = \substr($content, 0, 8);
+                        $head = substr($content, 0, 8);
                         if ($head !== 'OpusHead') {
                             $ignoredStreams[]= $headers['bitstream_serial_number'];
                             $content = '';
                             $ignore = true;
                             continue;
                         }
-                        $opus_head = \unpack('Cversion/Cchannel_count/vpre_skip/Vsample_rate/voutput_gain/Cchannel_mapping_family/', \substr($content, 8));
+                        $opus_head = unpack('Cversion/Cchannel_count/vpre_skip/Vsample_rate/voutput_gain/Cchannel_mapping_family/', substr($content, 8));
                         if ($opus_head['channel_mapping_family']) {
-                            $opus_head['channel_mapping'] = \unpack('Cstream_count/Ccoupled_count/C*channel_mapping', \substr($content, 19));
+                            $opus_head['channel_mapping'] = unpack('Cstream_count/Ccoupled_count/C*channel_mapping', substr($content, 19));
                         } else {
                             $opus_head['channel_mapping'] = [
                                 'stream_count' => 1,
@@ -490,14 +490,14 @@ final class Ogg
                         }
                         $state = self::STATE_READ_COMMENT;
                     } elseif ($state === self::STATE_READ_COMMENT) {
-                        $vendor_string_length = \unpack('V', \substr($content, 8, 4))[1];
-                        $this->vendorString = \substr($content, 12, $vendor_string_length);
-                        $comment_count = \unpack('V', \substr($content, 12+$vendor_string_length, 4))[1];
+                        $vendor_string_length = unpack('V', substr($content, 8, 4))[1];
+                        $this->vendorString = substr($content, 12, $vendor_string_length);
+                        $comment_count = unpack('V', substr($content, 12+$vendor_string_length, 4))[1];
                         $offset = 16+$vendor_string_length;
                         $comments = [];
                         for ($x = 0; $x < $comment_count; $x++) {
-                            $length = \unpack('V', \substr($content, $offset, 4))[1];
-                            $comments []= \substr($content, $offset += 4, $length);
+                            $length = unpack('V', substr($content, $offset, 4))[1];
+                            $comments []= substr($content, $offset += 4, $length);
                             $offset += $length;
                         }
                         $this->comments = $comments;
@@ -625,15 +625,15 @@ final class Ogg
             throw new AssertionError("Could not convert the file, make sure ffmpeg and libopus are installed!");
         }
         Assert::eq($header, 'RIFF', "A .wav file must be provided!");
-        $totalLength = \unpack('V', $read(4))[1];
+        $totalLength = unpack('V', $read(4))[1];
         Assert::eq($read(4), 'WAVE', "A .wav file must be provided!");
         do {
             $type = $read(4);
-            $length = \unpack('V', $read(4))[1];
+            $length = unpack('V', $read(4))[1];
             if ($type === 'fmt ') {
                 Assert::eq($length, 16);
                 $contents = $read($length + ($length % 2));
-                $header = \unpack('vaudioFormat/vchannels/VsampleRate/VbyteRate/vblockAlign/vbitsPerSample', $contents);
+                $header = unpack('vaudioFormat/vchannels/VsampleRate/VbyteRate/vblockAlign/vbitsPerSample', $contents);
                 Assert::eq($header['audioFormat'], 1, "The wav file must contain PCM audio");
                 Assert::eq($header['sampleRate'], 48000, "The sample rate of the wav file must be 48khz!");
             } elseif ($type === 'data') {
@@ -645,7 +645,7 @@ final class Ogg
 
         $sampleCount = 0.06 * $header['sampleRate'];
         $chunkSize = (int) ($sampleCount * $header['channels'] * ($header['bitsPerSample'] >> 3));
-        $shift = (int) \log($header['channels'] * ($header['bitsPerSample'] >> 3), 2);
+        $shift = (int) log($header['channels'] * ($header['bitsPerSample'] >> 3), 2);
 
         $encoder = $opus->opus_encoder_create(48000, $header['channels'], self::OPUS_APPLICATION_AUDIO, FFI::addr($err));
         $checkErr($err);
@@ -663,10 +663,10 @@ final class Ogg
         $writePage = function (int $header_type_flag, int $granule, int $streamId, int &$streamSeqno, string $packet) use ($out): void {
             Assert::true(\strlen($packet) < 65025);
             $segments = [
-                ...\array_fill(0, (int) (\strlen($packet) / 255), 255),
+                ...array_fill(0, (int) (\strlen($packet) / 255), 255),
                 \strlen($packet) % 255
             ];
-            $data = 'OggS'.\pack(
+            $data = 'OggS'.pack(
                 'CCPVVVCC*',
                 0, // stream_structure_version
                 $header_type_flag,
@@ -682,9 +682,9 @@ final class Ogg
             for ($i = 0; $i < \strlen($data); $i++) {
                 $c = ($c<<8)^self::CRC[(($c >> 24)&0xFF)^(\ord($data[$i]))];
             }
-            $crc = \pack('V', $c);
+            $crc = pack('V', $c);
 
-            $data = \substr_replace(
+            $data = substr_replace(
                 $data,
                 $crc,
                 22,
@@ -693,7 +693,7 @@ final class Ogg
             $out->write($data);
         };
 
-        $streamId = \unpack('V', Tools::random(4))[1];
+        $streamId = unpack('V', Tools::random(4))[1];
         $seqno = 0;
 
         $writePage(
@@ -701,7 +701,7 @@ final class Ogg
             0,
             $streamId,
             $seqno,
-            'OpusHead'.\pack(
+            'OpusHead'.pack(
                 'CCvVvC',
                 1,
                 $header['channels'],
@@ -714,10 +714,10 @@ final class Ogg
 
         $tags = 'OpusTags';
         $writeTag = function (string $tag) use (&$tags): void {
-            $tags .= \pack('V', \strlen($tag)).$tag;
+            $tags .= pack('V', \strlen($tag)).$tag;
         };
         $writeTag("MadelineProto ".API::RELEASE.", ".$opus->opus_get_version_string());
-        $tags .= \pack('V', 2);
+        $tags .= pack('V', 2);
         $writeTag("ENCODER=MadelineProto ".API::RELEASE." with ".$opus->opus_get_version_string());
         $writeTag("MADELINE_ENCODER_V=1");
         $writeTag('See https://docs.madelineproto.xyz/docs/CALLS.html for more info');
@@ -733,7 +733,7 @@ final class Ogg
         $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
         do {
             $chunkOrig = $read($chunkSize) ?? '';
-            $chunk = \str_pad($chunkOrig, $chunkSize, "\0");
+            $chunk = str_pad($chunkOrig, $chunkSize, "\0");
             $granuleDiff = \strlen($chunk) >> $shift;
             $len = $opus->opus_encode($encoder, $chunk, $granuleDiff, $buf, 1024);
             $checkErr($len);

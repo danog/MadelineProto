@@ -65,6 +65,6 @@ trait DbArrayTrait
      */
     final public function getArrayCopy(): array
     {
-        return \iterator_to_array($this->getIterator());
+        return iterator_to_array($this->getIterator());
     }
 }

@@ -36,7 +36,7 @@ final class FilterTextCaseInsensitive extends Filter
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof Message && \strtolower($update->message) === $this->content) ||
-            ($update instanceof Story && \strtolower($update->caption) === $this->content);
+        return ($update instanceof Message && strtolower($update->message) === $this->content) ||
+            ($update instanceof Story && strtolower($update->caption) === $this->content);
     }
 }

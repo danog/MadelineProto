@@ -94,7 +94,7 @@ final class Auth extends SettingsAbstract
      */
     public function setMaxAuthTries(int $maxAuthTries): self
     {
-        $this->maxAuthTries = \max(1, $maxAuthTries);
+        $this->maxAuthTries = max(1, $maxAuthTries);
 
         return $this;
     }

@@ -92,14 +92,14 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
         } elseif ($method !== 0) {
             throw new Exception("Wrong method: {$method}");
         }
-        $payload = \pack('C3', 0x5, 0x1, 0x0);
+        $payload = pack('C3', 0x5, 0x1, 0x0);
         try {
-            $ip = \inet_pton($uri->getHost());
-            $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4).$ip : \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
+            $ip = inet_pton($uri->getHost());
+            $payload .= $ip ? pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4).$ip : pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         } catch (Exception $e) {
-            $payload .= \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
+            $payload .= pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         }
-        $payload .= \pack('n', $uri->getPort());
+        $payload .= pack('n', $uri->getPort());
         $this->stream->write($payload);
         $l = 4;
         $buffer = $this->stream->getReadBuffer($l);
@@ -119,12 +119,12 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
         switch (\ord($buffer->bufferRead(1))) {
             case 1:
                 $buffer = $this->stream->getReadBuffer($l);
-                $ip = \inet_ntop($buffer->bufferRead(4));
+                $ip = inet_ntop($buffer->bufferRead(4));
                 break;
             case 4:
                 $l = 16;
                 $buffer = $this->stream->getReadBuffer($l);
-                $ip = \inet_ntop($buffer->bufferRead(16));
+                $ip = inet_ntop($buffer->bufferRead(16));
                 break;
             case 3:
                 $l = 1;
@@ -136,7 +136,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
         }
         $l = 2;
         $buffer = $this->stream->getReadBuffer($l);
-        $port = \unpack('n', $buffer->bufferRead(2))[1];
+        $port = unpack('n', $buffer->bufferRead(2))[1];
         Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
         if ($secure) {
             $this->getSocket()->setupTls();

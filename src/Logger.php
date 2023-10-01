@@ -259,23 +259,23 @@ final class Logger
         $maxSize = $settings->getMaxSize();
 
         if ($this->mode === self::FILE_LOGGER) {
-            if (!$optional || !\file_exists(\pathinfo($optional, PATHINFO_DIRNAME))) {
+            if (!$optional || !file_exists(pathinfo($optional, PATHINFO_DIRNAME))) {
                 $optional = Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log';
             }
-            if (!\str_ends_with($optional, '.log')) {
+            if (!str_ends_with($optional, '.log')) {
                 $optional .= '.log';
             }
-            if ($maxSize !== -1 && \file_exists($optional) && \filesize($optional) > $maxSize) {
-                \file_put_contents($optional, '');
+            if ($maxSize !== -1 && file_exists($optional) && filesize($optional) > $maxSize) {
+                file_put_contents($optional, '');
             }
         }
         $this->optional = $optional;
-        $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
-        $this->colors[self::VERBOSE] = \implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
-        $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
-        $this->colors[self::WARNING] = \implode(';', [self::FOREGROUND['white'], self::SET['dim'], self::BACKGROUND['red']]);
-        $this->colors[self::ERROR] = \implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
-        $this->colors[self::FATAL_ERROR] = \implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
+        $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
+        $this->colors[self::VERBOSE] = implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
+        $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        $this->colors[self::WARNING] = implode(';', [self::FOREGROUND['white'], self::SET['dim'], self::BACKGROUND['red']]);
+        $this->colors[self::ERROR] = implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
+        $this->colors[self::FATAL_ERROR] = implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $this->newline = PHP_EOL;
         if ($this->mode === self::ECHO_LOGGER) {
             $stdout = getStdout();
@@ -283,16 +283,16 @@ final class Logger
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            $stdout = new WritableResourceStream(\fopen($this->optional, 'a'));
+            $stdout = new WritableResourceStream(fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
                 $optional = $this->optional;
                 $stdout = $stdout;
                 $this->rotateId = EventLoop::repeat(
                     10,
                     static function () use ($maxSize, $optional, $stdout): void {
-                        \clearstatcache(true, $optional);
-                        if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
-                            \ftruncate($stdout->getResource(), 0);
+                        clearstatcache(true, $optional);
+                        if (file_exists($optional) && filesize($optional) >= $maxSize) {
+                            ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize, MadelineProto ".\danog\MadelineProto\API::RELEASE);
                         }
                     },
@@ -304,7 +304,7 @@ final class Logger
             if ($result === 'syslog') {
                 $stdout = getStderr();
             } elseif ($result) {
-                $stdout = new WritableResourceStream(\fopen($result, 'a+'));
+                $stdout = new WritableResourceStream(fopen($result, 'a+'));
             } else {
                 $stdout = getStderr();
             }
@@ -319,18 +319,18 @@ final class Logger
                 try {
                     pipe($source, $stdout);
                 } finally {
-                    unset(self::$closePromises[\spl_object_id($promise)]);
+                    unset(self::$closePromises[spl_object_id($promise)]);
                 }
             });
-            self::$closePromises[\spl_object_id($promise)] = [$this->stdout, $promise];
+            self::$closePromises[spl_object_id($promise)] = [$this->stdout, $promise];
         }
 
         self::$default = $this;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
-                \error_reporting(E_ALL);
-                \ini_set('log_errors', '1');
-                \ini_set('error_log', $this->mode === self::FILE_LOGGER
+                error_reporting(E_ALL);
+                ini_set('log_errors', '1');
+                ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
             } catch (Exception) {
@@ -340,12 +340,12 @@ final class Logger
 
         if (!self::$printed) {
             self::$printed = true;
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
             $this->logger('MadelineProto '.\danog\MadelineProto\API::RELEASE);
-            $this->logger('Copyright (C) 2016-'.\date('Y').' Daniil Gentili');
+            $this->logger('Copyright (C) 2016-'.date('Y').' Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
-            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
     }
     /**
@@ -355,7 +355,7 @@ final class Logger
     {
         if ($this->mode === self::FILE_LOGGER) {
             Assert::true($this->stdoutUnbuffered instanceof WritableResourceStream);
-            \ftruncate($this->stdoutUnbuffered->getResource(), 0);
+            ftruncate($this->stdoutUnbuffered->getResource(), 0);
         }
     }
     /**
@@ -386,7 +386,7 @@ final class Logger
     public static function log(mixed $param, int $level = self::NOTICE): void
     {
         if (!\is_null(self::$default)) {
-            self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
+            self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
         } else {
             echo $param.PHP_EOL;
         }
@@ -416,17 +416,17 @@ final class Logger
         if ($param instanceof Throwable) {
             $param = (string) $param;
         } elseif (!\is_string($param)) {
-            $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         }
         if (empty($file)) {
-            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+            $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
+        $param = str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         if ($this->mode === self::DEFAULT_LOGGER) {
             try {
                 $this->stdout->write($param.$this->newline);
             } catch (\Throwable) {
-                \error_log($param);
+                error_log($param);
             }
             return;
         }
@@ -439,7 +439,7 @@ final class Logger
                     echo $param;
                     break;
                 case self::FILE_LOGGER:
-                    \file_put_contents($this->optional, $param, FILE_APPEND);
+                    file_put_contents($this->optional, $param, FILE_APPEND);
                     break;
             }
         }

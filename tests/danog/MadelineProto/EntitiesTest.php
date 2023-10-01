@@ -32,43 +32,43 @@ class EntitiesTest extends MadelineTestCase
      */
     public function testEntities(string $mode, string $html, string $bare, array $entities, ?string $htmlReverse = null): void
     {
-        $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: $html, parse_mode: $mode);
+        $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: $html, parse_mode: $mode);
         $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
         $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
         $this->assertEquals($bare, $result['text']);
         $this->assertEquals($entities, $result['entities']);
-        if (\strtolower($mode) === 'html') {
+        if (strtolower($mode) === 'html') {
             $this->assertEquals(
-                \str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
+                str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
                 StrTools::entitiesToHtml(
                     $resultMTProto['message'],
                     $resultMTProto['entities'],
                     true
                 ),
             );
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: \htmlentities($html), parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: htmlentities($html), parse_mode: $mode);
             $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
             $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, $result['text']);
             $this->assertNoRelevantEntities($result['entities']);
         } else {
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: Tools::markdownEscape($html), parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: Tools::markdownEscape($html), parse_mode: $mode);
             $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
             $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, $result['text']);
             $this->assertNoRelevantEntities($result['entities']);
 
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: \getenv('DEST'), message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
             $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
             $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
-            $this->assertEquals($html, \rtrim($result['text']));
+            $this->assertEquals($html, rtrim($result['text']));
             $this->assertEquals([['offset' => 0, 'length' => StrTools::mbStrlen($html), 'language' => '', 'type' => 'pre']], $result['entities']);
         }
     }
 
     private function assertNoRelevantEntities(array $entities): void
     {
-        $entities = \array_filter($entities, fn (array $e) => !\in_array(
+        $entities = array_filter($entities, fn (array $e) => !\in_array(
             $e['type'],
             ['url', 'email', 'phone_number', 'mention', 'bot_command'],
             true
@@ -78,7 +78,7 @@ class EntitiesTest extends MadelineTestCase
     public function provideEntities(): array
     {
         $this->setUpBeforeClass();
-        $mention = self::$MadelineProto->getPwrChat(\getenv('TEST_USERNAME'), false);
+        $mention = self::$MadelineProto->getPwrChat(getenv('TEST_USERNAME'), false);
         return [
             [
                 'html',
@@ -309,7 +309,7 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                '<a href="mention:'.\getenv('TEST_USERNAME').'">mention1</a> <a href="tg://user?id='.\getenv('TEST_USERNAME').'">mention2</a>',
+                '<a href="mention:'.getenv('TEST_USERNAME').'">mention1</a> <a href="tg://user?id='.getenv('TEST_USERNAME').'">mention2</a>',
                 'mention1 mention2',
                 [
                     [

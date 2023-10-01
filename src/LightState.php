@@ -46,7 +46,7 @@ final class LightState
      */
     public function canStartIpc(): bool
     {
-        return !$this->eventHandler || \class_exists($this->eventHandler);
+        return !$this->eventHandler || class_exists($this->eventHandler);
     }
 
     /**

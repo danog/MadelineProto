@@ -35,7 +35,7 @@ abstract class Extension
      */
     public static function getMimeFromExtension(string $extension, string $default): string
     {
-        $ext = \ltrim($extension, '.');
+        $ext = ltrim($extension, '.');
         if (isset(self::ALL_MIMES[$ext])) {
             return self::ALL_MIMES[$ext][0];
         }
