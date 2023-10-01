@@ -479,7 +479,7 @@ abstract class EventHandler extends AbstractAPI
     }
     public function __destruct()
     {
-        if (\method_exists($this, 'onStop')) {
+        if (method_exists($this, 'onStop')) {
             $this->onStop();
         }
     }
