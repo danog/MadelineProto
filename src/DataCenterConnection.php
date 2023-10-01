@@ -166,7 +166,8 @@ final class DataCenterConnection implements JsonSerializable
                 }
                 if ($media) {
                     $this->link(-$this->datacenter);
-                    if ($this->hasTempAuthKey()) {
+                    if ($this->hasTempAuthKey() && $this->isBound()) {
+                        $this->syncAuthorization();
                         return;
                     }
                 }
@@ -197,6 +198,7 @@ final class DataCenterConnection implements JsonSerializable
                 $this->syncAuthorization();
             }
         } finally {
+            $logger->logger("Done initing auth for DC {$this->datacenter}", Logger::NOTICE);
             EventLoop::queue($lock->release(...));
         }
         if ($this->hasTempAuthKey()) {
