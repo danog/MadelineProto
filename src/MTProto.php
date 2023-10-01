@@ -122,7 +122,7 @@ final class MTProto implements TLCallback, LoggerGetter
      * @internal
      * @var int
      */
-    const V = 175;
+    const V = 176;
     /**
      * Bad message error codes.
      *
@@ -1202,13 +1202,13 @@ final class MTProto implements TLCallback, LoggerGetter
         if (!\is_object($this->datacenter)) {
             throw new Exception(Lang::$current_lang['session_corrupted']);
         }
-        foreach ($this->datacenter->getDataCenterConnections() as $socket) {
+        foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
             if ($de) {
                 $socket->resetSession();
             }
             if ($auth_key) {
                 $socket->setTempAuthKey(null);
-                EventLoop::queue($socket->initAuthorization(...));
+                EventLoop::queue($this->datacenter->waitGetConnection($id)->methodCallAsyncRead(...), 'help.getConfig', []);
             }
         }
     }
