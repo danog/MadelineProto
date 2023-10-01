@@ -201,7 +201,7 @@ interface Stories
      *
      *
      * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @return array{_: 'stories.boostsStatus', my_boost: bool, level: int, current_level_boosts: int, boosts: int, next_level_boosts: int, premium_audience?: array{_: 'statsPercentValue', part: float, total: float}} @see https://docs.madelineproto.xyz/API_docs/types/stories.BoostsStatus.html
+     * @return array{_: 'stories.boostsStatus', my_boost: bool, level: int, current_level_boosts: int, boosts: int, next_level_boosts: int, premium_audience?: array{_: 'statsPercentValue', part: float, total: float}, boost_url: string} @see https://docs.madelineproto.xyz/API_docs/types/stories.BoostsStatus.html
      */
     public function getBoostsStatus(array|int|string|null $peer = null): array;
 
