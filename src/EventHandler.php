@@ -477,4 +477,10 @@ abstract class EventHandler extends AbstractAPI
 
         return $plugins;
     }
+    public function __destruct()
+    {
+        if (\method_exists($this, 'onStop')) {
+            $this->onStop();
+        }
+    }
 }
