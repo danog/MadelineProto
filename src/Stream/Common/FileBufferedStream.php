@@ -114,9 +114,9 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): ?string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string
     {
-        return $this->stream->read(null, $length);
+        return $this->stream->read($cancellation, $length);
     }
     /**
      * Async write.

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
+use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -101,9 +102,9 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Decrypts read data asynchronously.
      */
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
-        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length));
+        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
     }
     /**
      * Writes data to the stream.

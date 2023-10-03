@@ -144,15 +144,16 @@ final class Client extends ClientAbstract
      * @param callable                     $cb        Callback
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
             $url = $url->getFile();
         }
-        $params = [$url, $size, $fileName, &$cb, $encrypted];
+        $params = [$url, $size, $fileName, &$cb, $encrypted, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('uploadFromUrl', $wrapper);
     }
 
@@ -196,16 +197,17 @@ final class Client extends ClientAbstract
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
             $callable = $callable->getFile();
         }
-        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted];
+        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('uploadFromCallable', $wrapper);
     }
     /**
@@ -215,7 +217,7 @@ final class Client extends ClientAbstract
      * @param callable $cb        Callback
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false)
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -224,6 +226,7 @@ final class Client extends ClientAbstract
         $params = [$media, &$cb, $encrypted];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('uploadFromTgfile', $wrapper);
     }
     /**
@@ -269,7 +272,7 @@ final class Client extends ClientAbstract
         $params = [$messageMedia, $dir, &$cb, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        $wrapper->wrap($cancellation, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('downloadToDir', $wrapper);
     }
     /**
@@ -288,7 +291,7 @@ final class Client extends ClientAbstract
         $params = [$messageMedia, $file, &$cb, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
-        $wrapper->wrap($cancellation, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('downloadToFile', $wrapper);
     }
     /**
@@ -316,7 +319,7 @@ final class Client extends ClientAbstract
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($callable, false);
         $wrapper->wrap($cb, false);
-        $wrapper->wrap($cancellation, false);
+        $wrapper->wrap($cancellation);
         return $this->__call('downloadToCallable', $wrapper);
     }
     /**

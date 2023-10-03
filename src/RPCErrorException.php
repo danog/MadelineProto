@@ -73,9 +73,7 @@ class RPCErrorException extends \Exception
         }
         $error = preg_replace('/\\d+$/', 'X', $error);
         $description = self::$descriptions[$error] ?? '';
-        if (
-            !isset(self::$fetchedError[$error])
-            && (!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]))
+        if ((!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]))
             && !self::isBad($error, $code)
             && !($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
         ) {

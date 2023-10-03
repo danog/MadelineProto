@@ -716,11 +716,15 @@ final class TL implements TLInterface
                     case 'vector':
                         $value = [];
                         break;
+                    case 'Bool':
+                        $value = false;
+                        break;
                     case 'DataJSON':
                     case '%DataJSON':
                         $value = null;
                         break;
                     default:
+                        $value = ['_' => $this->constructors->findByType($type)['predicate']];
                         throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
                 }
             } else {

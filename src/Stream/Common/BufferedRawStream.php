@@ -130,7 +130,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
@@ -148,7 +148,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = $this->read();
+            $chunk = $this->read($cancellation);
             if ($chunk === null) {
                 $this->disconnect();
                 throw new NothingInTheSocketException();

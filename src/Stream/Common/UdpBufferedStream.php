@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
+use Amp\Cancellation;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -101,7 +102,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              *
              * @param integer $length Length
              */
-            public function bufferRead(int $length): string
+            public function bufferRead(int $length, ?Cancellation $_ = null): string
             {
                 return fread($this->buffer, $length);
             }

@@ -256,9 +256,9 @@ trait FilesLogic
      *
      * @return array InputFile constructor
      */
-    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null): array
+    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null, ?Cancellation $cancellation = null): array
     {
-        return $this->upload($file, $fileName, $cb, true);
+        return $this->upload($file, $fileName, $cb, true, $cancellation);
     }
 
     /**
@@ -307,7 +307,7 @@ trait FilesLogic
      *
      * @return array InputFile constructor
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -319,17 +319,17 @@ trait FilesLogic
         if ($file instanceof BotApiFileId) {
             $info = $this->getDownloadInfo($file->fileId);
             $info['size'] = $file->size;
-            return $this->uploadFromTgfile($info, $cb, $encrypted);
+            return $this->uploadFromTgfile($info, $cb, $encrypted, $cancellation);
         }
         if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
             if (filter_var($file, FILTER_VALIDATE_URL)) {
-                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
             }
         } elseif (\is_array($file) || $file instanceof Media) {
-            return $this->uploadFromTgfile($file, $cb, $encrypted);
+            return $this->uploadFromTgfile($file, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof ReadableStream || \is_resource($file)) {
-            return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
+            return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof LocalFile) {
             $file = $file->file;
@@ -337,7 +337,7 @@ trait FilesLogic
             /** @var Settings $settings */
             $settings = $this->getSettings();
             if (!$settings->getFiles()->getAllowAutomaticUpload()) {
-                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
             }
         }
         $file = Tools::absolute($file);
@@ -353,7 +353,7 @@ trait FilesLogic
         }
         $stream = openFile($file, 'rb');
         $mime = Extension::getMimeFromFile($file);
-        return async($this->uploadFromStream(...), $stream, $size, $mime, $fileName, $cb, $encrypted)->finally($stream->close(...))->await();
+        return async($this->uploadFromStream(...), $stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation)->finally($stream->close(...))->await($cancellation);
     }
 
     /**
@@ -368,7 +368,7 @@ trait FilesLogic
      *
      * @return array InputFile constructor
      */
-    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -403,7 +403,7 @@ trait FilesLogic
         if ($stream instanceof File) {
             $lock = new LocalMutex;
             $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock, &$nextOffset): string {
+            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock, &$nextOffset, $cancellation): string {
                 /** @var Lock */
                 $l = $lock->acquire();
                 try {
@@ -415,7 +415,7 @@ trait FilesLogic
                         Assert::eq($offset, $nextOffset);
                         $nextOffset += $size;
                     }
-                    $result = $stream->read(null, $size);
+                    $result = $stream->read($cancellation, $size);
                     \assert($result !== null);
                     return $result;
                 } finally {
@@ -429,7 +429,7 @@ trait FilesLogic
                 $created = true;
             }
             $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset): string {
+            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset, $cancellation): string {
                 if (!$stream instanceof BufferedRawStream) {
                     throw new \InvalidArgumentException('Invalid stream type');
                 }
@@ -437,17 +437,17 @@ trait FilesLogic
                 $nextOffset += $size;
                 $reader = $stream->getReadBuffer($l);
                 try {
-                    $result = $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size, $cancellation);
                 } catch (NothingInTheSocketException $e) {
                     $reader = $stream->getReadBuffer($size);
-                    $result = $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size, $cancellation);
                 }
                 \assert($result !== null);
                 return $result;
             };
             $seekable = false;
         }
-        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
+        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
         if ($created) {
             /** @var StreamInterface $stream */
             $stream->disconnect();

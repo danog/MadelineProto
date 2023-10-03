@@ -190,23 +190,23 @@ trait Files
      * @param  boolean                      $encrypted Whether to encrypt file for secret chats
      * @return array                        InputFile constructor
      */
-    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromUrl(string|FileCallbackInterface $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
             $url = $url->getFile();
         }
         $request = new Request($url);
-        $request->setTransferTimeout(10 * 3600);
+        $request->setTransferTimeout(INF);
         $request->setBodySizeLimit(512 * 1024 * 8000);
-        $response = $this->datacenter->getHTTPClient()->request($request);
+        $response = $this->datacenter->getHTTPClient()->request($request, $cancellation);
         if (($status = $response->getStatus()) !== 200) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
         $mime = trim(explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
-        return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
+        return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
     }
     /**
      * Upload file from callable.
@@ -214,17 +214,17 @@ trait Files
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param callable(int, int): string $callable  Callable (offset, length) => data
-     * @param integer                    $size      File size
-     * @param string                     $mime      Mime type
-     * @param string                     $fileName  File name
-     * @param callable(float, float, float): void $cb        Status callback
-     * @param boolean                    $seekable  Whether chunks can be fetched out of order
-     * @param boolean                    $encrypted Whether to encrypt file for secret chats
+     * @param callable(int, int, ?Cancellation): string $callable  Callable (offset, length) => data
+     * @param integer                                   $size      File size
+     * @param string                                    $mime      Mime type
+     * @param string                                    $fileName  File name
+     * @param callable(float, float, float): void       $cb        Status callback
+     * @param boolean                                   $seekable  Whether chunks can be fetched out of order
+     * @param boolean                                   $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false): array
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if ($cb === null) {
             $cb = function (float $percent, float $speed, float $time): void {
@@ -278,17 +278,19 @@ trait Files
         $totalSize = 0;
         if (!$seekable) {
             $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($callable, &$nextOffset): string {
+            $callable = static function (int $offset, int $size, ?Cancellation $cancellation) use ($callable, &$nextOffset): string {
                 Assert::eq($offset, $nextOffset);
                 $nextOffset += $size;
-                return $callable($offset, $size);
+                return $callable($offset, $size, $cancellation);
             };
         }
-        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige): array {
+        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige, $cancellation): array {
             $bytes = $callable(
                 $part_num * $part_size,
-                $part_size
+                $part_size,
+                $cancellation,
             );
+            $cancellation?->throwIfRequested();
             $totalSize += $bytesLen = \strlen($bytes);
             if ($size === 0) {
                 if ($bytesLen === 0) {
@@ -313,18 +315,18 @@ trait Files
                     $this->methodCallAsyncWrite(...),
                     $method,
                     $seekable ? fn () => $callable($part_num) : $callable($part_num),
-                    ['heavy' => true, 'datacenter' => &$datacenter]
+                    ['heavy' => true, 'datacenter' => &$datacenter, 'cancellation' => $cancellation]
                 );
             } catch (StreamEof) {
                 break;
             }
-            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises): void {
-                $readFuture = $writePromise->await();
+            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation): void {
+                $readFuture = $writePromise->await($cancellation);
                 $d = new DeferredFuture;
                 $resPromises[] = $d->getFuture();
                 try {
                     // Wrote chunk!
-                    if (!$readFuture->await()) {
+                    if (!$readFuture->await($cancellation)) {
                         throw new Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
@@ -342,7 +344,7 @@ trait Files
             ++$part_num;
             if (\count($promises) === $parallel_chunks) {
                 // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                awaitFirst($promises);
+                awaitFirst($promises, $cancellation);
                 foreach ($promises as $k => $p) {
                     if ($p->isComplete()) {
                         unset($promises[$k]);
@@ -351,8 +353,8 @@ trait Files
                 }
             }
         }
-        await($promises);
-        await($resPromises);
+        await($promises, $cancellation);
+        await($resPromises, $cancellation);
         $time = microtime(true) - $start;
         $speed = (int) ($totalSize * 8 / $time) / 1000000;
         if (!$size) {
@@ -380,7 +382,7 @@ trait Files
      *
      * @return array InputFile constructor
      */
-    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -393,7 +395,7 @@ trait Files
         $size = $media['size'];
         $mime = $media['mime'];
         $chunk_size = 512 * 1024;
-        $bridge = new class($size, $chunk_size, $cb) {
+        $bridge = new class($size, $chunk_size, $cb, $cancellation) {
             /**
              * Read promises.
              *
@@ -435,7 +437,7 @@ trait Files
              * @param integer       $partSize Part size
              * @param null|callable $cb       Callback
              */
-            public function __construct(int $size, int $partSize, ?callable $cb)
+            public function __construct(int $size, int $partSize, ?callable $cb, private readonly ?Cancellation $cancellation)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
                     $this->read[] = new DeferredFuture();
@@ -454,7 +456,7 @@ trait Files
             public function read(int $offset, int $size): string
             {
                 $offset /= $this->partSize;
-                return $this->write[$offset]->getFuture()->await();
+                return $this->write[$offset]->getFuture()->await($this->cancellation);
             }
             /**
              * Write chunk.
@@ -466,7 +468,7 @@ trait Files
             {
                 $offset /= $this->partSize;
                 $this->write[$offset]->complete($data);
-                $this->read[$offset]->getFuture()->await();
+                $this->read[$offset]->getFuture()->await($this->cancellation);
             }
             /**
              * Read callback, called when the chunk is read and fully resent.
@@ -486,9 +488,9 @@ trait Files
         $reader = $bridge->read(...);
         $writer = $bridge->write(...);
         $cb = $bridge->callback(...);
-        $read = async($this->uploadFromCallable(...), $reader, $size, $mime, '', $cb, true, $encrypted);
-        $write = async($this->downloadToCallable(...), $media, $writer, null, true, 0, -1, $chunk_size);
-        [$res] = await([$read, $write]);
+        $read = async($this->uploadFromCallable(...), $reader, $size, $mime, '', $cb, true, $encrypted, $cancellation);
+        $write = async($this->downloadToCallable(...), $media, $writer, null, true, 0, -1, $chunk_size, $cancellation);
+        [$res] = await([$read, $write], $cancellation);
         return $res;
     }
 
@@ -977,7 +979,7 @@ trait Files
                 deleteFile("$file.lock");
             } catch (\Throwable) {
             }
-        })->await();
+        })->await($cancellation);
         return $file;
     }
     /**
@@ -1095,7 +1097,7 @@ trait Files
                 $promises[] = $previous_promise;
                 if (\count($promises) === $parallel_chunks) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps
-                    awaitFirst($promises);
+                    awaitFirst($promises, $cancellation);
                     foreach ($promises as $k => $p) {
                         if ($p->isComplete()) {
                             unset($promises[$k]);
@@ -1111,7 +1113,7 @@ trait Files
                 }
             }
             if ($promises) {
-                await($promises);
+                await($promises, $cancellation);
             }
         }
         $time = microtime(true) - $start;
@@ -1226,12 +1228,12 @@ trait Files
                 $res['bytes'] = substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
             if (!$seekable && $offset['previous_promise'] instanceof Future) {
-                $offset['previous_promise']->await();
+                $offset['previous_promise']->await($cancellation);
             }
             $len = \strlen($res['bytes']);
             $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
             if ($res instanceof Future) {
-                $res = $res->await();
+                $res = $res->await($cancellation);
             }
             $cb();
             return $len;

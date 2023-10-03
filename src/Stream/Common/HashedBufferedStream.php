@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
+use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -187,24 +188,24 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * Reads data from the stream.
      */
-    public function bufferRead(int $length): ?string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string
     {
         if ($this->read_hash === null) {
-            return $this->read_buffer->bufferRead($length);
+            return $this->read_buffer->bufferRead($length, $cancellation);
         }
         if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
             if ($length + $this->read_check_pos > $this->read_check_after) {
                 throw new Exception('Tried to read too much out of frame data');
             }
-            $data = $this->read_buffer->bufferRead($length);
+            $data = $this->read_buffer->bufferRead($length, $cancellation);
             hash_update($this->read_hash, $data);
             $hash = $this->getReadHash();
-            if ($hash !== $this->read_buffer->bufferRead(\strlen($hash))) {
+            if ($hash !== $this->read_buffer->bufferRead(\strlen($hash), $cancellation)) {
                 throw new Exception('Hash mismatch');
             }
             return $data;
         }
-        $data = $this->read_buffer->bufferRead($length);
+        $data = $this->read_buffer->bufferRead($length, $cancellation);
         hash_update($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;

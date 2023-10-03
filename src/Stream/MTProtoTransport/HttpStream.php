@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -160,7 +161,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         return $buffer;
     }
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         return $this->code;
     }
