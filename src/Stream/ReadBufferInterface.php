@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
+use Amp\Cancellation;
+
 /**
  * Read buffer interface.
  *
@@ -32,5 +34,5 @@ interface ReadBufferInterface
      *
      * @param int $length How much data to read
      */
-    public function bufferRead(int $length): ?string;
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string;
 }

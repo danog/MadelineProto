@@ -157,36 +157,36 @@ final class TL implements TLInterface
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
         $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
-        foreach (\array_filter([
+        foreach (array_filter([
             'api' => $files->getAPISchema(),
             'mtproto' => $files->getMTProtoSchema(),
             'secret' => $files->getSecretSchema(),
             ...$files->getOther(),
         ]) as $scheme_type => $file) {
-            $this->API?->logger?->logger(\sprintf(Lang::$current_lang['file_parsing'], \basename($file)), Logger::VERBOSE);
-            $filec = \file_get_contents(Tools::absolute($file));
-            $TL_dict = \json_decode($filec, true);
+            $this->API?->logger?->logger(sprintf(Lang::$current_lang['file_parsing'], basename($file)), Logger::VERBOSE);
+            $filec = file_get_contents(Tools::absolute($file));
+            $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
                 $TL_dict = ['methods' => [], 'constructors' => []];
                 $type = 'constructors';
                 $layer = null;
-                $tl_file = \explode("\n", $filec);
+                $tl_file = explode("\n", $filec);
                 $key = 0;
                 $e = null;
                 $class = null;
                 $dparams = [];
                 $lineBuf = '';
                 foreach ($tl_file as $line) {
-                    $line = \rtrim($line);
-                    if (\preg_match('|^//@|', $line)) {
-                        $list = \explode(' @', \str_replace('//', ' ', $line));
+                    $line = rtrim($line);
+                    if (preg_match('|^//@|', $line)) {
+                        $list = explode(' @', str_replace('//', ' ', $line));
                         foreach ($list as $elem) {
                             if ($elem === '') {
                                 continue;
                             }
-                            $elem = \explode(' ', $elem, 2);
+                            $elem = explode(' ', $elem, 2);
                             if ($elem[0] === 'class') {
-                                $elem = \explode(' ', $elem[1], 2);
+                                $elem = explode(' ', $elem[1], 2);
                                 $class = $elem[0];
                                 continue;
                             }
@@ -206,7 +206,7 @@ final class TL implements TLInterface
                         }
                         continue;
                     }
-                    $line = \preg_replace(['|//.*|', '|^\\s+$|'], '', $line);
+                    $line = preg_replace(['|//.*|', '|^\\s+$|'], '', $line);
                     if ($line === '') {
                         continue;
                     }
@@ -218,18 +218,18 @@ final class TL implements TLInterface
                         $type = 'constructors';
                         continue;
                     }
-                    if (\preg_match('|^===(\\d*)===|', $line, $matches)) {
+                    if (preg_match('|^===(\\d*)===|', $line, $matches)) {
                         $layer = (int) $matches[1];
                         continue;
                     }
-                    if (\str_starts_with($line, 'vector#')) {
+                    if (str_starts_with($line, 'vector#')) {
                         continue;
                     }
-                    if (\str_contains($line, ' ?= ')) {
+                    if (str_contains($line, ' ?= ')) {
                         continue;
                     }
-                    $line = \preg_replace(['/[(]([\\w\\.]+) ([\\w\\.]+)[)]/', '/\\s+/'], ['$1<$2>', ' '], $line);
-                    if (!\str_contains($line, ';')) {
+                    $line = preg_replace(['/[(]([\\w\\.]+) ([\\w\\.]+)[)]/', '/\\s+/'], ['$1<$2>', ' '], $line);
+                    if (!str_contains($line, ';')) {
                         $lineBuf .= $line;
                         continue;
                     } elseif ($lineBuf) {
@@ -237,7 +237,7 @@ final class TL implements TLInterface
                         $line = $lineBuf;
                         $lineBuf = '';
                     }
-                    $name = \preg_replace(['/#.*/', '/\\s.*/'], '', $line);
+                    $name = preg_replace(['/#.*/', '/\\s.*/'], '', $line);
                     if (\in_array($name, ['bytes', 'int128', 'int256', 'int512', 'int', 'long', 'double', 'string', 'bytes', 'object', 'function'], true)) {
                         /*if (!(\in_array($scheme_type, ['ton_api', 'lite_api'], true) && $name === 'bytes')) {
                               continue;
@@ -245,13 +245,13 @@ final class TL implements TLInterface
                         continue;
                     }
                     if (\in_array($scheme_type, ['ton_api', 'lite_api'], true)) {
-                        $clean = \preg_replace(['/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/{/', '/}/'], ['', ' ', '', ' ', ' ', ' ', '', '', '', ''], $line);
+                        $clean = preg_replace(['/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/{/', '/}/'], ['', ' ', '', ' ', ' ', ' ', '', '', '', ''], $line);
                     } else {
-                        $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
+                        $clean = preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
                     }
-                    $id = \hash('crc32b', $clean);
-                    if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
-                        $nid = \str_pad($matches[1], 8, '0', STR_PAD_LEFT);
+                    $id = hash('crc32b', $clean);
+                    if (preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
+                        $nid = str_pad($matches[1], 8, '0', STR_PAD_LEFT);
                         /*if ($id !== $nid) {
                             $this->API?->logger?->logger(\sprintf('CRC32 mismatch (%s, %s) for %s', $id, $nid, $line), Logger::ERROR);
                         }*/
@@ -263,14 +263,14 @@ final class TL implements TLInterface
                         $dparams = [];
                     }
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
-                    $TL_dict[$type][$key]['id'] = $a = \strrev(\hex2bin($id));
+                    $TL_dict[$type][$key]['id'] = $a = strrev(hex2bin($id));
                     $TL_dict[$type][$key]['params'] = [];
-                    $TL_dict[$type][$key]['type'] = \preg_replace(['/.+\\s+=\\s+/', '/;/'], '', $line);
+                    $TL_dict[$type][$key]['type'] = preg_replace(['/.+\\s+=\\s+/', '/;/'], '', $line);
                     if ($layer !== null) {
                         $TL_dict[$type][$key]['layer'] = $layer;
                     }
                     if ($name !== 'vector' && $TL_dict[$type][$key]['type'] !== 'Vector t') {
-                        foreach (\explode(' ', \preg_replace(['/^[^\\s]+\\s/', '/=\\s[^\\s]+/', '/\\s$/'], '', $line)) as $param) {
+                        foreach (explode(' ', preg_replace(['/^[^\\s]+\\s/', '/=\\s[^\\s]+/', '/\\s$/'], '', $line)) as $param) {
                             if ($param === '') {
                                 continue;
                             }
@@ -280,7 +280,7 @@ final class TL implements TLInterface
                             if ($param === '#') {
                                 continue;
                             }
-                            $explode = \explode(':', $param);
+                            $explode = explode(':', $param);
                             $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                         }
                     }
@@ -301,7 +301,7 @@ final class TL implements TLInterface
             $this->API?->logger?->logger('Translating objects...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
-                    $this->secretLayer = \max($this->secretLayer, $elem['layer']);
+                    $this->secretLayer = max($this->secretLayer, $elem['layer']);
                 }
                 $this->constructors->add($elem, $scheme_type);
             }
@@ -309,7 +309,7 @@ final class TL implements TLInterface
             foreach ($TL_dict['methods'] as $elem) {
                 $this->methods->add($elem, $scheme_type);
                 if ($scheme_type === 'secret') {
-                    $this->secretLayer = \max($this->secretLayer, $elem['layer']);
+                    $this->secretLayer = max($this->secretLayer, $elem['layer']);
                 }
             }
         }
@@ -323,7 +323,7 @@ final class TL implements TLInterface
                         continue;
                     }
                     foreach ($this->tdDescriptions['constructors'][$name]['params'] as $k => $param) {
-                        $this->tdDescriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
+                        $this->tdDescriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -333,7 +333,7 @@ final class TL implements TLInterface
                     unset($this->tdDescriptions['methods'][$name]);
                 } else {
                     foreach ($this->tdDescriptions['methods'][$name]['params'] as $k => $param) {
-                        $this->tdDescriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
+                        $this->tdDescriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -347,7 +347,7 @@ final class TL implements TLInterface
     {
         $res = [];
         foreach ($this->methods->method_namespace as $pair) {
-            $a = \key($pair);
+            $a = key($pair);
             $res[$a] = $a;
         }
         return $res;
@@ -366,29 +366,29 @@ final class TL implements TLInterface
      */
     public function updateCallbacks(array $callbacks): void
     {
-        $this->beforeMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+        $this->beforeMethodResponseDeserialization = array_merge_recursive(...array_map(
             fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterMethodResponseDeserialization = \array_merge_recursive(...\array_map(
+        $this->afterMethodResponseDeserialization = array_merge_recursive(...array_map(
             fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
             $callbacks
         ));
 
-        $this->beforeConstructorSerialization = \array_merge(...\array_map(
+        $this->beforeConstructorSerialization = array_merge(...array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
         ));
-        $this->beforeConstructorDeserialization = \array_merge_recursive(...\array_map(
+        $this->beforeConstructorDeserialization = array_merge_recursive(...array_map(
             fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
             $callbacks
         ));
-        $this->afterConstructorDeserialization = \array_merge_recursive(...\array_map(
+        $this->afterConstructorDeserialization = array_merge_recursive(...array_map(
             fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
             $callbacks
         ));
 
-        $this->typeMismatch = \array_merge(...\array_map(
+        $this->typeMismatch = array_merge(...array_map(
             fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
             $callbacks
         ));
@@ -418,7 +418,7 @@ final class TL implements TLInterface
     {
         switch ($type['type']) {
             case 'int':
-                if (!\is_numeric($object)) {
+                if (!is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
                 return Tools::packSignedInt((int) $object);
@@ -431,27 +431,27 @@ final class TL implements TLInterface
                 return $object;
             case 'long':
                 if (\is_object($object)) {
-                    return \str_pad(\strrev($object->toBytes()), 8, \chr(0));
+                    return str_pad(strrev($object->toBytes()), 8, \chr(0));
                 }
                 if (\is_string($object) && \strlen($object) === 8) {
                     return $object;
                 }
                 if (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
-                    return \substr($object, 1);
+                    return substr($object, 1);
                 }
                 if (\is_array($object) && $type['name'] === 'hash') {
                     return Tools::genVectorHash($object);
                 }
                 if (\is_array($object) && \count($object) === 2) {
-                    return \pack('l2', ...$object); // For bot API on 32bit
+                    return pack('l2', ...$object); // For bot API on 32bit
                 }
-                if (!\is_numeric($object)) {
+                if (!is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
                 return Tools::packSignedLong((int) $object);
             case 'int128':
                 if (\strlen($object) !== 16) {
-                    $object = \base64_decode($object);
+                    $object = base64_decode($object);
                     if (\strlen($object) !== 16) {
                         throw new Exception(Lang::$current_lang['long_not_16']);
                     }
@@ -459,7 +459,7 @@ final class TL implements TLInterface
                 return (string) $object;
             case 'int256':
                 if (\strlen($object) !== 32) {
-                    $object = \base64_decode($object);
+                    $object = base64_decode($object);
                     if (\strlen($object) !== 32) {
                         throw new Exception(Lang::$current_lang['long_not_32']);
                     }
@@ -467,7 +467,7 @@ final class TL implements TLInterface
                 return (string) $object;
             case 'int512':
                 if (\strlen($object) !== 64) {
-                    $object = \base64_decode($object);
+                    $object = base64_decode($object);
                     if (\strlen($object) !== 64) {
                         throw new Exception(Lang::$current_lang['long_not_64']);
                     }
@@ -487,17 +487,17 @@ final class TL implements TLInterface
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
+                    $concat .= substr(Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'bytes':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
-                    $object = \base64_decode($object['bytes']);
+                    $object = base64_decode($object['bytes']);
                 }
                 if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;
@@ -510,17 +510,17 @@ final class TL implements TLInterface
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
+                    $concat .= substr(Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'waveform':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
-                    $object = \base64_decode($object['bytes']);
+                    $object = base64_decode($object['bytes']);
                 }
                 if (\is_array($object)) {
                     $object = self::compressWaveform($object);
@@ -536,12 +536,12 @@ final class TL implements TLInterface
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr(Tools::packSignedInt($l), 0, 3);
+                    $concat .= substr(Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.Tools::posmod(-$l, 4));
+                    $concat .= pack('@'.Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'Bool':
@@ -555,7 +555,7 @@ final class TL implements TLInterface
                     throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception(\sprintf(Lang::$current_lang['array_invalid'], $type['subtype']));
+                    throw new Exception(sprintf(Lang::$current_lang['array_invalid'], $type['subtype']));
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
@@ -583,7 +583,7 @@ final class TL implements TLInterface
             $object = $this->typeMismatch[$type['type']]($object);
             if (!isset($object['_'])) {
                 if (!isset($object[$type['type']])) {
-                    throw new \danog\MadelineProto\Exception(\sprintf(Lang::$current_lang['could_not_convert_object'], $type['type']));
+                    throw new \danog\MadelineProto\Exception(sprintf(Lang::$current_lang['could_not_convert_object'], $type['type']));
                 }
                 $object = $object[$type['type']];
             }
@@ -602,10 +602,10 @@ final class TL implements TLInterface
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
             $this->API->logger($object, Logger::FATAL_ERROR);
-            throw new Exception(\sprintf(Lang::$current_lang['type_extract_error'], $predicate));
+            throw new Exception(sprintf(Lang::$current_lang['type_extract_error'], $predicate));
         }
         if ($bare = $type['type'] != '' && $type['type'][0] === '%') {
-            $type['type'] = \substr($type['type'], 1);
+            $type['type'] = substr($type['type'], 1);
         }
         if ($predicate === $type['type']) {
             $bare = true;
@@ -703,7 +703,7 @@ final class TL implements TLInterface
                     $serialized .= "\0\0\0\0";
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate(\lcfirst($type).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $type) {
+                if (($id = $this->constructors->findByPredicate(lcfirst($type).'Empty', $tl['layer'] ?? -1)) && $id['type'] === $type) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -716,22 +716,26 @@ final class TL implements TLInterface
                     case 'vector':
                         $value = [];
                         break;
+                    case 'Bool':
+                        $value = false;
+                        break;
                     case 'DataJSON':
                     case '%DataJSON':
                         $value = null;
                         break;
                     default:
+                        $value = ['_' => $this->constructors->findByType($type)['predicate']];
                         throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
                 }
             } else {
                 $value = $arguments[$name];
             }
             if (\in_array($type, ['DataJSON', '%DataJSON'], true)) {
-                $value = ['_' => 'dataJSON', 'data' => \json_encode($value)];
+                $value = ['_' => 'dataJSON', 'data' => json_encode($value)];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'], true)) {
-                \array_walk($value, function (&$arg): void {
-                    $arg = ['_' => 'dataJSON', 'data' => \json_encode($arg)];
+                array_walk($value, function (&$arg): void {
+                    $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
@@ -759,15 +763,15 @@ final class TL implements TLInterface
     public function getLength($stream, array $type = ['type' => '']): int
     {
         if (\is_string($stream)) {
-            $res = \fopen('php://memory', 'rw+b');
-            \fwrite($res, $stream);
-            \fseek($res, 0);
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $stream);
+            fseek($res, 0);
             $stream = $res;
         } elseif (!\is_resource($stream)) {
             throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
         $this->deserialize($stream, $type);
-        return \ftell($stream);
+        return ftell($stream);
     }
 
     /**
@@ -777,9 +781,9 @@ final class TL implements TLInterface
      */
     public static function extractWaveform(string $x): array
     {
-        $values = \array_pad(\array_values(\unpack('C*', $x)), 63, 0);
+        $values = array_pad(array_values(unpack('C*', $x)), 63, 0);
 
-        $result = \array_fill(0, 100, 0);
+        $result = array_fill(0, 100, 0);
         $bitPos = 0;
         foreach ($result as &$value) {
             $start = $bitPos & 7;
@@ -804,7 +808,7 @@ final class TL implements TLInterface
         if (\count($x) !== 100) {
             throw new Exception(Lang::$current_lang['waveform_must_have_100_values']);
         }
-        $values = \array_fill(0, 63, 0);
+        $values = array_fill(0, 63, 0);
         $bitPos = 0;
         foreach ($x as $value) {
             if (!\is_int($value) || $value < 0 || $value > 31) {
@@ -818,7 +822,7 @@ final class TL implements TLInterface
             }
             $bitPos += 5;
         }
-        return \pack('C63', ...$values);
+        return pack('C63', ...$values);
     }
     /**
      * Deserialize TL object.
@@ -829,51 +833,51 @@ final class TL implements TLInterface
     public function deserialize($stream, array $type)
     {
         if (\is_string($stream)) {
-            $res = \fopen('php://memory', 'rw+b');
-            \fwrite($res, $stream);
-            \fseek($res, 0);
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $stream);
+            fseek($res, 0);
             $stream = $res;
         } elseif (!\is_resource($stream)) {
             throw new Exception(Lang::$current_lang['stream_handle_invalid']);
         }
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserializeBool(\stream_get_contents($stream, 4));
+                return $this->deserializeBool(stream_get_contents($stream, 4));
             case 'int':
-                return Tools::unpackSignedInt(\stream_get_contents($stream, 4));
+                return Tools::unpackSignedInt(stream_get_contents($stream, 4));
             case '#':
-                return \unpack('V', \stream_get_contents($stream, 4))[1];
+                return unpack('V', stream_get_contents($stream, 4))[1];
             case 'strlong':
-                return \stream_get_contents($stream, 8);
+                return stream_get_contents($stream, 8);
             case 'long':
-                return Tools::unpackSignedLong(\stream_get_contents($stream, 8));
+                return Tools::unpackSignedLong(stream_get_contents($stream, 8));
             case 'double':
-                return Tools::unpackDouble(\stream_get_contents($stream, 8));
+                return Tools::unpackDouble(stream_get_contents($stream, 8));
             case 'int128':
-                return \stream_get_contents($stream, 16);
+                return stream_get_contents($stream, 16);
             case 'int256':
-                return \stream_get_contents($stream, 32);
+                return stream_get_contents($stream, 32);
             case 'int512':
-                return \stream_get_contents($stream, 64);
+                return stream_get_contents($stream, 64);
             case 'waveform':
             case 'string':
             case 'bytes':
-                $l = \ord(\stream_get_contents($stream, 1));
+                $l = \ord(stream_get_contents($stream, 1));
                 if ($l > 254) {
                     throw new Exception(Lang::$current_lang['length_too_big']);
                 }
                 if ($l === 254) {
-                    $long_len = \unpack('V', \stream_get_contents($stream, 3).\chr(0))[1];
-                    $x = \stream_get_contents($stream, $long_len);
+                    $long_len = unpack('V', stream_get_contents($stream, 3).\chr(0))[1];
+                    $x = stream_get_contents($stream, $long_len);
                     $resto = Tools::posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        \stream_get_contents($stream, $resto);
+                        stream_get_contents($stream, $resto);
                     }
                 } else {
-                    $x = $l ? \stream_get_contents($stream, $l) : '';
+                    $x = $l ? stream_get_contents($stream, $l) : '';
                     $resto = Tools::posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        \stream_get_contents($stream, $resto);
+                        stream_get_contents($stream, $resto);
                     }
                 }
                 if (!\is_string($x)) {
@@ -887,19 +891,19 @@ final class TL implements TLInterface
                 }
                 return $x;
             case 'Vector t':
-                $id = \stream_get_contents($stream, 4);
+                $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->findById($id);
                 if ($constructorData === false) {
                     $constructorData = $this->methods->findById($id);
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
-                    throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
+                    throw new Exception(sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
                         return $this->deserialize(
-                            \gzdecode(
+                            gzdecode(
                                 (string) $this->deserialize(
                                     $stream,
                                     ['type' => 'bytes', 'connection' => $type['connection']],
@@ -915,7 +919,7 @@ final class TL implements TLInterface
                 }
                 // no break
             case 'vector':
-                $count = \unpack('V', \stream_get_contents($stream, 4))[1];
+                $count = unpack('V', stream_get_contents($stream, 4))[1];
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
@@ -924,7 +928,7 @@ final class TL implements TLInterface
                 return $result;
         }
         if ($type['type'] != '' && $type['type'][0] === '%') {
-            $checkType = \substr($type['type'], 1);
+            $checkType = substr($type['type'], 1);
             $constructorData = $this->constructors->findByType($checkType);
             if ($constructorData === false) {
                 throw new Exception(Lang::$current_lang['constructor_not_found'].$checkType);
@@ -932,12 +936,12 @@ final class TL implements TLInterface
         } else {
             $constructorData = $this->constructors->findByPredicate($type['type']);
             if ($constructorData === false) {
-                $id = \stream_get_contents($stream, 4);
+                $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->findById($id);
                 if ($constructorData === false) {
                     $constructorData = $this->methods->findById($id);
                     if ($constructorData === false) {
-                        throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
+                        throw new Exception(sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                     }
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
@@ -948,7 +952,7 @@ final class TL implements TLInterface
                 $type['subtype'] = '';
             }
             return $this->deserialize(
-                \gzdecode(
+                gzdecode(
                     (string) $this->deserialize(
                         $stream,
                         ['type' => 'bytes'],
@@ -1009,7 +1013,7 @@ final class TL implements TLInterface
             }
         }
         if ($x['_'] === 'dataJSON') {
-            return \json_decode($x['data'], true);
+            return json_decode($x['data'], true);
         } elseif ($constructorData['type'] === 'JSONValue') {
             switch ($x['_']) {
                 case 'jsonNull':

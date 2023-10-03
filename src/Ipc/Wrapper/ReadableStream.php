@@ -41,14 +41,14 @@ class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
                 $result = $this->__call('read');
             } catch (ClosedException $e) {
                 if ($this->closeCallbacks) {
-                    \array_map(EventLoop::queue(...), $this->closeCallbacks);
+                    array_map(EventLoop::queue(...), $this->closeCallbacks);
                     $this->closeCallbacks = [];
                 }
                 throw $e;
             }
             if ($result === null) {
                 if ($this->closeCallbacks) {
-                    \array_map(EventLoop::queue(...), $this->closeCallbacks);
+                    array_map(EventLoop::queue(...), $this->closeCallbacks);
                     $this->closeCallbacks = [];
                 }
             }

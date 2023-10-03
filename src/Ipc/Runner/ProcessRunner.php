@@ -97,7 +97,7 @@ final class ProcessRunner extends RunnerAbstract
             $session,
             (string) $startupId,
         ];
-        $command = \implode(' ', \array_map(escapeArgument(...), $command));
+        $command = implode(' ', array_map(escapeArgument(...), $command));
         Logger::log("Starting process with $command");
 
         $params = [
@@ -111,16 +111,16 @@ final class ProcessRunner extends RunnerAbstract
             } catch (Throwable) {
             }
         }
-        $envVars = \array_merge(
-            \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
+        $envVars = array_merge(
+            array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
             [
-                'QUERY_STRING' => \http_build_query($params),
+                'QUERY_STRING' => http_build_query($params),
                 'absoluteRootDir' => $root,
                 'serverName' => $_SERVER['SERVER_NAME'] ?? ''
             ],
         );
 
-        self::$resources []= \proc_open(
+        self::$resources []= proc_open(
             $command,
             [
                 ["pipe", "r"],
@@ -147,11 +147,11 @@ final class ProcessRunner extends RunnerAbstract
         $lastLine = '';
         try {
             while (($chunk = $stream->read()) !== null) {
-                $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
-                $lastLine .= \array_shift($chunk);
+                $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
+                $lastLine .= array_shift($chunk);
                 while ($chunk) {
                     Logger::log("Got message from worker: $lastLine");
-                    $lastLine = \array_shift($chunk);
+                    $lastLine = array_shift($chunk);
                 }
             }
         } catch (Throwable $e) {
@@ -162,15 +162,15 @@ final class ProcessRunner extends RunnerAbstract
     }
     private static function locateBinary(): string
     {
-        $executable = \strncasecmp(PHP_OS, 'WIN', 3) === 0 ? 'php.exe' : 'php';
+        $executable = strncasecmp(PHP_OS, 'WIN', 3) === 0 ? 'php.exe' : 'php';
 
-        $paths = \array_filter(\explode(PATH_SEPARATOR, \getenv('PATH') ?: ''));
+        $paths = array_filter(explode(PATH_SEPARATOR, getenv('PATH') ?: ''));
         $paths[] = PHP_BINDIR;
-        $paths = \array_unique($paths);
+        $paths = array_unique($paths);
 
         foreach ($paths as $path) {
             $path .= DIRECTORY_SEPARATOR.$executable;
-            if (\is_executable($path)) {
+            if (is_executable($path)) {
                 return self::$binaryPath = $path;
             }
         }
@@ -188,7 +188,7 @@ final class ProcessRunner extends RunnerAbstract
         $result = [];
 
         foreach ($options as $option => $value) {
-            $result[] = \sprintf('-d%s=%s', $option, $value);
+            $result[] = sprintf('-d%s=%s', $option, $value);
         }
 
         return $result;

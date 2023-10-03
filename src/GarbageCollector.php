@@ -66,7 +66,7 @@ final class GarbageCollector
         EventLoop::unreference(EventLoop::repeat(1, static function (): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
-                \gc_collect_cycles();
+                gc_collect_cycles();
                 self::$memoryConsumption = self::getMemoryConsumption();
                 $cleanedMemory = $currentMemory - self::$memoryConsumption;
                 if (!Magic::$suspendPeriodicLogging) {
@@ -85,17 +85,17 @@ final class GarbageCollector
             try {
                 $request = new Request(MADELINE_RELEASE_URL);
                 $latest = $client->request($request);
-                Magic::$latest_release = \trim($latest->getBody()->buffer());
+                Magic::$latest_release = trim($latest->getBody()->buffer());
                 if (API::RELEASE !== Magic::$latest_release) {
                     $old = API::RELEASE;
                     $new = Magic::$latest_release;
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
 
-                    $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".\rand(0, PHP_INT_MAX)))
+                    $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".rand(0, PHP_INT_MAX)))
                         ->getBody()
                         ->buffer();
 
-                    if (!\str_starts_with($contents, '<?php')) {
+                    if (!str_starts_with($contents, '<?php')) {
                         throw new AssertionError("phar.php is not a PHP file!");
                     }
 
@@ -107,7 +107,7 @@ final class GarbageCollector
                     }
 
                     try {
-                        \unlink(MADELINE_PHAR_VERSION);
+                        unlink(MADELINE_PHAR_VERSION);
                     } catch (Throwable) {
                     }
                     if (Magic::$isIpcWorker) {
@@ -120,18 +120,18 @@ final class GarbageCollector
                 }
 
                 /** @var string */
-                foreach (\glob(MADELINE_PHAR_GLOB) as $path) {
-                    $base = \basename($path);
+                foreach (glob(MADELINE_PHAR_GLOB) as $path) {
+                    $base = basename($path);
                     if ($base === 'madeline-'.API::RELEASE.'.phar') {
                         continue;
                     }
-                    $f = \fopen("$path.lock", 'c');
-                    if (\flock($f, LOCK_EX|LOCK_NB)) {
-                        \fclose($f);
-                        \unlink($path);
-                        \unlink("$path.lock");
+                    $f = fopen("$path.lock", 'c');
+                    if (flock($f, LOCK_EX|LOCK_NB)) {
+                        fclose($f);
+                        unlink($path);
+                        unlink("$path.lock");
                     } else {
-                        \fclose($f);
+                        fclose($f);
                     }
                 }
             } catch (Throwable $e) {
@@ -156,7 +156,7 @@ final class GarbageCollector
     private static function getMemoryConsumption(): int
     {
         self::$map ??= new WeakMap;
-        $memory = \round(\memory_get_usage()/1024/1024, 1);
+        $memory = round(memory_get_usage()/1024/1024, 1);
         /*if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
         }*/

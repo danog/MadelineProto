@@ -173,7 +173,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             //throw new Exception("Trying to resend already replied message $this!");
         }
         $this->state |= self::STATE_SENT;
-        $this->sent = \time();
+        $this->sent = time();
         if (isset($this->sendDeferred)) {
             $sendDeferred = $this->sendDeferred;
             $this->sendDeferred = null;
@@ -351,7 +351,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         } elseif ($this->state & self::STATE_ACKED) {
             $state = 'acked';
         } elseif ($this->state & self::STATE_SENT) {
-            $state = 'sent '.(\time() - $this->sent).' seconds ago';
+            $state = 'sent '.(time() - $this->sent).' seconds ago';
         } else {
             $state = 'pending';
         }

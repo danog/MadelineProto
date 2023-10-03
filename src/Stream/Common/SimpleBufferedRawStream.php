@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\Common;
 
+use Amp\Cancellation;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -36,24 +37,24 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length < $length && $buffer_length) {
-            \fseek($this->memory_stream, $offset + $buffer_length);
+            fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = $this->read();
+            $chunk = $this->read($cancellation);
             if ($chunk === null) {
                 break;
             }
-            \fwrite($this->memory_stream, $chunk);
+            fwrite($this->memory_stream, $chunk);
             $buffer_length += \strlen($chunk);
         }
-        \fseek($this->memory_stream, $offset);
-        return \fread($this->memory_stream, $length);
+        fseek($this->memory_stream, $offset);
+        return fread($this->memory_stream, $length);
     }
     /**
      * {@inheritDoc}

@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\ByteStream\ClosedException;
+use Amp\Cancellation;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
@@ -92,25 +93,25 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              */
             public function __construct(string $buf)
             {
-                $this->buffer = \fopen('php://memory', 'r+');
-                \fwrite($this->buffer, $buf);
-                \fseek($this->buffer, 0);
+                $this->buffer = fopen('php://memory', 'r+');
+                fwrite($this->buffer, $buf);
+                fseek($this->buffer, 0);
             }
             /**
              * Read data from buffer.
              *
              * @param integer $length Length
              */
-            public function bufferRead(int $length): string
+            public function bufferRead(int $length, ?Cancellation $_ = null): string
             {
-                return \fread($this->buffer, $length);
+                return fread($this->buffer, $length);
             }
             /**
              * Destructor function.
              */
             public function __destruct()
             {
-                \fclose($this->buffer);
+                fclose($this->buffer);
             }
         };
     }

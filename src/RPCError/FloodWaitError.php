@@ -33,8 +33,8 @@ final class FloodWaitError extends RPCErrorException
     public function __construct($message = null, $code = 0, $caller = '', ?Exception $previous = null)
     {
         parent::__construct($message, $code, $caller, $previous);
-        Assert::true(\str_starts_with($this->rpc, 'FLOOD_WAIT_'));
-        $seconds = \substr($this->rpc, 11);
+        Assert::true(str_starts_with($this->rpc, 'FLOOD_WAIT_'));
+        $seconds = substr($this->rpc, 11);
         Assert::numeric($seconds);
         $this->seconds = (int) $seconds;
     }

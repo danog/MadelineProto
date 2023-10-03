@@ -141,7 +141,7 @@ final class WriteLoop extends Loop
                 return false;
             }
 
-            \ksort($this->connection->pendingOutgoing);
+            ksort($this->connection->pendingOutgoing);
 
             $messages = [];
             $keys = [];
@@ -212,7 +212,7 @@ final class WriteLoop extends Loop
                 if ($message->isMethod && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
-                            $this->API->logger(\sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
+                            $this->API->logger(sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
                             $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', [
                                 'layer' => $this->API->settings->getSchema()->getLayer(),
                                 'query' => $this->API->getTL()->serializeMethod(
@@ -239,6 +239,7 @@ final class WriteLoop extends Loop
                     } elseif ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
                         && !$this->shared->isAuthorized()
                         && $constructor !== 'auth.importAuthorization'
+                        && !$this->connection->isCDN()
                     ) {
                         $this->API->logger("Skipping $message due to unimported auth in connection in DC $this->datacenter");
                         $skipped = true;
@@ -324,7 +325,7 @@ final class WriteLoop extends Loop
             if ($count > 1 || $has_seq) {
                 $this->API->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
-                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(\array_values($keys));
+                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(array_values($keys));
                 $keys[$this->connection->pendingOutgoingKey++] = $message_id;
                 $message_data = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
                 $message_data_length = \strlen($message_data);
@@ -336,17 +337,17 @@ final class WriteLoop extends Loop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $this->API->logger("NO MESSAGE SENT in $this, pending ".\implode(', ', \array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
+                $this->API->logger("NO MESSAGE SENT in $this, pending ".implode(', ', array_map('strval', $this->connection->pendingOutgoing)), Logger::WARNING);
                 return true;
             }
             unset($messages);
-            $plaintext = $this->shared->getTempAuthKey()->getServerSalt().$this->connection->session_id.Tools::packSignedLong($message_id).\pack('VV', $seq_no, $message_data_length).$message_data;
+            $plaintext = $this->shared->getTempAuthKey()->getServerSalt().$this->connection->session_id.Tools::packSignedLong($message_id).pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $padding = Tools::random($padding);
-            $message_key = \substr(\hash('sha256', \substr($this->shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey());
             $message = $this->shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
             $buffer = $this->connection->stream->getWriteBuffer(\strlen($message));

@@ -215,7 +215,7 @@ final class Connection extends SettingsAbstract
      */
     public function setProtocol(string $protocol): self
     {
-        if (!isset(\class_implements($protocol)[MTProtoBufferInterface::class])) {
+        if (!isset(class_implements($protocol)[MTProtoBufferInterface::class])) {
             throw new Exception('An invalid protocol was specified!');
         }
         $this->protocol = $protocol;
@@ -325,7 +325,7 @@ final class Connection extends SettingsAbstract
      */
     public function addProxy(string $proxy, array $extra = []): self
     {
-        if (!isset(\class_implements($proxy)[StreamInterface::class])) {
+        if (!isset(class_implements($proxy)[StreamInterface::class])) {
             throw new Exception('An invalid proxy class was specified!');
         }
         if (!isset($this->proxy[$proxy])) {
@@ -352,7 +352,7 @@ final class Connection extends SettingsAbstract
     public function setProxies(array $proxies): self
     {
         foreach ($proxies as $proxy => $_) {
-            if (!isset(\class_implements($proxy)[StreamInterface::class])) {
+            if (!isset(class_implements($proxy)[StreamInterface::class])) {
                 throw new Exception('An invalid proxy class was specified!');
             }
         }
@@ -377,7 +377,7 @@ final class Connection extends SettingsAbstract
         if (!isset($this->proxy[$proxy])) {
             return $this;
         }
-        if (false === $index = \array_search($extra, $this->proxy[$proxy])) {
+        if (false === $index = array_search($extra, $this->proxy[$proxy])) {
             return $this;
         }
         unset($this->proxy[$proxy][$index]);
@@ -448,7 +448,7 @@ final class Connection extends SettingsAbstract
      */
     public function setTransport(string $transport): self
     {
-        if (!isset(\class_implements($transport)[RawStreamInterface::class])) {
+        if (!isset(class_implements($transport)[RawStreamInterface::class])) {
             throw new Exception('An invalid transport was specified!');
         }
         $this->transport = $transport;

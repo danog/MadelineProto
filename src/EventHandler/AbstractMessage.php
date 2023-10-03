@@ -150,7 +150,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function getReply(string $class = AbstractMessage::class): ?self
     {
-        if ($class !== AbstractMessage::class && !\is_subclass_of($class, AbstractMessage::class)) {
+        if ($class !== AbstractMessage::class && !is_subclass_of($class, AbstractMessage::class)) {
             throw new AssertionError("A class that extends AbstractMessage was expected.");
         }
         if ($this->replyToMsgId === null) {
@@ -292,17 +292,17 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 'peer' => $this->senderId,
             ]
         )['stories']['stories'];
-        $result = \array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
         // Recall it because storyItemSkipped
         // TODO: Do this more efficiently
         $result = $client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
                 'peer' => $this->senderId,
-                'id' => \array_column($result, 'id'),
+                'id' => array_column($result, 'id'),
             ]
         )['stories'];
-        return \array_map(
+        return array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])

@@ -160,7 +160,7 @@ final class Logger extends SettingsAbstract
      */
     public function setLevel(int $level): self
     {
-        $this->level = \max($level, MadelineProtoLogger::NOTICE);
+        $this->level = max($level, MadelineProtoLogger::NOTICE);
 
         return $this;
     }
@@ -180,7 +180,7 @@ final class Logger extends SettingsAbstract
      */
     public function setMaxSize(int $maxSize): self
     {
-        $this->maxSize = $maxSize === -1 ? $maxSize : \max($maxSize, 25 * 1024 * 1024);
+        $this->maxSize = $maxSize === -1 ? $maxSize : max($maxSize, 25 * 1024 * 1024);
 
         return $this;
     }

@@ -50,7 +50,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = $ctx->getStream($header);
-        $this->memory_stream = \fopen('php://memory', 'r+');
+        $this->memory_stream = fopen('php://memory', 'r+');
     }
     /**
      * Async chunked read.
@@ -80,7 +80,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function disconnect(): void
     {
         if ($this->memory_stream) {
-            \fclose($this->memory_stream);
+            fclose($this->memory_stream);
             $this->memory_stream = null;
         }
         if ($this->stream) {
@@ -98,16 +98,16 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $length = $size - $offset;
         if ($length === 0 || $size > self::MAX_SIZE) {
-            $new_memory_stream = \fopen('php://memory', 'r+');
+            $new_memory_stream = fopen('php://memory', 'r+');
             if ($length) {
-                \fwrite($new_memory_stream, \fread($this->memory_stream, $length));
-                \fseek($new_memory_stream, 0);
+                fwrite($new_memory_stream, fread($this->memory_stream, $length));
+                fseek($new_memory_stream, 0);
             }
-            \fclose($this->memory_stream);
+            fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
         return $this;
@@ -130,34 +130,34 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Amount of data to read
      */
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         if (!$this->stream) {
             throw new ClosedException('MadelineProto stream was disconnected');
         }
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
-            return \fread($this->memory_stream, $length);
+            return fread($this->memory_stream, $length);
         }
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length < $length && $buffer_length) {
-            \fseek($this->memory_stream, $offset + $buffer_length);
+            fseek($this->memory_stream, $offset + $buffer_length);
         }
         while ($buffer_length < $length) {
-            $chunk = $this->read();
+            $chunk = $this->read($cancellation);
             if ($chunk === null) {
                 $this->disconnect();
                 throw new NothingInTheSocketException();
             }
-            \fwrite($this->memory_stream, $chunk);
+            fwrite($this->memory_stream, $chunk);
             $buffer_length += \strlen($chunk);
         }
-        \fseek($this->memory_stream, $offset);
-        return \fread($this->memory_stream, $length);
+        fseek($this->memory_stream, $offset);
+        return fread($this->memory_stream, $length);
     }
     /**
      * Async write.
@@ -184,11 +184,11 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      */
     public function bufferClear(): string
     {
-        $size = \fstat($this->memory_stream)['size'];
-        $offset = \ftell($this->memory_stream);
+        $size = fstat($this->memory_stream)['size'];
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
-        $data = \fread($this->memory_stream, $buffer_length);
-        \fclose($this->memory_stream);
+        $data = fread($this->memory_stream, $buffer_length);
+        fclose($this->memory_stream);
         $this->memory_stream = null;
         return $data;
     }

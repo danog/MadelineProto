@@ -34,13 +34,13 @@ trait Constructors
     private array $docs_constructors;
     public function mkConstructors(): void
     {
-        foreach (\glob('constructors/'.$this->any) as $unlink) {
-            \unlink($unlink);
+        foreach (glob('constructors/'.$this->any) as $unlink) {
+            unlink($unlink);
         }
-        if (\file_exists('constructors')) {
-            \rmdir('constructors');
+        if (file_exists('constructors')) {
+            rmdir('constructors');
         }
-        \mkdir('constructors');
+        mkdir('constructors');
         $this->docs_constructors = [];
         $this->logger->logger('Generating constructors documentation...', Logger::NOTICE);
         $got = [];
@@ -74,13 +74,13 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
-                if (\preg_match('/%/', $param[$type_or_subtype])) {
-                    $param[$type_or_subtype] = $this->TL->getConstructors()->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
+                $type_or_bare_type = ctype_upper(Tools::end(explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true) ? 'types' : 'constructors';
+                $param[$type_or_subtype] = str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
+                if (preg_match('/%/', $param[$type_or_subtype])) {
+                    $param[$type_or_subtype] = $this->TL->getConstructors()->findByType(str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
-                if (\substr($param[$type_or_subtype], -1) === '>') {
-                    $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
+                if (substr($param[$type_or_subtype], -1) === '>') {
+                    $param[$type_or_subtype] = substr($param[$type_or_subtype], 0, -1);
                 }
                 $params .= "'".$param['name']."' => ";
                 $param[$type_or_subtype] = '['.self::markdownEscape($param[$type_or_subtype]).'](/API_docs/'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
@@ -130,12 +130,12 @@ trait Constructors
                     continue;
                 }
                 $ptype = $param[isset($param['subtype']) ? 'subtype' : 'type'];
-                if (\preg_match('/%/', $ptype)) {
-                    $ptype = $this->TL->getConstructors()->findByType(\str_replace('%', '', $ptype))['predicate'];
+                if (preg_match('/%/', $ptype)) {
+                    $ptype = $this->TL->getConstructors()->findByType(str_replace('%', '', $ptype))['predicate'];
                 }
-                $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true)) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
-                if (\substr($ptype, -1) === '>') {
-                    $ptype = \substr($ptype, 0, -1);
+                $type_or_bare_type = (ctype_upper(Tools::end(explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'], true)) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
+                if (substr($ptype, -1) === '>') {
+                    $ptype = substr($ptype, 0, -1);
                 }
                 switch ($ptype) {
                     case 'true':
@@ -143,10 +143,10 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer'], true) && !isset($this->settings['td'])) {
+                if (strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'], true) && !isset($this->settings['td'])) {
+                if (strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
                 }
                 if (\in_array($ptype, ['InputMessage'], true) && !isset($this->settings['td'])) {
@@ -161,7 +161,7 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors()->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'], true) ? 'Optional' : 'Yes').'|';
                 if (!isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptionsRef()['constructors'][$constructor]['description'])) {
@@ -197,9 +197,9 @@ trait Constructors
             $lua_params = "{_='".$constructor."'".$lua_params.'}';
             $pwr_params = '{"_": "'.$constructor.'"'.$pwr_params.'}';
             $description = isset($this->TL->getDescriptionsRef()['constructors'][$constructor]) ? $this->TL->getDescriptionsRef()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
-            $symFile = \str_replace('.', '_', $constructor.$layer);
+            $symFile = str_replace('.', '_', $constructor.$layer);
             $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/{$symFile}.html" : '';
-            $description = \str_replace('"', "'", Tools::toString(\rtrim(\explode("\n", $description)[0], ':')));
+            $description = str_replace('"', "'", Tools::toString(rtrim(explode("\n", $description)[0], ':')));
             $header = '---
 title: "'.$constructor.'"
 description: "'.$description.'"
@@ -231,19 +231,19 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
                 if ($hasentities) {
                     $example = $this->template('parse_mode');
                 }
-                $example .= $this->template('constructor-example', \str_replace('.', '_', $constructor.$layer), $params, $lua_params);
+                $example .= $this->template('constructor-example', str_replace('.', '_', $constructor.$layer), $params, $lua_params);
             }
-            \file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
+            file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
         $this->logger->logger('Generating constructors index...', Logger::NOTICE);
-        \ksort($this->docs_constructors);
+        ksort($this->docs_constructors);
         $last_namespace = '';
         foreach ($this->docs_constructors as $constructor => &$value) {
-            $new_namespace = \preg_replace('/_.*/', '', $constructor);
+            $new_namespace = preg_replace('/_.*/', '', $constructor);
             $br = $new_namespace != $last_namespace ? "***\n<br><br>" : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        \file_put_contents('constructors/'.$this->index, $this->template('constructors-index', \implode('', $this->docs_constructors)));
+        file_put_contents('constructors/'.$this->index, $this->template('constructors-index', implode('', $this->docs_constructors)));
     }
 }

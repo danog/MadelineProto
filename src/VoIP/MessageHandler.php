@@ -52,12 +52,12 @@ final class MessageHandler
         if ($l <= 253) {
             $concat .= \chr($l);
             $concat .= $object;
-            $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
+            $concat .= pack('@'.Tools::posmod(-$l - 1, 4));
         } else {
             $concat .= \chr(254);
-            $concat .= \substr(Tools::packSignedInt($l), 0, 3);
+            $concat .= substr(Tools::packSignedInt($l), 0, 3);
             $concat .= $object;
-            $concat .= \pack('@'.Tools::posmod(-$l, 4));
+            $concat .= pack('@'.Tools::posmod(-$l, 4));
         }
 
         return $concat;
@@ -96,7 +96,7 @@ final class MessageHandler
                     $message .= \chr($stream['id']);
                     $message .= \chr($stream['type']);
                     $message .= $stream['codec'];
-                    $message .= \pack('v', $stream['frame_duration']);
+                    $message .= pack('v', $stream['frame_duration']);
                     $message .= \chr($stream['enabled']);
                 }
                 break;
@@ -116,7 +116,7 @@ final class MessageHandler
                 $flags = $flags << 6;
                 $flags = $flags | $args['stream_id'];
                 $message .= \chr($flags);
-                $message .= $length > 255 ? \pack('v', $length) : \chr($length);
+                $message .= $length > 255 ? pack('v', $length) : \chr($length);
                 $message .= Tools::packUnsignedInt($args['timestamp']);
                 $message .= $args['data'];
                 break;
@@ -136,7 +136,7 @@ final class MessageHandler
                     $flags = $flags << 6;
                     $flags = $flags | $args[$x]['stream_id'];
                     $message .= \chr($flags);
-                    $message .= $length > 255 ? \pack('v', $length) : \chr($length);
+                    $message .= $length > 255 ? pack('v', $length) : \chr($length);
                     $message .= Tools::packUnsignedInt($args[$x]['timestamp']);
                     $message .= $args[$x]['data'];
                 }
@@ -150,7 +150,7 @@ final class MessageHandler
                     $flags = $flags << 6;
                     $flags = $flags | $args[$x]['stream_id'];
                     $message .= \chr($flags);
-                    $message .= $length > 255 ? \pack('v', $length) : \chr($length);
+                    $message .= $length > 255 ? pack('v', $length) : \chr($length);
                     $message .= Tools::packUnsignedInt($args[$x]['timestamp']);
                     $message .= $args[$x]['data'];
                 }

@@ -74,10 +74,11 @@ class SecretHandler extends SimpleEventHandler
      * Handle secret chat messages.
      */
     #[Handler]
-    public function handle(Incoming&SecretMessage $update): void
+    public function handle(Incoming&SecretMessage $message): void
     {
-        if ($update->media) {
-            $this->logger($update->media->downloadToDir('/tmp'));
+        if ($message->media) {
+            $path = $message->media->downloadToDir('/tmp');
+            $message->reply($path);
         }
         /*if (isset($this->sent[$update->chatId])) {
             return;

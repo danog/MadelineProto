@@ -112,10 +112,10 @@ trait Reliable
             $cur_info = 0;
             if (!isset($this->incoming_messages[$msg_id])) {
                 $shifted = $msg_id >> 32;
-                if ($shifted > (\time() + $this->time_delta + 30)) {
+                if ($shifted > (time() + $this->time_delta + 30)) {
                     $this->API->logger("Do not know anything about {$msg_id} and it is too big");
                     $cur_info |= 3;
-                } elseif ($shifted < (\time() + $this->time_delta - 300)) {
+                } elseif ($shifted < (time() + $this->time_delta - 300)) {
                     $this->API->logger("Do not know anything about {$msg_id} and it is too small");
                     $cur_info |= 1;
                 } else {

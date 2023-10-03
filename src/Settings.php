@@ -426,7 +426,7 @@ final class Settings extends SettingsAbstract
 
     public function applyChanges(): SettingsAbstract
     {
-        foreach (\get_object_vars($this) as $setting) {
+        foreach (get_object_vars($this) as $setting) {
             if ($setting instanceof SettingsAbstract) {
                 $setting->applyChanges();
             }

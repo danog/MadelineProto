@@ -372,6 +372,8 @@ final class Connection
             }
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
+            } elseif (isset($arguments['message']['reply_to']['reply_to_msg_id'])) {
+                $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to']['reply_to_msg_id'];
             }
         } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
             if ($method === 'messages.uploadMedia') {
@@ -414,7 +416,16 @@ final class Connection
             $this->API->logger($arguments);
         } elseif ($method === 'messages.sendEncryptedFile' || $method === 'messages.uploadEncryptedFile') {
             if (isset($arguments['file'])) {
-                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
+                if (
+                    (
+                        !\is_array($arguments['file'])
+                        || !(
+                            isset($arguments['file']['_'])
+                            && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_'])['type'] === 'InputEncryptedFile'
+                        )
+                    )
+                    && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()
+                ) {
                     $arguments['file'] = ($this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {
@@ -428,7 +439,7 @@ final class Connection
                 }
             }
             return;
-        } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat'], true) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
+        } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat'], true) && isset($arguments['chat_id']) && (!is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
             $res = $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
@@ -516,8 +527,8 @@ final class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
-        if ($flush && isset($this->writer)) {
-            $this->writer->resume();
+        if ($flush) {
+            $this->flush();
         }
         $this->connect();
         $promise->await();

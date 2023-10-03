@@ -113,7 +113,7 @@ final class DataCenter
     }
     public static function isTest(int $dc): bool
     {
-        return \abs($dc) > 10000;
+        return abs($dc) > 10000;
     }
     public static function isMedia(int $dc): bool
     {
@@ -146,11 +146,11 @@ final class DataCenter
             return null;
         }
 
-        if (\preg_match("/\\[(?P<ip>[0-9a-f:]+)](:(?P<port>\\d+))?$/", $bindTo, $match)) {
+        if (preg_match("/\\[(?P<ip>[0-9a-f:]+)](:(?P<port>\\d+))?$/", $bindTo, $match)) {
             $ip = $match['ip'];
             $port = (int) ($match['port'] ?? 0);
 
-            if (\inet_pton($ip) === false) {
+            if (inet_pton($ip) === false) {
                 throw new \Error("Invalid IPv6 address: $ip");
             }
 
@@ -161,11 +161,11 @@ final class DataCenter
             return "[$ip]:$port";
         }
 
-        if (\preg_match("/(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)(:(?P<port>\\d+))?$/", $bindTo, $match)) {
+        if (preg_match("/(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)(:(?P<port>\\d+))?$/", $bindTo, $match)) {
             $ip = $match['ip'];
             $port = (int) ($match['port'] ?? 0);
 
-            if (\inet_pton($ip) === false) {
+            if (inet_pton($ip) === false) {
                 throw new \Error("Invalid IPv4 address: $ip");
             }
 
@@ -211,20 +211,20 @@ final class DataCenter
                 [[DefaultStream::class, []], [UdpBufferedStream::class, []]],
         };
         if ($this->getSettings()->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
-            $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+            $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
         }
         if (!\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             switch ($this->getSettings()->getTransport()) {
                 case DefaultStream::class:
                     if ($this->getSettings()->getObfuscated()) {
-                        $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                        $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
                     }
                     break;
                 case WssStream::class:
-                    $default = [[DefaultStream::class, []], [WssStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                    $default = [[DefaultStream::class, []], [WssStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
                     break;
                 case WsStream::class:
-                    $default = [[DefaultStream::class, []], [WsStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
+                    $default = [[DefaultStream::class, []], [WsStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
                     break;
             }
         }
@@ -235,7 +235,7 @@ final class DataCenter
             $extra = isset($this->API->dcList[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->API->dcList[$test][$ipv6][$dc_number]['secret']] : [];
             $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
             if ($only) {
-                \array_unshift($combos, $combo);
+                array_unshift($combos, $combo);
             } else {
                 $combos []= $combo;
             }
@@ -253,7 +253,7 @@ final class DataCenter
                         if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
                             $combo[\count($combo) - 2][1] = $extra;
                         } else {
-                            $mtproto = \end($combo);
+                            $mtproto = end($combo);
                             $combo[\count($combo) - 1] = [$proxy, $extra];
                             $combo[] = $mtproto;
                         }
@@ -261,12 +261,12 @@ final class DataCenter
                         if ($orig[1][0] === BufferedRawStream::class) {
                             [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                             $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
+                            $combo = array_merge($first, $second);
                         } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
                             [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                             $first[] = [BufferedRawStream::class, []];
                             $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
+                            $combo = array_merge($first, $second);
                         }
                     }
                     $proxyCombos []= $combo;
@@ -274,12 +274,12 @@ final class DataCenter
             }
         }
         if ($this->getSettings()->getRetry()) {
-            $combos = \array_merge($proxyCombos, $combos);
+            $combos = array_merge($proxyCombos, $combos);
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
         } elseif ($proxyCombos) {
             $combos = $proxyCombos;
         }
-        $combos = \array_unique($combos, SORT_REGULAR);
+        $combos = array_unique($combos, SORT_REGULAR);
 
         $bind = self::normalizeBindToOption($this->getSettings()->getBindTo());
         $onlyIPv6 = null;
@@ -307,10 +307,10 @@ final class DataCenter
                         $address = "[$address]";
                     }
                     $port = $this->API->dcList[$test][$ipv6][$dc_number]['port'];
-                    foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
-                        $stream = \end($combo)[0];
+                    foreach (array_unique([$port, 443, 80, 88, 5222]) as $port) {
+                        $stream = end($combo)[0];
                         if ($stream === HttpsStream::class) {
-                            $subdomain = $this->getSettings()->getSslSubdomains()[\abs($dc_number)] ?? null;
+                            $subdomain = $this->getSettings()->getSslSubdomains()[abs($dc_number)] ?? null;
                             if (!$subdomain) {
                                 continue;
                             }
@@ -337,7 +337,7 @@ final class DataCenter
                             if (\in_array($stream[0], [WsStream::class, WssStream::class], true) && $stream[1] === []) {
                                 $stream[1] = $this->dohWrapper->webSocketConnector;
                                 if ($stream[0] === WssStream::class) {
-                                    $subdomain = $this->getSettings()->getSslSubdomains()[\abs($dc_number)] ?? null;
+                                    $subdomain = $this->getSettings()->getSslSubdomains()[abs($dc_number)] ?? null;
                                     if (!$subdomain) {
                                         continue;
                                     }

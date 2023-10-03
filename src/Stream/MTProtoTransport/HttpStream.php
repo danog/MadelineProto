@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -72,7 +73,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     public function setExtra($extra): void
     {
         if (isset($extra['user']) && isset($extra['password'])) {
-            $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";
+            $this->header = base64_encode($extra['user'].':'.$extra['password'])."\r\n";
         }
     }
     /**
@@ -117,25 +118,25 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
             }
             $was_crlf = $piece === "\r\n";
         }
-        $headers = \explode("\r\n", $headers);
-        [$protocol, $code, $description] = \explode(' ', $headers[0], 3);
-        [$protocol, $protocol_version] = \explode('/', $protocol);
+        $headers = explode("\r\n", $headers);
+        [$protocol, $code, $description] = explode(' ', $headers[0], 3);
+        [$protocol, $protocol_version] = explode('/', $protocol);
         if ($protocol !== 'HTTP') {
             throw new Exception('Wrong protocol');
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (\array_pop($headers).\array_pop($headers) !== '') {
+        if (array_pop($headers).array_pop($headers) !== '') {
             throw new Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
             unset($headers[$key]);
-            $current_header = \explode(':', $current_header, 2);
-            $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
+            $current_header = explode(':', $current_header, 2);
+            $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
         $close = $protocol_version === '1.0';
         if (isset($headers['connection'])) {
-            $close = \strtolower($headers['connection']) === 'close';
+            $close = strtolower($headers['connection']) === 'close';
         }
         if ($code !== 200) {
             $read = '';
@@ -160,7 +161,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         return $buffer;
     }
-    public function bufferRead(int $length): string
+    public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         return $this->code;
     }

@@ -41,7 +41,7 @@ final class SecretChat extends IpcCapable
         public readonly int $otherID,
     ) {
         parent::__construct($API);
-        $this->created = \time();
+        $this->created = time();
     }
 
     /**

@@ -52,19 +52,19 @@ final class DocsBuilder
     public function __construct(Logger $logger, array $settings)
     {
         $this->logger = $logger;
-        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(null);
         $this->TL->init($settings['TL']);
         $this->settings = $settings;
-        if (!\file_exists($this->settings['output_dir'])) {
-            \mkdir($this->settings['output_dir']);
+        if (!file_exists($this->settings['output_dir'])) {
+            mkdir($this->settings['output_dir']);
         }
-        \chdir($this->settings['output_dir']);
+        chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
 
-        foreach (\glob($this->settings['template'].'/*') as $template) {
-            $this->templates[\basename($template, '.md')] = \file_get_contents($template);
+        foreach (glob($this->settings['template'].'/*') as $template) {
+            $this->templates[basename($template, '.md')] = file_get_contents($template);
         }
     }
     /**
@@ -75,25 +75,25 @@ final class DocsBuilder
 
     protected static function markdownEscape(string $s): string
     {
-        return \str_replace('_', '\\_', $s);
+        return str_replace('_', '\\_', $s);
     }
     public $types = [];
     public $any = '*';
     public function mkDocs(): void
     {
         Logger::log('Generating documentation index...', Logger::NOTICE);
-        \file_put_contents($this->index, $this->template('index', $this->settings['description']));
+        file_put_contents($this->index, $this->template('index', $this->settings['description']));
 
         $this->mkMethods();
         $this->mkConstructors();
-        foreach (\glob('types/*') as $unlink) {
-            \unlink($unlink);
+        foreach (glob('types/*') as $unlink) {
+            unlink($unlink);
         }
-        if (\file_exists('types')) {
-            \rmdir('types');
+        if (file_exists('types')) {
+            rmdir('types');
         }
-        \mkdir('types');
-        \ksort($this->types);
+        mkdir('types');
+        ksort($this->types);
         $index = '';
         Logger::log('Generating types documentation...', Logger::NOTICE);
         foreach ($this->types as $otype => $keys) {
@@ -110,10 +110,10 @@ final class DocsBuilder
             $methods = '';
             foreach ($keys['methods'] as $data) {
                 $name = $data['method'];
-                $md_name = \str_replace(['.', '_'], ['->', '\\_'], $name);
+                $md_name = str_replace(['.', '_'], ['->', '\\_'], $name);
                 $methods .= "[\$MadelineProto->$md_name](/API_docs/methods/$name.md)  \n\n";
             }
-            $symFile = \str_replace('.', '_', $type);
+            $symFile = str_replace('.', '_', $type);
             $redir = $symFile !== $type ? "\nredirect_from: /API_docs/types/{$symFile}.html" : '';
             $header = '';
             if (!isset($this->settings['td'])) {
@@ -126,7 +126,7 @@ final class DocsBuilder
             if (isset($this->tdDescriptions['types'][$otype])) {
                 $header = "{$this->tdDescriptions['types'][$otype]}\n\n$header";
             }
-            $header = \sprintf(
+            $header = sprintf(
                 $this->templates['Type'],
                 $type,
                 $redir,
@@ -135,17 +135,17 @@ final class DocsBuilder
                 $constructors,
                 $methods,
             );
-            \file_put_contents('types/'.$type.'.md', $header);
+            file_put_contents('types/'.$type.'.md', $header);
         }
         Logger::log('Generating types index...', Logger::NOTICE);
-        \file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);
+        file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);
 
         Logger::log('Generating additional types...', Logger::NOTICE);
         foreach (['waveform', 'string', 'bytes', 'int', 'int53', 'long', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON', '!X'] as $type) {
-            \file_put_contents("types/$type.md", $this->templates[$type]);
+            file_put_contents("types/$type.md", $this->templates[$type]);
         }
         foreach (['boolFalse', 'boolTrue', 'null', 'photoStrippedSize'] as $constructor) {
-            \file_put_contents("constructors/$constructor.md", $this->templates[$constructor]);
+            file_put_contents("constructors/$constructor.md", $this->templates[$constructor]);
         }
         Logger::log('Done!', Logger::NOTICE);
     }
@@ -163,6 +163,6 @@ final class DocsBuilder
      */
     protected function template(string $name, string ...$params): string
     {
-        return \sprintf($this->templates[$name], ...$params);
+        return sprintf($this->templates[$name], ...$params);
     }
 }

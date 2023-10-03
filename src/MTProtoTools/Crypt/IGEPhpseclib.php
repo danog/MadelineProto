@@ -35,14 +35,14 @@ final class IGEPhpseclib extends IGE
         $this->instance = new AES('ecb');
         $this->instance->setKey($key);
         $this->instance->disablePadding();
-        $this->iv_part_1 = \substr($iv, 0, 16);
-        $this->iv_part_2 = \substr($iv, 16);
+        $this->iv_part_1 = substr($iv, 0, 16);
+        $this->iv_part_2 = substr($iv, 16);
     }
     public function encrypt(string $plaintext): string
     {
         $ciphertext = '';
         for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
-            $plain = \substr($plaintext, $i, 16);
+            $plain = substr($plaintext, $i, 16);
 
             $cipher = $this->instance->encrypt($plain ^ $this->iv_part_1) ^ $this->iv_part_2;
 
@@ -58,7 +58,7 @@ final class IGEPhpseclib extends IGE
     {
         $plaintext = '';
         for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
-            $cipher = \substr($ciphertext, $i, 16);
+            $cipher = substr($ciphertext, $i, 16);
 
             $plain = $this->instance->decrypt($cipher ^ $this->iv_part_2) ^ $this->iv_part_1;
 

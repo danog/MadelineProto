@@ -46,10 +46,10 @@ abstract class AbstractAPI extends InternalDoc
                 if ($e instanceof SecurityException || $e instanceof SignalException) {
                     throw $e;
                 }
-                if (\str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
+                if (str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
                     throw $e;
                 }
-                $t = \time();
+                $t = time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
                 if ($errors[$t] > 10 && (!$this->wrapper->getAPI()->isInited() || !$started)) {

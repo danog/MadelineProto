@@ -17,8 +17,10 @@
 namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\Cancellation;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
 /**
@@ -60,14 +62,24 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly string $botApiFileUniqueId;
 
     /** @internal Media location */
-    protected readonly array $location;
+    public readonly array $location;
 
     /** @internal Encryption key for secret chat files */
-    protected readonly ?string $key;
+    public readonly ?string $key;
     /** @internal Encryption IV for secret chat files */
-    protected readonly ?string $iv;
+    public readonly ?string $iv;
     /** @internal Encryption key fingerprint for secret chat files */
     protected readonly ?int $keyFingerprint;
+
+    /** Whether this media originates from a secret chat. */
+    public readonly bool $encrypted;
+
+    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
+    public readonly ?Bytes $thumb;
+    /** Thumbnail height only for secret chats. */
+    public readonly ?int $thumbHeight;
+    /** Thumbnail width only for secret chats. */
+    public readonly ?int $thumbWidth;
 
     /** @internal */
     public function __construct(
@@ -101,6 +113,15 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
         $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
         $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
+        if ($this->encrypted = isset($rawMedia['iv'])) {
+            $this->thumb = $rawMedia['thumb'] ?? null;
+            $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
+            $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
+        } else {
+            $this->thumb = null;
+            $this->thumbHeight = null;
+            $this->thumbWidth = null;
+        }
     }
 
     /**
@@ -118,9 +139,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
      *
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
     {
-        return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end);
+        return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end, $cancellation);
     }
 
     /**
@@ -129,10 +150,10 @@ abstract class Media extends IpcCapable implements JsonSerializable
      * @param string $dir Directory where to download the file
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function downloadToDir(?string $dir = null, ?callable $cb = null): string
+    public function downloadToDir(?string $dir = null, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
-        $dir ??= \getcwd();
-        return $this->getClient()->downloadToDir($this, $dir, $cb);
+        $dir ??= getcwd();
+        return $this->getClient()->downloadToDir($this, $dir, $cb, $cancellation);
     }
     /**
      * Download the media to file.
@@ -140,9 +161,9 @@ abstract class Media extends IpcCapable implements JsonSerializable
      * @param string $file Downloaded file path
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function downloadToFile(string $file, ?callable $cb = null): string
+    public function downloadToFile(string $file, ?callable $cb = null, ?Cancellation $cancellation = null): string
     {
-        return $this->getClient()->downloadToFile($this, $file, $cb);
+        return $this->getClient()->downloadToFile($this, $file, $cb, $cancellation);
     }
 
     /**
@@ -160,7 +181,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public function getDownloadInfo(): array
     {
         $result = [
-            'name' => \basename($this->fileName, $this->fileExt),
+            'name' => basename($this->fileName, $this->fileExt),
             'ext' => $this->fileExt,
             'mime' => $this->mimeType,
             'size' => $this->size,
@@ -176,7 +197,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** @internal */
     public function jsonSerialize(): mixed
     {
-        $v = \get_object_vars($this);
+        $v = get_object_vars($this);
         unset($v['API'], $v['session'], $v['location'], $v['key'], $v['iv'], $v['keyFingerprint']);
         return $v;
     }

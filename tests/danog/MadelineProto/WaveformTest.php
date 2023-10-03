@@ -31,11 +31,11 @@ class WaveformTest extends TestCase
     }
     public static function provideInvalidWaveforms(): \Generator
     {
-        yield [\array_fill(0, 99, 0)];
-        yield [\array_fill(0, 101, 0)];
-        yield [\array_fill(0, 100, -1)];
-        yield [\array_fill(0, 100, 32)];
-        yield [\array_fill(0, 100, "10")];
+        yield [array_fill(0, 99, 0)];
+        yield [array_fill(0, 101, 0)];
+        yield [array_fill(0, 100, -1)];
+        yield [array_fill(0, 100, 32)];
+        yield [array_fill(0, 100, "10")];
         yield [[]];
     }
     public static function provideWaveforms(): \Generator
@@ -46,9 +46,9 @@ class WaveformTest extends TestCase
     }
     private static function getWaveforms(): \Generator
     {
-        yield \array_fill(0, 100, 0);
-        yield \array_fill(0, 100, 10);
-        yield \array_fill(0, 100, 31);
+        yield array_fill(0, 100, 0);
+        yield array_fill(0, 100, 10);
+        yield array_fill(0, 100, 31);
         $result = [];
         for ($x = 0; $x < 100; $x++) {
             $result []= $x % 32;

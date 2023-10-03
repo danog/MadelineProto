@@ -124,15 +124,15 @@ final class MinDatabase implements TLCallback
     }
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), \array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
+        return array_merge(array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
     }
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return \array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
+        return array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
     }
     public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return \array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
+        return array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
     }
     public function getTypeMismatchCallbacks(): array
     {
@@ -186,7 +186,7 @@ final class MinDatabase implements TLCallback
     }
     public function addOrigin(array $data = []): void
     {
-        $cache = \array_pop($this->cache);
+        $cache = array_pop($this->cache);
         if ($cache === null) {
             throw new Exception('Trying to add origin with no origin context set');
         }
@@ -235,7 +235,7 @@ final class MinDatabase implements TLCallback
         $id = $this->API->getIdInternal($object);
         $dbObject = $this->pendingDb[$id] ?? $this->db[$id];
         if ($dbObject) {
-            $new = \array_merge($object, $dbObject);
+            $new = array_merge($object, $dbObject);
             $new['_'] .= 'FromMessage';
             $new['peer'] = $this->API->getInputPeer($new['peer']);
             if (($new['peer']['min'] ?? false)) {
@@ -266,6 +266,6 @@ final class MinDatabase implements TLCallback
     }
     public function __debugInfo()
     {
-        return ['MinDatabase instance '.\spl_object_hash($this)];
+        return ['MinDatabase instance '.spl_object_hash($this)];
     }
 }

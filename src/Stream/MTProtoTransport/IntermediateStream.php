@@ -43,7 +43,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->stream = ($ctx->getStream(\str_repeat(\chr(238), 4).$header));
+        $this->stream = ($ctx->getStream(str_repeat(\chr(238), 4).$header));
     }
     /**
      * Async close.
@@ -60,7 +60,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $buffer = $this->stream->getWriteBuffer($length + 4, $append);
-        $buffer->bufferWrite(\pack('V', $length));
+        $buffer->bufferWrite(pack('V', $length));
         return $buffer;
     }
     /**
@@ -71,7 +71,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
-        $length = \unpack('V', $buffer->bufferRead(4))[1];
+        $length = unpack('V', $buffer->bufferRead(4))[1];
         return $buffer;
     }
     /**

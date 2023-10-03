@@ -23,6 +23,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Cancellation;
 use Amp\File\File;
 use Amp\File\Whence;
 use Amp\Http\HttpStatus;
@@ -82,7 +83,7 @@ trait FilesLogic
      * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      */
-    public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null): void
+    public function downloadToBrowser(array|string|FileCallbackInterface|Message $messageMedia, ?callable $cb = null, ?int $size = null, ?string $name = null, ?string $mime = null, ?Cancellation $cancellation = null): void
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -102,7 +103,7 @@ trait FilesLogic
             $messageMedia['size'] = $size ?? $messageMedia['size'];
             $messageMedia['mime'] = $mime ?? $messageMedia['mime'];
             if ($name) {
-                $name = \explode('.', $name, 2);
+                $name = explode('.', $name, 2);
                 $messageMedia['name'] = $name[0];
                 $messageMedia['ext'] = isset($name[1]) ? '.'.$name[1] : '';
             }
@@ -124,11 +125,12 @@ trait FilesLogic
         if (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
-            if (\ob_get_level()) {
-                \ob_end_flush();
-                \ob_implicit_flush();
+            if (ob_get_level()) {
+                ob_end_flush();
+                ob_implicit_flush();
             }
-            $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, ...$result->getServeRange());
+            [$start, $end] = $result->getServeRange();
+            $this->downloadToStream($messageMedia, fopen('php://output', 'w'), $cb, $start, $end, $cancellation);
         }
     }
     /**
@@ -139,11 +141,11 @@ trait FilesLogic
      * @param int      $offset       Offset where to start downloading
      * @param int      $end          Offset where to end download
      */
-    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1): ReadableStream
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
     {
         $pipe = new Pipe(1024*1024);
         $sink = $pipe->getSink();
-        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end)->finally($sink->close(...));
+        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end, $cancellation)->finally($sink->close(...));
         return $pipe->getSource();
     }
     /**
@@ -155,7 +157,7 @@ trait FilesLogic
      * @param int                                                 $offset       Offset where to start downloading
      * @param int                                                 $end          Offset where to end download
      */
-    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1): void
+    public function downloadToStream(mixed $messageMedia, mixed $stream, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): void
     {
         $messageMedia = $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
@@ -169,7 +171,7 @@ trait FilesLogic
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;
-        if (\method_exists($stream, 'seek')) {
+        if (method_exists($stream, 'seek')) {
             try {
                 $stream->seek($offset);
                 $seekable = true;
@@ -193,7 +195,7 @@ trait FilesLogic
             }
             return \strlen($payload);
         };
-        $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end);
+        $this->downloadToCallable($messageMedia, $callable, $cb, $seekable, $offset, $end, null, $cancellation);
     }
 
     /**
@@ -208,7 +210,7 @@ trait FilesLogic
      * @param null|string                                                                  $name         Name of file to download, required for bot API file IDs.
      * @param null|string                                                                  $mime         MIME type of file to download, required for bot API file IDs.
      */
-    public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null): Response
+    public function downloadToResponse(array|string|FileCallbackInterface|Message $messageMedia, ServerRequest $request, ?callable $cb = null, ?int $size = null, ?string $mime = null, ?string $name = null, ?Cancellation $cancellation = null): Response
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
@@ -228,14 +230,15 @@ trait FilesLogic
 
         $result = ResponseInfo::parseHeaders(
             $request->getMethod(),
-            \array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
+            array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
         );
 
         $body = null;
         if ($result->shouldServe()) {
             $pipe = new Pipe(1024 * 1024);
-            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, ...$result->getServeRange());
+            [$start, $end] = $result->getServeRange();
+            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
             $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();
@@ -247,15 +250,15 @@ trait FilesLogic
     /**
      * Upload file to secret chat.
      *
-     * @param FileCallbackInterface|string|array $file     File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                             $fileName File name
      * @param callable                           $cb       Callback
      *
      * @return array InputFile constructor
      */
-    public function uploadEncrypted(FileCallbackInterface|string|array $file, string $fileName = '', ?callable $cb = null): array
+    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null, ?Cancellation $cancellation = null): array
     {
-        return $this->upload($file, $fileName, $cb, true);
+        return $this->upload($file, $fileName, $cb, true, $cancellation);
     }
 
     /**
@@ -286,7 +289,7 @@ trait FilesLogic
             }
             unset($media['url']);
             $media['mime_type'] = Extension::getMimeFromExtension(
-                \pathinfo($url, PATHINFO_EXTENSION),
+                pathinfo($url, PATHINFO_EXTENSION),
                 'application/octet-stream'
             );
         }
@@ -304,7 +307,7 @@ trait FilesLogic
      *
      * @return array InputFile constructor
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -316,17 +319,17 @@ trait FilesLogic
         if ($file instanceof BotApiFileId) {
             $info = $this->getDownloadInfo($file->fileId);
             $info['size'] = $file->size;
-            return $this->uploadFromTgfile($info, $cb, $encrypted);
+            return $this->uploadFromTgfile($info, $cb, $encrypted, $cancellation);
         }
-        if (\is_string($file) || (\is_object($file) && \method_exists($file, '__toString'))) {
-            if (\filter_var($file, FILTER_VALIDATE_URL)) {
-                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+        if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
+            if (filter_var($file, FILTER_VALIDATE_URL)) {
+                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
             }
         } elseif (\is_array($file) || $file instanceof Media) {
-            return $this->uploadFromTgfile($file, $cb, $encrypted);
+            return $this->uploadFromTgfile($file, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof ReadableStream || \is_resource($file)) {
-            return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
+            return $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof LocalFile) {
             $file = $file->file;
@@ -334,7 +337,7 @@ trait FilesLogic
             /** @var Settings $settings */
             $settings = $this->getSettings();
             if (!$settings->getFiles()->getAllowAutomaticUpload()) {
-                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
+                return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
             }
         }
         $file = Tools::absolute($file);
@@ -342,7 +345,7 @@ trait FilesLogic
             throw new Exception(Lang::$current_lang['file_not_exist']);
         }
         if (empty($fileName)) {
-            $fileName = \basename($file);
+            $fileName = basename($file);
         }
         $size = getSize($file);
         if ($size > 512 * 1024 * 8000) {
@@ -350,7 +353,7 @@ trait FilesLogic
         }
         $stream = openFile($file, 'rb');
         $mime = Extension::getMimeFromFile($file);
-        return async($this->uploadFromStream(...), $stream, $size, $mime, $fileName, $cb, $encrypted)->finally($stream->close(...))->await();
+        return async($this->uploadFromStream(...), $stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation)->finally($stream->close(...))->await($cancellation);
     }
 
     /**
@@ -365,7 +368,7 @@ trait FilesLogic
      *
      * @return array InputFile constructor
      */
-    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -378,7 +381,7 @@ trait FilesLogic
             throw new Exception('Invalid stream provided');
         }
         $seekable = false;
-        if (\method_exists($stream, 'seek')) {
+        if (method_exists($stream, 'seek')) {
             try {
                 $stream->seek(0);
                 $seekable = true;
@@ -387,7 +390,7 @@ trait FilesLogic
         }
         $created = false;
         if (!$size) {
-            if ($seekable && \method_exists($stream, 'tell')) {
+            if ($seekable && method_exists($stream, 'tell')) {
                 $stream->seek(0, Whence::End);
                 $size = $stream->tell();
                 $stream->seek(0);
@@ -400,7 +403,7 @@ trait FilesLogic
         if ($stream instanceof File) {
             $lock = new LocalMutex;
             $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock, &$nextOffset): string {
+            $callable = static function (int $offset, int $size) use ($stream, $seekable, $lock, &$nextOffset, $cancellation): string {
                 /** @var Lock */
                 $l = $lock->acquire();
                 try {
@@ -412,7 +415,7 @@ trait FilesLogic
                         Assert::eq($offset, $nextOffset);
                         $nextOffset += $size;
                     }
-                    $result = $stream->read(null, $size);
+                    $result = $stream->read($cancellation, $size);
                     \assert($result !== null);
                     return $result;
                 } finally {
@@ -426,7 +429,7 @@ trait FilesLogic
                 $created = true;
             }
             $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset): string {
+            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset, $cancellation): string {
                 if (!$stream instanceof BufferedRawStream) {
                     throw new \InvalidArgumentException('Invalid stream type');
                 }
@@ -434,17 +437,17 @@ trait FilesLogic
                 $nextOffset += $size;
                 $reader = $stream->getReadBuffer($l);
                 try {
-                    $result = $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size, $cancellation);
                 } catch (NothingInTheSocketException $e) {
                     $reader = $stream->getReadBuffer($size);
-                    $result = $reader->bufferRead($size);
+                    $result = $reader->bufferRead($size, $cancellation);
                 }
                 \assert($result !== null);
                 return $result;
             };
             $seekable = false;
         }
-        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
+        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
         if ($created) {
             /** @var StreamInterface $stream */
             $stream->disconnect();

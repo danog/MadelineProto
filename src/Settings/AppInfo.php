@@ -73,22 +73,22 @@ final class AppInfo extends SettingsAbstract
     {
         // Detect device model
         try {
-            $this->deviceModel = \php_uname('s');
+            $this->deviceModel = php_uname('s');
         } catch (Throwable $e) {
             $this->deviceModel = 'Web server';
         }
         // Detect system version
         try {
-            $this->systemVersion = \php_uname('r');
+            $this->systemVersion = php_uname('r');
         } catch (Throwable $e) {
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language
         Lang::$current_lang =& Lang::$lang[$this->langCode];
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $this->setLangCode(\substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+            $this->setLangCode(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
         } elseif (isset($_SERVER['LANG'])) {
-            $this->setLangCode(\explode('_', $_SERVER['LANG'])[0]);
+            $this->setLangCode(explode('_', $_SERVER['LANG'])[0]);
         }
         $this->init();
         $this->appVersion = \danog\MadelineProto\API::RELEASE;

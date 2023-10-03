@@ -30,7 +30,7 @@ abstract class MessageEntity implements JsonSerializable
      */
     public static function fromRawEntities(array $entities): array
     {
-        return \array_map(static fn (array $entity): MessageEntity => match ($entity['_']) {
+        return array_map(static fn (array $entity): MessageEntity => match ($entity['_']) {
             'messageEntityMention' => new Mention($entity),
             'messageEntityHashtag' => new Hashtag($entity),
             'messageEntityBotCommand' => new BotCommand($entity),

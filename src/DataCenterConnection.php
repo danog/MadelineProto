@@ -161,25 +161,26 @@ final class DataCenterConnection implements JsonSerializable
             $pfs = $this->API->settings->getAuth()->getPfs();
             if (!$this->hasTempAuthKey() || !$this->hasPermAuthKey() || !$this->isBound()) {
                 if (!$this->hasPermAuthKey() && !$cdn && !$media) {
-                    $logger->logger(\sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+                    $logger->logger(sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                     $this->setPermAuthKey($connection->createAuthKey(false));
                 }
                 if ($media) {
                     $this->link(-$this->datacenter);
-                    if ($this->hasTempAuthKey()) {
+                    if ($this->hasTempAuthKey() && $this->isBound()) {
+                        $this->syncAuthorization();
                         return;
                     }
                 }
                 if ($pfs) {
                     if (!$cdn) {
-                        $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+                        $logger->logger(sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey(null);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                         $this->bindTempAuthKey();
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
+                        $logger->logger(sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 } else {
@@ -188,7 +189,7 @@ final class DataCenterConnection implements JsonSerializable
                         $connection->methodCallAsyncRead('help.getConfig', []);
                         $this->syncAuthorization();
                     } elseif (!$this->hasTempAuthKey()) {
-                        $logger->logger(\sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
+                        $logger->logger(sprintf('Generating temporary authorization key for CDN DC %s...', $this->datacenter), Logger::NOTICE);
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 }
@@ -197,6 +198,7 @@ final class DataCenterConnection implements JsonSerializable
                 $this->syncAuthorization();
             }
         } finally {
+            $logger->logger("Done initing auth for DC {$this->datacenter}", Logger::NOTICE);
             EventLoop::queue($lock->release(...));
         }
         if ($this->hasTempAuthKey()) {
@@ -217,15 +219,15 @@ final class DataCenterConnection implements JsonSerializable
             try {
                 $logger->logger('Binding authorization keys...', Logger::VERBOSE);
                 $nonce = Tools::random(8);
-                $expires_at = \time() + $expires_in;
+                $expires_at = time() + $expires_in;
                 $temp_auth_key_id = $this->getTempAuthKey()->getID();
                 $perm_auth_key_id = $this->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
                 $message_data = ($this->API->getTL()->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner', 'nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner'));
                 $message_id = $connection->msgIdHandler->generateMessageId();
                 $seq_no = 0;
-                $encrypted_data = Tools::random(16).Tools::packSignedLong($message_id).\pack('VV', $seq_no, \strlen($message_data)).$message_data;
-                $message_key = \substr(\sha1($encrypted_data, true), -16);
+                $encrypted_data = Tools::random(16).Tools::packSignedLong($message_id).pack('VV', $seq_no, \strlen($message_data)).$message_data;
+                $message_key = substr(sha1($encrypted_data, true), -16);
                 $padding = Tools::random(Tools::posmod(-\strlen($encrypted_data), 16));
                 [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->getPermAuthKey()->getAuthKey());
                 $encrypted_message = $this->getPermAuthKey()->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
@@ -501,7 +503,7 @@ final class DataCenterConnection implements JsonSerializable
             $list .= ', ';
         }
         $this->API->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
-        $this->backup = \array_merge($this->backup, $backup);
+        $this->backup = array_merge($this->backup, $backup);
         unset($this->connections[$id], $this->availableConnections[$id]);
     }
     /**
@@ -601,8 +603,8 @@ final class DataCenterConnection implements JsonSerializable
         if (\count($this->availableConnections) <= 1) {
             return $this->connections[0];
         }
-        $max = \max($this->availableConnections);
-        $key = \array_search($max, $this->availableConnections);
+        $max = max($this->availableConnections);
+        $key = array_search($max, $this->availableConnections);
         // Decrease to implement round robin
         $this->availableConnections[$key]--;
         return $this->connections[$key];
@@ -615,7 +617,7 @@ final class DataCenterConnection implements JsonSerializable
         if (!$this->availableConnections) {
             return;
         }
-        $min = \min($this->availableConnections);
+        $min = min($this->availableConnections);
         if ($min < 50) {
             foreach ($this->availableConnections as &$count) {
                 $count += 50;

@@ -80,7 +80,7 @@ trait AckHandler
         /** @var MTProtoOutgoingMessage */
         foreach ($this->new_outgoing as $message) {
             if ($message->wasSent()
-                && $message->getSent() + $timeout < \time()
+                && $message->getSent() + $timeout < time()
                 && $message->unencrypted === $unencrypted
                 && $message->getConstructor() !== 'msgs_state_req') {
                 if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
@@ -111,7 +111,7 @@ trait AckHandler
         /** @var MTProtoOutgoingMessage $message */
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->wasSent()
-                && $message->getSent() + $timeout < \time()
+                && $message->getSent() + $timeout < time()
                 && $message->unencrypted === $unencrypted
             ) {
                 if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
@@ -121,7 +121,7 @@ trait AckHandler
                     unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     continue;
                 }
-                if ($message->getSent() + $dropTimeout < \time()) {
+                if ($message->getSent() + $dropTimeout < time()) {
                     $this->handleReject($message, fn () => new Exception('Request timeout'));
                     continue;
                 }

@@ -67,7 +67,7 @@ final class ResponseInfo
             return;
         }
         if (isset($headers['range'])) {
-            $range = \explode('=', $headers['range'], 2);
+            $range = explode('=', $headers['range'], 2);
             if (\count($range) == 1) {
                 $range[1] = '';
             }
@@ -75,7 +75,7 @@ final class ResponseInfo
             if ($size_unit == 'bytes') {
                 //multiple ranges could be specified at the same time, but for simplicity only serve the first range
                 //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
-                $list = \explode(',', $range_orig, 2);
+                $list = explode(',', $range_orig, 2);
                 if (\count($list) == 1) {
                     $list[1] = '';
                 }
@@ -89,24 +89,24 @@ final class ResponseInfo
         } else {
             $range = '';
         }
-        $listseek = \explode('-', $range, 2);
+        $listseek = explode('-', $range, 2);
         if (\count($listseek) == 1) {
             $listseek[1] = '';
         }
         [$seek_start, $seek_end] = $listseek;
 
         $size = $messageMedia['size'] ?? 0;
-        $seek_end = empty($seek_end) ? ($size - 1) : \min(\abs(\intval($seek_end)), $size - 1);
+        $seek_end = empty($seek_end) ? ($size - 1) : min(abs(\intval($seek_end)), $size - 1);
 
-        if (!empty($seek_start) && $seek_end < \abs(\intval($seek_start))) {
+        if (!empty($seek_start) && $seek_end < abs(\intval($seek_start))) {
             $this->serve = false;
             $this->code = HttpStatus::RANGE_NOT_SATISFIABLE;
             $this->headers = self::NO_CACHE;
             return;
         }
-        $seek_start = empty($seek_start) ? 0 : \abs(\intval($seek_start));
+        $seek_start = empty($seek_start) ? 0 : abs(\intval($seek_start));
 
-        $isSafari = !empty($headers['user-agent']) && \preg_match('/^((?!chrome|android).)*safari/i', $headers['user-agent']);
+        $isSafari = !empty($headers['user-agent']) && preg_match('/^((?!chrome|android).)*safari/i', $headers['user-agent']);
         if ($range !== '' && $isSafari) {
             //Safari video streaming fix
             $length = ($seek_end - $seek_start + 1);
@@ -219,14 +219,14 @@ final class ResponseInfo
      */
     public function writeHeaders(): void
     {
-        \http_response_code($this->getCode());
+        http_response_code($this->getCode());
         foreach ($this->getHeaders() as $key => $value) {
             if (\is_array($value)) {
                 foreach ($value as $subValue) {
-                    \header("$key: $subValue", false);
+                    header("$key: $subValue", false);
                 }
             } else {
-                \header("$key: $value");
+                header("$key: $value");
             }
         }
     }

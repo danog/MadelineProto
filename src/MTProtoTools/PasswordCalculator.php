@@ -85,8 +85,8 @@ final class PasswordCalculator
                     $object['current_algo']['g'] = new BigInteger($object['current_algo']['g']);
                     $object['current_algo']['p'] = new BigInteger((string) $object['current_algo']['p'], 256);
                     Crypt::checkPG($object['current_algo']['p'], $object['current_algo']['g']);
-                    $object['current_algo']['gForHash'] = \str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-                    $object['current_algo']['pForHash'] = \str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                    $object['current_algo']['gForHash'] = str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                    $object['current_algo']['pForHash'] = str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
                     $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
                     $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
                     break;
@@ -102,7 +102,7 @@ final class PasswordCalculator
                 throw new SecurityException('srp_B > p');
             }
             $this->srp_B = $object['srp_B'];
-            $this->srp_BForHash = \str_pad($object['srp_B']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            $this->srp_BForHash = str_pad($object['srp_B']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $this->srp_id = $object['srp_id'];
         } else {
             $this->current_algo = null;
@@ -117,8 +117,8 @@ final class PasswordCalculator
                 $object['new_algo']['g'] = new BigInteger($object['new_algo']['g']);
                 $object['new_algo']['p'] = new BigInteger((string) $object['new_algo']['p'], 256);
                 Crypt::checkPG($object['new_algo']['p'], $object['new_algo']['g']);
-                $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-                $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                $object['new_algo']['gForHash'] = str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+                $object['new_algo']['pForHash'] = str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), STR_PAD_LEFT);
                 if (isset($object['current_algo'])) {
                     $object['current_algo']['salt1'] = (string) $object['current_algo']['salt1'];
                     $object['current_algo']['salt2'] = (string) $object['current_algo']['salt2'];
@@ -151,7 +151,7 @@ final class PasswordCalculator
      */
     public function hashSha256(string $data, string $salt): string
     {
-        return \hash('sha256', $salt.$data.$salt, true);
+        return hash('sha256', $salt.$data.$salt, true);
     }
     /**
      * Hashes the specified password.
@@ -165,7 +165,7 @@ final class PasswordCalculator
     {
         $buf = $this->hashSha256($password, $client_salt);
         $buf = $this->hashSha256($buf, $server_salt);
-        $hash = \hash_pbkdf2('sha512', $buf, $client_salt, 100000, 0, true);
+        $hash = hash_pbkdf2('sha512', $buf, $client_salt, 100000, 0, true);
         return $this->hashSha256($hash, $server_salt);
     }
     /**
@@ -190,23 +190,23 @@ final class PasswordCalculator
         $id = $this->srp_id;
         $x = new BigInteger($this->hashPassword($password, $client_salt, $server_salt), 256);
         $g_x = $g->powMod($x, $p);
-        $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
+        $k = new BigInteger(hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
         $a = new BigInteger(Tools::random(256), 256);
         $A = $g->powMod($a, $p);
         Crypt::checkG($A, $p);
-        $AForHash = \str_pad($A->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+        $AForHash = str_pad($A->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
-        $u = new BigInteger(\hash('sha256', $AForHash.$BForHash, true), 256);
+        $u = new BigInteger(hash('sha256', $AForHash.$BForHash, true), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
         $S = $b_kg_x->powMod($a_ux, $p);
-        $SForHash = \str_pad($S->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-        $K = \hash('sha256', $SForHash, true);
-        $h1 = \hash('sha256', $pForHash, true);
-        $h2 = \hash('sha256', $gForHash, true);
+        $SForHash = str_pad($S->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+        $K = hash('sha256', $SForHash, true);
+        $h1 = hash('sha256', $pForHash, true);
+        $h2 = hash('sha256', $gForHash, true);
         $h1 ^= $h2;
-        $M1 = \hash('sha256', $h1.\hash('sha256', $client_salt, true).\hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
+        $M1 = hash('sha256', $h1.hash('sha256', $client_salt, true).hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
     /**
@@ -230,7 +230,7 @@ final class PasswordCalculator
             $pForHash = $this->new_algo['pForHash'];
             $x = new BigInteger($this->hashPassword((string) $params['new_password'], $client_salt, $server_salt), 256);
             $v = $g->powMod($x, $p);
-            $vForHash = \str_pad($v->toBytes(), 256, \chr(0), STR_PAD_LEFT);
+            $vForHash = str_pad($v->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             $new_settings['new_algo'] = ['_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', 'salt1' => $client_salt, 'salt2' => $server_salt, 'g' => (int) $g->toString(), 'p' => $pForHash];
             $new_settings['new_password_hash'] = $vForHash;
             $new_settings['hint'] = $params['hint'] ?? '';

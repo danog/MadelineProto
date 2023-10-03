@@ -102,11 +102,11 @@ trait AuthKeyHandler
             $b = new BigInteger(Tools::random(256), 256);
             $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
             Crypt::checkG($params['g_a'], $dh_config['p']);
-            $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
             //$this->logger->logger($key);
-            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
-            $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
-            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+            $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
+            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
             $this->secretChats[$params['id']] = $chat = new SecretChatController(
                 $this,
                 $key,
@@ -141,16 +141,16 @@ trait AuthKeyHandler
             $dh_config = ($this->getDhConfig());
             $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
             Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
-            $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
+            $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
             unset($this->temp_requested_secret_chats[$params['id']]);
-            $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
             //$this->logger->logger($key);
             if ($key['fingerprint'] !== $params['key_fingerprint']) {
                 $this->discardSecretChat($params['id']);
                 throw new SecurityException('Invalid key fingerprint!');
             }
-            $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
-            $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+            $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
+            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
             $this->secretChats[$params['id']] = $chat = new SecretChatController(
                 $this,
                 $key,

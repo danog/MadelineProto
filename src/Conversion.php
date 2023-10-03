@@ -63,7 +63,7 @@ final class Conversion
             throw Exception::extension('sqlite3');
         }
         Magic::start(light: false);
-        if (!isset(\pathinfo($session)['extension'])) {
+        if (!isset(pathinfo($session)['extension'])) {
             $session .= '.session';
         }
         $session = Tools::absolute($session);
@@ -89,12 +89,12 @@ final class Conversion
      */
     public static function pyrogram(string $session, string $new_session, ?SettingsAbstract $settings = null): API
     {
-        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!\extension_loaded('sqlite3')) {
             throw Exception::extension('sqlite3');
         }
         Magic::start(light: false);
-        if (!isset(\pathinfo($session)['extension'])) {
+        if (!isset(pathinfo($session)['extension'])) {
             $session .= '.session';
         }
         $session = Tools::absolute($session);
@@ -112,12 +112,12 @@ final class Conversion
 
     public static function zerobias(string|array $session, string $new_session, ?SettingsAbstract $settings = null): API
     {
-        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (\is_string($session)) {
-            $session = \json_decode($session, true);
+            $session = json_decode($session, true);
         }
         $dc = $session['dc'];
-        $key = \hex2bin($session["dc$dc".'_auth_key']);
+        $key = hex2bin($session["dc$dc".'_auth_key']);
 
         Assert::integer($dc);
         Assert::string($key);
@@ -127,11 +127,11 @@ final class Conversion
     private static function tdesktop_md5($data)
     {
         $result = '';
-        foreach (\str_split(\md5($data), 2) as $byte) {
-            $result .= \strrev($byte);
+        foreach (str_split(md5($data), 2) as $byte) {
+            $result .= strrev($byte);
         }
 
-        return \strtoupper($result);
+        return strtoupper($result);
     }
 
     const FILEOPTION_SAFE = 1;
@@ -145,32 +145,32 @@ final class Conversion
         $name = ($options & self::FILEOPTION_USER ? self::$tdesktop_user_base_path : self::$tdesktop_base_path).$fileName;
         $totry = [];
         foreach (['0', '1', 's'] as $x) {
-            if (\file_exists($name.$x)) {
-                $totry[] = \fopen($name.$x, 'rb');
+            if (file_exists($name.$x)) {
+                $totry[] = fopen($name.$x, 'rb');
             }
         }
         foreach ($totry as $fp) {
-            if (\stream_get_contents($fp, 4) !== 'TDF$') {
+            if (stream_get_contents($fp, 4) !== 'TDF$') {
                 Logger::log('Wrong magic', Logger::ERROR);
                 continue;
             }
-            $versionBytes = \stream_get_contents($fp, 4);
+            $versionBytes = stream_get_contents($fp, 4);
             $version = Tools::unpackSignedInt($versionBytes);
             Logger::log("TDesktop version: $version");
-            $data = \stream_get_contents($fp);
-            $md5 = \substr($data, -16);
-            $data = \substr($data, 0, -16);
+            $data = stream_get_contents($fp);
+            $md5 = substr($data, -16);
+            $data = substr($data, 0, -16);
 
-            $length = \pack('l', \strlen($data));
-            $length = Magic::$BIG_ENDIAN ? \strrev($length) : $length;
+            $length = pack('l', \strlen($data));
+            $length = Magic::$BIG_ENDIAN ? strrev($length) : $length;
 
-            if (\md5($data.$length.$versionBytes.'TDF$', true) !== $md5) {
+            if (md5($data.$length.$versionBytes.'TDF$', true) !== $md5) {
                 Logger::log('Wrong MD5', Logger::ERROR);
             }
 
-            $res = \fopen('php://memory', 'rw+b');
-            \fwrite($res, $data);
-            \fseek($res, 0);
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $data);
+            fseek($res, 0);
 
             return $res;
         }
@@ -183,9 +183,9 @@ final class Conversion
         $f = self::tdesktop_fopen($fileName, $options);
         $data = self::tdesktop_read_bytearray($f);
         $res = self::tdesktop_decrypt($data, self::$tdesktop_key);
-        $length = \unpack('V', \stream_get_contents($res, 4))[1];
+        $length = unpack('V', stream_get_contents($res, 4))[1];
 
-        if ($length > \fstat($res)['size'] || $length < 4) {
+        if ($length > fstat($res)['size'] || $length < 4) {
             throw new Exception('Wrong length');
         }
 
@@ -194,33 +194,33 @@ final class Conversion
 
     private static function tdesktop_read_bytearray($fp, bool $asString = false)
     {
-        $length = Tools::unpackSignedInt(\strrev(\stream_get_contents($fp, 4)));
-        $data = $length > 0 ? \stream_get_contents($fp, $length) : '';
+        $length = Tools::unpackSignedInt(strrev(stream_get_contents($fp, 4)));
+        $data = $length > 0 ? stream_get_contents($fp, $length) : '';
         if ($asString) {
             return $data;
         }
-        $res = \fopen('php://memory', 'rw+b');
-        \fwrite($res, $data);
-        \fseek($res, 0);
+        $res = fopen('php://memory', 'rw+b');
+        fwrite($res, $data);
+        fseek($res, 0);
 
         return $res;
     }
 
     private static function tdesktop_decrypt($data, $auth_key)
     {
-        $message_key = \stream_get_contents($data, 16);
-        $encrypted_data = \stream_get_contents($data);
+        $message_key = stream_get_contents($data, 16);
+        $encrypted_data = stream_get_contents($data);
 
         [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $auth_key, false);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
-        if ($message_key != \substr(\sha1($decrypted_data, true), 0, 16)) {
+        if ($message_key != substr(sha1($decrypted_data, true), 0, 16)) {
             throw new SecurityException('msg_key mismatch');
         }
 
-        $res = \fopen('php://memory', 'rw+b');
-        \fwrite($res, $decrypted_data);
-        \fseek($res, 0);
+        $res = fopen('php://memory', 'rw+b');
+        fwrite($res, $decrypted_data);
+        fseek($res, 0);
 
         return $res;
     }
@@ -307,15 +307,15 @@ final class Conversion
 
     private static function tdesktop(string $session, string $new_session, $settings = [])
     {
-        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $settings['old_session_key'] ??= 'data';
         $settings['old_session_passcode'] ??= '';
 
-        if (\basename($session) !== 'tdata') {
+        if (basename($session) !== 'tdata') {
             $session .= DIRECTORY_SEPARATOR.'tdata';
         }
 
-        [$part_one_md5, $part_two_md5] = \str_split(self::tdesktop_md5($settings['old_session_key']), 16);
+        [$part_one_md5, $part_two_md5] = str_split(self::tdesktop_md5($settings['old_session_key']), 16);
         self::$tdesktop_base_path = $session.DIRECTORY_SEPARATOR;
         self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.DIRECTORY_SEPARATOR;
 
@@ -326,9 +326,9 @@ final class Conversion
 
         if (\strlen($salt)) {
             $keyIterCount = \strlen($settings['old_session_passcode']) ? 4000 : 4;
-            $passKey = \openssl_pbkdf2($settings['old_session_passcode'], $salt, 256, $keyIterCount);
+            $passKey = openssl_pbkdf2($settings['old_session_passcode'], $salt, 256, $keyIterCount);
 
-            self::$tdesktop_key = \stream_get_contents(
+            self::$tdesktop_key = stream_get_contents(
                 self::tdesktop_read_bytearray(
                     self::tdesktop_decrypt($encryptedKey, $passKey),
                 ),
@@ -345,26 +345,26 @@ final class Conversion
             $encryptedKey = self::tdesktop_read_bytearray($data);
             $encryptedInfo = self::tdesktop_read_bytearray($data);
 
-            $hash = \hash('sha512', $salt.$settings['old_session_passcode'].$salt, true);
+            $hash = hash('sha512', $salt.$settings['old_session_passcode'].$salt, true);
             $iterCount = \strlen($settings['old_session_passcode']) ? 100000 : 1;
 
-            $passKey = \openssl_pbkdf2($hash, $salt, 256, $iterCount, 'sha512');
+            $passKey = openssl_pbkdf2($hash, $salt, 256, $iterCount, 'sha512');
 
             $key = self::tdesktop_read_bytearray(self::tdesktop_decrypt($encryptedKey, $passKey), true);
             $info = self::tdesktop_read_bytearray(self::tdesktop_decrypt($encryptedInfo, $key));
 
             self::$tdesktop_key = $key;
 
-            $count = Tools::unpackSignedInt(\strrev(\stream_get_contents($info, 4)));
+            $count = Tools::unpackSignedInt(strrev(stream_get_contents($info, 4)));
             Logger::log("Number of accounts: $count");
             for ($i = 0; $i != $count; $i++) {
-                $idx = Tools::unpackSignedInt(\strrev(\stream_get_contents($info, 4)));
+                $idx = Tools::unpackSignedInt(strrev(stream_get_contents($info, 4)));
                 if ($idx >= 0) {
                     $dataName = $settings['old_session_key'];
                     if ($idx > 0) {
                         $dataName = $settings['old_session_key'].'#'.($idx+1);
                     }
-                    [$part_one_md5] = \str_split(self::tdesktop_md5($dataName), 16);
+                    [$part_one_md5] = str_split(self::tdesktop_md5($dataName), 16);
                 }
             }
         }
@@ -373,86 +373,86 @@ final class Conversion
 
         $auth_keys = [];
 
-        while (!\feof($main)) {
-            $magic = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
+        while (!feof($main)) {
+            $magic = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
             switch ($magic) {
                 case self::dbiDcOptionOldOld:
-                    \stream_get_contents($main, 4);
+                    stream_get_contents($main, 4);
                     self::tdesktop_read_bytearray($main);
                     self::tdesktop_read_bytearray($main);
-                    \stream_get_contents($main, 4);
+                    stream_get_contents($main, 4);
                     break;
                 case self::dbiDcOptionOld:
-                    \stream_get_contents($main, 8);
+                    stream_get_contents($main, 8);
                     self::tdesktop_read_bytearray($main);
-                    \stream_get_contents($main, 4);
+                    stream_get_contents($main, 4);
                     break;
                 case self::dbiDcOptions:
                     self::tdesktop_read_bytearray($main);
                     break;
                 case self::dbiUser:
-                    \stream_get_contents($main, 4);
-                    $main_dc_id = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
+                    stream_get_contents($main, 4);
+                    $main_dc_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
                     break;
                 case self::dbiKey:
-                    $auth_keys[Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)))] = \stream_get_contents($main, 256);
+                    $auth_keys[Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)))] = stream_get_contents($main, 256);
                     break;
                 case self::dbiMtpAuthorization:
                     $main = self::tdesktop_read_bytearray($main);
                     //stream_get_contents($main, 4);
-                    $user_id = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
-                    $main_dc_id = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
-                    $length = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
+                    $user_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
+                    $main_dc_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
+                    $length = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
                     for ($x = 0; $x < $length; $x++) {
-                        $dc = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
-                        $auth_key = \stream_get_contents($main, 256);
+                        $dc = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
+                        $auth_key = stream_get_contents($main, 256);
                         if ($dc <= 5) {
                             $auth_keys[$dc] = $auth_key;
                         }
                     }
                     break 2;
                 case self::dbiAutoDownload:
-                    \stream_get_contents($main, 12);
+                    stream_get_contents($main, 12);
                     break;
                 case self::dbiDialogsMode:
-                    \stream_get_contents($main, 8);
+                    stream_get_contents($main, 8);
                     break;
                 case self::dbiAuthSessionSettings:
                     self::tdesktop_read_bytearray($main);
                     break;
                 case self::dbiConnectionTypeOld:
-                    switch (Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)))) {
+                    switch (Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)))) {
                         case 2:
                         case 3:
                             self::tdesktop_read_bytearray($main);
-                            \stream_get_contents($main, 4);
+                            stream_get_contents($main, 4);
                             self::tdesktop_read_bytearray($main);
                             self::tdesktop_read_bytearray($main);
                             break;
                     }
                     break;
                 case self::dbiConnectionType:
-                    \stream_get_contents($main, 8);
+                    stream_get_contents($main, 8);
                     self::tdesktop_read_bytearray($main);
-                    \stream_get_contents($main, 4);
+                    stream_get_contents($main, 4);
                     self::tdesktop_read_bytearray($main);
                     self::tdesktop_read_bytearray($main);
                     break;
                 case self::dbiThemeKey:
                 case self::dbiLangPackKey:
                 case self::dbiMutePeer:
-                    \stream_get_contents($main, 8);
+                    stream_get_contents($main, 8);
                     break;
                 case self::dbiWindowPosition:
-                    \stream_get_contents($main, 24);
+                    stream_get_contents($main, 24);
                     break;
                 case self::dbiLoggedPhoneNumber:
                     self::tdesktop_read_bytearray($main);
                     break;
                 case self::dbiMutedPeers:
-                    $length = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
+                    $length = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
                     for ($x = 0; $x < $length; $x++) {
-                        \stream_get_contents($main, 8);
+                        stream_get_contents($main, 8);
                     }
                     // no break
                 case self::dbiDownloadPathOld:

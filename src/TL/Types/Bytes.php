@@ -60,7 +60,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      */
     public function jsonSerialize(): array
     {
-        return ['_' => 'bytes', 'bytes' => \base64_encode($this->bytes)];
+        return ['_' => 'bytes', 'bytes' => base64_encode($this->bytes)];
     }
     /**
      * Set char at offset.

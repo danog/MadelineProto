@@ -53,7 +53,7 @@ trait Loop
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && !$inited) {
             try {
                 if (\function_exists('set_time_limit')) {
-                    \set_time_limit(-1);
+                    set_time_limit(-1);
                 }
             } catch (Exception) {
             }
@@ -66,8 +66,8 @@ trait Loop
             $id = Shutdown::addCallback(static function () use (&$logger): void {
                 $params = $_GET;
                 $params['MadelineSelfRestart'] = Tools::randomInt();
-                $url = \explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0] ?? '';
-                $query = \http_build_query($params);
+                $url = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0] ?? '';
+                $query = http_build_query($params);
 
                 WebRunner::selfStart("$url?$query");
 
@@ -80,9 +80,9 @@ trait Loop
             $inited = true;
         } elseif (PHP_SAPI === 'cli') {
             try {
-                if (\function_exists('shell_exec') && \file_exists('/data/data/com.termux/files/usr/bin/termux-wake-lock')) {
+                if (\function_exists('shell_exec') && file_exists('/data/data/com.termux/files/usr/bin/termux-wake-lock')) {
                     /** @psalm-suppress ForbiddenCode */
-                    \shell_exec('/data/data/com.termux/files/usr/bin/termux-wake-lock');
+                    shell_exec('/data/data/com.termux/files/usr/bin/termux-wake-lock');
                 }
             } catch (Throwable) {
             }

@@ -33,27 +33,27 @@ final class FilterRegex extends Filter
     /** @param non-empty-string $regex */
     public function __construct(private readonly string $regex)
     {
-        \preg_match($regex, '');
-        Assert::eq(\preg_last_error_msg(), 'No error');
+        preg_match($regex, '');
+        Assert::eq(preg_last_error_msg(), 'No error');
     }
     public function apply(Update $update): bool
     {
-        if ($update instanceof Message && \preg_match($this->regex, $update->message, $matches)) {
+        if ($update instanceof Message && preg_match($this->regex, $update->message, $matches)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof ButtonQuery && \preg_match($this->regex, $update->data, $matches)) {
+        if ($update instanceof ButtonQuery && preg_match($this->regex, $update->data, $matches)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof InlineQuery && \preg_match($this->regex, $update->query, $matches)) {
+        if ($update instanceof InlineQuery && preg_match($this->regex, $update->query, $matches)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof Story && \preg_match($this->regex, $update->caption, $matches)) {
+        if ($update instanceof Story && preg_match($this->regex, $update->caption, $matches)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;

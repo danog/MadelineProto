@@ -63,7 +63,7 @@ final class CacheContainer
             EventLoop::cancel($this->cacheCleanupId);
         }
         $this->cacheCleanupId = EventLoop::repeat(
-            \max(1, $this->cacheTtl / 5),
+            max(1, $this->cacheTtl / 5),
             fn () => $this->flushCache(),
         );
     }
@@ -86,7 +86,7 @@ final class CacheContainer
             return $this->cache[$index];
         }
 
-        $this->ttl[$index] = \time() + $this->cacheTtl;
+        $this->ttl[$index] = time() + $this->cacheTtl;
         $this->cache[$index] = $result;
 
         return $result;
@@ -133,7 +133,7 @@ final class CacheContainer
             $updatedValues = [];
             $newValues = [];
             $newTtl = [];
-            $now = \time();
+            $now = time();
             foreach ($this->ttl as $key => $ttl) {
                 if ($ttl === true) {
                     $updatedValues[$key] = $this->cache[$key];
@@ -149,7 +149,7 @@ final class CacheContainer
             }
             foreach ($updatedValues as $key => $value) {
                 if (($newValues[$key] = $this->cache[$key]) === $value) {
-                    $newTtl[$key] = \time() + $this->cacheTtl;
+                    $newTtl[$key] = time() + $this->cacheTtl;
                 } else {
                     $newTtl[$key] = $this->ttl[$key];
                 }

@@ -56,7 +56,7 @@ final class ExitFailure
         $this->file = $exception->getFile();
         $this->line = $exception->getLine();
         $this->trace = ContextFlattenThrowableBacktrace($exception);
-        if (\method_exists($exception, 'getTLTrace')) {
+        if (method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
         }
 
@@ -92,10 +92,10 @@ final class ExitFailure
             }
         }
 
-        if ($this->tlTrace && \method_exists($exception, 'setTLTrace')) {
+        if ($this->tlTrace && method_exists($exception, 'setTLTrace')) {
             $exception->setTLTrace($this->tlTrace);
         }
-        if ($this->localized && \method_exists($exception, 'setLocalization')) {
+        if ($this->localized && method_exists($exception, 'setLocalization')) {
             $exception->setLocalization($this->localized);
         }
         return $exception;

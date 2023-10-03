@@ -42,16 +42,16 @@ final class FiltersAnd extends Filter
         foreach ($this->filters as $filter) {
             $filter = $filter->initialize($API);
             if ($filter instanceof self) {
-                $final = \array_merge($final, $filter->filters);
+                $final = array_merge($final, $filter->filters);
             } else {
                 $final []= $filter;
             }
         }
-        $final = \array_filter(
+        $final = array_filter(
             $final,
             fn (Filter $f): bool => !$f instanceof FilterAllowAll,
         );
-        $final = \array_values($final);
+        $final = array_values($final);
         return match (\count($final)) {
             0 => new FilterAllowAll,
             1 => $final[0],

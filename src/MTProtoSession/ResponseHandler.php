@@ -46,8 +46,8 @@ trait ResponseHandler
     public function handleMessages(): void
     {
         while ($this->new_incoming) {
-            \reset($this->new_incoming);
-            $current_msg_id = \key($this->new_incoming);
+            reset($this->new_incoming);
+            $current_msg_id = key($this->new_incoming);
 
             /** @var MTProtoIncomingMessage */
             $message = $this->new_incoming[$current_msg_id];
@@ -96,7 +96,7 @@ trait ResponseHandler
                     }
                     $this->checkInSeqNo($message);
                     unset($newMessage, $message, $msg);
-                    \ksort($this->new_incoming);
+                    ksort($this->new_incoming);
                     break;
                 case 'msg_copy':
                     $this->ackIncomingMessage($message);
@@ -156,13 +156,13 @@ trait ResponseHandler
                         }
                         $this->API->logger('No', Logger::VERBOSE);
                     }
-                    $this->API->logger('Dunno how to handle ' . PHP_EOL . \var_export($message->read(), true), Logger::FATAL_ERROR);
+                    $this->API->logger('Dunno how to handle ' . PHP_EOL . var_export($message->read(), true), Logger::FATAL_ERROR);
                     break;
             }
         }
         $this->new_incoming = [];
         if ($this->pendingOutgoing) {
-            $this->writer->resume();
+            $this->flush();
         }
     }
     /**
@@ -220,7 +220,7 @@ trait ResponseHandler
                     return;
                 case 16:
                 case 17:
-                    $this->time_delta = ($message->getMsgId() >> 32) - \time();
+                    $this->time_delta = ($message->getMsgId() >> 32) - time();
                     $this->API->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
@@ -288,7 +288,7 @@ trait ResponseHandler
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
         }
-        if (\str_starts_with($response['error_message'], 'FILE_REFERENCE_')) {
+        if (str_starts_with($response['error_message'], 'FILE_REFERENCE_')) {
             $this->API->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
             $this->gotResponseForOutgoingMessage($request);
             $msgId = $request->getMsgId();
@@ -312,7 +312,7 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(\time() + 5*60);
+                    $request->setSent(time() + 5*60);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     $prev = $request->getPreviousQueuedMessage();
@@ -336,7 +336,7 @@ trait ResponseHandler
                 }
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
-                $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($this->API->isTestMode()) {
                     $datacenter += 10_000;
                 }
@@ -361,7 +361,7 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(\time() + 5*60);
+                    $request->setSent(time() + 5*60);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
@@ -385,10 +385,10 @@ trait ResponseHandler
                         $this->API->logger($response['error_message'], Logger::FATAL_ERROR);
                         if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
-                            $this->API->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         $this->API->logout();
-                        throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
+                        throw new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
@@ -409,9 +409,9 @@ trait ResponseHandler
                         if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN) {
                             $this->API->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->API->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                             $this->API->logout();
-                            throw new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
+                            throw new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
                         EventLoop::queue($this->shared->initAuthorization(...));
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
@@ -425,20 +425,20 @@ trait ResponseHandler
                 }
                 return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 420:
-                $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
-                if (\is_numeric($seconds) && $seconds < $limit) {
+                if (is_numeric($seconds) && $seconds < $limit) {
                     $this->API->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(\time() + $seconds);
+                    $request->setSent(time() + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
                     EventLoop::delay((float) $seconds, fn () => $this->methodRecall($msgId));
                     return null;
                 }
-                if (\str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
+                if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
                     return fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
                 }
                 // no break

@@ -115,6 +115,8 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null]): WrappedFuture
     {
+        $cancellation = $aargs['cancellation'] ?? null;
+        $cancellation?->throwIfRequested();
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
             return $this->API->methodCallAsyncWrite($method, $args, $aargs);
@@ -129,7 +131,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && \mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+            if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
                 $peer = $args['peer'];
                 $args = $this->API->splitToChunks($args);
                 $promises = [];
@@ -148,9 +150,9 @@ trait CallHandler
                     $promises[] = async($this->methodCallAsyncWrite(...), $method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
-                    $this->writer->resume();
+                    $this->flush();
                 }
-                return new WrappedFuture(async(fn () => \array_map(
+                return new WrappedFuture(async(fn () => array_map(
                     fn (WrappedFuture $f) => $f->await(),
                     await($promises)
                 )));
@@ -185,7 +187,7 @@ trait CallHandler
             queueId: $aargs['queue'] ?? null,
             floodWaitLimit: $aargs['FloodWaitLimit'] ?? null,
             resultDeferred: $response,
-            cancellation: $aargs['cancellation'] ?? null,
+            cancellation: $cancellation,
         );
         if (isset($aargs['msg_id'])) {
             $message->setMsgId($aargs['msg_id']);

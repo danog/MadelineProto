@@ -75,7 +75,7 @@ trait Events
      */
     public function setEventHandler(string $eventHandler): void
     {
-        if (!\is_subclass_of($eventHandler, EventHandler::class)) {
+        if (!is_subclass_of($eventHandler, EventHandler::class)) {
             throw new Exception('Wrong event handler was defined');
         }
         $this->event_handler = $eventHandler;
@@ -98,7 +98,7 @@ trait Events
         $this->pluginInstances = $pluginsNew;
 
         $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
-        \array_map($this->handleUpdate(...), $this->updates);
+        array_map($this->handleUpdate(...), $this->updates);
         $this->updates = [];
         $this->updates_key = 0;
         $this->startUpdateSystem();

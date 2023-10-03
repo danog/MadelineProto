@@ -40,7 +40,7 @@ final class DbPropertiesFactory
         $dbSettings = clone $dbSettings;
 
         if ($dbSettings instanceof DriverDatabaseAbstract) {
-            $config = \array_merge([
+            $config = array_merge([
                 'serializer' => $dbSettings->getSerializer() ?? (
                     Magic::$can_use_igbinary ? SerializerType::IGBINARY : SerializerType::SERIALIZE
                 ),

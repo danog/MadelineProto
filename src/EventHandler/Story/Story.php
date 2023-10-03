@@ -120,7 +120,7 @@ final class Story extends AbstractStory
 
         $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
-        $this->privacy = \array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
+        $this->privacy = array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
 
         $this->recentViewers = $rawStory['views']['recent_viewers'] ?? [];
         $this->views = $rawStory['views']['views_count'] ?? null;
@@ -353,7 +353,7 @@ final class Story extends AbstractStory
     public function getHTML(bool $allowTelegramTags = false): string
     {
         if (!$this->entities) {
-            return \htmlentities($this->caption);
+            return htmlentities($this->caption);
         }
         if ($allowTelegramTags) {
             return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->caption, $this->entities, $allowTelegramTags);

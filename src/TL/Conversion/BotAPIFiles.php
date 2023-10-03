@@ -76,7 +76,7 @@ trait BotAPIFiles
             'file_unique_id' => $fileId->getUniqueBotAPI(),
             'width' => $photoSize['w'],
             'height' => $photoSize['h'],
-            'file_size' => $photoSize['size'] ?? (isset($photoSize['sizes']) ? \end($photoSize['sizes']) : \strlen((string) $photoSize['bytes'])),
+            'file_size' => $photoSize['size'] ?? (isset($photoSize['sizes']) ? end($photoSize['sizes']) : \strlen((string) $photoSize['bytes'])),
             'mime_type' => 'image/jpeg',
             'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg',
         ];
@@ -239,7 +239,7 @@ trait BotAPIFiles
                 $attribute = ['_' => 'documentAttributeVideo', 'round_message' => true];
                 break;
             default:
-                throw new Exception(\sprintf(Lang::$current_lang['file_type_invalid'], $fileId->getTypeName()));
+                throw new Exception(sprintf(Lang::$current_lang['file_type_invalid'], $fileId->getTypeName()));
         }
 
         $constructor = [

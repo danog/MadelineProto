@@ -87,7 +87,7 @@ final class RPC extends SettingsAbstract
      */
     public function getFloodTimeout(): int
     {
-        return \max(5, $this->floodTimeout);
+        return max(5, $this->floodTimeout);
     }
 
     /**

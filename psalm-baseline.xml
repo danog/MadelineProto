@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@1f979f4c33897fc8b42c68a063828381c6d60716">
+<files psalm-version="dev-master@1b12255fb19da5c25413fb0071ab3d1f006bb67b">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -244,7 +244,7 @@
     </MissingClosureParamType>
     <MissingClosureReturnType>
       <code><![CDATA[fn ($v) => $v]]></code>
-      <code><![CDATA[fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
     <MissingConstructor>
       <code>$dbSettings</code>
@@ -310,9 +310,9 @@
       <code>$value</code>
     </MissingClosureParamType>
     <MissingClosureReturnType>
-      <code><![CDATA[fn ($v) => \igbinary_unserialize(\hex2bin($v))]]></code>
-      <code><![CDATA[fn ($v) => \unserialize(\hex2bin($v))]]></code>
-      <code><![CDATA[fn ($value) => \json_decode(\hex2bin($value), true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[fn ($v) => igbinary_unserialize(hex2bin($v))]]></code>
+      <code><![CDATA[fn ($v) => unserialize(hex2bin($v))]]></code>
+      <code><![CDATA[fn ($value) => json_decode(hex2bin($value), true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
   </file>
   <file src="src/Db/PostgresArrayBytea.php">
@@ -329,7 +329,7 @@
     </MissingClosureParamType>
     <MissingClosureReturnType>
       <code><![CDATA[fn ($v) => $v]]></code>
-      <code><![CDATA[fn ($value) => \json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
   </file>
   <file src="src/Db/RedisArray.php">
@@ -391,7 +391,7 @@
       <code>self::$pluginCache</code>
     </PropertyTypeCoercion>
     <RedundantFunctionCall>
-      <code>\array_values</code>
+      <code>array_values</code>
     </RedundantFunctionCall>
     <TypeDoesNotContainType>
       <code><![CDATA[$this->startedInternal]]></code>
@@ -412,7 +412,7 @@
     <LessSpecificReturnStatement>
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
       <code><![CDATA[$client->wrapMessage($client->extractMessage($result))]]></code>
-      <code><![CDATA[\array_map(
+      <code><![CDATA[array_map(
             fn (array $arr): AbstractStory =>
                 $arr['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])
@@ -714,7 +714,7 @@
   </file>
   <file src="src/EventHandler/Privacy.php">
     <PropertyTypeCoercion>
-      <code><![CDATA[\array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules'])]]></code>
+      <code><![CDATA[array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules'])]]></code>
     </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/Query/ChatTrait.php">
@@ -752,7 +752,7 @@
     </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
       <code><![CDATA[$API->wrapMedia($rawStory['media'], $this->protected)]]></code>
-      <code><![CDATA[\array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
+      <code><![CDATA[array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? [])]]></code>
     </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/Story/StoryReaction.php">
@@ -767,7 +767,7 @@
   </file>
   <file src="src/EventHandler/User/Username.php">
     <PropertyTypeCoercion>
-      <code><![CDATA[\array_map(
+      <code><![CDATA[array_map(
             fn (array $username) => new UsernameInfo($username),
             $rawUserName['usernames']
         )]]></code>
@@ -880,7 +880,7 @@
       <code>logger</code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
+      <code><![CDATA[debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PropertyNotSetInConstructor>
       <code>$logger</code>
@@ -1017,8 +1017,8 @@
       <code>$optional</code>
     </PossiblyInvalidOperand>
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
-      <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
+      <code><![CDATA[debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
+      <code><![CDATA[debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PropertyNotSetInConstructor>
       <code>$colors</code>
@@ -1093,7 +1093,7 @@
   </file>
   <file src="src/Loop/Connection/ReadLoop.php">
     <DocblockTypeContradiction>
-      <code><![CDATA[\str_starts_with($e->getReason(), '       ')]]></code>
+      <code><![CDATA[str_starts_with($e->getReason(), '       ')]]></code>
     </DocblockTypeContradiction>
     <InvalidThrow>
       <code>throw $e;</code>
@@ -1258,15 +1258,15 @@
       <code>$callbacks</code>
     </InvalidArgument>
     <InvalidReturnStatement>
-      <code><![CDATA[\array_merge(
-            \array_fill_keys(
+      <code><![CDATA[array_merge(
+            array_fill_keys(
                 [
                     'InputUser',
                     'InputChannel',
                 ],
                 $this->getInputConstructor(...),
             ),
-            \array_fill_keys(
+            array_fill_keys(
                 [
                     'User',
                     'Chat',
@@ -1276,7 +1276,7 @@
                 ],
                 $this->getInfo(...),
             ),
-            \array_fill_keys(
+            array_fill_keys(
                 [
                     'InputMedia',
                     'InputDocument',
@@ -1331,7 +1331,7 @@
       <code>start</code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
+      <code><![CDATA[debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PropertyTypeCoercion>
       <code><![CDATA[$this->sanitizeReportPeers($userOrId)]]></code>
@@ -1400,7 +1400,6 @@
     </MissingReturnType>
     <PossiblyNullReference>
       <code>resume</code>
-      <code>resume</code>
     </PossiblyNullReference>
   </file>
   <file src="src/MTProtoSession/MsgIdHandler.php">
@@ -1414,7 +1413,7 @@
     </MissingClosureReturnType>
     <PossiblyInvalidArgument>
       <code>$response</code>
-      <code>\time() + $seconds</code>
+      <code>time() + $seconds</code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
       <code>$msgId</code>
@@ -1425,13 +1424,12 @@
     <PossiblyNullReference>
       <code>hasReply</code>
       <code>hasReply</code>
-      <code>resume</code>
     </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
     <RiskyCast>
-      <code><![CDATA[\preg_replace('/[^0-9]+/', '', $response['error_message'])]]></code>
+      <code><![CDATA[preg_replace('/[^0-9]+/', '', $response['error_message'])]]></code>
     </RiskyCast>
   </file>
   <file src="src/MTProtoSession/Session.php">
@@ -1547,6 +1545,12 @@
     <MoreSpecificReturnType>
       <code>Message</code>
     </MoreSpecificReturnType>
+    <PossiblyInvalidArgument>
+      <code>$file</code>
+      <code>$file</code>
+      <code><![CDATA[$media['file']]]></code>
+      <code><![CDATA[$media['file']]]></code>
+    </PossiblyInvalidArgument>
   </file>
   <file src="src/MTProtoTools/FilesLogic.php">
     <MissingClosureReturnType>
@@ -1773,7 +1777,7 @@
   </file>
   <file src="src/Magic.php">
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[\end($backtrace)['file']]]></code>
+      <code><![CDATA[end($backtrace)['file']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MyTelegramOrgWrapper.php">
@@ -2235,9 +2239,6 @@
       <code>\is_resource($stream)</code>
       <code>\is_resource($stream)</code>
     </DocblockTypeContradiction>
-    <InvalidScalarArgument>
-      <code>$value</code>
-    </InvalidScalarArgument>
     <MissingClosureParamType>
       <code>$arg</code>
     </MissingClosureParamType>
@@ -2250,6 +2251,7 @@
     <PossiblyInvalidArgument>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>
+      <code>$value</code>
       <code>$value</code>
       <code>$value</code>
       <code><![CDATA[$x['result']]]></code>

@@ -42,7 +42,7 @@ final class FiltersOr extends Filter
         foreach ($this->filters as $filter) {
             $filter = $filter->initialize($API);
             if ($filter instanceof self) {
-                $final = \array_merge($final, $filter->filters);
+                $final = array_merge($final, $filter->filters);
             } else {
                 $final []= $filter;
             }

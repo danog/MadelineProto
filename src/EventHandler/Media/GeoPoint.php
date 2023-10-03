@@ -29,7 +29,7 @@ final class GeoPoint implements JsonSerializable
     /** @internal */
     public function jsonSerialize(): mixed
     {
-        $v = \get_object_vars($this);
+        $v = get_object_vars($this);
         $v['_'] = static::class;
         return $v;
     }

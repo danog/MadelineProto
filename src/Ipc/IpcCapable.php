@@ -38,9 +38,9 @@ abstract class IpcCapable
     /** @internal */
     final public function __sleep()
     {
-        $vars = \get_object_vars($this);
+        $vars = get_object_vars($this);
         unset($vars['API']);
-        return \array_keys($vars);
+        return array_keys($vars);
     }
 
     final protected function getClient(): MTProto|Client
@@ -50,7 +50,7 @@ abstract class IpcCapable
 
     final public function __debugInfo()
     {
-        $vars = \get_object_vars($this);
+        $vars = get_object_vars($this);
         unset($vars['API']);
         return $vars;
     }

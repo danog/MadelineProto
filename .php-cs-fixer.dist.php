@@ -8,6 +8,7 @@ $config = new class extends Amp\CodeStyle\Config {
             'array_indentation' => true,
             'ternary_to_null_coalescing' => true,
             'assign_null_coalescing_to_coalesce_equal' => true,
+            "native_function_invocation" => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced'],
         ]);
     }
 };

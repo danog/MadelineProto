@@ -27,11 +27,11 @@ final class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 164;
+    protected int $layer = 165;
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__ . '/../TL_telegram_v164.tl';
+    protected string $APISchema = __DIR__ . '/../TL_telegram_v165.tl';
     /**
      * MTProto schema path.
      */
@@ -50,7 +50,7 @@ final class TLSchema extends SettingsAbstract
     private bool $wasUpgraded = true;
     public function __sleep()
     {
-        return \array_merge(['wasUpgraded'], parent::__sleep());
+        return array_merge(['wasUpgraded'], parent::__sleep());
     }
 
     /**
@@ -60,7 +60,7 @@ final class TLSchema extends SettingsAbstract
     {
         $exists = false;
         try {
-            $exists = \file_exists($this->APISchema);
+            $exists = file_exists($this->APISchema);
         } catch (Throwable) {
         }
         // Scheme was upgraded or path has changed

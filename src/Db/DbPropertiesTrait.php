@@ -46,8 +46,8 @@ trait DbPropertiesTrait
 
         $prefix = $this->getDbPrefix();
 
-        $className = \explode('\\', static::class);
-        $className = \end($className);
+        $className = explode('\\', static::class);
+        $className = end($className);
 
         $promises = [];
         foreach (static::$dbProperties as $property => $type) {

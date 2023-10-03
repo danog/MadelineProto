@@ -44,7 +44,7 @@ final class ActionSend implements Action
                         $message['media']['_'] !== 'messageMediaWebPage'
                         ? 'messages.sendMedia'
                         : 'messages.sendMessage',
-                    \array_merge($message, ['peer' => $peer]),
+                    array_merge($message, ['peer' => $peer]),
                     ['FloodWaitLimit' => 2*86400]
                 ));
             }

@@ -90,7 +90,7 @@ final class DoHWrapper
         $configProvider = new class implements DnsConfigLoader {
             public function loadConfig(): DnsConfig
             {
-                $loader = \stripos(PHP_OS, 'win') === 0 ? new WindowsDnsConfigLoader() : new UnixDnsConfigLoader();
+                $loader = stripos(PHP_OS, 'win') === 0 ? new WindowsDnsConfigLoader() : new UnixDnsConfigLoader();
                 try {
                     return $loader->loadConfig();
                 } catch (Throwable) {
@@ -147,19 +147,19 @@ final class DoHWrapper
                         if ($orig[1][0] === BufferedRawStream::class) {
                             [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                             $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
+                            $combo = array_merge($first, $second);
                         } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
                             [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                             $first[] = [BufferedRawStream::class, []];
                             $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
+                            $combo = array_merge($first, $second);
                         }
                         $proxyCombos []= $combo;
                     }
                 }
             }
-            $combos = \array_merge($proxyCombos, $combos);
-            $combos = \array_unique($combos, SORT_REGULAR);
+            $combos = array_merge($proxyCombos, $combos);
+            $combos = array_unique($combos, SORT_REGULAR);
         }
 
         $context ??= (new ConnectContext())->withConnectTimeout($this->API->getSettings()->getConnection()->getTimeout())->withBindTo($this->API->getSettings()->getConnection()->getBindTo());

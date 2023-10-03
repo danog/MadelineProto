@@ -32,16 +32,16 @@ final class IGEOpenssl extends IGE
 {
     protected function __construct(private string $key, string $iv)
     {
-        $this->iv_part_1 = \substr($iv, 0, 16);
-        $this->iv_part_2 = \substr($iv, 16);
+        $this->iv_part_1 = substr($iv, 0, 16);
+        $this->iv_part_2 = substr($iv, 16);
     }
     public function encrypt(string $plaintext): string
     {
         $ciphertext = '';
         for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
-            $plain = \substr($plaintext, $i, 16);
+            $plain = substr($plaintext, $i, 16);
 
-            $cipher = \openssl_encrypt($plain ^ $this->iv_part_1, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_2;
+            $cipher = openssl_encrypt($plain ^ $this->iv_part_1, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_2;
 
             $ciphertext .= $cipher;
 
@@ -55,9 +55,9 @@ final class IGEOpenssl extends IGE
     {
         $plaintext = '';
         for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
-            $cipher = \substr($ciphertext, $i, 16);
+            $cipher = substr($ciphertext, $i, 16);
 
-            $plain = \openssl_decrypt($cipher ^ $this->iv_part_2, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_1;
+            $plain = openssl_decrypt($cipher ^ $this->iv_part_2, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_1;
 
             $plaintext .= $plain;
 

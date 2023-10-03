@@ -91,7 +91,7 @@ final class MysqlArray extends SqlArray
     {
         foreach ($params as $key => $value) {
             $value = $this->pdo->quote($value);
-            $sql = \str_replace(":$key", $value, $sql);
+            $sql = str_replace(":$key", $value, $sql);
         }
 
         return $this->db->query($sql);

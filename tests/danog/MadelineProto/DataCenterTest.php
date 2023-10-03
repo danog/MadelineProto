@@ -44,8 +44,8 @@ final class DataCenterTest extends TestCase
     {
         $settings = new Settings;
         $settings->getAppInfo()
-            ->setApiHash(\getenv('API_HASH'))
-            ->setApiId((int) \getenv('API_ID'));
+            ->setApiHash(getenv('API_HASH'))
+            ->setApiId((int) getenv('API_ID'));
         $settings->getLogger()
             ->setType(Logger::FILE_LOGGER)
             ->setExtra(__DIR__.'/../../MadelineProto.log')
@@ -63,10 +63,10 @@ final class DataCenterTest extends TestCase
         }
         self::$proxy = new LeProxyServer(Loop::get());
         self::$proxySocket = self::$proxy->listen('127.0.0.1:0', false);
-        self::$proxyEndpoint = InternetAddress::fromString(\str_replace('tcp://', '', self::$proxySocket->getAddress()));
+        self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', self::$proxySocket->getAddress()));
 
         self::$main = new API(
-            \sys_get_temp_dir().'/testing_datacenter_main.madeline',
+            sys_get_temp_dir().'/testing_datacenter_main.madeline',
             self::getBaseSettings(false)
         );
         /*self::$test = new API(
@@ -104,7 +104,7 @@ final class DataCenterTest extends TestCase
             ->setTimeout(10);
 
         $API = $test_mode ? self::$test : self::$main;
-        $API->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($proxies ? 'and '.\array_key_first($proxies) : 'no proxies'));
+        $API->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($proxies ? 'and '.array_key_first($proxies) : 'no proxies'));
         $API->updateSettings($settings);
 
         $this->assertIsArray($API->help->getConfig());
@@ -123,7 +123,7 @@ final class DataCenterTest extends TestCase
         self::setUpBeforeClass();
         $ipv6Pair = [false];
         try {
-            if (\file_get_contents('https://ipv6.google.com')) {
+            if (file_get_contents('https://ipv6.google.com')) {
                 $ipv6Pair []= true;
             }
         } catch (Throwable) {

@@ -42,7 +42,7 @@ final class IpcState
      */
     public function __construct(int $startupId, ?Throwable $exception = null)
     {
-        $this->startupTime = \microtime(true);
+        $this->startupTime = microtime(true);
         $this->startupId = $startupId;
         $this->exception = $exception ? new ExitFailure($exception) : null;
     }
